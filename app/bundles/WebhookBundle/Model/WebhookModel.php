@@ -15,12 +15,9 @@ use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use Joomla\Http\Http;
-use Joomla\Http\Response;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
@@ -30,8 +27,8 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -100,11 +97,6 @@ class WebhookModel extends FormModel
     protected $serializer;
 
     /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
      * Queued events default order by dir
      * Possible values: ['ASC', 'DESC'].
      *
@@ -113,20 +105,18 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
-     * WebhookModel constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param Serializer           $serializer
-     * @param NotificationModel    $notificationModel
+     * @param CoreParametersHelper     $coreParametersHelper
+     * @param Serializer               $serializer
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         Serializer $serializer,
-        NotificationModel $notificationModel
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
-        $this->notificationModel = $notificationModel;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -409,30 +399,15 @@ class WebhookModel extends FormModel
      * and notify user about it.
      *
      * @param Webhook $webhook
+     * @param string  $reason
      */
     public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
 
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.webhook.stopped.details',
-                [
-                    '%reason%'  => $this->translator->trans($reason),
-                    '%webhook%' => '<a href="'.$this->router->generate(
-                        'mautic_webhook_action',
-                        ['objectAction' => 'view', 'objectId' => $webhook->getId()]
-                    ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
-                ]
-            ),
-            'error',
-            false,
-            $this->translator->trans('mautic.webhook.stopped'),
-            null,
-            null,
-            $this->em->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
-        );
+        $event = new WebhookEvent($webhook, false, $reason);
+        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
     }
 
     /**

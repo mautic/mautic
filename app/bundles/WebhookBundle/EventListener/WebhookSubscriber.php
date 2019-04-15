@@ -11,9 +11,11 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
 
@@ -33,15 +35,31 @@ class WebhookSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * WebhookSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var NotificationModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    private $notificationModel;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @param IpLookupHelper    $ipLookupHelper
+     * @param AuditLogModel     $auditLogModel
+     * @param NotificationModel $notificationModel
+     * @param EntityManager     $entityManager
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        NotificationModel $notificationModel,
+        EntityManager $entityManager
+    ) {
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->auditLogModel     = $auditLogModel;
+        $this->notificationModel = $notificationModel;
+        $this->entityManager     = $entityManager;
     }
 
     /**
@@ -52,6 +70,7 @@ class WebhookSubscriber extends CommonSubscriber
         return [
             WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
             WebhookEvents::WEBHOOK_POST_DELETE => ['onWebhookDelete', 0],
+            WebhookEvents::WEBHOOK_KILL        => ['onWebhookKill', 0],
         ];
     }
 
@@ -94,5 +113,35 @@ class WebhookSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Send notification about killed webhook.
+     *
+     * @param WebhookEvent $event
+     */
+    public function onWebhookKill(WebhookEvent $event)
+    {
+        $webhook = $event->getWebhook();
+        $reason  = $event->getReason();
+
+        $this->notificationModel->addNotification(
+            $this->translator->trans(
+                'mautic.webhook.stopped.details',
+                [
+                    '%reason%'  => $this->translator->trans($reason),
+                    '%webhook%' => '<a href="'.$this->router->generate(
+                            'mautic_webhook_action',
+                            ['objectAction' => 'view', 'objectId' => $webhook->getId()]
+                        ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
+                ]
+            ),
+            'error',
+            false,
+            $this->translator->trans('mautic.webhook.stopped'),
+            null,
+            null,
+            $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
+        );
     }
 }

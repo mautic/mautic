@@ -54,6 +54,15 @@ final class WebhookEvents
     const WEBHOOK_POST_DELETE = 'mautic.webhook_post_delete';
 
     /**
+     * The mautic.webhook_kill event is thrown when target is not available.
+     *
+     * The event listener receives a Mautic\WebhookBundle\Event\WebhookEvent instance.
+     *
+     * @var string
+     */
+    const WEBHOOK_KILL = 'mautic.webhook_kill';
+
+    /**
      * The mautic.webhook_queue_on_add event is thrown as the queue entity is created, before it is persisted to the database.
      *
      * The event listener receives a Mautic\WebhookBundle\Event\WebhookQueueEvent instance.

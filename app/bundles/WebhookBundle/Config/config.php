@@ -76,6 +76,8 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.core.model.notification',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.webhook.stats.subscriber' => [
@@ -97,7 +99,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
-                    'mautic.core.model.notification',
+                    'event_dispatcher',
                 ],
             ],
         ],
@@ -115,7 +117,7 @@ return [
         'webhook_start'         => 0, // deprecated, should be 0 by default
         'webhook_limit'         => 10, // How many entities can be sent in one webhook
         'webhook_log_max'       => 1000, // How many recent logs to keep
-        'webhook_disable_limit' => 100, // How many times the webhook response can fail until the webhook will be unpublished
+        'webhook_disable_limit' => 2, // How many times the webhook response can fail until the webhook will be unpublished
         'webhook_timeout'       => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
         'queue_mode'            => 'immediate_process', // Trigger the webhook immediately or queue it for faster response times
         'events_orderby_dir'    => \Doctrine\Common\Collections\Criteria::ASC, // Order the queued events chronologically or the other way around
