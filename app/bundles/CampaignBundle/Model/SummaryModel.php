@@ -106,7 +106,8 @@ class SummaryModel extends AbstractCommonModel
             /** @var \DateTime $oldestSumamryDate */
             $start = $this->getRepository()->getOldestTriggeredDate();
         }
-        $start = $start ? $start : new \DateTime();
+        // Start with the last complete hour.
+        $start = $start ? $start : new \DateTime('-1 hour');
         $start->setTimestamp($start->getTimestamp() - ($start->getTimestamp() % 3600));
 
         /** @var LeadEventLog $oldestTriggeredEventLog */
