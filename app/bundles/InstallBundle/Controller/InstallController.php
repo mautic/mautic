@@ -124,7 +124,8 @@ class InstallController extends CommonController
                         break;
 
                     case self::USER_STEP:
-                        $messages = $this->installer->createAdminUserStep($formData);
+                        $adminParam = (array) $formData;
+                        $messages   = $this->installer->createAdminUserStep($adminParam);
 
                         if (is_bool($messages) && $messages === true) {
                             // Store the data to repopulate the form
@@ -138,7 +139,8 @@ class InstallController extends CommonController
                         break;
 
                     case self::EMAIL_STEP:
-                        $messages = $this->installer->saveConfiguration($formData, $step);
+                        $emailParam = (array) $formData;
+                        $messages   = $this->installer->setupEmailStep($step, $emailParam);
                         if (is_bool($messages)) {
                             $complete = $messages;
                         } elseif (is_array($messages) && !empty($messages)) {

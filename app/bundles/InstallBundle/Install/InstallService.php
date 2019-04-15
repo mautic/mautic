@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactory;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class InstallService.
@@ -72,6 +74,10 @@ class InstallService
      */
     private $kernel;
     /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+    /**
      * @var EncoderFactory
      */
     private $encoder;
@@ -91,6 +97,7 @@ class InstallService
      * @param EntityManager        $entityManager
      * @param TranslatorInterface  $translator
      * @param KernelInterface      $kernel
+     * @param ValidatorInterface   $validator
      * @param EncoderFactory       $encoder
      * @param LoggerInterface      $logger
      */
@@ -101,6 +108,7 @@ class InstallService
                                 EntityManager $entityManager,
                                 TranslatorInterface $translator,
                                 KernelInterface $kernel,
+                                ValidatorInterface $validator,
                                 EncoderFactory $encoder,
                                 LoggerInterface $logger)
     {
@@ -111,6 +119,7 @@ class InstallService
         $this->entityManager            = $entityManager;
         $this->translator               = $translator;
         $this->kernel                   = $kernel;
+        $this->validator                = $validator;
         $this->encoder                  = $encoder;
         $this->logger                   = $logger;
     }
@@ -261,8 +270,8 @@ class InstallService
     {
         $translator = $this->translator;
 
-        if (null !== $step) {
-            $params = $step->update($params);
+        if (null !== $step && $step instanceof StepInterface) {
+            $params = $step->update($step);
         }
 
         $this->configurator->mergeParameters($params);
@@ -298,6 +307,7 @@ class InstallService
         $translator = $this->translator;
 
         $required = [
+            'driver',
             'host',
             'name',
             'user',
@@ -305,7 +315,7 @@ class InstallService
 
         $messages = [];
         foreach ($required as $r) {
-            if (empty($dbParams[$r])) {
+            if (!isset($dbParams[$r]) || empty($dbParams[$r])) {
                 $messages[$r] = $translator->trans(
                     'mautic.core.value.required',
                     [],
@@ -314,7 +324,7 @@ class InstallService
             }
         }
 
-        if ((int) $dbParams['port'] <= 0) {
+        if (!isset($dbParams['port']) || (int) $dbParams['port'] <= 0) {
             $messages['port'] = $translator->trans(
                 'mautic.install.database.port.invalid',
                 [],
@@ -382,9 +392,10 @@ class InstallService
      */
     public function createSchemaStep($dbParams)
     {
-        $translator   = $this->translator;
-        $schemaHelper = new SchemaHelper($dbParams);
-        $schemaHelper->setEntityManager($this->entityManager);
+        $translator    = $this->translator;
+        $entityManager = $this->entityManager;
+        $schemaHelper  = new SchemaHelper($dbParams);
+        $schemaHelper->setEntityManager($entityManager);
 
         $messages = [];
         try {
@@ -464,6 +475,12 @@ class InstallService
         $purger = new ORMPurger($entityManager);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
         $executor = new ORMExecutor($entityManager, $purger);
+        /*
+         * FIXME entity manager does not load configuration if local.php just created by CLI install
+         * [error] An error occurred while attempting to add default data
+         * An exception occured in driver:
+         * SQLSTATE[HY000] [1045] Access refused for user: ''@'@localhost' (mot de passe: NON)
+         */
         $executor->execute($fixtures, true);
 
         return true;
@@ -496,6 +513,8 @@ class InstallService
             $user = new User();
         }
 
+        $translator = $this->translator;
+
         $required = [
             'firstname',
             'lastname',
@@ -504,11 +523,9 @@ class InstallService
             'password',
         ];
 
-        $translator = $this->translator;
-
         $messages = [];
         foreach ($required as $r) {
-            if (empty($data[$r])) {
+            if (!isset($data[$r])) {
                 $messages[$r] = $translator->trans(
                     'mautic.core.value.required',
                     [],
@@ -518,6 +535,25 @@ class InstallService
         }
 
         if (!empty($messages)) {
+            return $messages;
+        }
+
+        $emailConstraint          = new Assert\Email();
+        $emailConstraint->message = $translator->trans('mautic.core.email.required',
+            [],
+            'validators'
+        );
+
+        $errors = $this->validator->validate(
+            $data['email'],
+            $emailConstraint
+        );
+
+        if (0 !== count($errors)) {
+            foreach ($errors as $error) {
+                $messages[] = $error->getMessage();
+            }
+
             return $messages;
         }
 
@@ -546,6 +582,7 @@ class InstallService
             try {
                 $entityManager->persist($user);
                 $entityManager->flush();
+                $messages = true;
             } catch (\Exception $exception) {
                 $messages['error'] = $translator->trans(
                     'mautic.installer.error.creating.user',
@@ -554,6 +591,62 @@ class InstallService
                 );
             }
         }
+
+        return $messages;
+    }
+
+    /**
+     * Setup the email configuration.
+     *
+     * @param null|StepInterface $step
+     * @param array              data
+     *
+     * @return array|bool
+     */
+    public function setupEmailStep($step, $data)
+    {
+        $translator = $this->translator;
+
+        $required = [
+            'mailer_from_name',
+            'mailer_from_email',
+        ];
+
+        $messages = [];
+        foreach ($required as $r) {
+            if (!isset($data[$r]) || empty($data[$r])) {
+                $messages[$r] = $translator->trans(
+                    'mautic.core.value.required',
+                    [],
+                    'validators'
+                );
+            }
+        }
+
+        if (!empty($messages)) {
+            return $messages;
+        }
+
+        $emailConstraint          = new Assert\Email();
+        $emailConstraint->message = $translator->trans('mautic.core.email.required',
+            [],
+            'validators'
+        );
+
+        $errors = $this->validator->validate(
+            $data['mailer_from_email'],
+            $emailConstraint
+        );
+
+        if (0 !== count($errors)) {
+            foreach ($errors as $error) {
+                $messages[] = $error->getMessage();
+            }
+
+            return $messages;
+        }
+
+        $messages = $this->saveConfiguration($data, $step, true);
 
         return $messages;
     }
@@ -574,9 +667,6 @@ class InstallService
         ];
 
         $messages = $this->saveConfiguration($finalConfigVars, null, true);
-        if (is_bool($messages)) {
-            return $messages;
-        }
 
         return $messages;
     }

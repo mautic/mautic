@@ -11,6 +11,9 @@
 
 namespace Mautic\InstallBundle\Command;
 
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
+use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -156,6 +159,83 @@ class InstallCommand extends ContainerAwareCommand
                 'Admin user.',
                 null
             )
+            ->addOption(
+                '--mailer_from_name',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'From name for email sent from Mautic.',
+                null
+            )
+            ->addOption(
+                '--mailer_from_email',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'From email sent from Mautic.',
+                null
+            )
+            ->addOption(
+                '--mailer_transport',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Mail transport.',
+                'mail'
+            )
+            ->addOption(
+                '--mailer_host',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'SMTP host.',
+                null
+            )
+            ->addOption(
+                '--mailer_port',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'SMTP port.',
+                null
+            )
+            ->addOption(
+                '--mailer_user',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'SMTP username.',
+                null
+            )
+            ->addOption(
+                '--mailer_password',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'SMTP password.',
+                null
+            )
+            ->addOption(
+                '--mailer_encryption',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'SMTP encryption (null|tls|ssl).',
+                null
+            )
+            ->addOption(
+                '--mailer_auth_mode',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'SMTP auth mode (null|plain|login|cram-md5).',
+                null
+            )
+            ->addOption(
+                '--mailer_spool_type',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Spool mode (file|memory).',
+                'memory'
+            )
+            ->addOption(
+                '--mailer_spool_path',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Spool path.',
+                '%kernel.root_dir%/spool'
+            )
         ;
         parent::configure();
     }
@@ -186,27 +266,45 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('Parsing options and arguments...');
         $options = $input->getOptions();
 
-        $dbParams     = [];
-        $adminOptions = [];
+        $dbParams   = [];
+        $adminParam = [];
+        $allParams  = $installer->localConfigParameters();
         foreach ($options as $opt => $value) {
-            if ($value !== null) {
-                if ((substr($opt, 0, 3) === 'db_')) {
-                    $dbParams[substr($opt, 4)] = $value;
-                } elseif ((substr($opt, 0, 6) === 'admin_')) {
-                    $adminOptions[substr($opt, 7)] = $value;
+            if (!empty($value)) {
+                if (0 === strpos($opt, 'db_')) {
+                    $dbParams[substr($opt, 3)] = $value;
+                    $allParams[$opt]           = $value;
+                } elseif (0 === strpos($opt, 'admin_')) {
+                    $adminParam[substr($opt, 6)] = $value;
+                } elseif (0 === strpos($opt, 'mailer_')) {
+                    $allParams[$opt] = $value;
                 }
             }
         }
 
-        $dbParams  = array_merge($dbParams, $installer->localConfigParameters());
-        $siteUrl   = $input->getArgument('site_url');
-        $allParams = array_merge($dbParams, ['site_url' => $siteUrl]);
-        $step      = $input->getArgument('step');
+        if (isset($allParams['site_url']) && !empty($allParams['site_url'])) {
+            $siteUrl = $allParams['site_url'];
+        } else {
+            $siteUrl               = $input->getArgument('site_url');
+            $allParams['site_url'] = $siteUrl;
+        }
+
+        if ((!isset($allParams['mailer_from_name']) || empty($allParams['mailer_from_name']))
+            && isset($adminParam['firstname']) && isset($adminParam['lastname'])) {
+            $allParams['mailer_from_name'] = $adminParam['firstname'].' '.$adminParam['lastname'];
+        }
+
+        if ((!isset($allParams['mailer_from_email']) || empty($allParams['mailer_from_email']))
+            && isset($adminParam['email'])) {
+            $allParams['mailer_from_email'] = $adminParam['email'];
+        }
+
+        $step = $input->getArgument('step');
 
         switch ($step) {
             default:
             case self::CHECK_STEP:
-                $output->writeln('Checking installation requirements...');
+                $output->writeln($step.' - Checking installation requirements...');
                 $messages = $this->stepAction($installer, ['site_url' => $siteUrl], $step);
                 if (is_array($messages) && !empty($messages)) {
                     if (isset($messages['requirements']) && !empty($messages['requirements'])) {
@@ -232,49 +330,69 @@ class InstallCommand extends ContainerAwareCommand
                     }
                 }
                 $output->writeln('Ready to Install!');
+                // Keep on with next step
+                $step = self::DOCTRINE_STEP;
 
             case self::DOCTRINE_STEP:
-                $step = self::DOCTRINE_STEP;
-                $output->writeln('Creating database...');
+                $output->writeln($step.' - Creating database...');
                 $messages = $this->stepAction($installer, $dbParams, $step);
                 if (is_array($messages) && !empty($messages)) {
+                    $output->writeln('Errors in database configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
+
+                    $output->writeln('Install canceled');
 
                     return -$step;
                 }
+                $step = self::DOCTRINE_STEP + .1;
 
-                $output->writeln('Creating schema...');
-                $messages = $this->stepAction($installer, $dbParams, $step + .1);
+                $output->writeln($step.' - Creating schema...');
+                $messages = $this->stepAction($installer, $dbParams, $step);
                 if (is_array($messages) && !empty($messages)) {
+                    $output->writeln('Errors in schema configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
-                    return -$step;
-                }
+                    $output->writeln('Install canceled');
 
-                $output->writeln('Loading fixtures...');
-                $messages = $this->stepAction($installer, $dbParams, $step + .2);
+                    return -self::DOCTRINE_STEP;
+                }
+                $step = self::DOCTRINE_STEP + .2;
+
+                $output->writeln($step.' - Loading fixtures...');
+                $messages = $this->stepAction($installer, $dbParams, $step);
                 if (is_array($messages) && !empty($messages)) {
+                    $output->writeln('Errors in fixtures configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
 
-                    return -$step;
+                    $output->writeln('Install canceled');
+
+                    return -self::DOCTRINE_STEP;
                 }
+                // Keep on with next step
+                $step = self::USER_STEP;
 
             case self::USER_STEP:
-                $step = self::USER_STEP;
-                $output->writeln('Creating admin user...');
-                $messages = $this->stepAction($installer, $adminOptions, $step);
+                $output->writeln($step.' - Creating admin user...');
+                $messages = $this->stepAction($installer, $adminParam, $step);
                 if (is_array($messages) && !empty($messages)) {
+                    $output->writeln('Errors in admin user configuration/installation:');
                     $this->handleInstallerErrors($output, $messages);
+
+                    $output->writeln('Install canceled');
 
                     return -$step;
                 }
+                // Keep on with next step
+                $step = self::EMAIL_STEP;
 
             case self::EMAIL_STEP:
-                $step = self::EMAIL_STEP;
-                $output->writeln('Email configuration and final steps...');
+                $output->writeln($step.' - Email configuration and final steps...');
                 $messages = $this->stepAction($installer, $allParams, $step);
                 if (is_array($messages) && !empty($messages)) {
+                    $output->writeln('Errors in email configuration or final migration:');
                     $this->handleInstallerErrors($output, $messages);
+
+                    $output->writeln('Install canceled');
 
                     return -$step;
                 }
@@ -313,13 +431,25 @@ class InstallCommand extends ContainerAwareCommand
         switch ($index) {
             case self::CHECK_STEP:
                 // Check installation requirements
-                $step->site_url           = $params['site_url'];
+                if ($step instanceof CheckStep) {
+                    // Set all step fields based on parameters
+                    $step->site_url = $params['site_url'];
+                }
+
                 $messages                 = [];
                 $messages['requirements'] = $installer->checkRequirements($step);
                 $messages['optional']     = $installer->checkOptionalSettings($step);
                 break;
 
             case self::DOCTRINE_STEP:
+                if ($step instanceof DoctrineStep) {
+                    // Set all step fields based on parameters
+                    foreach ($step as $key => $value) {
+                        if (isset($params[$key])) {
+                            $step->$key = $params[$key];
+                        }
+                    }
+                }
                 if (!isset($subIndex)) {
                     // Install database
                     $messages = $installer->createDatabaseStep($step, $params);
@@ -345,7 +475,15 @@ class InstallCommand extends ContainerAwareCommand
 
             case self::EMAIL_STEP:
                 // Save email configuration
-                $messages = $installer->saveConfiguration($params, $step);
+                if ($step instanceof EmailStep) {
+                    // Set all step fields based on parameters
+                    foreach ($step as $key => $value) {
+                        if (isset($params[$key])) {
+                            $step->$key = $params[$key];
+                        }
+                    }
+                }
+                $messages = $installer->setupEmailStep($step, $params);
                 break;
         }
 
@@ -368,11 +506,7 @@ class InstallCommand extends ContainerAwareCommand
     private function handleInstallerErrors(OutputInterface $output, array $messages)
     {
         foreach ($messages as $type => $message) {
-            $output->write("[$type] $message");
+            $output->writeln("  - [$type] $message");
         }
-
-        $output->writeln([
-            '',
-        ]);
     }
 }

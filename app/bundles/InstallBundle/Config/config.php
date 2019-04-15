@@ -131,6 +131,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'translator',
                     'kernel',
+                    'validator',
                     'security.encoder_factory',
                     'monolog.logger.mautic',
                 ],
