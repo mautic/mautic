@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 
 /**
  * Class ConfigType.
@@ -498,6 +499,21 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.ip.lookup.auth.tooltip',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'ip_lookup_create_organization',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.create.organization.from.ip.lookup',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
+                ],
+                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
                 'required' => false,
             ]
         );

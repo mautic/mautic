@@ -91,6 +91,7 @@ $template  = '<div class="col-md-6">{content}</div>';
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_create_organization', $template); ?>
             <div id="ip_lookup_config_container">
             <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>'); ?>
             </div>
