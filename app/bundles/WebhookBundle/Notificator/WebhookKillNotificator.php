@@ -81,30 +81,19 @@ class WebhookKillNotificator
             ]
         );
 
-        $this->sendMauticNotification($webhook, $subject, $details);
-        $this->sendMailNotification($webhook, $subject, $details);
-    }
-
-    /**
-     * @param string $subject
-     * @param string $details
-     *
-     * @throws ORMException
-     */
-    private function sendMauticNotification(Webhook $webhook, $subject, $details)
-    {
-        $owner      = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy());
-        /** @var User $user */
-        $user = $owner;
+        /** @var User $owner */
+        $owner = $toUser = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy());
 
         if ($modifiedBy = $webhook->getModifiedBy()) {
             $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $modifiedBy);
 
             if ($modifiedBy !== $owner) {
-                $user = $modifiedBy;
+                $toUser   = $modifiedBy; // Send notification to modifier
+                $ccToUser = $owner; // And cc e-mail to owner
             }
         }
 
+        // Send notification
         $this->notificationModel->addNotification(
             $details,
             'error',
@@ -112,32 +101,16 @@ class WebhookKillNotificator
             $subject,
             null,
             null,
-            $user
+            $toUser
         );
-    }
 
-    /**
-     * @param string $subject
-     * @param string $details
-     *
-     * @throws ORMException
-     */
-    private function sendMailNotification(Webhook $webhook, $subject, $details)
-    {
+        // Send e-mail
         $mailer = $this->mailer;
 
-        /** @var User $owner */
-        $owner = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy());
+        $mailer->setTo($toUser->getEmail());
 
-        $mailer->setTo($owner->getEmail());
-
-        if ($modifiedBy = $webhook->getModifiedBy()) {
-            $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getModifiedBy());
-
-            if ($modifiedBy !== $owner) {
-                $mailer->setTo($modifiedBy->getEmail());
-                $mailer->setCC($owner);
-            }
+        if (isset($ccToUser)) {
+            $mailer->setCc($ccToUser->getEmail());
         }
 
         $mailer->setSubject($subject);
