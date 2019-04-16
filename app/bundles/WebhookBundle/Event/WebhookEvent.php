@@ -76,7 +76,7 @@ class WebhookEvent extends CommonEvent
     /**
      * @return string
      */
-    public function getReason(): string
+    public function getReason()
     {
         return $this->reason;
     }
