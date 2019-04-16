@@ -12,7 +12,6 @@
 namespace Mautic\WebhookBundle\Notificator;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
