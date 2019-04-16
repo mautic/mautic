@@ -12,7 +12,6 @@
 namespace Mautic\WebhookBundle\Notificator;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
@@ -96,7 +95,7 @@ class WebhookKillNotificator
             $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $modifiedBy);
 
             if ($modifiedBy !== $owner) {
-                $toUser = $modifiedBy; // Send notification to modifier
+                $toUser   = $modifiedBy; // Send notification to modifier
                 $ccToUser = $owner; // And cc e-mail to owner
             }
         }
