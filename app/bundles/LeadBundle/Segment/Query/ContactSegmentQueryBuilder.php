@@ -92,12 +92,12 @@ class ContactSegmentQueryBuilder
                 continue;
             }
 
-            $queryBuilder = $filter->applyQuery($queryBuilder);
-
             // OR - set the subqueries to query
             if ('or' == $filter->getGlue() && !empty($queryBuilder->getSubQueries())) {
                 $queryBuilder = $this->applySubquery($queryBuilder);
             }
+
+            $queryBuilder = $filter->applyQuery($queryBuilder);
         }
         // If there is not OR statemennt, set the subqueries to query
         if (!empty($queryBuilder->getSubQueries())) {

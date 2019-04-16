@@ -61,11 +61,9 @@ class RelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
         switch ($filterOperator) {
             case 'empty':
                 $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
-               // $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notEmpty':
                 $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
-               // $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notIn':
                 // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
@@ -78,7 +76,6 @@ class RelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
 
                 $subQueryBuilder->andWhere($expression);
-               // $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'neq':
                 $expression = $subQueryBuilder->expr()->orX(
@@ -88,7 +85,6 @@ class RelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $subQueryBuilder->andWhere($expression);
 
-                //$queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'notLike':
                 $expression = $subQueryBuilder->expr()->orX(
@@ -97,7 +93,6 @@ class RelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
 
                 $subQueryBuilder->andWhere($expression);
-                //$queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'regexp':
             case 'notRegexp':
@@ -105,7 +100,6 @@ class RelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
 
                 $subQueryBuilder->andWhere($expression);
-                //$queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
                 $expression = $subQueryBuilder->expr()->$filterOperator(
@@ -113,7 +107,6 @@ class RelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $filterParametersHolder
                 );
                 $subQueryBuilder->andWhere($expression);
-                //$queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
         }
         $subQuery->addSubQuery($subQueryBuilder);
         $queryBuilder->setParametersPairs($parameters, $filterParameters);

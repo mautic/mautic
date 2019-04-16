@@ -140,7 +140,7 @@ class RelationFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             $queryBuilder->addGroupBy('l.id');
         } else {
             if ($filterAggr) {
-                if (!$subQueryBuilder) {
+                if (!isset($subQueryBuilder)) {
                     $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
                     $subQueryBuilder
                         ->select(null)->from($filter->getTable(), $tableAlias)
@@ -153,8 +153,6 @@ class RelationFuncFilterQueryBuilder extends BaseFilterQueryBuilder
             } else { // This should never happen
                 $queryBuilder->addGroupBy('l.id');
             }
-
-            //$queryBuilder->addLogic($expression, $filter->getGlue());
         }
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
 

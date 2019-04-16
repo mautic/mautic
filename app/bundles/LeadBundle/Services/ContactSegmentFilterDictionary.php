@@ -13,8 +13,6 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\RelationFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\RelationValueFilterQueryBuilder;
@@ -28,7 +26,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
     public function __construct()
     {
         $this->translations['lead_email_read_count'] = [
-            'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
+            'type'                => RelationFuncFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'email_stats',
             'foreign_table_field' => 'lead_id',
             'table'               => 'leads',
@@ -39,7 +37,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['lead_email_received'] = [
-            'type'                 => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'                 => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table_field'  => 'lead_id',
             'foreign_table'        => 'email_stats',
             'field'                => 'email_id',
@@ -57,13 +55,13 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['lead_email_read_date'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'email_stats',
             'field'         => 'date_read',
         ];
 
         $this->translations['lead_email_sent_date'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'email_stats',
             'field'         => 'date_sent',
         ];
@@ -95,43 +93,43 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['globalcategory'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_categories',
             'field'         => 'category_id',
         ];
 
         $this->translations['tags'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_tags_xref',
             'field'         => 'tag_id',
         ];
 
         $this->translations['lead_email_sent'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'email_stats',
             'field'         => 'email_id',
         ];
 
         $this->translations['device_type'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_devices',
             'field'         => 'device',
         ];
 
         $this->translations['device_brand'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_devices',
             'field'         => 'device_brand',
         ];
 
         $this->translations['device_os'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_devices',
             'field'         => 'device_os_name',
         ];
 
         $this->translations['device_model'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_devices',
             'field'         => 'device_model',
         ];
@@ -143,31 +141,31 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['notification'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'push_ids',
             'field'         => 'id',
         ];
 
         $this->translations['page_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'foreign_field' => 'page_id',
         ];
 
         $this->translations['email_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'foreign_field' => 'email_id',
         ];
 
         $this->translations['redirect_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'foreign_field' => 'redirect_id',
         ];
 
         $this->translations['source'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'foreign_field' => 'source',
         ];
@@ -179,17 +177,17 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['referer'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
 
         $this->translations['source_id'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
 
         $this->translations['url_title'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
 
@@ -202,32 +200,32 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['utm_campaign'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_utmtags',
         ];
 
         $this->translations['utm_content'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_utmtags',
         ];
 
         $this->translations['utm_medium'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_utmtags',
         ];
 
         $this->translations['utm_source'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_utmtags',
         ];
 
         $this->translations['utm_term'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'lead_utmtags',
         ];
 
         $this->translations['campaign'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'campaign_leads',
             'field'         => 'campaign_id',
             'where'         => 'campaign_leads.manually_removed = 0',
