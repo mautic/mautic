@@ -16,6 +16,8 @@ use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\RelationFuncFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\RelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
 
@@ -45,7 +47,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['hit_url_count'] = [
-            'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
+            'type'                => RelationFuncFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'page_hits',
             'foreign_table_field' => 'lead_id',
             'table'               => 'leads',
@@ -67,7 +69,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['hit_url_date'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'field'         => 'date_hit',
         ];
@@ -171,7 +173,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
         ];
 
         $this->translations['hit_url'] = [
-            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'type'          => RelationValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
             'field'         => 'url',
         ];
