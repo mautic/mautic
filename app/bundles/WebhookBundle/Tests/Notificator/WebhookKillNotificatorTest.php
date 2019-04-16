@@ -22,7 +22,7 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 
 class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSend()
+    public function testSendToOwner()
     {
         $subject        = 'subject';
         $reason         = 'reason';
