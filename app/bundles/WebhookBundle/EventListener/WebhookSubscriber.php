@@ -11,13 +11,12 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
-use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
+use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
+use Mautic\WebhookBundle\WebhookEvents;
 
 /**
  * Class WebhookSubscriber.
@@ -35,31 +34,30 @@ class WebhookSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * @var NotificationModel
+     * @var WebhookKillNotificator
      */
-    private $notificationModel;
+    private $webhookKillNotificator;
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @param IpLookupHelper    $ipLookupHelper
-     * @param AuditLogModel     $auditLogModel
-     * @param NotificationModel $notificationModel
-     * @param EntityManager     $entityManager
+     * @param IpLookupHelper         $ipLookupHelper
+     * @param AuditLogModel          $auditLogModel
+     * @param WebhookKillNotificator $webhookKillNotificator
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
-        NotificationModel $notificationModel,
-        EntityManager $entityManager
+        WebhookKillNotificator $webhookKillNotificator
     ) {
+<<<<<<< HEAD
         $this->ipLookupHelper    = $ipLookupHelper;
         $this->auditLogModel     = $auditLogModel;
         $this->notificationModel = $notificationModel;
         $this->entityManager     = $entityManager;
+=======
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->auditLogModel          = $auditLogModel;
+        $this->webhookKillNotificator = $webhookKillNotificator;
+>>>>>>> 946c956a45... Add webhook kill notificator service with added e-mail sender
     }
 
     /**
@@ -122,6 +120,7 @@ class WebhookSubscriber extends CommonSubscriber
      */
     public function onWebhookKill(WebhookEvent $event)
     {
+<<<<<<< HEAD
         $webhook = $event->getWebhook();
         $reason  = $event->getReason();
 
@@ -143,5 +142,8 @@ class WebhookSubscriber extends CommonSubscriber
             null,
             $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
         );
+=======
+        $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
+>>>>>>> 946c956a45... Add webhook kill notificator service with added e-mail sender
     }
 }
