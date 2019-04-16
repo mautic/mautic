@@ -14,10 +14,9 @@ namespace Mautic\WebhookBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
+use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Mautic\WebhookBundle\WebhookEvents;
-use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class WebhookSubscriber implements EventSubscriberInterface
@@ -33,32 +32,23 @@ class WebhookSubscriber implements EventSubscriberInterface
     private $auditLogModel;
 
     /**
-     * @var NotificationModel
+     * @var WebhookKillNotificator
      */
-    private $notificationModel;
+    private $webhookKillNotificator;
 
     /**
      * @var EntityManager
      */
     private $entityManager;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
-        NotificationModel $notificationModel,
-        EntityManager $entityManager,
-        TranslatorInterface $translator
+        WebhookKillNotificator $webhookKillNotificator
     ) {
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->auditLogModel     = $auditLogModel;
-        $this->notificationModel = $notificationModel;
-        $this->entityManager     = $entityManager;
-        $this->translator        = $translator;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->auditLogModel          = $auditLogModel;
+        $this->webhookKillNotificator = $webhookKillNotificator;
     }
 
     /**
@@ -115,26 +105,6 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     public function onWebhookKill(WebhookEvent $event)
     {
-        $webhook = $event->getWebhook();
-        $reason  = $event->getReason();
-
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.webhook.stopped.details',
-                [
-                    '%reason%'  => $this->translator->trans($reason),
-                    '%webhook%' => '<a href="'.$this->router->generate(
-                            'mautic_webhook_action',
-                            ['objectAction' => 'view', 'objectId' => $webhook->getId()]
-                        ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
-                ]
-            ),
-            'error',
-            false,
-            $this->translator->trans('mautic.webhook.stopped'),
-            null,
-            null,
-            $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
-        );
+        $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
     }
 }
