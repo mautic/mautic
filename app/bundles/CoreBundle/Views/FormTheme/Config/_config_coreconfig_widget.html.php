@@ -80,6 +80,9 @@ $template  = '<div class="col-md-6">{content}</div>';
     </div>
     <div class="panel-body">
         <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'disable_search_until_enter', $template); ?>
+        </div>
+        <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'trusted_hosts', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'trusted_proxies', $template); ?>
         </div>

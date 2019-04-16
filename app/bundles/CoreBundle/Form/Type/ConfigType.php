@@ -645,6 +645,20 @@ class ConfigType extends AbstractType
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
         );
+
+        // Allow disable of the Search Auto complete until Enter Key hit (performance)
+        $builder->add(
+            'disable_search_until_enter',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.core.config.disable_search_until_enter',
+                'data'  => (array_key_exists('disable_search_until_enter', $options['data']) && !empty($options['data']['disable_search_until_enter'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.disable_search_until_enter.tooltip',
+                ],
+            ]
+        );
     }
 
     /**

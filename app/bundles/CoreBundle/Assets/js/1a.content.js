@@ -1356,8 +1356,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         }
 
         //searchStr in MauticVars[liveCacheVar] ||
-        if ((!searchStr && MauticVars[searchStrVar].length) || diff >= 3 || spaceKeyPressed || enterKeyPressed) {
-            MauticVars[searchStrVar] = searchStr;
+        if (
+            (MauticVars['disableSearchUntilEnter'] && enterKeyPressed) ||
+            (!MauticVars['disableSearchUntilEnter'] && ((!searchStr && MauticVars[searchStrVar].length) || diff >= 3 || spaceKeyPressed || enterKeyPressed))
+        ) {            MauticVars[searchStrVar] = searchStr;
             event.data.livesearch = true;
 
             Mautic.filterList(event,
