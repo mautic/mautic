@@ -18,7 +18,9 @@ use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
+use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class WebhookModelTest extends \PHPUnit_Framework_TestCase
