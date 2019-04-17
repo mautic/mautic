@@ -113,8 +113,14 @@ class BuildJsSubscriber extends CommonSubscriber
             var dtf = new window.Intl.DateTimeFormat(),
                 resolvedOptions =  dtf.resolvedOptions && dtf.resolvedOptions(),
                 timeZone = resolvedOptions && resolvedOptions.timeZone;
-            if (timeZone) {
-                params.timezone = timeZone
+            if (timeZone && (timeZone.indexOf("/") > -1 || timeZone === 'UTC') && timeZone.indexOf("Etc") != 0 ) {
+                // Sanity check: browser should understand its own time zone
+                try {
+                    var now = new Date();
+                    if ( now.toTimeString().replace(/ .*/, "") === now.toLocaleTimeString("en-US", {hour12: false, timeZone: timeZone})) {
+                        params.timezone = timeZone;
+                    }
+                } catch (e) { } // browser doesn't support locale options
             }
         }
 
