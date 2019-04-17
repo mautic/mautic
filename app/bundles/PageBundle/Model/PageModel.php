@@ -604,7 +604,7 @@ class PageModel extends FormModel
                 // timezone_key is an offset plus DST/hemisphere for better zone identification
                 $timezone = $this->dateTimeHelper->guessTimezoneFromJSTZ($query['timezone_key']);
             }
-            if (!isset($timezone) && isset(query['timezone_offset'])) {
+            if (!isset($timezone) && isset($query['timezone_offset'])) {
                 // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
                 // Multiply by -1 because Firgerprint2 seems to have it the other way around.
                 $timezone = (-1 * $query['timezone_offset'] * 60);
