@@ -26,7 +26,7 @@ class DayStat implements StatInterface
     /**
      * DayStat constructor.
      *
-     * @param string $day
+     * @param string $day "2019-11-07" format
      */
     public function __construct($day)
     {
@@ -34,7 +34,7 @@ class DayStat implements StatInterface
     }
 
     /**
-     * @param $hour
+     * @param int $hour
      *
      * @return HourStat
      *

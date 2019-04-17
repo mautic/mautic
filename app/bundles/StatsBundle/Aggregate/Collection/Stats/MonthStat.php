@@ -26,7 +26,7 @@ class MonthStat implements StatInterface
     /**
      * MonthStat constructor.
      *
-     * @param string $month
+     * @param string $month "2019-01" format
      */
     public function __construct($month)
     {
@@ -34,7 +34,7 @@ class MonthStat implements StatInterface
     }
 
     /**
-     * @param $day
+     * @param int $day
      *
      * @return DayStat
      *

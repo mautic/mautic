@@ -26,7 +26,7 @@ class YearStat implements StatInterface
     /**
      * YearStat constructor.
      *
-     * @param $year
+     * @param int $year
      */
     public function __construct($year)
     {
@@ -34,7 +34,7 @@ class YearStat implements StatInterface
     }
 
     /**
-     * @param $month
+     * @param int $month
      *
      * @return MonthStat
      *
