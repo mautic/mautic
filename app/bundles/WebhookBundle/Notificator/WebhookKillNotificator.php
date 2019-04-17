@@ -17,12 +17,12 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WebhookKillNotificator
 {
     /**
-     * @var DataCollectorTranslator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -47,7 +47,7 @@ class WebhookKillNotificator
     private $mailer;
 
     public function __construct(
-        DataCollectorTranslator $translator,
+        TranslatorInterface $translator,
         Router $router,
         NotificationModel $notificationModel,
         EntityManager $entityManager,
