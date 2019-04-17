@@ -400,25 +400,29 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isVariant) {
-            if ($isVariant) {
-                $event->getForm()->add(
-                    'variantSettings',
-                    VariantType::class,
-                    [
-                        'label' => false,
-                    ]
-                );
-            }
+        $variantSettingsModifier = function (FormEvent $event, $isParentVariant, $parentCriteria) {
+            $event->getForm()->add(
+                'variantSettings',
+                VariantType::class,
+                [
+                    'label'             => 'mautic.email.abtest',
+                    'required'          => false,
+                    'is_parent_variant' => $isParentVariant,
+                    'parent_criteria'   => $parentCriteria
+                ]
+            );
         };
 
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier) {
+                $parentVariant = $event->getData()->getVariantParent();
+                $parentSettings = $parentVariant ? $parentVariant->getVariantSettings() : null;
                 $variantSettingsModifier(
                     $event,
-                    $event->getData()->getVariantParent()
+                    empty($parentVariant),
+                    $parentSettings['winnerCriteria']
                 );
             }
         );
@@ -430,7 +434,8 @@ class EmailType extends AbstractType
                 $data = $event->getData();
                 $variantSettingsModifier(
                     $event,
-                    !empty($data['variantParent'])
+                    empty($data['variantParent']),
+                    $data['variantParent']->getVariantSettings()['winnerCriteria']
                 );
 
                 if (isset($data['emailType']) && 'list' == $data['emailType']) {
