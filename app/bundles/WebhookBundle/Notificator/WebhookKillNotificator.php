@@ -85,13 +85,11 @@ class WebhookKillNotificator
         /** @var User $owner */
         $owner = $toUser = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy());
 
-        if (null !== $webhook->getModifiedBy() && $modifiedBy = $webhook->getModifiedBy()) {
-            $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $modifiedBy);
+        if (null !== $webhook->getModifiedBy() && $webhook->getCreatedBy() !== $webhook->getModifiedBy()) {
+            $modifiedBy = $this->entityManager->getReference('MauticUserBundle:User', $webhook->getModifiedBy());
 
-            if ($modifiedBy !== $owner) {
-                $toUser   = $modifiedBy; // Send notification to modifier
-                $ccToUser = $owner; // And cc e-mail to owner
-            }
+            $toUser   = $modifiedBy; // Send notification to modifier
+            $ccToUser = $owner; // And cc e-mail to owner
         }
 
         // Send notification
