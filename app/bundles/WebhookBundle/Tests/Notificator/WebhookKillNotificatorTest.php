@@ -18,6 +18,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
@@ -61,7 +62,8 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
             ->method('generate')
             ->with(
                 'mautic_webhook_action',
-                ['objectAction' => 'view', 'objectId' => $webhookId]
+                ['objectAction' => 'view', 'objectId' => $webhookId],
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
             ->willReturn($generatedRoute);
 
@@ -170,7 +172,8 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
             ->method('generate')
             ->with(
                 'mautic_webhook_action',
-                ['objectAction' => 'view', 'objectId' => $webhookId]
+                ['objectAction' => 'view', 'objectId' => $webhookId],
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
             ->willReturn($generatedRoute);
 
