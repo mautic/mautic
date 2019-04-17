@@ -189,11 +189,11 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
             ->willReturn($details);
 
         $webhook
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getCreatedBy')
             ->willReturn($createdBy);
         $webhook
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('getModifiedBy')
             ->willReturn($modifiedBy);
 
