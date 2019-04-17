@@ -118,6 +118,14 @@ class BuildJsSubscriber extends CommonSubscriber
             }
         }
 
+        if ( ! params.timezone ) {
+            // Determine presence and type of daylight savings on older browsers
+            var jan = -(new Date(2014, 0, 2)).getTimezoneOffset()||0,
+                jun = -(new Date(2014, 5, 2)).getTimezoneOffset()||0,
+                dif = jan - jun;
+            params.timezone_key = dif<0 ? jan+',1' : (dif>0 ? jun+',1,s' : jan+',0');
+        }
+
         params.fingerprint = m.fingerprint;
         
         return params;

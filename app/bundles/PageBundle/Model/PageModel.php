@@ -596,16 +596,23 @@ class PageModel extends FormModel
 
         $query = $hit->getQuery() ? $hit->getQuery() : [];
 
-        if (isset($query['timezone']) && !$lead->getTimezone()) {
+        if (!$lead->getTimezone()) {
             // timezone holds timezone name
-            $lead->setTimezone($query['timezone']);
-        }
-
-        if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
-            // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
-            // Multiply by -1 because Firgerprint2 seems to have it the other way around.
-            $timezone = (-1 * $query['timezone_offset'] * 60);
-            $lead->setTimezone($this->dateTimeHelper->guessTimezoneFromOffset($timezone));
+            if (isset($query['timezone'])) {
+                $timezone = $query['timezone'];
+            } elseif (isset($query['timezone_key'])) {
+                // timezone_key is an offset plus DST/hemisphere for better zone identification
+                $timezone = $this->dateTimeHelper->guessTimezoneFromJSTZ($query['timezone_key']);
+            }
+            if (!isset($timezone) && isset(query['timezone_offset'])) {
+                // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
+                // Multiply by -1 because Firgerprint2 seems to have it the other way around.
+                $timezone = (-1 * $query['timezone_offset'] * 60);
+                $timezone = $this->dateTimeHelper->guessTimezoneFromOffset($timezone);
+            }
+            if (isset($timezone)) {
+                $lead->setTimezone($timezone);
+            }
         }
 
         $query = $this->cleanQuery($query);
