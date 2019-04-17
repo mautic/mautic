@@ -17,6 +17,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class WebhookKillNotificator
@@ -69,7 +70,8 @@ class WebhookKillNotificator
         $reason  = $this->translator->trans($reason);
         $htmlUrl = '<a href="'.$this->router->generate(
                 'mautic_webhook_action',
-                ['objectAction' => 'view', 'objectId' => $webhook->getId()]
+                ['objectAction' => 'view', 'objectId' => $webhook->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
             ).'" data-toggle="ajax">'.$webhook->getName().'</a>';
 
         $details = $this->translator->trans(
