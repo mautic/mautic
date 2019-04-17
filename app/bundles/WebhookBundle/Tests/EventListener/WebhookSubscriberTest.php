@@ -9,7 +9,7 @@
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace Mautic\WebhookBundle\Tests\EvenzListener;
+namespace Mautic\WebhookBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
