@@ -18,7 +18,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +35,7 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
         $ownerEmail     = 'toEmail';
         $modifiedBy     = null;
 
-        $translatorMock = $this->createMock(DataCollectorTranslator::class);
+        $translatorMock = $this->createMock(TranslatorInterface::class);
         $translatorMock
             ->expects($this->at(0))
             ->method('trans')
@@ -144,7 +144,7 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
         $modifier       = $this->createMock(User::class);
         $modifierEmail  = 'modifierEmail';
 
-        $translatorMock = $this->createMock(DataCollectorTranslator::class);
+        $translatorMock = $this->createMock(TranslatorInterface::class);
         $translatorMock
             ->expects($this->at(0))
             ->method('trans')
