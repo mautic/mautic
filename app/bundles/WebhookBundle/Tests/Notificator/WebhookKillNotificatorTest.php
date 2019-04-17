@@ -31,9 +31,9 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
         $generatedRoute = 'generatedRoute';
         $details        = 'details';
         $createdBy      = 'createdBy';
+        $owner          = $this->createMock(User::class);
+        $ownerEmail     = 'toEmail';
         $modifiedBy     = null;
-        $toUser         = $this->createMock(User::class);
-        $toEmail        = 'toEmail';
 
         $translatorMock = $this->createMock(DataCollectorTranslator::class);
         $translatorMock
@@ -90,7 +90,7 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('getReference')
             ->with('MauticUserBundle:User', $createdBy)
-            ->willReturn($toUser);
+            ->willReturn($owner);
 
         $notificationModelMock = $this->createMock(NotificationModel::class);
         $notificationModelMock
@@ -103,19 +103,142 @@ class WebhookKillNotificatorTest extends \PHPUnit_Framework_TestCase
                 $subject,
                 null,
                 false,
-                $toUser
+                $owner
             );
 
-        $toUser
+        $owner
             ->expects($this->once())
             ->method('getEmail')
-            ->willReturn($toEmail);
+            ->willReturn($ownerEmail);
 
         $mailHelperMock = $this->createMock(MailHelper::class);
         $mailHelperMock
             ->expects($this->once())
             ->method('setTo')
-            ->with($toEmail);
+            ->with($ownerEmail);
+        $mailHelperMock
+            ->expects($this->once())
+            ->method('setSubject')
+            ->with($subject);
+        $mailHelperMock
+            ->expects($this->once())
+            ->method('setBody')
+            ->with($details);
+
+        $webhookKillNotificator = new WebhookKillNotificator($translatorMock, $routerMock, $notificationModelMock, $entityManagerMock, $mailHelperMock);
+        $webhookKillNotificator->send($webhook, $reason);
+    }
+
+    public function testSendToModifier()
+    {
+        $subject        = 'subject';
+        $reason         = 'reason';
+        $webhookId      = 1;
+        $webhookName    = 'Webhook name';
+        $generatedRoute = 'generatedRoute';
+        $details        = 'details';
+        $createdBy      = 'createdBy';
+        $owner          = $this->createMock(User::class);
+        $ownerEmail     = 'ownerEmail';
+        $modifiedBy     = 'modifiedBy';
+        $modifier       = $this->createMock(User::class);
+        $modifierEmail  = 'modifierEmail';
+
+        $translatorMock = $this->createMock(DataCollectorTranslator::class);
+        $translatorMock
+            ->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.webhook.stopped')
+            ->willReturn($subject);
+        $translatorMock
+            ->expects($this->at(1))
+            ->method('trans')
+            ->with($reason)
+            ->willReturn($reason);
+
+        $webhook = $this->createMock(Webhook::class);
+        $webhook->expects($this->once())
+            ->method('getId')
+            ->willReturn($webhookId);
+        $webhook->expects($this->once())
+            ->method('getName')
+            ->willReturn($webhookName);
+
+        $routerMock = $this->createMock(Router::class);
+        $routerMock
+            ->expects($this->once())
+            ->method('generate')
+            ->with(
+                'mautic_webhook_action',
+                ['objectAction' => 'view', 'objectId' => $webhookId]
+            )
+            ->willReturn($generatedRoute);
+
+        $htmlUrl = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
+
+        $translatorMock
+            ->expects($this->at(2))
+            ->method('trans')
+            ->with(
+                'mautic.webhook.stopped.details',
+                ['%reason%'  => $reason, '%webhook%' => $htmlUrl]
+            )
+            ->willReturn($details);
+
+        $webhook
+            ->expects($this->once())
+            ->method('getCreatedBy')
+            ->willReturn($createdBy);
+        $webhook
+            ->expects($this->once())
+            ->method('getModifiedBy')
+            ->willReturn($modifiedBy);
+
+        $entityManagerMock = $this->createMock(EntityManager::class);
+        $entityManagerMock
+            ->expects($this->at(0))
+            ->method('getReference')
+            ->with('MauticUserBundle:User', $createdBy)
+            ->willReturn($owner);
+
+        $entityManagerMock
+            ->expects($this->at(1))
+            ->method('getReference')
+            ->with('MauticUserBundle:User', $modifiedBy)
+            ->willReturn($modifier);
+
+        $notificationModelMock = $this->createMock(NotificationModel::class);
+        $notificationModelMock
+            ->expects($this->once())
+            ->method('addNotification')
+            ->with(
+                $details,
+                'error',
+                false,
+                $subject,
+                null,
+                false,
+                $modifier
+            );
+
+        $owner
+            ->expects($this->once())
+            ->method('getEmail')
+            ->willReturn($ownerEmail);
+        $modifier
+            ->expects($this->once())
+            ->method('getEmail')
+            ->willReturn($modifierEmail);
+
+        $mailHelperMock = $this->createMock(MailHelper::class);
+        $mailHelperMock
+            ->expects($this->once())
+            ->method('setTo')
+            ->with($modifierEmail);
+        $mailHelperMock
+            ->expects($this->once())
+            ->method('setCc')
+            ->with($ownerEmail);
         $mailHelperMock
             ->expects($this->once())
             ->method('setSubject')
