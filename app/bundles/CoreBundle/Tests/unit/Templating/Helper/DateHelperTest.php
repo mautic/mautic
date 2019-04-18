@@ -39,9 +39,10 @@ class DateHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testToTextWithPragueTimezone()
     {
-        $dateTime = new \DateTime('2016-01-27 13:30:00', new \DateTimeZone('UTC'));
+        $dateTime    = new \DateTime('2016-01-27 13:30:00', new \DateTimeZone('UTC'));
+        $regexForDst = '/^January 27, 2016 [1,2]:30 pm$/';
 
-        $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($dateTime, 'Europe/Prague', 'Y-m-d H:i:s', true));
+        $this->assertRegExp($regexForDst, $this->helper->toText($dateTime, 'Europe/Prague', 'Y-m-d H:i:s', true));
     }
 
     public function testToTextWithUtcTimezone()
