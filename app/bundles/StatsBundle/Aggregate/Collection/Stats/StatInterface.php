@@ -14,7 +14,7 @@ namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 interface StatInterface
 {
     /**
-     * @return StatInterface[]
+     * @return array
      */
     public function getStats();
 
