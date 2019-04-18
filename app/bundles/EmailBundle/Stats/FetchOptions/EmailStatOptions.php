@@ -43,7 +43,7 @@ class EmailStatOptions extends FetchOptions
     /**
      * @var bool
      */
-    private $canViewOthers = false;
+    private $canViewOthers = true;
 
     /**
      * @var string
