@@ -400,15 +400,14 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isParentVariant, $parentCriteria) {
+        $variantSettingsModifier = function (FormEvent $event, $isParent) {
             $event->getForm()->add(
                 'variantSettings',
                 VariantType::class,
                 [
                     'label'             => 'mautic.email.abtest',
                     'required'          => false,
-                    'is_parent_variant' => $isParentVariant,
-                    'parent_criteria'   => $parentCriteria
+                    'is_parent' => $isParent,
                 ]
             );
         };
@@ -418,11 +417,9 @@ class EmailType extends AbstractType
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier) {
                 $parentVariant = $event->getData()->getVariantParent();
-                $parentSettings = $parentVariant ? $parentVariant->getVariantSettings() : null;
                 $variantSettingsModifier(
                     $event,
-                    empty($parentVariant),
-                    $parentSettings['winnerCriteria']
+                    empty($parentVariant)
                 );
             }
         );
@@ -432,10 +429,10 @@ class EmailType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($variantSettingsModifier) {
                 $data = $event->getData();
+
                 $variantSettingsModifier(
                     $event,
-                    empty($data['variantParent']),
-                    $data['variantParent']->getVariantSettings()['winnerCriteria']
+                    empty($data['variantParent'])
                 );
 
                 if (isset($data['emailType']) && 'list' == $data['emailType']) {

@@ -149,7 +149,12 @@ trait VariantEntityTrait
      */
     public function getVariantSettings()
     {
-        return $this->variantSettings;
+        $variantSettings = $this->variantSettings;
+        if(empty($this->variantSettings['winnerCriteria']) and $this->getVariantParent() !== null) {
+            return $this->addWinnerCriteriaFromParent($this->variantSettings);
+        }
+
+        return $variantSettings;
     }
 
     /**
@@ -336,5 +341,17 @@ trait VariantEntityTrait
                 }
             }
         }
+    }
+
+    private function addWinnerCriteriaFromParent($variantSettings)
+    {
+        $variantParent = $this->getVariantParent();
+        if(!$variantParent) {
+            return $variantSettings;
+        }
+
+        $winnerCriteria = $variantParent->getVariantSettings()['winnerCriteria'];
+        $variantSettings['winnerCriteria'] = $winnerCriteria;
+        return $variantSettings;
     }
 }

@@ -469,6 +469,10 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
+        if(empty($entity->getVariantSettings())) {
+            $entity->setVariantSettings(['enable_ab_test' => false]);
+        }
+
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
@@ -667,6 +671,7 @@ class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
+
         /** @var Form $form */
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
@@ -1019,6 +1024,7 @@ class EmailController extends FormController
             $clone->setIsPublished(false);
             $clone->setEmailType($emailType);
             $clone->setVariantParent($entity);
+            //$clone->setVariantSettings(['winnerCriteria' => $entity->getVariantSettings()['winnerCriteria']]);
         }
 
         return $this->newAction($clone);
