@@ -20,11 +20,11 @@ use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ScheduleModel;
+use Mautic\ReportBundle\ReportEvents;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
-use Mautic\ReportBundle\ReportEvents;
 
 class ReportExporterTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +45,7 @@ class ReportExporterTest extends \PHPUnit_Framework_TestCase
             $scheduler2,
             $schedulerNow,
         ];
-        
+
         $reportNow->setScheduleUnit(SchedulerEnum::UNIT_NOW);
 
         $coreParametersHelper->expects($this->once())
