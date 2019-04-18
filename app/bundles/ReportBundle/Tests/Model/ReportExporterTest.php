@@ -89,9 +89,6 @@ class ReportExporterTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->with(ReportEvents::REPORT_SCHEDULE_SEND);
 
-        $reportFileWriter->expects($this->exactly($batchSize))
-            ->method('clear');
-
         $schedulerModel->expects($this->exactly($batchSize))
             ->method('reportWasScheduled');
 
