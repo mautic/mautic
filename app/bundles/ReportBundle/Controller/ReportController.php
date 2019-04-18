@@ -868,7 +868,7 @@ class ReportController extends FormController
         if (empty($report)) {
             return $this->notFound($this->translator->trans('mautic.report.notfound', ['%id%' => $reportId]));
         }
-        
+
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             return $this->accessDenied();
         }
