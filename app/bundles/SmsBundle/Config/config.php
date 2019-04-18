@@ -166,7 +166,6 @@ return [
                 'serviceAliases' => [
                     'sms_api',
                     'mautic.sms.api',
-                    'mautic.sms.transport.twilio',
                 ],
             ],
             'mautic.sms.twilio.callback' => [
@@ -176,6 +175,16 @@ return [
                     'mautic.sms.twilio.configuration',
                 ],
                 'tag'   => 'mautic.sms_callback_handler',
+            ],
+
+            // @deprecated - this should not be used; use `mautic.sms.twilio.transport` instead.
+            // Only kept as BC in case someone is passing the service by name in 3rd party
+            'mautic.sms.transport.twilio' => [
+                'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
+                'arguments'    => [
+                    'mautic.sms.twilio.configuration',
+                    'monolog.logger.mautic',
+                ],
             ],
         ],
         'models' => [
