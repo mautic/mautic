@@ -16,7 +16,7 @@ use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Sms\TransportInterface;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Twilio\Exceptions\ConfigurationException;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Client;
@@ -29,7 +29,7 @@ class TwilioTransport implements TransportInterface
     private $configuration;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -44,12 +44,12 @@ class TwilioTransport implements TransportInterface
     private $sendingPhoneNumber;
 
     /**
-     * TwilioApi constructor.
+     * TwilioTransport constructor.
      *
-     * @param Configuration $configuration
-     * @param Logger        $logger
+     * @param Configuration   $configuration
+     * @param LoggerInterface $logger
      */
-    public function __construct(Configuration $configuration, Logger $logger)
+    public function __construct(Configuration $configuration, LoggerInterface $logger)
     {
         $this->logger        = $logger;
         $this->configuration = $configuration;
@@ -107,7 +107,7 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
-     * @param $number
+     * @param string $number
      *
      * @return string
      *

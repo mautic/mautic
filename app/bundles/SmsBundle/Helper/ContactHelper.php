@@ -52,7 +52,7 @@ class ContactHelper
     }
 
     /**
-     * @param $number
+     * @param string $number
      *
      * @return ArrayCollection
      *

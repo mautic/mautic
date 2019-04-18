@@ -23,7 +23,7 @@ class NumberNotFoundException extends \Exception
     /**
      * NumberNotFoundException constructor.
      *
-     * @param                $number
+     * @param string         $number
      * @param string         $message
      * @param int            $code
      * @param Throwable|null $previous
@@ -31,6 +31,11 @@ class NumberNotFoundException extends \Exception
     public function __construct($number, $message = '', $code = 0, Throwable $previous = null)
     {
         $this->number = $number;
+
+        if (!$message) {
+            $message = "Phone number '{$number}' not found";
+        }
+
         parent::__construct($message, $code, $previous);
     }
 

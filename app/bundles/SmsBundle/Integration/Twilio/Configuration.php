@@ -47,7 +47,7 @@ class Configuration
     }
 
     /**
-     * @return mixed
+     * @return string
      *
      * @throws ConfigurationException
      */

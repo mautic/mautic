@@ -12,14 +12,13 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\SmsBundle\Api\AbstractSmsApi;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Monolog\Logger;
 
 class TransportChain
 {
     /**
-     * @var AbstractSmsApi[]
+     * @var TransportInterface[]
      */
     private $transports;
 
@@ -41,9 +40,9 @@ class TransportChain
     /**
      * TransportChain constructor.
      *
-     * @param $primaryTransport
-     * @param $integrationHelper
-     * @param $logger
+     * @param string            $primaryTransport
+     * @param IntegrationHelper $integrationHelper
+     * @param Logger            $logger
      */
     public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
     {
@@ -54,10 +53,10 @@ class TransportChain
     }
 
     /**
-     * @param                    $alias
+     * @param string             $alias
      * @param TransportInterface $transport
-     * @param                    $translatableAlias
-     * @param                    $integrationAlias
+     * @param string             $translatableAlias
+     * @param string             $integrationAlias
      *
      * @return $this
      */
@@ -73,7 +72,7 @@ class TransportChain
     /**
      * Return the transport defined in parameters.
      *
-     * @return AbstractSmsApi
+     * @return TransportInterface
      *
      * @throws PrimaryTransportNotEnabledException
      */
@@ -115,7 +114,7 @@ class TransportChain
     /**
      * Get all transports registered in service container.
      *
-     * @return AbstractSmsApi[]
+     * @return TransportInterface[]
      */
     public function getTransports()
     {
@@ -123,9 +122,9 @@ class TransportChain
     }
 
     /**
-     * @param $transport
+     * @param string $transport
      *
-     * @return
+     * @return TransportInterface
      *
      * @throws PrimaryTransportNotEnabledException
      */
@@ -143,7 +142,7 @@ class TransportChain
     /**
      * Get published transports.
      *
-     * @return AbstractSmsApi[]
+     * @return TransportInterface[]
      */
     public function getEnabledTransports()
     {

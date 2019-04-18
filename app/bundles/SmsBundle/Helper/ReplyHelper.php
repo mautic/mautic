@@ -60,8 +60,8 @@ class ReplyHelper
     }
 
     /**
-     * @param $pattern
-     * @param $replyBody
+     * @param string $pattern
+     * @param string $replyBody
      *
      * @return bool
      */
@@ -120,8 +120,8 @@ class ReplyHelper
     }
 
     /**
-     * @param Lead $contact
-     * @param      $message
+     * @param Lead   $contact
+     * @param string $message
      *
      * @return null|\Symfony\Component\HttpFoundation\Response
      */

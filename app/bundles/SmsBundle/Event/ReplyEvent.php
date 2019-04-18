@@ -35,8 +35,8 @@ class ReplyEvent extends Event
     /**
      * ReplyEvent constructor.
      *
-     * @param Lead $contact
-     * @param      $message
+     * @param Lead   $contact
+     * @param string $message
      */
     public function __construct(Lead $contact, $message)
     {
