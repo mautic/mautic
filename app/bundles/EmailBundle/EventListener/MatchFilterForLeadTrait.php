@@ -151,37 +151,30 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'in':
                     $leadValMatched = false;
-                    if (is_array($leadVal)) {
-                        foreach ($leadVal as $k => $v) {
-                            if (in_array($v, $filterVal)) {
-                                $leadValMatched = true;
-                                // Break once we find a match
-                                break;
-                            }
-                        }
-                    } else {
-                        if (in_array($leadVal, $filterVal)) {
+                    if (!is_array($leadVal)) {
+                        $leadVal = [$leadVal];
+                    }
+                    foreach ($leadVal as $k => $v) {
+                        if (in_array($v, $filterVal)) {
                             $leadValMatched = true;
+                            // Break once we find a match
+                            break;
                         }
                     }
                     $groups[$groupNum] = $leadValMatched;
                     break;
                 case '!in':
                     $leadValNotMatched = true;
-                    if (is_array($leadVal)) {
-                        foreach ($leadVal as $k => $v) {
-                            if (in_array($v, $filterVal)) {
-                                $leadValNotMatched = false;
-                                // Break once we find a match
-                                break;
-                            }
-                        }
-                    } else {
-                        if (in_array($leadVal, $filterVal)) {
+                    if (!is_array($leadVal)) {
+                        $leadVal = [$leadVal];
+                    }
+                    foreach ($leadVal as $k => $v) {
+                        if (in_array($v, $filterVal)) {
                             $leadValNotMatched = false;
+                            // Break once we find a match
+                            break;
                         }
                     }
-
                     $groups[$groupNum] = $leadValNotMatched;
                     break;
                 case 'regexp':
