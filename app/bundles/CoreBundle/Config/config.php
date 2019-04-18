@@ -213,6 +213,17 @@ return [
                     'templating.helper.assets',
                 ],
             ],
+            'mautic.core.subscriber.router' => [
+                'class'     => \Mautic\CoreBundle\EventListener\RouterSubscriber::class,
+                'arguments' => [
+                    'router',
+                    '%router.request_context.scheme%',
+                    '%router.request_context.host%',
+                    '%request_listener.https_port%',
+                    '%request_listener.http_port%',
+                    '%router.request_context.base_url%',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.spacer' => [

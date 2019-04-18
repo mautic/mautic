@@ -231,6 +231,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'where'         => 'campaign_leads.manually_removed = 0',
         ];
 
+        $this->translations['lead_asset_download'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'asset_downloads',
+            'field'         => 'asset_id',
+        ];
+
         parent::__construct($this->translations);
     }
 }

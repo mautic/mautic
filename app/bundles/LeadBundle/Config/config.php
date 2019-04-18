@@ -532,6 +532,7 @@ return [
                     'mautic.category.model.category',
                     'mautic.helper.user',
                     'mautic.campaign.model.campaign',
+                    'mautic.asset.model.asset',
                 ],
                 'alias' => 'leadlist',
             ],
@@ -828,6 +829,10 @@ return [
                 'arguments' => [
                     'mautic.lead.repository.company_lead',
                 ],
+            ],
+            'mautic.lead.validator.length' => [
+                'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
+                'tag'       => 'validator.constraint_validator',
             ],
         ],
         'repositories' => [
