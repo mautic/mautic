@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 
 /**
  * Class LeadApiController.
@@ -565,6 +566,15 @@ class LeadApiController extends CommonApiController
             // new endpoints will leverage getNewEntity in order to return the correct status codes
             $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
         }
+
+        $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';
+
+        $entity->setManipulator(new LeadManipulator(
+            'lead',
+            $manipulatorObject,
+            null,
+            $this->get('mautic.helper.user')->getUser()->getName()
+        ));
 
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
