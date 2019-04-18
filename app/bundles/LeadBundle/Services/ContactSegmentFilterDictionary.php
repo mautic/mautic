@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\RelationFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\RelationValueFilterQueryBuilder;
