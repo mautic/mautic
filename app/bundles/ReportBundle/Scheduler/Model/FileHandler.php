@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\FileTooBigException;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 
 class FileHandler
 {
