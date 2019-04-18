@@ -132,8 +132,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function getPermissionBase()
     {
-        // We are using lead:leads in the CompanyController so this should match to prevent a BC break
-        return 'lead:leads';
+        return 'company:companies';
     }
 
     /**
