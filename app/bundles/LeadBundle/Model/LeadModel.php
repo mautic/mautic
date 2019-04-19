@@ -2362,7 +2362,6 @@ class LeadModel extends FormModel
                 $manipulationLog->setProperties(['object_description' => $description]);
 
                 $lead->addEventLog($manipulationLog);
-                $lead->setManipulator(null);
             }
         }
     }
