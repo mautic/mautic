@@ -37,7 +37,7 @@ class IpAddressRepository extends CommonRepository
     /**
      * Deletes duplicate IP addresses that are not being used in any other table.
      *
-     * @return int  Number of deleted rows
+     * @return int Number of deleted rows
      *
      * @throws \Doctrine\DBAL\DBALException
      */
