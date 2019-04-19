@@ -830,6 +830,7 @@ return [
                     'mautic.lead.model.dnc',
                     'mautic.generated.columns.provider',
                     'mautic.email.helper.stats_collection',
+                    'mautic.security',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [

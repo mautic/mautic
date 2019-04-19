@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -173,7 +174,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        StatsCollectionHelper $statsCollectionHelper
+        StatsCollectionHelper $statsCollectionHelper,
+        CorePermissions $corePermissions
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -192,6 +194,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->doNotContact             = $doNotContact;
         $this->generatedColumnsProvider = $generatedColumnsProvider;
         $this->statsCollectionHelper    = $statsCollectionHelper;
+        $this->corePermissions          = $corePermissions;
     }
 
     /**
@@ -928,6 +931,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setEmailIds($ids);
+        $fetchOptions->canViewOthers($this->corePermissions->isGranted('email:emails:viewother'));
 
         $chart->setDataset(
             $this->translator->trans('mautic.email.sent.emails'),
