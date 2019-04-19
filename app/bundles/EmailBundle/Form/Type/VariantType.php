@@ -69,7 +69,7 @@ class VariantType extends AbstractType
                 'disabled'     => !$options['is_parent'],
             ];
 
-            if($options['is_parent'] === true) {
+            if ($options['is_parent'] === true) {
                 $attr['data-show-on'] = '{"emailform_variantSettings_enable_ab_test_1":"checked"}';
             }
 

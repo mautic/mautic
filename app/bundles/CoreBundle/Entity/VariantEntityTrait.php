@@ -150,7 +150,7 @@ trait VariantEntityTrait
     public function getVariantSettings()
     {
         $variantSettings = $this->variantSettings;
-        if(empty($this->variantSettings['winnerCriteria']) and $this->getVariantParent() !== null) {
+        if (empty($this->variantSettings['winnerCriteria']) and $this->getVariantParent() !== null) {
             return $this->addWinnerCriteriaFromParent($this->variantSettings);
         }
 
@@ -346,12 +346,13 @@ trait VariantEntityTrait
     private function addWinnerCriteriaFromParent($variantSettings)
     {
         $variantParent = $this->getVariantParent();
-        if(!$variantParent) {
+        if (!$variantParent) {
             return $variantSettings;
         }
 
-        $winnerCriteria = $variantParent->getVariantSettings()['winnerCriteria'];
+        $winnerCriteria                    = $variantParent->getVariantSettings()['winnerCriteria'];
         $variantSettings['winnerCriteria'] = $winnerCriteria;
+
         return $variantSettings;
     }
 }

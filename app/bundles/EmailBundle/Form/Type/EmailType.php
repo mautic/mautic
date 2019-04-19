@@ -407,7 +407,7 @@ class EmailType extends AbstractType
                 [
                     'label'             => 'mautic.email.abtest',
                     'required'          => false,
-                    'is_parent' => $isParent,
+                    'is_parent'         => $isParent,
                 ]
             );
         };

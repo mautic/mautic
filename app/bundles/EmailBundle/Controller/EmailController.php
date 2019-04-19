@@ -469,7 +469,7 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
-        if(empty($entity->getVariantSettings())) {
+        if (empty($entity->getVariantSettings())) {
             $entity->setVariantSettings(['enable_ab_test' => false]);
         }
 
