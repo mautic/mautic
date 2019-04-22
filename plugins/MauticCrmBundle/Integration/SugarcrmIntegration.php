@@ -1925,7 +1925,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Hold a list of Integration Entitity records to be saved later
      * If a NEW Integration Entity record is provided, it is saved/flushed immediately.
-     * 
+     *
      * This is needed because the `getLeads` and `getContacts` functions create
      * IntegrationEntity records (in the `amendLeadDataBeforeMauticPopulate` function). The
      * `pushLeads` function calls the repo's `findLeadsToUpdate` function which filters based on
