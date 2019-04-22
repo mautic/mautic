@@ -135,14 +135,14 @@ class LeadImportFieldType extends AbstractType
             );
 
             $builder->add(
-                'overwrite_blank',
+                'skip_if_exists',
                 'yesno_button_group',
                 [
-                    'label'       => 'mautic.lead.import.overwrite_blank',
+                    'label'       => 'mautic.lead.import.skip_if_exists',
                     'label_attr'  => ['class' => 'control-label'],
                     'attr'        => ['class' => 'form-control'],
                     'required'    => false,
-                    'mapped'      => false,
+                    'data'        => false,
                 ]
             );
         }

@@ -27,7 +27,7 @@
                 <?php echo $view['form']->rowIfExists($form, 'tags'); ?>
             </div>
             <div class="col-xs-4">
-                <?php echo $view['form']->rowIfExists($form, 'overwrite_blank'); ?>
+                <?php echo $view['form']->rowIfExists($form, 'skip_if_exists'); ?>
             </div>
         </div>
     </div>
