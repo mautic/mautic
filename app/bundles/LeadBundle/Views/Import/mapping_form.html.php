@@ -26,6 +26,9 @@
             <div class="col-xs-4">
                 <?php echo $view['form']->rowIfExists($form, 'tags'); ?>
             </div>
+            <div class="col-xs-4">
+                <?php echo $view['form']->rowIfExists($form, 'overwrite_blank'); ?>
+            </div>
         </div>
     </div>
     <div class="panel panel-info">
