@@ -42,8 +42,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     protected $doNotContactModel;
 
     /**
-     * Holds a list of IntegrationEntities which are saved later in 
-     * fetchLeads process
+     * Holds a list of IntegrationEntities which are saved later in fetchLeads process.
      *
      * @var array
      */
@@ -1927,22 +1926,21 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * Hold a list of Integration Entitity records to be saved later
      * If a NEW Integration Entity record is provided, it is saved/flushed immediately.
      * 
-     * This is needed because the `getLeads` and `getContacts` functions create 
+     * This is needed because the `getLeads` and `getContacts` functions create
      * IntegrationEntity records (in the `amendLeadDataBeforeMauticPopulate` function). The
-     * `pushLeads` function calls the repo's `findLeadsToUpdate` function which filters based on 
+     * `pushLeads` function calls the repo's `findLeadsToUpdate` function which filters based on
      * the IE's last_sync_date. We need to not flush the IE record until after that function has
-     * been called. 
-     * So this function helps to hold on to them until a reasonable time
+     * been called.
+     * So this function helps to hold on to them until a reasonable time.
      *
      * @param array $entities
-     * @return void
      */
     protected function delaySaveIntegrationEntities(array $entities)
     {
-        foreach($entities as $entity){
-            if($entity->getId()){
+        foreach ($entities as $entity) {
+            if ($entity->getId()) {
                 $this->IntegrationEntitiesToSave[$entity->getId()] = $entity;
-            }else{
+            } else {
                 $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntity($entity);
             }
         }
