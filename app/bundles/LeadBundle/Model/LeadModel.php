@@ -1491,7 +1491,7 @@ class LeadModel extends FormModel
         $fieldErrors = [];
 
         foreach ($this->leadFields as $leadField) {
-            // Import just to blank field
+            // Skip If value already exists
             if ($skipIfExists && !$lead->isNew() && !empty($lead->getFieldValue($leadField['alias']))) {
                 unset($fieldData[$leadField['alias']]);
                 continue;

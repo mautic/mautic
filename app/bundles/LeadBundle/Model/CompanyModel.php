@@ -730,12 +730,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param null         $tags
      * @param bool         $persist
      * @param LeadEventLog $eventLog
+     * @param null         $importId
+     * @param bool         $skipIfExists
      *
      * @return bool|null
      *
      * @throws \Exception
      */
-    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null, $importId = null, $skipIfExists = false)
     {
         $fields = array_flip($fields);
 
@@ -806,6 +808,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $fieldErrors = [];
 
         foreach ($this->fetchCompanyFields() as $entityField) {
+            // Skip If value already exists
+            if ($skipIfExists && !$company->isNew() && !empty($company->getFieldValue($entityField['alias']))) {
+                unset($fieldData[$entityField['alias']]);
+                continue;
+            }
+
             if (isset($fieldData[$entityField['alias']])) {
                 $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 
