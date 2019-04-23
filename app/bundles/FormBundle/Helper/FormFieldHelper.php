@@ -233,10 +233,20 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 foreach ($value as $val) {
                     $val = $this->sanitizeValue($val);
                     if (preg_match(
+                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox_'.$alias.'_(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
+                        $formHtml,
+                        $match
+                    )) {
+                        // For multiple checkbox groups
+                        $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox_'.$alias.'_'.$match[2].'"'.$match[3].'value="'.$val.'"'
+                            .$match[4].' checked />';
+                        $formHtml = str_replace($match[0], $replace, $formHtml);
+                    } elseif (preg_match(
                         '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
                         $formHtml,
                         $match
                     )) {
+                        // For one checkbox group
                         $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$match[2].'"'.$match[3].'value="'.$val.'"'
                             .$match[4].' checked />';
                         $formHtml = str_replace($match[0], $replace, $formHtml);
