@@ -1031,11 +1031,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $toTags = $config['toTags'];
             $tags   = [];
             foreach ($toTags as $toTag) {
-                $toTagForContat = str_replace('__Leads', '__Contacts', $toTag);
+                $toTagForContact = str_replace('__Leads', '__Contacts', $toTag);
                 if (!empty($dataObject[$toTag])) {
                     $tags[] = $dataObject[$toTag];
-                } elseif (!empty($dataObject[$toTagForContat])) {
-                    $tags[] = $dataObject[$toTagForContat];
+                } elseif (!empty($dataObject[$toTagForContact])) {
+                    $tags[] = $dataObject[$toTagForContact];
                 }
             }
             if (!empty($tags) && method_exists($entity, 'setTags')) {
