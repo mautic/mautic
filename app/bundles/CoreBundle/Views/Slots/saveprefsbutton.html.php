@@ -27,7 +27,7 @@ if (isset($form)) {
     <div style="clear:both"></div>
 <?php
 if (isset($form)) {
-    unset($form['subscribed_channels'], $form['buttons']['save'], $form['buttons']['cancel']);
+    unset($form['lead_channels']['subscribed_channels'], $form['buttons']['save'], $form['buttons']['cancel']);
     if (!$showContactCategories) {
         unset($form['global_categories']);
     }

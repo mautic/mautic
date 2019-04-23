@@ -11,7 +11,7 @@
 
 $channelNumber = 0;
 ?>
-<?php if (isset($form)) : ?>
+<?php if (isset($form['lead_channels'])) : ?>
 <table class="table table-striped">
     <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key=>$channel):
         $contactMe   = isset($leadChannels[$channel->value]);
@@ -24,7 +24,7 @@ $channelNumber = 0;
                     <input type="hidden" id="<?php echo $channel->value; ?>"
                            name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                            value="">
-                    <input type="checkbox" id="<?php echo $channel->value; ?>"
+                    <input type="checkbox" id="<?php echo $channel->value; ?>
                            name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                            onclick="togglePreferredChannel(this.value);"
                            value="<?php echo $view->escape($channel->value); ?>" <?php echo $checked; ?>>
