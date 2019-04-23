@@ -47,12 +47,6 @@ class VariantType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.core.ab_test.form.traffic_weight.help',
-                    'readonly' => $options['is_parent'],
-                ],
-                'constraints' => $options['is_parent'] ? null : [
-                    new NotBlank(
-                        ['message' => 'mautic.email.variant.weight.notblank']
-                    ),
                 ],
             ]);
         }

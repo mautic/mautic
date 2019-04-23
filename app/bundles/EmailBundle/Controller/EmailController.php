@@ -312,19 +312,17 @@ class EmailController extends FormController
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
 
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
-                        if (!isset($lastCriteria)) {
-                            $lastCriteria = $variantSettings['winnerCriteria'];
-                        }
-
-                        //make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
-
-                        $weight += $variantSettings['weight'];
+                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria']) && $c->isPublished()) {
+                    if (!isset($lastCriteria)) {
+                        $lastCriteria = $variantSettings['winnerCriteria'];
                     }
+
+                    //make sure all the variants are configured with the same criteria
+                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                        $variantError = true;
+                    }
+
+                    $weight += $variantSettings['weight'];
                 } else {
                     $variantSettings['winnerCriteria'] = '';
                     $variantSettings['weight']         = 0;
@@ -469,8 +467,8 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
-        if (empty($entity->getVariantSettings())) {
-            $entity->setVariantSettings(['enable_ab_test' => false]);
+        if (empty($entity->getVariantSettings()) and !$entity->isVariant()) {
+           $entity->setVariantSettings(['enable_ab_test' => false]);
         }
 
         //create the form
@@ -671,6 +669,12 @@ class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
+
+        //Enable variant settings for a parent with variants, helpful for BC
+        if (empty($entity->getVariantSettings()) and $entity->hasVariants()) {
+            $entity->setVariantSettings(['enable_ab_test' => true]);
+        }
+
 
         /** @var Form $form */
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
@@ -1024,7 +1028,6 @@ class EmailController extends FormController
             $clone->setIsPublished(false);
             $clone->setEmailType($emailType);
             $clone->setVariantParent($entity);
-            //$clone->setVariantSettings(['winnerCriteria' => $entity->getVariantSettings()['winnerCriteria']]);
         }
 
         return $this->newAction($clone);

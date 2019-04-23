@@ -103,6 +103,14 @@ trait VariantEntityTrait
 
         $this->variantParent = $parent;
 
+        if ($parent !== null) {
+            $variantSettings = $parent->getVariantSettings();
+            $this->setVariantSettings([
+                'enable_ab_test' => $variantSettings['enable_ab_test'],
+                'winnerCriteria' => $variantSettings['winnerCriteria']
+            ]);
+        }
+
         return $this;
     }
 
@@ -137,7 +145,11 @@ trait VariantEntityTrait
             $this->isChanged('variantSettings', $variantSettings);
         }
 
-        $this->variantSettings = $variantSettings;
+        foreach ($variantSettings as $key => $setting) {
+            if ($setting !== null) {
+                $this->variantSettings[$key] = $setting;
+            }
+        }
 
         return $this;
     }
@@ -149,13 +161,9 @@ trait VariantEntityTrait
      */
     public function getVariantSettings()
     {
-        $variantSettings = $this->variantSettings;
-        if (empty($this->variantSettings['winnerCriteria']) and $this->getVariantParent() !== null) {
-            return $this->addWinnerCriteriaFromParent($this->variantSettings);
-        }
-
-        return $variantSettings;
+        return $this->variantSettings;
     }
+
 
     /**
      * @return mixed
@@ -341,18 +349,5 @@ trait VariantEntityTrait
                 }
             }
         }
-    }
-
-    private function addWinnerCriteriaFromParent($variantSettings)
-    {
-        $variantParent = $this->getVariantParent();
-        if (!$variantParent) {
-            return $variantSettings;
-        }
-
-        $winnerCriteria                    = $variantParent->getVariantSettings()['winnerCriteria'];
-        $variantSettings['winnerCriteria'] = $winnerCriteria;
-
-        return $variantSettings;
     }
 }
