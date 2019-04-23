@@ -45,7 +45,7 @@ DSN;
         $this->assertEquals(Type::HARD, $bounce->getType());
         $this->assertTrue($bounce->isFinal());
     }
-    
+
     /**
      * @testdox Test a Postfix BouncedEmail is returned from a dsn report
      *
@@ -73,7 +73,7 @@ DSN;
         $this->assertEquals(Category::UNKNOWN, $bounce->getRuleCategory());
         $this->assertEquals(Type::HARD, $bounce->getType());
         $this->assertTrue($bounce->isFinal());
-    }    
+    }
 
     /**
      * @testdox Test that an exception is thrown if a bounce cannot be found in a dsn report
