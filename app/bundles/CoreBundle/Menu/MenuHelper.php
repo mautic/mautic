@@ -328,7 +328,6 @@ class MenuHelper
                 if (!$this->security->isAdmin()) {
                     return false;
                 }
-            return $this->security->isAdmin();
                 return $this->security->isAdmin();
             default:
                 return $this->security->isGranted($accessLevel, 'MATCH_ONE');
