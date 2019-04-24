@@ -1,0 +1,11 @@
+namespace: Mautic\CampaignBundle
+paths:
+    tests: Tests
+    output: Tests/_output
+    data: Tests/_data
+    support: Tests/_support
+    envs: Tests/_envs
+params:
+    - ../../../.env.dist
+settings:
+    bootstrap: _bootstrap.php

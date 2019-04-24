@@ -59,11 +59,11 @@ $container->loadFromExtension('doctrine', [
         'connections'        => [
             'default' => [
                 'driver'   => 'pdo_mysql',
-                'host'     => getenv('DB_HOST') ?: '%mautic.db_host%',
-                'port'     => getenv('DB_PORT') ?: '%mautic.db_port%',
-                'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
-                'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
-                'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
+                'host'     => getenv('DB_HOST'),
+                'port'     => getenv('DB_PORT'),
+                'dbname'   => getenv('DB_NAME'),
+                'user'     => getenv('DB_USER'),
+                'password' => getenv('DB_PASSWD'),
                 'charset'  => 'UTF8',
                 // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
                 'mapping_types' => [

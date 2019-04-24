@@ -45,7 +45,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
 

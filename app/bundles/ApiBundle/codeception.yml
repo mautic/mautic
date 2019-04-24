@@ -1,0 +1,17 @@
+namespace: Mautic\ApiBundle
+paths:
+    tests: Tests
+    output: Tests/_output
+    data: Tests/_data
+    support: Tests/_support
+    envs: Tests/_envs
+modules:
+    enabled:
+        - Symfony:
+              app_path: '../../../app'
+              var_path: '../../../app'
+              debug: false
+        - Doctrine2:
+              depends: Symfony
+params:
+    - ../../../.env.dist

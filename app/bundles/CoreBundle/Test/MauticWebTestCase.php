@@ -202,7 +202,7 @@ class MauticWebTestCase extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         static::$kernel = static::createKernel();
         static::$kernel->boot();

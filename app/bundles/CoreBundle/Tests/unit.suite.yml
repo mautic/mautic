@@ -1,4 +1,8 @@
 actor: UnitTester
 modules:
     enabled:
+        - Symfony:
+              app_path: '../../../app'
+              part: SERVICES
+        - Asserts
         - \Mautic\CoreBundle\Helper\Unit

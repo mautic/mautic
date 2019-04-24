@@ -7,8 +7,4 @@ namespace Mautic\CoreBundle\Helper;
 
 class Functional extends \Codeception\Module
 {
-    public function getParameterFromContainer($service)
-    {
-        return $this->getModule('Symfony2')->_getContainer()->getParameter($service);
-    }
 }

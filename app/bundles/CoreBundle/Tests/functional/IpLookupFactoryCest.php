@@ -2,16 +2,14 @@
 
 namespace Mautic\CoreBundle;
 
-use Mautic\CoreBundle\Factory\IpLookupFactory;
-
 class IpLookupFactoryCest
 {
     public function ensureGettingServiceFromFactoryProvidesInstance(FunctionalTester $I)
     {
-        $ipServices = $I->getParameterFromContainer('mautic.ip_lookup_services');
-        $ipFactory  = new IpLookupFactory($ipServices);
+        $ipFactory        = $I->grabService('mautic.ip_lookup.factory');
+        $ipLookupServices = $I->grabService('mautic.config')->getParameter('ip_lookup_services');
 
-        foreach ($ipServices as $service => $details) {
+        foreach ($ipLookupServices as $service => $details) {
             $instance = $ipFactory->getService($service);
 
             $I->assertInstanceOf(

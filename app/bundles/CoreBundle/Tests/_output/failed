@@ -1,0 +1,2 @@
+Tests/functional/Entity/CommonRepositoryCest.php:ensureIsMineSearchCommandDoesntCauseExceptionDueToBadDQL
+Tests/functional/IpLookupFactoryCest.php:ensureGettingServiceFromFactoryProvidesInstance

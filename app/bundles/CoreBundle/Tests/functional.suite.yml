@@ -1,10 +1,8 @@
 actor: FunctionalTester
 modules:
     enabled:
-        - Symfony2:
-            app_path: '../../../app'
-            var_path: '../../../app'
-        - Doctrine2:
-            depends: Symfony2
+        - Symfony:
+              app_path: '../../../app'
+              var_path: '../../../app'
         - Asserts
         - \Mautic\CoreBundle\Helper\Functional

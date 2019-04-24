@@ -1,0 +1,4 @@
+actor: FunctionalTester
+modules:
+    enabled:
+        - \Mautic\LeadBundle\Helper\Functional
