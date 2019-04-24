@@ -38,6 +38,17 @@ class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider multiGroupFieldProvider
+     */
+    public function testPopulateMultiGroupFields($field, $value, $formHtml, $expectedValue, $message)
+    {
+        $field->setAlias('test');
+        $this->fixture->populateField($field, $value, 'mautic', $formHtml);
+
+        $this->assertEquals($expectedValue, $formHtml, $message);
+    }
+
+    /**
      * @return array
      */
     public function fieldProvider()
@@ -98,6 +109,22 @@ class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
                 '<select id="mauticform_input_mautic_select"><option value="myvalue">My Value</option></select>',
                 '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
                 'Select lists should have their values set appropriately via GET.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function multiGroupFieldProvider()
+    {
+        return [
+            [
+                $this->getField('Multi checkbox groups', 'checkboxgrp'),
+                'myvalue|alsomyvalue',
+                '<input id="mauticform_checkboxgrp_checkbox_test_00" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox_test_01" value="notmyvalue"/>',
+                '<input id="mauticform_checkboxgrp_checkbox_test_00" value="myvalue" checked /><input id="mauticform_checkboxgrp_checkbox_test_01" value="notmyvalue"/>',
+                'Multi-value multi checkbox groups should have their values set appropriately via GET.',
             ],
         ];
     }

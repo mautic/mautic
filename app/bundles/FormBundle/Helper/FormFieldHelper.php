@@ -238,7 +238,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                         $match
                     )) {
                         // For multiple checkbox groups
-                        $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox'.$alias.'_'.$match[2].'"'.$match[3].'value="'.$val.'"'
+                        $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox_'.$alias.'_'.$match[2].'"'.$match[3].'value="'.$val.'"'
                             .$match[4].' checked />';
                         $formHtml = str_replace($match[0], $replace, $formHtml);
                     } elseif (preg_match(
