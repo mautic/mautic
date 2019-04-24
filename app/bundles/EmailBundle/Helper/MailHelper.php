@@ -1632,8 +1632,8 @@ class MailHelper
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];
-            $errorMessage = $error->getMessage();
-            $error        = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
+            $errorMessage     = $error->getMessage();
+            $error            = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
 
             // Clean up the error message
             $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
@@ -1641,7 +1641,7 @@ class MailHelper
             $this->fatal = true;
         } else {
             $exceptionContext = [];
-            $errorMessage = trim($error);
+            $errorMessage     = trim($error);
         }
 
         $logDump = $this->logger->dump();
