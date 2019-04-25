@@ -355,12 +355,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($useDncColumns) {
-                    $qb->leftJoin(
-                        self::EMAILS_PREFIX,
-                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                        self::DNC_PREFIX,
-                        'e.id = dnc.channel_id AND dnc.channel=\'email\''
-                    );
+                    $this->addDNCTableForEmails($qb);
                 }
 
                 break;
@@ -508,9 +503,12 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
-                    $queryBuilder->select(
-                        'SUM(DISTINCT e.sent_count) as sent_count, SUM(DISTINCT e.read_count) as read_count, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                    $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count,
+                        SUM(DISTINCT e.read_count) as read_count,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
+                        count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     );
+                    $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
                     $counts = $queryBuilder->execute()->fetch();
                     $chart  = new PieChart();
@@ -670,6 +668,25 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add the Do Not Contact table to the query builder.
+     */
+    private function addDNCTableForEmails(QueryBuilder $qb)
+    {
+        $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
+
+        if (!$this->isJoined($qb, $table, self::EMAILS_PREFIX, self::DNC_PREFIX)) {
+            $qb->leftJoin(
+                self::EMAILS_PREFIX,
+                $table,
+                self::DNC_PREFIX,
+                'e.id = dnc.channel_id AND dnc.channel=\'email\''
+            );
+        }
+    }
+
+    /**
+     * Add the Do Not Contact table to the query builder.
+     *
+     * @param QueryBuilder $qb
      */
     private function addDNCTableForEmailStats(QueryBuilder $qb)
     {
