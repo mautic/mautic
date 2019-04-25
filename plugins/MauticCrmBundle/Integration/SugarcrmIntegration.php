@@ -239,7 +239,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return [
             'sugarcrm_url'  => 'mautic.sugarcrm.form.url',
             'client_id'     => 'mautic.sugarcrm.form.clientkey',
-            //'client_secret' => 'mautic.sugarcrm.form.clientsecret',
+            'client_secret' => 'mautic.sugarcrm.form.clientsecret',
             'username'      => 'mautic.sugarcrm.form.username',
             'password'      => 'mautic.sugarcrm.form.password',
         ];
@@ -456,13 +456,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     private function getAvailableLeadFieldsChoices()
     {
         $availableLeadFields =  $this->getAvailableLeadFields();
-        $availableLeadFields = reset($availableLeadFields);
-
-        if (!empty($availableLeadFields)) {
-            return array_combine(array_keys($availableLeadFields), array_column($availableLeadFields, 'optionLabel'));
+        $fieldsToTags        = [];
+        foreach ($availableLeadFields as $availableLeadField) {
+            $fieldsToTags = array_merge($fieldsToTags, array_combine(array_keys($availableLeadField), array_column($availableLeadField, 'label')));
         }
 
-        return [];
+        return $fieldsToTags;
     }
 
     /**
@@ -1031,11 +1030,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $toTags = $config['toTags'];
             $tags   = [];
             foreach ($toTags as $toTag) {
-                $toTagForContact = str_replace('__Leads', '__Contacts', $toTag);
                 if (!empty($dataObject[$toTag])) {
                     $tags[] = $dataObject[$toTag];
-                } elseif (!empty($dataObject[$toTagForContact])) {
-                    $tags[] = $dataObject[$toTagForContact];
                 }
             }
             if (!empty($tags) && method_exists($entity, 'setTags')) {
