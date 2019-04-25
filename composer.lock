@@ -6541,11 +6541,11 @@
         },
         {
             "name": "symfony/intl",
-            "version": "v2.8.50",
+            "version": "v2.8.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/intl.git",
-                "reference": "7c332001c3c3557c136eba4908f642dca41769de"
+                "reference": "236c4eb3d12813f766d6b52d23b5677bf0a9840f"
             },
             "require": {
                 "php": ">=5.3.9",
@@ -6606,7 +6606,7 @@
                 "l10n",
                 "localization"
             ],
-            "time": "2018-11-11T11:11:22+00:00"
+            "time": "2019-04-25T07:50:25+00:00"
         },
         {
             "name": "symfony/monolog-bridge",
