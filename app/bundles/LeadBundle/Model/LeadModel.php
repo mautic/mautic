@@ -2347,7 +2347,7 @@ class LeadModel extends FormModel
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
             // Only store an entry once for created and once for identified, not every time the lead is saved
             $manipulator = $lead->getManipulator();
-            if (null !== $manipulator) {
+            if (null !== $manipulator && !$manipulator->wasLogged()) {
                 $manipulationLog = new LeadEventLog();
                 $manipulationLog->setLead($lead)
                     ->setBundle($manipulator->getBundleName())
@@ -2362,6 +2362,7 @@ class LeadModel extends FormModel
                 $manipulationLog->setProperties(['object_description' => $description]);
 
                 $lead->addEventLog($manipulationLog);
+                $manipulator->setAsLogged();
             }
         }
     }

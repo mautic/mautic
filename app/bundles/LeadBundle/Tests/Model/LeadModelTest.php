@@ -35,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 
 class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -446,6 +447,47 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->expectException(ImportFailedException::class);
 
         $this->leadModel->setFieldValues($lead, $data, false, false);
+    }
+
+    public function testManipulatorIsLoggedOnlyOnce()
+    {
+        $contact     = $this->createMock(Lead::class);
+        $manipulator = new LeadManipulator('lead', 'import', 333);
+
+        $contact->expects($this->exactly(2))
+            ->method('getIpAddresses')
+            ->willReturn([]);
+
+        $contact->expects($this->exactly(2))
+            ->method('isNewlyCreated')
+            ->willReturn(true);
+
+        $contact->expects($this->exactly(2))
+            ->method('getManipulator')
+            ->willReturn($manipulator);
+
+        $contact->expects($this->once())
+            ->method('addEventLog')
+            ->with($this->callback(function(LeadEventLog $leadEventLog) use ($contact) {
+                $this->assertSame($contact, $leadEventLog->getLead());
+                $this->assertSame('identified_contact', $leadEventLog->getAction());
+                $this->assertSame('lead', $leadEventLog->getBundle());
+                $this->assertSame('import', $leadEventLog->getObject());
+                $this->assertSame(333, $leadEventLog->getObjectId());
+
+                return true;
+            }));
+
+        $this->fieldModelMock->expects($this->exactly(2))
+            ->method('getFieldListWithProperties')
+            ->willReturn([]);
+
+        $this->fieldModelMock->expects($this->once())
+            ->method('getFieldList')
+            ->willReturn([]);
+
+        $this->leadModel->saveEntity($contact);
+        $this->leadModel->saveEntity($contact);
     }
 
     /**
