@@ -400,7 +400,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isParent) {
+        $variantSettingsModifier = function (FormEvent $event, $isParent, $isExisting = false) {
             $event->getForm()->add(
                 'variantSettings',
                 VariantType::class,
@@ -408,6 +408,7 @@ class EmailType extends AbstractType
                     'label'             => 'mautic.email.abtest',
                     'required'          => false,
                     'is_parent'         => $isParent,
+                    'is_existing'       => $isExisting,
                 ]
             );
         };
@@ -419,7 +420,8 @@ class EmailType extends AbstractType
                 $parentVariant = $event->getData()->getVariantParent();
                 $variantSettingsModifier(
                     $event,
-                    empty($parentVariant)
+                    empty($parentVariant),
+                    ($event->getData()->getId() > 0)
                 );
             }
         );

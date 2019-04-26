@@ -41,6 +41,7 @@ $actionUrl = $view['router']->path(
         'objectId'     => $variant->getId(),
     ]
 );
+
 $isCurrent = ($variant->getId() === $activeEntity->getId());
 ?>
 <li class="list-group-item bg-auto bg-<?php echo ($isCurrent) ? 'dark' : 'light'; ?>-xs">
@@ -117,7 +118,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
         </div>
         <div class="col-md-4 va-t text-right">
             <em class="text-white dark-sm">
-                <?php if ($isPublished && ($totalWeight > 100 || ($thisCriteria && $firstCriteria != $thisCriteria))): ?>
+                <?php if ($isPublished && ($totalWeight > $variants['parent']->getVariantSettingsTotalWeight() || ($thisCriteria && $firstCriteria != $thisCriteria))): ?>
                     <div class="text-danger" data-toggle="label label-danger"
                          title="<?php echo $view['translator']->trans('mautic.core.variant.misconfiguration'); ?>">
                         <div>
@@ -127,10 +128,10 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                             <i class="fa fa-fw fa-exclamation-triangle"></i><?php echo $criteriaLabel; ?>
                         </div>
                     </div>
-                <?php elseif ($isPublished && $criteriaLabel): ?>
+                <?php elseif ($isPublished): ?>
                     <div class="text-success">
                         <div>
-                            <span class="label label-success"><?php echo $weight; ?>%</span>
+                            <span class="label label-<?php echo ($variant === $variants['parent']) ? 'default' : 'success'; ?>"><?php echo $weight; ?>%</span>
                         </div>
                         <div>
                             <i class="fa fa-fw fa-check"></i><?php echo $criteriaLabel; ?>

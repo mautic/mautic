@@ -1279,7 +1279,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     //set parent weight
-                    $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
+                    $totalWeight = $email->getVariantSettingsTotalWeight();
+                    $emailSettings[$email->getId()]['weight'] = (($totalWeight - $variantWeight) / 100);
                 } else {
                     $emailSettings[$email->getId()]['weight'] = 1;
                 }

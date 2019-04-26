@@ -21,7 +21,7 @@ trait VariantEntityTrait
     /**
      * @var array
      */
-    private $variantSettings = [];
+    private $variantSettings = ['weightTotal' => 100, 'enableAbTest' => false];
 
     /**
      * @var \DateTime
@@ -43,6 +43,7 @@ trait VariantEntityTrait
             ->setIndexBy('id')
             ->setOrderBy(['isPublished' => 'DESC'])
             ->mappedBy('variantParent')
+            ->cascadePersist()
             ->build();
 
         $builder->createField('variantSettings', 'array')
@@ -64,7 +65,12 @@ trait VariantEntityTrait
     public function addVariantChild(VariantEntityInterface $child)
     {
         if (!$this->variantChildren->contains($child)) {
-            $this->variantChildren[] = $child;
+            $this->variantChildren->add($child);
+
+            $child->setVariantSettings([
+                'enableAbTest' => $this->variantSettings['enableAbTest'],
+                'winnerCriteria' => $this->variantSettings['winnerCriteria']
+            ]);
         }
 
         return $this;
@@ -103,14 +109,6 @@ trait VariantEntityTrait
 
         $this->variantParent = $parent;
 
-        if ($parent !== null) {
-            $variantSettings = $parent->getVariantSettings();
-            $this->setVariantSettings([
-                'enable_ab_test' => $variantSettings['enable_ab_test'],
-                'winnerCriteria' => $variantSettings['winnerCriteria']
-            ]);
-        }
-
         return $this;
     }
 
@@ -142,7 +140,7 @@ trait VariantEntityTrait
     public function setVariantSettings($variantSettings)
     {
         if (method_exists($this, 'isChanged')) {
-            $this->isChanged('variantSettings', $variantSettings);
+             $this->isChanged('variantSettings', $variantSettings);
         }
 
         foreach ($variantSettings as $key => $setting) {
@@ -161,7 +159,39 @@ trait VariantEntityTrait
      */
     public function getVariantSettings()
     {
+        $this->variantSettings['weight'] = $this->getVariantSettingsWeight();
+
         return $this->variantSettings;
+    }
+
+    /**
+     * Get variantSettings total weight
+     *
+     * @return int
+     */
+    public function getVariantSettingsTotalWeight()
+    {
+        return isset($this->variantSettings['weightTotal']) ? $this->variantSettings['weightTotal'] : 100;
+    }
+
+    /**
+     * Get variantSettings weight.
+     *
+     * @return int
+     */
+    public function getVariantSettingsWeight()
+    {
+        if ($this->getVariantParent() !== null) {
+
+            return $this->variantSettings['weight'];
+        }
+
+        $variantsWeight = 0;
+        foreach ($this->getVariantChildren() as $variant) {
+            $variantsWeight = $variant->addWeight($variantsWeight);
+        }
+
+        return $this->getVariantSettingsTotalWeight() - $variantsWeight;
     }
 
 
@@ -285,6 +315,21 @@ trait VariantEntityTrait
         }
 
         return array_unique($ids);
+    }
+
+    /**
+     * Adds variant weight for further calculation
+     *
+     * @param int $weight
+     *
+     * @return int
+     */
+    public function addWeight($weight) {
+        if ($this->isPublished()) {
+            $weight += $this->variantSettings['weight'];
+        }
+
+        return $weight;
     }
 
     /**

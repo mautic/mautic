@@ -10,8 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Form;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class VariantType extends AbstractType
 {
@@ -27,29 +29,47 @@ class VariantType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['is_parent']) {
-            $builder->add(
-                'enable_ab_test',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.core.ab_test.form.enable',
-                    'attr'  => [
-                        'tooltip' => 'mautic.core.ab_test.form.enable.help',
-                        'class'   => 'form-control',
-                    ],
-                ]
-            );
-        }
-        else {
-            $builder->add('weight', IntegerType::clas, [
-                'label' => 'mautic.core.ab_test.form.traffic_weight',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.core.ab_test.form.traffic_weight.help',
+        $builder->add(
+            'enableAbTest',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.ab_test.form.enable',
+                'attr'  => [
+                    'tooltip' => 'mautic.core.ab_test.form.enable.help',
+                    'class'   => 'form-control',
                 ],
-            ]);
+            ]
+        );
+
+        $builder->add('weight', IntegerType::class, [
+            'label'      => 'mautic.core.ab_test.form.traffic_weight',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.core.ab_test.form.traffic_weight.help',
+            ],
+
+        ]);
+
+
+        $attr = [
+            'class'    => 'form-control',
+            'tooltip'  => 'mautic.core.ab_test.form.traffic_weight_total.help',
+        ];
+
+        if ($options['is_parent'] === true && $options["is_existing"] === false) {
+            $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
         }
+
+        $builder->add('weightTotal', IntegerType::class, [
+            'label'      => 'mautic.core.ab_test.form.traffic_weight_total',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => $attr,
+            'constraints' => new Assert\Range([
+                'min' => 0,
+                'max' => 100,
+            ])
+        ]);
 
         $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
@@ -63,8 +83,8 @@ class VariantType extends AbstractType
                 'disabled'     => !$options['is_parent'],
             ];
 
-            if ($options['is_parent'] === true) {
-                $attr['data-show-on'] = '{"emailform_variantSettings_enable_ab_test_1":"checked"}';
+            if ($options['is_parent'] === true && $options["is_existing"] === false) {
+                $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
             }
 
             $builder->add('winnerCriteria', ChoiceType::class, [
@@ -77,7 +97,7 @@ class VariantType extends AbstractType
                 'empty_value' => 'mautic.core.form.chooseone',
                 'constraints' => !$options['is_parent'] ? null : [
                     new NotBlank(
-                        ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                        ['message' => 'mautic.core.ab_test.winner_criteria.not_blank', 'groups' => 'variant']
                     ),
                 ],
             ]);
@@ -110,10 +130,25 @@ class VariantType extends AbstractType
         return 'emailvariant';
     }
 
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
             'is_parent' => true,
+            'is_existing' => false,
+            'validation_groups' => function (Form $form) {
+                $data = $form->getData();
+
+                $groups = ['Default'];
+
+                if ($data['enableAbTest']) {
+                    $groups[] = 'variant';
+                }
+
+                return $groups;
+            },
         ]);
     }
 }

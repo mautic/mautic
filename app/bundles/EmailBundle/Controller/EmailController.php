@@ -307,7 +307,6 @@ class EmailController extends FormController
         [$parent, $children]     = $email->getVariants();
         $properties              = [];
         $variantError            = false;
-        $weight                  = 0;
         if (count($children)) {
             foreach ($children as $c) {
                 $variantSettings = $c->getVariantSettings();
@@ -321,8 +320,6 @@ class EmailController extends FormController
                     if ($lastCriteria != $variantSettings['winnerCriteria']) {
                         $variantError = true;
                     }
-
-                    $weight += $variantSettings['weight'];
                 } else {
                     $variantSettings['winnerCriteria'] = '';
                     $variantSettings['weight']         = 0;
@@ -330,9 +327,9 @@ class EmailController extends FormController
 
                 $properties[$c->getId()] = $variantSettings;
             }
-
-            $properties[$parent->getId()]['weight']         = 100 - $weight;
-            $properties[$parent->getId()]['winnerCriteria'] = '';
+            $parentSettings = $parent->getVariantSettings();
+            $properties[$parent->getId()]['weight']         = $parentSettings['weight'];
+            $properties[$parent->getId()]['winnerCriteria'] = isset($parentSettings['winnerCriteria']) ? $parentSettings['winnerCriteria'] : $lastCriteria;
         }
 
         $abTestResults = [];
@@ -465,10 +462,6 @@ class EmailController extends FormController
         if ($updateSelect) {
             // Force type to template
             $entity->setEmailType('template');
-        }
-
-        if (empty($entity->getVariantSettings()) and !$entity->isVariant()) {
-           $entity->setVariantSettings(['enable_ab_test' => false]);
         }
 
         //create the form
@@ -671,8 +664,8 @@ class EmailController extends FormController
         }
 
         //Enable variant settings for a parent with variants, helpful for BC
-        if (empty($entity->getVariantSettings()) and $entity->hasVariants()) {
-            $entity->setVariantSettings(['enable_ab_test' => true]);
+        if ($entity->hasVariants()) {
+            $entity->setVariantSettings(['enableAbTest' => true]);
         }
 
 
