@@ -130,7 +130,7 @@ class ContactChannelsType extends AbstractType
                         ]
                     );
                 }
- 
+
                 if (!$options['public_view'] || $showContactPauseDates) {
                     $builder->add(
                         'contact_pause_start_date_'.$channel,
