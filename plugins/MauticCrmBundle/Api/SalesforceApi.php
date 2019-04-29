@@ -368,33 +368,34 @@ class SalesforceApi extends CrmApi
             $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
 
         if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
-            unset($fields['HasOptedOutOfEmail']);
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
         }
 
-        $leadsQuery = 'SELECT '.join(', ', $fields).' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
+        $baseQuery = 'SELECT %s from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
             .$ignoreConvertedLeads;
 
         try {
-            $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', false, null, $queryUrl);
+            $leadsQuery = sprintf($baseQuery, join(', ', $fields));
+            $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', false, null, $queryUrl);
         } catch (ApiErrorException $e) {
-            if (preg_match("/No such column 'HasOptedOutOfEmail' on entity '([^']+)'/", $e->getMessage(), $matches)) {
-                // Unset field as it is not accessible
-                unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
-
-                // Disable the use of the HasOptedOutOfEmail field for future requests
-                $this->setOptOutFieldAccessible(false);
-
-                // Notify all admins of this error
-                $this->integration->upsertUnreadAdminsNotification(
-                    $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.header'),
-                    $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.message')
-                );
+            if (!preg_match("/No such column 'HasOptedOutOfEmail' on entity '([^']+)'/", $e->getMessage(), $matches)) {
+                throw $e;
             }
 
-            $leadsQuery = 'SELECT '.join(', ', $fields).' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
-                .$ignoreConvertedLeads;
+            // Unset field as it is not accessible
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
 
-            $response = $this->request('queryAll', ['q' => $leadsQuery], 'GET', true, null, $queryUrl);
+            // Disable the use of the HasOptedOutOfEmail field for future requests
+            $this->setOptOutFieldAccessible(false);
+
+            // Notify all admins of this error
+            $this->integration->upsertUnreadAdminsNotification(
+                $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.header'),
+                $this->integration->getTranslator()->trans('mautic.salesforce.error.opt-out_permission.message')
+            );
+
+            $leadsQuery = sprintf($baseQuery, join(', ', $fields));
+            $response   = $this->request('queryAll', ['q' => $leadsQuery], 'GET', true, null, $queryUrl);
         }
 
         return $response;
