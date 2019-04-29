@@ -68,6 +68,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $joinCondition->add(
                     $q->expr()->gte('l.last_active', ':startDate')
                 );
+                $q->setParameter('startDate', $startDate);
             }
 
             $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', $joinCondition);
