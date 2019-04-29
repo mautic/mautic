@@ -108,6 +108,7 @@ class SalesforceApi extends CrmApi
         // try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
             $fields      = $this->integration->getFieldsForQuery('Contact');
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
             $fields[]    = 'Id';
             $fields      = implode(', ', array_unique($fields));
             $findContact = 'select '.$fields.' from Contact where email = \''.$this->escapeQueryValue($data['Contact']['Email']).'\'';
@@ -120,6 +121,7 @@ class SalesforceApi extends CrmApi
 
         if (!empty($data['Lead']['Email'])) {
             $fields   = $this->integration->getFieldsForQuery('Lead');
+            unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
             $findLead = 'select '.$fields.' from Lead where email = \''.$this->escapeQueryValue($data['Lead']['Email']).'\' and ConvertedContactId = NULL';
