@@ -66,6 +66,33 @@ trait EntityFieldsBuildFormTrait
             }
 
             switch ($type) {
+                case 'textarea':
+                    if (empty($properties['precision'])) {
+                        $properties['precision'] = null;
+                    } //ensure default locale is used
+                    else {
+                        $properties['precision'] = (int) $properties['precision'];
+                    }
+
+                    if ('' === $value) {
+                        // Prevent transform errors
+                        $value = null;
+                    }
+
+                    $builder->add(
+                        $alias,
+                        'yesno_button_group',
+                        [
+                            'label'       => 'mautic.lead.field.form.properties.allowhtml',
+                            'label_attr'  => ['class' => 'control-label'],
+                            'attr'        => ['class' => 'form-control'],
+                            'required'    => false,
+                            'mapped'      => false,
+                            'data'        => isset($options['data']->getProperties()['allowHtml']) ? $options['data']->getProperties()['allowHtml'] : false,
+                        ]
+                    );
+                    echo 'test';
+                    break;
                 case 'number':
                     if (empty($properties['precision'])) {
                         $properties['precision'] = null;
