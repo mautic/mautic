@@ -358,14 +358,15 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    private function requestQueryAllAndHandle($queryUrl, $fields, $object, $query)
+    private function requestQueryAllAndHandle($queryUrl, array $fields, $object, array $query)
     {
-        $fields = array_unique($fields);
-
         $config = $this->integration->mergeConfigToFeatureSettings([]);
         if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
-            $fields = $fields = ['Owner.Name', 'Owner.Email'];
+            $fields[] = 'Owner.Name';
+            $fields[] = 'Owner.Email';
         }
+
+        $fields = array_unique($fields);
 
             $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
 
