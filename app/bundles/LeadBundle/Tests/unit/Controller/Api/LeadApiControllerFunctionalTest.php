@@ -12,13 +12,12 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 
 /**
- * Class LeadApiControllerFunctionalTest
- * @package Mautic\LeadBundle\Tests\Controller\Api
+ * Class LeadApiControllerFunctionalTest.
  */
-class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
+class LeadApiControllerFunctionalTest extends AbstractMauticTestCase
 {
     public function testBatchNewEndpointDoesNotCreateDuplicates()
     {
@@ -72,7 +71,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(3, count($response['contacts'][1]['tags']));
         $this->assertEquals(0, count($response['contacts'][2]['tags']));
 
-        // Emulate an unsanitized email to ensure that doesn't cause duplicates
+        // Emulate an-usanitized email to ensure that doesn't cause duplicates
         $payload[0]['email'] = 'batchemail1@email.com,';
 
         // Set first name as null - Mautic should keep the value

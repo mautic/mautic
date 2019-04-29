@@ -13,6 +13,11 @@ namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor\Event;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 
+/**
+ * Class ConditionAccessorTest.
+ *
+ * @group Unit
+ */
 class ConditionAccessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testEventNameIsReturned()

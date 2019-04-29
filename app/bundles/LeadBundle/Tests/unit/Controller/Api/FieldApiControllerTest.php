@@ -11,11 +11,11 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use Mautic\CampaignBundle\Test\CampaignTestCase;
+use Mautic\CampaignBundle\Test\CampaignModelTestCase;
 use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldApiControllerTest extends CampaignTestCase
+class FieldApiControllerTest extends CampaignModelTestCase
 {
     private $defaultWhere = [
         [

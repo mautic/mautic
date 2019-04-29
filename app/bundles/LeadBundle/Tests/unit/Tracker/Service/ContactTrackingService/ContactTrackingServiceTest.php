@@ -22,6 +22,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class ContactTrackingServiceTest.
+ *
+ * @group Unit
  */
 final class ContactTrackingServiceTest extends \PHPUnit_Framework_TestCase
 {

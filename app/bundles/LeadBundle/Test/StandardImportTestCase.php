@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Test;
 
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\CoreBundle\Test\CommonTestCase;
+use Mautic\CoreBundle\Test\MauticSubscriberTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-abstract class StandardImportTestCase extends CommonTestCase
+abstract class StandardImportTestCase extends MauticSubscriberTestCase
 {
     protected $eventEntities = [];
     protected static $csvPath;
@@ -87,7 +87,7 @@ abstract class StandardImportTestCase extends CommonTestCase
         self::$largeCsvPath = $tmpFile;
     }
 
-   protected function setUp()
+    protected function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
 

@@ -2,11 +2,6 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use Exception;
-
-/**
- * Class MauticMysqlTestCase.
- */
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     /**
@@ -15,9 +10,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private $sqlDumpFile = false;
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
@@ -29,7 +24,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @param $file
      *
-     * @throws Exception
+     * @throws \Exception
      */
     protected function applySqlFromFile($file)
     {
@@ -40,14 +35,14 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $lastLine = system($command, $status);
 
         if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
     }
 
     /**
      * Reset each test using a SQL file if possible to prevent from having to run the fixtures over and over.
      *
-     * @throws Exception
+     * @throws \Exception
      */
     private function prepareDatabase()
     {
@@ -68,7 +63,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function installDatabase()
     {
@@ -78,7 +73,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function createDatabase()
     {
@@ -106,7 +101,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     private function dumpToFile()
     {
@@ -116,7 +111,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $lastLine = system($command, $status);
         if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+            throw new \Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
         }
 
         $f         = fopen($this->sqlDumpFile, 'r');

@@ -20,6 +20,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Class AbstractMauticTestCase.
+ */
 abstract class AbstractMauticTestCase extends WebTestCase
 {
     /**
@@ -129,9 +132,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @param array|null $paths
      */
-    protected function installDatabaseFixtures(array $paths = null)
+    protected function installDatabaseFixtures(array $types = null)
     {
-        if (null === $paths) {
+        if (null === $types) {
             $paths = [
                 dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
                 // Default user and roles

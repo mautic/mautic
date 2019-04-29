@@ -11,9 +11,9 @@
 
 namespace Mautic\CampaignBundle\Tests\Model;
 
-use Mautic\CampaignBundle\Test\CampaignTestCase;
+use Mautic\CampaignBundle\Test\CampaignModelTestCase;
 
-class CampaignModelTest extends CampaignTestCase
+class CampaignModelTest extends CampaignModelTestCase
 {
     public function testGetSourceListsWithNull()
     {

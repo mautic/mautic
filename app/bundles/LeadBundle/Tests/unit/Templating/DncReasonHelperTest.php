@@ -16,6 +16,11 @@ use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Class DncReasonHelperTest.
+ *
+ * @group Unit
+ */
 class DncReasonHelperTest extends \PHPUnit_Framework_TestCase
 {
     private $reasonTo = [

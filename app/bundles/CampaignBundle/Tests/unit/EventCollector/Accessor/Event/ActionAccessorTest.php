@@ -13,6 +13,11 @@ namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor\Event;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 
+/**
+ * Class ActionAccessorTest.
+ *
+ * @group Unit
+ */
 class ActionAccessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testBatchEventNameIsNotExtra()

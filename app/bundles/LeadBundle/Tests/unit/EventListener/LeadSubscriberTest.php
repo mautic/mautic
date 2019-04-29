@@ -13,14 +13,14 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Test\CommonTestCase;
+use Mautic\CoreBundle\Test\MauticSubscriberTestCase;
 use Mautic\LeadBundle\Entity\lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 
-class LeadSubscriberTest extends CommonTestCase
+class LeadSubscriberTest extends MauticSubscriberTestCase
 {
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice()
     {

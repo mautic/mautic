@@ -11,9 +11,14 @@
 
 namespace Mautic\CampaignBundle\Command;
 
-use Mautic\CampaignBundle\Test\CommandTestCase;
+use Mautic\CampaignBundle\Test\CampaignTriggerCommandTestCase;
 
-class ValidateEventCommandTest extends CommandTestCase
+
+/**
+ * Class ValidateEventMauticCommandTest
+ * @group Command
+ */
+class ValidateEventCampaignTriggerCommandTest extends CampaignTriggerCommandTestCase
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact()
     {

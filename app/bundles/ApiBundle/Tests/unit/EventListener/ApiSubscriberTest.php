@@ -12,11 +12,16 @@
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
-use Mautic\CoreBundle\Test\CommonTestCase;
+use Mautic\CoreBundle\Test\MauticSubscriberTestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class ApiSubscriberTest extends CommonTestCase
+/**
+ * Class ApiSubscriberTest.
+ *
+ * @group Listener
+ */
+class ApiSubscriberTest extends MauticSubscriberTestCase
 {
     public function testIsBasicAuthWithValidBasicAuth()
     {

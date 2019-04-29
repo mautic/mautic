@@ -14,7 +14,11 @@ namespace Mautic\CampaignBundle\Test;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CommandTestCase extends MauticMysqlTestCase
+
+/**
+ * Class CommandTestCase
+ */
+class CampaignTriggerCommandTestCase extends MauticMysqlTestCase
 {
     /**
      * @var array
@@ -39,7 +43,7 @@ class CommandTestCase extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-   protected function setUp()
+   public function setUp()
     {
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;
@@ -51,7 +55,7 @@ class CommandTestCase extends MauticMysqlTestCase
         $this->prefix = $this->container->getParameter('mautic.db_table_prefix');
 
         // Populate contacts
-        $this->installDatabaseFixtures([dirname(__DIR__).'/../LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
+        $this->installDatabaseFixtures(['Lead']);
 
         // Campaigns are so complex that we are going to load a SQL file rather than build with entities
         $sql = file_get_contents(__DIR__.'/campaign_schema.sql');

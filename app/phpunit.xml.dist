@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit
     backupGlobals               = "false"
     backupStaticAttributes      = "false"
@@ -9,16 +8,16 @@
     convertNoticesToExceptions  = "true"
     convertWarningsToExceptions = "true"
     processIsolation            = "false"
-    stopOnFailure               = "false"
-    syntaxCheck                 = "false"
+    stopOnFailure               = "true"
+    syntaxCheck                 = "true"
     bootstrap                   = "autoload.php" >
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>bundles/*Bundle/Tests</directory>
+            <directory>bundles/*Bundle/Tests/unit</directory>
         </testsuite>
         <testsuite name="Plugin tests">
-            <directory>./../plugins/*Bundle/Tests</directory>
+            <directory>./../plugins/*Bundle/Tests/unit</directory>
         </testsuite>
     </testsuites>
 
@@ -33,4 +32,20 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <logging>
+        <log type="testdox-text" target="logs/test.log"/>
+    </logging>
+
+    <php>
+        <env name="DB_HOST" value="127.0.0.1" />
+        <env name="DB_NAME" value="mautictest" />
+        <env name="DB_PORT" value="3306" />
+        <env name="DB_USER" value="travis" />
+        <env name="DB_PASSWD" value="" />
+        <env name="MAUTIC_TABLE_PREFIX" value="" />
+        <env name="MAUTIC_ENV" value="test" />
+        <env name="MAUTIC_ADMIN_USERNAME" value="admin" />
+        <env name="MAUTIC_ADMIN_PASSWORD" value="mautic" />
+    </php>
 </phpunit>

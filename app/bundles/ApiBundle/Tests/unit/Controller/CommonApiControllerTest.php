@@ -12,10 +12,15 @@
 namespace Mautic\ApiBundle\Tests\Controller;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class CommonApiControllerTest extends CampaignTestAbstract
+/**
+ * Class CommonApiControllerTest.
+ *
+ * @group Controller
+ */
+class CommonApiControllerTest extends AbstractMauticTestCase
 {
     public function testAddAliasIfNotPresentWithOneColumnWithoutAlias()
     {
@@ -45,7 +50,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    public function testgetWhereFromRequestWithNoWhere()
+    public function testGetWhereFromRequestWithNoWhere()
     {
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
@@ -56,7 +61,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals([], $result);
     }
 
-    public function testgetWhereFromRequestWithSomeWhere()
+    public function testGetWhereFromRequestWithSomeWhere()
     {
         $where = [
             [
@@ -79,6 +84,13 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
+    /**
+     * @param $method
+     * @param array        $args
+     * @param Request|null $request
+     *
+     * @return mixed
+     */
     protected function getResultFromProtectedMethod($method, array $args, Request $request = null)
     {
         $controller = new CommonApiController();

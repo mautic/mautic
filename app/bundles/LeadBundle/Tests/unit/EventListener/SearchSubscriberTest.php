@@ -16,7 +16,7 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Test\CommonTestCase;
+use Mautic\CoreBundle\Test\MauticSubscriberTestCase;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Class SearchSubscriberTest.
  */
-class SearchSubscriberTest extends CommonTestCase
+class SearchSubscriberTest extends MauticSubscriberTestCase
 {
     /**
      * Tests emailread search command.

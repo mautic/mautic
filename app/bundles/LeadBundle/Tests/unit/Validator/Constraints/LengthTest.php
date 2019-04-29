@@ -14,6 +14,11 @@ namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Mautic\LeadBundle\Validator\Constraints\LengthValidator;
 
+/**
+ * Class LengthTest.
+ *
+ * @group Unit
+ */
 class LengthTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidateBy()

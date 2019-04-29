@@ -11,11 +11,16 @@
 
 namespace Mautic\CampaignBundle\Command;
 
-use Mautic\CampaignBundle\Test\CommandTestCase;
+use Mautic\CampaignBundle\Test\CampaignTriggerCommandTestCase;
 
-class TriggerCampaignCommandTest extends CommandTestCase
+
+/**
+ * Class TriggerCampaignMauticCommandTest
+ * @group Command
+ */
+class TriggerCampaignTriggerCommandTest extends CampaignTriggerCommandTestCase
 {
-   protected function setUp()
+   public function setUp()
     {
         parent::setUp();
 

@@ -21,6 +21,11 @@ use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
+/**
+ * Class ContactLimiterTraitTest.
+ *
+ * @group Unit
+ */
 class ContactLimiterTraitTest extends \PHPUnit_Framework_TestCase
 {
     use ContactLimiterTrait;

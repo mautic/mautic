@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class CompanyModelTest.
+ * Class DeviceTrackingServiceTest.
+ *
+ * @group Unit.
  */
 final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
 {

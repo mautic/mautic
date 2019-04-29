@@ -24,7 +24,10 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 
-class CampaignTestCase extends \PHPUnit_Framework_TestCase
+/**
+ * Class CampaignTestCase
+ */
+class CampaignModelTestCase extends \PHPUnit_Framework_TestCase
 {
     protected static $mockId   = 232;
     protected static $mockName = 'Mock name';

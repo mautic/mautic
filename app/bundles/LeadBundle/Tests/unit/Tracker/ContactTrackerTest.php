@@ -28,6 +28,11 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Class ContactTrackerTest.
+ *
+ * @group Unit
+ */
 class ContactTrackerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -80,7 +85,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
      */
     private $leadFieldModelMock;
 
-   protected function setUp()
+    protected function setUp()
     {
         $this->leadRepositoryMock = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()

@@ -5,6 +5,7 @@ paths:
     data: Tests/_data
     support: Tests/_support
     envs: Tests/_envs
-params:
-    - ../../../.env.dist
-
+actor_suffix: Tester
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
