@@ -138,6 +138,19 @@ class FieldType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'properties_textarea_template',
+            'yesno_button_group',
+            [
+                'label'       => 'mautic.lead.field.form.properties.allowhtml',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'required'    => false,
+                'mapped'      => false,
+                'data'        => isset($options['data']->getProperties()['allowHtml']) ? $options['data']->getProperties()['allowHtml'] : false,
+            ]
+        );
+
         $listChoices = [
             'country'  => FormFieldHelper::getCountryChoices(),
             'region'   => FormFieldHelper::getRegionChoices(),
