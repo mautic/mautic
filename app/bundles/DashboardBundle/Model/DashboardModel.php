@@ -144,16 +144,15 @@ class DashboardModel extends FormModel
      * Fill widgets with their empty content.
      *
      * @param array $widgets
-     * @param array $filter
      */
-    public function populateWidgetPreviews(&$widgets, $filter = [])
+    public function populateWidgetPreviews(&$widgets)
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
                 if (!($widget instanceof Widget)) {
                     $widget = $this->populateWidgetEntity($widget);
                 }
-                $this->populateWidgetContent($widget, $filter);
+                $this->populateWidgetPreview($widget);
             }
         }
     }
@@ -192,6 +191,19 @@ class DashboardModel extends FormModel
         }
 
         return $entity;
+    }
+
+    /**
+     * Populate widget preview
+     *
+     * @param Widget $widget
+     * @param array  $filter
+     */
+    public function populateWidgetPreview(Widget $widget)
+    {
+        $event = $this->widgetEventFactory->create($widget, $this->userHelper->getUser()->getId());
+
+        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD, $event);
     }
 
     /**

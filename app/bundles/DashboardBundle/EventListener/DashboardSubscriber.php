@@ -51,7 +51,6 @@ class DashboardSubscriber implements EventSubscriberInterface
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event)
     {
         $widget = $event->getWidget();
-        $params = $widget->getParams(); // $params['dateFrom'], $params['dateTo']
 
         $event->setTemplateData([
             'chartType'   => 'line',

@@ -34,8 +34,6 @@ class WidgetDetailEvent extends CommonEvent
 
     private string $cacheKeyPath = 'dashboard.widget.';
 
-    protected $security = null;
-
     private bool $isPreview = false;
 
     public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProvider $cacheProvider = null)
