@@ -194,7 +194,7 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Populate widget preview
+     * Populate widget preview.
      *
      * @param Widget $widget
      * @param array  $filter
