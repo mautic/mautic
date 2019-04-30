@@ -141,7 +141,7 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Fill widgets with their content.
+     * Fill widgets with their empty content.
      *
      * @param array $widgets
      * @param array $filter
