@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Command;
+namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Test\CampaignTriggerCommandTestCase;
 
-
 /**
- * Class ValidateEventMauticCommandTest
+ * Class ValidateEventMauticCommandTest.
+ *
  * @group Command
  */
 class ValidateEventCampaignTriggerCommandTest extends CampaignTriggerCommandTestCase

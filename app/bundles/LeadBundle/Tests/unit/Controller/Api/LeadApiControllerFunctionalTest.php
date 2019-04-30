@@ -12,12 +12,12 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 /**
  * Class LeadApiControllerFunctionalTest.
  */
-class LeadApiControllerFunctionalTest extends AbstractMauticTestCase
+class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testBatchNewEndpointDoesNotCreateDuplicates()
     {

@@ -2,6 +2,9 @@
 
 namespace Mautic\CoreBundle\Test;
 
+/**
+ * Class MauticMysqlTestCase.
+ */
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     /**

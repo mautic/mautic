@@ -15,6 +15,9 @@ use Mautic\CampaignBundle\Test\CampaignModelTestCase;
 use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Class FieldApiControllerTest.
+ */
 class FieldApiControllerTest extends CampaignModelTestCase
 {
     private $defaultWhere = [
@@ -25,7 +28,7 @@ class FieldApiControllerTest extends CampaignModelTestCase
         ],
     ];
 
-    public function testgetWhereFromRequestWithNoWhere()
+    public function testGetWhereFromRequestWithNoWhere()
     {
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
@@ -36,7 +39,7 @@ class FieldApiControllerTest extends CampaignModelTestCase
         $this->assertEquals($this->defaultWhere, $result);
     }
 
-    public function testgetWhereFromRequestWithSomeWhere()
+    public function testGetWhereFromRequestWithSomeWhere()
     {
         $where = [
             [
@@ -59,6 +62,15 @@ class FieldApiControllerTest extends CampaignModelTestCase
         $this->assertEquals(array_merge($where, $this->defaultWhere), $result);
     }
 
+    /**
+     * @param $method
+     * @param array        $args
+     * @param Request|null $request
+     *
+     * @return mixed
+     *
+     * @throws \ReflectionException
+     */
     protected function getResultFromProtectedMethod($method, array $args, Request $request = null)
     {
         $controller = new FieldApiController();

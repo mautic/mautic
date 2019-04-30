@@ -132,9 +132,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @param array|null $paths
      */
-    protected function installDatabaseFixtures(array $types = null)
+    protected function installDatabaseFixtures(array $paths = null)
     {
-        if (null === $types) {
+        if (null === $paths) {
             $paths = [
                 dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
                 // Default user and roles
