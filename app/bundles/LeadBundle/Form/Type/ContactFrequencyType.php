@@ -51,6 +51,7 @@ class ContactFrequencyType extends AbstractType
                 'lead_channels',
                 ContactChannelsType::class,
                 [
+                    'label'       => false,
                     'channels'    => $options['channels'],
                     'data'        => $options['data']['lead_channels'],
                     'public_view' => $options['public_view'],
