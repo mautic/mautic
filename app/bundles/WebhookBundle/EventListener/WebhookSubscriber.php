@@ -48,16 +48,9 @@ class WebhookSubscriber extends CommonSubscriber
         AuditLogModel $auditLogModel,
         WebhookKillNotificator $webhookKillNotificator
     ) {
-<<<<<<< HEAD
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->auditLogModel     = $auditLogModel;
-        $this->notificationModel = $notificationModel;
-        $this->entityManager     = $entityManager;
-=======
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->auditLogModel          = $auditLogModel;
         $this->webhookKillNotificator = $webhookKillNotificator;
->>>>>>> 946c956a45... Add webhook kill notificator service with added e-mail sender
     }
 
     /**
@@ -120,30 +113,6 @@ class WebhookSubscriber extends CommonSubscriber
      */
     public function onWebhookKill(WebhookEvent $event)
     {
-<<<<<<< HEAD
-        $webhook = $event->getWebhook();
-        $reason  = $event->getReason();
-
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.webhook.stopped.details',
-                [
-                    '%reason%'  => $this->translator->trans($reason),
-                    '%webhook%' => '<a href="'.$this->router->generate(
-                            'mautic_webhook_action',
-                            ['objectAction' => 'view', 'objectId' => $webhook->getId()]
-                        ).'" data-toggle="ajax">'.$webhook->getName().'</a>',
-                ]
-            ),
-            'error',
-            false,
-            $this->translator->trans('mautic.webhook.stopped'),
-            null,
-            null,
-            $this->entityManager->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
-        );
-=======
         $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());
->>>>>>> 946c956a45... Add webhook kill notificator service with added e-mail sender
     }
 }
