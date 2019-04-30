@@ -627,4 +627,19 @@ SQL;
             'is_scheduled' => 1,
         ]);
     }
+
+    /**
+     * Removes logs by event_id.
+     * It uses batch processing for removing
+     * large quantities of records.
+     *
+     * @param int $eventId
+     */
+    public function removeEventLogs($eventId)
+    {
+        $conn = $this->_em->getConnection();
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
+            'event_id' => (int) $eventId,
+        ]);
+    }
 }
