@@ -7,13 +7,13 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Form;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class VariantType extends AbstractType
 {
@@ -48,16 +48,14 @@ class VariantType extends AbstractType
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.core.ab_test.form.traffic_weight.help',
             ],
-
         ]);
-
 
         $attr = [
             'class'    => 'form-control',
             'tooltip'  => 'mautic.core.ab_test.form.traffic_weight_total.help',
         ];
 
-        if ($options['is_parent'] === true && $options["is_existing"] === false) {
+        if ($options['is_parent'] === true && $options['is_existing'] === false) {
             $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
         }
 
@@ -68,7 +66,7 @@ class VariantType extends AbstractType
             'constraints' => new Assert\Range([
                 'min' => 0,
                 'max' => 100,
-            ])
+            ]),
         ]);
 
         $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
@@ -83,7 +81,7 @@ class VariantType extends AbstractType
                 'disabled'     => !$options['is_parent'],
             ];
 
-            if ($options['is_parent'] === true && $options["is_existing"] === false) {
+            if ($options['is_parent'] === true && $options['is_existing'] === false) {
                 $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
             }
 
@@ -136,8 +134,8 @@ class VariantType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'is_parent' => true,
-            'is_existing' => false,
+            'is_parent'         => true,
+            'is_existing'       => false,
             'validation_groups' => function (Form $form) {
                 $data = $form->getData();
 

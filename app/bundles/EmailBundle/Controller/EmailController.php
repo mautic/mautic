@@ -327,7 +327,7 @@ class EmailController extends FormController
 
                 $properties[$c->getId()] = $variantSettings;
             }
-            $parentSettings = $parent->getVariantSettings();
+            $parentSettings                                 = $parent->getVariantSettings();
             $properties[$parent->getId()]['weight']         = $parentSettings['weight'];
             $properties[$parent->getId()]['winnerCriteria'] = isset($parentSettings['winnerCriteria']) ? $parentSettings['winnerCriteria'] : $lastCriteria;
         }
@@ -667,7 +667,6 @@ class EmailController extends FormController
         if ($entity->hasVariants()) {
             $entity->setVariantSettings(['enableAbTest' => true]);
         }
-
 
         /** @var Form $form */
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
