@@ -13,8 +13,8 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Portability\Statement;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -56,7 +56,7 @@ class LeadFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $statementAlias   = $this->createMock(Statement::class);
         $statementCompare = $this->createMock(Statement::class);
         $exprCompare      = $this->createMock(ExpressionBuilder::class);
-        
+
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
         $builderCompare->method('expr')->willReturn($exprCompare);
@@ -149,7 +149,7 @@ class LeadFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $statementAlias   = $this->createMock(Statement::class);
         $statementCompare = $this->createMock(Statement::class);
         $exprCompare      = $this->createMock(ExpressionBuilder::class);
-        
+
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
         $builderCompare->method('expr')->willReturn($exprCompare);
