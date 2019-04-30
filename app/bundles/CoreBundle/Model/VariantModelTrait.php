@@ -48,6 +48,8 @@ trait VariantModelTrait
             }
         }
 
+        $entity->setWinnerWeight();
+
         if (count($save)) {
             foreach ($save as $child) {
                 if ($child->getId() != $entity->getId()) {

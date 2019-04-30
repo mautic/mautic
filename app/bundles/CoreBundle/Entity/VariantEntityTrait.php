@@ -66,11 +66,6 @@ trait VariantEntityTrait
     {
         if (!$this->variantChildren->contains($child)) {
             $this->variantChildren->add($child);
-
-            $child->setVariantSettings([
-                'enableAbTest'   => $this->variantSettings['enableAbTest'],
-                'winnerCriteria' => $this->variantSettings['winnerCriteria'],
-            ]);
         }
 
         return $this;
@@ -149,6 +144,11 @@ trait VariantEntityTrait
             }
         }
 
+        if (empty($this->variantSettings['winnerCriteria']) && !empty($this->variantParent)) {
+            $this->setVariantSettings([
+                'winnerCriteria' => $this->getVariantParent()->getVariantSettingsWinnerCriteria(),
+            ]);
+        }
         return $this;
     }
 
@@ -159,7 +159,9 @@ trait VariantEntityTrait
      */
     public function getVariantSettings()
     {
-        $this->variantSettings['weight'] = $this->getVariantSettingsWeight();
+        if ($this->getVariantChildren() !== null) {
+            $this->variantSettings['weight'] = $this->calculateParentSettingsWeight();
+        }
 
         return $this->variantSettings;
     }
@@ -172,25 +174,6 @@ trait VariantEntityTrait
     public function getVariantSettingsTotalWeight()
     {
         return isset($this->variantSettings['weightTotal']) ? $this->variantSettings['weightTotal'] : 100;
-    }
-
-    /**
-     * Get variantSettings weight.
-     *
-     * @return int
-     */
-    public function getVariantSettingsWeight()
-    {
-        if ($this->getVariantParent() !== null) {
-            return $this->variantSettings['weight'];
-        }
-
-        $variantsWeight = 0;
-        foreach ($this->getVariantChildren() as $variant) {
-            $variantsWeight = $variant->addWeight($variantsWeight);
-        }
-
-        return $this->getVariantSettingsTotalWeight() - $variantsWeight;
     }
 
     /**
@@ -332,6 +315,27 @@ trait VariantEntityTrait
     }
 
     /**
+     * @return mixed
+     */
+    public function getVariantSettingsWinnerCriteria()
+    {
+        return $this->variantSettings['winnerCriteria'];
+    }
+
+    /**
+     * Sets winner weight variant settings
+     */
+    public function setWinnerWeight()
+    {
+        $this->variantSettings['weight'] = 100;
+        $this->variantSettings['weightTotal'] = 100;
+
+        foreach ($this->getVariantChildren() as $child) {
+            $child->setVariantSettings(['weight' => 0, 'weightTotal' => 100]);
+        }
+    }
+
+    /**
      * @param $getter
      *
      * @return mixed
@@ -393,5 +397,25 @@ trait VariantEntityTrait
                 }
             }
         }
+    }
+
+
+    /**
+     * Calculates variantSettings weight.
+     *
+     * @return int
+     */
+    private function calculateParentSettingsWeight()
+    {
+        if ($this->getVariantParent() !== null) {
+            return $this->variantSettings['weight'];
+        }
+
+        $variantsWeight = 0;
+        foreach ($this->getVariantChildren() as $variant) {
+            $variantsWeight = $variant->addWeight($variantsWeight);
+        }
+
+        return $this->getVariantSettingsTotalWeight() - $variantsWeight;
     }
 }
