@@ -149,6 +149,7 @@ trait VariantEntityTrait
                 'winnerCriteria' => $this->getVariantParent()->getVariantSettingsWinnerCriteria(),
             ]);
         }
+
         return $this;
     }
 
@@ -323,11 +324,11 @@ trait VariantEntityTrait
     }
 
     /**
-     * Sets winner weight variant settings
+     * Sets winner weight variant settings.
      */
     public function setWinnerWeight()
     {
-        $this->variantSettings['weight'] = 100;
+        $this->variantSettings['weight']      = 100;
         $this->variantSettings['weightTotal'] = 100;
 
         foreach ($this->getVariantChildren() as $child) {
@@ -398,7 +399,6 @@ trait VariantEntityTrait
             }
         }
     }
-
 
     /**
      * Calculates variantSettings weight.
