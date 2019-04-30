@@ -1921,7 +1921,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return $convertedString;
     }
 
-    
     /**
      * Hold a list of Integration Entitity records to be saved later
      * If a NEW Integration Entity record is provided, it is saved/flushed immediately.
