@@ -50,17 +50,6 @@ class DashboardSubscriber implements EventSubscriberInterface
      */
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event)
     {
-        $widget = $event->getWidget();
-
-        $event->setTemplateData([
-            'chartType'   => 'line',
-            'chartHeight' => $widget->getHeight() - 80,
-            'chartData'   => [
-                'datasets'=> [],
-                'labels'  => [],
-            ],
-        ]);
-
         $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
         $event->stopPropagation();
     }
