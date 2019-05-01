@@ -14,8 +14,8 @@ namespace Mautic\CoreBundle\Command;
 use Doctrine\DBAL\DBALException;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * CLI Command to delete unused IP addresses.
@@ -56,7 +56,7 @@ EOT
         $ipAddressRepo  = $em->getRepository('MauticCoreBundle:IpAddress');
 
         try {
-            $limit = $input->getOption('limit');
+            $limit       = $input->getOption('limit');
             $deletedRows = $ipAddressRepo->deleteUnusedIpAddresses($limit);
             $output->writeln(sprintf('<info>%s unused IP addresses has been deleted</info>', $deletedRows));
         } catch (DBALException $e) {
