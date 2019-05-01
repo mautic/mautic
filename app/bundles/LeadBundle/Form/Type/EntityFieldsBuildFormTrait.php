@@ -279,7 +279,7 @@ trait EntityFieldsBuildFormTrait
                             break;
                         case 'textarea':
                             if (!empty($properties['allowHtml'])) {
-                                $cleaningRules[$field['alias']] = 'clean';
+                                $cleaningRules[$field['alias']] = 'html';
                             }
                             break;
                     }
