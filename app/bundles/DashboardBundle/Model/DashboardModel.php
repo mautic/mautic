@@ -149,9 +149,6 @@ class DashboardModel extends FormModel
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
-                if (!($widget instanceof Widget)) {
-                    $widget = $this->populateWidgetEntity($widget);
-                }
                 $this->populateWidgetPreview($widget);
             }
         }
