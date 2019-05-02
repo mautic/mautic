@@ -97,6 +97,11 @@ class WebhookModel extends FormModel
     protected $serializer;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * Queued events default order by dir
      * Possible values: ['ASC', 'DESC'].
      *
