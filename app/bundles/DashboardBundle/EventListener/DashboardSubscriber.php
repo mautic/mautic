@@ -50,7 +50,7 @@ class DashboardSubscriber implements EventSubscriberInterface
      */
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event)
     {
-        $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+        $event->setTemplate('@MauticCore/Helper/chart.html.twig');
         $event->stopPropagation();
     }
 
