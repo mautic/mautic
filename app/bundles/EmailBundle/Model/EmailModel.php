@@ -312,9 +312,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function saveEntities($entities, $unlock = true)
     {
-        //iterate over the results so the events are dispatched on each delete
-        $batchSize = 20;
-        $i         = 0;
         foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
@@ -325,17 +322,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             }
 
-            $this->getRepository()->saveEntity($entity, false);
+            // we should flush before post_save event is triggered or use different EM
+            $this->getRepository()->saveEntity($entity, true);
 
             if ($dispatchEvent) {
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
-
-            if (0 === ++$i % $batchSize) {
-                $this->em->flush();
-            }
         }
-        $this->em->flush();
     }
 
     /**
