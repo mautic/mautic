@@ -580,6 +580,18 @@ class SugarcrmApi extends CrmApi
                         $fields[] = str_replace('-'.$object, '', $sugarField);
                     }
                 }
+
+                // add custom fields to select query
+                if (!empty($availableFields['toTags'])) {
+                    foreach ($availableFields['toTags'] as $sugarField) {
+                        if (strpos($sugarField, '__'.$object) !== false) {
+                            $field = str_replace('__'.$object, '', $sugarField);
+                            if (!in_array($field, $fields)) {
+                                $fields[] = $field;
+                            }
+                        }
+                    }
+                }
         }
 
         if ('6' == $tokenData['version']) {
