@@ -88,6 +88,10 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
+        $this->translations['dnc_all'] = [
+            'type' => DoNotContactFilterQueryBuilder::getServiceId(),
+        ];
+
         $this->translations['leadlist'] = [
             'type' => SegmentReferenceFilterQueryBuilder::getServiceId(),
         ];

@@ -39,11 +39,18 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
         $exprParameter    = $this->generateRandomParameterName();
         $channelParameter = $this->generateRandomParameterName();
 
-        $expression = $queryBuilder->expr()->andX(
-            $queryBuilder->expr()->eq($tableAlias.'.reason', ":$exprParameter"),
-            $queryBuilder->expr()
-              ->eq($tableAlias.'.channel', ":$channelParameter")
-        );
+        if ($filter->getField() == 'dnc_all') {
+            $expression = $queryBuilder->expr()->andX(
+                $queryBuilder->expr()
+                    ->eq($tableAlias.'.channel', ":$channelParameter")
+            );
+        } else {
+            $expression = $queryBuilder->expr()->andX(
+                $queryBuilder->expr()->eq($tableAlias.'.reason', ":$exprParameter"),
+                $queryBuilder->expr()
+                    ->eq($tableAlias.'.channel', ":$channelParameter")
+            );
+        }
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);
 
@@ -55,7 +62,9 @@ class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->addLogic($queryBuilder->expr()->$queryType($tableAlias.'.id'), $filter->getGlue());
 
-        $queryBuilder->setParameter($exprParameter, $doNotContactParts->getParameterType());
+        if ($filter->getField() != 'dnc_all') {
+            $queryBuilder->setParameter($exprParameter, $doNotContactParts->getParameterType());
+        }
         $queryBuilder->setParameter($channelParameter, $doNotContactParts->getChannel());
 
         return $queryBuilder;

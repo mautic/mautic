@@ -491,6 +491,18 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
+            'dnc_all' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_all'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => [
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => $this->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
                 'properties' => [
