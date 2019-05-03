@@ -174,7 +174,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettingsTotalWeight()
     {
-        return isset($this->variantSettings['weightTotal']) ? $this->variantSettings['weightTotal'] : 100;
+        return isset($this->variantSettings['weightTotal']) ? $this->variantSettings['weightTotal'] : null;
     }
 
     /**
@@ -323,18 +323,6 @@ trait VariantEntityTrait
         return $this->variantSettings['winnerCriteria'];
     }
 
-    /**
-     * Sets winner weight variant settings.
-     */
-    public function setWinnerWeight()
-    {
-        $this->variantSettings['weight']      = 100;
-        $this->variantSettings['weightTotal'] = 100;
-
-        foreach ($this->getVariantChildren() as $child) {
-            $child->setVariantSettings(['weight' => 0, 'weightTotal' => 100]);
-        }
-    }
 
     /**
      * @param $getter

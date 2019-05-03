@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Model\Variant\VariantConverterService;
 
 /**
  * Class VariantModelTrait.
@@ -22,54 +23,10 @@ trait VariantModelTrait
     {
         //let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
+        $converter = new VariantConverterService(); // todo inject it
 
-        list($parent, $children) = $entity->getVariants();
-
-        $save = [];
-
-        //set this email as the parent for the original parent and children
-        if ($parent) {
-            if ($parent->getId() != $entity->getId()) {
-                if (method_exists($parent, 'setIsPublished')) {
-                    $parent->setIsPublished(false);
-                }
-                $entity->addVariantChild($parent);
-                $parent->setVariantParent($entity);
-            }
-
-            $parent->setVariantStartDate(null);
-            $parent->setVariantSentCount(0);
-
-            foreach ($children as $child) {
-                //capture child before it's removed from collection
-                $save[] = $child;
-
-                $parent->removeVariantChild($child);
-            }
-        }
-
-        $entity->setWinnerWeight();
-
-        if (count($save)) {
-            foreach ($save as $child) {
-                if ($child->getId() != $entity->getId()) {
-                    if (method_exists($child, 'setIsPublished')) {
-                        $child->setIsPublished(false);
-                    }
-
-                    $entity->addVariantChild($child);
-                    $child->setVariantParent($entity);
-                } else {
-                    $child->removeVariantParent();
-                }
-
-                $child->setVariantSentCount(0);
-                $child->setVariantStartDate(null);
-            }
-        }
-
-        $save[] = $parent;
-        $save[] = $entity;
+        $converter->convertWinnerVariant($entity);
+        $save = $converter->getUpdatedVariants();
 
         //save the entities
         $this->saveEntities($save, false);

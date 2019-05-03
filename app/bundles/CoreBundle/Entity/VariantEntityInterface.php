@@ -78,4 +78,14 @@ interface VariantEntityInterface
      * @return bool
      */
     public function isVariant($isChild = false);
+
+
+    /**
+     * Sets settings array for the variant.
+     *
+     * @param array $variantSettings
+     *
+     * @return mixed
+     */
+    public function setVariantSettings($variantSettings);
 }
