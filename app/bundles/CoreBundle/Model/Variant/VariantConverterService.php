@@ -10,18 +10,13 @@
 
 namespace Mautic\CoreBundle\Model\Variant;
 
-
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 /**
- * Class VariantConverterService
- * @package Mautic\CoreBundle\Model\Variant
+ * Class VariantConverterService.
  */
 class VariantConverterService
 {
-    /**
-     *
-     */
     const DEFAULT_WEIGHT = 100;
 
     /**
@@ -50,8 +45,7 @@ class VariantConverterService
             $this->switchParent($winner, $oldParent);
             $this->updateOldChildren($oldParent->getVariantChildren(), $winner);
             $this->updateOldParentSettings($oldParent);
-        }
-        else {
+        } else {
             $this->updateOldChildren($winner->getVariantChildren(), $winner);
         }
     }
@@ -64,7 +58,6 @@ class VariantConverterService
         return $this->updatedVariants;
     }
 
-
     /**
      * @param VariantEntityInterface $winner
      * @param VariantEntityInterface $oldParent
@@ -72,7 +65,6 @@ class VariantConverterService
     private function switchParent(VariantEntityInterface $winner, VariantEntityInterface $oldParent)
     {
         if ($winner->getId() === $oldParent->getId()) {
-
             return;
         }
 
@@ -82,9 +74,7 @@ class VariantConverterService
         $this->transferChildToWinner($oldParent, $winner);
         $this->addToUpdatedVariants($winner);
         $this->addToUpdatedVariants($oldParent);
-
     }
-
 
     /**
      * @param $variantChildren
@@ -120,7 +110,6 @@ class VariantConverterService
         $winner->setVariantSettings($variantSettings);
     }
 
-
     /**
      * Sets oldParent settings.
      *
@@ -146,7 +135,6 @@ class VariantConverterService
     private function transferChildToWinner(VariantEntityInterface $child, VariantEntityInterface $winner)
     {
         if ($this->switchParent === false) {
-
             return;
         }
 
@@ -158,15 +146,13 @@ class VariantConverterService
         $child->setVariantParent($winner);
     }
 
-
     /**
      * @param VariantEntityInterface $variant
      */
     private function addToUpdatedVariants(VariantEntityInterface $variant)
     {
         if (in_array($variant, $this->updatedVariants)) {
-
-           return;
+            return;
         }
 
         $this->updatedVariants[] = $variant;

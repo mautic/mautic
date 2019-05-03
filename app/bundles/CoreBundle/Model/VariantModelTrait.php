@@ -23,7 +23,7 @@ trait VariantModelTrait
     {
         //let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
-        $converter = new VariantConverterService(); // todo inject it
+        $converter          = new VariantConverterService(); // todo inject it
 
         $converter->convertWinnerVariant($entity);
         $save = $converter->getUpdatedVariants();

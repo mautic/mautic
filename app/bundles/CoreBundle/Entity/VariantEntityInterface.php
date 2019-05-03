@@ -79,7 +79,6 @@ interface VariantEntityInterface
      */
     public function isVariant($isChild = false);
 
-
     /**
      * Sets settings array for the variant.
      *

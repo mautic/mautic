@@ -323,7 +323,6 @@ trait VariantEntityTrait
         return $this->variantSettings['winnerCriteria'];
     }
 
-
     /**
      * @param $getter
      *
