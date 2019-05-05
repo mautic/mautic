@@ -1036,6 +1036,7 @@ return [
         'ip_lookup_service'               => 'maxmind_download',
         'ip_lookup_auth'                  => '',
         'ip_lookup_config'                => [],
+        'ip_lookup_create_organization'   => false,
         'transifex_username'              => '',
         'transifex_password'              => '',
         'update_stability'                => 'stable',
