@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
+use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,6 +21,10 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $mockFactory->method('get')
+            ->with('mautic.helper.from_email_helper')
+            ->willReturn($this->createMock(FromEmailHelper::class));
 
         $tokens = [
             '{test}' => 'value',
