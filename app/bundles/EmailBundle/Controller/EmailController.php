@@ -303,8 +303,6 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-
-
         //get A/B test information
         list($parent, $children) = $email->getVariants();
 
@@ -357,10 +355,10 @@ class EmailController extends FormController
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
-                        'parent'     => $parent,
-                        'children'   => $children,
-                        'properties' => $abTestSettings['variants'],
-                        'criteria'   => $criteria['criteria'],
+                        'parent'         => $parent,
+                        'children'       => $children,
+                        'properties'     => $abTestSettings['variants'],
+                        'criteria'       => $criteria['criteria'],
                         'winnerCriteria' => $abTestSettings['winnerCriteria'],
                     ],
                     'translations' => [

@@ -13,8 +13,7 @@ namespace Mautic\CoreBundle\Model\Variant;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 /**
- * Class AbTestSettingsService
- * @package Mautic\CoreBundle\Model\Variant
+ * Class AbTestSettingsService.
  */
 class AbTestSettingsService
 {
@@ -48,9 +47,9 @@ class AbTestSettingsService
      */
     private $setCriteriaFromVariants = false;
 
-
     /**
      * @param VariantEntityInterface $parentVariant
+     *
      * @return array
      */
     public function getAbTestSettings(VariantEntityInterface $parentVariant)
@@ -76,15 +75,13 @@ class AbTestSettingsService
         $parentSettings = $parentVariant->getVariantSettings();
         if (isset($parentSettings['totalWeight'])) {
             $this->totalWeight = $parentSettings['totalWeight'];
-        }
-        else {
+        } else {
             $this->totalWeight = self::DEFAULT_TOTAL_WEIGHT;
         }
 
         if (isset($parentSettings['winnerCriteria'])) {
             $this->winnerCriteria = $parentSettings['winnerCriteria'];
-        }
-        else {
+        } else {
             $this->setCriteriaFromVariants = true;
         }
     }
@@ -96,8 +93,7 @@ class AbTestSettingsService
     {
         $variants = $parentVariant->getVariantChildren();
 
-        foreach ($variants as $variant)
-        {
+        foreach ($variants as $variant) {
             $this->setVariantSettings($variant);
         }
         $this->setParentSettingsWeight($parentVariant);
@@ -117,7 +113,6 @@ class AbTestSettingsService
         }
     }
 
-
     /**
      * @param VariantEntityInterface $variant
      * @param $weight
@@ -127,8 +122,7 @@ class AbTestSettingsService
         if ($variant->isPublished()) {
             $this->variantsSettings[$variant->getId()]['weight'] = $weight;
             $this->addPublishedVariantWeight($weight);
-        }
-        else {
+        } else {
             $this->variantsSettings[$variant->getId()]['weight'] = 0;
         }
     }
@@ -165,8 +159,7 @@ class AbTestSettingsService
         if (!empty($this->winnerCriteria) && $variantCriteria != $this->winnerCriteria) {
             // there are variants with different winner criteria
             $this->configurationError = true;
-        }
-        else {
+        } else {
             $this->winnerCriteria = $variantCriteria;
         }
     }
