@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Tests\Helper;
-
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
@@ -217,7 +215,7 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
                 'last_name'  => 'Last',
                 'email'      => 'user2@somewhere.com',
                 'signature'  => 'hello there again',
-            ]
+            ],
         ];
 
         $this->leadRepository->expects($this->exactly(2))
@@ -481,7 +479,6 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
             'signature'  => 'user 1',
         ];
 
-
         $user2 = [
             'id'         => 2,
             'first_name' => 'First',
@@ -490,10 +487,9 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
             'signature'  => 'user 2',
         ];
 
-
         $this->leadRepository->expects($this->exactly(2))
             ->method('getLeadOwner')
-            ->withConsecutive([1],[2])
+            ->withConsecutive([1], [2])
             ->willReturnOnConsecutiveCalls($user, $user2);
 
         $helper = $this->getHelper();

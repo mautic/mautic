@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
@@ -197,9 +196,9 @@ class FromEmailHelper
     }
 
     /**
-     * @param string      $token
-     * @param array $contact
-     * @param boolean      $asOwner
+     * @param string $token
+     * @param array  $contact
+     * @param bool   $asOwner
      *
      * @return array
      */
@@ -227,6 +226,7 @@ class FromEmailHelper
      * @param array $contact
      *
      * @return array
+     *
      * @throws OwnerNotFoundException
      */
     private function getFromEmailArrayAsOwner(array $contact)
