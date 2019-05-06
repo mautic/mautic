@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 /**
  * Class VariantConverterService.
  */
-class VariantConverterService
+class VariantConverterService implements VariantConverterInterface
 {
     /**
      * @const integer
@@ -33,6 +33,8 @@ class VariantConverterService
     private $switchParent = false;
 
     /**
+     * Converts variants for a new winner.
+     *
      * @param VariantEntityInterface $winner
      */
     public function convertWinnerVariant(VariantEntityInterface $winner)
@@ -74,7 +76,9 @@ class VariantConverterService
         $oldParent->removeVariantChild($winner);
         $winner->removeVariantParent();
 
+        $this->switchVariantSettings($winner, $oldParent);
         $this->transferChildToWinner($oldParent, $winner);
+
         $this->addToUpdatedVariants($winner);
         $this->addToUpdatedVariants($oldParent);
     }
@@ -93,8 +97,7 @@ class VariantConverterService
                 $child->setIsPublished(false);
             }
 
-            $child->setVariantSentCount(0);
-            $child->setVariantStartDate(null);
+            $this->setDefaultValues($child);
 
             $this->addToUpdatedVariants($child);
         }
@@ -105,12 +108,10 @@ class VariantConverterService
      */
     private function updateWinnerSettings(VariantEntityInterface $winner)
     {
-        $variantSettings = $winner->getVariantSettings();
-
         $variantSettings['weight']      = self::DEFAULT_WEIGHT;
-        $variantSettings['totalWeight'] = self::DEFAULT_WEIGHT;
-
         $winner->setVariantSettings($variantSettings);
+
+        $this->setDefaultValues($winner);
     }
 
     /**
@@ -124,11 +125,7 @@ class VariantConverterService
             $oldParent->setIsPublished(false);
         }
 
-        $variantSettings = $oldParent->getVariantSettings();
-
-        $variantSettings['totalWeight'] = self::DEFAULT_WEIGHT;
-
-        $oldParent->setVariantSettings($variantSettings);
+        $this->setDefaultValues($oldParent);
     }
 
     /**
@@ -159,5 +156,36 @@ class VariantConverterService
         }
 
         $this->updatedVariants[] = $variant;
+    }
+
+    /**
+     * @param VariantEntityInterface $winner
+     * @param VariantEntityInterface $oldParent
+     */
+    private function switchVariantSettings(VariantEntityInterface $winner, VariantEntityInterface $oldParent)
+    {
+        $winnerSettings = $winner->getVariantSettings();
+        $oldParentSettings = $oldParent->getVariantSettings();
+
+        $winnerSettings['winnerCriteria'] = $oldParentSettings['winnerCriteria'];
+        $oldParentSettings['weight'] = 0;
+
+        $winner->setVariantSettings($winnerSettings);
+        $oldParent->setVariantSettings($oldParentSettings);
+    }
+
+    /**
+     * @param VariantEntityInterface $variant
+     */
+    private function setDefaultValues(VariantEntityInterface $variant)
+    {
+        $variantSettings = $variant->getVariantSettings();
+
+        $variantSettings['totalWeight'] = self::DEFAULT_WEIGHT;
+
+        $variant->setVariantSettings($variantSettings);
+
+        $variant->setVariantSentCount(0);
+        $variant->setVariantStartDate(null);
     }
 }

@@ -306,7 +306,11 @@ class EmailController extends FormController
         //get A/B test information
         list($parent, $children) = $email->getVariants();
 
-        $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
+        if(count($children) > 0)
+        {
+            $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
+        }
+
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
@@ -355,11 +359,12 @@ class EmailController extends FormController
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
-                        'parent'         => $parent,
-                        'children'       => $children,
-                        'properties'     => $abTestSettings['variants'],
-                        'criteria'       => $criteria['criteria'],
-                        'winnerCriteria' => $abTestSettings['winnerCriteria'],
+                        'parent'             => $parent,
+                        'children'           => $children,
+                        'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+                        'criteria'           => $criteria['criteria'],
+                        'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
+                        'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
                     ],
                     'translations' => [
                         'parent'   => $translationParent,
@@ -1047,7 +1052,8 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
-            $model->convertVariant($entity);
+            $variantConverter = $this->get('mautic.core.variant.converter');
+            $model->convertVariant($entity, $variantConverter);
 
             $flashes[] = [
                 'type'    => 'notice',

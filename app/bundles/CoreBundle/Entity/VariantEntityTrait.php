@@ -290,30 +290,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Adds variant weight for further calculation.
-     *
-     * @param int $weight
-     *
-     * @return int
-     */
-    public function addWeight($weight)
-    {
-        if ($this->isPublished()) {
-            $weight += $this->variantSettings['weight'];
-        }
-
-        return $weight;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVariantSettingsWinnerCriteria()
-    {
-        return $this->variantSettings['winnerCriteria'];
-    }
-
-    /**
      * @param $getter
      *
      * @return mixed

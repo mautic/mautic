@@ -105,11 +105,11 @@ class AbTestSettingsService
     private function setVariantSettings(VariantEntityInterface $variant)
     {
         $variantsSettings = $variant->getVariantSettings();
-
-        $this->setVariantSettingsWeight($variant, $variantsSettings['weight']);
+        $weight = isset($variantsSettings['weight']) ? $variantsSettings['weight'] : 0;
+        $this->setVariantSettingsWeight($variant, $weight);
 
         if ($this->setCriteriaFromVariants === true) {
-            $this->setWinnerCriteriaFromVariant($variant);
+            $this->setWinnerCriteriaFromVariant($variantsSettings['winnerCriteria']);
         }
     }
 

@@ -21,8 +21,6 @@ $criteriaLabel = ($thisCriteria) ? $view['translator']->trans(
 ) : '';
 
 $isPublished = $variant->isPublished();
-$totalWeight += ($isPublished) ? $weight : 0;
-$firstCriteria = (!isset($firstCriteria)) ? $thisCriteria : $firstCriteria;
 $isWinner      = (isset($abTestResults['winners'])
     && in_array(
         $variant->getId(),
@@ -114,7 +112,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
         </div>
         <div class="col-md-4 va-t text-right">
             <em class="text-white dark-sm">
-                <?php if ($isPublished && ($totalWeight > $variants['parent']->getVariantSettingsTotalWeight() || ($thisCriteria && $firstCriteria != $thisCriteria))): ?>
+                <?php if ($variants['configurationError'] === true): ?>
                     <div class="text-danger" data-toggle="label label-danger"
                          title="<?php echo $view['translator']->trans('mautic.core.variant.misconfiguration'); ?>">
                         <div>
@@ -138,7 +136,9 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                         <div>
                             <span class="label label-default"><?php echo $weight; ?>%</span>
                         </div>
-                        <div><?php echo $criteriaLabel; ?></div>
+                        <div>
+                            <i class="fa fa-fw fa-check"></i><?php echo $criteriaLabel; ?>
+                        </div>
                     </div>
                 <?php endif; ?>
             </em>

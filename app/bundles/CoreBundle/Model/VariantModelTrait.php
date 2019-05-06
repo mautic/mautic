@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\CoreBundle\Model\Variant\VariantConverterService;
+use Mautic\CoreBundle\Model\Variant\VariantConverterInterface;
 
 /**
  * Class VariantModelTrait.
@@ -19,11 +19,10 @@ trait VariantModelTrait
     /**
      * Converts a variant to the main item and the original main item a variant.
      */
-    public function convertVariant(VariantEntityInterface $entity)
+    public function convertVariant(VariantEntityInterface $entity, VariantConverterInterface $converter)
     {
         //let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
-        $converter          = new VariantConverterService(); // todo inject it
 
         $converter->convertWinnerVariant($entity);
         $save = $converter->getUpdatedVariants();
