@@ -336,11 +336,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
+            self::getTokenOrEmailConstraint('fromAddress')
         );
 
         $metadata->addPropertyConstraint(
@@ -1173,5 +1169,40 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function isBackgroundSending(): bool
     {
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+    }
+
+    /**
+     * @param $field
+     *
+     * @return Callback
+     */
+    private static function getTokenOrEmailConstraint($field)
+    {
+        return new Callback([
+            'callback' => function ($value, ExecutionContextInterface $context) use ($field) {
+                if (preg_match('/{contactfield=(.*?)}/', $value)) {
+                    return;
+                }
+
+                $validator = $context->getValidator();
+                $violations = $validator->validate(
+                    $value,
+                    [
+                        new \Symfony\Component\Validator\Constraints\Email(
+                            [
+                                'message' => 'mautic.core.email.required',
+                            ]
+                        ),
+                    ]
+                );
+
+                if (count($violations) > 0) {
+                    $string = (string) $violations;
+                    $context->buildViolation($string)
+                        ->atPath($field)
+                        ->addViolation();
+                }
+            }
+        ]);
     }
 }
