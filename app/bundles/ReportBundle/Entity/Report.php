@@ -133,7 +133,7 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', Type::BOOLEAN);
+        $builder->addField('system', Type::BOOLEAN, ['columnName'=>'`system`']);
 
         $builder->addField('source', Type::STRING);
 
@@ -362,6 +362,26 @@ class Report extends FormEntity implements SchedulerInterface
     public function getFilters()
     {
         return $this->filters;
+    }
+
+    /**
+     * Get filter value from a specific filter.
+     *
+     * @param string $column
+     *
+     * @return mixed
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function getFilterValue($column)
+    {
+        foreach ($this->getFilters() as $field) {
+            if ($column === $field['column']) {
+                return $field['value'];
+            }
+        }
+
+        throw new \UnexpectedValueException("Column {$column} doesn't have any filter.");
     }
 
     /**
