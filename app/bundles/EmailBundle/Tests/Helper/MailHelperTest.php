@@ -33,6 +33,11 @@ class MailHelperTest extends TestCase
     private $fromEmailHelper;
 
     /**
+     * @var MauticFactory|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $mockFactory;
+
+    /**
      * @var array
      */
     protected $contacts = [
@@ -69,6 +74,18 @@ class MailHelperTest extends TestCase
     protected function setUp(): void
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+
+        $this->fromEmailHelper = $this->createMock(FromEmailHelper::class);
+
+        $this->mockFactory     = $this->createMock(MauticFactory::class);
+        $this->mockFactory->method('get')
+            ->with('mautic.helper.from_email_helper')
+            ->willReturn($this->fromEmailHelper);
+
+        $this->swiftEventsDispatcher = $this->createMock(\Swift_Events_EventDispatcher::class);
+        $this->delegatingSpool       = $this->createMock(DelegatingSpool::class);
+
+        $this->spoolTransport = new SpoolTransport($this->swiftEventsDispatcher, $this->delegatingSpool);
     }
 
     /**
@@ -76,7 +93,7 @@ class MailHelperTest extends TestCase
      */
     public function testQueueModeThrowsExceptionWhenBatchLimitHit()
     {
-        $mockFactory = $this->createFactory();
+        $mockFactory = $this->mockFactory;
         $mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
@@ -105,7 +122,7 @@ class MailHelperTest extends TestCase
 
     public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit()
     {
-        $mockFactory = $this->createFactory();
+        $mockFactory = $this->mockFactory;
         $mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
@@ -737,7 +754,7 @@ class MailHelperTest extends TestCase
         $mockLeadModel->method('getRepository')
             ->willReturn($mockLeadRepository);
 
-        $mockFactory = $this->createFactory();
+        $mockFactory = $this->mockFactory;
 
         $parameterMap = array_merge(
             [
@@ -786,7 +803,7 @@ class MailHelperTest extends TestCase
 
     public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
-        $mockFactory = $this->createFactory();
+        $mockFactory = $this->mockFactory;
         $mockFactory->method('getParameter')
             ->will(
                 $this->returnValueMap(
@@ -896,60 +913,5 @@ class MailHelperTest extends TestCase
                 $this->assertEquals('{tracking_pixel}', $header->getBody()->getName());
             }
         }
-    }
-
-    public function testInlineImages(): void
-    {
-        $root = realpath(__DIR__.'/../');
-
-        $parameterMap = [
-          ['mailer_convert_embed_images', false, true],
-          ['site_url', false, 'http://default'],
-        ];
-
-        /** @var MockObject|MauticFactory $mockFactory */
-        $mockFactory = $this->getMockFactory(true, $parameterMap);
-
-        $mockFactory->method('getSystemPath')
-          ->with('root', true)
-          ->willReturn($root);
-
-        $transport     = new SmtpTransport();
-        $symfonyMailer = new Mailer($transport);
-
-        $mailer = new MailHelper($mockFactory, $symfonyMailer, ['nobody@nowhere.com' => '{tracking_pixel}']);
-        $mailer->addTo($this->contacts[0]['email']);
-
-        $email = new Email();
-        $email->setSubject('Test');
-        $email->setCustomHtml('<img src="http://default/_data/test_image.png" /><img src="https://www.mautic.org/themes/custom/mauticorg_base/logo.svg" />');
-
-        $mailer->setEmail($email);
-        $mailer->send();
-
-        $attachments = $mailer->message->getAttachments();
-        $body        = $mailer->message->getHtmlBody();
-
-        foreach ($attachments as $attachment) {
-            $matches = [];
-            preg_match('/filename: ([0-9a-z]+)/', $attachment->asDebugString(), $matches);
-            $this->assertStringContainsString('<img src="cid:'.$matches[1].'" />', $body);
-        }
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MauticFactory
-     */
-    private function createFactory()
-    {
-        $mockFactory = $this->createMock(MauticFactory::class);
-
-        $this->fromEmailHelper = $this->createMock(FromEmailHelper::class);
-
-        $mockFactory->method('get')
-            ->with('mautic.helper.from_email_helper')
-            ->willReturn($this->fromEmailHelper);
-
-        return $mockFactory;
     }
 }
