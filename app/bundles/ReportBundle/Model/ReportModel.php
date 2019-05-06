@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -546,7 +547,7 @@ class ReportModel extends FormModel
         $paginate        = !empty($options['paginate']);
         $reportPage      = isset($options['reportPage']) ? $options['reportPage'] : 1;
         $data            = $graphs            = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit    = 0;
@@ -771,5 +772,17 @@ class ReportModel extends FormModel
         }
 
         return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    private function getConnection()
+    {
+        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+            $this->em->getConnection()->connect('slave');
+        }
+
+        return $this->em->getConnection();
     }
 }

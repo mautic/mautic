@@ -362,11 +362,12 @@ return [
     'services' => [
         'events' => [
             'mautic.lead.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\LeadSubscriber',
+                'class'     => Mautic\LeadBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.lead.event.dispatcher',
+                    'mautic.helper.template.dnc_reason',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
@@ -531,6 +532,7 @@ return [
                     'mautic.category.model.category',
                     'mautic.helper.user',
                     'mautic.campaign.model.campaign',
+                    'mautic.asset.model.asset',
                 ],
                 'alias' => 'leadlist',
             ],
@@ -828,6 +830,10 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.validator.length' => [
+                'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
+                'tag'       => 'validator.constraint_validator',
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -940,13 +946,18 @@ return [
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
-                'class'     => 'Mautic\LeadBundle\Templating\Helper\AvatarHelper',
+                'class'     => Mautic\LeadBundle\Templating\Helper\AvatarHelper::class,
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'lead_avatar',
             ],
             'mautic.helper.field.alias' => [
                 'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
                 'arguments' => ['mautic.lead.model.field'],
+            ],
+            'mautic.helper.template.dnc_reason' => [
+                'class'     => Mautic\LeadBundle\Templating\Helper\DncReasonHelper::class,
+                'arguments' => ['translator'],
+                'alias'     => 'lead_dnc_reason',
             ],
         ],
         'models' => [
