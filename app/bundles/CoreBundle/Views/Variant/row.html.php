@@ -14,16 +14,12 @@ if (!isset($variants['properties'][$id])):
     $variants['properties'][$id] = $settings;
 endif;
 
-if (!empty($variants['properties'][$id])):
-    $thisCriteria  = $variants['properties'][$id]['winnerCriteria'];
-    $weight        = (int) $variants['properties'][$id]['weight'];
-    $criteriaLabel = ($thisCriteria) ? $view['translator']->trans(
-        $variants['criteria'][$thisCriteria]['label']
-    ) : '';
-else:
-    $thisCriteria = $criteriaLabel = '';
-    $weight       = 0;
-endif;
+$thisCriteria  = $variants['winnerCriteria'];
+$weight        = (int) $variants['properties'][$id]['weight'];
+$criteriaLabel = ($thisCriteria) ? $view['translator']->trans(
+    $variants['criteria'][$thisCriteria]['label']
+) : '';
+
 $isPublished = $variant->isPublished();
 $totalWeight += ($isPublished) ? $weight : 0;
 $firstCriteria = (!isset($firstCriteria)) ? $thisCriteria : $firstCriteria;

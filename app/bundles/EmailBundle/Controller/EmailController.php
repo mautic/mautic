@@ -303,46 +303,24 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
+
+
         //get A/B test information
-        [$parent, $children]     = $email->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
+        list($parent, $children) = $email->getVariants();
 
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria']) && $c->isPublished()) {
-                    if (!isset($lastCriteria)) {
-                        $lastCriteria = $variantSettings['winnerCriteria'];
-                    }
-
-                    //make sure all the variants are configured with the same criteria
-                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                        $variantError = true;
-                    }
-                } else {
-                    $variantSettings['winnerCriteria'] = '';
-                    $variantSettings['weight']         = 0;
-                }
-
-                $properties[$c->getId()] = $variantSettings;
-            }
-            $parentSettings                                 = $parent->getVariantSettings();
-            $properties[$parent->getId()]['weight']         = $parentSettings['weight'];
-            $properties[$parent->getId()]['winnerCriteria'] = isset($parentSettings['winnerCriteria']) ? $parentSettings['winnerCriteria'] : $lastCriteria;
-        }
+        $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
-        if (!empty($lastCriteria) && empty($variantError)) {
-            if (isset($criteria['criteria'][$lastCriteria])) {
-                $testSettings = $criteria['criteria'][$lastCriteria];
+        if (!empty($abTestSettings['winnerCriteria']) && empty($abTestSettings['configurationError'])) {
+            if (isset($criteria['criteria'][$abTestSettings['winnerCriteria']])) {
+                $testSettings = $criteria['criteria'][$abTestSettings['winnerCriteria']];
 
                 $args = [
                     'email'      => $email,
                     'parent'     => $parent,
                     'children'   => $children,
-                    'properties' => $properties,
+                    'properties' => $abTestSettings, // todo check format
                 ];
 
                 $event = new DetermineWinnerEvent($args);
@@ -381,8 +359,9 @@ class EmailController extends FormController
                     'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
-                        'properties' => $properties,
+                        'properties' => $abTestSettings['variants'],
                         'criteria'   => $criteria['criteria'],
+                        'winnerCriteria' => $abTestSettings['winnerCriteria'],
                     ],
                     'translations' => [
                         'parent'   => $translationParent,

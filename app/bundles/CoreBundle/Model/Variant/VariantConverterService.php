@@ -17,6 +17,9 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
  */
 class VariantConverterService
 {
+    /**
+     * @const integer
+     */
     const DEFAULT_WEIGHT = 100;
 
     /**
@@ -105,7 +108,7 @@ class VariantConverterService
         $variantSettings = $winner->getVariantSettings();
 
         $variantSettings['weight']      = self::DEFAULT_WEIGHT;
-        $variantSettings['weightTotal'] = self::DEFAULT_WEIGHT;
+        $variantSettings['totalWeight'] = self::DEFAULT_WEIGHT;
 
         $winner->setVariantSettings($variantSettings);
     }
@@ -123,7 +126,7 @@ class VariantConverterService
 
         $variantSettings = $oldParent->getVariantSettings();
 
-        $variantSettings['weightTotal'] = self::DEFAULT_WEIGHT;
+        $variantSettings['totalWeight'] = self::DEFAULT_WEIGHT;
 
         $oldParent->setVariantSettings($variantSettings);
     }

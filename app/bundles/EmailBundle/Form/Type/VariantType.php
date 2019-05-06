@@ -52,17 +52,17 @@ class VariantType extends AbstractType
 
         $attr = [
             'class'    => 'form-control',
-            'tooltip'  => 'mautic.core.ab_test.form.traffic_weight_total.help',
+            'tooltip'  => 'mautic.core.ab_test.form.traffic_total_weight.help',
         ];
 
         if ($options['is_parent'] === true && $options['is_existing'] === false) {
             $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
         }
 
-        $builder->add('weightTotal', IntegerType::class, [
-            'label'      => 'mautic.core.ab_test.form.traffic_weight_total',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => $attr,
+        $builder->add('totalWeight', 'integer', [
+            'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => $attr,
             'constraints' => new Assert\Range([
                 'min' => 0,
                 'max' => 100,

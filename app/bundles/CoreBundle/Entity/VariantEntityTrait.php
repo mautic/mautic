@@ -21,7 +21,7 @@ trait VariantEntityTrait
     /**
      * @var array
      */
-    private $variantSettings = ['weightTotal' => 100, 'enableAbTest' => false];
+    private $variantSettings = ['totalWeight' => 100, 'enableAbTest' => false];
 
     /**
      * @var \DateTime
@@ -144,12 +144,6 @@ trait VariantEntityTrait
             }
         }
 
-        if (empty($this->variantSettings['winnerCriteria']) && !empty($this->variantParent)) {
-            $this->setVariantSettings([
-                'winnerCriteria' => $this->getVariantParent()->getVariantSettingsWinnerCriteria(),
-            ]);
-        }
-
         return $this;
     }
 
@@ -160,10 +154,6 @@ trait VariantEntityTrait
      */
     public function getVariantSettings()
     {
-        if ($this->getVariantChildren() !== null) {
-            $this->variantSettings['weight'] = $this->calculateParentSettingsWeight();
-        }
-
         return $this->variantSettings;
     }
 
@@ -174,7 +164,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettingsTotalWeight()
     {
-        return isset($this->variantSettings['weightTotal']) ? $this->variantSettings['weightTotal'] : null;
+        return isset($this->variantSettings['totalWeight']) ? $this->variantSettings['totalWeight'] : null;
     }
 
     /**
@@ -385,24 +375,5 @@ trait VariantEntityTrait
                 }
             }
         }
-    }
-
-    /**
-     * Calculates variantSettings weight.
-     *
-     * @return int
-     */
-    private function calculateParentSettingsWeight()
-    {
-        if ($this->getVariantParent() !== null) {
-            return $this->variantSettings['weight'];
-        }
-
-        $variantsWeight = 0;
-        foreach ($this->getVariantChildren() as $variant) {
-            $variantsWeight = $variant->addWeight($variantsWeight);
-        }
-
-        return $this->getVariantSettingsTotalWeight() - $variantsWeight;
     }
 }
