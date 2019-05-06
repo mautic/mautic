@@ -137,7 +137,7 @@ class FromEmailHelper
     }
 
     /**
-     * @return mixed|string
+     * @return string
      */
     public function getSignature()
     {
@@ -186,9 +186,9 @@ class FromEmailHelper
     }
 
     /**
-     * @param $email
+     * @param string $email
      *
-     * @return false|int
+     * @return bool
      */
     private function isToken($email)
     {
