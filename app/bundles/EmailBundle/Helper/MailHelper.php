@@ -13,11 +13,11 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Form\Type\ConfigType;
-use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Mautic\EmailBundle\Mailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
+use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -2022,9 +2022,11 @@ class MailHelper
             return false;
         }
 
-        $owner = $this->fromEmailHelper->getContactOwner($contact['owner_id']);
-
-        return $owner ? $owner : false;
+        try {
+            return $this->fromEmailHelper->getContactOwner($contact['owner_id']);
+        } catch (OwnerNotFoundException $exception) {
+            return false;
+        }
     }
 
     /**
@@ -2040,6 +2042,12 @@ class MailHelper
             return '';
         }
 
-        return $this->fromEmailHelper->getSignature($owner['id']);
+        try {
+            $this->fromEmailHelper->getContactOwner($owner['id']);
+        } catch (OwnerNotFoundException $exception) {
+            return '';
+        }
+
+        return $this->fromEmailHelper->getSignature();
     }
 }

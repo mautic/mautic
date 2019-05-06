@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
@@ -328,8 +329,10 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($user === $owner);
     }
 
-    public function testNullIsReturnedWhenMailAsOwnerIsDisabled()
+    public function testExceptionIsThrownWhenMailAsOwnerIsDisabled()
     {
+        $this->expectException(OwnerNotFoundException::class);
+
         $this->coreParametersHelper->expects($this->once())
             ->method('getParameter')
             ->with('mailer_is_owner')
@@ -343,8 +346,10 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $owner);
     }
 
-    public function testNullIsReturnedWhenOwnerNotFound()
+    public function testExceptionIsThrownWhenOwnerNotFound()
     {
+        $this->expectException(OwnerNotFoundException::class);
+
         $this->coreParametersHelper->expects($this->once())
             ->method('getParameter')
             ->with('mailer_is_owner')

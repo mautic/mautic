@@ -112,15 +112,17 @@ class FromEmailHelper
     /**
      * @param int $userId
      *
-     * @return array|null
+     * @return array
+     *
+     * @throws OwnerNotFoundException
      */
-    public function getContactOwner(int $userId)
+    public function getContactOwner($userId)
     {
         // Reset last owner
         $this->lastOwner = null;
 
         if (!$this->coreParametersHelper->getParameter('mailer_is_owner')) {
-            return null;
+            throw new OwnerNotFoundException('mailer_is_owner is not enabled');
         }
 
         if (isset($this->owners[$userId])) {
@@ -133,7 +135,7 @@ class FromEmailHelper
             return $owner;
         }
 
-        return null;
+        throw new OwnerNotFoundException();
     }
 
     /**
@@ -235,10 +237,7 @@ class FromEmailHelper
             throw new OwnerNotFoundException();
         }
 
-        if (!$owner = $this->getContactOwner($contact['owner_id'])) {
-            throw new OwnerNotFoundException();
-        }
-
+        $owner      = $this->getContactOwner($contact['owner_id']);
         $ownerEmail = $owner['email'];
         $ownerName  = sprintf('%s %s', $owner['first_name'], $owner['last_name']);
 
