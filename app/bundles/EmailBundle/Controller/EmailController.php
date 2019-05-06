@@ -306,11 +306,9 @@ class EmailController extends FormController
         //get A/B test information
         list($parent, $children) = $email->getVariants();
 
-        if(count($children) > 0)
-        {
+        if (count($children) > 0) {
             $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
         }
-
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');

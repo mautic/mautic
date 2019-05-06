@@ -164,11 +164,11 @@ class VariantConverterService implements VariantConverterInterface
      */
     private function switchVariantSettings(VariantEntityInterface $winner, VariantEntityInterface $oldParent)
     {
-        $winnerSettings = $winner->getVariantSettings();
+        $winnerSettings    = $winner->getVariantSettings();
         $oldParentSettings = $oldParent->getVariantSettings();
 
         $winnerSettings['winnerCriteria'] = $oldParentSettings['winnerCriteria'];
-        $oldParentSettings['weight'] = 0;
+        $oldParentSettings['weight']      = 0;
 
         $winner->setVariantSettings($winnerSettings);
         $oldParent->setVariantSettings($oldParentSettings);

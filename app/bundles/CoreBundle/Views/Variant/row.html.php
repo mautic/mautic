@@ -20,7 +20,7 @@ $criteriaLabel = ($thisCriteria) ? $view['translator']->trans(
     $variants['criteria'][$thisCriteria]['label']
 ) : '';
 
-$isPublished = $variant->isPublished();
+$isPublished   = $variant->isPublished();
 $isWinner      = (isset($abTestResults['winners'])
     && in_array(
         $variant->getId(),
