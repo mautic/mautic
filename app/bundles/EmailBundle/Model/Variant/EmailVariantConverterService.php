@@ -21,10 +21,11 @@ class EmailVariantConverterService
     /**
      * @var VariantConverterService
      */
-    var $variantConverterService;
+    public $variantConverterService;
 
     /**
      * EmailVariantConverterService constructor.
+     *
      * @param VariantConverterService $variantConverterService
      */
     public function __construct(VariantConverterService $variantConverterService)
@@ -42,13 +43,9 @@ class EmailVariantConverterService
         $this->setDefaultValues();
     }
 
-    /**
-     *
-     */
     private function setDefaultValues()
     {
-        foreach ($this->getUpdatedVariants() as $variant)
-        {
+        foreach ($this->getUpdatedVariants() as $variant) {
             $variant->setVariantSentCount(0);
         }
     }

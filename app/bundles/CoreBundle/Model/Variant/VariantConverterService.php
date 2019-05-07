@@ -108,7 +108,7 @@ class VariantConverterService
      */
     private function updateWinnerSettings(VariantEntityInterface $winner)
     {
-        $variantSettings = $winner->getVariantSettings();
+        $variantSettings           = $winner->getVariantSettings();
         $variantSettings['weight'] = self::DEFAULT_WEIGHT;
         $winner->setVariantSettings($variantSettings);
 
@@ -175,7 +175,6 @@ class VariantConverterService
         $winner->setVariantSettings($winnerSettings);
         $oldParent->setVariantSettings($oldParentSettings);
     }
-
 
     /**
      * @param VariantEntityInterface $variant

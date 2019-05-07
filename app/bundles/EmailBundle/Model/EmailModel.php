@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
+use Mautic\CoreBundle\Model\Variant\AbTestSettingsService;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
@@ -34,6 +35,7 @@ use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
+use Mautic\EmailBundle\Model\Variant\EmailVariantConverterService;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
@@ -51,8 +53,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Mautic\CoreBundle\Model\Variant\AbTestSettingsService;
-use Mautic\EmailBundle\Model\Variant\EmailVariantConverterService;
 
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -1227,7 +1227,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $childrenVariant = $email->getVariantChildren();
 
                 if (count($childrenVariant)) {
-                    $totalSent     = $emailSettings[$email->getId()]['variantCount'];
+                    $totalSent      = $emailSettings[$email->getId()]['variantCount'];
                     $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
                     foreach ($childrenVariant as $child) {
