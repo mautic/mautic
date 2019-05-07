@@ -20,7 +20,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactDeduper
 {
@@ -62,7 +62,7 @@ class ContactDeduper
      * @param LeadRepository  $leadRepository
      * @param EventDispatcher $dispatcher
      */
-    public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository, EventDispatcher $dispatcher)
+    public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository, EventDispatcherInterface $dispatcher)
     {
         $this->fieldModel     = $fieldModel;
         $this->contactMerger  = $contactMerger;
@@ -79,7 +79,7 @@ class ContactDeduper
     public function deduplicate($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
         $this->mergeNewerIntoOlder = $mergeNewerIntoOlder;
-        $lastContactId             = 0;
+        $lastContactId             = 23823;
         $totalContacts             = $this->leadRepository->getIdentifiedContactCount();
         $progress                  = null;
 
@@ -91,12 +91,7 @@ class ContactDeduper
         while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
             $lastContactId = $contact->getId();
             $fields        = $contact->getProfileFields();
-
-            try {
-                $duplicates = $this->dispatchGetLeadsByUniqueFieldsByPlugin($fields);
-            } catch (NotHandledDuplicationByPlugin $exception) {
-                $duplicates    = $this->checkForDuplicateContacts($fields);
-            }
+            $duplicates    = $this->checkForDuplicateContacts($fields);
 
             if ($progress) {
                 $progress->advance();
@@ -138,8 +133,12 @@ class ContactDeduper
     public function checkForDuplicateContacts(array $queryFields)
     {
         $duplicates = [];
-        if ($uniqueData = $this->getUniqueData($queryFields)) {
-            $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
+        try {
+            $duplicates = $this->dispatchGetLeadsByUniqueFieldsByPlugin($queryFields);
+        } catch (NotHandledDuplicationByPlugin $exception) {
+            if ($uniqueData = $this->getUniqueData($queryFields)) {
+                $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
+            }
 
             // By default, duplicates are ordered by newest first
             if (!$this->mergeNewerIntoOlder) {
@@ -206,8 +205,9 @@ class ContactDeduper
         if ($this->dispatcher->hasListeners(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT)) {
             $event = new CheckForDuplicateContactsEvent($queryFields);
             $this->dispatcher->dispatch(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT, $event);
-
-            return $event->getDuplicates();
+            if ($event->isHandledByPlugin()) {
+                return $event->getDuplicates();
+            }
         }
 
         throw new NotHandledDuplicationByPlugin();

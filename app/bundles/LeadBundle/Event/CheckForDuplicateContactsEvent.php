@@ -18,7 +18,12 @@ class CheckForDuplicateContactsEvent extends \Mautic\ChannelBundle\Event\Channel
      */
     private $fields;
 
+    /**
+     * @var array
+     */
     private $duplicates = [];
+
+    private $handledByPlugin = false;
 
     /**
      * CheckForDuplicateContactsEvent constructor.
@@ -59,6 +64,15 @@ class CheckForDuplicateContactsEvent extends \Mautic\ChannelBundle\Event\Channel
      */
     public function setDuplicates($duplicates)
     {
-        $this->duplicates = $duplicates;
+        $this->handledByPlugin = true;
+        $this->duplicates      = $duplicates;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHandledByPlugin()
+    {
+        return $this->handledByPlugin;
     }
 }
