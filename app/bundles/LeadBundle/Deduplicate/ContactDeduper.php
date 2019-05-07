@@ -137,7 +137,6 @@ class ContactDeduper
     public function checkForDuplicateContacts(array $queryFields)
     {
         $duplicates = [];
-
         if ($uniqueData = $this->getUniqueData($queryFields)) {
             $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
 
