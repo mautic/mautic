@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\CheckForDuplicateContactsEvent;
-use Mautic\LeadBundle\Exception\PluginNotHandledGetLeadsByUniqueFieldsException;
+use Mautic\LeadBundle\Exception\NotHandledDuplicationByPlugin;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -134,8 +134,8 @@ class ContactDeduper
         $duplicates = [];
         $uniqueData = $this->getUniqueData($queryFields);
         try {
-            $duplicates = $this->dispatchPluginGetLeadsByUniqueFields($queryFields, $uniqueData);
-        } catch (PluginNotHandledGetLeadsByUniqueFieldsException $exception) {
+            $duplicates = $this->dispatchGełtLeadsByUniqueFieldsByPlugin($queryFields, $uniqueData);
+        } catch (NotHandledDuplicationByPlugin $exception) {
             if (!empty($uniqueData)) {
                 $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
             }
@@ -199,9 +199,9 @@ class ContactDeduper
      *
      * @return array
      *
-     * @throws PluginNotHandledGetLeadsByUniqueFieldsException
+     * @throws NotHandledDuplicationByPlugin
      */
-    private function dispatchPluginGetLeadsByUniqueFields(array $queryFields, array $uniqueFields)
+    private function dispatchGetLeadsByUniqueFieldsByPlugin(array $queryFields, array $uniqueFields)
     {
         if ($this->dispatcher->hasListeners(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT)) {
             $event = new CheckForDuplicateContactsEvent($queryFields, $uniqueFields);
@@ -210,6 +210,6 @@ class ContactDeduper
             return $event->getDuplicates();
         }
 
-        throw new PluginNotHandledGetLeadsByUniqueFieldsException();
+        throw new NotHandledDuplicationByPlugin();
     }
 }

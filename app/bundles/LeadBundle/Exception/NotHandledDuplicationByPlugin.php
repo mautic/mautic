@@ -11,6 +11,6 @@
 
 namespace Mautic\LeadBundle\Exception;
 
-class PluginNotHandledGetLeadsByUniqueFieldsException extends \Exception
+class NotHandledDuplicationByPlugin extends \Exception
 {
 }
