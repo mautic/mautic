@@ -79,7 +79,7 @@ class ContactDeduper
     public function deduplicate($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
         $this->mergeNewerIntoOlder = $mergeNewerIntoOlder;
-        $lastContactId             = 23823;
+        $lastContactId             = 0;
         $totalContacts             = $this->leadRepository->getIdentifiedContactCount();
         $progress                  = null;
 
