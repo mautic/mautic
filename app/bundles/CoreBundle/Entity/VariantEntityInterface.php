@@ -19,6 +19,8 @@ interface VariantEntityInterface
     /**
      * Set entity this is a translation of.
      *
+     * @param VariantEntityInterface $parent
+     *
      * @return mixed
      */
     public function setVariantParent(VariantEntityInterface $parent = null);
@@ -40,12 +42,16 @@ interface VariantEntityInterface
     /**
      * Add entity to $translationChildren.
      *
+     * @param VariantEntityInterface $child
+     *
      * @return mixed
      */
     public function addVariantChild(VariantEntityInterface $child);
 
     /**
      * Remove entity from $translationChildren.
+     *
+     * @param VariantEntityInterface $child
      *
      * @return mixed
      */
@@ -87,4 +93,11 @@ interface VariantEntityInterface
      * @return mixed
      */
     public function setVariantSettings($variantSettings);
+
+    /**
+     * @param $variantStartDate
+     *
+     * @return $this
+     */
+    public function setVariantStartDate($variantStartDate);
 }

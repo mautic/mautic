@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -15,6 +16,7 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\CoreBundle\Model\Variant\VariantConverterService;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -104,15 +106,16 @@ class PageModel extends FormModel
      * @var CompanyModel
      */
     private $companyModel;
+    /**
+     * @var VariantConverterService
+     */
+    private $variantConverterService;
 
     /**
      * @var ContactTracker
      */
     private $contactTracker;
 
-    /**
-     * PageModel constructor.
-     */
     public function __construct(
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
@@ -124,7 +127,8 @@ class PageModel extends FormModel
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        VariantConverterService $variantConverterService
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -138,6 +142,7 @@ class PageModel extends FormModel
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->variantConverterService  = $variantConverterService;
     }
 
     /**
@@ -1195,7 +1200,24 @@ class PageModel extends FormModel
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
     }
 
-    /*
+    /**
+     * Converts a variant to the main item and the original main item a variant.
+     *
+     * @param VariantEntityInterface $entity
+     */
+    public function convertWinnerVariant(VariantEntityInterface $entity)
+    {
+        //let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        $this->variantConverterService->convertWinnerVariant($entity);
+        $save = $this->variantConverterService->getUpdatedVariants();
+
+        //save the entities
+        $this->saveEntities($save, false);
+    }
+
+    /**
      * Cleans query params saving url values.
      *
      * @param $query array

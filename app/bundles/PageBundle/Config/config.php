@@ -299,6 +299,7 @@ return [
                     'mautic.tracker.device',
                     'mautic.tracker.contact',
                     'mautic.helper.core_parameters',
+                    'mautic.core.variant.converter',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

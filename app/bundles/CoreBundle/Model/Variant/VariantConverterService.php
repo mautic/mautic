@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 /**
  * Class VariantConverterService.
  */
-class VariantConverterService implements VariantConverterInterface
+class VariantConverterService
 {
     /**
      * @const integer
@@ -108,10 +108,12 @@ class VariantConverterService implements VariantConverterInterface
      */
     private function updateWinnerSettings(VariantEntityInterface $winner)
     {
-        $variantSettings['weight']      = self::DEFAULT_WEIGHT;
+        $variantSettings = $winner->getVariantSettings();
+        $variantSettings['weight'] = self::DEFAULT_WEIGHT;
         $winner->setVariantSettings($variantSettings);
 
         $this->setDefaultValues($winner);
+        $this->addToUpdatedVariants($winner);
     }
 
     /**
@@ -174,6 +176,7 @@ class VariantConverterService implements VariantConverterInterface
         $oldParent->setVariantSettings($oldParentSettings);
     }
 
+
     /**
      * @param VariantEntityInterface $variant
      */
@@ -185,7 +188,6 @@ class VariantConverterService implements VariantConverterInterface
 
         $variant->setVariantSettings($variantSettings);
 
-        $variant->setVariantSentCount(0);
         $variant->setVariantStartDate(null);
     }
 }

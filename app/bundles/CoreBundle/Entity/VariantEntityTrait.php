@@ -158,16 +158,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get variantSettings total weight.
-     *
-     * @return int
-     */
-    public function getVariantSettingsTotalWeight()
-    {
-        return isset($this->variantSettings['totalWeight']) ? $this->variantSettings['totalWeight'] : null;
-    }
-
-    /**
      * @return mixed
      */
     public function getVariantStartDate()

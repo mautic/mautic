@@ -320,7 +320,7 @@ class EmailController extends FormController
                     'email'      => $email,
                     'parent'     => $parent,
                     'children'   => $children,
-                    'properties' => $abTestSettings, // todo check format
+                    'properties' => $abTestSettings,
                 ];
 
                 $event = new DetermineWinnerEvent($args);
@@ -1050,8 +1050,7 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
-            $variantConverter = $this->get('mautic.core.variant.converter');
-            $model->convertVariant($entity, $variantConverter);
+            $model->convertWinnerVariant($entity);
 
             $flashes[] = [
                 'type'    => 'notice',

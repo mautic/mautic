@@ -806,6 +806,12 @@ return [
                 ],
                 'tag' => 'mautic.email_stat_helper',
             ],
+            'mautic.email.variant.converter'=> [
+                'class'     => \Mautic\EmailBundle\Model\Variant\EmailVariantConverterService::class,
+                'arguments' => [
+                    'mautic.core.variant.converter',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -829,6 +835,8 @@ return [
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
                     'doctrine.dbal.default_connection',
+                    'mautic.core.variant.abtest_settings',
+                    'mautic.email.variant.converter',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [

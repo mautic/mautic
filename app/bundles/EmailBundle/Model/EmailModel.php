@@ -51,6 +51,8 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Mautic\CoreBundle\Model\Variant\AbTestSettingsService;
+use Mautic\EmailBundle\Model\Variant\EmailVariantConverterService;
 
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -154,6 +156,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     private $statsCollectionHelper;
 
+    private AbTestSettingsService $abTestSettingsService;
+
+    private EmailVariantConverterService $variantConverterService;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ThemeHelperInterface $themeHelper,
@@ -172,7 +178,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
         CorePermissions $corePermissions,
-        Connection $connection
+        Connection $connection,
+        AbTestSettingsService $abTestSettingsService,
+        EmailVariantConverterService $variantConverterService
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -190,6 +198,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->contactTracker           = $contactTracker;
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
+        $this->abTestSettingsService    = $abTestSettingsService;
+        $this->variantConverterService  = $variantConverterService;
         $this->corePermissions          = $corePermissions;
         $this->connection               = $connection;
     }
@@ -1217,8 +1227,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $childrenVariant = $email->getVariantChildren();
 
                 if (count($childrenVariant)) {
-                    $variantWeight = 0;
                     $totalSent     = $emailSettings[$email->getId()]['variantCount'];
+                    $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
                     foreach ($childrenVariant as $child) {
                         if ($child->isPublished()) {
@@ -1231,20 +1241,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                                     $useSlots         = $slots[$template];
                                 }
                             }
-                            $variantSettings                = $child->getVariantSettings();
+
                             $emailSettings[$child->getId()] = [
                                 'template'     => $child->getTemplate(),
                                 'slots'        => $useSlots,
                                 'sentCount'    => $child->getSentCount(),
                                 'variantCount' => $child->getVariantSentCount(),
                                 'isVariant'    => null !== $email->getVariantStartDate(),
-                                'weight'       => ($variantSettings['weight'] / 100),
+                                'weight'       => ($abTestSettings['variants'][$child->getId()]['weight'] / 100),
                                 'entity'       => $child,
                                 'translations' => $child->getTranslations(true),
                                 'languages'    => ['default' => $child->getId()],
                             ];
-
-                            $variantWeight += $variantSettings['weight'];
 
                             if ($emailSettings[$child->getId()]['translations']) {
                                 // Add in the sent counts for translations of this email
@@ -1272,8 +1280,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     //set parent weight
-                    $totalWeight                              = $email->getVariantSettingsTotalWeight();
-                    $emailSettings[$email->getId()]['weight'] = (($totalWeight - $variantWeight) / 100);
+                    $emailSettings[$email->getId()]['weight'] = $abTestSettings['variants'][$email->getId()]['weight'] / 100;
                 } else {
                     $emailSettings[$email->getId()]['weight'] = 1;
                 }
@@ -2340,5 +2347,22 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function isUpdatingTranslationChildren(): bool
     {
         return $this->updatingTranslationChildren;
+    }
+
+    /**
+     * Converts a variant to the main item and the original main item a variant.
+     *
+     * @param Email $entity
+     */
+    public function convertWinnerVariant(Email $entity)
+    {
+        //let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        $this->variantConverterService->convertWinnerVariant($entity);
+        $save = $this->variantConverterService->getUpdatedVariants();
+
+        //save the entities
+        $this->saveEntities($save, false);
     }
 }
