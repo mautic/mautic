@@ -391,7 +391,7 @@ class MailHelper
                 $this->message->attach($attachment);
             }
 
-            $this->message->setSubject($this->subject.rand(1,999));
+            $this->message->setSubject($this->subject);
             // Only set body if not empty or if plain text is empty - this ensures an empty HTML body does not show for
             // messages only with plain text
             if (!empty($this->body['content']) || empty($this->plainText)) {
