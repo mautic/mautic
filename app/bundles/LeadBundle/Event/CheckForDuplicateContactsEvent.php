@@ -21,20 +21,13 @@ class CheckForDuplicateContactsEvent extends \Mautic\ChannelBundle\Event\Channel
     private $duplicates = [];
 
     /**
-     * @var array
-     */
-    private $uniqueFields;
-
-    /**
      * CheckForDuplicateContactsEvent constructor.
      *
      * @param array $fields
-     * @param array $uniqueFields
      */
-    public function __construct(array $fields, array $uniqueFields)
+    public function __construct(array $fields)
     {
-        $this->fields       = $fields;
-        $this->uniqueFields = $uniqueFields;
+        $this->fields = $fields;
     }
 
     /**
@@ -51,22 +44,6 @@ class CheckForDuplicateContactsEvent extends \Mautic\ChannelBundle\Event\Channel
     public function setFields($fields)
     {
         $this->fields = $fields;
-    }
-
-    /**
-     * @return array
-     */
-    public function getUniqueFields()
-    {
-        return $this->uniqueFields;
-    }
-
-    /**
-     * @param array $uniqueFields
-     */
-    public function setUniqueFields($uniqueFields)
-    {
-        $this->uniqueFields = $uniqueFields;
     }
 
     /**

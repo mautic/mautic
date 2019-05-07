@@ -90,7 +90,12 @@ class ContactDeduper
         while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
             $lastContactId = $contact->getId();
             $fields        = $contact->getProfileFields();
-            $duplicates    = $this->checkForDuplicateContacts($fields);
+
+            try {
+                $duplicates = $this->dispatchGetLeadsByUniqueFieldsByPlugin($fields);
+            } catch (NotHandledDuplicationByPlugin $exception) {
+                $duplicates    = $this->checkForDuplicateContacts($fields);
+            }
 
             if ($progress) {
                 $progress->advance();
@@ -132,20 +137,16 @@ class ContactDeduper
     public function checkForDuplicateContacts(array $queryFields)
     {
         $duplicates = [];
-        $uniqueData = $this->getUniqueData($queryFields);
-        try {
-            $duplicates = $this->dispatchGełtLeadsByUniqueFieldsByPlugin($queryFields, $uniqueData);
-        } catch (NotHandledDuplicationByPlugin $exception) {
-            if (!empty($uniqueData)) {
-                $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
-            }
-        }
 
-        // By default, duplicates are ordered by newest first
-        if (!$this->mergeNewerIntoOlder) {
-            // Reverse the array so that oldest are on "top" in order to merge oldest into the next until they all have been merged into the
-            // the newest record
-            $duplicates = array_reverse($duplicates);
+        if ($uniqueData = $this->getUniqueData($queryFields)) {
+            $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
+
+            // By default, duplicates are ordered by newest first
+            if (!$this->mergeNewerIntoOlder) {
+                // Reverse the array so that oldest are on "top" in order to merge oldest into the next until they all have been merged into the
+                // the newest record
+                $duplicates = array_reverse($duplicates);
+            }
         }
 
         return $duplicates;
@@ -195,16 +196,15 @@ class ContactDeduper
 
     /**
      * @param array $queryFields
-     * @param array $uniqueFields
      *
      * @return array
      *
      * @throws NotHandledDuplicationByPlugin
      */
-    private function dispatchGetLeadsByUniqueFieldsByPlugin(array $queryFields, array $uniqueFields)
+    private function dispatchGetLeadsByUniqueFieldsByPlugin(array $queryFields)
     {
         if ($this->dispatcher->hasListeners(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT)) {
-            $event = new CheckForDuplicateContactsEvent($queryFields, $uniqueFields);
+            $event = new CheckForDuplicateContactsEvent($queryFields);
             $this->dispatcher->dispatch(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT, $event);
 
             return $event->getDuplicates();

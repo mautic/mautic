@@ -583,6 +583,16 @@ final class LeadEvents
     const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
 
     /**
+     * The mautic.check_for_duplicate_contact event is dispatched when deduplicate for contact is execute
+     * URL.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CheckForDuplicateContactsEvent instance.
+     *
+     * @var string
+     */
+    const CHECK_FOR_DUPLICATE_CONTACTS_EVENT = 'mautic.check_for_duplicate_contact';
+
+    /**
      * @deprecated - 2.4 to be removed in 3.0; use Mautic\ChannelBundle\ChannelEvents::ADD_CHANNEL
      *
      * The mautic.add_channel event registers communication channels.
