@@ -14,9 +14,13 @@ namespace Mautic\LeadBundle\Deduplicate;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\CheckForDuplicateContactsEvent;
+use Mautic\LeadBundle\Exception\PluginNotHandledCheckForDuplicateContactsException;
 use Mautic\LeadBundle\Model\FieldModel;
+use OpenCloud\CloudMonitoring\Resource\Check;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ContactDeduper
 {
@@ -46,17 +50,36 @@ class ContactDeduper
     private $mergeNewerIntoOlder = false;
 
     /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
+
+    /**
      * DedupModel constructor.
      *
-     * @param FieldModel     $fieldModel
-     * @param ContactMerger  $contactMerger
-     * @param LeadRepository $leadRepository
+     * @param FieldModel      $fieldModel
+     * @param ContactMerger   $contactMerger
+     * @param LeadRepository  $leadRepository
+     * @param EventDispatcher $dispatcher
      */
-    public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository)
+    public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository, EventDispatcher $dispatcher)
     {
         $this->fieldModel     = $fieldModel;
         $this->contactMerger  = $contactMerger;
         $this->leadRepository = $leadRepository;
+        $this->dispatcher     = $dispatcher;
+    }
+
+    private function dispatchPluginCheckForDuplicateContactsEvent(array $fields)
+    {
+        if ($this->dispatcher->hasListeners(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT)) {
+            $event = new CheckForDuplicateContactsEvent($fields);
+            $this->dispatcher->dispatch(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT, $event);
+
+            return $event->getDuplicates();
+        }
+
+        throw new PluginNotHandledCheckForDuplicateContactsException();
     }
 
     /**
@@ -80,7 +103,13 @@ class ContactDeduper
         while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
             $lastContactId = $contact->getId();
             $fields        = $contact->getProfileFields();
-            $duplicates    = $this->checkForDuplicateContacts($fields);
+            try {
+                // plugin check
+                $duplicates = $this->dispatchPluginCheckForDuplicateContactsEvent($fields);
+            } catch (PluginNotHandledCheckForDuplicateContactsException $exception) {
+                // default check
+                $duplicates    = $this->checkForDuplicateContacts($fields);
+            }
 
             if ($progress) {
                 $progress->advance();

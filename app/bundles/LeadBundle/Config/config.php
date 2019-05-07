@@ -822,6 +822,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.merger',
                     'mautic.lead.repository.lead',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.lead.helper.primary_company' => [
