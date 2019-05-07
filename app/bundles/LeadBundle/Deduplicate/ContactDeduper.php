@@ -50,17 +50,17 @@ class ContactDeduper
     private $mergeNewerIntoOlder = false;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
      * DedupModel constructor.
      *
-     * @param FieldModel      $fieldModel
-     * @param ContactMerger   $contactMerger
-     * @param LeadRepository  $leadRepository
-     * @param EventDispatcher $dispatcher
+     * @param FieldModel               $fieldModel
+     * @param ContactMerger            $contactMerger
+     * @param LeadRepository           $leadRepository
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository, EventDispatcherInterface $dispatcher)
     {
