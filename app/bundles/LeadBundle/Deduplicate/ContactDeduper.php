@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Deduplicate;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\CheckForDuplicateContactsEvent;
+use Mautic\LeadBundle\Event\DuplicateContactsEvent;
 use Mautic\LeadBundle\Exception\NotHandledDuplicationByPlugin;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -134,7 +134,7 @@ class ContactDeduper
     {
         $duplicates = [];
         try {
-            $duplicates = $this->dispatchGetLeadsByUniqueFieldsByPlugin($queryFields);
+            $duplicates = $this->dispatchDuplicatesByPlugin($queryFields);
         } catch (NotHandledDuplicationByPlugin $exception) {
             if ($uniqueData = $this->getUniqueData($queryFields)) {
                 $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
@@ -200,10 +200,10 @@ class ContactDeduper
      *
      * @throws NotHandledDuplicationByPlugin
      */
-    private function dispatchGetLeadsByUniqueFieldsByPlugin(array $queryFields)
+    private function dispatchDuplicatesByPlugin(array $queryFields)
     {
         if ($this->dispatcher->hasListeners(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT)) {
-            $event = new CheckForDuplicateContactsEvent($queryFields);
+            $event = new DuplicateContactsEvent($queryFields);
             $this->dispatcher->dispatch(LeadEvents::CHECK_FOR_DUPLICATE_CONTACTS_EVENT, $event);
             if ($event->isHandledByPlugin()) {
                 return $event->getDuplicates();

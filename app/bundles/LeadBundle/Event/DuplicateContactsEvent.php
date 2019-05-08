@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Event;
 
-class CheckForDuplicateContactsEvent extends \Mautic\ChannelBundle\Event\ChannelEvent
+class DuplicateContactsEvent extends \Mautic\ChannelBundle\Event\ChannelEvent
 {
     /**
      * @var array
