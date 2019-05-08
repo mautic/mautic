@@ -22,6 +22,7 @@ use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
 use Mautic\QueueBundle\QueueEvents;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -48,15 +49,18 @@ class MomentumSubscriber extends CommonSubscriber
      * @param MomentumCallbackInterface $momentumCallback
      * @param QueueService              $queueService
      * @param RequestStorageHelper      $requestStorageHelper
+     * @param LoggerInterface           $logger
      */
     public function __construct(
         MomentumCallbackInterface $momentumCallback,
         QueueService $queueService,
-        RequestStorageHelper $requestStorageHelper
+        RequestStorageHelper $requestStorageHelper,
+        LoggerInterface $logger
     ) {
         $this->momentumCallback     = $momentumCallback;
         $this->queueService         = $queueService;
         $this->requestStorageHelper = $requestStorageHelper;
+        $this->logger               = $logger;
     }
 
     /**
@@ -80,9 +84,15 @@ class MomentumSubscriber extends CommonSubscriber
         if ($event->checkTransport(MomentumTransport::class)) {
             $payload = $event->getPayload();
             $key     = $payload['key'];
-            $request = $this->requestStorageHelper->getRequest($key);
-            $this->momentumCallback->processCallbackRequest($request);
-            $this->requestStorageHelper->deleteCachedRequest($key);
+
+            try {
+                $request = $this->requestStorageHelper->getRequest($key);
+                $this->momentumCallback->processCallbackRequest($request);
+                $this->requestStorageHelper->deleteCachedRequest($key);
+            } catch (\UnexpectedValueException $e) {
+                $this->logger->error($e->getMessage());
+            }
+
             $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
         }
     }
@@ -96,7 +106,7 @@ class MomentumSubscriber extends CommonSubscriber
         if ($this->queueService->isQueueEnabled() && $event->transportIsInstanceOf($transport)) {
             // Beanstalk jobs are limited to 65,535 kB. Momentum can send up to 10.000 items per request.
             // One item has about 1,6 kB. Lets store the request to the cache storage instead of the job itself.
-            $key       = $this->requestStorageHelper->storeRequest($transport, $event->getRequest());
+            $key = $this->requestStorageHelper->storeRequest($transport, $event->getRequest());
             $this->queueService->publishToQueue(QueueName::TRANSPORT_WEBHOOK, ['transport' => $transport, 'key' => $key]);
             $event->stopPropagation();
         }
