@@ -78,10 +78,12 @@
             if (Core.debug()) console.log('binding modal click events');
             for(var index in Form.clickEvents) {
                 var current = Form.clickEvents[index];
-                document.querySelector(current.data.element).setAttribute("_mautic_form_index", index);
-                document.querySelector(current.data.element).addEventListener("click", function(){
-                    if (Core.debug()) console.log('add event to '+current.data.element);
-                    Form.openModal(Form.clickEvents[this.getAttribute('_mautic_form_index')]);
+                document.querySelectorAll(current.data.element).forEach(function(el) {
+                    el.setAttribute("_mautic_form_index", index);
+                    el.addEventListener("click", function(){
+                      if (Core.debug()) console.log('add event to '+current.data.element);
+                      Form.openModal(Form.clickEvents[this.getAttribute('_mautic_form_index')]);
+                    });
                 });
             }
         };
@@ -95,8 +97,8 @@
         };
 
         Form.getFormLink = function(options) {
-            var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
+            var index = (Core.devMode()) ? 'index_dev.php/' : '';
+            return Core.getMauticBaseUrl() + index + 'form/' + options.data['id'] + '?' + options.params;
         };
 
         Form.createIframe = function(options, embed) {
@@ -807,10 +809,15 @@
             if (typeof(config.mautic_base_url) == 'undefined') Core.setMauticBaseUrl(base_url);
             if (Core.debug()) console.log('Automatic setup mautic_base_url as: ' + config.mautic_base_url);
             Modal.loadStyle();
-            document.addEventListener("DOMContentLoaded", function(e){
+            if(document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded',afterDOMLoaded);
+            } else {
+                afterDOMLoaded();
+            }
+            function afterDOMLoaded(e){
                 if (Core.debug()) console.log('DOM is ready');
                 Form.initialize();
-            });
+            }
         };
 
         Core.openModal = function(options){
