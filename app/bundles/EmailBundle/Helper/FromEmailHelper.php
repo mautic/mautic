@@ -13,7 +13,10 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
+use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
 class FromEmailHelper
@@ -34,7 +37,7 @@ class FromEmailHelper
     private $owners = [];
 
     /**
-     * @var array|null
+     * @var AddressDTO|null
      */
     private $defaultFrom;
 
@@ -60,7 +63,7 @@ class FromEmailHelper
      */
     public function setDefaultFromArray(array $from)
     {
-        $this->defaultFrom = $from;
+        $this->defaultFrom = new AddressDTO($from);
     }
 
     /**
@@ -71,14 +74,14 @@ class FromEmailHelper
      */
     public function getFromAddressArrayConsideringOwner(array $from, array $contact = null)
     {
+        $address = new AddressDTO($from);
+
         // Reset last owner
         $this->lastOwner = null;
 
-        $email = key($from);
-
         // Check for token
-        if ($this->isToken($email)) {
-            return $this->getEmailArrayFromToken($email, $contact, true);
+        if ($address->isEmailTokenized() || $address->isNameTokenized()) {
+            return $this->getEmailArrayFromToken($address, $contact);
         }
 
         try {
@@ -96,14 +99,14 @@ class FromEmailHelper
      */
     public function getFromAddressArray(array $from, array $contact = null)
     {
+        $address = new AddressDTO($from);
+
         // Reset last owner
         $this->lastOwner = null;
 
-        $email = key($from);
-
         // Check for token
-        if ($this->isToken($email)) {
-            return $this->getEmailArrayFromToken($email, $contact, false);
+        if ($address->isEmailTokenized() || $address->isNameTokenized()) {
+            return $this->getEmailArrayFromToken($address, $contact, false);
         }
 
         return $from;
@@ -177,51 +180,53 @@ class FromEmailHelper
     private function getDefaultFromArray()
     {
         if ($this->defaultFrom) {
-            return $this->defaultFrom;
+            return $this->defaultFrom->getAddressArray();
         }
 
+        return $this->getSystemDefaultFrom()->getAddressArray();
+    }
+
+    /**
+     * @return AddressDTO
+     */
+    private function getSystemDefaultFrom()
+    {
         $email = $this->coreParametersHelper->getParameter('mailer_from_email');
         $name  = $this->coreParametersHelper->getParameter('mailer_from_name');
         $name  = $name ? $name : null;
 
-        return [$email => $name];
+        return new AddressDTO([$email => $name]);
     }
 
     /**
-     * @param string $email
-     *
-     * @return bool
-     */
-    private function isToken($email)
-    {
-        return (bool) preg_match('/{contactfield=(.*?)}/', $email);
-    }
-
-    /**
-     * @param string $token
-     * @param array  $contact
-     * @param bool   $asOwner
+     * @param AddressDTO $address
+     * @param array      $contact
+     * @param bool       $asOwner
      *
      * @return array
      */
-    private function getEmailArrayFromToken($token, array $contact, $asOwner)
+    private function getEmailArrayFromToken(AddressDTO $address, array $contact, $asOwner = true)
     {
-        preg_match('/{contactfield=(.*?)}/', $token, $matches);
-
-        $field = $matches[1];
-
-        if (!empty($contact[$field])) {
-            return [$contact[$field] => null];
+        try {
+            $name = $address->isNameTokenized() ? $address->getNameTokenValue($contact) : $address->getName();
+        } catch (TokenNotFoundOrEmptyException $exception) {
+            $name = $this->getSystemDefaultFrom()->getName();
         }
 
-        if ($asOwner) {
-            try {
-                return $this->getFromEmailArrayAsOwner($contact);
-            } catch (OwnerNotFoundException $exception) {
+        try {
+            $email = $address->isEmailTokenized() ? $address->getEmailTokenValue($contact) : $address->getEmail();
+
+            return [$email => $name];
+        } catch (TokenNotFoundOrEmptyException $exception) {
+            if ($asOwner) {
+                try {
+                    return $this->getFromEmailArrayAsOwner($contact);
+                } catch (OwnerNotFoundException $exception) {
+                }
             }
-        }
 
-        return $this->getDefaultFromArray();
+            return $this->getDefaultFromArray();
+        }
     }
 
     /**
