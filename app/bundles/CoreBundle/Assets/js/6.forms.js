@@ -468,7 +468,7 @@ Mautic.updateEntitySelect = function (response) {
         }
 
         newOption.prop('selected', true);
-        mQueryParent(el).trigger("chosen:updated");
+        mQueryParent(el).val(response.id).trigger("chosen:updated");
     }
 
     if (window.opener) {

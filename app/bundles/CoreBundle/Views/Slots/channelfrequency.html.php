@@ -36,7 +36,7 @@ $channelNumber = 0;
         </tr>
         <tr>
             <td>
-                <div id="frequency_<?php echo $channel->value; ?>" class="text-left">
+                <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
                     <?php
                     if ($showContactFrequency && isset($form['lead_channels']['frequency_number_'.$channel->value]) && isset($form['lead_channels']['frequency_time_'.$channel->value])):?>
                         <div class="col-md-6">
@@ -81,7 +81,7 @@ $channelNumber = 0;
     </tr>
     <tr>
         <td>
-            <div id="frequency_email" class="text-left">
+            <div id="frequency_email" class="text-left row">
                 <div class="col-xs-6">
                     <label class="text-muted label1"><?php echo $view['translator']->trans('mautic.lead.list.frequency.number'); ?></label>
                     <input type="text" class="frequency form-control">

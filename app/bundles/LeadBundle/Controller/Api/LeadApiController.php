@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
@@ -651,12 +652,21 @@ class LeadApiController extends CommonApiController
             unset($this->entityRequestParameters['lastActive']);
         }
 
+        // Batch DNC settings
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
             foreach ($parameters['doNotContact'] as $dnc) {
                 $channel  = !empty($dnc['channel']) ? $dnc['channel'] : 'email';
                 $comments = !empty($dnc['comments']) ? $dnc['comments'] : '';
-                $reason   = !empty($dnc['reason']) ? $dnc['reason'] : DoNotContact::MANUAL;
-                $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+
+                $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
+
+                if ($reason === DoNotContact::IS_CONTACTABLE) {
+                    // Remove DNC record
+                    $this->model->removeDncForLead($entity, $channel, false);
+                } else {
+                    // Add DNC record
+                    $this->model->addDncForLead($entity, $channel, $comments, $reason, false);
+                }
             }
             unset($parameters['doNotContact']);
         }
@@ -679,7 +689,8 @@ class LeadApiController extends CommonApiController
             unset($parameters['frequencyRules']);
         }
 
-        $this->setCustomFieldValues($entity, $form, $parameters, 'POST' === $this->request->getMethod());
+        $isPostOrPatch = 'POST' === $this->request->getMethod() || 'PATCH' === $this->request->getMethod();
+        $this->setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch);
     }
 
     /**

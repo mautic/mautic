@@ -60,10 +60,19 @@ class RequestStorageHelper
      * @param string $key
      *
      * @return Request
+     *
+     * @throws \UnexpectedValueException
      */
     public function getRequest($key)
     {
-        return new Request([], $this->cacheStorage->get($key));
+        $key           = $this->removeCachePrefix($key);
+        $cachedRequest = $this->cacheStorage->get($key);
+
+        if (false === $cachedRequest) {
+            throw new \UnexpectedValueException("Request with key '{$key}' was not found in the cache store '{$this->cacheStorage->getAdaptorClassName()}'.");
+        }
+
+        return new Request([], $cachedRequest);
     }
 
     /**
@@ -71,6 +80,8 @@ class RequestStorageHelper
      */
     public function deleteCachedRequest($key)
     {
+        $key = $this->removeCachePrefix($key);
+
         $this->cacheStorage->delete($key);
     }
 
@@ -83,9 +94,31 @@ class RequestStorageHelper
      */
     public function getTransportNameFromKey($key)
     {
-        list($transportName) = explode(self::KEY_SEPARATOR, $key);
+        $key = $this->removeCachePrefix($key);
+
+        // Take the part before the key separator as the serialized transpot name.
+        list($serializedTransportName) = explode(self::KEY_SEPARATOR, $key);
+
+        // Unserialize transport name to the standard full class name.
+        $transportName = str_replace('|', '\\', $serializedTransportName);
 
         return $transportName;
+    }
+
+    /**
+     * Remove the default cache key prefix if set.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    private function removeCachePrefix($key)
+    {
+        if (strpos($key, 'mautic:') === 0) {
+            $key = ltrim($key, 'mautic:');
+        }
+
+        return $key;
     }
 
     /**

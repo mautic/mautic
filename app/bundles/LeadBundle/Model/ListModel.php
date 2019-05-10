@@ -320,6 +320,12 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'lead_asset_download' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.lead_asset_download'),
+                'properties' => ['type' => 'assets'],
+                'operators'  => $this->getOperatorsForFieldType('multiselect'),
+                'object'     => 'lead',
+            ],
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
                 'properties' => [
@@ -1742,6 +1748,13 @@ class ListModel extends FormModel
      */
     public function isFieldUsed(LeadField $field)
     {
+        $segments = $this->getFieldSegments($field);
+
+        return 0 < $segments->count();
+    }
+
+    public function getFieldSegments(LeadField $field)
+    {
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
@@ -1752,7 +1765,7 @@ class ListModel extends FormModel
             ],
         ];
 
-        return $this->getEntities(['filter' => $filter])->count() !== 0;
+        return $this->getEntities(['filter' => $filter]);
     }
 
     /**

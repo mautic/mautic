@@ -527,7 +527,7 @@ class LeadModel extends FormModel
                 }
             }
 
-            if (!$entity->getCompany() && !empty($details['organization'])) {
+            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->getParameter('ip_lookup_create_organization', false)) {
                 $entity->addUpdatedField('company', $details['organization']);
             }
         }
@@ -617,7 +617,8 @@ class LeadModel extends FormModel
             $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
             $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-            if ($data['stage'] !== $currentLeadStage) {
+            $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
+            if ($previousId !== $currentLeadStage) {
                 $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
                 $lead->stageChangeLogEntry(
                     $stage,
