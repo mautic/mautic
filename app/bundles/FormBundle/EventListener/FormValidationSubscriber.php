@@ -48,13 +48,15 @@ class FormValidationSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param Events\ValidationEvent $event
+     * Custom validation     *.
+     *
+     *@param Events\ValidationEvent $event
      */
     public function onFormValidate(Events\ValidationEvent $event)
     {
         $field = $event->getField();
-        if ($field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
-            $value     = $event->getValue();
+        $value = $event->getValue();
+        if (!empty($value) && $field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
@@ -62,7 +64,7 @@ class FormValidationSubscriber extends CommonSubscriber
                 if (!empty($field->getValidation()['international_validationmsg'])) {
                     $event->failedValidation($field->getValidation()['international_validationmsg']);
                 } else {
-                    $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid'));
+                    $event->failedValidation($this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'));
                 }
             }
         }

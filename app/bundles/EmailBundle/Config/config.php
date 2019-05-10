@@ -127,6 +127,7 @@ return [
                     'mautic.transport.momentum.callback',
                     'mautic.queue.service',
                     'mautic.email.helper.request.storage',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.email.monitored.bounce.subscriber' => [

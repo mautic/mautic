@@ -506,7 +506,7 @@ class LeadRepository extends CommonRepository
                 )
             );
 
-        $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
+        $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
         $results = $qb->execute()->fetchAll();

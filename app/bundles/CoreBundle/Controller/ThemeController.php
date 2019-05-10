@@ -122,7 +122,7 @@ class ThemeController extends FormController
         $flashes     = [];
         $error       = false;
 
-        if (!$this->get('mautic.security')->isGranted('core:themes:edit')) {
+        if (!$this->get('mautic.security')->isGranted('core:themes:view')) {
             return $this->accessDenied();
         }
 
