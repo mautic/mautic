@@ -79,7 +79,6 @@ class VariantType extends AbstractType
             ]),
         ]);
 
-
         $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {

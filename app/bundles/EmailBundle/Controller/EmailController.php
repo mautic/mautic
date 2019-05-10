@@ -310,9 +310,9 @@ class EmailController extends FormController
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
 
         if (count($children) > 0) {
-            $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
+            $abTestSettings      = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
             $abTestResultService = $this->get('mautic.core.variant.abtest_result');
-            $abTestResults = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
+            $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
         }
 
         //get related translations
@@ -629,11 +629,11 @@ class EmailController extends FormController
 
         // Variant settings for an email with variants, helpful for BC
         if ($entity->isVariant()) {
-            $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
-            $variantSettings = $entity->getVariantSettings();
-            $variantSettings['enableAbTest'] = true;
+            $abTestSettings                    = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
+            $variantSettings                   = $entity->getVariantSettings();
+            $variantSettings['enableAbTest']   = true;
             $variantSettings['winnerCriteria'] = $abTestSettings['winnerCriteria'];
-            $variantSettings['totalWeight'] = $abTestSettings['totalWeight'];
+            $variantSettings['totalWeight']    = $abTestSettings['totalWeight'];
             $entity->setVariantSettings($variantSettings);
         }
 
@@ -651,9 +651,7 @@ class EmailController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-                   /* foreach ($entity->getVariantChildren() as $variantChild) {
-                        $model->saveEntity($variantChild, $form->get('buttons')->get('save')->isClicked());
-                    }*/
+
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         [

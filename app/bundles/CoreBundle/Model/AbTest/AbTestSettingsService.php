@@ -134,7 +134,7 @@ class AbTestSettingsService
         $weight           = isset($variantsSettings['weight']) ? $variantsSettings['weight'] : 0;
         $this->setVariantSettingsWeight($variant, $weight);
 
-        if ($this->setCriteriaFromVariants === true) {
+        if ($this->setCriteriaFromVariants === true && array_key_exists('winnerCriteria', $variantsSettings)) {
             $this->setWinnerCriteriaFromVariant($variantsSettings['winnerCriteria']);
         }
     }

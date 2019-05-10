@@ -21,7 +21,7 @@ trait VariantEntityTrait
     /**
      * @var array
      */
-    private $variantSettingsKeys = ['weight'];
+    private $variantSettingsKeys = ['weight', 'winnerCriteria'];
 
     /**
      * @var array
@@ -295,8 +295,7 @@ trait VariantEntityTrait
     {
         if ($this->getVariantParent()) {
             return $this->variantSettingsKeys;
-        }
-        else {
+        } else {
             return $this->parentSettingsKeys;
         }
     }
@@ -306,10 +305,9 @@ trait VariantEntityTrait
         if (!$this->getVariantParent()) {
             $this->variantSettings = [
                 'enableAbTest' => false,
-                'totalWeight' => 100,
+                'totalWeight'  => 100,
             ];
-        }
-        else {
+        } else {
             $this->variantSettings = [];
         }
     }

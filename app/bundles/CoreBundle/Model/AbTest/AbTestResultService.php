@@ -14,8 +14,7 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class AbTestResultService
- * @package Mautic\CoreBundle\Model\AbTest
+ * Class AbTestResultService.
  */
 class AbTestResultService
 {
@@ -26,6 +25,7 @@ class AbTestResultService
 
     /**
      * AbTestResultService constructor.
+     *
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
@@ -36,7 +36,9 @@ class AbTestResultService
     /**
      * @param VariantEntityInterface $parentVariant
      * @param $criteria
+     *
      * @return array|mixed
+     *
      * @throws \ReflectionException
      */
     public function getAbTestResult(VariantEntityInterface $parentVariant, $criteria)
