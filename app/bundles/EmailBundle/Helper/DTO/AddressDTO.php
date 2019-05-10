@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Helper\DTO;
 
-
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
 
 class AddressDTO
@@ -57,6 +56,7 @@ class AddressDTO
      * @param array $contact
      *
      * @return string
+     *
      * @throws TokenNotFoundOrEmptyException
      */
     public function getEmailTokenValue(array $contact)
@@ -78,6 +78,7 @@ class AddressDTO
      * @param array $contact
      *
      * @return string
+     *
      * @throws TokenNotFoundOrEmptyException
      */
     public function getNameTokenValue(array $contact)

@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\OwnerNotFoundException;
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
 class FromEmailHelper

@@ -11,8 +11,6 @@
 
 namespace Mautic\EmailBundle\Helper\Exception;
 
-
 class TokenNotFoundOrEmptyException extends \Exception
 {
-
 }

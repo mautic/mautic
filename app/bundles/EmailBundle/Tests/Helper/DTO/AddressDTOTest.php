@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\DTO;
 
-
 use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
 
@@ -37,7 +36,7 @@ class AddressDTOTest extends \PHPUnit_Framework_TestCase
     public function testNameTokenIsReturned()
     {
         $contact = [
-            'other_name' => 'Thing Two'
+            'other_name' => 'Thing Two',
         ];
 
         $this->assertEquals(
@@ -49,7 +48,6 @@ class AddressDTOTest extends \PHPUnit_Framework_TestCase
     public function testEmailTokenReturnsTrue()
     {
         $this->assertTrue((new AddressDTO(['{contactfield=other_email}' => 'Someone Somewhere']))->isEmailTokenized());
-
     }
 
     public function testEmailTokenReturnsFalse()
@@ -67,7 +65,7 @@ class AddressDTOTest extends \PHPUnit_Framework_TestCase
     public function testEmailTokenIsReturned()
     {
         $contact = [
-            'other_email' => 'other@somewhere.com'
+            'other_email' => 'other@somewhere.com',
         ];
 
         $this->assertEquals(
@@ -80,7 +78,7 @@ class AddressDTOTest extends \PHPUnit_Framework_TestCase
     {
         $contact = [
             'other_email' => 'thingtwo@somewhere.com',
-            'other_name'  => 'Thing Two'
+            'other_name'  => 'Thing Two',
         ];
 
         $addressDTO = new AddressDTO(['{contactfield=other_email}' => '{contactfield=other_name}']);

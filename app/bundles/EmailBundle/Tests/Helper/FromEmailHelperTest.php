@@ -266,7 +266,7 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
 
         $defaultFrom = ['someone@somewhere.com' => '{contactfield=other_name}'];
         $contact     = [
-            'other_name' => 'Thing One'
+            'other_name' => 'Thing One',
         ];
 
         $fromEmail = $this->getHelper()->getFromAddressArray($defaultFrom, $contact);
@@ -285,7 +285,7 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
         $defaultFrom = ['{contactfield=other_email}' => '{contactfield=other_name}'];
         $contact     = [
             'other_email'=> 'thingone@somewhere.com',
-            'other_name' => 'Thing One'
+            'other_name' => 'Thing One',
         ];
 
         $fromEmail = $this->getHelper()->getFromAddressArray($defaultFrom, $contact);
