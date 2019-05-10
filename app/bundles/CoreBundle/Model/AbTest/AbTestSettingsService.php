@@ -85,12 +85,12 @@ class AbTestSettingsService
      */
     private function init()
     {
-        $this->variantsSettings = [];
-        $this->winnerCriteria = null;
+        $this->variantsSettings           = [];
+        $this->winnerCriteria             = null;
         $this->allPublishedVariantsWeight = 0;
-        $this->totalWeight = self::DEFAULT_TOTAL_WEIGHT;
-        $this->configurationError = false;
-        $this->setCriteriaFromVariants = false;
+        $this->totalWeight                = self::DEFAULT_TOTAL_WEIGHT;
+        $this->configurationError         = false;
+        $this->setCriteriaFromVariants    = false;
     }
 
     /**
