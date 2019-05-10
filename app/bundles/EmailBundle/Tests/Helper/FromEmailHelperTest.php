@@ -373,7 +373,6 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->coreParametersHelper->expects($this->never())
             ->method('getParameter');
-
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
@@ -390,6 +389,30 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(['someone@somewhere.com' => 'Thing Two'], $fromEmail);
     }
+
+    public function testTokenizedNameIsReplacedWithSystemDefaultWhenFieldEmptyWithoutDefaultBeingOverriden()
+    {
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('getParameter')
+            ->withConsecutive(['mailer_from_email'], ['mailer_from_name'])
+            ->willReturnOnConsecutiveCalls('default@somewhere.com', 'Default Name');
+
+        $this->leadRepository->expects($this->never())
+            ->method('getLeadOwner');
+
+        $defaultFrom = ['someone@somewhere.com' => '{contactfield=other_name}'];
+        $contact     = [
+            'owner_id'    => 1,
+            'other_email' => '',
+            'other_name'  => '',
+        ];
+
+        $helper = $this->getHelper();
+        $fromEmail = $helper->getFromAddressArray($defaultFrom, $contact);
+
+        $this->assertEquals(['someone@somewhere.com' => 'Default Name'], $fromEmail);
+    }
+
 
     public function testContactOwnerIsReturnedWhenMailAsOwnerIsEnabled()
     {

@@ -209,7 +209,7 @@ class FromEmailHelper
         try {
             $name = $address->isNameTokenized() ? $address->getNameTokenValue($contact) : $address->getName();
         } catch (TokenNotFoundOrEmptyException $exception) {
-            $name = $this->getSystemDefaultFrom()->getName();
+            $name = $this->defaultFrom ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
         }
 
         try {
