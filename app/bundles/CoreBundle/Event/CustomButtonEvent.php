@@ -100,9 +100,9 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Add a single button.
      *
-     * @param array $button
-     * @param null  $location
-     * @param null  $route
+     * @param array       $button
+     * @param string|null $location
+     * @param string|null $route
      *
      * @return $this
      */

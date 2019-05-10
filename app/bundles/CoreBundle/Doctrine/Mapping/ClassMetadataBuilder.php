@@ -312,9 +312,9 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a nullable field.
      *
-     * @param        $name
-     * @param string $type
-     * @param null   $columnName
+     * @param string      $name
+     * @param string      $type
+     * @param string|null $columnName
      *
      * @return $this
      */
