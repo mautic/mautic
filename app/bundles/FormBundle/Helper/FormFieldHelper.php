@@ -13,7 +13,6 @@ namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraint;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -68,11 +67,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'password'  => [],
         'radiogrp'  => [],
         'select'    => [],
-        'tel'       => [
-            'constraints' => [
-                PhoneNumberConstraint::class => ['message' => 'mautic.form.submission.phone.invalid'],
-            ],
-        ],
+        'tel'       => [],
         'text'      => [],
         'textarea'  => [],
         'url'       => [

@@ -82,7 +82,7 @@ trait RequestTrait
                             if ($timestamp) {
                                 switch ($type) {
                                     case 'datetime':
-                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                                         break;
                                     case 'date':
                                         $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
