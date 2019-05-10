@@ -407,12 +407,11 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
             'other_name'  => '',
         ];
 
-        $helper = $this->getHelper();
+        $helper    = $this->getHelper();
         $fromEmail = $helper->getFromAddressArray($defaultFrom, $contact);
 
         $this->assertEquals(['someone@somewhere.com' => 'Default Name'], $fromEmail);
     }
-
 
     public function testContactOwnerIsReturnedWhenMailAsOwnerIsEnabled()
     {
