@@ -807,7 +807,7 @@ return [
                 'tag' => 'mautic.email_stat_helper',
             ],
             'mautic.email.variant.converter'=> [
-                'class'     => \Mautic\EmailBundle\Model\Variant\EmailVariantConverterService::class,
+                'class'     => \Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService::class,
                 'arguments' => [
                     'mautic.core.variant.converter',
                 ],

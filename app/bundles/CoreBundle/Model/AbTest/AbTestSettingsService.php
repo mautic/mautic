@@ -8,12 +8,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Model\Variant;
+namespace Mautic\CoreBundle\Model\AbTest;
 
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 
 /**
  * Class AbTestSettingsService.
+ * Reads configuration from variants and returns configuration set for AB test.
+ * Helps with BC of old variants that have settings in variant children.
  */
 class AbTestSettingsService
 {
@@ -25,35 +27,46 @@ class AbTestSettingsService
     /**
      * @var int
      */
-    private $allPublishedVariantsWeight = 0;
+    private $allPublishedVariantsWeight;
+
     /**
      * @var array
      */
-    private $variantsSettings = [];
+    private $variantsSettings;
+
     /**
      * @var string
      */
     private $winnerCriteria;
+
     /**
      * @var int
      */
     private $totalWeight;
-    /**
-     * @var bool
-     */
-    private $configurationError = false;
-    /**
-     * @var bool
-     */
-    private $setCriteriaFromVariants = false;
 
     /**
-     * @param VariantEntityInterface $parentVariant
+     * @var bool
+     */
+    private $configurationError;
+
+    /**
+     * @var bool
+     */
+    private $setCriteriaFromVariants;
+
+    /**
+     * @param VariantEntityInterface $variant
      *
      * @return array
      */
-    public function getAbTestSettings(VariantEntityInterface $parentVariant)
+    public function getAbTestSettings(VariantEntityInterface $variant)
     {
+        $parentVariant = $variant->getVariantParent();
+        if (empty($parentVariant)) {
+            $parentVariant = $variant;
+        }
+
+        $this->init();
         $this->setGeneralSettings($parentVariant);
         $this->setVariantsSettings($parentVariant);
 
@@ -65,6 +78,19 @@ class AbTestSettingsService
         $settings['configurationError'] = $this->configurationError;
 
         return $settings;
+    }
+
+    /**
+     * Sets default values.
+     */
+    private function init()
+    {
+        $this->variantsSettings = [];
+        $this->winnerCriteria = null;
+        $this->allPublishedVariantsWeight = 0;
+        $this->totalWeight = self::DEFAULT_TOTAL_WEIGHT;
+        $this->configurationError = false;
+        $this->setCriteriaFromVariants = false;
     }
 
     /**

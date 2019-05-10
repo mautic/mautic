@@ -8,9 +8,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Model\Variant;
+namespace Mautic\EmailBundle\Model\AbTest;
 
-use Mautic\CoreBundle\Model\Variant\VariantConverterService;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
@@ -43,6 +43,9 @@ class EmailVariantConverterService
         $this->setDefaultValues();
     }
 
+    /**
+     * Sets default values for AB test variants.
+     */
     private function setDefaultValues()
     {
         foreach ($this->getUpdatedVariants() as $variant) {

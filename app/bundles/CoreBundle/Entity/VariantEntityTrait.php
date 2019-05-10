@@ -14,9 +14,19 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var Page
+     * @var VariantEntityInterface
      **/
     private $variantParent;
+
+    /**
+     * @var array
+     */
+    private $variantSettingsKeys = ['weight'];
+
+    /**
+     * @var array
+     */
+    private $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerWait'];
 
     /**
      * @var array
@@ -138,9 +148,11 @@ trait VariantEntityTrait
             $this->isChanged('variantSettings', $variantSettings);
         }
 
-        foreach ($variantSettings as $key => $setting) {
-            if ($setting !== null) {
-                $this->variantSettings[$key] = $setting;
+        $this->variantSettings = [];
+
+        foreach ($this->getSettingsKeys() as $key) {
+            if (array_key_exists($key, $variantSettings)) {
+                $this->variantSettings[$key] = $variantSettings[$key];
             }
         }
 
@@ -277,6 +289,29 @@ trait VariantEntityTrait
         }
 
         return array_unique($ids);
+    }
+
+    private function getSettingsKeys()
+    {
+        if ($this->getVariantParent()) {
+            return $this->variantSettingsKeys;
+        }
+        else {
+            return $this->parentSettingsKeys;
+        }
+    }
+
+    public function clearVariantSettings()
+    {
+        if (!$this->getVariantParent()) {
+            $this->variantSettings = [
+                'enableAbTest' => false,
+                'totalWeight' => 100,
+            ];
+        }
+        else {
+            $this->variantSettings = [];
+        }
     }
 
     /**

@@ -306,31 +306,13 @@ class EmailController extends FormController
         //get A/B test information
         list($parent, $children) = $email->getVariants();
 
-        if (count($children) > 0) {
-            $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
-        }
-
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
-        if (!empty($abTestSettings['winnerCriteria']) && empty($abTestSettings['configurationError'])) {
-            if (isset($criteria['criteria'][$abTestSettings['winnerCriteria']])) {
-                $testSettings = $criteria['criteria'][$abTestSettings['winnerCriteria']];
 
-                $args = [
-                    'email'      => $email,
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $abTestSettings,
-                ];
-
-                $event = new DetermineWinnerEvent($args);
-                $this->dispatcher->dispatch(
-                        $testSettings['event'],
-                        $event
-                    );
-
-                $abTestResults = $event->getAbTestResults();
-            }
+        if (count($children) > 0) {
+            $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
+            $abTestResultService = $this->get('mautic.core.variant.abtest_result');
+            $abTestResults = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
         }
 
         //get related translations
@@ -443,6 +425,8 @@ class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
+
+        $entity->clearVariantSettings();
 
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
@@ -643,9 +627,14 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
-        //Enable variant settings for a parent with variants, helpful for BC
-        if ($entity->hasVariants()) {
-            $entity->setVariantSettings(['enableAbTest' => true]);
+        // Variant settings for an email with variants, helpful for BC
+        if ($entity->isVariant()) {
+            $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
+            $variantSettings = $entity->getVariantSettings();
+            $variantSettings['enableAbTest'] = true;
+            $variantSettings['winnerCriteria'] = $abTestSettings['winnerCriteria'];
+            $variantSettings['totalWeight'] = $abTestSettings['totalWeight'];
+            $entity->setVariantSettings($variantSettings);
         }
 
         /** @var Form $form */
@@ -662,7 +651,9 @@ class EmailController extends FormController
 
                     //form is valid so process the data
                     $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
-
+                   /* foreach ($entity->getVariantChildren() as $variantChild) {
+                        $model->saveEntity($variantChild, $form->get('buttons')->get('save')->isClicked());
+                    }*/
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         [
