@@ -31,11 +31,11 @@ abstract class DateWeekAbstract extends DateOptionAbstract
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? 'Y-m-d H:i:s' : 'Y-m-d';
-        $startWith  = $dateTimeHelper->toUtcString($dateFormat);
+        $startWith  = $dateTimeHelper->toLocalString($dateFormat);
 
         $modifier = $this->getModifierForBetweenRange().' -1 second';
         $dateTimeHelper->modify($modifier);
-        $endWith = $dateTimeHelper->toUtcString($dateFormat);
+        $endWith = $dateTimeHelper->toLocalString($dateFormat);
 
         return [$startWith, $endWith];
     }
