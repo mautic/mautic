@@ -1631,15 +1631,17 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $errorMessage = $error->getMessage();
-            $error        = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
+            $exceptionContext = ['exception' => $error];
+            $errorMessage     = $error->getMessage();
+            $error            = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
 
             // Clean up the error message
             $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
             $this->fatal = true;
         } else {
-            $errorMessage = trim($error);
+            $exceptionContext = [];
+            $errorMessage     = trim($error);
         }
 
         $logDump = $this->logger->dump();
@@ -1659,7 +1661,7 @@ class MailHelper
 
         $this->logger->clear();
 
-        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error);
+        $this->factory->getLogger()->log('error', '[MAIL ERROR] '.$error, $exceptionContext);
     }
 
     /**
