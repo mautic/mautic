@@ -25,6 +25,9 @@ class SummaryModel extends AbstractCommonModel
     /** @var ProgressBarHelper */
     private $progressBar;
 
+    /** @var array */
+    private $summaries = [];
+
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
      *
@@ -32,7 +35,6 @@ class SummaryModel extends AbstractCommonModel
      */
     public function updateSummary($logs)
     {
-        $summaries = [];
         $now       = new \DateTime();
         foreach ($logs as $log) {
             /** @var LeadEventLog $log */
@@ -42,16 +44,16 @@ class SummaryModel extends AbstractCommonModel
             $campaign  = $log->getCampaign();
             $event     = $log->getEvent();
             $key       = $campaign->getId().'.'.$event->getId().'.'.$timestamp;
-            if (!isset($summaries[$key])) {
+            if (!isset($this->summaries[$key])) {
                 $dateTriggered = new \DateTime();
                 $dateTriggered->setTimestamp($timestamp);
                 $summary = new Summary();
                 $summary->setCampaign($campaign);
                 $summary->setEvent($event);
                 $summary->setDateTriggered($dateTriggered);
-                $summaries[$key] = $summary;
+                $this->summaries[$key] = $summary;
             } else {
-                $summary = $summaries[$key];
+                $summary = $this->summaries[$key];
             }
 
             if ($log->getIsScheduled() && $log->getTriggerDate() > $now) {
@@ -64,8 +66,9 @@ class SummaryModel extends AbstractCommonModel
                 $summary->setTriggeredCount($summary->getTriggeredCount() + 1);
             }
         }
-        if ($summaries) {
-            $this->getRepository()->saveEntities($summaries);
+
+        if (count($this->summaries) >= 100) {
+            $this->persistSummaries($this->summaries);
         }
     }
 
@@ -142,5 +145,18 @@ class SummaryModel extends AbstractCommonModel
     public function getCampaignLeadEventLogRepository()
     {
         return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function persistSummaries()
+    {
+        if ($this->summaries) {
+            $this->getRepository()->saveEntities($this->summaries);
+            $this->summaries = [];
+            $this->em->clear(Summary::class);
+        }
     }
 }
