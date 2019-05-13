@@ -44,6 +44,14 @@ class EmailVariantConverterService
     }
 
     /**
+     * @return array
+     */
+    public function getUpdatedVariants()
+    {
+        return $this->variantConverterService->getUpdatedVariants();
+    }
+
+    /**
      * Sets default values for AB test variants.
      */
     private function setDefaultValues()
@@ -51,13 +59,5 @@ class EmailVariantConverterService
         foreach ($this->getUpdatedVariants() as $variant) {
             $variant->setVariantSentCount(0);
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getUpdatedVariants()
-    {
-        return $this->variantConverterService->getUpdatedVariants();
     }
 }

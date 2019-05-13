@@ -45,6 +45,11 @@ class AbTestSettingsService
     private $totalWeight;
 
     /**
+     * @var int
+     */
+    private $sendWinnerWait;
+
+    /**
      * @var bool
      */
     private $configurationError;
@@ -75,6 +80,7 @@ class AbTestSettingsService
         $settings['variants']           = $this->variantsSettings;
         $settings['winnerCriteria']     = $this->winnerCriteria;
         $settings['totalWeight']        = $this->totalWeight;
+        $settings['sendWinnerWait']     = $this->sendWinnerWait;
         $settings['configurationError'] = $this->configurationError;
 
         return $settings;
@@ -103,6 +109,10 @@ class AbTestSettingsService
             $this->totalWeight = $parentSettings['totalWeight'];
         } else {
             $this->totalWeight = self::DEFAULT_TOTAL_WEIGHT;
+        }
+
+        if (isset($parentSettings['sendWinnerWait'])) {
+            $this->sendWinnerWait = $parentSettings['sendWinnerWait'];
         }
 
         if (isset($parentSettings['winnerCriteria'])) {
