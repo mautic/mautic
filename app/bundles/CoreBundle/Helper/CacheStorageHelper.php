@@ -17,6 +17,8 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
  * Class CacheStorageHelper.
+ *
+ * @deprecated This helper is deprecated in favor of CacheBundle
  */
 class CacheStorageHelper
 {
@@ -110,10 +112,13 @@ class CacheStorageHelper
     }
 
     /**
-     * @param $name
-     * @param $data
+     * @param      $name
+     * @param      $data
+     * @param null $expiration
      *
      * @return bool
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function set($name, $data, $expiration = null)
     {
@@ -132,7 +137,7 @@ class CacheStorageHelper
 
         $cacheItem->set($data);
 
-        $this->cacheAdaptor->save($cacheItem);
+        return $this->cacheAdaptor->save($cacheItem);
     }
 
     /**
@@ -140,6 +145,8 @@ class CacheStorageHelper
      * @param int $maxAge @deprecated 2.6.0 to be removed in 3.0; set expiration when using set()
      *
      * @return bool|mixed
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function get($name, $maxAge = null)
     {
@@ -207,8 +214,7 @@ class CacheStorageHelper
     }
 
     /**
-     * @param $namespace
-     * @param $defaultExpiration
+     * Creates adapter.
      */
     protected function setCacheAdaptor()
     {

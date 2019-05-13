@@ -2,10 +2,6 @@
 
 Enables PSR-6 and PSR-16 caching. Check: [Symfony Cache Component](https://symfony.com/doc/3.4/components/cache.html)
 
-## Installation
-
-Install this plugin as submodule into plugins directory.
-
 ## Namespace versus tag
 
 This bundle introduces tags to cache. All its adapters are fully tag
