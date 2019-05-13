@@ -31,8 +31,8 @@
         "symfony/property-access": "~2.8",
         "symfony/dom-crawler": "~2.8",
         "symfony/browser-kit": "~2.8",
-        "symfony/cache": "~3.1",
-
+        "symfony/cache": "~3.4",
+	    "symfony/serializer": "~2.8",
         "symfony/asset": "~2.7",
         "symfony/class-loader": "~2.1",
         "symfony/dependency-injection": "~2.8",

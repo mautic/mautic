@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "76ca1f3e88950d50351be721720c3e0a",
+    "content-hash": "75e3a9b72f0fbc0e6a0c8bf9e49d3adb",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -5474,16 +5474,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v3.4.4",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "8dee9ec2c9824c3f4039960d679a6689ee1cbdc1"
+                "reference": "380b8395b43f60e7d26a32f84f80c0a7ba93e7c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/8dee9ec2c9824c3f4039960d679a6689ee1cbdc1",
-                "reference": "8dee9ec2c9824c3f4039960d679a6689ee1cbdc1",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/380b8395b43f60e7d26a32f84f80c0a7ba93e7c5",
+                "reference": "380b8395b43f60e7d26a32f84f80c0a7ba93e7c5",
                 "shasum": ""
             },
             "require": {
@@ -5540,7 +5540,7 @@
                 "caching",
                 "psr6"
             ],
-            "time": "2018-01-18T22:16:57+00:00"
+            "time": "2019-04-16T09:03:16+00:00"
         },
         {
             "name": "symfony/class-loader",
@@ -6845,6 +6845,64 @@
             "time": "2018-01-30T19:27:44+00:00"
         },
         {
+            "name": "symfony/polyfill-ctype",
+            "version": "v1.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-ctype.git",
+                "reference": "82ebae02209c21113908c229e9883c419720738a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/82ebae02209c21113908c229e9883c419720738a",
+                "reference": "82ebae02209c21113908c229e9883c419720738a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-ctype": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.11-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                },
+                {
+                    "name": "Gert de Pagter",
+                    "email": "BackEndTea@gmail.com"
+                }
+            ],
+            "description": "Symfony polyfill for ctype functions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "ctype",
+                "polyfill",
+                "portable"
+            ],
+            "time": "2019-02-06T07:57:58+00:00"
+        },
+        {
             "name": "symfony/polyfill-intl-icu",
             "version": "v1.7.0",
             "source": {
@@ -7641,6 +7699,71 @@
             "description": "Symfony SecurityBundle",
             "homepage": "https://symfony.com",
             "time": "2018-09-08T12:44:02+00:00"
+        },
+        {
+            "name": "symfony/serializer",
+            "version": "v2.8.50",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/serializer.git",
+                "reference": "2939e67396f7356aace05c90e5913736fcb46a20"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/2939e67396f7356aace05c90e5913736fcb46a20",
+                "reference": "2939e67396f7356aace05c90e5913736fcb46a20",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9",
+                "symfony/polyfill-ctype": "~1.8",
+                "symfony/polyfill-php55": "~1.0"
+            },
+            "require-dev": {
+                "doctrine/annotations": "~1.0",
+                "doctrine/cache": "~1.0",
+                "symfony/config": "~2.2|~3.0.0",
+                "symfony/property-access": "~2.3|~3.0.0",
+                "symfony/yaml": "^2.0.5|~3.0.0"
+            },
+            "suggest": {
+                "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+                "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+                "symfony/config": "For using the XML mapping loader.",
+                "symfony/property-access": "For using the ObjectNormalizer.",
+                "symfony/yaml": "For using the default YAML mapping loader."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Serializer\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Serializer Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-11-11T11:18:13+00:00"
         },
         {
             "name": "symfony/stopwatch",
