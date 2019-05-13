@@ -59,16 +59,16 @@ EOT
 
         $abTestSettings = $container->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
 
-        if(!array_key_exists('sendWinnerWait', $abTestSettings) || $abTestSettings['sendWinnerWait'] < 1)
-        {
+        if (!array_key_exists('sendWinnerWait', $abTestSettings) || $abTestSettings['sendWinnerWait'] < 1) {
             $output->writeln('Amount of time to send winner email not specified in AB test variant settings.');
+
             return 1;
         }
 
-        if (!$this->checkWait($parent, $abTestSettings['sendWinnerWait']))
-        {
+        if (!$this->checkWait($parent, $abTestSettings['sendWinnerWait'])) {
             // too early
             $output->writeln('Predetermined amount of time haven\'t passed yet');
+
             return 1;
         }
 
@@ -77,21 +77,22 @@ EOT
         } else {
             // no variants
             $output->writeln('Email doesn\'t have variants');
+
             return 1;
         }
 
         if (empty($winner)) {
             // no winners
             $output->writeln('No winner yet.');
+
             return 1;
         }
 
         $model->convertWinnerVariant($winner);
 
-
         // send winner email
 
-        $output->writeln('Winner email [' . $winner->getId() . '] has been sent to remaining contacts.');
+        $output->writeln('Winner email ['.$winner->getId().'] has been sent to remaining contacts.');
 
         return 0;
     }
@@ -100,24 +101,24 @@ EOT
      * @param $output
      * @param $parentVariant
      * @param $winnerCriteria
+     *
      * @return |null
      */
     private function getWinner($output, $parentVariant, $winnerCriteria)
     {
         $container  = $this->getContainer();
-        $model = $container->get('mautic.email.model.email');
+        $model      = $container->get('mautic.email.model.email');
 
         $criteria               = $model->getBuilderComponents($parentVariant, 'abTestWinnerCriteria');
         $abTestResultService    = $container->get('mautic.core.variant.abtest_result');
         $abTestResults          = $abTestResultService->getAbTestResult($parentVariant, $criteria['criteria'][$winnerCriteria]);
         $winners                = $abTestResults['winners'];
 
-        if (empty($winners))
-        {
+        if (empty($winners)) {
             return null;
         }
 
-        $output->writeln('Winner ids: ' . implode($winners, ','));
+        $output->writeln('Winner ids: '.implode($winners, ','));
 
         $winner = $model->getEntity($winners[0]);
 
@@ -127,6 +128,7 @@ EOT
     /**
      * @param $email
      * @param $waitHours
+     *
      * @return bool
      */
     private function checkWait($email, $waitHours)
