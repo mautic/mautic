@@ -13,8 +13,8 @@ namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
+use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerInterface;
-use Joomla\Http\Http;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -31,6 +31,7 @@ use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
+use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -103,14 +104,27 @@ class WebhookModel extends FormModel
      */
     protected $eventsOrderByDir;
 
+    /**
+     * @var Client
+     */
+    private $httpClient;
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param Serializer           $serializer
+     * @param NotificationModel    $notificationModel
+     * @param Client               $httpClient
+     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        SerializerInterface $serializer,
-        NotificationModel $notificationModel
+        Serializer $serializer,
+        NotificationModel $notificationModel,
+        Client $httpClient
     ) {
         $this->setConfigProps($coreParametersHelper);
         $this->serializer        = $serializer;
         $this->notificationModel = $notificationModel;
+        $this->httpClient        = $httpClient;
     }
 
     /**
@@ -286,9 +300,6 @@ class WebhookModel extends FormModel
      */
     public function processWebhook(Webhook $webhook, WebhookQueue $queue = null)
     {
-        // instantiate new http class
-        $http = new Http();
-
         // get the webhook payload
         $payload = $this->getWebhookPayload($webhook, $queue);
 
@@ -297,24 +308,10 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        if (is_array($payload)) {
-            $payload = json_encode($payload);
-        }
-
-        // generate a base64 encoded HMAC-SHA256 signature of the payload
-        $secret    = $webhook->getSecret();
-        $signature = base64_encode(hash_hmac('sha256', $payload, $secret, true));
-
-        // Set up custom headers
-        $headers = [
-            'Content-Type'      => 'application/json',
-            'Webhook-Signature' => $signature,
-            'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
-        ];
-        $start   = microtime(true);
+        $start = microtime(true);
 
         try {
-            $response = $http->post($webhook->getWebhookUrl(), $payload, $headers, $this->webhookTimeout);
+            $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $this->webhookTimeout, $webhook->getSecret());
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
             foreach ($this->webhookQueueIdList as $queue) {

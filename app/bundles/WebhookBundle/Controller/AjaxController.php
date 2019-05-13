@@ -11,7 +11,6 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Joomla\Http\Http;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,22 +45,8 @@ class AjaxController extends CommonAjaxController
         $payloads['timestamp'] = $now->format('c');
         $jsonPayloads          = json_encode($payloads);
 
-        // generate a base64 encoded HMAC-SHA256 signature of the payload
-        $secret    = InputHelper::string($request->request->get('secret'));
-        $signature = base64_encode(hash_hmac('sha256', $jsonPayloads, $secret, true));
-
-        // Set up custom headers
-        $headers = [
-            'Content-Type'      => 'application/json',
-            'Webhook-Signature' => $signature,
-            'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
-        ];
-
-        // instantiate new http class
-        $http = new Http();
-
         // set the response
-        $response = $http->post($url, $jsonPayloads, $headers);
+        $response = $this->get('mautic.webhook.http.client')->post($url, $payloads, null, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
         $dataArray = [
