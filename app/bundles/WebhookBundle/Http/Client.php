@@ -38,7 +38,7 @@ class Client
      *
      * @return Response
      */
-    public function post(string $url, array $payload, int $timeout = null, ?string $secret = null): Response
+    public function post($url, array $payload, $timeout = null, $secret = null)
     {
         if (is_array($payload)) {
             $payload = json_encode($payload);
@@ -52,6 +52,7 @@ class Client
             'Content-Type'      => 'application/json',
             'Webhook-Signature' => $signature,
             'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
+            'Cookie'            => 'XDEBUG_SESSION=XDEBUG_ECLIPSE',
         ];
 
         $http = new Http();
