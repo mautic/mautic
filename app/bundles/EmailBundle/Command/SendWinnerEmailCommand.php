@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends email to winner variant after predetermined amount of time.
  */
-class TriggerEmailSendWinnerCommand extends ContainerAwareCommand
+class SendWinnerEmailCommand extends ContainerAwareCommand
 {
     /**
      * {@inheritdoc}
