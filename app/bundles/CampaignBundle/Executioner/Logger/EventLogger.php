@@ -43,7 +43,7 @@ class EventLogger
     /**
      * @var SummaryModel
      */
-    private $summaryModel;
+    public $summaryModel;
 
     /**
      * @var LeadRepository
@@ -254,5 +254,13 @@ class EventLogger
         }
 
         $this->persistQueue->clear();
+    }
+
+    /**
+     * @return SummaryModel
+     */
+    public function getSummaryModel()
+    {
+        return $this->summaryModel;
     }
 }

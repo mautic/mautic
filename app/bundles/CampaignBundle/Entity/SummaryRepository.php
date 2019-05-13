@@ -70,8 +70,6 @@ class SummaryRepository extends CommonRepository
             ->getConnection()
             ->prepare($sql)
             ->execute();
-
-        $this->getEntityManager()->flush();
     }
 
     /**
