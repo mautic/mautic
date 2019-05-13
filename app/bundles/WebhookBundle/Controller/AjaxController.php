@@ -54,6 +54,7 @@ class AjaxController extends CommonAjaxController
         $headers = [
             'Content-Type'      => 'application/json',
             'Webhook-Signature' => $signature,
+            'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
         ];
 
         // instantiate new http class

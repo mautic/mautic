@@ -309,6 +309,7 @@ class WebhookModel extends FormModel
         $headers = [
             'Content-Type'      => 'application/json',
             'Webhook-Signature' => $signature,
+            'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
         ];
         $start   = microtime(true);
 
