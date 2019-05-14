@@ -53,7 +53,7 @@ class CitrixApi
         );
         $status  = $request->code;
 
-        // Try refresh access_token with refresh_token (ttps://goto-developer.logmeininc.com/how-use-refresh-tokens)
+        // Try refresh access_token with refresh_token (https://goto-developer.logmeininc.com/how-use-refresh-tokens)
         if ($refreshToken && $this->isInvalidTokenFromReponse($request)) {
             $error = $this->integration->authCallback(['use_refresh_token' => true]);
             if (!$error) {
