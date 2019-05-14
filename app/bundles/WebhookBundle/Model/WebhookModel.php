@@ -318,16 +318,23 @@ class WebhookModel extends FormModel
                 $webhook->removeQueue($queue);
             }
 
-            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $response->getBody());
+            $responseBody = $response->getBody()->getContents();
+            if (!$responseBody) {
+                $responseBody = '[]'; // Empty response body mark for log
+            }
+
+            $responseStatusCode = $response->getStatusCode();
+
+            $this->addLog($webhook, $response->getStatusCode(), (microtime(true) - $start), $responseBody);
 
             // throw an error exception if we don't get a 200 back
-            if ($response->getStatusCode() >= 300 || $response->getStatusCode() < 200) {
-                // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
-                if ($response->getStatusCode() == 410) {
+            if ($responseStatusCode >= 300 || $responseStatusCode < 200) {
+                // The receiver of the webhook is telling us to stop bothering him with our requests by code 410
+                if ($responseStatusCode === 410) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
-                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$response->getStatusCode());
+                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode);
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();
