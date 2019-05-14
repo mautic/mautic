@@ -693,8 +693,8 @@ class StatRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('max(s.date_sent) as last_sent_date')
-            ->join('s',MAUTIC_TABLE_PREFIX.'emails','e', 's.email_id = e.id')
-            ->where( 's.email_id = :email')
+            ->join('s', MAUTIC_TABLE_PREFIX.'emails', 'e', 's.email_id = e.id')
+            ->where('s.email_id = :email')
             ->orWhere('e.variant_parent_id = :email')
             ->setParameter(':email', $emailId);
 

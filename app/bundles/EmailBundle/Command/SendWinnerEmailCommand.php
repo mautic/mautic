@@ -42,7 +42,7 @@ EOT
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return int
@@ -101,9 +101,9 @@ EOT
     }
 
     /**
-     * @param OutputInterface $output
+     * @param OutputInterface        $output
      * @param VariantEntityInterface $parentVariant
-     * @param string $winnerCriteria
+     * @param string                 $winnerCriteria
      *
      * @return |null
      */
@@ -147,9 +147,9 @@ EOT
         $sendWinnerTime = new \DateTime($lastSentDate);
         $sendWinnerTime->modify("+{$waitHours} hours");
 
-        $now = new \DateTime("now");
+        $now = new \DateTime('now');
 
-        if($now > $sendWinnerTime) {
+        if ($now > $sendWinnerTime) {
             return true;
         }
 
