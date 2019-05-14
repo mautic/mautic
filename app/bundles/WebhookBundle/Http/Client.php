@@ -11,22 +11,30 @@
 
 namespace Mautic\WebhookBundle\Http;
 
-use Joomla\Http\Http;
-use Joomla\Http\Response;
+use GuzzleHttp\Psr7\Request;
+use Http\Adapter\Guzzle6\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Psr\Http\Message\ResponseInterface;
 
 class Client
 {
+    /**
+     * @var GuzzleClient
+     */
+    private $httpClient;
+
     /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
 
     /**
+     * @param GuzzleClient         $httpClient
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(GuzzleClient $httpClient, CoreParametersHelper $coreParametersHelper)
     {
+        $this->httpClient           = $httpClient;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -36,7 +44,7 @@ class Client
      * @param int|null $timeout
      * @param int|null $secret
      *
-     * @return Response
+     * @return ResponseInterface
      */
     public function post($url, array $payload, $timeout = null, $secret = null)
     {
@@ -55,8 +63,13 @@ class Client
             'Cookie'            => 'XDEBUG_SESSION=XDEBUG_ECLIPSE',
         ];
 
-        $http = new Http();
+        $request = new Request(
+            'GET',
+            $url,
+            $headers,
+            $payload
+        );
 
-        return $http->post($url, $payload, $headers, $timeout);
+        return $this->httpClient->sendRequest($request);
     }
 }

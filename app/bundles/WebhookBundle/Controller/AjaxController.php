@@ -47,7 +47,7 @@ class AjaxController extends CommonAjaxController
         $jsonPayloads          = json_encode($payloads);
 
         // set the response
-        /** @var Client $response */
+        /** @var Psr\Http\Message\ResponseInterface $response */
         $response = $this->get('mautic.webhook.http.client')->post($url, $payloads, null, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
@@ -59,7 +59,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (2 == substr($response->code, 0, 1)) {
+        if (substr($response->getStatusCode(), 0, 1) == 2) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')
