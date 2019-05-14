@@ -60,7 +60,6 @@ class Client
             'Content-Type'      => 'application/json',
             'Webhook-Signature' => $signature,
             'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
-            'Cookie'            => 'XDEBUG_SESSION=XDEBUG_ECLIPSE',
         ];
 
         $request = new Request(
