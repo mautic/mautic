@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,10 +42,12 @@ EOT
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return int
+     *
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -65,7 +68,7 @@ EOT
             return 1;
         }
 
-        if (!$this->checkWait($parent, $abTestSettings['sendWinnerWait'])) {
+        if (!$this->isReady($parent->getId(), $abTestSettings['sendWinnerWait'])) {
             // too early
             $output->writeln('Predetermined amount of time haven\'t passed yet');
 
@@ -83,7 +86,7 @@ EOT
 
         if (empty($winner)) {
             // no winners
-            $output->writeln('No winner yet.');
+            $output->writeln('No winner yet or email has been sent already.');
 
             return 1;
         }
@@ -98,13 +101,13 @@ EOT
     }
 
     /**
-     * @param $output
-     * @param $parentVariant
-     * @param $winnerCriteria
+     * @param OutputInterface $output
+     * @param VariantEntityInterface $parentVariant
+     * @param string $winnerCriteria
      *
      * @return |null
      */
-    private function getWinner($output, $parentVariant, $winnerCriteria)
+    private function getWinner(OutputInterface $output, VariantEntityInterface $parentVariant, $winnerCriteria)
     {
         $container  = $this->getContainer();
         $model      = $container->get('mautic.email.model.email');
@@ -122,17 +125,34 @@ EOT
 
         $winner = $model->getEntity($winners[0]);
 
+        $model->sendEmailToLists($winner);
+
         return $winner;
     }
 
     /**
-     * @param $email
-     * @param $waitHours
+     * @param int $emailId
+     * @param int $waitHours
      *
      * @return bool
+     *
+     * @throws \Exception
      */
-    private function checkWait($email, $waitHours)
+    private function isReady($emailId, $waitHours)
     {
-        return true;
+        $container  = $this->getContainer();
+        $repo       = $container->get('mautic.email.repository.stat');
+
+        $lastSentDate   = $repo->getEmailSentLastDate($emailId);
+        $sendWinnerTime = new \DateTime($lastSentDate);
+        $sendWinnerTime->modify("+{$waitHours} hours");
+
+        $now = new \DateTime("now");
+
+        if($now > $sendWinnerTime) {
+            return true;
+        }
+
+        return false;
     }
 }
