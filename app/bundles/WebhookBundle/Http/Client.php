@@ -11,7 +11,6 @@
 
 namespace Mautic\WebhookBundle\Http;
 
-use GuzzleHttp\Psr7\Request;
 use Http\Adapter\Guzzle6\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -19,23 +18,33 @@ use Psr\Http\Message\ResponseInterface;
 class Client
 {
     /**
-     * @var GuzzleClient
-     */
-    private $httpClient;
-
-    /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
 
     /**
-     * @param GuzzleClient         $httpClient
-     * @param CoreParametersHelper $coreParametersHelper
+     * @var RequestFactory
      */
-    public function __construct(GuzzleClient $httpClient, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->httpClient           = $httpClient;
+    private $requestFactory;
+
+    /**
+     * @var GuzzleClient
+     */
+    private $httpClient;
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param RequestFactory       $requestFactory
+     * @param GuzzleClient         $httpClient
+     */
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        RequestFactory $requestFactory,
+        GuzzleClient $httpClient
+    ) {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->requestFactory       = $requestFactory;
+        $this->httpClient           = $httpClient;
     }
 
     /**
@@ -62,8 +71,8 @@ class Client
             'X-Origin-Base-URL' => $this->coreParametersHelper->getParameter('site_url'),
         ];
 
-        $request = new Request(
-            'GET',
+        $request = $this->requestFactory->create(
+            'POST',
             $url,
             $headers,
             $payload
