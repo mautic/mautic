@@ -320,7 +320,7 @@ class WebhookModel extends FormModel
 
             $responseBody = $response->getBody()->getContents();
             if (!$responseBody) {
-                $responseBody = '<<< Empty response body received >>>'; // Empty response body mark for log
+                $responseBody = null; // Save null value to database
             }
 
             $responseStatusCode = $response->getStatusCode();
