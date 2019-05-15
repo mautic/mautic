@@ -4,8 +4,8 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -639,7 +639,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * Gets emails with published variants
+     * Gets emails with published variants.
      *
      * @return array
      */

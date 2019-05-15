@@ -2367,7 +2367,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Gets emails with published variants for automatic determination of a winner variant
+     * Gets emails with published variants for automatic determination of a winner variant.
      *
      * @return array
      */

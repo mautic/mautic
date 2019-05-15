@@ -58,15 +58,13 @@ EOT
 
         if ($emailId === null) {
             $emails = $model->getEmailsToSendWinnerVariant();
-        }
-        else {
+        } else {
             $emails = [$model->getEntity($emailId)];
         }
 
         if (empty($emails)) {
             $output->writeln('No emails to send');
         }
-
 
         foreach ($emails as $email) {
             $result = $this->processWinnerEmail($output, $email);
@@ -81,7 +79,7 @@ EOT
 
     /**
      * @param OutputInterface $output
-     * @param Email $email
+     * @param Email           $email
      *
      * @return int
      *
