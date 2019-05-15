@@ -756,7 +756,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $companyState   = isset($fields['companystate']) ? $data[$fields['companystate']] : null;
 
             $found   = $companyName ? $this->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState) : false;
-            $company = ($found) ? $this->em->getReference('MauticLeadBundle:Company', $found['id']) : new Company();
+            $company = ($found) ? $this->getEntity($found['id']) : new Company();
             $merged  = $found;
         } else {
             return null;
@@ -809,7 +809,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         foreach ($this->fetchCompanyFields() as $entityField) {
             // Skip If value already exists
-            if ($skipIfExists && !$company->isNew() && !empty($company->getFieldValue($entityField['alias']))) {
+            if ($skipIfExists && !$company->isNew() && !empty($company->getProfileFields()[$entityField['alias']])) {
                 unset($fieldData[$entityField['alias']]);
                 continue;
             }
