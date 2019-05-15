@@ -419,11 +419,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         protected function log($logLevel, $message, $context = [], $debugTrace = null)
         {
-            if ('dev' !== self::$environment) {
-                // Don't clutter the logs
-                $context = [];
-            }
-
             $message = strip_tags($message);
             if ($this->logger) {
                 if (LogLevel::DEBUG === $logLevel) {
@@ -434,7 +429,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                     if ($this->debugLogger) {
                         if ($debugTrace) {
                             // Just a snippet
-                            $context['trace'] = array_slice($debugTrace, 1, 5);
+                            $context['trace'] = array_slice($debugTrace, 0, 50);
                         }
                         $this->debugLogger->log($logLevel, $message, $context);
                     }

@@ -96,7 +96,7 @@ class RouterSubscriber implements EventSubscriberInterface
         }
 
         if ('dev' === MAUTIC_ENV) {
-            $this->baseUrl = '/index_dev.php'.$this->baseUrl;
+            $this->baseUrl = $this->baseUrl.'/index_dev.php';
         }
 
         $context = $this->router->getContext();

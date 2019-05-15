@@ -533,11 +533,12 @@ class PageModel extends FormModel
 
         if ($this->queueService->isQueueEnabled()) {
             $msg = [
-                'hitId'   => $hit->getId(),
-                'pageId'  => $page ? $page->getId() : null,
-                'request' => $request,
-                'leadId'  => $lead ? $lead->getId() : null,
-                'isNew'   => $this->deviceTracker->wasDeviceChanged(),
+                'hitId'         => $hit->getId(),
+                'pageId'        => $page ? $page->getId() : null,
+                'request'       => $request,
+                'leadId'        => $lead ? $lead->getId() : null,
+                'isNew'         => $this->deviceTracker->wasDeviceChanged(),
+                'isRedirect'    => ($page instanceof Redirect),
             ];
             $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
         } else {

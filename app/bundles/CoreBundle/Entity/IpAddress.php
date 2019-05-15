@@ -185,22 +185,24 @@ class IpAddress
     {
         if (!empty($this->doNotTrack)) {
             foreach ($this->doNotTrack as $ip) {
-                if (strpos($ip, '/') == false) {
-                    if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
-                        return false;
-                    }
-                } else {
+                if (strpos($ip, '/') !== false) {
                     // has a netmask range
                     // https://gist.github.com/tott/7684443
                     list($range, $netmask) = explode('/', $ip, 2);
                     $range_decimal         = ip2long($range);
-                    $ip_decimal            = ip2long($ip);
+                    $ip_decimal            = ip2long($this->ipAddress);
                     $wildcard_decimal      = pow(2, (32 - $netmask)) - 1;
                     $netmask_decimal       = ~$wildcard_decimal;
 
                     if ((($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal))) {
                         return false;
                     }
+
+                    continue;
+                }
+
+                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+                    return false;
                 }
             }
         }
