@@ -21,7 +21,7 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $webhookModel;
-    
+
     /**
      * @var WebhookSubscriber
      */
@@ -48,7 +48,6 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
                     'description' => 'mautic.sms.webhook.event.send_desc',
                 ]
             );
-
 
         $this->subscriber->onWebhookBuild($event);
     }

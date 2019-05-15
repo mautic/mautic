@@ -22,7 +22,7 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $webhookModel;
-    
+
     /**
      * @var WebhookSubscriber
      */
@@ -50,17 +50,16 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
                     [
                         'label'       => 'mautic.email.webhook.event.send',
                         'description' => 'mautic.email.webhook.event.send_desc',
-                    ]
+                    ],
                 ],
                 [
                     EmailEvents::EMAIL_ON_OPEN,
                     [
                         'label'       => 'mautic.email.webhook.event.open',
                         'description' => 'mautic.email.webhook.event.open_desc',
-                    ]
+                    ],
                 ]
             );
-
 
         $this->subscriber->onWebhookBuild($event);
     }
@@ -86,7 +85,7 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
         $email   = $this->createMock(Email::class);
         $tokens  = ['{unsubscribe_text}' => '<a href=\"https://...'];
         $headers = ['List-Unsubscribe' => '<a href=\"https://...'];
-        $source  = ['List-Unsubscribe' => '<a href=\"https://...'];// todo find out real source example
+        $source  = ['List-Unsubscribe' => '<a href=\"https://...']; // todo find out real source example
 
         $event->expects($this->once())
             ->method('isInternalSend')
@@ -122,7 +121,7 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $event->expects($this->once())
             ->method('getSource')
-            ->willReturn($source); 
+            ->willReturn($source);
 
         $event->expects($this->once())
             ->method('getTextHeaders')
