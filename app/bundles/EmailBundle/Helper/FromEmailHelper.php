@@ -83,6 +83,10 @@ class FromEmailHelper
             return $this->getEmailArrayFromToken($address, $contact);
         }
 
+        if (!$contact) {
+            return $from;
+        }
+
         try {
             return $this->getFromEmailArrayAsOwner($contact);
         } catch (OwnerNotFoundException $exception) {
@@ -204,20 +208,28 @@ class FromEmailHelper
      *
      * @return array
      */
-    private function getEmailArrayFromToken(AddressDTO $address, array $contact, $asOwner = true)
+    private function getEmailArrayFromToken(AddressDTO $address, array $contact = null, $asOwner = true)
     {
         try {
+            if (!$contact) {
+                throw new TokenNotFoundOrEmptyException();
+            }
+
             $name = $address->isNameTokenized() ? $address->getNameTokenValue($contact) : $address->getName();
         } catch (TokenNotFoundOrEmptyException $exception) {
             $name = $this->defaultFrom ? $this->defaultFrom->getName() : $this->getSystemDefaultFrom()->getName();
         }
 
         try {
+            if (!$contact) {
+                throw new TokenNotFoundOrEmptyException();
+            }
+
             $email = $address->isEmailTokenized() ? $address->getEmailTokenValue($contact) : $address->getEmail();
 
             return [$email => $name];
         } catch (TokenNotFoundOrEmptyException $exception) {
-            if ($asOwner) {
+            if ($contact && $asOwner) {
                 try {
                     return $this->getFromEmailArrayAsOwner($contact);
                 } catch (OwnerNotFoundException $exception) {

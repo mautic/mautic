@@ -413,6 +413,35 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['someone@somewhere.com' => 'Default Name'], $fromEmail);
     }
 
+    public function testNullContactReturnsDefaultAddress()
+    {
+        $this->coreParametersHelper->expects($this->never())
+            ->method('getParameter');
+        $this->leadRepository->expects($this->never())
+            ->method('getLeadOwner');
+
+        $contact = null;
+        $helper  = $this->getHelper();
+        $helper->setDefaultFromArray(['overridden@somewhere.com' => null]);
+        $fromEmail = $helper->getFromAddressArrayConsideringOwner(['default@somewhere.com' => 'Default Name'], $contact);
+
+        $this->assertEquals(['default@somewhere.com' => 'Default Name'], $fromEmail);
+    }
+
+    public function testNullContactReturnsDefaultAddressWhenMailerIsOwnerEnabled()
+    {
+        $this->leadRepository->expects($this->never())
+            ->method('getLeadOwner');
+
+        $contact = null;
+        $helper  = $this->getHelper();
+        $helper->setDefaultFromArray(['overridden@somewhere.com' => null]);
+        $fromEmail = $helper->getFromAddressArray(['default@somewhere.com' => 'Default Name'], $contact);
+
+        $this->assertEquals(['default@somewhere.com' => 'Default Name'], $fromEmail);
+    }
+
+
     public function testContactOwnerIsReturnedWhenMailAsOwnerIsEnabled()
     {
         $this->coreParametersHelper->expects($this->once())
