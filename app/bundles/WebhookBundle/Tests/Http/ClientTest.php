@@ -16,7 +16,6 @@ use GuzzleHttp\Psr7\Response;
 use Http\Adapter\Guzzle6\Client as GuzzleClient;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Http\Client;
-use Mautic\WebhookBundle\Http\RequestFactory;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,11 +29,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $siteUrl,
         ];
-        $request  = new Request($method, $url); // It doesn't matter what args are used here
+
         $response = new Response(); // here too
 
         $parametersMock     = $this->createMock(CoreParametersHelper::class);
-        $requestFactoryMock = $this->createMock(RequestFactory::class);
         $httpClientMock     = $this->createMock(GuzzleClient::class);
 
         $parametersMock->expects($this->once())
@@ -42,17 +40,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->with('site_url')
             ->willReturn($siteUrl);
 
-        $requestFactoryMock->expects($this->once())
-            ->method('create')
-            ->with($method, $url, $headers, $payload)
-            ->willReturn($request);
-
         $httpClientMock->expects($this->once())
             ->method('sendRequest')
-            ->with($request)
+            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload) {
+                $this->assertSame($method, $request->getMethod());
+                $this->assertSame($url, $request->getUri()->getPath());
+
+                foreach ($headers as $headerName => $headerValue) {
+                    $header = $request->getHeader($headerName);
+                    $this->assertSame($headerValue, $header[0]);
+                }
+
+                $this->assertSame(json_encode($payload), (string) $request->getBody());
+
+                return $request;
+            }))
             ->willReturn($response);
 
-        $client = new Client($parametersMock, $requestFactoryMock, $httpClientMock);
+        $client = new Client($parametersMock, $httpClientMock);
 
         $this->assertEquals($response, $client->post($url, $payload));
     }

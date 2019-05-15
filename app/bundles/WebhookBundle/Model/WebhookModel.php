@@ -311,7 +311,7 @@ class WebhookModel extends FormModel
         $start = microtime(true);
 
         try {
-            $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $this->webhookTimeout, $webhook->getSecret());
+            $response = $this->httpClient->post($webhook->getWebhookUrl(), $payload, $webhook->getSecret());
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
             foreach ($this->webhookQueueIdList as $queue) {
@@ -320,7 +320,7 @@ class WebhookModel extends FormModel
 
             $responseBody = $response->getBody()->getContents();
             if (!$responseBody) {
-                $responseBody = '[]'; // Empty response body mark for log
+                $responseBody = '<<< Empty response body received >>>'; // Empty response body mark for log
             }
 
             $responseStatusCode = $response->getStatusCode();

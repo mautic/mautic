@@ -106,14 +106,10 @@ return [
                     'mautic.http.connector',
                 ],
             ],
-            'mautic.webhook.http.request_factory' => [
-                'class' => \Mautic\WebhookBundle\Http\RequestFactory::class,
-            ],
             'mautic.webhook.http.client' => [
                 'class'     => \Mautic\WebhookBundle\Http\Client::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.webhook.http.request_factory',
                     'mautic.guzzle.client',
                 ],
             ],
