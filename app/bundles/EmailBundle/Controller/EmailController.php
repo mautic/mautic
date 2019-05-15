@@ -981,6 +981,10 @@ class EmailController extends FormController
                 return $this->accessDenied();
             }
 
+            if ($parent->getVariantSettings()['enableAbTest'] !== true) {
+                $this->addFlash('AB test not enabled');// todo add translation
+            }
+
             // Note this since it's cleared on __clone()
             $emailType = $entity->getEmailType();
 

@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\EmailBundle\Entity\Email;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,7 +31,7 @@ class SendWinnerEmailCommand extends ContainerAwareCommand
         $this
             ->setName('mautic:email:sendwinner')
             ->setDescription('Send winner email variant to remaining contacts')
-            ->addOption('--id', null, InputOption::VALUE_REQUIRED, 'Parent variant email id.')
+            ->addOption('--id', null, InputOption::VALUE_OPTIONAL, 'Parent variant email id.')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to send winner email variant to remaining contacts after predetermined amount of timeá
 
@@ -55,7 +56,44 @@ EOT
         $model     = $container->get('mautic.email.model.email');
         $emailId   = $input->getOption('id');
 
-        $email = $model->getEntity($emailId);
+        if ($emailId === null) {
+            $emails = $model->getEmailsToSendWinnerVariant();
+        }
+        else {
+            $emails = [$model->getEntity($emailId)];
+        }
+
+        if (empty($emails)) {
+            $output->writeln('No emails to send');
+        }
+
+
+        foreach ($emails as $email) {
+            $result = $this->processWinnerEmail($output, $email);
+
+            if ($emailId > 0) {
+                return $result;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param Email $email
+     *
+     * @return int
+     *
+     * @throws \Exception
+     */
+    private function processWinnerEmail(OutputInterface $output, Email $email)
+    {
+        $msg = sprintf('Processing email id #%d', $email->getId());
+        $output->writeln($msg);
+
+        $container = $this->getContainer();
+        $model     = $container->get('mautic.email.model.email');
 
         //g et A/B test information
         list($parent, $children) = $email->getVariants();
@@ -68,7 +106,7 @@ EOT
             return 1;
         }
 
-        if (!$this->isReady($parent->getId(), $abTestSettings['sendWinnerWait'])) {
+        if ($this->isReady($parent->getId(), $abTestSettings['sendWinnerWait']) === false) {
             // too early
             $output->writeln('Predetermined amount of time haven\'t passed yet');
 
@@ -107,7 +145,7 @@ EOT
      *
      * @return |null
      */
-    private function getWinner(OutputInterface $output, VariantEntityInterface $parentVariant, $winnerCriteria)
+    private function getWinner(OutputInterface $output, Email $parentVariant, $winnerCriteria)
     {
         $container  = $this->getContainer();
         $model      = $container->get('mautic.email.model.email');

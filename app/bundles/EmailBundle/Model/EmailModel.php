@@ -2365,4 +2365,31 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         //save the entities
         $this->saveEntities($save, false);
     }
+
+    /**
+     * Gets emails with published variants for automatic determination of a winner variant
+     *
+     * @return array
+     */
+    public function getEmailsToSendWinnerVariant()
+    {
+        $emailRepo = $this->getRepository();
+        $emails    = $emailRepo->getPublishedEmailsWithVariant();
+
+        $emailsToSend = [];
+
+        foreach ($emails as $email) {
+            $variantSettings = $email->getVariantSettings();
+
+            if (array_key_exists('totalWeight', $variantSettings)
+                && array_key_exists('sendWinnerWait', $variantSettings)
+                && $variantSettings['totalWeight'] < 100
+                && $variantSettings['sendWinnerWait'] > 0
+            ) {
+                $emailsToSend[] = $email;
+            }
+        }
+
+        return $emailsToSend;
+    }
 }
