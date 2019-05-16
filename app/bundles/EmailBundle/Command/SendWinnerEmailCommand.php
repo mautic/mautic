@@ -129,7 +129,7 @@ EOT
         $model->convertWinnerVariant($winner);
 
         // send winner email
-
+        $model->sendEmailToLists($winner);
         $output->writeln('Winner email '.$winner->getId().' has been sent to remaining contacts.');
 
         return 0;
@@ -159,8 +159,6 @@ EOT
         $output->writeln('Winner ids: '.implode($winners, ','));
 
         $winner = $model->getEntity($winners[0]);
-
-        $model->sendEmailToLists($winner);
 
         return $winner;
     }
