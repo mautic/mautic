@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -36,7 +37,7 @@ class CompanyApiController extends CommonApiController
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
         $this->serializerGroups[] = 'companyDetails';
-
+        $this->setCleaningRules('company');
         parent::initialize($event);
     }
 
