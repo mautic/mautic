@@ -127,7 +127,6 @@ final class RecipientDTO implements \JsonSerializable
             // `substitution_data` is required but Sparkpost will return the following error with empty arrays:
             // field 'substitution_data' is of type 'json_array', but needs to be of type 'json_object'
             $json['substitution_data'] = new \stdClass();
-
         } else {
             $json['substitution_data'] = $this->substitutionData;
         }
