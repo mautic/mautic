@@ -73,28 +73,25 @@
 /* Close Button */
 .mauticForm-close
 {
-    font-family: Helvetica,Arial,sans-serif;
-    font-size: 24px;
-    font-weight: 700;
+    font-family: Montserrat;
+    font-size: 40px;
+    font-weight: 400;
+    color: #061231;
+    background: none;
     line-height: 12px;
-
     position: absolute;
     top: 5px;
     right: 5px;
-
-    padding: 5px 7px 7px;
-
+    padding: 5px 0px 7px 7px;
     cursor: pointer;
-
-    color: #fff;
     border: 0;
     outline: none;
-    background: #e74c3c;
+    opacity: 0.7;
 }
 
-.mauticForm-close:hover
-{
-    background: #c0392b;
+.mauticForm-close:hover {
+    background: none;
+    opacity: 1;
 }
 
 /* Default Animation */
@@ -169,4 +166,32 @@
 
 .mauticForm-content {
     height: 100%;
+}
+
+table[data-section="1"] {
+    max-width: 600px;
+    width: 100%;
+    padding: 10px;
+}
+@media (max-width: 767.98px) {
+    .mauticForm-modal {
+        width: 84% !important;
+    }
+}
+.mauticform-button {
+    display: inline-block;
+    margin-bottom: 0;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid #6f42c1;
+    white-space: nowrap;
+    padding: 16px 25px;
+    line-height: 1;
+    font-size: 18px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

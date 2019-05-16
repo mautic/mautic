@@ -95,8 +95,8 @@
         };
 
         Form.getFormLink = function(options) {
-            var index = (Core.devMode()) ? 'index_dev.php' : 'index.php';
-            return Core.getMauticBaseUrl() + index + '/form/' + options.data['id'] + '?' + options.params;
+            var index = (Core.devMode()) ? 'index_dev.php/' : '';
+            return Core.getMauticBaseUrl() + index + 'form/' + options.data['id'] + '?' + options.params;
         };
 
         Form.createIframe = function(options, embed) {
