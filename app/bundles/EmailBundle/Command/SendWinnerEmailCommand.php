@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Command;
 
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -137,9 +136,9 @@ EOT
     }
 
     /**
-     * @param OutputInterface        $output
-     * @param Email $parentVariant
-     * @param string                 $winnerCriteria
+     * @param OutputInterface $output
+     * @param Email           $parentVariant
+     * @param string          $winnerCriteria
      *
      * @return |null
      */

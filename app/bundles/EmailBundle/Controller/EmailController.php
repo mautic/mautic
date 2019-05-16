@@ -987,6 +987,7 @@ class EmailController extends FormController
                     'type'    => 'error',
                     'msg'     => 'mautic.email.error.disabled_abtest',
                 ];
+
                 return $this->postActionRedirect([
                     'flashes' => $flashes,
                 ]);

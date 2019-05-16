@@ -170,11 +170,11 @@ class VariantConverterService
         $winnerSettings    = $winner->getVariantSettings();
         $oldParentSettings = $oldParent->getVariantSettings();
 
-        if(array_key_exists('winnerCriteria', $oldParentSettings)) {
+        if (array_key_exists('winnerCriteria', $oldParentSettings)) {
             $winnerSettings['winnerCriteria'] = $oldParentSettings['winnerCriteria'];
         }
 
-        if(array_key_exists('sendWinnerDelay', $oldParentSettings)) {
+        if (array_key_exists('sendWinnerDelay', $oldParentSettings)) {
             $winnerSettings['sendWinnerDelay'] = $oldParentSettings['sendWinnerDelay'];
         }
         $winnerSettings['totalWeight'] = self::DEFAULT_WEIGHT;
@@ -190,6 +190,6 @@ class VariantConverterService
      */
     private function setDefaultValues(VariantEntityInterface $variant)
     {
-         $variant->setVariantStartDate(null);
+        $variant->setVariantStartDate(null);
     }
 }

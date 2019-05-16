@@ -77,11 +77,11 @@ class AbTestSettingsService
 
         $settings = [];
 
-        $settings['variants']           = $this->variantsSettings;
-        $settings['winnerCriteria']     = $this->winnerCriteria;
-        $settings['totalWeight']        = $this->totalWeight;
+        $settings['variants']            = $this->variantsSettings;
+        $settings['winnerCriteria']      = $this->winnerCriteria;
+        $settings['totalWeight']         = $this->totalWeight;
         $settings['sendWinnerDelay']     = $this->sendWinnerDelay;
-        $settings['configurationError'] = $this->configurationError;
+        $settings['configurationError']  = $this->configurationError;
 
         return $settings;
     }
