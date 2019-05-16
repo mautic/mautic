@@ -235,7 +235,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
-        $this->abTestSettingsService    = $this->createMock(AbTestSettingsService::class);
+        $this->abTestSettingsService    = new AbTestSettingsService();
         $this->variantConverterService  = $this->createMock(EmailVariantConverterService::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->connection               = $this->createMock(Connection::class);
@@ -645,7 +645,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
-            $this->connection
+            $this->connection,
+            $this->abTestSettingsService,
+            $this->variantConverterService
         );
 
         $emailModel->setTranslator($this->translator);
