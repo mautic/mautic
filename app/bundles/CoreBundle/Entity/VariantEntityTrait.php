@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 
 trait VariantEntityTrait
 {
@@ -26,12 +27,12 @@ trait VariantEntityTrait
     /**
      * @var array
      */
-    private $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerWait'];
+    private $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerDelay'];
 
     /**
      * @var array
      */
-    private $variantSettings = ['totalWeight' => 100, 'enableAbTest' => false];
+    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT, 'enableAbTest' => false];
 
     /**
      * @var \DateTime
@@ -305,7 +306,7 @@ trait VariantEntityTrait
         if (!$this->getVariantParent()) {
             $this->variantSettings = [
                 'enableAbTest' => false,
-                'totalWeight'  => 100,
+                'totalWeight'  => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT,
             ];
         } else {
             $this->variantSettings = [];

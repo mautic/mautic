@@ -2382,9 +2382,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $variantSettings = $email->getVariantSettings();
 
             if (array_key_exists('totalWeight', $variantSettings)
-                && array_key_exists('sendWinnerWait', $variantSettings)
-                && $variantSettings['totalWeight'] < 100
-                && $variantSettings['sendWinnerWait'] > 0
+                && array_key_exists('sendWinnerDelay', $variantSettings)
+                && $variantSettings['totalWeight'] < AbTestSettingsService::DEFAULT_TOTAL_WEIGHT
+                && $variantSettings['sendWinnerDelay'] > 0
             ) {
                 $emailsToSend[] = $email;
             }

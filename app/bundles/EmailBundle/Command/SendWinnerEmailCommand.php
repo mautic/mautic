@@ -98,15 +98,15 @@ EOT
 
         $abTestSettings = $container->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
 
-        if (!array_key_exists('sendWinnerWait', $abTestSettings) || $abTestSettings['sendWinnerWait'] < 1) {
+        if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
             $output->writeln('Amount of time to send winner email not specified in AB test variant settings.');
 
             return 1;
         }
 
-        if ($this->isReady($parent->getId(), $abTestSettings['sendWinnerWait']) === false) {
+        if ($this->isReady($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
             // too early
-            $output->writeln('Predetermined amount of time haven\'t passed yet');
+            $output->writeln("Predetermined amount of time hasn't passed yet");
 
             return 1;
         }
@@ -115,7 +115,7 @@ EOT
             $winner = $this->getWinner($output, $parent, $abTestSettings['winnerCriteria']);
         } else {
             // no variants
-            $output->writeln('Email doesn\'t have variants');
+            $output->writeln("Email doesn't have variants");
 
             return 1;
         }
@@ -131,14 +131,14 @@ EOT
 
         // send winner email
 
-        $output->writeln('Winner email ['.$winner->getId().'] has been sent to remaining contacts.');
+        $output->writeln('Winner email '.$winner->getId().' has been sent to remaining contacts.');
 
         return 0;
     }
 
     /**
      * @param OutputInterface        $output
-     * @param VariantEntityInterface $parentVariant
+     * @param Email $parentVariant
      * @param string                 $winnerCriteria
      *
      * @return |null
@@ -168,20 +168,20 @@ EOT
 
     /**
      * @param int $emailId
-     * @param int $waitHours
+     * @param int $delayHours
      *
      * @return bool
      *
      * @throws \Exception
      */
-    private function isReady($emailId, $waitHours)
+    private function isReady($emailId, $delayHours)
     {
         $container  = $this->getContainer();
         $repo       = $container->get('mautic.email.repository.stat');
 
         $lastSentDate   = $repo->getEmailSentLastDate($emailId);
         $sendWinnerTime = new \DateTime($lastSentDate);
-        $sendWinnerTime->modify("+{$waitHours} hours");
+        $sendWinnerTime->modify("+{$delayHours} hours");
 
         $now = new \DateTime('now');
 

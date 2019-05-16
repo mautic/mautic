@@ -174,8 +174,8 @@ class VariantConverterService
             $winnerSettings['winnerCriteria'] = $oldParentSettings['winnerCriteria'];
         }
 
-        if(array_key_exists('sendWinnerWait', $oldParentSettings)) {
-            $winnerSettings['sendWinnerWait'] = $oldParentSettings['sendWinnerWait'];
+        if(array_key_exists('sendWinnerDelay', $oldParentSettings)) {
+            $winnerSettings['sendWinnerDelay'] = $oldParentSettings['sendWinnerDelay'];
         }
         $winnerSettings['totalWeight'] = self::DEFAULT_WEIGHT;
 

@@ -47,7 +47,7 @@ class AbTestSettingsService
     /**
      * @var int
      */
-    private $sendWinnerWait;
+    private $sendWinnerDelay;
 
     /**
      * @var bool
@@ -80,7 +80,7 @@ class AbTestSettingsService
         $settings['variants']           = $this->variantsSettings;
         $settings['winnerCriteria']     = $this->winnerCriteria;
         $settings['totalWeight']        = $this->totalWeight;
-        $settings['sendWinnerWait']     = $this->sendWinnerWait;
+        $settings['sendWinnerDelay']     = $this->sendWinnerDelay;
         $settings['configurationError'] = $this->configurationError;
 
         return $settings;
@@ -111,8 +111,8 @@ class AbTestSettingsService
             $this->totalWeight = self::DEFAULT_TOTAL_WEIGHT;
         }
 
-        if (isset($parentSettings['sendWinnerWait'])) {
-            $this->sendWinnerWait = $parentSettings['sendWinnerWait'];
+        if (isset($parentSettings['sendWinnerDelay'])) {
+            $this->sendWinnerDelay = $parentSettings['sendWinnerDelay'];
         }
 
         if (isset($parentSettings['winnerCriteria'])) {

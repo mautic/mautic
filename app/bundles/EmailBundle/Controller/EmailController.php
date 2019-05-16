@@ -983,7 +983,13 @@ class EmailController extends FormController
 
             $variantSettings = $entity->getVariantSettings();
             if (!array_key_exists('enableAbTest', $variantSettings) || $variantSettings['enableAbTest'] == false) {
-                $this->addFlash('AB test not enabled in a parent variant'); // todo add translation and redirect
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.email.error.disabled_abtest',
+                ];
+                return $this->postActionRedirect([
+                    'flashes' => $flashes,
+                ]);
             }
 
             // Note this since it's cleared on __clone()
