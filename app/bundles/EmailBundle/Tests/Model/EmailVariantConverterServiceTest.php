@@ -97,8 +97,8 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(1));
         $winner->setVariantSettings([
             'totalWeight'     => '50',
-            'winnerCriteria'  => 'email.openrate',
-            'sendWinnerDelay' => 2, ]);
+            'winnerCriteria'  => $winnerCriteria,
+            'sendWinnerDelay' => $sendWinnerDelay, ]);
         $winner->setIsPublished(true);
 
         $variant = $this->getMockBuilder(Email::class)
@@ -107,7 +107,6 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $variant->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(3));
-        $variant->setVariantSettings(['weight' => '25']);
         $variant->setIsPublished(true);
 
         $winner->addVariantChild($variant);
