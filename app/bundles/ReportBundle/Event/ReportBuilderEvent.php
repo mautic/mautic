@@ -135,10 +135,6 @@ class ReportBuilderEvent extends AbstractReportEvent
 
         $this->tableArray[$context] = $data;
 
-        if ($this->context == $context) {
-            $this->stopPropagation();
-        }
-
         return $this;
     }
 
