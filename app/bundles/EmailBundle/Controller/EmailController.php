@@ -985,7 +985,7 @@ class EmailController extends FormController
             if (!array_key_exists('enableAbTest', $variantSettings) || $variantSettings['enableAbTest'] == false) {
                 $flashes[] = [
                     'type'    => 'error',
-                    'msg'     => 'mautic.email.error.disabled_abtest',
+                    'msg'     => 'mautic.core.error.disabled_abtest',
                 ];
 
                 return $this->postActionRedirect([

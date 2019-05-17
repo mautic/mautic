@@ -103,7 +103,7 @@ EOT
             return 1;
         }
 
-        if ($this->isReady($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
+        if ($model->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
             // too early
             $output->writeln("Predetermined amount of time hasn't passed yet");
 
@@ -161,31 +161,5 @@ EOT
         $winner = $model->getEntity($winners[0]);
 
         return $winner;
-    }
-
-    /**
-     * @param int $emailId
-     * @param int $delayHours
-     *
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    private function isReady($emailId, $delayHours)
-    {
-        $container  = $this->getContainer();
-        $repo       = $container->get('mautic.email.repository.stat');
-
-        $lastSentDate   = $repo->getEmailSentLastDate($emailId);
-        $sendWinnerTime = new \DateTime($lastSentDate);
-        $sendWinnerTime->modify("+{$delayHours} hours");
-
-        $now = new \DateTime('now');
-
-        if ($now > $sendWinnerTime) {
-            return true;
-        }
-
-        return false;
     }
 }

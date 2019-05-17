@@ -2392,4 +2392,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         return $emailsToSend;
     }
+
+    /**
+     * @param int $emailId
+     * @param int $delayHours
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public function isReadyToSendWinner($emailId, $delayHours)
+    {
+        $lastSentDate   = $this->getStatRepository()->getEmailSentLastDate($emailId);
+        $sendWinnerTime = new \DateTime($lastSentDate);
+        $sendWinnerTime->modify("+{$delayHours} hours");
+
+        $now = new \DateTime('now');
+
+        if ($now > $sendWinnerTime) {
+            return true;
+        }
+
+        return false;
+    }
 }
