@@ -405,7 +405,7 @@ class EmailType extends AbstractType
                 'variantSettings',
                 VariantType::class,
                 [
-                    'label'             => 'mautic.email.abtest',
+                    'label'             => 'mautic.core.ab_test.form.abtest_settings',
                     'required'          => false,
                     'is_parent'         => $isParent,
                     'is_existing'       => $isExisting,
