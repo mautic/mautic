@@ -52,6 +52,7 @@ class CitrixApi
             $requestSettings
         );
         $status  = $request->code;
+        $message = '';
 
         // Try refresh access_token with refresh_token (https://goto-developer.logmeininc.com/how-use-refresh-tokens)
         if ($refreshToken && $this->isInvalidTokenFromReponse($request)) {
