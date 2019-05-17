@@ -11,9 +11,8 @@
 
 namespace Mautic\EmailBundle\Tests;
 
-
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 
 class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
@@ -26,7 +25,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $converter      = new VariantConverterService();
         $emailConverter = new EmailVariantConverterService($converter);
 
-        $winnerCriteria = 'email.openrate';
+        $winnerCriteria  = 'email.openrate';
         $sendWinnerDelay = 2;
 
         $parent = $this->getMockBuilder(Email::class)
@@ -36,9 +35,9 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(1));
         $parent->setVariantSettings([
-            'totalWeight' => '50',
-            'winnerCriteria' => $winnerCriteria,
-            'sendWinnerDelay' => $sendWinnerDelay]);
+            'totalWeight'     => '50',
+            'winnerCriteria'  => $winnerCriteria,
+            'sendWinnerDelay' => $sendWinnerDelay, ]);
         $parent->setIsPublished(true);
 
         $winner = $this->getMockBuilder(Email::class)
@@ -87,7 +86,7 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
         $converter      = new VariantConverterService();
         $emailConverter = new EmailVariantConverterService($converter);
 
-        $winnerCriteria = 'email.openrate';
+        $winnerCriteria  = 'email.openrate';
         $sendWinnerDelay = 2;
 
         $winner = $this->getMockBuilder(Email::class)
@@ -97,9 +96,9 @@ class EmailVariantConverterServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(1));
         $winner->setVariantSettings([
-            'totalWeight' => '50',
-            'winnerCriteria' => 'email.openrate',
-            'sendWinnerDelay' => 2]);
+            'totalWeight'     => '50',
+            'winnerCriteria'  => 'email.openrate',
+            'sendWinnerDelay' => 2, ]);
         $winner->setIsPublished(true);
 
         $variant = $this->getMockBuilder(Email::class)

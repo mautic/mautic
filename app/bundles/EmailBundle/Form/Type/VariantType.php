@@ -72,7 +72,7 @@ class VariantType extends AbstractType
         $builder->add('sendWinnerDelay', 'integer', [
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
             'label_attr'  => ['class' => 'control-label'],
-            'attr'  => [
+            'attr'        => [
                 'tooltip' => 'mautic.core.ab_test.form.send_winner_delay.help',
                 'class'   => 'form-control',
             ],

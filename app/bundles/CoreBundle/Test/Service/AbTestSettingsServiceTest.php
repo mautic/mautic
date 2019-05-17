@@ -11,9 +11,8 @@
 
 namespace Mautic\CoreBundle\Test\Service;
 
-
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
+use Mautic\EmailBundle\Entity\Email;
 
 class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,9 +40,9 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue($idParent));
         $parent->setVariantSettings([
-            'totalWeight' => $totalWeight,
-            'winnerCriteria' => $winnerCriteria,
-            'sendWinnerDelay' => $sendWinnerDelay]);
+            'totalWeight'     => $totalWeight,
+            'winnerCriteria'  => $winnerCriteria,
+            'sendWinnerDelay' => $sendWinnerDelay, ]);
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
@@ -57,7 +56,6 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA->setVariantSettings(['weight' => $weightA]);
         $variantA->setIsPublished(true);
 
-
         $variantB = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
@@ -69,7 +67,6 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantB->setVariantSettings(['weight' => $weightB]);
         $variantB->setIsPublished(true);
 
-
         $abTestSettings = $abTestSettingsService->getAbTestSettings($parent);
 
         $this->assertEquals($totalWeight, $abTestSettings['totalWeight']);
@@ -80,7 +77,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($weightA, $abTestSettings['variants'][$idA]['weight']);
         $this->assertEquals($weightB, $abTestSettings['variants'][$idB]['weight']);
 
-        $this->assertFalse( $abTestSettings['configurationError']);
+        $this->assertFalse($abTestSettings['configurationError']);
     }
 
     /**
@@ -107,9 +104,9 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue($idParent));
         $parent->setVariantSettings([
-            'totalWeight' => $totalWeight,
-            'winnerCriteria' => $winnerCriteria,
-            'sendWinnerDelay' => $sendWinnerDelay]);
+            'totalWeight'     => $totalWeight,
+            'winnerCriteria'  => $winnerCriteria,
+            'sendWinnerDelay' => $sendWinnerDelay, ]);
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
@@ -123,7 +120,6 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA->setVariantSettings(['weight' => $weightA]);
         $variantA->setIsPublished(true);
 
-
         $variantB = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
@@ -135,10 +131,9 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantB->setVariantSettings(['weight' => $weightB]);
         $variantB->setIsPublished(true);
 
-
         $abTestSettings = $abTestSettingsService->getAbTestSettings($parent);
 
-        $this->assertTrue( $abTestSettings['configurationError']);
+        $this->assertTrue($abTestSettings['configurationError']);
     }
 
     /**
@@ -176,7 +171,6 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA->setVariantSettings(['weight' => $weightA, 'winnerCriteria' => $winnerCriteria]);
         $variantA->setIsPublished(true);
 
-
         $variantB = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
@@ -188,7 +182,6 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantB->setVariantSettings(['weight' => $weightB, 'winnerCriteria' => $winnerCriteria]);
         $variantB->setIsPublished(true);
 
-
         $abTestSettings = $abTestSettingsService->getAbTestSettings($parent);
 
         $this->assertEquals($totalWeight, $abTestSettings['totalWeight']);
@@ -198,6 +191,6 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($weightA, $abTestSettings['variants'][$idA]['weight']);
         $this->assertEquals($weightB, $abTestSettings['variants'][$idB]['weight']);
 
-        $this->assertFalse( $abTestSettings['configurationError']);
+        $this->assertFalse($abTestSettings['configurationError']);
     }
 }
