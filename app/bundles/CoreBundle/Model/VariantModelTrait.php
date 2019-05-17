@@ -16,6 +16,69 @@ trait VariantModelTrait
     protected $inConversion = false;
 
     /**
+     * Converts a variant to the main item and the original main item a variant.
+     *
+     * @deprecated use VariantConverterService instead
+     *
+     * @param VariantEntityInterface $entity
+     */
+    public function convertVariant(VariantEntityInterface $entity)
+    {
+        //let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        list($parent, $children) = $entity->getVariants();
+
+        $save = [];
+
+        //set this email as the parent for the original parent and children
+        if ($parent) {
+            if ($parent->getId() != $entity->getId()) {
+                if (method_exists($parent, 'setIsPublished')) {
+                    $parent->setIsPublished(false);
+                }
+
+                $entity->addVariantChild($parent);
+                $parent->setVariantParent($entity);
+            }
+
+            $parent->setVariantStartDate(null);
+            $parent->setVariantSentCount(0);
+
+            foreach ($children as $child) {
+                //capture child before it's removed from collection
+                $save[] = $child;
+
+                $parent->removeVariantChild($child);
+            }
+        }
+
+        if (count($save)) {
+            foreach ($save as $child) {
+                if ($child->getId() != $entity->getId()) {
+                    if (method_exists($child, 'setIsPublished')) {
+                        $child->setIsPublished(false);
+                    }
+
+                    $entity->addVariantChild($child);
+                    $child->setVariantParent($entity);
+                } else {
+                    $child->removeVariantParent();
+                }
+
+                $child->setVariantSentCount(0);
+                $child->setVariantStartDate(null);
+            }
+        }
+
+        $save[] = $parent;
+        $save[] = $entity;
+
+        //save the entities
+        $this->saveEntities($save, false);
+    }
+
+    /**
      * Prepare a variant for saving.
      *
      * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
