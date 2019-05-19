@@ -169,6 +169,10 @@ trait EntityFieldsBuildFormTrait
                 case 'select':
                 case 'multiselect':
                 case 'boolean':
+                    if ($type == 'multiselect') {
+                        $constraints[] = new Length(['max' => 255]);
+                    }
+
                     $typeProperties = [
                         'required'    => $required,
                         'label'       => $field['label'],
@@ -271,6 +275,10 @@ trait EntityFieldsBuildFormTrait
                         case 'text':
                             $constraints[] = new Length(['max' => 255]);
                             break;
+                        case 'multiselect':
+                            if ($type == 'multiselect') {
+                                $constraints[] = new Length(['max' => 255]);
+                            }
                     }
 
                     $builder->add(

@@ -62,8 +62,8 @@ class AjaxController extends CommonAjaxController
                 .'</span></div>',
         ];
 
-        // if we get a 200 response convert to success message
-        if ($response->code == 200) {
+        // if we get a 2xx response convert to success message
+        if (substr($response->code, 0, 1) == 2) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')

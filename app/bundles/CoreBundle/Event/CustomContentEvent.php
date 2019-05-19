@@ -84,7 +84,10 @@ class CustomContentEvent extends Event
      */
     public function addTemplate($template, array $vars = [])
     {
-        $this->templates[$template] = $vars;
+        $this->templates[] = [
+            'template' => $template,
+            'vars'     => $vars,
+        ];
     }
 
     /**

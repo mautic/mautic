@@ -69,7 +69,7 @@ JS;
                     </tr>
                     <tr>
                         <td>
-                            <div id="frequency_<?php echo $channel->value; ?>" class="text-left">
+                            <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
                                 <?php
                                 if ($showContactFrequency):?>
                                     <div class="col-md-6">

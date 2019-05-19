@@ -171,7 +171,7 @@ class ContactRequestHelper
                 true,
                 true
             );
-            if ($foundContact->getId() !== $this->trackedContact->getId()) {
+            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 return $foundContact;
             }

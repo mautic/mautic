@@ -123,6 +123,27 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
+    public function testIpLookupDoesNotAddCompanyIfConfiguredSo()
+    {
+        $entity    = new Lead();
+        $ipAddress = new IpAddress();
+
+        $ipAddress->setIpDetails(['organization' => 'Doctors Without Borders']);
+
+        $entity->addIpAddress($ipAddress);
+
+        $this->coreParametersHelperMock->expects($this->once())->method('getParameter')->with('ip_lookup_create_organization', false)->willReturn(false);
+        $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
+        $this->fieldModelMock->method('getFieldList')->willReturn([]);
+        $this->companyLeadRepositoryMock->expects($this->never())->method('getEntitiesByLead');
+        $this->companyModelMock->expects($this->never())->method('getEntities');
+
+        $this->leadModel->saveEntity($entity);
+
+        $this->assertNull($entity->getCompany());
+        $this->assertTrue(empty($entity->getUpdatedFields()['company']));
+    }
+
     public function testIpLookupAddsCompanyIfDoesNotExistInEntity()
     {
         $companyFromIpLookup = 'Doctors Without Borders';
@@ -133,9 +154,11 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
         $entity->addIpAddress($ipAddress);
 
+        $this->coreParametersHelperMock->expects($this->once())->method('getParameter')->with('ip_lookup_create_organization', false)->willReturn(true);
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
+        $this->companyModelMock->expects($this->once())->method('getEntities')->willReturn([]);
 
         $this->leadModel->saveEntity($entity);
 
@@ -155,6 +178,7 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
         $entity->addIpAddress($ipAddress);
 
+        $this->coreParametersHelperMock->expects($this->never())->method('getParameter');
         $this->fieldModelMock->method('getFieldListWithProperties')->willReturn([]);
         $this->fieldModelMock->method('getFieldList')->willReturn([]);
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);

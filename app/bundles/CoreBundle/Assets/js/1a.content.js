@@ -983,7 +983,9 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
  * @param el
  */
 Mautic.destroyChosen = function(el) {
-    var eventObject = mQuery._data(el.get(0), 'events');
+    if(el.get(0)) {
+        var eventObject = mQuery._data(el.get(0), 'events');
+    }
 
     // Check if object has chosen event
     if (eventObject !== undefined && eventObject['chosen:activate'] !== undefined) {
@@ -1229,6 +1231,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     } else if(type == 'date') {
@@ -1238,6 +1241,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false,
             closeOnDateSelect: true
         });
@@ -1248,6 +1252,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
+            scrollMonth: false,
             scrollInput: false
         });
     }

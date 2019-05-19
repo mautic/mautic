@@ -213,6 +213,17 @@ return [
                     'templating.helper.assets',
                 ],
             ],
+            'mautic.core.subscriber.router' => [
+                'class'     => \Mautic\CoreBundle\EventListener\RouterSubscriber::class,
+                'arguments' => [
+                    'router',
+                    '%router.request_context.scheme%',
+                    '%router.request_context.host%',
+                    '%request_listener.https_port%',
+                    '%request_listener.http_port%',
+                    '%router.request_context.base_url%',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.spacer' => [
@@ -277,8 +288,8 @@ return [
                 ],
             ],
             'mautic.form.type.theme_list' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\CoreBundle\Form\Type\ThemeListType::class,
+                'arguments' => ['mautic.helper.theme'],
                 'alias'     => 'theme_list',
             ],
             'mautic.form.type.daterange' => [
@@ -1025,6 +1036,7 @@ return [
         'ip_lookup_service'               => 'maxmind_download',
         'ip_lookup_auth'                  => '',
         'ip_lookup_config'                => [],
+        'ip_lookup_create_organization'   => false,
         'transifex_username'              => '',
         'transifex_password'              => '',
         'update_stability'                => 'stable',
