@@ -65,7 +65,7 @@ class CitrixCampaignActionType extends AbstractType
 
         $newChoices = [];
         foreach ($choices as $k => $c) {
-            if (strpos($k, $product) === 0) {
+            if (0 === strpos($k, $product)) {
                 $newChoices[$k] = $c;
             }
         }

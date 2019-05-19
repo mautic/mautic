@@ -30,7 +30,7 @@ abstract class DateMonthAbstract extends DateOptionAbstract
      */
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
-        return $dateTimeHelper->toUtcString('Y-m-%');
+        return $dateTimeHelper->toLocalString('Y-m-%');
     }
 
     /**
