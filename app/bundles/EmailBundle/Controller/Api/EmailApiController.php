@@ -124,9 +124,10 @@ class EmailApiController extends CommonApiController
                 return $lead;
             }
 
-            $post     = $this->request->request->all();
-            $tokens   = (!empty($post['tokens'])) ? $post['tokens'] : [];
-            $response = ['success' => false];
+            $post       = $this->request->request->all();
+            $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
+            $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+            $response   = ['success' => false];
 
             $cleanTokens = [];
 
@@ -145,9 +146,10 @@ class EmailApiController extends CommonApiController
                 $entity,
                 $leadFields,
                 [
-                    'source'        => ['api', 0],
-                    'tokens'        => $cleanTokens,
-                    'return_errors' => true,
+                    'source'            => ['api', 0],
+                    'tokens'            => $cleanTokens,
+                    'assetAttachments'  => $assetsIds,
+                    'return_errors'     => true,
                 ]
             );
 
