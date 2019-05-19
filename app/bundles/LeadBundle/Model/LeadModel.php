@@ -1439,8 +1439,11 @@ class LeadModel extends FormModel
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
             foreach ($addresses as $address) {
-                $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress(trim($address));
+                $address = trim($address);
+                if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
+                    $ipAddress = new IpAddress();
+                    $ipAddress->setIpAddress($address);
+                }
                 $lead->addIpAddress($ipAddress);
             }
         }
