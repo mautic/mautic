@@ -139,6 +139,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
+        if (is_array($value)) {
+            $q->where($col.' IN (:value)')
+                ->setParameter('value', $value);
+        } else {
+            $q->where("$col = :search")
+                ->setParameter('search', $value);
+        }
+
         if ($ignoreId) {
             $q->where('l.id != :ignoreId')
                 ->setParameter('ignoreId', $ignoreId);
@@ -274,7 +282,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->andWhere("l.$col = :".$col)
+            $q->orWhere("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 

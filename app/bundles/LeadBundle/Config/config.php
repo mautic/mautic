@@ -532,6 +532,7 @@ return [
                     'mautic.category.model.category',
                     'mautic.helper.user',
                     'mautic.campaign.model.campaign',
+                    'mautic.asset.model.asset',
                 ],
                 'alias' => 'leadlist',
             ],
@@ -829,6 +830,10 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.validator.length' => [
+                'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
+                'tag'       => 'validator.constraint_validator',
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -1094,6 +1099,13 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_decorator_date',
                     'mautic.lead.model.relative_date',
+                    'mautic.lead.model.lead_segment.timezoneResolver',
+                ],
+            ],
+            'mautic.lead.model.lead_segment.timezoneResolver' => [
+                'class'     => \Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.model.random_parameter_name' => [
