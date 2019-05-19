@@ -231,10 +231,14 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $recipient['metadata'] = $metadata[$to['email']];
             }
 
-            // Apparently Sparkpost doesn't like empty substitution_data or metadata
+            // Sparkpost requires substitution_data which can be byspassed by using MailHelper::setTo() rather than a Lead via MailHelper::setLead()
+            // Without it, Sparkpost returns the error: "field 'substitution_data' is required"
+            // But, it can't be an empty array or Sparkpost will return error: field 'substitution_data' is of type 'json_array', but needs to be of type 'json_object'
             if (empty($recipient['substitution_data'])) {
-                unset($recipient['substitution_data']);
+                $recipient['substitution_data'] = new \stdClass();
             }
+
+            // Sparkpost doesn't like empty metadata
             if (empty($recipient['metadata'])) {
                 unset($recipient['metadata']);
             }
