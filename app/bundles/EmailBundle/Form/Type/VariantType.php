@@ -69,13 +69,19 @@ class VariantType extends AbstractType
             ]),
         ]);
 
+        $attr = [
+            'class'    => 'form-control',
+            'tooltip'  => 'mautic.core.ab_test.form.send_winner_delay.help',
+        ];
+
+        if ($options['is_parent'] === true && $options['is_existing'] === false) {
+            $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
+        }
+
         $builder->add('sendWinnerDelay', 'integer', [
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
             'label_attr'  => ['class' => 'control-label'],
-            'attr'        => [
-                'tooltip' => 'mautic.core.ab_test.form.send_winner_delay.help',
-                'class'   => 'form-control',
-            ],
+            'attr'        => $attr,
             'constraints' => new Assert\Range([
                 'min' => 0,
                 'max' => 480,
