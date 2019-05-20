@@ -398,7 +398,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
-            if (isset($leadFieldTypes[$leadField]['type']) && $leadFieldTypes[$leadField]['type'] == 'text') {
+            // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
+            // "False" has to be converted to 0 instead.
+            if (isset($leadFieldTypes[$leadField]['type']) && ($leadFieldTypes[$leadField]['type'] == 'text') && !is_bool($value)) {
                 $matchedFields[$leadField] = substr($value, 0, 255);
             }
         }
@@ -439,7 +441,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, true, false);
+        $leadModel->setFieldValues($lead, $matchedFields, false, false);
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
