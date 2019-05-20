@@ -173,4 +173,16 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
 
         return $keys['organizer_key'];
     }
+
+    public function mergeApiKeysAfterRefresh()
+    {
+        if (!$this->session) {
+            return;
+        }
+
+        $tokenResponse = $this->session->get($this->getName().'_tokenResponse', []);
+        if (!empty($tokenResponse)) {
+            $this->mergeApiKeys($tokenResponse);
+        }
+    }
 }

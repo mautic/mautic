@@ -8,8 +8,16 @@ use MauticPlugin\MauticCitrixBundle\Integration\CitrixAbstractIntegration;
 
 class CitrixApi
 {
+    /**
+     * @var CitrixAbstractIntegration
+     */
     protected $integration;
 
+    /**
+     * CitrixApi constructor.
+     *
+     * @param CitrixAbstractIntegration $integration
+     */
     public function __construct(CitrixAbstractIntegration $integration)
     {
         $this->integration = $integration;
@@ -53,11 +61,12 @@ class CitrixApi
         );
         $status  = $request->code;
         $message = '';
-
+        $this->integration->mergeApiKeysAfterRefresh();
         // Try refresh access_token with refresh_token (https://goto-developer.logmeininc.com/how-use-refresh-tokens)
         if ($refreshToken && $this->isInvalidTokenFromReponse($request)) {
             $error = $this->integration->authCallback(['use_refresh_token' => true]);
             if (!$error) {
+                // keys changes, load new integration object
                 $request = $this->_request($operation, $settings, $route, false);
                 $status  = $request->code;
             }
