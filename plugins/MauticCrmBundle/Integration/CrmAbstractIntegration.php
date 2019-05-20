@@ -439,7 +439,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
+        $leadModel->setFieldValues($lead, $matchedFields, true, false);
         if (!empty($socialCache)) {
             // Update the social cache
             $leadSocialCache = $lead->getSocialCache();
