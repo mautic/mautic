@@ -11,6 +11,7 @@
 namespace Mautic\CoreBundle\Model\AbTest;
 
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Class VariantConverterService.
@@ -85,7 +86,7 @@ class VariantConverterService
     }
 
     /**
-     * @param $variantChildren
+     * @param Collection $variantChildren
      * @param VariantEntityInterface $winner
      */
     private function updateOldChildren($variantChildren, VariantEntityInterface $winner)
