@@ -107,7 +107,6 @@ interface VariantEntityInterface
      *
      * @param array $variantSettings
      *
-     * @return mixed
      */
     public function setVariantSettings($variantSettings);
 
