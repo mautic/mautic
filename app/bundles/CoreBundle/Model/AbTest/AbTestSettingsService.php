@@ -151,7 +151,7 @@ class AbTestSettingsService
 
     /**
      * @param VariantEntityInterface $variant
-     * @param $weight
+     * @param int $weight
      */
     private function setVariantSettingsWeight(VariantEntityInterface $variant, $weight)
     {
