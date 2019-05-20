@@ -140,7 +140,7 @@ EOT
      * @param Email           $parentVariant
      * @param string          $winnerCriteria
      *
-     * @return |null
+     * @return Email|null
      */
     private function getWinner(OutputInterface $output, Email $parentVariant, $winnerCriteria)
     {
