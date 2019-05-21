@@ -36,8 +36,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $parent = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $parent->expects($this->any())
-            ->method('getId')
+        $parent->method('getId')
             ->willReturn($idParent);
         $parent->setVariantSettings([
             'totalWeight'     => $totalWeight,
@@ -48,8 +47,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $variantA->expects($this->any())
-            ->method('getId')
+        $variantA->method('getId')
             ->willReturn($idA);
         $parent->addVariantChild($variantA);
         $variantA->setVariantParent($parent);
@@ -59,8 +57,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantB = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $variantB->expects($this->any())
-            ->method('getId')
+        $variantB->method('getId')
             ->willReturn($idB);
         $parent->addVariantChild($variantB);
         $variantB->setVariantParent($parent);
@@ -100,8 +97,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $parent = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $parent->expects($this->any())
-            ->method('getId')
+        $parent->method('getId')
             ->willReturn($idParent);
         $parent->setVariantSettings([
             'totalWeight'     => $totalWeight,
@@ -112,8 +108,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantA = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $variantA->expects($this->any())
-            ->method('getId')
+        $variantA->method('getId')
             ->willReturn($idA);
         $parent->addVariantChild($variantA);
         $variantA->setVariantParent($parent);
@@ -123,8 +118,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantB = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $variantB->expects($this->any())
-            ->method('getId')
+        $variantB->method('getId')
             ->willReturn($idB);
         $parent->addVariantChild($variantB);
         $variantB->setVariantParent($parent);
@@ -155,16 +149,14 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $parent = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $parent->expects($this->any())
-            ->method('getId')
+        $parent->method('getId')
             ->willReturn($idParent);
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $variantA->expects($this->any())
-            ->method('getId')
+        $variantA->method('getId')
             ->willReturn($idA);
         $parent->addVariantChild($variantA);
         $variantA->setVariantParent($parent);
@@ -174,8 +166,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
         $variantB = $this->getMockBuilder(Email::class)
             ->setMethods(['getId'])
             ->getMock();
-        $variantB->expects($this->any())
-            ->method('getId')
+        $variantB->method('getId')
             ->willReturn($idB);
         $parent->addVariantChild($variantB);
         $variantB->setVariantParent($parent);
