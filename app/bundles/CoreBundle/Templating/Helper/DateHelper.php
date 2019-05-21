@@ -170,12 +170,6 @@ class DateHelper extends Helper
             return '';
         }
 
-        if ($datetime instanceof \DateTime) {
-            // Fix time shift with timezone conversion into string representation
-            $timezone  = ($datetime->getTimezone()->getName() === 'UTC') ? 'utc' : $timezone;
-            $datetime  = $datetime->format($fromFormat);
-        }
-
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
         $textDate = $this->helper->getTextDate();

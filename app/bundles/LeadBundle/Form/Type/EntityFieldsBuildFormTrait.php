@@ -13,10 +13,10 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Validator\Constraints\Length;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -169,6 +169,10 @@ trait EntityFieldsBuildFormTrait
                 case 'select':
                 case 'multiselect':
                 case 'boolean':
+                    if ($type == 'multiselect') {
+                        $constraints[] = new Length(['max' => 255]);
+                    }
+
                     $typeProperties = [
                         'required'    => $required,
                         'label'       => $field['label'],
@@ -268,6 +272,13 @@ trait EntityFieldsBuildFormTrait
                                 ]
                             );
                             break;
+                        case 'text':
+                            $constraints[] = new Length(['max' => 255]);
+                            break;
+                        case 'multiselect':
+                            if ($type == 'multiselect') {
+                                $constraints[] = new Length(['max' => 255]);
+                            }
                     }
 
                     $builder->add(

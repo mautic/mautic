@@ -359,7 +359,9 @@ Mautic.initDateRangePicker = function (fromId, toId) {
                     maxDate: dateTo.val() ? new Date(dateTo.val()) : false
                 });
             },
-            timepicker: false
+            timepicker: false,
+            scrollMonth: false,
+            scrollInput: false
         });
 
         dateTo.datetimepicker({
@@ -370,7 +372,9 @@ Mautic.initDateRangePicker = function (fromId, toId) {
                     minDate: dateFrom.val() ? new Date(dateFrom.val()) : false
                 });
             },
-            timepicker: false
+            timepicker: false,
+            scrollMonth: false,
+            scrollInput: false
         });
     }
 };

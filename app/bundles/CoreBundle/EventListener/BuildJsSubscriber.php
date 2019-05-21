@@ -110,7 +110,7 @@ MauticJS.log = function() {
 };
 
 MauticJS.setCookie = function(name, value) {
-    document.cookie = name+"="+value+";";
+    document.cookie = name+"="+value+"; path=/";
 };
 
 MauticJS.createCORSRequest = function(method, url) {

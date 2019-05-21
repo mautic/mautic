@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Sparkpost;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use SparkPost\SparkPost;
 
-/**
- * Class SparkpostFactory.
- */
 final class SparkpostFactory implements SparkpostFactoryInterface
 {
     /**
@@ -16,8 +13,6 @@ final class SparkpostFactory implements SparkpostFactoryInterface
     private $client;
 
     /**
-     * SparkpostFactory constructor.
-     *
      * @param GuzzleAdapter $client
      */
     public function __construct(GuzzleAdapter $client)
@@ -26,11 +21,11 @@ final class SparkpostFactory implements SparkpostFactoryInterface
     }
 
     /**
-     * @param      $host
-     * @param      $apiKey
-     * @param null $port
+     * @param string   $host
+     * @param string   $apiKey
+     * @param int|null $port
      *
-     * @return mixed|SparkPost
+     * @return SparkPost
      */
     public function create($host, $apiKey, $port = null)
     {
@@ -39,11 +34,12 @@ final class SparkpostFactory implements SparkpostFactoryInterface
         }
 
         $options = [
-            'host'     => '',
-            'protocol' => 'https',
-            'port'     => $port,
-            'key'      => ($apiKey) ?: 1234, // prevent Exception: You must provide an API key
+            'key' => ($apiKey) ?: 1234, // prevent Exception: You must provide an API key
         ];
+
+        if ($port) {
+            $options['port'] = $port;
+        }
 
         $hostInfo = parse_url($host);
         if ($hostInfo) {

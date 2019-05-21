@@ -20,14 +20,21 @@ class FieldFilterTransformer implements DataTransformerInterface
     private $relativeDateStrings;
 
     /**
-     * @param $translator
+     * @var array
      */
-    public function __construct($translator)
+    private $default;
+
+    /**
+     * @param       $translator
+     * @param array $default
+     */
+    public function __construct($translator, $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
             $string = $translator->trans($string);
         }
+        $this->default = $default;
     }
 
     /**
@@ -44,6 +51,9 @@ class FieldFilterTransformer implements DataTransformerInterface
         }
 
         foreach ($rawFilters as $k => $f) {
+            if (!empty($this->default)) {
+                $rawFilters[$k] = array_merge($this->default, $rawFilters[$k]);
+            }
             if ($f['type'] == 'datetime') {
                 if (in_array($f['filter'], $this->relativeDateStrings) or stristr($f['filter'][0], '-') or stristr($f['filter'][0], '+')) {
                     continue;

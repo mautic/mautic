@@ -44,6 +44,10 @@ Installing from source is only recommended if you are comfortable using the comm
 
 ## Requirements
 
+#### Contributors Agreement 
+
+By contributing to this project, you accept and agree to the [Contributors Agreement](https://www.mautic.org/contributors-agreement) in its entirety.
+
 #### Development / Build process requirements
 
 1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
