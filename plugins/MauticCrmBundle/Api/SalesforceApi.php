@@ -424,7 +424,7 @@ class SalesforceApi extends CrmApi
                     // Remove the missing field from the request
                     $missingFieldIndex = array_search($missingField, $fields);
                     if (false !== $missingFieldIndex) {
-                        unset($missingField[$missingFieldIndex]);
+                        unset($fields[$missingFieldIndex]);
                     }
                 }
             }
