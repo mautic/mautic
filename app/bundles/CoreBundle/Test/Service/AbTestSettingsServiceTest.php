@@ -38,7 +38,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $parent->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idParent));
+            ->willReturn($idParent);
         $parent->setVariantSettings([
             'totalWeight'     => $totalWeight,
             'winnerCriteria'  => $winnerCriteria,
@@ -50,7 +50,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $variantA->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idA));
+            ->willReturn($idA);
         $parent->addVariantChild($variantA);
         $variantA->setVariantParent($parent);
         $variantA->setVariantSettings(['weight' => $weightA]);
@@ -61,7 +61,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $variantB->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idB));
+            ->willReturn($idB);
         $parent->addVariantChild($variantB);
         $variantB->setVariantParent($parent);
         $variantB->setVariantSettings(['weight' => $weightB]);
@@ -102,7 +102,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $parent->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idParent));
+            ->willReturn($idParent);
         $parent->setVariantSettings([
             'totalWeight'     => $totalWeight,
             'winnerCriteria'  => $winnerCriteria,
@@ -114,7 +114,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $variantA->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idA));
+            ->willReturn($idA);
         $parent->addVariantChild($variantA);
         $variantA->setVariantParent($parent);
         $variantA->setVariantSettings(['weight' => $weightA]);
@@ -125,7 +125,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $variantB->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idB));
+            ->willReturn($idB);
         $parent->addVariantChild($variantB);
         $variantB->setVariantParent($parent);
         $variantB->setVariantSettings(['weight' => $weightB]);
@@ -157,7 +157,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $parent->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idParent));
+            ->willReturn($idParent);
         $parent->setIsPublished(true);
 
         $variantA = $this->getMockBuilder(Email::class)
@@ -165,7 +165,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $variantA->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idA));
+            ->willReturn($idA);
         $parent->addVariantChild($variantA);
         $variantA->setVariantParent($parent);
         $variantA->setVariantSettings(['weight' => $weightA, 'winnerCriteria' => $winnerCriteria]);
@@ -176,7 +176,7 @@ class AbTestSettingsServiceTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $variantB->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($idB));
+            ->willReturn($idB);
         $parent->addVariantChild($variantB);
         $variantB->setVariantParent($parent);
         $variantB->setVariantSettings(['weight' => $weightB, 'winnerCriteria' => $winnerCriteria]);
