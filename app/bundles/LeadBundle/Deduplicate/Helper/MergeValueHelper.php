@@ -18,13 +18,14 @@ class MergeValueHelper
     /**
      * @param mixed $newerValue
      * @param mixed $olderValue
-     * @param null  $currentValue
+     * @param mixed $currentValue
+     * @param mixed $defaultValue
      *
      * @return mixed
      *
      * @throws ValueNotMergeableException
      */
-    public static function getMergeValue($newerValue, $olderValue, $currentValue = null)
+    public static function getMergeValue($newerValue, $olderValue, $currentValue = null, $defaultValue = null)
     {
         if ($newerValue === $olderValue) {
             throw new ValueNotMergeableException($newerValue, $olderValue);
@@ -34,7 +35,7 @@ class MergeValueHelper
             throw new ValueNotMergeableException($newerValue, $olderValue);
         }
 
-        if (self::isNotEmpty($newerValue)) {
+        if (self::isNotEmpty($newerValue) && $newerValue !== $defaultValue) {
             return $newerValue;
         }
 
