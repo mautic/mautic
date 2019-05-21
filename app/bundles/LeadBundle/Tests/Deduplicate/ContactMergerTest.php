@@ -491,7 +491,6 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
                 'default_value' => 'No',
             ]));
 
-
         $winner->expects($this->exactly(2))
             ->method('addUpdatedField')
             ->withConsecutive(
