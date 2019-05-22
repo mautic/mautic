@@ -988,11 +988,16 @@ return [
                 ],
             ],
             'mautic.lead.model.field' => [
-                'class'     => 'Mautic\LeadBundle\Model\FieldModel',
+                'class'     => \Mautic\LeadBundle\Model\FieldModel::class,
                 'arguments' => [
-                    'mautic.schema.helper.index',
                     'mautic.schema.helper.column',
                     'mautic.lead.model.list',
+                    'mautic.lead.field.custom_field_column',
+                    'mautic.lead.field.dispatcher.field_save_dispatcher',
+                    'mautic.lead.repository.field',
+                    'mautic.lead.field.fields_with_unique_identifier',
+                    'mautic.lead.field.field_list',
+                    'mautic.lead.field.lead_field_saver',
                 ],
             ],
             'mautic.lead.model.list' => [
@@ -1211,11 +1216,100 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
+
+            'mautic.lead.field.schema_definition' => [
+                'class'     => Mautic\LeadBundle\Field\SchemaDefinition::class,
+            ],
+            'mautic.lead.field.custom_field_column' => [
+                'class'     => Mautic\LeadBundle\Field\CustomFieldColumn::class,
+                'arguments' => [
+                    'mautic.schema.helper.column',
+                    'mautic.lead.field.schema_definition',
+                    'monolog.logger.mautic',
+                    'mautic.lead.field.lead_field_saver',
+                    'mautic.lead.field.custom_field_index',
+                    'mautic.lead.field.dispatcher.field_column_dispatcher',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.field.custom_field_index' => [
+                'class'     => Mautic\LeadBundle\Field\CustomFieldIndex::class,
+                'arguments' => [
+                    'mautic.schema.helper.index',
+                    'monolog.logger.mautic',
+                    'mautic.lead.field.fields_with_unique_identifier',
+                ],
+            ],
+            'mautic.lead.field.dispatcher.field_save_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.lead.field.dispatcher.field_column_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.lead.field.settings.background_settings',
+                ],
+            ],
+            'mautic.lead.field.dispatcher.field_column_background_dispatcher' => [
+                'class'     => Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.field.fields_with_unique_identifier' => [
+                'class'     => Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier::class,
+                'arguments' => [
+                    'mautic.lead.field.field_list',
+                ],
+            ],
+            'mautic.lead.field.field_list' => [
+                'class'     => Mautic\LeadBundle\Field\FieldList::class,
+                'arguments' => [
+                    'mautic.lead.repository.field',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.field.lead_field_saver' => [
+                'class'     => Mautic\LeadBundle\Field\LeadFieldSaver::class,
+                'arguments' => [
+                    'mautic.lead.repository.field',
+                    'mautic.lead.field.dispatcher.field_save_dispatcher',
+                ],
+            ],
+            'mautic.lead.field.settings.background_settings' => [
+                'class'     => Mautic\LeadBundle\Field\Settings\BackgroundSettings::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.lead.field.settings.background_service' => [
+                'class'     => Mautic\LeadBundle\Field\BackgroundService::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.field.custom_field_column',
+                    'mautic.lead.field.lead_field_saver',
+                    'mautic.lead.field.dispatcher.field_column_background_dispatcher',
+                    'mautic.lead.field.notification.custom_field',
+                ],
+            ],
+            'mautic.lead.field.notification.custom_field' => [
+                'class'     => Mautic\LeadBundle\Field\Notification\CustomFieldNotification::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                    'mautic.user.model.user',
+                    'translator',
+                  ],
+            ],
             'mautic.lead.model.ipaddress' => [
                 'class'     => Mautic\LeadBundle\Model\IpAddressModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'monolog.logger.mautic',
+
                 ],
             ],
         ],
@@ -1228,10 +1322,19 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'mautic.lead.command.create_custom_field' => [
+                'class'     => \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class,
+                'arguments' => [
+                    'mautic.lead.field.settings.background_service',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
     ],
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'create_custom_field_in_background'   => false,
     ],
 ];

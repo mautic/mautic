@@ -14,15 +14,20 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Field\CustomFieldColumn;
+use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Field\LeadFieldSaver;
+use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -295,19 +300,24 @@ class FieldModel extends FormModel
     ];
 
     /**
-     * @var IndexSchemaHelper
-     */
-    private $indexSchemaHelper;
-
-    /**
      * @var ColumnSchemaHelper
      */
     private $columnSchemaHelper;
 
     /**
-     * @var array
+     * @var CustomFieldColumn
      */
-    protected $uniqueIdentifierFields = [];
+    private $customFieldColumn;
+
+    /**
+     * @var FieldSaveDispatcher
+     */
+    private $fieldSaveDispatcher;
+
+    /**
+     * @var LeadFieldRepository
+     */
+    private $leadFieldRepository;
 
     /**
      * @var ListModel
@@ -315,20 +325,48 @@ class FieldModel extends FormModel
     private $leadListModel;
 
     /**
-     * FieldModel constructor.
-     *
-     * @param IndexSchemaHelper  $indexSchemaHelper
-     * @param ColumnSchemaHelper $columnSchemaHelper
-     * @param ListModel          $leadListModel
+     * @var FieldsWithUniqueIdentifier
+     */
+    private $fieldsWithUniqueIdentifier;
+
+    /**
+     * @var FieldList
+     */
+    private $fieldList;
+
+    /**
+     * @var LeadFieldSaver
+     */
+    private $leadFieldSaver;
+
+    /**
+     * @param ColumnSchemaHelper         $columnSchemaHelper
+     * @param ListModel                  $leadListModel
+     * @param CustomFieldColumn          $customFieldColumn
+     * @param FieldSaveDispatcher        $fieldSaveDispatcher
+     * @param LeadFieldRepository        $leadFieldRepository
+     * @param FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier
+     * @param FieldList                  $fieldList
+     * @param LeadFieldSaver             $leadFieldSaver
      */
     public function __construct(
-        IndexSchemaHelper $indexSchemaHelper,
         ColumnSchemaHelper $columnSchemaHelper,
-        ListModel $leadListModel
+        ListModel $leadListModel,
+        CustomFieldColumn $customFieldColumn,
+        FieldSaveDispatcher $fieldSaveDispatcher,
+        LeadFieldRepository $leadFieldRepository,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        FieldList $fieldList,
+        LeadFieldSaver $leadFieldSaver
     ) {
-        $this->indexSchemaHelper  = $indexSchemaHelper;
-        $this->columnSchemaHelper = $columnSchemaHelper;
-        $this->leadListModel      = $leadListModel;
+        $this->columnSchemaHelper         = $columnSchemaHelper;
+        $this->leadListModel              = $leadListModel;
+        $this->customFieldColumn          = $customFieldColumn;
+        $this->fieldSaveDispatcher        = $fieldSaveDispatcher;
+        $this->leadFieldRepository        = $leadFieldRepository;
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
+        $this->fieldList                  = $fieldList;
+        $this->leadFieldSaver             = $leadFieldSaver;
     }
 
     /**
@@ -336,7 +374,7 @@ class FieldModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadField');
+        return $this->leadFieldRepository;
     }
 
     /**
@@ -354,7 +392,7 @@ class FieldModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return null|LeadField
      */
     public function getEntity($id = null)
     {
@@ -362,9 +400,7 @@ class FieldModel extends FormModel
             return new LeadField();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -420,9 +456,10 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param object $entity
-     * @param bool   $unlock
+     * @param LeadField $entity
+     * @param bool      $unlock
      *
+     * @throws AbortColumnCreateException
      * @throws DBALException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
@@ -434,89 +471,23 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $isNew = $entity->getId() ? false : true;
+        $this->setTimestamps($entity, $entity->isNew(), $unlock);
 
-        //set some defaults
-        $this->setTimestamps($entity, $isNew, $unlock);
-        $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $alias   = $entity->getAlias();
-        $object  = $objects[$entity->getObject()];
-        $type    = $entity->getType();
-
-        if ($type == 'time') {
+        if ('time' === $entity->getType()) {
             //time does not work well with list filters
             $entity->setIsListable(false);
         }
 
         // Save the entity now if it's an existing entity
-        if (!$isNew) {
-            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            $this->getRepository()->saveEntity($entity);
-            $this->dispatchEvent('post_save', $entity, $isNew, $event);
+        if (!$entity->isNew()) {
+            $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
         }
 
-        // Create the field as its own column in the leads table.
-        /** @var ColumnSchemaHelper $leadsSchema */
-        $leadsSchema = $this->columnSchemaHelper->setName($object);
-        $isUnique    = $entity->getIsUniqueIdentifier();
-
-        // If the column does not exist in the contacts table, add it
-        if (!$leadsSchema->checkColumnExists($alias)) {
-            $schemaDefinition = self::getSchemaDefinition($alias, $type, $isUnique);
-
-            $leadsSchema->addColumn($schemaDefinition);
-
-            try {
-                $leadsSchema->executeChanges();
-            } catch (DriverException $e) {
-                $this->logger->addWarning($e->getMessage());
-
-                if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
-                    throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
-                } else {
-                    throw $e;
-                }
-            }
-
-            // If this is a new contact field, and it was successfully added to the contacts table, save it
-            if ($isNew === true) {
-                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-                $this->getRepository()->saveEntity($entity);
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
-
-            // Update the unique_identifier_search index and add an index for this field
-            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-            $modifySchema = $this->indexSchemaHelper->setName($object);
-
-            if ('string' == $schemaDefinition['type']) {
-                try {
-                    $modifySchema->addIndex([$alias], $alias.'_search');
-                    $modifySchema->allowColumn($alias);
-
-                    if ($isUnique) {
-                        // Get list of current uniques
-                        $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
-
-                        // Always use email
-                        $indexColumns   = ['email'];
-                        $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                        $indexColumns[] = $alias;
-
-                        // Only use three to prevent max key length errors
-                        $indexColumns = array_slice($indexColumns, 0, 3);
-                        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                    }
-
-                    $modifySchema->executeChanges();
-                } catch (DriverException $e) {
-                    if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
-                        $this->logger->addWarning($e->getMessage());
-                    } else {
-                        throw $e;
-                    }
-                }
-            }
+        try {
+            $this->customFieldColumn->createLeadColumn($entity);
+        } catch (CustomFieldLimitException $e) {
+            // Convert to original Exception not to cause BC
+            throw new DBALException($this->translator->trans($e->getMessage()));
         }
 
         // Update order of the other fields.
@@ -531,6 +502,7 @@ class FieldModel extends FormModel
      *
      * @return array|void
      *
+     * @throws AbortColumnCreateException
      * @throws DBALException
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
@@ -723,17 +695,13 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param $entity
-     * @param properties
+     * @param LeadField $entity
+     * @param $properties
      *
      * @return bool
      */
-    public function setFieldProperties(&$entity, $properties)
+    public function setFieldProperties(LeadField $entity, array $properties)
     {
-        if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(['LeadEntity']);
-        }
-
         if (!empty($properties) && is_array($properties)) {
             $properties = InputHelper::clean($properties);
         } else {
@@ -747,9 +715,9 @@ class FieldModel extends FormModel
             $entity->setProperties($properties);
 
             return true;
-        } else {
-            return $result[1];
         }
+
+        return $result[1];
     }
 
     /**
@@ -768,38 +736,12 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::FIELD_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::FIELD_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::FIELD_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::FIELD_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
-                $event = new LeadFieldEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-            }
-
-            $this->dispatcher->dispatch($name, $event);
-
-            return $event;
-        } else {
-            return null;
-        }
+        return $this->fieldSaveDispatcher->dispatchEventBc($action, $entity, $isNew, $event);
     }
 
     /**
+     * @deprecated Use FieldList::getFieldList method instead
+     *
      * @param bool|true $byGroup
      * @param bool|true $alphabetical
      * @param array     $filters
@@ -808,48 +750,7 @@ class FieldModel extends FormModel
      */
     public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
     {
-        $forceFilters = [];
-        foreach ($filters as $col => $val) {
-            $forceFilters[] = [
-                'column' => "f.{$col}",
-                'expr'   => 'eq',
-                'value'  => $val,
-            ];
-        }
-        // Get a list of custom form fields
-        $fields = $this->getEntities([
-            'filter' => [
-                'force' => $forceFilters,
-            ],
-            'orderBy'    => 'f.order',
-            'orderByDir' => 'asc',
-        ]);
-
-        $leadFields = [];
-
-        /** @var LeadField $f * */
-        foreach ($fields as $f) {
-            if ($byGroup) {
-                $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
-                $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
-            } else {
-                $leadFields[$f->getAlias()] = $f->getLabel();
-            }
-        }
-
-        if ($alphabetical) {
-            // Sort the groups
-            uksort($leadFields, 'strnatcmp');
-
-            if ($byGroup) {
-                // Sort each group by translation
-                foreach ($leadFields as $group => &$fieldGroup) {
-                    uasort($fieldGroup, 'strnatcmp');
-                }
-            }
-        }
-
-        return $leadFields;
+        return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
 
     /**
@@ -975,28 +876,23 @@ class FieldModel extends FormModel
     /**
      * Retrieves a list of published fields that are unique identifers.
      *
+     * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
+     *
      * @param array $filters
      *
      * @return mixed
      */
     public function getUniqueIdentifierFields($filters = [])
     {
-        $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
-        $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
-        $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
-
-        $key = base64_encode(json_encode($filters));
-        if (!isset($this->uniqueIdentifierFields[$key])) {
-            $this->uniqueIdentifierFields[$key] = $this->getFieldList(false, true, $filters);
-        }
-
-        return $this->uniqueIdentifierFields[$key];
+        return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }
 
     /**
      * Get the MySQL database type based on the field type
      * Use a static function so that it's accessible from DoctrineSubscriber
      * without causing a circular service injection error.
+     *
+     * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
      * @param      $alias
      * @param      $type
@@ -1006,50 +902,7 @@ class FieldModel extends FormModel
      */
     public static function getSchemaDefinition($alias, $type, $isUnique = false)
     {
-        // Unique is always a string in order to control index length
-        if ($isUnique) {
-            return [
-                'name'    => $alias,
-                'type'    => 'string',
-                'options' => [
-                    'notnull' => false,
-                ],
-            ];
-        }
-
-        switch ($type) {
-            case 'datetime':
-            case 'date':
-            case 'time':
-            case 'boolean':
-                $schemaType = $type;
-                break;
-            case 'number':
-                $schemaType = 'float';
-                break;
-            case 'timezone':
-            case 'locale':
-            case 'country':
-            case 'email':
-            case 'lookup':
-            case 'select':
-            case 'multiselect':
-            case 'region':
-            case 'tel':
-                $schemaType = 'string';
-                break;
-            case 'text':
-                $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
-                break;
-            default:
-                $schemaType = 'text';
-        }
-
-        return [
-            'name'    => $alias,
-            'type'    => $schemaType,
-            'options' => ['notnull' => false],
-        ];
+        return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
     }
 
     /**
