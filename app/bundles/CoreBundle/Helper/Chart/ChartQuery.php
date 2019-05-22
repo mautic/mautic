@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 
 /**
  * Class ChartQuery.
@@ -27,6 +28,11 @@ class ChartQuery extends AbstractChart
      * @var Connection
      */
     protected $connection;
+
+    /**
+     * @var GeneratedColumnsProviderInterface
+     */
+    private $generatedColumnProvider;
 
     /**
      * Match date/time unit to a SQL datetime format
@@ -66,19 +72,25 @@ class ChartQuery extends AbstractChart
     ];
 
     /**
-     * Construct a new ChartQuery object.
-     *
-     * @param Connection $connection
-     * @param DateTime   $dateFrom
-     * @param DateTime   $dateTo
-     * @param string     $unit
+     * @param Connection  $connection
+     * @param DateTime    $dateFrom
+     * @param DateTime    $dateTo
+     * @param string|null $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
         $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
         $this->isTimeUnit = (in_array($this->unit, ['H', 'i', 's']));
-        $this->setDateRange($dateFrom, $dateTo);
         $this->connection = $connection;
+        $this->setDateRange($dateFrom, $dateTo);
+    }
+
+    /**
+     * @param GeneratedColumnsProviderInterface $generatedColumnProvider
+     */
+    public function setGeneratedColumnProvider(GeneratedColumnsProviderInterface $generatedColumnProvider)
+    {
+        $this->generatedColumnProvider = $generatedColumnProvider;
     }
 
     /**
@@ -220,10 +232,9 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
-        // Convert time unitst to the right form for current database platform
-        $dbUnit  = $this->translateTimeUnit($this->unit);
+        // Convert time units to the right form for current database platform
         $limit   = $this->countAmountFromDateRange($this->unit);
         $groupBy = '';
 
@@ -231,7 +242,9 @@ class ChartQuery extends AbstractChart
             $groupBy = ', '.$tablePrefix.'.'.$filters['groupBy'];
             unset($filters['groupBy']);
         }
-        $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
+
+        $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
+        $count         = ($isEnumerable === true) ? 'COUNT('.$countColumn.') AS count' : $countColumn.' AS count';
 
         if ($isEnumerable === true) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -240,10 +253,10 @@ class ChartQuery extends AbstractChart
         } else {
             $count = $countColumn.' AS count';
         }
-        $query->select($dateConstruct.' AS date, '.$count)
-            ->groupBy($dateConstruct.$groupBy);
-
-        $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
+        $query->select($dateConstruct.' AS date, '.$count);
+        $query->groupBy($dateConstruct.$groupBy);
+        $query->orderBy($dateConstruct, 'ASC');
+        $query->setMaxResults($limit);
     }
 
     /**
@@ -580,5 +593,28 @@ class ChartQuery extends AbstractChart
         }
 
         return MAUTIC_TABLE_PREFIX.$table;
+    }
+
+    /**
+     * @param string $tablePrefix
+     * @param string $column
+     */
+    private function getDateConstruct($tablePrefix, $column)
+    {
+        if ($this->generatedColumnProvider) {
+            $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();
+
+            try {
+                $generatedColumn = $generatedColumns->getForOriginalDateColumnAndUnit($column, $this->unit);
+
+                return $tablePrefix.'.'.$generatedColumn->getColumnName();
+            } catch (\UnexpectedValueException $e) {
+                // Alright. Use the original column then.
+            }
+        }
+
+        $dbUnit = $this->translateTimeUnit($this->unit);
+
+        return 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
     }
 }

@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Tests\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 
-/**
- * Class ColorHelper test.
- */
 class LineChartTest extends \PHPUnit_Framework_TestCase
 {
     /**
