@@ -35,7 +35,6 @@ class VariantType extends AbstractType
             [
                 'label' => 'mautic.core.ab_test.form.enable',
                 'attr'  => [
-                    'tooltip' => 'mautic.core.ab_test.form.enable.help',
                     'class'   => 'form-control',
                 ],
             ]
