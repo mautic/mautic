@@ -86,7 +86,7 @@ EOT
      */
     private function processWinnerEmail(OutputInterface $output, Email $email)
     {
-        $msg = sprintf('Processing email id #%d', $email->getId());
+        $msg = sprintf("\n\nProcessing email id #%d", $email->getId());
         $output->writeln($msg);
 
         $container = $this->getContainer();
@@ -100,14 +100,13 @@ EOT
         if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
             $output->writeln('Amount of time to send winner email not specified in AB test variant settings.');
 
-            return 1;
+            return 0;
         }
 
-        if ($model->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
-            // too early
-            $output->writeln("Predetermined amount of time hasn't passed yet");
+        if (!array_key_exists('totalWeight', $abTestSettings) || $abTestSettings['totalWeight'] === 100) {
+            $output->writeln('Total weight has to be smaller than 100.');
 
-            return 1;
+            return 0;
         }
 
         if (count($children) > 0) {
@@ -116,14 +115,21 @@ EOT
             // no variants
             $output->writeln("Email doesn't have variants");
 
-            return 1;
+            return 0;
         }
 
         if (empty($winner)) {
             // no winners
             $output->writeln('No winner yet or email has been sent already.');
 
-            return 1;
+            return 0;
+        }
+
+        if ($model->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
+            // too early
+            $output->writeln("Predetermined amount of time hasn't passed yet");
+
+            return 1; // we should reschedule the call in this case
         }
 
         $model->convertWinnerVariant($winner);
