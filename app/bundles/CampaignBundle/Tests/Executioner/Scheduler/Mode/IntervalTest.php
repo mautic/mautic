@@ -48,7 +48,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn('America/Los_Angeles');
         $contacts = new ArrayCollection([$contact1]);
 
-        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 07:00:00', new \DateTimeZone('America/Los_Angeles')));
+        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 14:00:00', new \DateTimeZone('UTC')));
         $firstGroup = reset($grouped);
 
         $executionDate = $firstGroup->getExecutionDate();
@@ -83,7 +83,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn('America/Los_Angeles');
         $contacts = new ArrayCollection([$contact1]);
 
-        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 10:00:00', new \DateTimeZone('America/Los_Angeles')));
+        $grouped    = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 16:00:00', new \DateTimeZone('UTC')));
         $firstGroup = reset($grouped);
 
         $executionDate = $firstGroup->getExecutionDate();
@@ -118,7 +118,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn('America/New_York');
         $contacts = new ArrayCollection([$contact1]);
 
-        $grouped       = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 6:00:00', new \DateTimeZone('America/Los_Angeles')));
+        $grouped       = $interval->groupContactsByDate($event, $contacts, new \DateTime('2018-10-18 14:00:00', new \DateTimeZone('UTC')));
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
@@ -152,7 +152,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contacts = new ArrayCollection([$contact1]);
 
         $interval               = $this->getInterval();
-        $scheduledExecutionDate = new \DateTime('2018-10-18 07:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 12:00', new \DateTimeZone('UTC'));
         $grouped                = $interval->groupContactsByDate($event, $contacts, $scheduledExecutionDate);
 
         $firstGroup    = reset($grouped);
@@ -183,11 +183,11 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contact1->method('getId')
             ->willReturn(1);
         $contact1->method('getTimezone')
-            ->willReturn('America/New_York');
+            ->willReturn('Etc/GMT+5');
         $contacts = new ArrayCollection([$contact1]);
 
         $interval               = $this->getInterval();
-        $scheduledExecutionDate = new \DateTime('2018-10-18 11:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 16:00', new \DateTimeZone('UTC'));
         $grouped                = $interval->groupContactsByDate($event, $contacts, $scheduledExecutionDate);
 
         $firstGroup    = reset($grouped);
@@ -222,7 +222,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contacts = new ArrayCollection([$contact1]);
 
         $interval               = $this->getInterval();
-        $scheduledExecutionDate = new \DateTime('2018-10-18 21:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-19 02:00', new \DateTimeZone('UTC'));
         $grouped                = $interval->groupContactsByDate($event, $contacts, $scheduledExecutionDate);
 
         $firstGroup    = reset($grouped);
@@ -238,7 +238,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 10:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 15:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -262,7 +262,8 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        $this->assertEquals('2018-10-20 10:00', $executionDate->format('Y-m-d H:i'));
+        $executionDate->setTimezone(new \DateTimeZone('UTC'));
+        $this->assertEquals('2018-10-20 15:00', $executionDate->format('Y-m-d H:i'));
     }
 
     public function testNotRescheduledDueDayOfWeekRestriction()
@@ -272,7 +273,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 10:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 15:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -295,7 +296,8 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        $this->assertEquals('2018-10-18 10:00', $executionDate->format('Y-m-d H:i'));
+        $executionDate->setTimezone(new \DateTimeZone('UTC'));
+        $this->assertEquals('2018-10-18 15:00', $executionDate->format('Y-m-d H:i'));
     }
 
     public function testRescheduledDueToSpecificHourAndDayOfWeekRestrictions()
@@ -305,7 +307,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 10:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 15:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -342,7 +344,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 10:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 15:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -379,7 +381,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 9:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 14:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -416,7 +418,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 11:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 16:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -434,7 +436,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contact1->method('getId')
             ->willReturn(1);
         $contact1->method('getTimezone')
-            ->willReturn('America/New_York');
+            ->willReturn('Etc/GMT+5');
         $contacts = new ArrayCollection([$contact1]);
 
         $interval = $this->getInterval();
@@ -453,7 +455,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 10:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 15:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -471,7 +473,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
         $contact1->method('getId')
             ->willReturn(1);
         $contact1->method('getTimezone')
-            ->willReturn('America/New_York');
+            ->willReturn('Etc/GMT+5');
         $contacts = new ArrayCollection([$contact1]);
 
         $interval = $this->getInterval();
@@ -490,7 +492,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 08:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-18 13:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')
@@ -527,7 +529,7 @@ class IntervalTest extends \PHPUnit_Framework_TestCase
             ->willReturn(1);
 
         // Thursday/4
-        $scheduledExecutionDate = new \DateTime('2018-10-18 21:00:00', new \DateTimeZone('America/New_York'));
+        $scheduledExecutionDate = new \DateTime('2018-10-19 02:00:00', new \DateTimeZone('UTC'));
 
         $event = $this->createMock(Event::class);
         $event->method('getTriggerMode')

@@ -169,6 +169,8 @@ class PublicController extends CommonFormController
         }
         $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
         if (!empty($stat)) {
+            $successSessionName = 'mautic.email.prefscenter.success';
+
             if ($lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
@@ -177,9 +179,11 @@ class PublicController extends CommonFormController
                 if ($lead->getPreferredLocale()) {
                     $translator->setLocale($lead->getPreferredLocale());
                 }
-            }
 
-            $successSessionName = 'mautic.email.prefscenter.success.'.$lead->getId();
+                // Add contact ID to the session name in case more contacts
+                // share the same session/device and the contact is known.
+                $successSessionName .= ".{$lead->getId()}";
+            }
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
