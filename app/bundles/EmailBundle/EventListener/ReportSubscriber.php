@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
-use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -367,7 +366,7 @@ class ReportSubscriber extends CommonSubscriber
                         $qb->innerJoin('e', sprintf('(%s)', $subQuery->getSQL()), 'stats', 'e.id = stats.email_id');
                         $event->setColumnFormula('e.sent_count', 'stats.sent_count');
                         $event->setColumnFormula('e.read_count', 'stats.read_count');
-                        $event->setColumnFormula('e.read_ratio', 'ROUND((stats.read_count/stats.sent_count)*100,1)');
+                        $event->setColumnFormula('read_ratio', 'ROUND((stats.read_count/stats.sent_count)*100,1)');
 
                         // clicks stats with date range
                         $subQuery = $this->db->createQueryBuilder();
