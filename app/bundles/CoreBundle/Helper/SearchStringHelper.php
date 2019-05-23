@@ -214,7 +214,7 @@ class SearchStringHelper
                         //does group have a negative?
                         if (strpos($string, '!') === 0) {
                             $filters->{$baseName}[$keyCount]->not = 1;
-                            $string = substr($string, 1);
+                            $string                               = substr($string, 1);
                         }
 
                         //remove wrapping grouping chars
