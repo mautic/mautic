@@ -10,9 +10,8 @@
 
 namespace Mautic\CoreBundle\Model\AbTest;
 
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
-
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class AbTestSettingsService.
@@ -169,7 +168,7 @@ class AbTestSettingsService
 
     /**
      * @param VariantEntityInterface $variant
-     * @param int $weight
+     * @param int                    $weight
      */
     private function setVariantSettingsWeight(VariantEntityInterface $variant, $weight)
     {
