@@ -555,17 +555,34 @@ class LeadApiController extends CommonApiController
      *
      * @param Lead   $entity
      * @param array  $parameters
+     * @param string $method
+     */
+    public function processForm($entity, $parameters=null, $method='PUT')
+    {
+        if ($parameters === null) {
+            $parameters=$this->request->request->all();
+        }
+
+        if ($entity->getId()) {
+            // Merge existing duplicate contact based on unique fields if exist, *before*
+            // form processing, so that PATCH edits will be applied to the merged contact
+            // instead of the original contact.
+            $entity = $this->model->checkForDuplicateContact($parameters, $entity);
+        }
+
+        return parent::processForm($entity, $parameters, $method);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param Lead   $entity
+     * @param array  $parameters
      * @param        $form
      * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        if ('edit' === $action) {
-            // Merge existing duplicate contact based on unique fields if exist
-            // new endpoints will leverage getNewEntity in order to return the correct status codes
-            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
-        }
-
         if (isset($parameters['companies'])) {
             $this->model->modifyCompanies($entity, $parameters['companies']);
             unset($parameters['companies']);
