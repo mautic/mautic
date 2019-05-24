@@ -1508,7 +1508,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 && $sugarLeadRecord['contact_id'] != '');
 
                             $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id'];
-                            $lead['owner_email'] = $this->getOwnerEmail($mauticRecord);
+                            $lead['owner_email']                                             = $this->getOwnerEmail($mauticRecord);
                             if ($lead['owner_email']) {
                                 $leadOwnerEmails[] = $lead['owner_email'];
                             }
