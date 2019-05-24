@@ -10,7 +10,9 @@
 
 namespace Mautic\CoreBundle\Model\AbTest;
 
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+
 
 /**
  * Class AbTestSettingsService.
@@ -84,6 +86,22 @@ class AbTestSettingsService
         $settings['configurationError']  = $this->configurationError;
 
         return $settings;
+    }
+
+    /**
+     * @param Email $entity
+     *
+     * @return bool|null
+     */
+    public function getSendWinnerDelay(Email $entity)
+    {
+        $settings = $this->getAbTestSettings($entity);
+        if ($settings['totalWeight'] < self::DEFAULT_TOTAL_WEIGHT
+            && $settings['sendWinnerDelay'] > 0) {
+            return $settings['sendWinnerDelay'];
+        }
+
+        return null;
     }
 
     /**
