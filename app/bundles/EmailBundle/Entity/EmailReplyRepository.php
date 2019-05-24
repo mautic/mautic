@@ -2,14 +2,14 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\ORM\EntityRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
+use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * Class EmailReplyRepository.
  */
-final class EmailReplyRepository extends EntityRepository implements EmailReplyRepositoryInterface
+final class EmailReplyRepository extends CommonRepository implements EmailReplyRepositoryInterface
 {
     use TimelineTrait;
 
