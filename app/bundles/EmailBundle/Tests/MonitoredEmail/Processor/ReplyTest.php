@@ -136,10 +136,6 @@ BODY;
             ->willReturn($stat);
 
         $stat->expects($this->once())
-            ->method('getIsRead')
-            ->willReturn(false);
-
-        $stat->expects($this->once())
             ->method('isRead')
             ->with(true);
 
