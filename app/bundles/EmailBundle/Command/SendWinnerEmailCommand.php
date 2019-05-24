@@ -36,7 +36,7 @@ The <info>%command.name%</info> command is used to send winner email variant to 
 
 <info>php %command.full_name%</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
@@ -97,6 +97,13 @@ EOT
 
         $abTestSettings = $container->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
 
+        if ($model->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
+            // too early
+            $output->writeln("Predetermined amount of time hasn't passed yet");
+
+            return 1; // we should reschedule the call in this case
+        }
+
         if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
             $output->writeln('Amount of time to send winner email not specified in AB test variant settings.');
 
@@ -120,16 +127,9 @@ EOT
 
         if (empty($winner)) {
             // no winners
-            $output->writeln('No winner yet or email has been sent already.');
+            $output->writeln('No winner yet.');
 
-            return 0;
-        }
-
-        if ($model->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
-            // too early
-            $output->writeln("Predetermined amount of time hasn't passed yet");
-
-            return 1; // we should reschedule the call in this case
+            return 1;
         }
 
         $model->convertWinnerVariant($winner);
