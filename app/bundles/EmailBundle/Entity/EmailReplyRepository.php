@@ -2,9 +2,9 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
-use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * Class EmailReplyRepository.

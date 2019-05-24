@@ -11,9 +11,14 @@
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityNotFoundException;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
@@ -23,11 +28,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\EmailBundle\Entity\EmailReply;
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailReplyEvent;
 
 class ReplyTest extends \PHPUnit\Framework\TestCase
 {
