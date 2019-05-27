@@ -21,7 +21,7 @@ class EmailVariantConverterService
     /**
      * @var VariantConverterService
      */
-    public $variantConverterService;
+    private $variantConverterService;
 
     /**
      * EmailVariantConverterService constructor.
