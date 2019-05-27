@@ -52,120 +52,19 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
-        $model     = $container->get('mautic.email.model.email');
+        $sendWinnerService = $container->get('mautic.email.variant.send_winner');
         $emailId   = $input->getOption('id');
 
-        if ($emailId === null) {
-            $emails = $model->getEmailsToSendWinnerVariant();
-        } else {
-            $emails = [$model->getEntity($emailId)];
+        $sendWinnerService->processWinnerEmails($emailId);
+
+        foreach($sendWinnerService->getOutputMessages() as $message) {
+            $output->writeln($message);
         }
 
-        if (empty($emails)) {
-            $output->writeln('No emails to send');
-        }
-
-        foreach ($emails as $email) {
-            $result = $this->processWinnerEmail($output, $email);
-
-            if ($emailId > 0) {
-                return $result;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param Email           $email
-     *
-     * @return int
-     *
-     * @throws \Exception
-     */
-    private function processWinnerEmail(OutputInterface $output, Email $email)
-    {
-        $msg = sprintf("\n\nProcessing email id #%d", $email->getId());
-        $output->writeln($msg);
-
-        $container = $this->getContainer();
-        $model     = $container->get('mautic.email.model.email');
-
-        //g et A/B test information
-        list($parent, $children) = $email->getVariants();
-
-        $abTestSettings = $container->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
-
-        if ($model->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
-            // too early
-            $output->writeln("Predetermined amount of time hasn't passed yet");
-
-            return 1; // we should reschedule the call in this case
-        }
-
-        if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
-            $output->writeln('Amount of time to send winner email not specified in AB test variant settings.');
-
-            return 0;
-        }
-
-        if (!array_key_exists('totalWeight', $abTestSettings) || $abTestSettings['totalWeight'] === 100) {
-            $output->writeln('Total weight has to be smaller than 100.');
-
-            return 0;
-        }
-
-        if (count($children) > 0) {
-            $winner = $this->getWinner($output, $parent, $abTestSettings['winnerCriteria']);
-        } else {
-            // no variants
-            $output->writeln("Email doesn't have variants");
-
-            return 0;
-        }
-
-        if (empty($winner)) {
-            // no winners
-            $output->writeln('No winner yet.');
-
+        if ($sendWinnerService->tryAgain() === true) {
             return 1;
         }
 
-        $model->convertWinnerVariant($winner);
-
-        // send winner email
-        $model->sendEmailToLists($winner);
-        $output->writeln('Winner email '.$winner->getId().' has been sent to remaining contacts.');
-
         return 0;
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @param Email           $parentVariant
-     * @param string          $winnerCriteria
-     *
-     * @return Email|null
-     */
-    private function getWinner(OutputInterface $output, Email $parentVariant, $winnerCriteria)
-    {
-        $container  = $this->getContainer();
-        $model      = $container->get('mautic.email.model.email');
-
-        $criteria               = $model->getBuilderComponents($parentVariant, 'abTestWinnerCriteria');
-        $abTestResultService    = $container->get('mautic.core.variant.abtest_result');
-        $abTestResults          = $abTestResultService->getAbTestResult($parentVariant, $criteria['criteria'][$winnerCriteria]);
-        $winners                = $abTestResults['winners'];
-
-        if (empty($winners)) {
-            return null;
-        }
-
-        $output->writeln('Winner ids: '.implode($winners, ','));
-
-        $winner = $model->getEntity($winners[0]);
-
-        return $winner;
     }
 }

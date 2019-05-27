@@ -812,6 +812,14 @@ return [
                     'mautic.core.variant.converter',
                 ],
             ],
+            'mautic.email.variant.send_winner'=> [
+                'class'     => \Mautic\EmailBundle\Model\AbTest\SendWinnerService::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                    'mautic.core.variant.abtest_result',
+                    'mautic.core.variant.abtest_settings',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
