@@ -90,7 +90,7 @@ class AbTestSettingsService
     /**
      * @param Email $entity
      *
-     * @return bool|null
+     * @return int|null
      */
     public function getSendWinnerDelay(Email $entity)
     {
