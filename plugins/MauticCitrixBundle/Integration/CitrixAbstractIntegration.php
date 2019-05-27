@@ -171,6 +171,8 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     {
         $keys = $this->getKeys();
 
-        return $keys['organizer_key'];
+        if (isset($keys['organizer_key'])) {
+            return $keys['organizer_key'];
+        }
     }
 }
