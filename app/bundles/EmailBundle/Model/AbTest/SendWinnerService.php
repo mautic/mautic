@@ -35,11 +35,6 @@ class SendWinnerService
     /**
      * @var bool
      */
-    private $completed = false;
-
-    /**
-     * @var bool
-     */
     private $tryAgain = false;
 
     /**
@@ -68,9 +63,6 @@ class SendWinnerService
      */
     public function processWinnerEmails($emailId = null)
     {
-        $this->tryAgain  = false;
-        $this->completed = false;
-
         if ($emailId === null) {
             $emails = $this->emailModel->getEmailsToSendWinnerVariant();
         } else {
@@ -89,11 +81,10 @@ class SendWinnerService
             }
         }
 
-        // we always return true for processing multiple emails
         $this->tryAgain  = false;
-        $this->completed = true;
 
-        return $this->completed;
+        // returns true for processing multiple emails
+        return true;
     }
 
     /**
@@ -132,7 +123,7 @@ class SendWinnerService
         }
 
         if ($winner === null) {
-            return $this->completed;
+            return false;
         }
 
         $this->emailModel->convertWinnerVariant($winner);
@@ -141,9 +132,7 @@ class SendWinnerService
         $this->emailModel->sendEmailToLists($winner);
         $this->addOutputMessage('Winner email '.$winner->getId().' has been sent to remaining contacts.');
 
-        $this->completed = true;
-
-        return $this->completed;
+        return true;
     }
 
     /**
