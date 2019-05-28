@@ -691,6 +691,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (('text' == $fieldType) && !is_bool($value)) {
             return substr($value, 0, 255);
         }
+
         return $value;
     }
 }
