@@ -11,9 +11,13 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -118,5 +122,98 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Some Business', $company->getName());
         $this->assertEquals('Some Business', $company->getFieldValue('custom_company_name'));
         $this->assertEquals('some value', $company->getFieldValue('some_custom_field'));
+    }
+
+    public function testFalseValueIsUpdatedCorrectly()
+    {
+        $integration = $this->getMockBuilder(StubIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['getMauticLead', 'populateMauticLeadData'])
+            ->getMock();
+
+        $integration->expects($this->any())
+            ->method('mergeConfigToFeatureSettings')
+            ->willReturn([
+                'leadFields' => [
+                        'mautic__Email__c__Lead' => 'email',
+                        'mautic__Is_this_text__c__Lead' => 'is_this_text',
+                    ],
+                ]
+            );
+
+        $reflection = new \ReflectionClass($integration);
+
+        $translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translatorProperty = $reflection->getProperty('translator');
+        $translatorProperty->setAccessible(true);
+        $translatorProperty->setValue($integration, $translator);
+
+        $fieldModel = $this->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldModelProperty = $reflection->getProperty('fieldModel');
+        $fieldModelProperty->setAccessible(true);
+        $fieldModelProperty->setValue($integration, $fieldModel);
+
+        $fieldModel->expects($this->any())
+            ->method('getFieldListWithProperties')
+            ->willReturn([
+                'email' => [
+                    'type' => 'text',
+                ],
+                'is_this_text' => [
+                    'type' => 'text',
+                ],
+            ]);
+
+        $fieldModel->expects($this->any())
+            ->method('getUniqueIdentifierFields')
+            ->willReturn([
+                'email' => 'Email',
+            ]);
+
+
+        $leadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['setFieldValues',])
+            ->getMock();
+
+        $leadModelProperty = $reflection->getProperty('leadModel');
+        $leadModelProperty->setAccessible(true);
+        $leadModelProperty->setValue($integration, $leadModel);
+
+
+        $leadRepository = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $leadRepository->expects($this->any())
+            ->method('getLeadsByUniqueFields')
+            ->willReturn([]);
+
+        $entityManager =$this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($leadRepository);
+
+        $entityManagerProperty = $reflection->getProperty('em');
+        $entityManagerProperty->setAccessible(true);
+        $entityManagerProperty->setValue($integration, $entityManager);
+
+        $data = [
+            'mautic__Email__c__Lead' => 'test@test.com',
+            'mautic__Is_this_text__c__Lead' => false,
+        ];
+
+        $leadData = $integration->getMauticLead($data, false);
+
+        $a = 5;
     }
 }
