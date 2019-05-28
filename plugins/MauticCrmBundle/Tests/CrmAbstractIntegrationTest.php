@@ -124,7 +124,7 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $integration = $this->getMockBuilder(StubIntegration::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['limitString',])
+            ->setMethodsExcept(['limitString'])
             ->getMock();
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
@@ -145,7 +145,7 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
         $result = $methodLimitString->invokeArgs($integration, [false, 'text']);
         $this->assertSame($result, false);
 
-        $result = $methodLimitString->invokeArgs($integration, [[1, 2, 3],]);
+        $result = $methodLimitString->invokeArgs($integration, [[1, 2, 3]]);
         $this->assertSame($result, [1, 2, 3]);
     }
 }
