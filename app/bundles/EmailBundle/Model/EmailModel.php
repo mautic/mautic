@@ -2405,7 +2405,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     {
         $lastSentDate   = $this->getStatRepository()->getEmailSentLastDate($emailId);
         $sendWinnerTime = new \DateTime($lastSentDate);
-        $sendWinnerTime->modify("+{$delayHours} hours");
+        $sendWinnerTime->modify("+{$delayHours} minutes");
 
         $now = new \DateTime('now');
 
