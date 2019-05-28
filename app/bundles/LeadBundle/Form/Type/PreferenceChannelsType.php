@@ -43,7 +43,7 @@ class PreferenceChannelsType extends AbstractType
         $resolver->setDefaults(
             [
                 'choices'     => function (Options $options) use ($model) {
-                    return $model->getPreferenceChannels();
+                    return array_flip($model->getPreferenceChannels());
                 },
                 'empty_value' => '',
                 'attr'        => ['class' => 'form-control'],
