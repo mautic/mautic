@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Command;
 
-use Mautic\EmailBundle\Entity\Email;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
