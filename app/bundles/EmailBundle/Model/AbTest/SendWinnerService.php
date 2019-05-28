@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Mautic\EmailBundle\Model\AbTest;
-
 
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
@@ -10,9 +8,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
 /**
- * Class SendWinnerService
- *
- * @package Mautic\EmailBundle\Model\AbTest
+ * Class SendWinnerService.
  */
 class SendWinnerService
 {
@@ -49,8 +45,8 @@ class SendWinnerService
     /**
      * SendWinnerService constructor.
      *
-     * @param EmailModel $emailModel
-     * @param AbTestResultService $abTestResultService
+     * @param EmailModel            $emailModel
+     * @param AbTestResultService   $abTestResultService
      * @param AbTestSettingsService $abTestSettingsService
      */
     public function __construct(
@@ -66,7 +62,7 @@ class SendWinnerService
     /**
      * @param int $emailId
      *
-     * @return bool|int
+     * @return bool
      *
      * @throws \ReflectionException
      */
@@ -90,7 +86,8 @@ class SendWinnerService
             }
         }
 
-        $this->tryAgain = false;
+        // we always return true for processing multiple emails
+        $this->tryAgain  = false;
         $this->completed = true;
 
         return $this->completed;
@@ -123,47 +120,15 @@ class SendWinnerService
     {
         $this->addOutputMessage(sprintf("\n\nProcessing email id #%d", $email->getId()));
 
-        //g et A/B test information
-        list($parent, $children) = $email->getVariants();
+        $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-        $abTestSettings = $this->abTestSettingsService->getAbTestSettings($parent);
+        $winner = null;
 
-        if ($this->emailModel->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
-            // too early
-            $this->addOutputMessage("Predetermined amount of time hasn't passed yet");
-
-            $this->tryAgain = true; // we should reschedule the call in this case
-
-            return $this->completed;
+        if ($this->isAllowedToSendWinner($email, $abTestSettings) === true) {
+            $winner = $this->getWinner($email, $abTestSettings['winnerCriteria']);
         }
 
-        if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
-            $this->addOutputMessage('Amount of time to send winner email not specified in AB test variant settings.');
-
-            return $this->completed;
-        }
-
-        if (!array_key_exists('totalWeight', $abTestSettings) || $abTestSettings['totalWeight'] === 100) {
-            $this->addOutputMessage('Total weight has to be smaller than 100.');
-
-            return $this->completed;
-        }
-
-        if (count($children) > 0) {
-            $winner = $this->getWinner($parent, $abTestSettings['winnerCriteria']);
-        } else {
-            // no variants
-            $this->addOutputMessage("Email doesn't have variants");
-
-            return $this->completed;
-        }
-
-        if (empty($winner)) {
-            // no winners
-            $this->addOutputMessage('No winner yet.');
-
-            $this->tryAgain = true; // we should reschedule the call in this case
-
+        if($winner === null) {
             return $this->completed;
         }
 
@@ -179,7 +144,50 @@ class SendWinnerService
     }
 
     /**
-     * @param Email $parentVariant
+     * @param Email $email
+     * @param array $abTestSettings
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    private function isAllowedToSendWinner(Email $email, $abTestSettings) {
+        //g et A/B test information
+        list($parent, $children) = $email->getVariants();
+
+        if (!array_key_exists('sendWinnerDelay', $abTestSettings) || $abTestSettings['sendWinnerDelay'] < 1) {
+            $this->addOutputMessage('Amount of time to send winner email not specified in AB test variant settings.');
+
+            return false;
+        }
+
+        if (!array_key_exists('totalWeight', $abTestSettings) || $abTestSettings['totalWeight'] === AbTestSettingsService::DEFAULT_TOTAL_WEIGHT) {
+            $this->addOutputMessage('Total weight has to be smaller than 100.');
+
+            return false;
+        }
+
+        if (count($children) === 0) {
+            // no variants
+            $this->addOutputMessage("Email doesn't have variants");
+
+            return false;
+        }
+
+        if ($this->emailModel->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
+            // too early
+            $this->addOutputMessage("Predetermined amount of time hasn't passed yet");
+
+            $this->tryAgain = true; // we should reschedule the call in this case
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Email  $parentVariant
      * @param string $winnerCriteria
      *
      * @return Email|null
@@ -193,6 +201,11 @@ class SendWinnerService
         $winners       = $abTestResults['winners'];
 
         if (empty($winners)) {
+            // no winners
+            $this->addOutputMessage('No winner yet.');
+
+            $this->tryAgain = true; // we should reschedule the call in this case
+
             return null;
         }
 

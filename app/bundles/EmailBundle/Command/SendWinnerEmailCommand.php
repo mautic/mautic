@@ -51,13 +51,13 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $container         = $this->getContainer();
         $sendWinnerService = $container->get('mautic.email.variant.send_winner');
-        $emailId   = $input->getOption('id');
+        $emailId           = $input->getOption('id');
 
         $sendWinnerService->processWinnerEmails($emailId);
 
-        foreach($sendWinnerService->getOutputMessages() as $message) {
+        foreach ($sendWinnerService->getOutputMessages() as $message) {
             $output->writeln($message);
         }
 
