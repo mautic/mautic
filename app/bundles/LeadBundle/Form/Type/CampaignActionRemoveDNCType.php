@@ -29,7 +29,7 @@ class CampaignActionRemoveDNCType extends AbstractType
             [
                 'label'       => 'mautic.lead.contact.channels',
                 'multiple'    => true,
-                'required' => true,
+                'required'    => true,
                 'constraints' => [
                     new NotBlank(),
                 ],
