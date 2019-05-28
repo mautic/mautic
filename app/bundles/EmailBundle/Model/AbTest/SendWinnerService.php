@@ -68,6 +68,9 @@ class SendWinnerService
      */
     public function processWinnerEmails($emailId = null)
     {
+        $this->tryAgain  = false;
+        $this->completed = false;
+
         if ($emailId === null) {
             $emails = $this->emailModel->getEmailsToSendWinnerVariant();
         } else {
@@ -128,7 +131,7 @@ class SendWinnerService
             $winner = $this->getWinner($email, $abTestSettings['winnerCriteria']);
         }
 
-        if($winner === null) {
+        if ($winner === null) {
             return $this->completed;
         }
 
@@ -151,7 +154,8 @@ class SendWinnerService
      *
      * @throws \Exception
      */
-    private function isAllowedToSendWinner(Email $email, $abTestSettings) {
+    private function isAllowedToSendWinner(Email $email, $abTestSettings)
+    {
         //g et A/B test information
         list($parent, $children) = $email->getVariants();
 
