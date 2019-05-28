@@ -398,8 +398,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
-            // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
-            // "False" has to be converted to 0 instead.
             $fieldType                 = isset($leadFieldTypes[$leadField]['type']) ? $leadFieldTypes[$leadField]['type'] : null;
             $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
@@ -688,10 +686,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function limitString($value, $fieldType = null)
     {
+        // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
+        // "False" has to be converted to 0 instead.
         if (('text' == $fieldType) && !is_bool($value)) {
             return substr($value, 0, 255);
         }
-
         return $value;
     }
 }
