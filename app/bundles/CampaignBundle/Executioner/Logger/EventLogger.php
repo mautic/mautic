@@ -43,7 +43,7 @@ class EventLogger
     /**
      * @var SummaryModel
      */
-    public $summaryModel;
+    private $summaryModel;
 
     /**
      * @var LeadRepository
