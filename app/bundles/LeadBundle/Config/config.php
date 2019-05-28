@@ -411,6 +411,7 @@ return [
                 'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber::class,
                 'arguments' => [
                    'mautic.lead.model.dnc',
+                   'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [

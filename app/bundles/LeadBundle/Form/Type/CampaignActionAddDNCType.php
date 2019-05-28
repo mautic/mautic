@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CampaignDNCActionType extends AbstractType
+class CampaignActionAddDNCType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -29,9 +29,21 @@ class CampaignDNCActionType extends AbstractType
             [
                 'label'       => 'mautic.lead.contact.channels',
                 'multiple'    => true,
+                'required'    => true,
                 'constraints' => [
                     new NotBlank(),
                 ],
+            ]
+        );
+
+        $builder->add(
+            'reason',
+            'textarea',
+            [
+                'label'      => 'mautic.lead.batch.dnc_reason',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
     }
