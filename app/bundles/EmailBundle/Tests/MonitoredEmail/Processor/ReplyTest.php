@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
-use Doctrine\Coåmmon\Collections\ArrayCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
