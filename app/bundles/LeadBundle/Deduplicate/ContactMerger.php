@@ -200,7 +200,13 @@ class ContactMerger
 
             try {
                 $defaultValue = ArrayHelper::getValue('default_value', $winner->getField($field));
-                $newValue     = MergeValueHelper::getMergeValue($newestFields[$field], $oldestFields[$field], $winner->getFieldValue($field), $defaultValue);
+                $newValue     = MergeValueHelper::getMergeValue(
+                    $newestFields[$field],
+                    $oldestFields[$field],
+                    $winner->getFieldValue($field),
+                    $defaultValue,
+                    $newest->isAnonymous()
+                );
                 $winner->addUpdatedField($field, $newValue);
 
                 $fromValue = empty($oldestFields[$field]) ? 'empty' : $oldestFields[$field];

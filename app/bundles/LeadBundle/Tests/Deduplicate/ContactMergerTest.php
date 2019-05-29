@@ -462,6 +462,7 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->method('getId')->willReturn(1);
         $loser->method('getDateModified')->willReturn($loserDateModified);
         $loser->method('getId')->willReturn(2);
+        $loser->method('isAnonymous')->willReturn(true);
 
         $winner->expects($this->exactly(2))
             ->method('getFieldValue')
