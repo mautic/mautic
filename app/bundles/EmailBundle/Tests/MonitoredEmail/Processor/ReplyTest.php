@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Coåmmon\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -136,8 +136,16 @@ BODY;
             ->willReturn($stat);
 
         $stat->expects($this->once())
-            ->method('isRead')
+            ->method('setIsRead')
             ->with(true);
+
+        $stat->expects($this->once())
+            ->method('getDateRead')
+            ->willReturn(null);
+
+        $stat->expects($this->once())
+            ->method('setDateRead')
+            ->with($this->isInstanceOf(\DateTime::class));
 
         $stat->expects($this->any())
             ->method('getReplies')

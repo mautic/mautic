@@ -129,7 +129,11 @@ class Reply implements ProcessorInterface
             throw new EntityNotFoundException("Email Stat with tracking hash {$trackingHash} was not found");
         }
 
-        $stat->isRead(true);
+        $stat->setIsRead(true);
+
+        if (null === $stat->getDateRead()) {
+            $stat->setDateRead(new \DateTime());
+        }
 
         $this->createReply($stat, $messageId);
 

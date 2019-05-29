@@ -183,8 +183,20 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/api/stats/email_stat_replies', $statReplyQuery);
         $fetchedReplyData = json_decode($this->client->getResponse()->getContent(), true);
 
+        // Check that the email reply was created correctly.
         $this->assertSame('1', $fetchedReplyData['total']);
         $this->assertSame($stat->getId(), $fetchedReplyData['stats'][0]['stat_id']);
         $this->assertRegExp('/api-[a-z0-9]*/', $fetchedReplyData['stats'][0]['message_id']);
+
+        // Get the email stat that was just updated from the stat API.
+        $statQuery = ['where' => [['col' => 'id', 'expr' => 'eq', 'val' => $stat->getId()]]];
+        $this->client->request('GET', '/api/stats/email_stats', $statQuery);
+        $fetchedStatData = json_decode($this->client->getResponse()->getContent(), true);
+
+        // Check that the email stat was updated correctly/
+        $this->assertSame('1', $fetchedStatData['total']);
+        $this->assertSame($stat->getId(), $fetchedStatData['stats'][0]['id']);
+        $this->assertSame('1', $fetchedStatData['stats'][0]['is_read']);
+        $this->assertRegExp('/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/', $fetchedStatData['stats'][0]['date_read']);
     }
 }
