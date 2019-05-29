@@ -380,6 +380,11 @@ class SubmissionModel extends CommonFormModel
         // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
         $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
+	//return errors if there any
+        if (!empty($validationErrors)) {
+            return ['errors' => $validationErrors];
+        }
+
         // Create/update lead
         $lead = null;
         if (!empty($leadFieldMatches)) {
