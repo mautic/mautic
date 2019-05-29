@@ -56,7 +56,7 @@ EOT
 
         $sendWinnerService->processWinnerEmails($emailId);
 
-        foreach ($sendWinnerService->getOutputMessages() as $message) {
+        $output->write($sendWinnerService->getOutputMessages());
             $output->writeln($message);
         }
 
