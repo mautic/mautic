@@ -13,8 +13,8 @@ namespace Mautic\EmailBundle\Model\AbTest;
 use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Exception\NotReadyToSendWinnerException;
+use Mautic\EmailBundle\Model\EmailModel;
 
 /**
  * Class SendWinnerService.
@@ -79,7 +79,7 @@ class SendWinnerService
             $emailEntity = $this->emailModel->getEntity($emailId);
 
             if (empty($emailEntity)) {
-                throw new \Exception('Email id '.$emailId." not found");
+                throw new \Exception('Email id '.$emailId.' not found');
             }
 
             $emails = [$emailEntity];
@@ -87,6 +87,7 @@ class SendWinnerService
 
         if (empty($emails)) {
             $this->addOutputMessage('No emails to send');
+
             return;
         }
 
@@ -119,7 +120,6 @@ class SendWinnerService
     {
         return $this->tryAgain;
     }
-
 
     /**
      * @param Email $email
