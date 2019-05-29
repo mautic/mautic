@@ -108,7 +108,7 @@ class SendWinnerService
     /**
      * @return bool
      */
-    public function tryAgain()
+    public function shouldTryAgain()
     {
         return $this->tryAgain;
     }

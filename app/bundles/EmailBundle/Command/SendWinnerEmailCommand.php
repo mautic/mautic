@@ -60,7 +60,7 @@ EOT
             $output->writeln($message);
         }
 
-        if ($sendWinnerService->tryAgain() === true) {
+        if ($sendWinnerService->shouldTryAgain() === true) {
             return 1;
         }
 
