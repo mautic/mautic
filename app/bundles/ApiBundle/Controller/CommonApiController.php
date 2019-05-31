@@ -36,6 +36,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiEntityEvent;
 
 /**
  * Class CommonApiController.
@@ -1186,6 +1188,12 @@ class CommonApiController extends FOSRestController implements MauticController
                     array_merge(['id' => $entity->getId()], $this->routeParams),
                     true
                 );
+            }
+
+            try {
+                $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_POST_SAVE, new ApiEntityEvent($entity, $this->request));
+            } catch (\Exception $e) {
+                return $this->returnError($e->getMessage(), $e->getCode());
             }
 
             $this->preSerializeEntity($entity, $action);
