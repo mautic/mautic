@@ -358,6 +358,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::segmentListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -365,6 +366,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::categoryListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -372,6 +374,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::preferredchannel;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -379,6 +382,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::channelfrequency;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -387,6 +391,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $slot            = $divContent->item($i);
                     $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
                     $slot->nodeValue = self::saveprefsRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
 
                     $params['saveprefsbutton'] = [
@@ -421,6 +426,26 @@ class BuilderSubscriber extends CommonSubscriber
             if (false !== strpos($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
+            }
+            // add form before first block of prefs center
+            if (isset($params['startform']) && strpos($content, 'data-prefs-center') !== false) {
+                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+                $xpath      = new DOMXPath($dom);
+                // If use slots
+                $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+                if (!$divContent->length) {
+                    // If use tokens
+                    $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
+                }
+
+                if ($divContent->length) {
+                    $slot    = $divContent->item(0);
+                    $newnode = $dom->createElement('startform');
+                    $slot->parentNode->insertBefore($newnode, $slot);
+                    $content = $dom->saveHTML();
+                    $content = str_replace('<startform></startform>', $params['startform'], $content);
+                }
             }
 
             if (false !== strpos($content, self::successmessage)) {
@@ -465,6 +490,14 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
+     * @return string
+     */
+    private function getAttributeForFirtSlot()
+    {
+        return 'data-prefs-center-first="1"';
+    }
+
+    /**
      * Renders the HTML for the segment list.
      *
      * @param array $params
@@ -476,7 +509,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-segmentlist'>\n";
+            $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -494,7 +527,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-categorylist'>\n";
+            $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -548,7 +581,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-saveprefs'>\n";
+            $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
@@ -612,7 +645,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $related[$parent->getId()] = [
                     'lang' => $trans,
                     // Add ntrd to not auto redirect to another language
-                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
+                    'url'  => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -623,7 +656,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $related[$c->getId()] = [
                         'lang' => $trans,
                         // Add ntrd to not auto redirect to another language
-                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
+                        'url'  => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }

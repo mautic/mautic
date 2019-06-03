@@ -11,10 +11,9 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
@@ -41,17 +40,23 @@ class EventLogModel extends AbstractCommonModel
     protected $ipLookupHelper;
 
     /**
+     * @var EventScheduler
+     */
+    protected $eventScheduler;
+
+    /**
      * EventLogModel constructor.
      *
      * @param EventModel     $eventModel
      * @param CampaignModel  $campaignModel
      * @param IpLookupHelper $ipLookupHelper
      */
-    public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper)
+    public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper, EventScheduler $eventScheduler)
     {
         $this->eventModel     = $eventModel;
         $this->campaignModel  = $campaignModel;
         $this->ipLookupHelper = $ipLookupHelper;
+        $this->eventScheduler = $eventScheduler;
     }
 
     /**
@@ -198,26 +203,16 @@ class EventLogModel extends AbstractCommonModel
     }
 
     /**
-     * @param $entity
+     * @param LeadEventLog $entity
      */
     public function saveEntity(LeadEventLog $entity)
     {
-        $eventSettings = $this->campaignModel->getEvents();
-        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_SCHEDULED)) {
-            $event = $entity->getEvent();
-            $args  = [
-                'eventSettings'   => $eventSettings[$event->getEventType()][$event->getType()],
-                'eventDetails'    => null,
-                'event'           => $event->convertToArray(),
-                'lead'            => $entity->getLead(),
-                'systemTriggered' => false,
-                'dateScheduled'   => $entity->getTriggerDate(),
-            ];
-
-            $scheduledEvent = new CampaignScheduledEvent($args, $entity);
-            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_SCHEDULED, $scheduledEvent);
+        $triggerDate = $entity->getTriggerDate();
+        if (null === $triggerDate) {
+            // Reschedule for now
+            $triggerDate = new \DateTime();
         }
 
-        $this->getRepository()->saveEntity($entity);
+        $this->eventScheduler->reschedule($entity, $triggerDate);
     }
 }

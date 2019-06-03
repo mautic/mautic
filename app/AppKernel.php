@@ -41,7 +41,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const PATCH_VERSION = 1;
+    const PATCH_VERSION = 2;
 
     /**
      * Extra version identifier.
@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '';
+    const EXTRA_VERSION = '-beta';
 
     /**
      * @var array
@@ -527,7 +527,9 @@ class AppKernel extends Kernel
 
         // Warm up the cache if classes.php is missing or in dev mode
         if (!$fresh && $this->container->has('cache_warmer')) {
-            $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+            $warmer = $this->container->get('cache_warmer');
+            $warmer->enableOptionalWarmers();
+            $warmer->warmUp($this->container->getParameter('kernel.cache_dir'));
         }
     }
 

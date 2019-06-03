@@ -91,7 +91,7 @@ class MaintenanceSubscriber extends CommonSubscriber
                     $subQb->expr()->lte('l.date_added', ':date2'),
                     $subQb->expr()->isNull('l.last_active')
                   ));
-                $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
+                $subQb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
             $rows = 0;
             $loop = 0;

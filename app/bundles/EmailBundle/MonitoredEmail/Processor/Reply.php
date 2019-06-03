@@ -112,6 +112,7 @@ class Reply implements ProcessorInterface
         // A stat has been found so let's compare to the From address for the contact to prevent false positives
         $contactEmail = $this->cleanEmail($stat->getLead()->getEmail());
         $fromEmail    = $this->cleanEmail($repliedEmail->getFromAddress());
+
         if ($contactEmail !== $fromEmail) {
             // We can't reliably assume this email was from the originating contact
             $this->logger->debug('MONITORED EMAIL: '.$contactEmail.' != '.$fromEmail.' so cannot confirm match');

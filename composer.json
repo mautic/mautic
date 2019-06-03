@@ -134,6 +134,10 @@
         {
             "type": "git",
             "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/mautic/intl.git"
         }
     ],
     "scripts": {

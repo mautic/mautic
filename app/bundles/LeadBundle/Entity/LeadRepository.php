@@ -97,13 +97,41 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of leads based on field value.
      *
-     * @param $field
-     * @param $value
-     * @param $ignoreId
+     * @param string $field
+     * @param string $value
+     * @param ?int   $ignoreId
+     * @param bool   $indexByColumn
      *
      * @return array
      */
     public function getLeadsByFieldValue($field, $value, $ignoreId = null, $indexByColumn = false)
+    {
+        $results = $this->getEntities([
+            'qb'               => $this->buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId),
+            'ignore_paginator' => true,
+        ]);
+
+        if (!$indexByColumn) {
+            return $results;
+        }
+
+        return array_combine(array_map(function (Lead $lead) use ($field) {
+            return $lead->getFieldValue($field);
+        }, $results), $results);
+    }
+
+    /**
+     * Builds the query for the getLeadsByFieldValue method.
+     *
+     * @internal
+     *
+     * @param string $field
+     * @param string $value
+     * @param ?int   $ignoreId
+     *
+     * @return QueryBuilder
+     */
+    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
     {
         $col = 'l.'.$field;
 
@@ -111,35 +139,36 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        if (is_array($value)) {
-            $q->where(
-                $q->expr()->in($col, $value)
-            );
-        } else {
-            $q->where("$col = :search")
-                ->setParameter('search', $value);
-        }
-
         if ($ignoreId) {
-            $q->andWhere('l.id != :ignoreId')
+            $q->where('l.id != :ignoreId')
                 ->setParameter('ignoreId', $ignoreId);
         }
 
-        $results = $this->getEntities(['qb' => $q, 'ignore_paginator' => true]);
-
-        if (count($results) && $indexByColumn) {
-            /* @var Lead $lead */
-            $leads = [];
-            foreach ($results as $lead) {
-                $fieldKey = $lead->getFieldValue($field);
-
-                $leads[$fieldKey] = $lead;
+        if (is_array($value)) {
+            /**
+             * Bind each value to specific named parameters.
+             *
+             * @see https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72
+             */
+            $valueParams = [];
+            for ($i = 0; $i < count($value); ++$i) {
+                $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
             }
 
-            return $leads;
+            $q->andWhere(
+                $q->expr()->in($col, array_keys($valueParams))
+            );
+
+            foreach ($valueParams as $param => $value) {
+                $q->setParameter(ltrim($param, ':'), $value);
+            }
+
+            return $q;
         }
 
-        return $results;
+        $q->andWhere("$col = :search")->setParameter('search', $value);
+
+        return $q;
     }
 
     /**
@@ -245,7 +274,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->andWhere("l.$col = :".$col)
+            $q->orWhere("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
