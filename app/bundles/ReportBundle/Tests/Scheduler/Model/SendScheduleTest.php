@@ -131,7 +131,7 @@ class SendScheduleTest extends \PHPUnit_Framework_TestCase
                 null
             ));
 
-            $this->fileHandler->expects($this->once())
+        $this->fileHandler->expects($this->once())
             ->method('zipIt')
             ->with('/path/to/report.csv')
             ->willReturn('/path/to/report.zip');
