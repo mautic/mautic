@@ -1177,6 +1177,14 @@ class CommonApiController extends FOSRestController implements MauticController
                 return $preSaveError;
             }
 
+            try {
+                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_PRE_SAVE)) {
+                    $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_PRE_SAVE, new ApiEntityEvent($entity, $this->request));
+                }
+            } catch (\Exception $e) {
+                return $this->returnError($e->getMessage(), $e->getCode());
+            }
+
             $this->model->saveEntity($entity);
             $headers = [];
             //return the newly created entities location if applicable
@@ -1191,7 +1199,9 @@ class CommonApiController extends FOSRestController implements MauticController
             }
 
             try {
-                $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_POST_SAVE, new ApiEntityEvent($entity, $this->request));
+                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_POST_SAVE)) {
+                    $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_POST_SAVE, new ApiEntityEvent($entity, $this->request));
+                }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());
             }
