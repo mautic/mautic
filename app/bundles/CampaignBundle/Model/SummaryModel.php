@@ -68,7 +68,7 @@ class SummaryModel extends AbstractCommonModel
         }
 
         if (count($this->summaries) >= 100) {
-            $this->persistSummaries($this->summaries);
+            $this->persistSummaries();
         }
     }
 
