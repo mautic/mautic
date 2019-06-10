@@ -22,14 +22,25 @@ class ApiEntityEvent extends CommonEvent
     protected $entity;
 
     /**
+     * @var array
+     */
+    protected $entityRequestParameters;
+
+    /**
      * @var Request
      */
     private $request;
 
-    public function __construct($entity, Request $request)
+    /**
+     * @param object $entity
+     * @param array $entityRequestParameters
+     * @param Request $request
+     */
+    public function __construct($entity, array $entityRequestParameters, Request $request)
     {
-        $this->entity  = $entity;
-        $this->request = $request;
+        $this->entity                  = $entity;
+        $this->entityRequestParameters = $entityRequestParameters;
+        $this->request                 = $request;
     }
 
     /**
@@ -38,6 +49,14 @@ class ApiEntityEvent extends CommonEvent
     public function getEntity()
     {
         return $this->entity;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityRequestParameters()
+    {
+        return $this->entityRequestParameters;
     }
 
     /**
