@@ -32,8 +32,8 @@ class ApiEntityEvent extends CommonEvent
     private $request;
 
     /**
-     * @param object $entity
-     * @param array $entityRequestParameters
+     * @param object  $entity
+     * @param array   $entityRequestParameters
      * @param Request $request
      */
     public function __construct($entity, array $entityRequestParameters, Request $request)
