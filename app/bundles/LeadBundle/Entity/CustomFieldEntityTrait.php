@@ -252,7 +252,7 @@ trait CustomFieldEntityTrait
                 if ('all' === $group) {
                     continue;
                 }
-                
+
                 foreach ($fields as $alias => $field) {
                     $fieldValues[$alias] = $field['value'];
                 }
