@@ -1017,6 +1017,7 @@ class FieldModel extends FormModel
             ];
         }
 
+        $schemaLength = null;
         switch ($type) {
             case 'datetime':
             case 'date':
@@ -1033,7 +1034,6 @@ class FieldModel extends FormModel
             case 'email':
             case 'lookup':
             case 'select':
-            case 'multiselect':
             case 'region':
             case 'tel':
                 $schemaType = 'string';
@@ -1041,6 +1041,9 @@ class FieldModel extends FormModel
             case 'text':
                 $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
                 break;
+            case 'multiselect':
+                $schemaType = 'text';
+                $schemaLength = 65535;
             default:
                 $schemaType = 'text';
         }
@@ -1048,7 +1051,7 @@ class FieldModel extends FormModel
         return [
             'name'    => $alias,
             'type'    => $schemaType,
-            'options' => ['notnull' => false],
+            'options' => ['notnull' => false, 'length' => $schemaLength],
         ];
     }
 
