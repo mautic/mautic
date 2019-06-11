@@ -122,8 +122,6 @@ class ContactRequestHelper
      */
     public function getContactFromQuery(array $queryFields = [])
     {
-        $this->trackedContact = $this->contactTracker->getContact();
-
         unset($queryFields['page_url']); // This is set now automatically by PageModel
         $this->queryFields    = $queryFields;
 
@@ -132,6 +130,7 @@ class ContactRequestHelper
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
         } catch (ContactNotFoundException $exception) {
+            $this->trackedContact = $this->contactTracker->getContact();
         }
 
         if (!$this->trackedContact) {
