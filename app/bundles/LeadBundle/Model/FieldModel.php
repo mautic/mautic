@@ -1044,6 +1044,7 @@ class FieldModel extends FormModel
             case 'multiselect':
                 $schemaType = 'text';
                 $schemaLength = 65535;
+                break;
             default:
                 $schemaType = 'text';
         }
