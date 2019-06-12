@@ -676,16 +676,15 @@ SQL;
                 $q->expr()->lte('l.trigger_date', ':now'),
                 $q->expr()->eq('l.is_scheduled', ':true')
             );
-            $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
-            $results = $q->select('COUNT(*) as event_count, l.event_id')
+            $q->select('COUNT(*) as event_count, l.event_id')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
                 ->where($expr)
                 ->setParameter('ids', $eventIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
                 ->setParameter('true', true)
                 ->setParameter('now', $now->format('Y-m-d H:i:s'))
-                ->groupBy('l.event_id')
-                ->execute()
-                ->fetchAll();
+                ->groupBy('l.event_id');
+            $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
+            $results = $q->execute()->fetchAll();
 
             foreach ($results as $result) {
                 $events[$result['event_id']] = $result['event_count'];
@@ -700,13 +699,13 @@ SQL;
                     $q->expr()->lte('l.trigger_date', ':now'),
                     $q->expr()->eq('l.is_scheduled', ':true')
                 );
-                $this->updateQueryFromContactLimiter('l', $q, $limiter);
-                $results = $q->select('1 as event_count, l.event_id')
+                $q->select('1 as event_count, l.event_id')
                     ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
                     ->where($expr)
                     ->setParameter('true', true)
-                    ->setParameter('now', $now->format('Y-m-d H:i:s'))
-                    ->setMaxResults(1)
+                    ->setParameter('now', $now->format('Y-m-d H:i:s'));
+                $this->updateQueryFromContactLimiter('l', $q, $limiter);
+                $results = $q->setMaxResults(1)
                     ->execute()
                     ->fetchAll();
 
