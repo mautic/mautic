@@ -17,14 +17,15 @@
 !/app/bundles/CoreBundle/Assets/css/libraries/froala/plugins/gated_video.css
 !/app/bundles/CoreBundle/Assets/css/*.css
 
-/app/cache/*
+/app/cache*
 !/app/cache/.gitkeep
 
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
+/app/config/security_local.php
 
-/app/logs/*
+/app/logs*
 !/app/logs/.gitkeep
 
 /app/Resources/SensioGeneratorBundle
@@ -44,6 +45,7 @@
 /upgrade
 /upgrade_errors.txt
 
+/media_*/
 /media/dashboards/*
 !/media/dashboards/*.json
 /media/files/*
@@ -72,7 +74,7 @@
 !/plugins/MauticZapierBundle
 !/plugins/index.html
 
-/themes/*
+/themes*/
 !/themes/aurora
 !/themes/blank
 !/themes/cards
@@ -93,4 +95,4 @@
 !/themes/blank.png
 !/themes/blank-big.png
 
-/translations
+/translations*
