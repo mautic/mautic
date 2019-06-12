@@ -11,7 +11,7 @@
 
 ?>
 <?php if (isset($form)) : ?>
-    <?php if ($showContactSegments && count($form['lead_lists'])):?>
+    <?php if ($showContactSegments && isset($form['lead_lists']) && count($form['lead_lists'])):?>
         <div class="contact-segments">
             <div class="text-left">
                 <label class="control-label"><?php echo isset($label_text) ? $label_text : $view['translator']->trans('mautic.lead.form.list'); ?></label>

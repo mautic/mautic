@@ -526,6 +526,10 @@ class LeadModel extends FormModel
                     $entity->addUpdatedField('zipcode', $details['zipcode']);
                 }
             }
+
+            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->getParameter('ip_lookup_create_organization', false)) {
+                $entity->addUpdatedField('company', $details['organization']);
+            }
         }
 
         $updatedFields = $entity->getUpdatedFields();
@@ -613,7 +617,8 @@ class LeadModel extends FormModel
             $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
             $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-            if ($data['stage'] !== $currentLeadStage) {
+            $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
+            if ($previousId !== $currentLeadStage) {
                 $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
                 $lead->stageChangeLogEntry(
                     $stage,
@@ -1434,8 +1439,11 @@ class LeadModel extends FormModel
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
             foreach ($addresses as $address) {
-                $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress(trim($address));
+                $address = trim($address);
+                if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
+                    $ipAddress = new IpAddress();
+                    $ipAddress->setIpAddress($address);
+                }
                 $lead->addIpAddress($ipAddress);
             }
         }
@@ -1496,18 +1504,23 @@ class LeadModel extends FormModel
         unset($fieldData['stage']);
 
         // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
-            if ($doNotEmail) {
+        if (!empty($fields['doNotEmail']) && isset($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (null !== $doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
                     '%user%' => $this->userHelper->getUser()->getUsername(),
                 ]);
 
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
-                $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                if ($doNotEmail) {
+                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                } else {
+                    $this->removeDncForLead($lead, 'email', true);
+                }
             }
         }
+
         unset($fieldData['doNotEmail']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {

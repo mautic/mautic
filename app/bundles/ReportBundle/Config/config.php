@@ -76,6 +76,9 @@ return [
 
     'services' => [
         'events' => [
+            'mautic.report.configbundle.subscriber' => [
+                'class' => 'Mautic\ReportBundle\EventListener\ConfigSubscriber',
+            ],
             'mautic.report.search.subscriber' => [
                 'class'     => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
                 'arguments' => [
@@ -111,6 +114,10 @@ return [
             ],
         ],
         'forms' => [
+            'mautic.form.type.reportconfig' => [
+                'class'     => \Mautic\ReportBundle\Form\Type\ConfigType::class,
+                'alias'     => 'reportconfig',
+            ],
             'mautic.form.type.report' => [
                 'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
                 'arguments' => [
@@ -174,6 +181,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Model\CsvExporter::class,
                 'arguments' => [
                     'mautic.helper.template.formatter',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.excel_exporter' => [
@@ -290,5 +298,6 @@ return [
         'report_temp_dir'                     => '%kernel.root_dir%/../media/files/temp',
         'report_export_batch_size'            => 1000,
         'report_export_max_filesize_in_bytes' => 5000000,
+        'csv_always_enclose'                  => false,
     ],
 ];

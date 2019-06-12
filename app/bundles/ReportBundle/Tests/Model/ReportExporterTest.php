@@ -93,9 +93,6 @@ class ReportExporterTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->expects($this->exactly(2))
             ->method('dispatch');
 
-        $reportFileWriter->expects($this->exactly(2))
-            ->method('clear');
-
         $schedulerModel->expects($this->exactly(2))
             ->method('reportWasScheduled');
 

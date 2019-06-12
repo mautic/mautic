@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -546,21 +547,23 @@ class ReportModel extends FormModel
         $paginate        = !empty($options['paginate']);
         $reportPage      = isset($options['reportPage']) ? $options['reportPage'] : 1;
         $data            = $graphs            = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
         $totalResults    = $limit    = 0;
 
         // Prepare the query builder
-        $tableDetails = $this->getTableData($entity->getSource());
-
+        $tableDetails      = $this->getTableData($entity->getSource());
+        $dataColumns       = $dataAggregatorColumns = [];
         $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
 
         foreach ($aggregatorColumns as $aggregatorColumn) {
             $selectedColumns[] = $aggregatorColumn['column'];
+            // add aggregator columns to dataColumns also
+            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
+            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
@@ -699,17 +702,18 @@ class ReportModel extends FormModel
         }
 
         return [
-            'totalResults'    => $totalResults,
-            'data'            => $data,
-            'dataColumns'     => $dataColumns,
-            'graphs'          => $graphs,
-            'contentTemplate' => $contentTemplate,
-            'columns'         => $tableDetails['columns'],
-            'limit'           => ($paginate) ? $limit : 0,
-            'page'            => ($paginate) ? $reportPage : 1,
-            'dateFrom'        => $dataOptions['dateFrom'],
-            'dateTo'          => $dataOptions['dateTo'],
-            'debug'           => $debugData,
+            'totalResults'      => $totalResults,
+            'data'              => $data,
+            'dataColumns'       => $dataColumns,
+            'graphs'            => $graphs,
+            'contentTemplate'   => $contentTemplate,
+            'columns'           => $tableDetails['columns'],
+            'limit'             => ($paginate) ? $limit : 0,
+            'page'              => ($paginate) ? $reportPage : 1,
+            'dateFrom'          => $dataOptions['dateFrom'],
+            'dateTo'            => $dataOptions['dateTo'],
+            'debug'             => $debugData,
+            'aggregatorColumns' => $dataAggregatorColumns,
         ];
     }
 
@@ -771,5 +775,17 @@ class ReportModel extends FormModel
         }
 
         return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @return \Doctrine\DBAL\Connection
+     */
+    private function getConnection()
+    {
+        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+            $this->em->getConnection()->connect('slave');
+        }
+
+        return $this->em->getConnection();
     }
 }

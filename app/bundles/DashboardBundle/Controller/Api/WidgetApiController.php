@@ -94,6 +94,9 @@ class WidgetApiController extends CommonApiController
             'dataset'    => $dataset,
         ];
 
+        // Merge filters into the root array as well as that's how widget edit forms send them.
+        $params = array_merge($params, $params['filter']);
+
         $cacheTimeout = (int) $this->request->get('cacheTimeout', 0);
         $widgetHeight = (int) $this->request->get('height', 300);
 

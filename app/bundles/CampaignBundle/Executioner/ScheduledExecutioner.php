@@ -346,8 +346,8 @@ class ScheduledExecutioner implements ExecutionerInterface
             $executionDate = $this->scheduler->validateExecutionDateTime($log, $now);
             $this->logger->debug(
                 'CAMPAIGN: Log ID #'.$log->getID().
-                ' to be executed on '.$executionDate->format('Y-m-d H:i:s').
-                ' compared to '.$now->format('Y-m-d H:i:s')
+                ' to be executed on '.$executionDate->format('Y-m-d H:i:s e').
+                ' compared to '.$now->format('Y-m-d H:i:s e')
             );
 
             if ($this->scheduler->shouldSchedule($executionDate, $now)) {

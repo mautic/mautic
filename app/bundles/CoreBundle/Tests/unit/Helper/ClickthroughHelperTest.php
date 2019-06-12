@@ -28,4 +28,11 @@ class ClickthroughHelperTest extends \PHPUnit_Framework_TestCase
 
         ClickthroughHelper::decodeArrayFromUrl(urlencode(base64_encode(serialize(new \stdClass()))));
     }
+
+    public function testEmptyStringDoesNotThrowException()
+    {
+        $array = [];
+
+        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(''));
+    }
 }
