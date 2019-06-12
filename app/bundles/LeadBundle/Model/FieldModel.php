@@ -1042,7 +1042,7 @@ class FieldModel extends FormModel
                 $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
                 break;
             case 'multiselect':
-                $schemaType = 'text';
+                $schemaType   = 'text';
                 $schemaLength = 65535;
                 break;
             default:
