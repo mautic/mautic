@@ -363,6 +363,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.lead',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.campaign.event_collector' => [

@@ -21,6 +21,7 @@ use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Psr\Log\LoggerInterface;
 
 class EventLogger
 {
@@ -50,6 +51,11 @@ class EventLogger
     private $persistQueue;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @var ArrayCollection
      */
     private $logs;
@@ -66,17 +72,20 @@ class EventLogger
      * @param ContactTracker         $contactTracker
      * @param LeadEventLogRepository $leadEventLogRepository
      * @param LeadRepository         $leadRepository
+     * @param LoggerInterface        $logger
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         ContactTracker $contactTracker,
         LeadEventLogRepository $leadEventLogRepository,
-        LeadRepository $leadRepository
+        LeadRepository $leadRepository,
+        LoggerInterface $logger
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->contactTracker         = $contactTracker;
         $this->leadEventLogRepository = $leadEventLogRepository;
         $this->leadRepository         = $leadRepository;
+        $this->logger                 = $logger;
 
         $this->persistQueue = new ArrayCollection();
         $this->logs         = new ArrayCollection();
@@ -136,6 +145,9 @@ class EventLogger
             // Likely a single contact handle such as decision processing
             $rotations = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
             $log->setRotation($rotations[$contact->getId()]);
+        }
+        if (Event::TYPE_DECISION !== $event->getType()) {
+            $this->leadEventLogRepository->deDuplicate($log);
         }
 
         return $log;
@@ -232,6 +244,13 @@ class EventLogger
         // Ensure each contact has a log entry to prevent them from being picked up again prematurely
         foreach ($contacts as $contact) {
             $log = $this->buildLogEntry($event, $contact, $isInactiveEntry);
+            if ($log->getId()) {
+                $this->logger->debug(
+                    'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
+                    .' has already generated log entry ID# '.$log->getId()
+                );
+                continue;
+            }
             $log->setIsScheduled(false);
             $log->setDateTriggered(new \DateTime());
             ChannelExtractor::setChannel($log, $event, $config);

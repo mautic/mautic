@@ -541,7 +541,7 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
         $qb->select('log.rotation')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
@@ -559,6 +559,45 @@ class LeadEventLogRepository extends CommonRepository
         $results = $qb->execute()->fetchAll();
 
         return !empty($results);
+    }
+
+    /**
+     * Replace a log entry with an existing equivalent (if exists) based on unique constraints.
+     * This is to prevent integrity constraint violations when a campaign is recursive or rearranged.
+     *
+     * @param LeadEventLog $log
+     */
+    public function deDuplicate(LeadEventLog &$log)
+    {
+        $this->getSlaveConnection();
+        $entities = $this->getEntities(
+            [
+                'limit'            => 1,
+                'ignore_paginator' => true,
+                'filter'           => [
+                    'force' => [
+                        [
+                            'column' => 'll.event',
+                            'expr'   => 'eq',
+                            'value'  => $log->getEvent()->getId(),
+                        ],
+                        [
+                            'column' => 'll.lead',
+                            'expr'   => 'eq',
+                            'value'  => $log->getLead()->getId(),
+                        ],
+                        [
+                            'column' => 'll.rotation',
+                            'expr'   => 'eq',
+                            'value'  => $log->getRotation(),
+                        ],
+                    ],
+                ],
+            ]
+        );
+        if ($entities) {
+            $log = reset($entities);
+        }
     }
 
     /**

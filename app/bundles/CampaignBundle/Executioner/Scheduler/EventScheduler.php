@@ -446,6 +446,13 @@ class EventScheduler
         foreach ($contacts as $contact) {
             // Create the entry
             $log = $this->eventLogger->buildLogEntry($event, $contact, $isInactiveEvent);
+            if ($log->getId()) {
+                $this->logger->debug(
+                    'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
+                    .' has already built log entry ID# '.$log->getId()
+                );
+                continue;
+            }
 
             // Schedule it
             $log->setTriggerDate($executionDate);
