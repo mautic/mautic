@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -373,12 +374,16 @@ class TriggerCampaignCommand extends ModeratedCommand
                 $this->executeInactive();
             }
         } catch (\Exception $exception) {
+            $this->logger->error('CAMPAIGN '.$this->campaign->getId().': '.$exception->getMessage());
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
                 throw $exception;
             }
-
-            $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+            if ($exception instanceof ORMException && $exception->getMessage() === 'The EntityManager is closed.') {
+                // This is typically the secondary result of a failed query or integrity constraint violation.
+                // Better to throw this exception, or it can cause errors with subsequent batches.
+                throw $exception;
+            }
         }
 
         // Don't detach in tests since this command will be ran multiple times in the same process
