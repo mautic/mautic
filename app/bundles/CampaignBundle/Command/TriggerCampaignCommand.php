@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -379,9 +380,12 @@ class TriggerCampaignCommand extends ModeratedCommand
                 // Throw the exception for dev/test mode
                 throw $exception;
             }
-            if ($exception instanceof ORMException && $exception->getMessage() === 'The EntityManager is closed.') {
-                // This is typically the secondary result of a failed query or integrity constraint violation.
-                // Better to throw this exception, or it can cause errors with subsequent batches.
+            if (
+                $exception instanceof UniqueConstraintViolationException
+                || ($exception instanceof ORMException && 'The EntityManager is closed.' === $exception->getMessage())
+            ) {
+                // This is the result of a faulty query or integrity constraint violation.
+                // Better to throw this exception to prevent likely errors with subsequent batches.
                 throw $exception;
             }
         }
