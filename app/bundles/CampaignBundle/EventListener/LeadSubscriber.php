@@ -204,10 +204,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $action = $event->wasAdded() ? 'added' : 'removed';
 
         //get campaigns for the list
-        $listCampaigns = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists(
-            $list->getId(),
-            $this->security->isGranted('campaign:campaigns:viewother')
-        );
+        $listCampaigns = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
 
         $leadLists     = $this->leadModel->getLists($lead, true);
         $leadListIds   = array_keys($leadLists);
