@@ -562,12 +562,13 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * Replace a log entry with an existing equivalent (if exists) based on unique constraints.
-     * This is to prevent integrity constraint violations when a campaign is recursive or rearranged.
+     * Find a duplicate log entry based on the campaign_rotation unique constraint.
      *
      * @param LeadEventLog $log
+     *
+     * @return LeadEventLog|null
      */
-    public function deDuplicate(LeadEventLog &$log)
+    public function findDuplicate(LeadEventLog $log)
     {
         $this->getSlaveConnection();
         $entities = $this->getEntities(
@@ -595,9 +596,8 @@ class LeadEventLogRepository extends CommonRepository
                 ],
             ]
         );
-        if ($entities) {
-            $log = reset($entities);
-        }
+
+        return $entities ? reset($entity) : null;
     }
 
     /**

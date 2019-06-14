@@ -25,6 +25,8 @@ use Psr\Log\LoggerInterface;
 
 class EventLogger
 {
+    const CONCURRENT_THREAD_THRESHOLD_SECONDS = 60;
+
     /**
      * @var IpLookupHelper
      */
@@ -139,15 +141,41 @@ class EventLogger
         $log->setDateTriggered(new \DateTime());
         $log->setSystemTriggered(defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'));
 
-        if (isset($this->contactRotations[$contact->getId()])) {
-            $log->setRotation($this->contactRotations[$contact->getId()]);
-        } else {
+        if (!isset($this->contactRotations[$contact->getId()])) {
             // Likely a single contact handle such as decision processing
-            $rotations = $this->leadRepository->getContactRotations([$contact->getId()], $event->getCampaign()->getId());
-            $log->setRotation($rotations[$contact->getId()]);
+            $this->hydrateContactRotationsForNewLogs([$contact->getId()], $event->getCampaign()->getId());
         }
-        if (Event::TYPE_DECISION !== $event->getType()) {
-            $this->leadEventLogRepository->deDuplicate($log);
+        $log->setRotation($this->contactRotations[$contact->getId()]);
+
+        return $this->deDuplicate($log);
+    }
+
+    /**
+     * Given a new log entry, prevent a duplicate insertion by deferring to a previous event, or incrementing rotation.
+     *
+     * @param LeadEventLog $log
+     *
+     * @return LeadEventLog
+     */
+    private function deDuplicate(LeadEventLog $log)
+    {
+        if (Event::TYPE_DECISION !== $log->getEvent()->getEventType()) {
+            $duplicateLog = $this->leadEventLogRepository->findDuplicate($log);
+            if ($duplicateLog) {
+                // By campaign_rotation this event log already exists.
+                if (time() - $duplicateLog->getDateTriggered()->format('U') <= self::CONCURRENT_THREAD_THRESHOLD_SECONDS) {
+                    // A concurrent thread, do not repeat/recreate the event as it is unintentional.
+                    $log = $duplicateLog;
+                } else {
+                    // A campaign rearrangement occurred. Increment rotation to allow event repetition.
+                    $this->leadRepository->incrementCampaignRotationForContacts(
+                        [$log->getLead()->getId()],
+                        $log->getCampaign()->getId()
+                    );
+                    $this->hydrateContactRotationsForNewLogs([$log->getLead()->getId()], $log->getCampaign()->getId());
+                    $log->setRotation($this->contactRotations[$log->getLead()->getId()]);
+                }
+            }
         }
 
         return $log;
@@ -272,7 +300,12 @@ class EventLogger
      */
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {
-        $this->contactRotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
+        $rotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
+        if (1 === count($contactIds)) {
+            $this->contactRotations = array_merge($this->contactRotations, $rotations);
+        } else {
+            $this->contactRotations = $rotations;
+        }
     }
 
     private function persistPendingAndInsertIntoLogStack()
