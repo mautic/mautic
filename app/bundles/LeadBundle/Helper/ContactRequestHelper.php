@@ -130,6 +130,9 @@ class ContactRequestHelper
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
         } catch (ContactNotFoundException $exception) {
+        }
+
+        if (!$this->trackedContact) {
             $this->trackedContact = $this->contactTracker->getContact();
         }
 
