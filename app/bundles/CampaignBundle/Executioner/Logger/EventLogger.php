@@ -302,7 +302,7 @@ class EventLogger
     {
         $rotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         if (1 === count($contactIds)) {
-            $this->contactRotations = array_merge($this->contactRotations, $rotations);
+            $this->contactRotations = array_replace($this->contactRotations, $rotations);
         } else {
             $this->contactRotations = $rotations;
         }
