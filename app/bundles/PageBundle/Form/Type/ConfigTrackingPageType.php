@@ -52,16 +52,14 @@ class ConfigTrackingPageType extends AbstractType
                 ],
             ]
         );
-
         $builder->add(
-            'track_contact_by_ip',
+            'disable_tracking_404',
             'yesno_button_group',
             [
-                'label' => 'mautic.page.config.form.track_contact_by_ip',
-                'data'  => isset($options['data']['track_contact_by_ip']) ? (bool) $options['data']['track_contact_by_ip'] : false,
+                'label' => 'mautic.page.config.form.disable_tracking_404',
+                'data'  => isset($options['data']['disable_tracking_404']) ? (bool) $options['data']['disable_tracking_404'] : false,
                 'attr'  => [
-                    'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                    'data-show-on' => '{"config_trackingconfig_anonymize_ip_1":"checked"}',
+                    'tooltip'      => 'mautic.page.config.form.disable_tracking_404.tooltip',
                 ],
             ]
         );

@@ -70,6 +70,7 @@ class ConfigSubscriber extends CommonSubscriber
                 'google_analytics_trackingpage_enabled' => false,
                 'google_analytics_landingpage_enabled'  => false,
                 'google_analytics_anonymize_ip'         => false,
+                'disable_tracking_404'                  => false,
             ],
         ]);
     }
