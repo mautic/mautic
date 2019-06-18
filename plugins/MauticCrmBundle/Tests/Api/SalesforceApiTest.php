@@ -341,6 +341,9 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
+        $integration->method('getFieldsForQuery')
+            ->willReturn([]);
+
         $api = new SalesforceApi($integration);
 
         $api->getPerson([
@@ -386,6 +389,9 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                     );
                 }
             );
+
+        $integration->method('getFieldsForQuery')
+            ->willReturn([]);
 
         $api = new SalesforceApi($integration);
 
