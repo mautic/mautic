@@ -172,7 +172,6 @@ class ContactRequestHelper
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
 
-        $foundContact = null;
         /* @var Lead $foundContact */
         if (!empty($this->queryFields)) {
             list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
