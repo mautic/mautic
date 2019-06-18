@@ -398,8 +398,7 @@ class LeadEventLogRepository extends CommonRepository
             return new ArrayCollection();
         }
 
-        $this->getSlaveConnection($limiter);
-
+        // We cannot use a slave connection here, due to replication delay on large batches.
         $q = $this->createQueryBuilder('o');
 
         $q->select('o, e, c')
