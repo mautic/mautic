@@ -362,7 +362,7 @@ class SalesforceApi extends CrmApi
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
         }
 
-        $baseQuery = 'SELECT %s from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
+        $baseQuery = 'SELECT %s from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end'].' and isDeleted = false'
             .$ignoreConvertedLeads;
 
         try {
