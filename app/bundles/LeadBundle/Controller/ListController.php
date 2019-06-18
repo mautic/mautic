@@ -805,6 +805,8 @@ class ListController extends FormController
                         'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),
                         'ignoreAjax' => true,
                         'filters'    => $filters,
+                    ],[
+                        '_forwarded' => true
                     ]
                 )->getContent(),
             ],

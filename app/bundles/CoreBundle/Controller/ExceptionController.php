@@ -93,16 +93,23 @@ class ExceptionController extends CommonController
             $url      = $request->getRequestUri();
             $urlParts = parse_url($url);
 
+            if (!$exception instanceof FatalThrowableError && $request->get('_forwarded', false)) {
+                $inline = true;
+            }else{
+                $inline = false;
+            }
+
             return $this->delegateView(
                 [
                     'viewParameters' => [
-                        'baseTemplate'   => $baseTemplate,
+                        'baseTemplate'   => $inline?null:$baseTemplate,
                         'status_code'    => $code,
                         'status_text'    => $statusText,
                         'exception'      => $exception,
                         'logger'         => $logger,
                         'currentContent' => $currentContent,
                         'isPublicPage'   => $anonymous,
+                        'inline'         => $inline
                     ],
                     'contentTemplate' => $template,
                     'passthroughVars' => [

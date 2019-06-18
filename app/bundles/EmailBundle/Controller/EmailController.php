@@ -430,6 +430,8 @@ class EmailController extends FormController
                             'objectId'   => $email->getId(),
                             'page'       => $this->get('session')->get('mautic.email.contact.page', 1),
                             'ignoreAjax' => true,
+                        ],[
+                            '_forwarded' => true
                         ]
                     )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
