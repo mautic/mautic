@@ -172,6 +172,7 @@ class ContactRequestHelper
 
         $this->setEmailFromClickthroughIdentification($clickthrough);
 
+        $foundContact = null;
         /* @var Lead $foundContact */
         if (!empty($this->queryFields)) {
             list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
@@ -182,7 +183,9 @@ class ContactRequestHelper
             );
             if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
-                return $foundContact;
+                if (!$foundContact->isNew()) {
+                    return $foundContact;
+                }
             }
         }
 
@@ -248,7 +251,7 @@ class ContactRequestHelper
             throw new ContactNotFoundException();
         }
 
-        if (!$this->trackedContact->isAnonymous() || empty($this->queryFields['fingerprint'])) {
+        if (($this->trackedContact && !$this->trackedContact->isAnonymous()) || (empty($this->queryFields['fingerprint']))) {
             // We already know who this is or fingerprint is not available so just use tracked lead
             throw new ContactNotFoundException();
         }
