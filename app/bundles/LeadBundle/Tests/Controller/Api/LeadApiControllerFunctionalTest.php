@@ -197,7 +197,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-
+echo $clientResponse;
         $this->assertSame(null, $response['contacts'][0]['doNotContact'][0]['reason']);
 
         // Remove contact
