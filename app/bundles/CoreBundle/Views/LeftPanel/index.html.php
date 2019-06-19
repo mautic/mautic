@@ -11,46 +11,40 @@
 $extraMenu = $view['menu']->render('extra');
 ?>
 <!-- start: sidebar-header -->
-<div class="sidebar-header">
+<div style="background-color: #fedb00" class="sidebar-header">
     <!-- brand -->
-    <a class="mautic-brand<?php echo (!empty($extraMenu)) ? ' pull-left pl-0 pr-0' : ''; ?>" href="#">
-        <!-- logo figure -->
-        <svg version="1.1" class="mautic-logo-figure" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve">
-            <path class="circle" d="M64,119.843c-30.937,0-56.108-25.17-56.108-56.108C7.893,32.799,33.063,7.629,64,7.629
-            c7.474,0,14.734,1.446,21.578,4.301c1.936,0.807,2.85,3.03,2.041,4.964c-0.805,1.937-3.029,2.849-4.963,2.043
-            C76.742,16.472,70.465,15.221,64,15.221c-26.751,0-48.514,21.763-48.514,48.514c0,26.752,21.763,48.516,48.514,48.516
-            c26.751,0,48.513-21.764,48.513-48.516c0-5.735-0.988-11.345-2.939-16.677c-0.723-1.968,0.289-4.149,2.258-4.869
-            c1.971-0.721,4.15,0.291,4.871,2.259c2.258,6.171,3.404,12.661,3.404,19.287C120.107,94.673,94.938,119.843,64,119.843"/>
-            <polygon class="m" points="88.545,57.987 79.807,67.055 84.664,87.332 95.621,87.332 "/>
-            <polygon class="m-arrow" points="84.982,31.157 88.004,34.176 63.933,59.605 43.446,38.475 31.664,87.332 42.621,87.332
-            49.122,60.198 63.933,76.399 95.699,41.815 98.738,44.875 101.75,27.784 "/>
-        </svg>
-        <!--/ logo figure -->
-        <!-- logo text -->
-        <svg version="1.1" class="mautic-logo-text mnl-3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 260 65" enable-background="new 0 0 260 65" xml:space="preserve">
-            <g>
-                <path class="m" d="M39.336,57.983V37.951c0-4.932-2.58-9.409-7.664-9.409
-                c-5.008,0-7.967,4.477-7.967,9.409v20.032h-9.258V20.498h8.575l0.683,4.553c1.972-3.794,6.298-5.16,9.864-5.16
-                c4.477,0,8.955,1.822,11.079,6.981c3.339-5.311,7.664-6.829,12.521-6.829c10.623,0,15.859,6.526,15.859,17.756v20.185H63.77V37.799
-                c0-4.932-2.049-9.106-7.057-9.106s-8.119,4.326-8.119,9.258v20.032H39.336z"/>
-                <path class="a" d="M109.031,20.574h8.879v37.41h-8.728l-0.456-5.464
-                c-2.124,4.402-7.967,6.527-12.14,6.604c-11.079,0.074-19.275-6.754-19.275-19.883c0-12.898,8.575-19.652,19.502-19.577
-                c5.01,0,9.789,2.352,11.913,6.07L109.031,20.574z M86.569,39.24c0,7.134,4.934,11.384,11.079,11.384
-                c14.569,0,14.569-22.689,0-22.689C91.503,27.935,86.569,32.108,86.569,39.24"/>
-                <path class="u" d="M133.101,20.574v19.578c0,5.69,3.11,10.016,9.03,10.016
-                c5.69,0,9.561-4.781,9.561-10.471V20.574h9.181v37.486h-8.27l-0.607-5.084c-3.871,3.794-7.437,5.614-12.672,5.614
-                c-8.954,0-15.48-6.754-15.48-18.363V20.574H133.101z"/>
-                <path class="t" d="M182.123,10.026V20.65h10.319v7.967h-10.396V44.78
-                c0,3.567,1.973,5.313,4.855,5.313c1.443,0,3.112-0.455,4.479-1.14l2.58,7.893c-2.656,1.062-4.857,1.518-7.664,1.594
-                c-8.12,0.303-13.432-4.326-13.432-13.659V28.617h-6.98V20.65h6.98v-9.637L182.123,10.026z"/>
-                <path class="i" d="M209.441,10.026c0,7.209-10.929,7.209-10.929,0 C198.513,2.818,209.441,2.818,209.441,10.026 M199.348,57.984h9.259V20.422h-9.259V57.984z"/>
-                <path class="c" d="M247.803,53.203c-4.326,4.249-8.879,5.92-14.418,5.92
-                c-10.853,0-19.881-6.526-19.881-19.807c0-13.279,9.028-19.805,19.881-19.805c5.312,0,9.409,1.518,13.507,5.54l-5.843,6.146
-                c-2.2-1.973-4.934-2.959-7.514-2.959c-6.221,0-10.773,4.553-10.773,11.078c0,7.133,4.855,10.927,10.623,10.927
-                c2.959,0,5.919-0.834,8.194-3.11L247.803,53.203z"/>
-            </g>
-        </svg>
-        <!--/ logo text -->
+    <a class="bbts-brand<?php echo (!empty($extraMenu)) ? ' pull-left pl-0 pr-0' : ''; ?>" href="#">
+
+	<svg style="height: 45px; top:8px; position: absolute;" xmlns:dc="http://purl.org/dc/elements/1.1/" 
+	   xmlns:cc="http://creativecommons.org/ns#" 
+	   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+	   xmlns:svg="http://www.w3.org/2000/svg" 
+	   xmlns="http://www.w3.org/2000/svg" 
+	   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" 
+	   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="47.818462mm" height="17.354637mm" viewBox="0 0 169.4355 61.492809" id="svg4428" version="1.1" inkscape:version="0.91 r13725" sodipodi:docname="bbts.svg">
+	   <defs id="defs4430" />
+	   <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="1" inkscape:cx="291.0035" inkscape:cy="-143.68217" inkscape:document-units="px" inkscape:current-layer="layer1" showgrid="false" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0" inkscape:window-width="1920" inkscape:window-height="1017" inkscape:window-x="1366" inkscape:window-y="30" inkscape:window-maximized="1" />
+	   <metadata id="metadata4433">
+	      <rdf:RDF>
+		 <cc:Work rdf:about="">
+		    <dc:format>image/svg+xml</dc:format>
+		    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+		    <dc:title></dc:title>
+		 </cc:Work>
+	      </rdf:RDF>
+	   </metadata>
+	   <g inkscape:label="Camada 1" inkscape:groupmode="layer" id="layer1" transform="translate(-220.9965,-327.33008)">
+	      <g transform="matrix(3.5433071,0,0,3.5433071,-175.4637,-223.27909)" id="g5412">
+		 <rect style="opacity:1;fill:#fedb00;fill-opacity:1;stroke:#0033a0;stroke-width:0.80000001;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill" id="rect6122" width="47.018463" height="16.554638" x="112.28988" y="155.79414" inkscape:export-filename="C:\Users\pollyanna.rissatto\Desktop\Reduzida.png" inkscape:export-xdpi="300" inkscape:export-ydpi="300" />
+		 <path sodipodi:nodetypes="cccccccccccccccccccccccccccccccccc" style="clip-rule:evenodd;fill:#0033a0;fill-opacity:1;fill-rule:nonzero;stroke-width:0.00999486;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" inkscape:connector-curvature="0" id="path6124" d="m 120.71484,166.89 -1.23934,-0.83956 5.87698,-4.00793 -3.62813,-2.46875 -1.70913,1.1694 1.31933,0.88955 -3.05844,2.06894 -2.5437,-1.70912 6.14185,-4.15787 6.15185,4.14788 c -2.42209,1.63581 -4.88916,3.27164 -7.31127,4.90746 z m 2.31882,-5.68708 1.23938,0.83959 -5.87699,4.00793 3.62813,2.46874 1.70913,-1.16941 -1.31933,-0.88954 3.05844,-2.06894 2.55369,1.70913 -6.17183,4.15786 -6.12187,-4.12788 7.31127,-4.94746 z m -4.78753,7.4262 -1.25936,-0.86955 -1.25436,0.86955 0,1.67913 z m 7.31624,-9.09533 1.26934,0.86955 1.1944,-0.83957 0,-1.71912 -2.46374,1.67913 z" class="fil3" inkscape:export-filename="C:\Users\pollyanna.rissatto\Desktop\Reduzida.png" inkscape:export-xdpi="300" inkscape:export-ydpi="300" />
+		 <g transform="matrix(1.0132583,0,0,1.0132583,196.18786,-1.8259742)" id="g6132" inkscape:export-filename="C:\Users\pollyanna.rissatto\Desktop\Reduzida.png" inkscape:export-xdpi="300" inkscape:export-ydpi="300">
+		    <path style="clip-rule:evenodd;fill:#0033a0;fill-opacity:1;fill-rule:nonzero;stroke-width:0.00896524;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" inkscape:connector-curvature="0" id="path6126" d="m -61.587428,167.76072 c 0.779976,4.3e-4 2.698535,-0.0867 2.698535,-2.11115 0,-1.10183 -0.331713,-1.84547 -1.622707,-2.02573 l 0,-0.014 c 0.986176,-0.17034 1.488229,-0.84274 1.488229,-1.76615 0,-1.71236 -1.156516,-2.08004 -2.546129,-2.07994 -1.084792,0 -2.169587,0 -3.254379,0 l 0,7.99713 m 3.030249,-3.49721 c 0.636531,0.0537 0.950316,0.53632 0.950316,1.13604 0,0.92194 -0.555846,1.10523 -0.95928,1.14154 -0.325735,8.8e-4 -0.651475,0 -0.977212,0 l 0,-2.27758 m 0,-1.23657 0,-2.02615 0.977212,0 c 0.511017,0.018 0.78894,0.45338 0.78894,1.00844 0,0.69831 -0.466291,1.02563 -0.744114,1.01828 -0.340623,-0.003 -0.681378,-8.6e-4 -1.022038,-5.7e-4 z" class="fil3" sodipodi:nodetypes="csccsccccsccccccsccc" />
+		    <path sodipodi:nodetypes="csccsccccsccccccsccc" class="fil3" d="m -54.962115,167.76072 c 0.779974,4.3e-4 2.698536,-0.0867 2.698536,-2.11115 0,-1.10183 -0.331714,-1.84547 -1.622708,-2.02573 l 0,-0.014 c 0.986176,-0.17034 1.488229,-0.84274 1.488229,-1.76615 0,-1.71236 -1.156516,-2.08004 -2.546129,-2.07994 -1.084795,0 -2.169587,0 -3.254381,0 l 0,7.99713 m 3.030251,-3.49721 c 0.636532,0.0537 0.950317,0.53632 0.950317,1.13604 0,0.92194 -0.555847,1.10523 -0.959281,1.14154 -0.325737,8.8e-4 -0.651474,0 -0.977212,0 l 0,-2.27758 m 0,-1.23657 0,-2.02615 0.977212,0 c 0.511018,0.018 0.788938,0.45338 0.788938,1.00844 0,0.69831 -0.466289,1.02563 -0.744115,1.01828 -0.34062,-0.003 -0.681377,-8.6e-4 -1.022035,-5.7e-4 z" id="path6128" inkscape:connector-curvature="0" style="clip-rule:evenodd;fill:#0033a0;fill-opacity:1;fill-rule:nonzero;stroke-width:0.00896524;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" />
+		    <path sodipodi:nodetypes="cccssssccsssccccccccccc" style="clip-rule:evenodd;fill:#0033a0;fill-opacity:1;fill-rule:nonzero;stroke-width:0.00896524;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" inkscape:connector-curvature="0" id="path6130" d="m -42.607874,167.54885 -2.931632,0 0,-1.19238 2.743361,0 c 0.645498,0 0.968248,-0.3586 0.968248,-0.89652 0,-1.40754 -3.872986,-1.25513 -3.872986,-3.61299 0,-1.21927 0.582742,-2.16959 2.913705,-2.16959 l 2.384753,0 0,1.20135 -2.151659,0 c -0.627564,0 -0.986176,0.29585 -0.986176,0.84273 0,1.47926 3.855052,1.13858 3.855052,3.61299 0,2.03511 -1.48823,2.20545 -2.931633,2.20545 z m -9.622691,-7.7519 0,1.32686 2.017181,0 0,6.6522 2.017177,0 0,-6.6522 1.936493,0 0,-1.32686 z" class="fil3" />
+		 </g>
+	      </g>
+	   </g>
+	</svg>
     </a>
     <?php if (!empty($extraMenu)): ?>
         <div class="dropdown extra-menu">

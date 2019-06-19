@@ -30,7 +30,7 @@
             <!--/ end: app-sidebar(right) -->
 
             <!-- start: app-header -->
-            <header id="app-header" class="navbar">
+            <header id="app-header" style="background-color: #fedb00" class="navbar">
                <?php echo $view->render('MauticCoreBundle:Default:navbar.html.php'); ?>
 
                <?php echo $view->render('MauticCoreBundle:Notification:flashes.html.php'); ?>
