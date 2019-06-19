@@ -596,7 +596,7 @@ class LeadEventLogRepository extends CommonRepository
             ]
         );
 
-        return $entities ? reset($entity) : null;
+        return $entities ? reset($entities) : null;
     }
 
     /**
