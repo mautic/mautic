@@ -448,6 +448,7 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
                 'id'      => 1,
                 'email'   => 'winner@test.com',
                 'consent' => 'Yes',
+                'boolean' => 1,
             ]);
 
         $loser->expects($this->once())
@@ -456,6 +457,7 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
                 'id'      => 2,
                 'email'   => null,
                 'consent' => 'No',
+                'boolean' => 0,
             ]);
 
         $winner->method('getDateModified')->willReturn($winnerDateModified);
@@ -464,14 +466,14 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $loser->method('getId')->willReturn(2);
         $loser->method('isAnonymous')->willReturn(true);
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(3))
             ->method('getFieldValue')
-            ->withConsecutive(['email'], ['consent'])
-            ->will($this->onConsecutiveCalls('winner@test.com', 'Yes'));
+            ->withConsecutive(['email'], ['consent'], ['boolean'])
+            ->will($this->onConsecutiveCalls('winner@test.com', 'Yes', 1));
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(3))
             ->method('getField')
-            ->withConsecutive(['email'], ['consent'])
+            ->withConsecutive(['email'], ['consent'], ['boolean'])
             ->will($this->onConsecutiveCalls([
                 'id'            => 22,
                 'label'         => 'Email',
@@ -490,13 +492,23 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
                 'object'        => 'lead',
                 'is_fixed'      => true,
                 'default_value' => 'No',
+            ],  [
+                'id'            => 45,
+                'label'         => 'Boolean Field',
+                'alias'         => 'boolean',
+                'type'          => 'boolean',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => 0,
             ]));
 
-        $winner->expects($this->exactly(2))
+        $winner->expects($this->exactly(3))
             ->method('addUpdatedField')
             ->withConsecutive(
                 ['email', 'winner@test.com'],
-                ['consent', 'Yes']
+                ['consent', 'Yes'],
+                ['boolean', 1]
             );
 
         $merger->mergeFieldData($winner, $loser);

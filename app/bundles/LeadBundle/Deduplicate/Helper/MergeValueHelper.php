@@ -36,7 +36,7 @@ class MergeValueHelper
             throw new ValueNotMergeableException($newerValue, $olderValue);
         }
 
-        $isDefaultValue = $defaultValue && $newerValue === $defaultValue;
+        $isDefaultValue = null !== $defaultValue && $newerValue === $defaultValue;
 
         if (self::isNotEmpty($newerValue) && !($newIsAnonymous && $isDefaultValue)) {
             return $newerValue;
