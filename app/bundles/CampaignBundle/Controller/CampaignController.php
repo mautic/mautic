@@ -765,6 +765,7 @@ class CampaignController extends AbstractStandardFormController
                                 'ignoreAjax' => true,
                             ], [
                                 '_forwarded' => true,
+                                'ignoreAjax' => true,
                             ]
                         )->getContent(),
                     ]

@@ -236,6 +236,7 @@ class MobileNotificationController extends FormController
                         'ignoreAjax' => true,
                     ], [
                         '_forwarded' => true,
+                        'ignoreAjax' => true,
                     ]
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),

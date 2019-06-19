@@ -807,6 +807,7 @@ class ListController extends FormController
                         'filters'    => $filters,
                     ], [
                         '_forwarded' => true,
+                        'ignoreAjax' => true,
                     ]
                 )->getContent(),
             ],

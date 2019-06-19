@@ -141,6 +141,7 @@ class MessageController extends AbstractStandardFormController
                             'channel'    => 'all',
                         ], [
                             '_forwarded' => true,
+                            'ignoreAjax' => true,
                         ]
                     )->getContent(),
                 ];
@@ -164,6 +165,7 @@ class MessageController extends AbstractStandardFormController
                                 'channel'    => $channel->getChannel(),
                             ], [
                                 '_forwarded' => true,
+                                'ignoreAjax' => true,
                             ]
                         )->getContent();
                     }
