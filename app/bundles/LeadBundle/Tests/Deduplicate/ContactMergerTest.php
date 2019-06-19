@@ -492,7 +492,7 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
                 'object'        => 'lead',
                 'is_fixed'      => true,
                 'default_value' => 'No',
-            ],  [
+            ], [
                 'id'            => 45,
                 'label'         => 'Boolean Field',
                 'alias'         => 'boolean',
