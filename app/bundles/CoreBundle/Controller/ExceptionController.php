@@ -102,14 +102,14 @@ class ExceptionController extends CommonController
             return $this->delegateView(
                 [
                     'viewParameters' => [
-                        'baseTemplate'   => $inline?null:$baseTemplate,
+                        'baseTemplate'   => $inline ? null : $baseTemplate,
                         'status_code'    => $code,
                         'status_text'    => $statusText,
                         'exception'      => $exception,
                         'logger'         => $logger,
                         'currentContent' => $currentContent,
                         'isPublicPage'   => $anonymous,
-                        'inline'         => $inline
+                        'inline'         => $inline,
                     ],
                     'contentTemplate' => $template,
                     'passthroughVars' => [

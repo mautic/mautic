@@ -763,8 +763,8 @@ class CampaignController extends AbstractStandardFormController
                                 'objectId'   => $entity->getId(),
                                 'page'       => $this->get('session')->get('mautic.campaign.contact.page', 1),
                                 'ignoreAjax' => true,
-                            ],[
-                                '_forwarded' => true
+                            ], [
+                                '_forwarded' => true,
                             ]
                         )->getContent(),
                     ]
