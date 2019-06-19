@@ -163,7 +163,7 @@ class EventLogger
             $duplicateLog = $this->leadEventLogRepository->findDuplicate($log);
             if ($duplicateLog) {
                 // By campaign_rotation this event log already exists.
-                if (time() - $duplicateLog->getDateTriggered()->format('U') <= self::CONCURRENT_THREAD_THRESHOLD_SECONDS) {
+                if (abs(time() - $duplicateLog->getDateTriggered()->format('U')) <= self::CONCURRENT_THREAD_THRESHOLD_SECONDS) {
                     // A concurrent thread, do not repeat/recreate the event as it is unintentional.
                     $log = $duplicateLog;
                 } else {
