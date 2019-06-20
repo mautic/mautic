@@ -762,10 +762,48 @@ class MobileNotificationController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model    = $this->getModel('notification');
+      
+        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        $notification = $model->getEntity($objectId);
+      
+        if ($notification === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $page],
+                    'contentTemplate' => 'MauticNotificationBundle:MobileNotification:index',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_mobile_notification_index',
+                        'mauticContent' => 'mobile_notification',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.notification.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'notification:mobile_notifications:viewown',
+            'notification:mobile_notifications:viewother',
+            $notification->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'notification:mobile_notifications:view',
+            'lead:leads:viewown',
             'mobile_notification',
             'push_notification_stats',
             'mobile_notification',

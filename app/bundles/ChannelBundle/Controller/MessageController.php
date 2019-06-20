@@ -276,6 +276,13 @@ class MessageController extends AbstractStandardFormController
      */
     public function contactsAction($objectId, $channel, $page = 1)
     {
+        $model  = $this->getModel($this->getModelName());
+        $entity = $model->getEntity($objectId);
+
+        if (!$this->checkActionPermission('view', $entity)) {
+            return $this->accessDenied();
+        }
+
         $filter = [];
         if ('all' !== $channel) {
             $returnUrl = $this->generateUrl(
@@ -303,7 +310,7 @@ class MessageController extends AbstractStandardFormController
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'channel:messages:view',
+            'lead:leads:viewown',
             'message.'.$channel,
             'campaign_lead_event_log',
             $channel,

@@ -638,10 +638,14 @@ class MonitoringController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        if (!$this->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:view')) {
+            return $this->accessDenied();
+        }
+        
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'plugin:mauticSocial:monitoring:view',
+            'lead:leads:viewown',
             'social',
             'monitoring_leads',
             null, // @todo - implement when individual social channels are supported by the plugin

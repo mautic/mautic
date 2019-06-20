@@ -824,6 +824,43 @@ class ListController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+         /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        $model    = $this->getModel('lead.list');
+        
+        /** @var \Mautic\LeadBundle\Entity\LeadList $list */
+        $list = $model->getEntity($objectId);
+
+        if ($list === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
+
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $page],
+                'contentTemplate' => 'MauticLeadBundle:List:index',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_segment_index',
+                    'mauticContent' => 'list',
+                ],
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.list.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:leads:viewown',
+            'lead:lists:viewother',
+            $list->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+
+
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
         if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
@@ -850,7 +887,7 @@ class ListController extends FormController
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'lead:lists:viewother',
+            'lead:leads:viewown',
             'segment',
             'lead_lists_leads',
             null,

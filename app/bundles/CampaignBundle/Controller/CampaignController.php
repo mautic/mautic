@@ -127,10 +127,17 @@ class CampaignController extends AbstractStandardFormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        $model  = $this->getModel($this->getModelName());
+        $entity = $model->getEntity($objectId);
+
+        if (!$this->checkActionPermission('view', $entity)) {
+            return $this->accessDenied();
+        }
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'campaign:campaigns:view',
+            'lead:leads:viewown',
             'campaign',
             'campaign_leads',
             null,

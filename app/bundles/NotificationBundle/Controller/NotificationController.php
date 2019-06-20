@@ -760,10 +760,48 @@ class NotificationController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
+        $model    = $this->getModel('notification');        
+
+        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        $notification = $model->getEntity($objectId);        
+
+        if ($notification === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $page],
+                    'contentTemplate' => 'MauticNotificationBundle:Notification:index',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_notification_index',
+                        'mauticContent' => 'notification',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.notification.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'notification:notifications:viewown',
+            'notification:notifications:viewother',
+            $notification->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'notification:notifications:view',
+            'lead:leads:viewown',
             'notification',
             'push_notification_stats',
             'notification',

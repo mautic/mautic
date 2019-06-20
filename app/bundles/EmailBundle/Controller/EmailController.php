@@ -1595,10 +1595,48 @@ class EmailController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model    = $this->getModel('email');        
+
+        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        $email = $model->getEntity($objectId);
+           
+        if ($email === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $page],
+                    'contentTemplate' => 'MauticEmailBundle:Email:index',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_email_index',
+                        'mauticContent' => 'email',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.email.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'email:emails:viewown',
+            'email:emails:viewother',
+            $email->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            ['email:emails:viewown', 'email:emails:viewother'],
+            'lead:leads:viewown',
             'email',
             'email_stats',
             'email',

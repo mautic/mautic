@@ -735,10 +735,46 @@ class SmsController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        /** @var \Mautic\SmsBundle\Model\SmsModel $model */
+        $model    = $this->getModel('sms');        
+
+        /** @var \Mautic\SmsBundle\Entity\Sms $sms */
+        $sms = $model->getEntity($objectId);        
+
+        if ($sms === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
+
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $page],
+                'contentTemplate' => 'MauticSmsBundle:Sms:index',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_sms_index',
+                    'mauticContent' => 'sms',
+                ],
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.sms.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'sms:smses:viewown',
+            'sms:smses:viewother',
+            $sms->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'sms:smses:view',
+            'lead:leads:viewown',
             'sms',
             'sms_message_stats',
             'sms',
