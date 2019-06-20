@@ -114,7 +114,7 @@
         "sendgrid/sendgrid": "~6.0",
         "noxlogic/ratelimit-bundle": "^1.11",
         "sensio/framework-extra-bundle": "~3.0",
-        "westonwatson/datescan": "1.0.2"
+        "westonwatson/datescan": "1.0.3"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",

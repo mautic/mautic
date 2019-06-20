@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c723b01a495aa3fd913385f5ca47827e",
+    "content-hash": "27f26136863faeaf4e670d1a8aa2499a",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -8255,16 +8255,16 @@
         },
         {
             "name": "westonwatson/datescan",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/westonwatson/datescan.git",
-                "reference": "d31806483721f05d44fb2f1fb2d6ce598f5659c3"
+                "reference": "66f6f9a01c7e8a01d60b11b5c7a96c4e6cb153b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/westonwatson/datescan/zipball/d31806483721f05d44fb2f1fb2d6ce598f5659c3",
-                "reference": "d31806483721f05d44fb2f1fb2d6ce598f5659c3",
+                "url": "https://api.github.com/repos/westonwatson/datescan/zipball/66f6f9a01c7e8a01d60b11b5c7a96c4e6cb153b9",
+                "reference": "66f6f9a01c7e8a01d60b11b5c7a96c4e6cb153b9",
                 "shasum": ""
             },
             "require-dev": {
@@ -8290,7 +8290,7 @@
                 }
             ],
             "description": "Recognize and parse multiple date/time formats.",
-            "time": "2019-06-19T13:11:43+00:00"
+            "time": "2019-06-20T19:41:50+00:00"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
