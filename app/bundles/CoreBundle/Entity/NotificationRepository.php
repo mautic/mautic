@@ -48,6 +48,22 @@ class NotificationRepository extends CommonRepository
         $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
     }
 
+    /*
+     * Clear notifications from X days old.
+     *
+     * @param DateTime $from
+     *
+     */
+    public function clearNotifications($from)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->delete(MAUTIC_TABLE_PREFIX.'notifications')
+            ->where('date_added <= :from')
+            ->setParameter('from', $from->format('Y-m-d H:i:s'));
+
+        return $qb->execute();
+    }
+
     /**
      * Clear notifications for a user.
      *
@@ -103,7 +119,7 @@ class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return $result === null ? null : $result->getDateAdded();
+        return null === $result ? null : $result->getDateAdded();
     }
 
     /**
