@@ -22,8 +22,6 @@ interface AuthorizatorInterface
 
     /**
      * @return string
-     *
-     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
     public function getAccessToken(): string;
 

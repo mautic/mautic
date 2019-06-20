@@ -18,7 +18,7 @@ use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
- * Factory for building HTTP clients that will sign the requests with Oauth1a headers.
+ * Factory for building HTTP clients that will sign the requests with Oauth2 headers.
  * Based on Guzzle OAuth 2.0 Subscriber - kamermans/guzzle-oauth2-subscriber package
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
  */
