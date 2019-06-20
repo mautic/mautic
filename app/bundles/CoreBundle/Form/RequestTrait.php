@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Form;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Form;
+use westonwatson\Datescan\Datescan;
 
 trait RequestTrait
 {
@@ -76,19 +77,21 @@ trait RequestTrait
                             // Date placeholder was used so just ignore it to allow import of the field
                             unset($params[$name]);
                         } else {
+                            $dateTime = (new Datescan($params[$name]))->getRealDateTime();
+
                             if (false === ($timestamp = strtotime($params[$name]))) {
                                 $timestamp = null;
                             }
                             if ($timestamp) {
                                 switch ($type) {
                                     case 'datetime':
-                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
+                                        $params[$name] = $dateTime->format('Y-m-d H:i');
                                         break;
                                     case 'date':
-                                        $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                        $params[$name] = $dateTime->format('Y-m-d');
                                         break;
                                     case 'time':
-                                        $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                        $params[$name] = $dateTime->format('H:i:s');
                                         break;
                                 }
                             } else {
@@ -133,6 +136,8 @@ trait RequestTrait
             case 'datetime':
             case 'date':
             case 'time':
+                $dateTime = (new Datescan($fieldData[$leadField['alias']]))->getRealDateTime();
+
                 // Prevent zero based date placeholders
                 $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
                 if (!$dateTest) {
@@ -145,13 +150,13 @@ trait RequestTrait
                     if ($timestamp) {
                         switch ($leadField['type']) {
                             case 'datetime':
-                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                $fieldData[$leadField['alias']] = $dateTime->format('Y-m-d H:i:s');
                                 break;
                             case 'date':
-                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                $fieldData[$leadField['alias']] = $dateTime->format('Y-m-d');
                                 break;
                             case 'time':
-                                $fieldData[$leadField['alias']] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                $fieldData[$leadField['alias']] = $dateTime->format('H:i:s');
                                 break;
                         }
                     }
