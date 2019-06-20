@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "76ca1f3e88950d50351be721720c3e0a",
+    "content-hash": "c723b01a495aa3fd913385f5ca47827e",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -8252,6 +8252,45 @@
                 "twilio"
             ],
             "time": "2017-11-17T22:59:03+00:00"
+        },
+        {
+            "name": "westonwatson/datescan",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/westonwatson/datescan.git",
+                "reference": "d31806483721f05d44fb2f1fb2d6ce598f5659c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/westonwatson/datescan/zipball/d31806483721f05d44fb2f1fb2d6ce598f5659c3",
+                "reference": "d31806483721f05d44fb2f1fb2d6ce598f5659c3",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.7.27"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "": "src/"
+                },
+                "psr-4": {
+                    "westonwatson\\Datescan\\": "src/Datescan"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "westonwatson",
+                    "email": "wwatson@thedmsgrp.com"
+                }
+            ],
+            "description": "Recognize and parse multiple date/time formats.",
+            "time": "2019-06-19T13:11:43+00:00"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
