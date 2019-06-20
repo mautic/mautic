@@ -95,7 +95,7 @@ class ExceptionController extends CommonController
 
             if (!$exception instanceof FatalThrowableError && $request->get('_forwarded', false)) {
                 $inline = true;
-            }else{
+            } else {
                 $inline = false;
             }
 
