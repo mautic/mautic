@@ -24,6 +24,11 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    public function testType()
+    {
+        $this->assertEquals('api_key', (new HttpFactory())->getAuthType());
+    }
+
     public function testInvalidCredentialsThrowsException()
     {
         $this->expectException(InvalidCredentialsException::class);

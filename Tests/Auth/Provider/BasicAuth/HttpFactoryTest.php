@@ -20,7 +20,12 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testMissingCredentialsThrowsException()
+    public function testType()
+    {
+        $this->assertEquals('basic_auth', (new HttpFactory())->getAuthType());
+    }
+
+    public function testMissingUsernameThrowsException()
     {
         $this->expectException(PluginNotConfiguredException::class);
 
@@ -29,6 +34,26 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
             public function getUsername(): ?string
             {
                 return '';
+            }
+
+            public function getPassword(): ?string
+            {
+                return '123';
+            }
+        };
+
+        (new HttpFactory())->getClient($credentials);
+    }
+
+    public function testMissingPasswordThrowsException()
+    {
+        $this->expectException(PluginNotConfiguredException::class);
+
+        $credentials = new Class implements CredentialsInterface
+        {
+            public function getUsername(): ?string
+            {
+                return '123';
             }
 
             public function getPassword(): ?string

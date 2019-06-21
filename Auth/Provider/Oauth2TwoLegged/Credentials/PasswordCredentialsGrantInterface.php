@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic Inc. All rights reserved
+ * @copyright   2019 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        http://mautic.org
@@ -11,9 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials;
 
-interface CredentialsInterface
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+
+interface PasswordCredentialsGrantInterface extends AuthCredentialsInterface
 {
     /**
      * @return string
@@ -33,10 +35,10 @@ interface CredentialsInterface
     /**
      * @return string|null
      */
-    public function getScope(): ?string;
+    public function getUsername(): ?string;
 
     /**
      * @return string|null
      */
-    public function getState(): ?string;
+    public function getPassword(): ?string;
 }
