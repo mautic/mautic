@@ -13,16 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth;
 
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
-interface CredentialsInterface
+interface CredentialsInterface extends AuthCredentialsInterface
 {
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getUsername(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getPassword(): ?string;
 }
