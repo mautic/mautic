@@ -138,7 +138,15 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $fl = [$fl];
                 }
                 foreach ($fl as $field) {
-                    $fieldsValues[$row['no'] - 1][$this->getFieldKey($field['val'])] = $field['content'];
+                    // Fix boolean comparison
+                    $value = $field['content'];
+                    if ($field['content'] === 'true') {
+                        $value = true;
+                    } elseif ($field['content'] === 'false') {
+                        $value = false;
+                    }
+
+                    $fieldsValues[$row['no'] - 1][$this->getFieldKey($field['val'])] = $value;
                 }
             }
         }
@@ -994,7 +1002,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         // convert ignored contacts
         foreach ($isContact as $email => $lead) {
-            $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
+            $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
                 'Zoho',
                 'Leads',
                 'lead',
@@ -1296,7 +1304,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $parsedData = [];
 
-        if (!empty($data['response']['result'][$object])) {
+        if (!empty($data['response']['result'][$object]) && isset($data['response']['result'][$object]['row']['FL'])) {
             $records = $data['response']['result'][$object]['row']['FL'];
             foreach ($fields as $key => $field) {
                 foreach ($records as $record) {
