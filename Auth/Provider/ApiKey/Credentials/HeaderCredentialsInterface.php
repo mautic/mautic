@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials;
 
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
-interface HeaderCredentialsInterface extends CredentialsInterface
+interface HeaderCredentialsInterface extends AuthCredentialsInterface
 {
     /**
      * @return string

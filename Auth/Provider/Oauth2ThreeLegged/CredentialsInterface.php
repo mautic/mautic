@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
-interface CredentialsInterface
+
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+
+interface CredentialsInterface extends AuthCredentialsInterface
 {
     /**
      * @return string

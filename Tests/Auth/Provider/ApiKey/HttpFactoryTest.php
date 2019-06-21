@@ -18,7 +18,7 @@ use GuzzleHttp\Exception\ConnectException;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
@@ -28,7 +28,7 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(InvalidCredentialsException::class);
 
-        $credentials = new Class implements CredentialsInterface
+        $credentials = new Class implements AuthCredentialsInterface
         {
         };
 

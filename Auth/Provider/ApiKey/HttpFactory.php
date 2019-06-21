@@ -22,6 +22,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
@@ -56,14 +57,14 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|CredentialsInterface $credentials
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
      * @param ConfigInterface|null                                                          $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
      */
-    public function getClient(CredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface
     {
         if (!$this->credentialsAreValid($credentials)) {
             throw new InvalidCredentialsException(
@@ -76,7 +77,7 @@ class HttpFactory implements AuthProviderInterface
         }
 
         if (!$this->credentialsAreConfigured($credentials)) {
-            throw new PluginNotConfiguredException('Username or password is missing');
+            throw new PluginNotConfiguredException('API key is missing');
         }
 
         // Return cached initialized client if there is one.
@@ -98,21 +99,21 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param CredentialsInterface $credentials
+     * @param AuthCredentialsInterface $credentials
      *
      * @return bool
      */
-    private function credentialsAreValid(CredentialsInterface $credentials): bool
+    private function credentialsAreValid(AuthCredentialsInterface $credentials): bool
     {
         return $credentials instanceof HeaderCredentialsInterface || $credentials instanceof ParameterCredentialsInterface;
     }
 
     /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|CredentialsInterface $credentials
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
      *
      * @return bool
      */
-    private function credentialsAreConfigured(CredentialsInterface $credentials): bool
+    private function credentialsAreConfigured(AuthCredentialsInterface $credentials): bool
     {
         return !empty($credentials->getApiKey());
     }

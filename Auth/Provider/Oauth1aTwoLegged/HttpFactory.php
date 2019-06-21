@@ -18,6 +18,8 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
@@ -43,12 +45,13 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param CredentialsInterface $credentials
+     * @param CredentialsInterface|AuthCredentialsInterface $credentials
+     * @param ConfigInterface                               $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      */
-    public function getClient($credentials): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface
     {
         // Return cached initialized client if there is one.
         if (!empty($this->initializedClients[$credentials->getConsumerKey()])) {
@@ -74,11 +77,13 @@ class HttpFactory implements AuthProviderInterface
         $stack = HandlerStack::create();
         $stack->push($this->createOauth1($credentials));
 
-        return new Client([
-            'handler'  => $stack,
-            'base_uri' => $credentials->getAuthUrl(),
-            'auth'     => 'oauth'
-        ]);
+        return new Client(
+            [
+                'handler'  => $stack,
+                'base_uri' => $credentials->getAuthUrl(),
+                'auth'     => 'oauth'
+            ]
+        );
     }
 
     /**

@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials;
 
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
-
-interface ParameterCredentialsInterface extends CredentialsInterface
+interface ParameterCredentialsInterface extends AuthCredentialsInterface
 {
+    /**
+     * @return string
+     */
+    public function getKeyName(): string;
+
     /**
      * @return null|string
      */
     public function getApiKey(): ?string;
 
-    /**
-     * @return string
-     */
-    public function getKeyName(): string;
 }
