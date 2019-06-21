@@ -11,10 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials;
 
 
-interface CredentialsInterface
+use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
+
+interface ParameterCredentialsInterface extends CredentialsInterface
 {
     /**
      * @return null|string

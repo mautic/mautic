@@ -20,7 +20,12 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
@@ -51,13 +56,25 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param HeaderCredentialsInterface|ParameterCredentialsInterface $credentials
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|CredentialsInterface $credentials
+     * @param ConfigInterface|null                                                          $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
+     * @throws InvalidCredentialsException
      */
-    public function getClient($credentials): ClientInterface
+    public function getClient(CredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface
     {
+        if (!$this->credentialsAreValid($credentials)) {
+            throw new InvalidCredentialsException(
+                sprintf(
+                    'Credentials must implement either the %s or %s interfaces',
+                    HeaderCredentialsInterface::class,
+                    ParameterCredentialsInterface::class
+                )
+            );
+        }
+
         if (!$this->credentialsAreConfigured($credentials)) {
             throw new PluginNotConfiguredException('Username or password is missing');
         }
@@ -70,14 +87,28 @@ class HttpFactory implements AuthProviderInterface
         $this->credentials = $credentials;
 
         if ($credentials instanceof HeaderCredentialsInterface) {
-            return $this->initializedClients[$credentials->getKeyName()] = $this->getHeaderClient();
+            $this->initializedClients[$credentials->getKeyName()] = $this->getHeaderClient();
+
+            return $this->initializedClients[$credentials->getKeyName()];
         }
 
-        return $this->initializedClients[$credentials->getKeyName()] = $this->getParameterClient();
+        $this->initializedClients[$credentials->getKeyName()] = $this->getParameterClient();
+
+        return $this->initializedClients[$credentials->getKeyName()];
     }
 
     /**
      * @param CredentialsInterface $credentials
+     *
+     * @return bool
+     */
+    private function credentialsAreValid(CredentialsInterface $credentials): bool
+    {
+        return $credentials instanceof HeaderCredentialsInterface || $credentials instanceof ParameterCredentialsInterface;
+    }
+
+    /**
+     * @param HeaderCredentialsInterface|ParameterCredentialsInterface|CredentialsInterface $credentials
      *
      * @return bool
      */
