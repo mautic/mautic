@@ -24,7 +24,7 @@ use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCrede
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
@@ -58,13 +58,13 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
-     * @param ConfigInterface|null                                                          $config
+     * @param AuthConfigInterface|null                                                          $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
         if (!$this->credentialsAreValid($credentials)) {
             throw new InvalidCredentialsException(

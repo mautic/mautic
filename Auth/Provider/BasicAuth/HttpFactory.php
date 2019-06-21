@@ -16,7 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
@@ -44,12 +44,12 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param CredentialsInterface|AuthCredentialsInterface $credentials
-     * @param ConfigInterface                               $config
+     * @param AuthConfigInterface                           $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
         if (!$this->credentialsAreConfigured($credentials)) {
             throw new PluginNotConfiguredException('Username and/or password is missing');

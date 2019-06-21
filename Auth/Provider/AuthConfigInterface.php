@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
 
-interface ConfigInterface
+interface AuthConfigInterface
 {
 
 }

@@ -25,9 +25,9 @@ interface AuthProviderInterface
 
     /**
      * @param AuthCredentialsInterface $credentials
-     * @param ConfigInterface|null     $config
+     * @param AuthConfigInterface|null $config
      *
      * @return ClientInterface
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?ConfigInterface $config = null): ClientInterface;
+    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface;
 }
