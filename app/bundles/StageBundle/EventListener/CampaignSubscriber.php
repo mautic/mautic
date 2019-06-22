@@ -12,11 +12,14 @@
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
 
@@ -36,6 +39,16 @@ class CampaignSubscriber extends CommonSubscriber
     protected $stageModel;
 
     /**
+     * @var Stage
+     */
+    private $stage;
+
+    /**
+     * @var PendingEvent
+     */
+    private $pendingEvent;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param LeadModel  $leadModel
@@ -53,8 +66,8 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerActionChangeStage', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
+            StageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerStageChange', 0],
         ];
     }
 
@@ -64,50 +77,68 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
-            'label'       => 'mautic.stage.campaign.event.change',
-            'description' => 'mautic.stage.campaign.event.change_descr',
-            'eventName'   => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => 'stageaction_change',
-            'formTheme'   => 'MauticStageBundle:FormTheme\StageActionChange',
+            'label'          => 'mautic.stage.campaign.event.change',
+            'description'    => 'mautic.stage.campaign.event.change_descr',
+            'batchEventName' => StageEvents::ON_CAMPAIGN_BATCH_ACTION,
+            'formType'       => 'stageaction_change',
+            'formTheme'      => 'MauticStageBundle:FormTheme\StageActionChange',
         ];
         $event->addAction('stage.change', $action);
     }
 
     /**
-     * @param CampaignExecutionEvent $event
+     * @param PendingEvent $event
      */
-    public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
+    public function onCampaignTriggerStageChange(PendingEvent $event)
     {
-        $stageChange = false;
-        $lead        = $event->getLead();
-        $leadStage   = null;
+        $logs               = $event->getPending();
+        $config             = $event->getEvent()->getProperties();
+        $stageId            = (int) $config['stage'];
+        $this->stage        = $this->stageModel->getEntity($stageId);
+        $this->pendingEvent = $event;
 
-        if ($lead instanceof Lead) {
-            $leadStage = $lead->getStage();
+        if (!$this->stage || !$this->stage->isPublished()) {
+            $event->passAllWithError($this->translator->trans('mautic.stage.campaign.event.stage_missing'));
+
+            return;
         }
 
-        $stageId         = (int) $event->getConfig()['stage'];
-        $stageToChangeTo = $this->stageModel->getEntity($stageId);
+        foreach ($logs as $log) {
+            $this->changeStage($log);
+        }
+    }
 
-        if ($stageToChangeTo != null && $stageToChangeTo->isPublished()) {
-            if ($leadStage && $leadStage->getWeight() <= $stageToChangeTo->getWeight()) {
-                $stageChange = true;
-            } elseif (!$leadStage) {
-                $stageChange = true;
+    /**
+     * @param LeadEventLog $log
+     */
+    private function changeStage(LeadEventLog $log)
+    {
+        $lead      = $log->getLead();
+        $leadStage = ($lead instanceof Lead) ? $lead->getStage() : null;
+
+        if ($leadStage) {
+            if ($leadStage->getId() === $this->stage->getId()) {
+                $this->pendingEvent->passWithError($log, $this->translator->trans('mautic.stage.campaign.event.already_in_stage'));
+
+                return;
+            }
+
+            if ($leadStage->getWeight() > $this->stage->getWeight()) {
+                $this->pendingEvent->passWithError($log, $this->translator->trans('mautic.stage.campaign.event.stage_invalid'));
+
+                return;
             }
         }
 
-        if ($stageChange) {
-            $lead->stageChangeLogEntry(
-                $stageToChangeTo,
-                $stageToChangeTo->getId().': '.$stageToChangeTo->getName(),
-                $event->getName()
-            );
-            $lead->setStage($stageToChangeTo);
+        $lead->stageChangeLogEntry(
+            $this->stage,
+            $this->stage->getId().': '.$this->stage->getName(),
+            $log->getEvent()->getName()
+        );
+        $lead->setStage($this->stage);
 
-            $this->leadModel->saveEntity($lead);
-        }
+        $this->leadModel->saveEntity($lead);
 
-        return $event->setResult($stageChange);
+        $this->pendingEvent->pass($log);
     }
 }
