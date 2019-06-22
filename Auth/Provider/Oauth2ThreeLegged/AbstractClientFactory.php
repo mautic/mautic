@@ -23,6 +23,8 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  * Factory for building HTTP clients that will sign the requests with Oauth2 headers.
  * Based on Guzzle OAuth 2.0 Subscriber - kamermans/guzzle-oauth2-subscriber package
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
+ *
+ * @deprecated; use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory
  */
 abstract class AbstractClientFactory implements AuthProviderInterface
 {

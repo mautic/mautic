@@ -11,24 +11,21 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\HandlerStack;
-use kamermans\OAuth2\GrantType\ClientCredentials;
-use kamermans\OAuth2\GrantType\GrantTypeInterface;
-use kamermans\OAuth2\GrantType\PasswordCredentials;
+use kamermans\OAuth2\GrantType\AuthorizationCode;
 use kamermans\OAuth2\GrantType\RefreshToken;
 use kamermans\OAuth2\OAuth2Middleware;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\PasswordCredentialsGrantInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ScopeInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\StateInterface;
-use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CodeInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\RedirectUriInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\ScopeInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
@@ -38,15 +35,15 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    const NAME = 'oauth2_two_legged';
+    const NAME = 'oauth2_three_legged';
 
     /**
-     * @var PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface
+     * @var CredentialsInterface
      */
     private $credentials;
 
     /**
-     * @var AuthConfigInterface|ConfigInterface
+     * @var ConfigInterface
      */
     private $config;
 
@@ -71,27 +68,16 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface|ConfigInterface                                                                     $config
+     * @param AuthCredentialsInterface|CredentialsInterface $credentials
+     * @param AuthConfigInterface|ConfigInterface|null $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
-     * @throws InvalidCredentialsException
      */
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
-        if (!$this->credentialsAreValid($credentials)) {
-            throw new InvalidCredentialsException(
-                sprintf(
-                    'Credentials must implement either the %s or %s interfaces',
-                    PasswordCredentialsGrantInterface::class,
-                    ClientCredentialsGrantInterface::class
-                )
-            );
-        }
-
         if (!$this->credentialsAreConfigured($credentials)) {
-            throw new PluginNotConfiguredException('Authorization URL, client ID or client secret is missing');
+            throw new PluginNotConfiguredException('Missing credentials');
         }
 
         // Return cached initialized client if there is one.
@@ -113,27 +99,25 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param AuthCredentialsInterface $credentials
+     * @param CredentialsInterface $credentials
      *
      * @return bool
      */
-    private function credentialsAreValid(AuthCredentialsInterface $credentials): bool
+    protected function credentialsAreConfigured(CredentialsInterface $credentials): bool
     {
-        return $credentials instanceof PasswordCredentialsGrantInterface || $credentials instanceof ClientCredentialsGrantInterface;
-    }
-
-    /**
-     * @param ClientCredentialsGrantInterface|PasswordCredentialsGrantInterface|AuthCredentialsInterface $credentials
-     *
-     * @return bool
-     */
-    private function credentialsAreConfigured(AuthCredentialsInterface $credentials): bool
-    {
-        if (empty($credentials->getAuthorizationUrl()) || empty($credentials->getClientId()) || empty($credentials->getClientSecret())) {
+        if (empty($credentials->getAuthorizationUrl())) {
             return false;
         }
 
-        if ($credentials instanceof PasswordCredentialsGrantInterface && (empty($credentials->getUsername()) || empty($credentials->getPassword()))) {
+        if (empty($credentials->getTokenUrl())) {
+            return false;
+        }
+
+        if (empty($credentials->getClientId())) {
+            return false;
+        }
+
+        if (empty($credentials->getClientSecret())) {
             return false;
         }
 
@@ -146,9 +130,9 @@ class HttpFactory implements AuthProviderInterface
     private function getStackHandler(): HandlerStack
     {
         $reAuthConfig          = $this->getReAuthConfig();
-        $accessTokenGrantType  = $this->getGrantType($reAuthConfig);
+        $grantType             = new AuthorizationCode($this->getReAuthClient(), $reAuthConfig);
         $refreshTokenGrantType = new RefreshToken($this->getReAuthClient(), $reAuthConfig);
-        $middleware            = new OAuth2Middleware($accessTokenGrantType, $refreshTokenGrantType);
+        $middleware            = new OAuth2Middleware($grantType, $refreshTokenGrantType);
 
         $this->configureMiddleware($middleware);
 
@@ -169,7 +153,7 @@ class HttpFactory implements AuthProviderInterface
 
         $this->reAuthClient = new Client(
             [
-                'base_uri' => $this->credentials->getAuthorizationUrl(),
+                'base_uri' => $this->credentials->getTokenUrl(),
             ]
         );
 
@@ -184,38 +168,22 @@ class HttpFactory implements AuthProviderInterface
         $config = [
             'client_id'     => $this->credentials->getClientId(),
             'client_secret' => $this->credentials->getClientSecret(),
+            'code'          => '',
         ];
 
         if ($this->credentials instanceof ScopeInterface) {
-            $config['scope'] = $this->credentials->getScope();
+            $config['scope']  = $this->credentials->getScope();
         }
 
-        if ($this->credentials instanceof StateInterface) {
-            $config['state'] = $this->credentials->getState();
+        if ($this->credentials instanceof RedirectUriInterface) {
+            $config['redirect_uri']  = $this->credentials->getRedirectUri();
         }
 
-        if ($this->credentials instanceof ClientCredentialsGrantInterface) {
-            return $config;
+        if ($this->credentials instanceof CodeInterface) {
+            $config['code'] = $this->credentials->getCode();
         }
-
-        $config['username'] = $this->credentials->getUsername();
-        $config['password'] = $this->credentials->getPassword();
 
         return $config;
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return GrantTypeInterface
-     */
-    private function getGrantType(array $config): GrantTypeInterface
-    {
-        if ($this->credentials instanceof ClientCredentialsGrantInterface) {
-            return new ClientCredentials($this->getReAuthClient(), $config);
-        }
-
-        return new PasswordCredentials($this->getReAuthClient(), $config);
     }
 
     /**

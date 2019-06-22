@@ -1,23 +1,21 @@
 <?php
 
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider\Oauth2TwoLegged;
+namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider\Oauth2ThreeLegged;
 
 
 use GuzzleHttp\ClientInterface;
-use kamermans\OAuth2\GrantType\ClientCredentials;
-use kamermans\OAuth2\GrantType\PasswordCredentials;
 use kamermans\OAuth2\OAuth2Middleware;
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
 use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface as ClientCredentialsSigner;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\ConfigInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\PasswordCredentialsGrantInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ScopeInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\StateInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\HttpFactory;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\ConfigInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CodeInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\RedirectUriInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\ScopeInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
@@ -25,27 +23,51 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testType()
     {
-        $this->assertEquals('oauth2_two_legged', (new HttpFactory())->getAuthType());
-    }
-
-    public function testInvalidCredentialsThrowsException()
-    {
-        $this->expectException(InvalidCredentialsException::class);
-
-        $credentials = new Class implements AuthCredentialsInterface
-        {
-        };
-
-        (new HttpFactory())->getClient($credentials);
+        $this->assertEquals('oauth2_three_legged', (new HttpFactory())->getAuthType());
     }
 
     public function testMissingAuthorizationUrlThrowsException()
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new Class implements ClientCredentialsGrantInterface
+        $credentials = new Class implements CredentialsInterface
         {
             public function getAuthorizationUrl(): string
+            {
+                return '';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return '';
+            }
+
+            public function getClientId(): ?string
+            {
+                return '';
+            }
+
+            public function getClientSecret(): ?string
+            {
+                return '';
+            }
+        };
+
+        (new HttpFactory())->getClient($credentials);
+    }
+
+    public function testMissingTokenUrlThrowsException()
+    {
+        $this->expectException(PluginNotConfiguredException::class);
+
+        $credentials = new Class implements CredentialsInterface
+        {
+            public function getAuthorizationUrl(): string
+            {
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
             {
                 return '';
             }
@@ -68,11 +90,16 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new Class implements ClientCredentialsGrantInterface
+        $credentials = new Class implements CredentialsInterface
         {
             public function getAuthorizationUrl(): string
             {
-                return 'http://test.com';
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return 'http://token.url';
             }
 
             public function getClientId(): ?string
@@ -89,15 +116,20 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         (new HttpFactory())->getClient($credentials);
     }
 
-    public function testMissingClientSecretIdThrowsException()
+    public function testMissingClientSecretThrowsException()
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new Class implements ClientCredentialsGrantInterface
+        $credentials = new Class implements CredentialsInterface
         {
             public function getAuthorizationUrl(): string
             {
-                return 'http://test.com';
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return 'http://token.url';
             }
 
             public function getClientId(): ?string
@@ -106,76 +138,6 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
             }
 
             public function getClientSecret(): ?string
-            {
-                return '';
-            }
-        };
-
-        (new HttpFactory())->getClient($credentials);
-    }
-
-    public function testMissingUsernameThrowsException()
-    {
-        $this->expectException(PluginNotConfiguredException::class);
-
-        $credentials = new Class implements PasswordCredentialsGrantInterface
-        {
-            public function getAuthorizationUrl(): string
-            {
-                return 'http://test.com';
-            }
-
-            public function getClientId(): ?string
-            {
-                return 'foo';
-            }
-
-            public function getClientSecret(): ?string
-            {
-                return 'bar';
-            }
-
-            public function getUsername(): ?string
-            {
-                return '';
-            }
-
-            public function getPassword(): ?string
-            {
-                return '';
-            }
-        };
-
-        (new HttpFactory())->getClient($credentials);
-    }
-
-    public function testMissingPasswordThrowsException()
-    {
-        $this->expectException(PluginNotConfiguredException::class);
-
-        $credentials = new Class implements PasswordCredentialsGrantInterface
-        {
-            public function getAuthorizationUrl(): string
-            {
-                return 'http://test.com';
-            }
-
-            public function getClientId(): ?string
-            {
-                return 'foo';
-            }
-
-            public function getClientSecret(): ?string
-            {
-                return 'bar';
-            }
-
-            public function getUsername(): ?string
-            {
-                return 'foo';
-            }
-
-            public function getPassword(): ?string
             {
                 return '';
             }
@@ -186,11 +148,16 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testInstantiatedClientIsReturned()
     {
-        $credentials = new Class implements ClientCredentialsGrantInterface
+        $credentials = new Class implements CredentialsInterface
         {
             public function getAuthorizationUrl(): string
             {
-                return 'http://test.com';
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return 'http://token.url';
             }
 
             public function getClientId(): ?string
@@ -210,11 +177,16 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credentials2 = new Class implements ClientCredentialsGrantInterface
+        $credentials2 = new Class implements CredentialsInterface
         {
             public function getAuthorizationUrl(): string
             {
-                return 'http://test.com';
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return 'http://token.url';
             }
 
             public function getClientId(): ?string
@@ -249,79 +221,12 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $expectedConfig = [
             'client_id'     => $credentials->getClientId(),
             'client_secret' => $credentials->getClientSecret(),
+            'code'          => $credentials->getCode(),
+            'redirect_uri'  => $credentials->getRedirectUri(),
             'scope'         => $credentials->getScope(),
-            'state'         => $credentials->getState(),
-            'username'      => $credentials->getUsername(),
-            'password'      => $credentials->getPassword(),
         ];
 
         $this->assertEquals($expectedConfig, $reauthConfig->toArray());
-    }
-
-    public function testPasswordGrantTypeIsUsed()
-    {
-        $credentials = new Class implements PasswordCredentialsGrantInterface
-        {
-            public function getAuthorizationUrl(): string
-            {
-                return 'http://test.com';
-            }
-
-            public function getClientId(): ?string
-            {
-                return 'foo';
-            }
-
-            public function getClientSecret(): ?string
-            {
-                return 'bar';
-            }
-
-            public function getUsername(): ?string
-            {
-                return 'username';
-            }
-
-            public function getPassword(): ?string
-            {
-                return 'password';
-            }
-        };
-
-        $client              = (new HttpFactory())->getClient($credentials);
-        $middleware          = $this->extractMiddleware($client);
-        $reflectedMiddleware = new \ReflectionClass($middleware);
-        $grantType           = $this->getProperty($reflectedMiddleware, $middleware, 'grantType');
-
-        $this->assertInstanceOf(PasswordCredentials::class, $grantType);
-    }
-
-    public function testClientCredentialsGrantTypeIsUsed()
-    {
-        $credentials = new Class implements ClientCredentialsGrantInterface
-        {
-            public function getAuthorizationUrl(): string
-            {
-                return 'http://test.com';
-            }
-
-            public function getClientId(): ?string
-            {
-                return 'foo';
-            }
-
-            public function getClientSecret(): ?string
-            {
-                return 'bar';
-            }
-        };
-
-        $client              = (new HttpFactory())->getClient($credentials);
-        $middleware          = $this->extractMiddleware($client);
-        $reflectedMiddleware = new \ReflectionClass($middleware);
-        $grantType           = $this->getProperty($reflectedMiddleware, $middleware, 'grantType');
-
-        $this->assertInstanceOf(ClientCredentials::class, $grantType);
     }
 
     public function testClientConfiguration()
@@ -414,40 +319,40 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return PasswordCredentialsGrantInterface|StateInterface|ScopeInterface
+     * @return CredentialsInterface|CodeInterface|RedirectUriInterface|ScopeInterface
      */
-    private function getCredentials(): PasswordCredentialsGrantInterface
+    private function getCredentials(): CredentialsInterface
     {
-        return new Class implements PasswordCredentialsGrantInterface, StateInterface, ScopeInterface
+        return new Class implements CredentialsInterface, CodeInterface, RedirectUriInterface, ScopeInterface
         {
             public function getAuthorizationUrl(): string
             {
-                return 'http://test.com';
+                return 'http://auth.url';
+            }
+
+            public function getTokenUrl(): string
+            {
+                return 'http://token.url';
             }
 
             public function getClientId(): ?string
             {
-                return 'foo';
+                return 'bar';
             }
 
             public function getClientSecret(): ?string
             {
-                return 'bar';
+                return 'foo';
             }
 
-            public function getUsername(): ?string
+            public function getCode(): ?string
             {
-                return 'username';
+                return 'auth_code';
             }
 
-            public function getPassword(): ?string
+            public function getRedirectUri(): string
             {
-                return 'password';
-            }
-
-            public function getState(): ?string
-            {
-                return 'state';
+                return 'http://redirect.url';
             }
 
             public function getScope(): ?string

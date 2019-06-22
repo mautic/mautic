@@ -13,6 +13,10 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Interface AuthorizatorInterface
+ * @deprecated; Use Credentials\CredentialsInterface and \MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface instead
+ */
 interface AuthorizatorInterface
 {
     /**
