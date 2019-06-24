@@ -761,10 +761,10 @@ class NotificationController extends FormController
     public function contactsAction($objectId, $page = 1)
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
-        $model    = $this->getModel('notification');        
+        $model    = $this->getModel('notification');
 
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
-        $notification = $model->getEntity($objectId);        
+        $notification = $model->getEntity($objectId);
 
         if ($notification === null) {
             //set the return URL
@@ -796,7 +796,6 @@ class NotificationController extends FormController
         ) {
             return $this->accessDenied();
         }
-
 
         return $this->generateContactsGrid(
             $objectId,
