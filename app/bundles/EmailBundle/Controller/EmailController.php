@@ -1596,7 +1596,7 @@ class EmailController extends FormController
     public function contactsAction($objectId, $page = 1)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model    = $this->getModel('email');        
+        $model    = $this->getModel('email');
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
