@@ -736,10 +736,10 @@ class SmsController extends FormController
     public function contactsAction($objectId, $page = 1)
     {
         /** @var \Mautic\SmsBundle\Model\SmsModel $model */
-        $model    = $this->getModel('sms');        
+        $model    = $this->getModel('sms');
 
         /** @var \Mautic\SmsBundle\Entity\Sms $sms */
-        $sms = $model->getEntity($objectId);        
+        $sms = $model->getEntity($objectId);
 
         if ($sms === null) {
             //set the return URL
