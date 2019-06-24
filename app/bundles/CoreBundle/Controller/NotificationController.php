@@ -62,10 +62,6 @@ class NotificationController extends AbstractStandardFormController
     }
 
     /**
-     * @return string
-     */
-
-    /**
      * {@inheritdoc}
      */
     protected function getControllerBase()
