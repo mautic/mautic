@@ -79,6 +79,14 @@ class NotificationModel extends FormModel
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getPermissionBase()
+    {
+        return 'core:notifications';
+    }
+
+    /**
      * @param Session $session
      */
     public function setSession(Session $session)

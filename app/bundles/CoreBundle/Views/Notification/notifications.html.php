@@ -20,7 +20,10 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title">
-                    <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.notifications'); ?>
+                    <h6 class="fw-sb">
+                        <a href="<?php echo $view['router']->path('mautic_user_notification_index'); ?>">
+                            <?php echo $view['translator']->trans('mautic.core.notifications'); ?>
+                        </a>
                         <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin pull-right text-danger" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.notifications.clearall'); ?>" onclick="Mautic.clearNotification(0);"><i class="fa fa-times"></i></a>
                     </h6>
                 </div>
