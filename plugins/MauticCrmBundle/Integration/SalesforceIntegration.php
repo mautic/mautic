@@ -429,7 +429,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 foreach ($record as $key => $item) {
                     if (is_bool($item)) {
-                        $dataObject[$key.$newName] = (int)$item;
+                        $dataObject[$key.$newName] = (int) $item;
                     } else {
                         $dataObject[$key.$newName] = $item;
                     }
