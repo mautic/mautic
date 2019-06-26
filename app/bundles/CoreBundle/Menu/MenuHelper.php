@@ -325,10 +325,7 @@ class MenuHelper
     {
         switch ($accessLevel) {
             case 'admin':
-                if (!$this->security->isAdmin()) {
-                    return false;
-                }
-                return $this->security->isAdmin();
+                return (bool) $this->security->isAdmin();
             default:
                 return $this->security->isGranted($accessLevel, 'MATCH_ONE');
         }
