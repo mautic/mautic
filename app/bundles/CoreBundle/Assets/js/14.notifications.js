@@ -2,6 +2,8 @@ Mautic.notificationIndexLoad = function (translations) {
     mQuery(document).ready(function() { 
         // Hide the New button
         mQuery("a[href$='account/notifications/new']").hide();
+
+        // Mark a notification as read.
         mQuery('#notificationTable a')
             .each(function(index) { 
                 mQuery(this).on('click', function() { 
