@@ -22,6 +22,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PurgeStaleNotificationsCommand extends ContainerAwareCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this->setName('mautic:notifications:purge')
@@ -61,7 +64,7 @@ EOT
         $repo = $em->getRepository(Notification::class);
 
         $output->writeln('Purging notfications...');
-        $repo->clearNotifications($from);
+        $repo->deleteNotifications($from);
         $output->writeln('<info>Done</info>');
 
         return 0;

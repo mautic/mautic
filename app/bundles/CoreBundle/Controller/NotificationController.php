@@ -32,6 +32,14 @@ class NotificationController extends AbstractStandardFormController
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
+    }
+
+    /**
      * Get the route base for getIndexRoute() and getActionRoute() if they do not meet the mautic_*_index and mautic_*_action standards.
      *
      * @return mixed

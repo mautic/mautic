@@ -10,23 +10,28 @@
  */
 
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.notifications'));
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticCoreBundle:Standard:index.html.php');
 }
-
 ?>
+
+<script defer type="text/javascript">
+    Mautic.notificationIndexLoad( <?php echo json_encode(['mautic.core.yes' => $view['translator']->trans('mautic.core.yes')]); ?> );
+</script> 
+
 <?php if (count($items)): ?>
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
+        <table class="table table-hover table-striped table-bordered campaign-list" id="notificationTable">
             <thead>
             <tr>
                 <?php
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall'        => 'true',
-                        'target'          => '#notificationsTable',
-                        'routeBase'       => 'account/notifications',
+                        'sessionVar' => 'notification',
+                        'orderBy'    => 'n.id',
+                        'text'       => 'mautic.core.id',
+                        'class'      => 'visible-md visible-lg',
                     ]
                 );
 
@@ -45,9 +50,38 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'notification',
-                        'orderBy'    => 'cat.title',
+                        'orderBy'    => 'n.message',
                         'text'       => 'mautic.core.description',
-                        'class'      => 'visible-md visible-lg col-campaign-category',
+                        'class'      => 'visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'notification',
+                        'orderBy'    => 'n.isRead',
+                        'text'       => 'mautic.core.read',
+                        'class'      => 'visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'notification',
+                        'orderBy'    => 'n.dateAdded',
+                        'text'       => 'mautic.core.date.added',
+                        'class'      => 'visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'notification',
+                        'text'       => 'mautic.core.actions',
+                        'class'      => 'visible-md visible-lg',
                     ]
                 );
                 ?>
@@ -57,7 +91,7 @@ if ($tmpl == 'index') {
             <?php foreach ($items as $item): ?>
             <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
-                    <td></td>
+                    <td id="notificationId" class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                     <td>
                         <div>
                             <a href="<?php echo $view['router']->path(
@@ -69,7 +103,12 @@ if ($tmpl == 'index') {
                             </a>
                         </div>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getMessage() ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getMessage(); ?></td>
+                    <td id="isRead" class="visible-md visible-lg"><?php echo $view['translator']->trans($item->getIsRead() ? 'mautic.core.yes' : 'mautic.core.no'); ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded()->format('Y-m-d H:i:s'); ?></td>
+                    <td class="visible-md visible-lg"> 
+                        <a href="javascript:void(0);" class="btn btn-default btn-xs btn-nospin do-not-close" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.notifications.clear'); ?>"><i class="fa fa-times do-not-close"></i></a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

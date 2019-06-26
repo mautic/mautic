@@ -54,7 +54,7 @@ class NotificationRepository extends CommonRepository
      * @param DateTime $from
      *
      */
-    public function clearNotifications($from)
+    public function deleteNotifications($from)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->delete(MAUTIC_TABLE_PREFIX.'notifications')
