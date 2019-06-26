@@ -257,6 +257,9 @@ class FromEmailHelper
         $ownerEmail = $owner['email'];
         $ownerName  = sprintf('%s %s', $owner['first_name'], $owner['last_name']);
 
+        // Decode apostrophes and other special characters
+        $ownerName = trim(html_entity_decode($ownerName, ENT_QUOTES));
+
         return [$ownerEmail => $ownerName];
     }
 }

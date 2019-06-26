@@ -658,6 +658,35 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('user 2', $helper->getSignature());
     }
 
+    public function testOwnerWithEncodedCharactersInName()
+    {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('getParameter')
+            ->with('mailer_is_owner')
+            ->willReturn(true);
+
+        $user = [
+            'id'         => 1,
+            'first_name' => 'First',
+            'last_name'  => 'No Body&#39;s Business',
+            'email'      => 'user@somewhere.com',
+            'signature'  => '|USER_EMAIL| |USER_FIRST_NAME| there',
+        ];
+
+        $this->leadRepository->expects($this->once())
+            ->method('getLeadOwner')
+            ->with(1)
+            ->willReturn($user);
+
+        $helper = $this->getHelper();
+        $from = $helper->getFromAddressArrayConsideringOwner(
+            ['someone@somewhere.com' => null],
+            ['owner_id' => 1]
+        );
+
+        $this->assertEquals($from, ['user@somewhere.com' => "First No Body's Business"]);
+    }
+
     /**
      * @return FromEmailHelper
      */

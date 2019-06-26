@@ -94,4 +94,12 @@ class AddressDTOTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
         $this->assertEquals('Someone Somewhere', $addressDTO->getName());
     }
+
+    public function testSpecialCharactersAreDecoded()
+    {
+        $addressDTO = new AddressDTO(['someone@somewhere.com' => 'No Body&#39;s Business']);
+
+        $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
+        $this->assertEquals("No Body's Business", $addressDTO->getName());
+    }
 }
