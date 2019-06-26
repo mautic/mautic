@@ -121,8 +121,8 @@ if ('index' == $tmpl) {
                 'totalItems' => count($items),
                 'page'       => $page,
                 'limit'      => $limit,
-                'menuLinkId' => 'mautic_notification_index',
-                'baseUrl'    => $view['router']->path('mautic_notification_index'),
+                'menuLinkId' => 'mautic_user_notification_index',
+                'baseUrl'    => $view['router']->path('mautic_user_notification_index'),
                 'sessionVar' => 'notification',
             ]
         ); ?>
