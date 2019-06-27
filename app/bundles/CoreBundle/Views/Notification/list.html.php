@@ -40,7 +40,7 @@ if ('index' == $tmpl) {
                     [
                         'sessionVar' => 'notification',
                         'orderBy'    => 'n.header',
-                        'text'       => 'mautic.core.title',
+                        'text'       => 'mautic.core.header',
                         'class'      => 'visible-md visible-lg',
                         'default'    => true,
                     ]
@@ -51,7 +51,7 @@ if ('index' == $tmpl) {
                     [
                         'sessionVar' => 'notification',
                         'orderBy'    => 'n.message',
-                        'text'       => 'mautic.core.details',
+                        'text'       => 'mautic.core.message',
                         'class'      => 'visible-md visible-lg',
                     ]
                 );
