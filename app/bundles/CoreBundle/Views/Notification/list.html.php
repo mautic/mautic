@@ -127,6 +127,4 @@ if ('index' == $tmpl) {
             ]
         ); ?>
     </div>
-<?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'mautic.campaign.noresults.tip']); ?>
 <?php endif; ?>
