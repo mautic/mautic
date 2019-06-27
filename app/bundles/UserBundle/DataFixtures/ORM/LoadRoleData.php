@@ -41,30 +41,37 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
+        $repo = $manager->getRepository(Role::class);
         if (!$this->hasReference('admin-role')) {
-            $role = new Role();
-            $role->setName('Administrators');
-            $role->setDescription('Has access to everything.');
-            $role->setIsAdmin(1);
-            $manager->persist($role);
-            $manager->flush();
+            $role = $repo->findOneBy(['name' => 'Administrators']);
+            if (null === $role) {
+                $role = new Role();
+                $role->setName('Administrators');
+                $role->setDescription('Has access to everything.');
+                $role->setIsAdmin(1);
+                $manager->persist($role);
+                $manager->flush();
+            }
 
             $this->addReference('admin-role', $role);
         }
 
-        $role = new Role();
-        $role->setName('Sales Team');
-        $role->setDescription('Has access to sales');
-        $role->setIsAdmin(0);
+        $role = $repo->findOneBy(['name' => 'Sales Team']);
+        if (null === $role) {
+            $role = new Role();
+            $role->setName('Sales Team');
+            $role->setDescription('Has access to sales');
+            $role->setIsAdmin(0);
 
-        $permissions = [
-            'user:profile' => ['editname'],
-            'lead:leads'   => ['full'],
-        ];
-        $this->container->get('mautic.user.model.role')->setRolePermissions($role, $permissions);
+            $permissions = [
+                'user:profile' => ['editname'],
+                'lead:leads'   => ['full'],
+            ];
+            $this->container->get('mautic.user.model.role')->setRolePermissions($role, $permissions);
 
-        $manager->persist($role);
-        $manager->flush();
+            $manager->persist($role);
+            $manager->flush();
+        }
 
         $this->addReference('sales-role', $role);
     }

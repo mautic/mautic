@@ -15,6 +15,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -41,35 +42,43 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $user = new User();
-        $user->setFirstName('Admin');
-        $user->setLastName('User');
-        $user->setUsername('admin');
-        $user->setEmail('admin@yoursite.com');
-        $encoder = $this->container
-            ->get('security.encoder_factory')
-            ->getEncoder($user)
-        ;
-        $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
-        $user->setRole($this->getReference('admin-role'));
-        $manager->persist($user);
-        $manager->flush();
+        /** @var UserRepository $repo */
+        $repo = $manager->getRepository(User::class);
+        $user = $repo->findOneBy(['username' => 'admin']);
+        if (null === $user) {
+            $user = new User();
+            $user->setFirstName('Admin');
+            $user->setLastName('User');
+            $user->setUsername('admin');
+            $user->setEmail('admin@yoursite.com');
+            $encoder = $this->container
+                ->get('security.encoder_factory')
+                ->getEncoder($user)
+            ;
+            $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
+            $user->setRole($this->getReference('admin-role'));
+            $manager->persist($user);
+            $manager->flush();
+        }
 
         $this->addReference('admin-user', $user);
 
-        $user = new User();
-        $user->setFirstName('Sales');
-        $user->setLastName('User');
-        $user->setUsername('sales');
-        $user->setEmail('sales@yoursite.com');
-        $encoder = $this->container
-            ->get('security.encoder_factory')
-            ->getEncoder($user)
-        ;
-        $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
-        $user->setRole($this->getReference('sales-role'));
-        $manager->persist($user);
-        $manager->flush();
+        $user = $repo->findOneBy(['username' => 'sales']);
+        if (null === $user) {
+            $user = new User();
+            $user->setFirstName('Sales');
+            $user->setLastName('User');
+            $user->setUsername('sales');
+            $user->setEmail('sales@yoursite.com');
+            $encoder = $this->container
+                ->get('security.encoder_factory')
+                ->getEncoder($user)
+            ;
+            $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
+            $user->setRole($this->getReference('sales-role'));
+            $manager->persist($user);
+            $manager->flush();
+        }
 
         $this->addReference('sales-user', $user);
     }
