@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-
 class ValidateEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact()
@@ -61,7 +60,6 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
         $this->assertCount(3, $byEvent[7]); // inactive event executed
         $this->assertCount(0, $byEvent[10]); // the positive path should be 0
     }
-
 
     public function testContactsRemovedFromTheCampaignAreNotExecutedForInactiveEvents()
     {

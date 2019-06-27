@@ -213,7 +213,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->eq( 'l.campaign_id', ':campaignId'),
+                    $q->expr()->eq('l.campaign_id', ':campaignId'),
                     $q->expr()->eq('l.manually_removed', 0)
                 )
             )
@@ -298,7 +298,7 @@ class LeadRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
                 ->where(
                     $q->expr()->andX(
-                        $q->expr()->eq( 'l.campaign_id', ':campaignId'),
+                        $q->expr()->eq('l.campaign_id', ':campaignId'),
                         $q->expr()->eq('l.manually_removed', 0)
                     )
                 )
