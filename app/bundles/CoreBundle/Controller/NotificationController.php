@@ -65,10 +65,7 @@ class NotificationController extends AbstractStandardFormController
         $repo          = $this->getModel($this->getModelName())->getRepository();
         preg_match_all('/(\w+):([\w\s]*\w\b(?!:))/', $filter['string'], $matches);
         $alias         = $repo->getTableAlias();
-        $filter        = [
-            'where' => [],
-        ];
-        $matches = reset($matches);
+        $matches       = reset($matches);
         /** @var EntityManager $em */
         $em         = $this->container->get(EntityManager::class);
         $fieldNames = $em->getClassMetadata(Notification::class)->getFieldNames();
