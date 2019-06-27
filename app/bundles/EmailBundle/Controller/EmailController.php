@@ -686,16 +686,6 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
 
-        // Variant settings for an email with variants, helpful for BC
-        if ($entity->isVariant()) {
-            $abTestSettings                    = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
-            $variantSettings                   = $entity->getVariantSettings();
-
-            $variantSettings['winnerCriteria'] = $abTestSettings['winnerCriteria'];
-            $variantSettings['totalWeight']    = $abTestSettings['totalWeight'];
-            $entity->setVariantSettings($variantSettings);
-        }
-
         /** @var Form $form */
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
