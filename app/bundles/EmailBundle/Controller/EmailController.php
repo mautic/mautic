@@ -690,6 +690,7 @@ class EmailController extends FormController
         if ($entity->isVariant()) {
             $abTestSettings                    = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
             $variantSettings                   = $entity->getVariantSettings();
+
             $variantSettings['winnerCriteria'] = $abTestSettings['winnerCriteria'];
             $variantSettings['totalWeight']    = $abTestSettings['totalWeight'];
             $entity->setVariantSettings($variantSettings);

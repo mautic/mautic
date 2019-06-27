@@ -654,4 +654,27 @@ class EmailRepository extends CommonRepository
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
     }
+
+    /**
+     * Gets all emails with variants.
+     *
+     * @return array
+     */
+    public function getAllEmailsWithVariant()
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder();
+        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+
+        $qb->select($this->getTableAlias())
+            ->from('MauticEmailBundle:Email', $this->getTableAlias())
+            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent')
+            ))
+            ->where($expr);
+
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
 }
