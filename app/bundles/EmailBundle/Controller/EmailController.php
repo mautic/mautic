@@ -1034,7 +1034,7 @@ class EmailController extends FormController
             }
 
             $abTestSettings = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
-            if (!array_key_exists('winnerCriteria', $abTestSettings) || $abTestSettings['winnerCriteria'] === false) {
+            if (empty($abTestSettings['winnerCriteria'])) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.core.error.abtest_missing_criteria',
