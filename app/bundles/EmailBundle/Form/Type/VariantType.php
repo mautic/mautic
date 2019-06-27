@@ -96,4 +96,15 @@ class VariantType extends AbstractType
     {
         return 'emailvariant';
     }
+
+    /**
+     * @param OptionsResolverInterface $resolver
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults([
+            'is_parent'         => true,
+            'is_existing'       => false,
+        ]);
+    }
 }

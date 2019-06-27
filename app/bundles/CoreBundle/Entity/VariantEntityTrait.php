@@ -17,12 +17,22 @@ trait VariantEntityTrait
     /**
      * @var mixed
      **/
-    private $variantParent;
+    private $variantParent = null;
 
     /**
      * @var array
      */
-    private $variantSettings = [];
+    private $variantSettingsKeys = ['weight', 'winnerCriteria'];
+
+    /**
+     * @var array
+     */
+    private $parentSettingsKeys = ['totalWeight', 'winnerCriteria', 'sendWinnerDelay'];
+
+    /**
+     * @var array
+     */
+    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT];
 
     /**
      * @var \DateTimeInterface|null
@@ -270,6 +280,26 @@ trait VariantEntityTrait
         }
 
         return array_unique($ids);
+    }
+
+    private function getSettingsKeys()
+    {
+        if ($this->getVariantParent()) {
+            return $this->variantSettingsKeys;
+        } else {
+            return $this->parentSettingsKeys;
+        }
+    }
+
+    public function clearVariantSettings()
+    {
+        if (!$this->getVariantParent()) {
+            $this->variantSettings = [
+                'totalWeight'  => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT,
+            ];
+        } else {
+            $this->variantSettings = [];
+        }
     }
 
     /**
