@@ -47,10 +47,6 @@ return [
                 'path'       => '/account/notifications/{page}',
                 'controller' => 'MauticCoreBundle:Notification:index',
             ],
-            'mautic_user_notification_action'       => [
-                'path'       => '/account/notifications/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:Notification:execute',
-            ],
         ],
         'public' => [
             'mautic_js' => [
