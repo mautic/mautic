@@ -25,26 +25,26 @@ class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
      */
     public function it_purges_notifcations_older_than_seven_days_old_by_default()
     {
-        $shouldBePurged      = [];
-        $shouldBePurgedCount = 10;
-        for ($i = 0; $i < $shouldBePurgedCount; ++$i) {
+        $staleNotifications      = [];
+        $staleCount              = 10;
+        for ($i = 0; $i < $staleCount; ++$i) {
             $date = $this->randomDateInRange(new \DateTime('-30 days'), new \DateTime('-7 days'));
             $not  = $this->createNotification($date);
             $this->em->persist($not);
-            $shouldBePurged[] = $not;
+            $staleNotifications[] = $not;
         }
 
-        $shouldNOTBePurged      = [];
-        $shouldNOTBePurgedCount = 15;
-        for ($i = 0; $i < $shouldNOTBePurgedCount; ++$i) {
+        $freshNotifications      = [];
+        $freshCount              = 15;
+        for ($i = 0; $i < $freshCount; ++$i) {
             $date = $this->randomDateInRange(new \DateTime('-6 days'), new \DateTime());
             $not  = $this->createNotification($date);
             $this->em->persist($not);
-            $shouldNOTBePurged[] = $not;
+            $freshNotifications[] = $not;
         }
         $this->em->flush();
 
-        $this->assertEquals(($shouldBePurgedCount + $shouldNOTBePurgedCount), $this->getNotificationCount());
+        $this->assertEquals(($staleCount + $freshCount), $this->getNotificationCount());
 
         $command     = $this->getCommand();
         $commandTest = new CommandTester($command);
@@ -52,7 +52,7 @@ class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
         $output = $commandTest->getDisplay();
 
         $this->assertContains('Done', $output);
-        $this->assertEquals($shouldNOTBePurgedCount, $this->getNotificationCount());
+        $this->assertEquals($freshCount, $this->getNotificationCount());
     }
 
     /**
