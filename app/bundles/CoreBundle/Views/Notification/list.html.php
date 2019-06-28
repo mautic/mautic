@@ -92,17 +92,7 @@ if ('index' == $tmpl) {
             <?php $mauticTemplateVars['item'] = $item; ?>
                 <tr>
                     <td id="notificationId" class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
-                    <td>
-                        <div>
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_user_notification_action',
-                                ['objectAction' => 'view', 'objectId' => $item->getId()]
-                            ); ?>" data-toggle="ajax">
-                                <?php echo $item->getHeader(); ?>
-                            <?php echo $view['content']->getCustomContent('notification.', $mauticTemplateVars); ?>
-                            </a>
-                        </div>
-                    </td>
+                    <td><?php echo $item->getHeader(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getMessage(); ?></td>
                     <td id="isRead" class="visible-md visible-lg"><?php echo $view['translator']->trans($item->getIsRead() ? 'mautic.core.yes' : 'mautic.core.no'); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getDateAdded()->format('Y-m-d H:i:s'); ?></td>
