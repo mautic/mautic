@@ -513,6 +513,16 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.lead.serializer.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\SerializerSubscriber::class,
+                'arguments' => [
+                    'request_stack',
+                ],
+                'tag'          => 'jms_serializer.event_subscriber',
+                'tagArguments' => [
+                    'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
