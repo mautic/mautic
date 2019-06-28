@@ -20,11 +20,21 @@ class Version20190627212742 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $repo = $this->factory->getModel('email')->getRepository();
+        $repo = $this->container->get('mautic.email.repository.email');
+        $em   = $this->container->get('doctrine')->getManager();
 
-        $emailsWithVariant = $repo->getAllEmailsWithVariant();
+        $emailsWithVariantIterator = $repo->getEmailsWithVariantIterator();
 
-        foreach($emailsWithVariant as $email)  {
+        $batchSize = 20;
+        $i = 0;
+
+        while (($emailArray = $emailsWithVariantIterator->next()) !== false)  {
+           $email = $emailArray[0];
+
+           if (null === $email) {
+                continue;
+           }
+
            $variantSettings = $email->getVariantSettings();
            if (array_key_exists('winnerCriteria', $variantSettings)) {
                 continue;
@@ -34,9 +44,17 @@ class Version20190627212742 extends AbstractMauticMigration
            if (array_key_exists('winnerCriteria', $childSettings)) {
                $variantSettings['winnerCriteria'] = $childSettings['winnerCriteria'];
                $variantSettings['totalWeight'] = 100;
+
                $email->setVariantSettings($variantSettings);
-               $repo->saveEntity($email, true);
+               $em->persist($email);
+
+               if (0 === ($i % $batchSize)) {
+                   $em->flush();
+                   $em->clear();
+               }
+               ++$i;
            }
         }
+        $em->flush();
     }
 }

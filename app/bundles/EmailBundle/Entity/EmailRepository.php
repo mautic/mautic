@@ -656,11 +656,11 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * Gets all emails with variants.
+     * Gets iterator fpr all emails with variants.
      *
-     * @return array
+     * @return \Doctrine\ORM\Internal\Hydration\IterableResult
      */
-    public function getAllEmailsWithVariant()
+    public function getEmailsWithVariantIterator()
     {
         $qb = $this->getEntityManager()
             ->createQueryBuilder();
@@ -669,12 +669,11 @@ class EmailRepository extends CommonRepository
         $qb->select($this->getTableAlias())
             ->from('MauticEmailBundle:Email', $this->getTableAlias())
             ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
-                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent')
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                $qb->expr()->eq('v.isPublished', true)
             ))
             ->where($expr);
 
-        $result = $qb->getQuery()->getResult();
-
-        return $result;
+        return $qb->getQuery()->iterate();
     }
 }
