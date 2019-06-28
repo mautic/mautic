@@ -28,15 +28,16 @@ class PurgeStaleNotificationsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('mautic:notifications:purge')
-            ->setDescription("Purge stale user's notfications.")
+            ->setDescription("Purge stale users' notfications.")
             ->setDefinition([
                 new InputOption(
                     'stale-days',
                     'd',
                     InputOption::VALUE_OPTIONAL,
-                    'Notficiations from "X" days ago will be considered stale.',
+                    'Notificiations from "X" days ago will be considered stale.',
                     '-7 day'
                 ),
+                new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Do a dry run without actually deleting anything.'),
             ])
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to purge stale user's notifications
@@ -63,10 +64,21 @@ EOT
         /** @var NotificationRepository $repo */
         $repo = $em->getRepository(Notification::class);
 
-        $output->writeln('Purging notfications...');
+        if ($options['dry-run']) {
+            $qb = $repo->createQueryBuilder('n');
+            $qb->select('count(n.id)')
+                ->where('n.dateAdded <= :from')
+                ->setParameter('from', $from->format('Y-m-d H:i:s'));
+            $count = $qb->getQuery()->getSingleScalarResult();
+
+            $output->writeln("<info>{$count} notification(s) would be purged.</info> ", false);
+
+            return 0;
+        }
+
+        $output->writeln("Purging notifications older than {$from->format('Y-m-d')}");
         $repo->deleteNotifications($from);
-        $output->writeln('<info>Done</info>');
-        $output->writeln('<info>'.$from->format('Y-m-d H:i:s').'</info>');
+        $output->writeln('Finished.');
 
         return 0;
     }

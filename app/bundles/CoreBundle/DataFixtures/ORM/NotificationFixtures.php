@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\ORM\DataFixtures;
+namespace Mautic\CoreBundle\DataFixtures\ORM;
 
 use DateTime;
 use Doctrine\Common\DataFixtures\AbstractFixture;

@@ -20,6 +20,41 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
 {
+    /** @test */
+    public function it_doesnt_delete_notifications_on_dry_run()
+    {
+        for ($i = 0; $i < 20; ++$i) {
+            $note = $this->createNotification(new \DateTime('-7 days'));
+            $this->em->persist($note);
+        }
+        $this->em->flush();
+
+        $command       = $this->getCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'   => $command->getName(),
+            '--dry-run' => true,
+        ]);
+
+        $output = $commandTester->getDisplay();
+        $this->assertContains('20 notification(s) would be purged.', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function it_accepts_the_stale_days_argument()
+    {
+        $command       = $this->getCommand();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command'      => $command->getName(),
+            '--stale-days' => '-3 days',
+        ]);
+        $output = $commandTester->getDisplay();
+        $this->assertContains((new \DateTime('-3 days'))->format('Y-m-d'), $output);
+    }
+
     /**
      * @test
      */
@@ -37,7 +72,7 @@ class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
         $freshNotifications      = [];
         $freshCount              = 15;
         for ($i = 0; $i < $freshCount; ++$i) {
-            $date = $this->randomDateInRange(new \DateTime('-6 days'), new \DateTime());
+            $date = $this->randomDateInRange(new \DateTime('-7 days'), new \DateTime());
             $not  = $this->createNotification($date);
             $this->em->persist($not);
             $freshNotifications[] = $not;
@@ -51,7 +86,6 @@ class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
         $commandTest->execute(['command' => $command->getName()]);
         $output = $commandTest->getDisplay();
 
-        $this->assertContains('Done', $output);
         $this->assertEquals($freshCount, $this->getNotificationCount());
     }
 
