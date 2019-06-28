@@ -81,7 +81,7 @@ EOT
         }
 
         if (!empty($gdpr)) {
-            // to fullfil GDPR, you must delete inactive user data older than 3years
+            // to fullfil GDPR, you must delete inactive user data older than 3 years
             $daysOld = 365 * 3;
         }
 

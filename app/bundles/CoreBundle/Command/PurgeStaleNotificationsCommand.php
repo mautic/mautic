@@ -66,6 +66,7 @@ EOT
         $output->writeln('Purging notfications...');
         $repo->deleteNotifications($from);
         $output->writeln('<info>Done</info>');
+        $output->writeln('<info>'.$from->format('Y-m-d H:i:s').'</info>');
 
         return 0;
     }

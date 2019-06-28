@@ -52,7 +52,6 @@ class NotificationRepository extends CommonRepository
      * Clear notifications from X days old.
      *
      * @param DateTime $from
-     *
      */
     public function deleteNotifications($from)
     {
