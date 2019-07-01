@@ -100,7 +100,7 @@ class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
         $notification = new Notification();
         $notification->setMessage($message);
         $notification->setDateAdded($dateAdded);
-        $notification->setUser($this->createUser());
+        $notification->setUser($this->getOrCreateDefaultAdminUser());
 
         return $notification;
     }
@@ -153,7 +153,7 @@ class PurgeStaleNotificationsCommandTest extends MauticMysqlTestCase
      *
      * @return User
      */
-    private function createUser()
+    private function getOrCreateDefaultAdminUser()
     {
         // NOTE: This codebase really needs some sort of 'factory' for entities,
         // this makes it difficult and repetitive to test functionality.

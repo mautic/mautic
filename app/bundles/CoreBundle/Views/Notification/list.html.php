@@ -97,7 +97,7 @@ if ('index' == $tmpl) {
                     <td id="isRead" class="visible-md visible-lg"><?php echo $view['translator']->trans($item->getIsRead() ? 'mautic.core.yes' : 'mautic.core.no'); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getDateAdded()->format('Y-m-d H:i:s'); ?></td>
                     <td class="visible-md visible-lg"> 
-                        <a href="javascript:void(0);" class="notificationClearBtn btn btn-default btn-xs btn-nospin do-not-close" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.notifications.clear'); ?>"><i class="fa fa-times do-not-close"></i></a>
+                        <a href="javascript:void(0);" data-notification-id="<?php echo $item->getId() ?>" class="notificationClearBtn btn btn-default btn-xs btn-nospin do-not-close" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.notifications.clear'); ?>"><i class="fa fa-times do-not-close"></i></a>
                     </td>
                 </tr>
             <?php endforeach; ?>

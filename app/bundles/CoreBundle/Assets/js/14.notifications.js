@@ -8,7 +8,8 @@ Mautic.notificationIndexLoad = function (translations) {
             var tr = mQuery(this).parent().parent();
             var children = tr.children('#isRead');
             children.text(translations['mautic.core.yes']);
-            Mautic.clearNotification(tr.children('#notificationId').text());
+            Mautic.clearNotification(mQuery(this).data('notification-id'));
+            console.log(mQuery(this).data('notification-id'));
         });
     });
 };
