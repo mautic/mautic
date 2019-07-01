@@ -664,15 +664,10 @@ class EmailRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()
             ->createQueryBuilder();
-        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
 
-        $qb->select($this->getTableAlias())
+        $qb->select('DISTINCT '.$this->getTableAlias().'.id')
             ->from('MauticEmailBundle:Email', $this->getTableAlias())
-            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
-                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
-                $qb->expr()->eq('v.isPublished', true)
-            ))
-            ->where($expr);
+            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'));
 
         return $qb->getQuery()->iterate();
     }

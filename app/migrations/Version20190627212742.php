@@ -20,40 +20,39 @@ class Version20190627212742 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $repo = $this->container->get('mautic.email.repository.email');
-        $em   = $this->container->get('doctrine')->getManager();
+        $repo  = $this->container->get('mautic.email.repository.email');
+        $model = $this->container->get('mautic.email.model.email');
+        $em    = $this->container->get('doctrine')->getManager();
 
         $emailsWithVariantIterator = $repo->getEmailsWithVariantIterator();
 
         $batchSize = 20;
-        $i = 0;
+        $i         = 0;
 
-        while (($emailArray = $emailsWithVariantIterator->next()) !== false)  {
-           $email = $emailArray[0];
+        while (($emailArray = $emailsWithVariantIterator->next()) !== false) {
+            $id = array_pop($emailArray)['id'];
 
-           if (null === $email) {
+            $email = $model->getEntity($id);
+
+            $variantSettings = $email->getVariantSettings();
+            if (array_key_exists('winnerCriteria', $variantSettings)) {
                 continue;
-           }
+            }
 
-           $variantSettings = $email->getVariantSettings();
-           if (array_key_exists('winnerCriteria', $variantSettings)) {
-                continue;
-           }
+            $childSettings = $email->getVariantChildren()->first()->getVariantSettings();
+            if (array_key_exists('winnerCriteria', $childSettings)) {
+                $variantSettings['winnerCriteria'] = $childSettings['winnerCriteria'];
+                $variantSettings['totalWeight']    = 100;
 
-           $childSettings = $email->getVariantChildren()->first()->getVariantSettings();
-           if (array_key_exists('winnerCriteria', $childSettings)) {
-               $variantSettings['winnerCriteria'] = $childSettings['winnerCriteria'];
-               $variantSettings['totalWeight'] = 100;
+                $email->setVariantSettings($variantSettings);
+                $em->persist($email);
 
-               $email->setVariantSettings($variantSettings);
-               $em->persist($email);
-
-               if (0 === ($i % $batchSize)) {
-                   $em->flush();
-                   $em->clear();
-               }
-               ++$i;
-           }
+                if (0 === ($i % $batchSize)) {
+                    $em->flush();
+                    $em->clear();
+                }
+                ++$i;
+            }
         }
         $em->flush();
     }
