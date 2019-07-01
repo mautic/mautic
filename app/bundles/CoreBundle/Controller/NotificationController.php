@@ -62,15 +62,15 @@ class NotificationController extends AbstractStandardFormController
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
-        $repo          = $this->getModel($this->getModelName())->getRepository();
+        $repo = $this->getModel($this->getModelName())->getRepository();
         preg_match_all('/(\w+):([\w\s]*\w\b(?!:))/', $filter['string'], $matches);
-        $alias         = $repo->getTableAlias();
-        $matches       = reset($matches);
+        $alias   = $repo->getTableAlias();
+        $matches = reset($matches);
         /** @var EntityManager $em */
         $em         = $this->container->get(EntityManager::class);
         $fieldNames = $em->getClassMetadata(Notification::class)->getFieldNames();
         foreach ($matches as $item) {
-            $parsed            = explode(':', $item);
+            $parsed = explode(':', $item);
             if (in_array($parsed[0], $fieldNames)) {
                 $filter['where'][] = [
                     'col'  => $alias.'.'.$parsed[0],

@@ -27,18 +27,25 @@ class PurgeStaleNotificationsCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
+        $inputOptions = [
+            new InputOption(
+                'stale-days',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Notificiations from "X" days ago will be considered stale.',
+                '-7 day'
+            ),
+            new InputOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Do a dry run without actually deleting anything.'
+            ),
+        ];
+
         $this->setName('mautic:notifications:purge')
             ->setDescription("Purge stale users' notfications.")
-            ->setDefinition([
-                new InputOption(
-                    'stale-days',
-                    'd',
-                    InputOption::VALUE_OPTIONAL,
-                    'Notificiations from "X" days ago will be considered stale.',
-                    '-7 day'
-                ),
-                new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Do a dry run without actually deleting anything.'),
-            ])
+            ->setDefinition($inputOptions)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to purge stale user's notifications
 
@@ -65,10 +72,10 @@ EOT
         $repo = $em->getRepository(Notification::class);
 
         if ($options['dry-run']) {
-            $qb = $repo->createQueryBuilder('n');
-            $qb->select('count(n.id)')
-                ->where('n.dateAdded <= :from')
-                ->setParameter('from', $from->format('Y-m-d H:i:s'));
+            $qb = $repo->createQueryBuilder('n')
+                    ->select('count(n.id)')
+                    ->where('n.dateAdded <= :from')
+                    ->setParameter('from', $from->format('Y-m-d H:i:s'));
             $count = $qb->getQuery()->getSingleScalarResult();
 
             $output->writeln("<info>{$count} notification(s) would be purged.</info> ", false);
