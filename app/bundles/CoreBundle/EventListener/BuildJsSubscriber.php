@@ -156,14 +156,14 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
     }
     
     xhr.onreadystatechange = function (e) {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.readyState === 4) {
             response = MauticJS.parseTextToJSON(xhr.responseText);
             if (xhr.status === 200) {
                 callbackSuccess(response, xhr);
             } else {
                 callbackError(response, xhr);
                
-                if (xhr.status === XMLHttpRequest.UNSENT) {
+                if (xhr.status === 0) {
                     // Don't bother with further attempts
                     MauticJS.CORSRequestsAllowed = false;
                 }
