@@ -61,7 +61,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->pathsHelper->method('getSystemPath')
             ->with('themes', true)
-            ->willReturn(__DIR__.'/themes');
+            ->willReturn(__DIR__.'/resource/themes');
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -72,7 +72,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->getThemeHelper()->install(__DIR__.'/themes/missing-config.zip');
+        $this->getThemeHelper()->install(__DIR__.'/resource/themes/missing-config.zip');
     }
 
     public function testExceptionThrownWithMissingMessage()
@@ -81,7 +81,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->pathsHelper->method('getSystemPath')
             ->with('themes', true)
-            ->willReturn(__DIR__.'/themes');
+            ->willReturn(__DIR__.'/resource/themes');
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -92,7 +92,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->getThemeHelper()->install(__DIR__.'/themes/missing-message.zip');
+        $this->getThemeHelper()->install(__DIR__.'/resource/themes/missing-message.zip');
     }
 
     public function testExceptionThrownWithMissingFeature()
@@ -101,7 +101,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->pathsHelper->method('getSystemPath')
             ->with('themes', true)
-            ->willReturn(__DIR__.'/themes');
+            ->willReturn(__DIR__.'/resource/themes');
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -112,23 +112,23 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->getThemeHelper()->install(__DIR__.'/themes/missing-feature.zip');
+        $this->getThemeHelper()->install(__DIR__.'/resource/themes/missing-feature.zip');
     }
 
     public function testThemeIsInstalled()
     {
         $fs = new Filesystem();
-        $fs->copy(__DIR__.'/themes/good.zip', __DIR__.'/themes/good-tmp.zip');
+        $fs->copy(__DIR__.'/resource/themes/good.zip', __DIR__.'/resource/themes/good-tmp.zip');
 
         $this->pathsHelper->method('getSystemPath')
             ->with('themes', true)
-            ->willReturn(__DIR__.'/themes');
+            ->willReturn(__DIR__.'/resource/themes');
 
-        $this->getThemeHelper()->install(__DIR__.'/themes/good-tmp.zip');
+        $this->getThemeHelper()->install(__DIR__.'/resource/themes/good-tmp.zip');
 
-        $this->assertFileExists(__DIR__.'/themes/good-tmp');
+        $this->assertFileExists(__DIR__.'/resource/themes/good-tmp');
 
-        $fs->remove(__DIR__.'/themes/good-tmp');
+        $fs->remove(__DIR__.'/resource/themes/good-tmp');
     }
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing()
@@ -169,7 +169,7 @@ class ThemeHelperTest extends \PHPUnit_Framework_TestCase
                 function ($path, $absolute) {
                     switch ($path) {
                         case 'themes':
-                            return ($absolute) ? __DIR__.'/../../../../../../themes' : 'themes';
+                            return ($absolute) ? __DIR__.'/../../../../../../resource/themes' : 'themes';
                         case 'themes_root':
                             return __DIR__.'/../../../../../..';
                     }
