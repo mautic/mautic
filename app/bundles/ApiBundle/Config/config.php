@@ -133,6 +133,11 @@ return [
                 'alias' => 'apiconfig',
             ],
         ],
+        'helpers' => [
+            'mautic.api.helper.entity_result' => [
+                'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
+            ],
+        ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
                 'class'     => 'Mautic\ApiBundle\EventListener\OAuthEventListener',
