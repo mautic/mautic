@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Tests\Helper\Language;
 
-
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Symfony\Component\Filesystem\Filesystem;
 

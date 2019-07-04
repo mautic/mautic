@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Tests\Helper;
 
-
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
@@ -74,7 +73,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $filesystem->copy($this->translationsPath.'/es.zip', $this->tmpPath.'/es.zip');
 
         $helper = $this->getHelper();
-        $error = $helper->extractLanguagePackage('es');
+        $error  = $helper->extractLanguagePackage('es');
 
         $this->assertFalse($error['error']);
         $this->assertFileExists($this->translationsPath.'/translations/es');
@@ -97,8 +96,8 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['translations_root'], ['cache'])
             ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath);
 
-        $languages = ['languages' => ['es' => []]];
-        $response = new \stdClass();
+        $languages      = ['languages' => ['es' => []]];
+        $response       = new \stdClass();
         $response->code = 200;
         $response->body = json_encode($languages);
 
@@ -120,7 +119,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
     public function testLanguageIsFetched()
     {
         $languages = ['languages' => ['es' => []]];
-        $langFile = $this->tmpPath.'/../languageList.txt';
+        $langFile  = $this->tmpPath.'/../languageList.txt';
         file_put_contents($langFile, json_encode($languages));
 
         $this->coreParametersHelper->method('getParameter')
@@ -131,7 +130,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['translations_root'], ['cache'], ['cache'])
             ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath, $this->tmpPath);
 
-        $response = new \stdClass();
+        $response       = new \stdClass();
         $response->code = 200;
         $response->body = file_get_contents($this->translationsPath.'/es.zip');
 
