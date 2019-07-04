@@ -9,9 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace Mautic\CoreBundle\Helper\Language;
-
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -98,7 +96,6 @@ class Installer
     {
         $bundles = new Finder();
         $bundles->directories()->name('*Bundle')->in($this->sourceDirectory);
-
 
         /** @var \SplFileInfo $bundle */
         foreach ($bundles as $bundle) {
