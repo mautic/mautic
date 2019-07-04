@@ -18,7 +18,7 @@ class Version20190704154940 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = $this->container->get('mautic.helper.paths');
+        $pathsHelper  = $this->container->get('mautic.helper.paths');
         $translations = $pathsHelper->getSystemPath('translations_root').'/translations';
 
         // Convert language config.php to config.json
@@ -49,7 +49,7 @@ class Version20190704154940 extends AbstractMauticMigration
     public function down(Schema $schema)
     {
         /** @var PathsHelper $pathsHelper */
-        $pathsHelper = $this->container->get('mautic.helper.paths');
+        $pathsHelper  = $this->container->get('mautic.helper.paths');
         $translations = $pathsHelper->getSystemPath('translations_root').'/translations';
 
         // Convert language config.php to config.json
