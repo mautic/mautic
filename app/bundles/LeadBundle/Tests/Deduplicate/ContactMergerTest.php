@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -687,7 +686,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     public function testMergeFieldWithEmptyFieldData()
     {
-        $loser = $this->createMock(Lead::class);
+        $loser  = $this->createMock(Lead::class);
         $winner = $this->createMock(Lead::class);
 
         $loser->expects($this->exactly(2))
@@ -702,7 +701,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(1);
 
-        $loser->expects($this->exactly(1))
+        $loser->expects($this->once())
             ->method('getId')
             ->willReturn(2);
 
