@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\DateTime;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -682,6 +683,45 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->with($winner, [], null, false);
 
         $this->getMerger()->merge($winner, $loser);
+    }
+
+    public function testMergeFieldWithEmptyFieldData()
+    {
+        $loser = $this->createMock(Lead::class);
+        $winner = $this->createMock(Lead::class);
+
+        $loser->expects($this->exactly(2))
+            ->method('getDateModified')
+            ->willReturn(new \DateTime('-10 minutes'));
+
+        $winner->expects($this->exactly(2))
+            ->method('getDateModified')
+            ->willReturn(new \DateTime());
+
+        $winner->expects($this->exactly(4))
+            ->method('getId')
+            ->willReturn(1);
+
+        $loser->expects($this->exactly(1))
+            ->method('getId')
+            ->willReturn(2);
+
+        $winner->expects($this->once())
+            ->method('getProfileFields')
+            ->willReturn([
+                'email'  => 'winner@test.com',
+            ]);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn(false);
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with('CONTACT: email is not mergeable for 1 - ');
+
+        $this->getMerger()->mergeFieldData($winner, $loser);
     }
 
     /**
