@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ApiBundle\Helper;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -13,7 +12,7 @@ class EntityResultHelper
      *
      * @return array
      */
-    public function getArray($results,  $callback = null)
+    public function getArray($results, $callback = null)
     {
         $entities = [];
 
