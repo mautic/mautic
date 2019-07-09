@@ -92,7 +92,7 @@ class CompanyLeadRepository extends CommonRepository
         )->setParameter('false', false, 'boolean');
 
         $q->andWhere(
-            $q->expr()->eq('cl.is_primary',':true')
+            $q->expr()->eq('cl.is_primary', ':true')
         )->setParameter('true', true, 'boolean');
 
         if ($companyId) {
