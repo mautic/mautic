@@ -76,9 +76,19 @@ class MailHelper
     protected $from;
 
     /**
+     * @var null
+     */
+    protected $bcc;
+
+    /**
      * @var
      */
     protected $systemFrom;
+
+    /**
+     * @var
+     */
+    protected $systemBcc;
 
     /**
      * @var string
@@ -257,8 +267,9 @@ class MailHelper
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
+     * @param null          $bcc
      */
-    public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
+    public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null, $bcc = null)
     {
         $this->factory   = $factory;
         $this->mailer    = $mailer;
@@ -271,11 +282,13 @@ class MailHelper
             $this->logError($e);
         }
 
+        $systemBccEmail   = $factory->getParameter('mailer_default_bcc');
         $systemFromEmail  = $factory->getParameter('mailer_from_email');
         $systemFromName   = $this->cleanName(
             $factory->getParameter('mailer_from_name')
         );
         $this->setDefaultFrom($from, [$systemFromEmail => $systemFromName]);
+        $this->setDefaultBcc($bcc, $systemBccEmail);
 
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
@@ -324,7 +337,7 @@ class MailHelper
         // pass to ensure it is set regardless
         $transport  = $this->factory->get('swiftmailer.transport.real');
         $mailer     = new \Swift_Mailer($transport);
-        $mailHelper = new self($this->factory, $mailer, $this->from);
+        $mailHelper = new self($this->factory, $mailer, $this->from, $this->bcc);
 
         return $mailHelper->getMailer($cleanSlate);
     }
@@ -666,6 +679,7 @@ class MailHelper
             $this->appendTrackingPixel = false;
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
+            $this->bcc                 = $this->systemBcc;
             $this->headers             = [];
             $this->systemHeaders       = [];
             $this->source              = [];
@@ -1375,6 +1389,9 @@ class MailHelper
 
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
+            if (empty($bccAddress)) {
+                $bccAddress = $this->systemBcc;
+            }
             if (!empty($bccAddress)) {
                 $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
@@ -2203,5 +2220,15 @@ class MailHelper
 
         $this->systemFrom = $overrideFrom ?: $systemFrom;
         $this->from       = $this->systemFrom;
+    }
+
+    /**
+     * @param   $overrideBcc
+     * @param   $systemBcc
+     */
+    private function setDefaultBcc($overrideBcc, $systemBcc)
+    {
+        $this->systemBcc = $overrideBcc ?: $systemBcc;
+        $this->bcc       = $this->systemBcc;
     }
 }

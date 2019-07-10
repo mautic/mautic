@@ -59,6 +59,7 @@ class ConfigType extends AbstractType
                 [
                     'mailer_from_email'      => 'email',
                     'mailer_return_path'     => 'email',
+                    'mailer_default_bcc'     => 'email',
                     'default_signature_text' => 'html',
                     'unsubscribe_text'       => 'html',
                     'unsubscribe_message'    => 'html',
@@ -216,6 +217,27 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.email.required',
                         ]
                     ),
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_default_bcc',
+            'text',
+            [
+                'label'       => 'mautic.email.config.mailer.bcc.email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.config.mailer.bcc.email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'constraints' => [
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',

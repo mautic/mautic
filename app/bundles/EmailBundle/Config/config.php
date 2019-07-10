@@ -764,6 +764,7 @@ return [
         'mailer_transport'             => 'mail',
         'mailer_append_tracking_pixel' => true,
         'mailer_convert_embed_images'  => false,
+        'mailer_default_bcc'           => '',
         'mailer_host'                  => '',
         'mailer_port'                  => null,
         'mailer_user'                  => null,

@@ -25,6 +25,9 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_default_bcc', $template); ?>
+            </div>
+            <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_is_owner', $template); ?>
             </div>
 
