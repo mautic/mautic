@@ -1,10 +1,10 @@
 <?php
 
 /*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic
  *
- * @link        https://www.mautic.com
+ * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
