@@ -14,6 +14,7 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\Redirect;
 use Symfony\Component\HttpFoundation\Request;
 
 class Tracking404Model
@@ -46,12 +47,12 @@ class Tracking404Model
     }
 
     /**
-     * @param Page    $entity
-     * @param Request $request
+     * @param Page|Redirect $entity
+     * @param Request       $request
      *
      * @throws \Exception
      */
-    public function hitPage(Page $entity, Request $request)
+    public function hitPage($entity, Request $request)
     {
         if ($this->isTrackable()) {
             $this->pageModel->hitPage($entity, $request, 404);
