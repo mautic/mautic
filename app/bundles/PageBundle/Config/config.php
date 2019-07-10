@@ -302,6 +302,14 @@ return [
                     'mautic.helper.ip_lookup',
                 ],
             ],
+            'mautic.page.model.tracking.404' => [
+                'class'     => \Mautic\PageBundle\Model\Tracking404Model::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.tracker.contact',
+                    'mautic.page.model.page',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.page.repository.redirect' => [
