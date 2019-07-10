@@ -163,8 +163,17 @@ return [
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class
             ],
+            'mautic.integrations.auth_provider.api_key' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory::class,
+            ],
+            'mautic.integrations.auth_provider.basic_auth' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory::class,
+            ],
             'mautic.integrations.auth_provider.oauth1atwolegged' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
+            ],
+            'mautic.integrations.auth_provider.oauth2twolegged' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\HttpFactory::class,
             ],
         ],
         'repositories' => [

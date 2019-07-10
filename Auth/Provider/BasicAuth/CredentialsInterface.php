@@ -11,18 +11,19 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Integration\Auth\Provider\BasicAuth;
+namespace MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth;
 
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
-interface CredentialsInterface
+interface CredentialsInterface extends AuthCredentialsInterface
 {
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getUsername(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getPassword(): ?string;
 }

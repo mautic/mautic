@@ -20,6 +20,11 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends PHPUnit_Framework_TestCase
 {
+    public function testType()
+    {
+        $this->assertEquals('oauth1a_two_legged', (new HttpFactory())->getAuthType());
+    }
+
     public function testGetClientWithEmptyCredentials()
     {
         $credentials = $this->createMock(CredentialsInterface::class);

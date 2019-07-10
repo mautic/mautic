@@ -14,22 +14,21 @@ namespace MauticPlugin\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Helper\AuthIntegrationsHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthController extends CommonController
 {
     public function callbackAction(string $integration, Request $request)
     {
-        // Find the integration
+        /** @var AuthIntegrationsHelper $authIntegrationsHelper */
         $authIntegrationsHelper = $this->get('mautic.integrations.helper.auth_integrations');
         try {
-            $authIntegrationsHelper->getIntegration($integration);
+            $authIntegration = $authIntegrationsHelper->getIntegration($integration);
+
+            return $authIntegration->authenticateIntegration($request);
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
-        }
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-
         }
     }
 }

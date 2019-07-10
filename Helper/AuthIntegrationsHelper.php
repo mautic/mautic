@@ -49,10 +49,10 @@ class AuthIntegrationsHelper
     /**
      * @param string $integration
      *
-     * @return IntegrationInterface
+     * @return AuthenticationInterface
      * @throws IntegrationNotFoundException
      */
-    public function getIntegration(string $integration)
+    public function getIntegration(string $integration): AuthenticationInterface
     {
         if (!isset($this->integrations[$integration])){
             throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.authentication_integration");
