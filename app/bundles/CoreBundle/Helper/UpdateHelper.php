@@ -39,6 +39,14 @@ class UpdateHelper
      */
     private $coreParametersHelper;
 
+    /**
+     * UpdateHelper constructor.
+     *
+     * @param PathsHelper          $pathsHelper
+     * @param Logger               $logger
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param Http                 $connector
+     */
     public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector)
     {
         $this->pathsHelper          = $pathsHelper;
