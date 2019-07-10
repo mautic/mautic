@@ -1111,7 +1111,7 @@ return [
         'cors_valid_domains'        => [],
         'rss_notification_url'      => '',
         'translations_list_url'     => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=fetchLanguages',
-        'translations_fetch_url'    => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=downloadLanguagePackage&langCode=',
+        'translations_fetch_url'    => 'https://github.com/mautic-inc/mautic-language-packs/blob/master/',
         'system_update_url'         => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
