@@ -76,7 +76,7 @@ class MailHelper
     protected $from;
 
     /**
-     * @var null
+     * @var string
      */
     protected $bcc;
 
@@ -86,7 +86,7 @@ class MailHelper
     protected $systemFrom;
 
     /**
-     * @var
+     * @var string
      */
     protected $systemBcc;
 
