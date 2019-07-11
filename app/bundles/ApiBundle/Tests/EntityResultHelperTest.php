@@ -15,9 +15,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\LeadBundle\Entity\Lead;
 
-
 class EntityResultHelperTest extends \PHPUnit_Framework_TestCase
 {
+    const NEW_TITLE = 'Callback Title';
+
     public function testGetArrayEntities()
     {
         $resultHelper = new EntityResultHelper();
@@ -34,12 +35,12 @@ class EntityResultHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function($entity) {
-            $this->preserializeCallbackTest($entity);
+        $arrayResult = $resultHelper->getArray($results, function ($entity) {
+            $this->modifyEntityData($entity);
         });
 
-        foreach($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), 'Callback Title');
+        foreach ($arrayResult as $entity) {
+            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
         }
     }
 
@@ -70,12 +71,12 @@ class EntityResultHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function($entity) {
-            $this->preserializeCallbackTest($entity);
+        $arrayResult = $resultHelper->getArray($results, function ($entity) {
+            $this->modifyEntityData($entity);
         });
 
-        foreach($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), 'Callback Title');
+        foreach ($arrayResult as $entity) {
+            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
         }
     }
 
@@ -89,29 +90,32 @@ class EntityResultHelperTest extends \PHPUnit_Framework_TestCase
         $lead5 = new Lead();
         $lead5->setId(5);
 
-        $data = [[$lead2, 'title' => 'Title 2'], [$lead5, 'title' => 'Title 5']];
+        $lead7 = new Lead();
+        $lead7->setId(7);
 
-        $expectedResult = [$lead2, $lead5];;
+        $data = [[$lead2, 'title' => 'Title 2'], [$lead5, 'title' => 'Title 5'], [$lead7, 'title' => 'Title 7']];
+
+        $expectedResult = [$lead2, $lead5, $lead7];
 
         $arrayResult = $resultHelper->getArray($data);
 
         $this->assertEquals($expectedResult, $arrayResult);
 
-        foreach($arrayResult as $entity) {
+        foreach ($arrayResult as $entity) {
             $this->assertEquals($entity->getTitle(), 'Title '.$entity->getId());
         }
 
-        $arrayResult = $resultHelper->getArray($data, function($entity) {
-            $this->preserializeCallbackTest($entity);
+        $arrayResult = $resultHelper->getArray($data, function ($entity) {
+            $this->modifyEntityData($entity);
         });
 
-        foreach($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), 'Callback Title');
+        foreach ($arrayResult as $entity) {
+            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
         }
     }
 
-    private function preserializeCallbackTest(Lead $entity)
+    private function modifyEntityData(Lead $entity)
     {
-        $entity->setTitle('Callback Title');
+        $entity->setTitle(self::NEW_TITLE);
     }
 }
