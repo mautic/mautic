@@ -203,9 +203,10 @@ class MailHelper
      * @var array
      */
     protected $body = [
-        'content'     => '',
-        'contentType' => 'text/html',
-        'charset'     => null,
+        'content'           => '',
+        'embedMap'          => [],
+        'contentType'       => 'text/html',
+        'charset'           => null,
     ];
 
     /**
@@ -680,9 +681,10 @@ class MailHelper
             $this->plainText           = '';
             $this->plainTextSet        = false;
             $this->body                = [
-                'content'     => '',
-                'contentType' => 'text/html',
-                'charset'     => null,
+                'content'           => '',
+                'embedMap'          => [],
+                'contentType'       => 'text/html',
+                'charset'           => null,
             ];
         }
     }
@@ -959,7 +961,9 @@ class MailHelper
                 $replaces = [];
                 foreach ($matches[1] as $match) {
                     if (strpos($match, 'cid:') === false) {
-                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                        $cid                          = $this->message->embed(\Swift_Image::fromPath($match));
+                        $replaces[$match]             = $cid;
+                        $this->body['embedMap'][$cid] = $match;
                     }
                 }
                 $content = strtr($content, $replaces);
@@ -980,9 +984,10 @@ class MailHelper
         $this->contentHash = md5($content.$this->plainText);
 
         $this->body = [
-            'content'     => $content,
-            'contentType' => $contentType,
-            'charset'     => $charset,
+            'content'           => $content,
+            'embedMap'          => $this->body['embedMap'],
+            'contentType'       => $contentType,
+            'charset'           => $charset,
         ];
     }
 
@@ -1889,7 +1894,8 @@ class MailHelper
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
-                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                $contentToPersist = strtr($this->body['content'], $this->body['embedMap']);
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist)) {
                     // Try one more time to find the ID in case there was overlap when creating
                     $copy = $emailModel->getCopyRepository()->findByHash($hash);
                 } else {
