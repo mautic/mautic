@@ -1596,8 +1596,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             if (!is_int($val) and !is_float($val) and !is_array($val)) {
                 $val = "'$val'";
             } elseif (is_array($val)) {
-                if ($this->getParameterType($key)===102) {
-                    $val = array_map(function ($value){
+                if ($this->getParameterType($key) === 102) {
+                    $val = array_map(function ($value) {
                         return "'$value'";
                     }, $val);
                 }

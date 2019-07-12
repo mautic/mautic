@@ -236,7 +236,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * Returns filter value not modified by decorator
+     * Returns filter value not modified by decorator.
      *
      * @return mixed
      */
