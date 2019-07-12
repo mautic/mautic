@@ -1593,8 +1593,15 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $params = $this->getParameters();
         $sql    = $this->getSQL();
         foreach ($params as $key=>$val) {
-            if (!is_int($val) and !is_float($val)) {
+            if (!is_int($val) and !is_float($val) and !is_array($val)) {
                 $val = "'$val'";
+            } elseif (is_array($val)) {
+                if ($this->getParameterType($key)===102) {
+                    $val = array_map(function ($value){
+                        return "'$value'";
+                    }, $val);
+                }
+                $val = join(', ', $val);
             }
             $sql = str_replace(":{$key}", $val, $sql);
         }

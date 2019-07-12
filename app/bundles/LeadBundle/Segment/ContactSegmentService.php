@@ -248,7 +248,7 @@ class ContactSegmentService
         $qbO->select('orp.lead_id as id, orp.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
-        $qbO->setParameters($queryBuilder->getParameters());
+        $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
         $qbO->andWhere($qbO->expr()->isNull('members.id'));
         $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));

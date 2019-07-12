@@ -234,4 +234,16 @@ class ContactSegmentFilter
         return method_exists($this->filterDecorator, 'getRelationJoinTableField') ?
             $this->filterDecorator->getRelationJoinTableField() : null;
     }
+
+    /**
+     * Returns filter value not modified by decorator
+     *
+     * @return mixed
+     */
+    public function getCrateFilterValue()
+    {
+        $crateArray = $this->contactSegmentFilterCrate->getArray();
+
+        return $crateArray['filter'];
+    }
 }
