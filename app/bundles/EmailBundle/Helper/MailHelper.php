@@ -203,10 +203,10 @@ class MailHelper
      * @var array
      */
     protected $body = [
-        'content'           => '',
-        'embedMap'          => [],
-        'contentType'       => 'text/html',
-        'charset'           => null,
+        'content'     => '',
+        'embedMap'    => [],
+        'contentType' => 'text/html',
+        'charset'     => null,
     ];
 
     /**
@@ -681,10 +681,10 @@ class MailHelper
             $this->plainText           = '';
             $this->plainTextSet        = false;
             $this->body                = [
-                'content'           => '',
-                'embedMap'          => [],
-                'contentType'       => 'text/html',
-                'charset'           => null,
+                'content'     => '',
+                'embedMap'    => [],
+                'contentType' => 'text/html',
+                'charset'     => null,
             ];
         }
     }
@@ -984,10 +984,10 @@ class MailHelper
         $this->contentHash = md5($content.$this->plainText);
 
         $this->body = [
-            'content'           => $content,
-            'embedMap'          => $this->body['embedMap'],
-            'contentType'       => $contentType,
-            'charset'           => $charset,
+            'content'     => $content,
+            'embedMap'    => $this->body['embedMap'],
+            'contentType' => $contentType,
+            'charset'     => $charset,
         ];
     }
 
