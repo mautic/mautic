@@ -67,13 +67,13 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
-            'disable_tracking_404',
+            'disable_tracking_404_anonymous',
             'yesno_button_group',
             [
-                'label' => 'mautic.page.config.form.disable_tracking_404',
-                'data'  => isset($options['data']['disable_tracking_404']) ? (bool) $options['data']['disable_tracking_404'] : false,
+                'label' => 'mautic.page.config.form.disable_tracking_404_anonymous',
+                'data'  => isset($options['data']['disable_tracking_404_anonymous']) ? (bool) $options['data']['disable_tracking_404_anonymous'] : false,
                 'attr'  => [
-                    'tooltip'      => 'mautic.page.config.form.disable_tracking_404.tooltip',
+                    'tooltip'      => 'mautic.page.config.form.disable_tracking_404_anonymous.tooltip',
                 ],
             ]
         );

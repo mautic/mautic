@@ -54,17 +54,15 @@ class Tracking404Model
      */
     public function hitPage($entity, Request $request)
     {
-        if ($this->isTrackable()) {
-            $this->pageModel->hitPage($entity, $request, 404);
-        }
+        $this->pageModel->hitPage($entity, $request, 404);
     }
 
     /**
      * @return bool
      */
-    private function isTrackable()
+    public function isTrackable()
     {
-        if (!$this->coreParametersHelper->getParameter('disable_tracking_404')) {
+        if (!$this->coreParametersHelper->getParameter('disable_tracking_404_anonymous')) {
             return true;
         }
         // already tracked and identified contact

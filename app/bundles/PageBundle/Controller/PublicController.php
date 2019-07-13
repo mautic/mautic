@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
+use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -290,7 +291,11 @@ class PublicController extends CommonFormController
             return new Response($content);
         }
 
-        $this->get('mautic.page.model.tracking.404')->hitPage($entity, $this->request);
+        /** @var Tracking404Model $tracking404Model */
+        $tracking404Model = $this->get('mautic.page.model.tracking.404');
+        if ($tracking404Model->isTrackable()) {
+            $tracking404Model->hitPage($entity, $this->request);
+        }
 
         return $this->notFound();
     }

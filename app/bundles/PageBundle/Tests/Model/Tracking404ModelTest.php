@@ -14,10 +14,8 @@ namespace Mautic\PageBundle\Tests\Model;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
-use Symfony\Component\HttpFoundation\Request;
 
 class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,9 +47,6 @@ class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
         $this->mockContactTracker = $this->createMock(ContactTracker::class);
 
         $this->mockPageModel = $this->createMock(PageModel::class);
-        $this->mockPageModel->expects($this->any())
-            ->method('hitPage')
-            ->willThrowException(new \Exception());
 
         $this->lead = new Lead();
     }
@@ -60,30 +55,29 @@ class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('getParameter')
-            ->with('disable_tracking_404')
+            ->with('disable_tracking_404_anonymous')
             ->willReturn(true);
 
         $tracking404Model = new Tracking404Model($this->mockCoreParametersHelper, $this->mockContactTracker, $this->mockPageModel);
-        $tracking404Model->hitPage(new Page(), new Request());
+        $this->assertFalse($tracking404Model->isTrackable());
     }
 
     public function testIsTrackableIfTrackingDisable()
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('getParameter')
-            ->with('disable_tracking_404')
+            ->with('disable_tracking_404_anonymous')
             ->willReturn(false);
-        $this->expectException(\Exception::class);
 
         $tracking404Model = new Tracking404Model($this->mockCoreParametersHelper, $this->mockContactTracker, $this->mockPageModel);
-        $tracking404Model->hitPage(new Page(), new Request());
+        $this->assertTrue($tracking404Model->isTrackable());
     }
 
-    public function testIsTrackableForIdentified()
+    public function testIsTrackableForIdentifiedContacts()
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('getParameter')
-            ->with('disable_tracking_404')
+            ->with('disable_tracking_404_anonymous')
             ->willReturn(true);
 
         $this->lead->setFirstname('identified');
@@ -91,17 +85,15 @@ class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
             ->method('getContactByTrackedDevice')
             ->willReturn($this->lead);
 
-        $this->expectException(\Exception::class);
-
         $tracking404Model = new Tracking404Model($this->mockCoreParametersHelper, $this->mockContactTracker, $this->mockPageModel);
-        $tracking404Model->hitPage(new Page(), new Request());
+        $this->assertTrue($tracking404Model->isTrackable());
     }
 
     public function testIsTrackableForAnonymouse()
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('getParameter')
-            ->with('disable_tracking_404')
+            ->with('disable_tracking_404_anonymous')
             ->willReturn(true);
 
         $this->mockContactTracker->expects($this->any())
@@ -109,6 +101,6 @@ class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->lead);
 
         $tracking404Model = new Tracking404Model($this->mockCoreParametersHelper, $this->mockContactTracker, $this->mockPageModel);
-        $tracking404Model->hitPage(new Page(), new Request());
+        $this->assertFalse($tracking404Model->isTrackable());
     }
 }
