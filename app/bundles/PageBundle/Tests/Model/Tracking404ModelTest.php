@@ -51,7 +51,7 @@ class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
         $this->lead = new Lead();
     }
 
-    public function testIsTrackableIfTrackingEnabled()
+    public function testIsTrackableIfTracking404OptionEnabled()
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('getParameter')
@@ -62,7 +62,7 @@ class Tracking404ModelTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($tracking404Model->isTrackable());
     }
 
-    public function testIsTrackableIfTrackingDisable()
+    public function testIsTrackableIfTracking404OptionDisable()
     {
         $this->mockCoreParametersHelper->expects($this->at(0))
             ->method('getParameter')
