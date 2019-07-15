@@ -64,6 +64,7 @@ class FormType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
             ],
+            'required'   => false,
         ]);
 
         $builder->add('description', 'textarea', [
