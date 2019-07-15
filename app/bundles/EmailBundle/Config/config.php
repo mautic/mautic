@@ -824,6 +824,7 @@ return [
             ],
         ],
         'mailer_is_owner'                     => false,
+        'disable_unsubscribe_header'          => false,
         'default_signature_text'              => null,
         'email_frequency_number'              => null,
         'email_frequency_time'                => null,

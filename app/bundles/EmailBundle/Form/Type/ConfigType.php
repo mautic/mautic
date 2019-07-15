@@ -670,6 +670,22 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+
+        $builder->add(
+            'disable_unsubscribe_header',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.disable.unsubscribe.header',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.disable.unsubscribe.header.tooltip',
+                ],
+                'data'       => empty($options['data']['disable_unsubscribe_header']) ? false : true,
+                'required'   => false,
+            ]
+        );
+
         $builder->add(
             'email_frequency_number',
             'number',
