@@ -2,14 +2,14 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
 use Mautic\LeadBundle\Exception\FilterNotFoundException;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class DecoratorFactory.
- */
 class DecoratorFactory
 {
     /**
@@ -38,20 +38,24 @@ class DecoratorFactory
     private $dateOptionFactory;
 
     /**
-     * DecoratorFactory constructor.
+     * @var EventDispatcherInterface
      */
+    private $eventDispatcher;
+
     public function __construct(
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
         BaseDecorator $baseDecorator,
         CustomMappedDecorator $customMappedDecorator,
         DateOptionFactory $dateOptionFactory,
-        CompanyDecorator $companyDecorator
+        CompanyDecorator $companyDecorator,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->baseDecorator                  = $baseDecorator;
         $this->customMappedDecorator          = $customMappedDecorator;
         $this->dateOptionFactory              = $dateOptionFactory;
         $this->contactSegmentFilterDictionary = $contactSegmentFilterDictionary;
         $this->companyDecorator               = $companyDecorator;
+        $this->eventDispatcher                = $eventDispatcher;
     }
 
     /**
@@ -59,6 +63,13 @@ class DecoratorFactory
      */
     public function getDecoratorForFilter(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
+        $decoratorEvent = new LeadListFiltersDecoratorDelegateEvent($contactSegmentFilterCrate);
+
+        $this->eventDispatcher->dispatch(LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE, $decoratorEvent);
+        if ($decorator = $decoratorEvent->getDecorator()) {
+            return $decorator;
+        }
+
         if ($contactSegmentFilterCrate->isDateType()) {
             $dateDecorator = $this->dateOptionFactory->getDateOption($contactSegmentFilterCrate);
 
@@ -75,7 +86,8 @@ class DecoratorFactory
             $this->contactSegmentFilterDictionary->getFilter($originalField);
 
             return $this->customMappedDecorator;
-        } catch (FilterNotFoundException $e) {
+        }
+        catch (FilterNotFoundException $e) {
             if ($contactSegmentFilterCrate->isCompanyType()) {
                 return $this->companyDecorator;
             }

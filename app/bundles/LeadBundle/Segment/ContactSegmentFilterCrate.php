@@ -199,4 +199,12 @@ class ContactSegmentFilterCrate
     {
         return $this->nullValue;
     }
+
+    /**
+     * @return mixed|string|null
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
 }
