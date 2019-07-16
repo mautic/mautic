@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
-use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
@@ -73,7 +72,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             $dateOptionFactory,
             $companyDecorator,
             $eventDispatcherMock);
-
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
             'type'     => 'date',
