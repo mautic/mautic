@@ -1,9 +1,9 @@
 <?php
 /*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
+ * @copyright  2019 Mautic Contributors. All rights reserved
+ * @author      Mautic
  *
- * @link        https://mautic.com
+ * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -39,7 +39,7 @@ class LeadListFiltersDecoratorDelegateEvent extends CommonEvent
     /**
      * @return FilterDecoratorInterface|null
      */
-    public function getDecorator(): ?FilterDecoratorInterface
+    public function getDecorator()
     {
         return $this->decorator;
     }
@@ -49,7 +49,7 @@ class LeadListFiltersDecoratorDelegateEvent extends CommonEvent
      *
      * @return LeadListFiltersDecoratorDelegateEvent
      */
-    public function setDecorator(FilterDecoratorInterface $decorator): LeadListFiltersDecoratorDelegateEvent
+    public function setDecorator(FilterDecoratorInterface $decorator)
     {
         $this->decorator = $decorator;
 
@@ -59,7 +59,7 @@ class LeadListFiltersDecoratorDelegateEvent extends CommonEvent
     /**
      * @return ContactSegmentFilterCrate
      */
-    public function getCrate(): ContactSegmentFilterCrate
+    public function getCrate()
     {
         return $this->crate;
     }
