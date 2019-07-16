@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Scheduler\Model;
 
+use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\FileTooBigException;
-use Mautic\CoreBundle\Exception\FileInvalidException;
 
 class FileHandler
 {
@@ -81,6 +81,7 @@ class FileHandler
     public function compressedCsvFileForReportExists(Report $report): bool
     {
         $filePath = $this->getPathToCompressedCsvFileForReport($report);
+
         return file_exists($filePath);
     }
 

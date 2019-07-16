@@ -49,8 +49,8 @@ class SendSchedule
                 // Send the ZIP file as link in the email message.
                 $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);
-                $event = new PermanentReportFileCreated($report);
-                $this->eventDispatcher->dispatch(ReportEvents::REPORT_PERMANENT_ZIP_CREATED, $event);
+                $event   = new PermanentReportFileCreated($report);
+                $this->eventDispatcher->dispatch(ReportEvents::REPORT_PERMANENT_FILE_CREATED, $event);
             }
         }
 

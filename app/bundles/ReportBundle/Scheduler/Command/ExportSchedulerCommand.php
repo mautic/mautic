@@ -3,8 +3,8 @@
 namespace Mautic\ReportBundle\Scheduler\Command;
 
 use Mautic\ReportBundle\Exception\FileIOException;
-use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Model\ReportCleanup;
+use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

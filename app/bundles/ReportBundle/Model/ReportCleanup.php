@@ -37,11 +37,11 @@ class ReportCleanup
      */
     public function cleanup($reportId)
     {
-       $this->fileHandler->deleteCompressedCsvFileForReportId($reportId);
+        $this->fileHandler->deleteCompressedCsvFileForReportId($reportId);
     }
 
     /**
-     * Deletes files older than KEEP_DAYS
+     * Deletes files older than KEEP_FILE_DAYS.
      */
     public function cleanupAll()
     {
@@ -51,7 +51,7 @@ class ReportCleanup
             return;
         }
 
-        $files = array_diff(scandir($reportDirectory), array('.', '..'));
+        $files = array_diff(scandir($reportDirectory), ['.', '..']);
 
         foreach ($files as $file) {
             $filePath = $reportDirectory.'/'.$file;
@@ -69,15 +69,16 @@ class ReportCleanup
      * @param string $filePath
      *
      * @return bool
+     *
      * @throws \Exception
      */
     private function shouldBeDeleted($filePath)
     {
         $created = new \DateTime(date('Y-m-d', filemtime($filePath)));
         $now     = new \DateTime();
-        $days = $created->diff($now)->days;
+        $days    = $created->diff($now)->days;
 
-        if($days >= self::KEEP_FILE_DAYS) {
+        if ($days >= self::KEEP_FILE_DAYS) {
             return true;
         }
 
