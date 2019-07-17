@@ -104,19 +104,13 @@ class FileHandler
 
     /**
      * @param $reportId
-     *
-     * @return bool
      */
     public function deleteCompressedCsvFileForReportId($reportId)
     {
         $filePath = $this->getPathToCompressedCsvFileForReportId($reportId);
         if (file_exists($filePath)) {
             $this->delete($filePath);
-
-            return true;
         }
-
-        return false;
     }
 
     /**

@@ -37,7 +37,9 @@ class ReportCleanup
      */
     public function cleanup($reportId)
     {
-        $this->fileHandler->deleteCompressedCsvFileForReportId($reportId);
+        if ($this->shouldBeDeleted($this->fileHandler->getPathToCompressedCsvFileForReportId($reportId))) {
+            $this->fileHandler->deleteCompressedCsvFileForReportId($reportId);
+        }
     }
 
     /**
