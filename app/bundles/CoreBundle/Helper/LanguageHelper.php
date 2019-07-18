@@ -178,9 +178,17 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->post($this->coreParametersHelper->getParameter('translations_list_url'), [], [], 10);
-            $languages = json_decode($data->body, true);
-            $languages = $languages['languages'];
+            $data      = $this->connector->get($this->coreParametersHelper->getParameter('translations_list_url'), [], 10);
+            $manifest  = json_decode($data->body, true);
+            $languages = [];
+
+            # translate the manifest (plain array) to a format
+            # expected everywhere else inside mautic (locale keyed sorted array)
+            foreach($manifest['languages'] as $lang) {
+              $languages[$lang['locale']] = $lang;
+            }
+            ksort($languages);
+
         } catch (\Exception $exception) {
             // Log the error
             $this->logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
@@ -210,9 +218,6 @@ class LanguageHelper
                     'message' => 'mautic.core.language.helper.error.fetching.languages',
                 ];
         }
-
-        // Alphabetize the languages
-        ksort($languages);
 
         // Store to cache
         $cacheData = [
@@ -252,7 +257,7 @@ class LanguageHelper
             ];
         }
 
-        $langUrl = $this->coreParametersHelper->getParameter('translations_fetch_url').$languageCode;
+        $langUrl = $this->coreParametersHelper->getParameter('translations_fetch_url').$languageCode.'.zip';
 
         // GET the update data
         try {

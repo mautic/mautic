@@ -96,14 +96,14 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['translations_root'], ['cache'])
             ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath);
 
-        $languages      = ['languages' => ['es' => []]];
+        $languages      = ['languages' => [["name"=>"Spanish", "locale"=>"es"]]];
         $response       = new \stdClass();
         $response->code = 200;
         $response->body = json_encode($languages);
 
         $this->connector->expects($this->once())
-            ->method('post')
-            ->with('https://languages.test', [], [], 10)
+            ->method('get')
+            ->with('https://languages.test', [], 10)
             ->willReturn($response);
 
         $this->getHelper()->fetchLanguages();
@@ -111,7 +111,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($langFile);
 
         $written = json_decode(file_get_contents($langFile), true);
-        $this->assertEquals($languages['languages'], $written['languages']);
+        $this->assertEquals($languages['languages'][0], $written['languages']['es']);
 
         @unlink($langFile);
     }
@@ -124,7 +124,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->coreParametersHelper->method('getParameter')
             ->with('translations_fetch_url')
-            ->willReturn('https://languages.test?locale=');
+            ->willReturn('https://languages.test/');
 
         $this->pathsHelper->method('getSystemPath')
             ->withConsecutive(['translations_root'], ['cache'], ['cache'])
@@ -136,7 +136,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->connector->expects($this->once())
             ->method('get')
-            ->with('https://languages.test?locale=es')
+            ->with('https://languages.test/es.zip')
             ->willReturn($response);
 
         $error = $this->getHelper()->fetchPackage('es');
