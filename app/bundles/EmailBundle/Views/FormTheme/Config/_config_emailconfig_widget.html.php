@@ -28,7 +28,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_is_owner', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'disable_unsubscribe_header', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'disable_unsubscribe_header_email_part', $template); ?>
             </div>
 
             <?php if (isset($fields['mailer_from_name']) || isset($fields['mailer_from_email'])): ?>

@@ -91,7 +91,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     {
         $helper = $event->getHelper();
 
-        if ($helper && $helper->isUnsubscribedHeaderDisabled()) {
+        if ($helper && $helper->isUnsubscribeHeaderEmailPartDisabled()) {
             return;
         }
 
