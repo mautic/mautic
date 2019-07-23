@@ -405,9 +405,9 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
 
         if (!$campaignCanBeRestarted) {
+            $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
@@ -440,9 +440,9 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
 
         if (!$campaignCanBeRestarted) {
+            $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
