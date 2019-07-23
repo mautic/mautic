@@ -612,7 +612,9 @@ class LeadModel extends FormModel
                         $this->translator->trans('mautic.stage.event.changed')
                     );
                 } else {
-                    throw new ImportFailedException(sprintf("LEAD: Stage with ID '%s' was not found.", $data['stage']));
+                    throw new ImportFailedException(
+                        sprintf("Stage with ID '%s' was not found.", $data['stage'])
+                    );
                 }
             }
         }
