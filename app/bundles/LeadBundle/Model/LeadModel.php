@@ -604,7 +604,7 @@ class LeadModel extends FormModel
 
             $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
             if ($previousId !== $currentLeadStage) {
-                $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->findByIdOrName($data['stage']);
                 if ($stage) {
                     $lead->stageChangeLogEntry(
                         $stage,

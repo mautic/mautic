@@ -380,7 +380,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $stageRepositoryMock = $this->createMock(StageRepository::class);
         $stageRepositoryMock->expects($this->once())
-            ->method('find')
+            ->method('findByIdOrName')
             ->with($data['stage'])
             ->willReturn(null);
 
