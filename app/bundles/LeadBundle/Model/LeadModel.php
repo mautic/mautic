@@ -48,6 +48,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -620,11 +621,17 @@ class LeadModel extends FormModel
             $previousId = is_object($data['stage']) ? $data['stage']->getId() : (int) $data['stage'];
             if ($previousId !== $currentLeadStage) {
                 $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
-                $lead->stageChangeLogEntry(
-                    $stage,
-                    $stage->getId().':'.$stage->getName(),
-                    $this->translator->trans('mautic.stage.event.changed')
-                );
+                if ($stage) {
+                    $lead->stageChangeLogEntry(
+                        $stage,
+                        $stage->getId().':'.$stage->getName(),
+                        $this->translator->trans('mautic.stage.event.changed')
+                    );
+                } else {
+                    throw new ImportFailedException(
+                        sprintf("LEAD: Stage with ID '%s' was not found.", $data['stage'])
+                    );
+                }
             }
         }
 
