@@ -629,7 +629,7 @@ class LeadModel extends FormModel
                     );
                 } else {
                     throw new ImportFailedException(
-                        sprintf("LEAD: Stage with ID '%s' was not found.", $data['stage'])
+                        sprintf("Stage with ID '%s' was not found.", $data['stage'])
                     );
                 }
             }
