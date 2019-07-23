@@ -38,12 +38,7 @@ if ($support['data']) {
     </div>
 </div>
 
-<script>
-    mQuery(document).ready(function() {
-        mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
-            var canvas = document.getElementById("abtest-bar-chart");
-            var barData = mQuery.parseJSON('<?php echo str_replace('\'', '\\\'', json_encode($chart->render())); ?>');
-            var barGraph = new Chart(canvas, {type: 'bar', data: barData});
-        });
-    });
-</script>
+<?php echo $view->render(
+    'MauticCoreBundle:Helper:chart.html.php',
+    ['chartData' => $chart->render(), 'chartType' => 'bar', 'chartHeight' => 300]
+); ?>
