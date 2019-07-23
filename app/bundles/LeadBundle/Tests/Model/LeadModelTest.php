@@ -16,6 +16,8 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
+use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\IpAddressModel;
@@ -25,6 +27,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -110,21 +113,13 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
         $this->leadModel->setDispatcher($this->dispatcherMock);
         $this->leadModel->setEntityManager($this->entityManagerMock);
 
-        $this->entityManagerMock->expects($this->any())
-            ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['MauticLeadBundle:Lead', $this->leadRepositoryMock],
-                    ]
-                )
-            );
-
         $this->companyModelMock->method('getCompanyLeadRepository')->willReturn($this->companyLeadRepositoryMock);
     }
 
     public function testIpLookupDoesNotAddCompanyIfConfiguredSo()
     {
+        $this->mockGetLeadRepository();
+
         $entity    = new Lead();
         $ipAddress = new IpAddress();
 
@@ -146,6 +141,8 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
     public function testIpLookupAddsCompanyIfDoesNotExistInEntity()
     {
+        $this->mockGetLeadRepository();
+
         $companyFromIpLookup = 'Doctors Without Borders';
         $entity              = new Lead();
         $ipAddress           = new IpAddress();
@@ -168,6 +165,8 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
     public function testIpLookupAddsCompanyIfExistsInEntity()
     {
+        $this->mockGetLeadRepository();
+
         $companyFromIpLookup = 'Doctors Without Borders';
         $companyFromEntity   = 'Red Cross';
         $entity              = new Lead();
@@ -364,6 +363,38 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testInportIsIgnoringContactWitNotFoudStage()
+    {
+        $lead = new Lead();
+        $lead->setId(1);
+        $data = ['stage' => 'not found'];
+
+        $stagesChangeLogRepo = $this->createMock(StagesChangeLogRepository::class);
+        $stagesChangeLogRepo->expects($this->once())
+            ->method('getCurrentLeadStage')
+            ->with($lead->getId())
+            ->willReturn(null);
+
+        $stageRepositoryMock = $this->createMock(StageRepository::class);
+        $stageRepositoryMock->expects($this->once())
+            ->method('find')
+            ->with($data['stage'])
+            ->willReturn(null);
+
+        $this->entityManagerMock->expects($this->at(0))
+            ->method('getRepository')
+            ->with('MauticLeadBundle:StagesChangeLog')
+            ->willReturn($stagesChangeLogRepo);
+        $this->entityManagerMock->expects($this->at(1))
+            ->method('getRepository')
+            ->with('MauticStageBundle:Stage')
+            ->willReturn($stageRepositoryMock);
+
+        $this->expectException(ImportFailedException::class);
+
+        $this->leadModel->setFieldValues($lead, $data, false, false);
+    }
+
     /**
      * Set protected property to an object.
      *
@@ -377,5 +408,18 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
         $reflectedProp = new \ReflectionProperty($class, $property);
         $reflectedProp->setAccessible(true);
         $reflectedProp->setValue($object, $value);
+    }
+
+    private function mockGetLeadRepository()
+    {
+        $this->entityManagerMock->expects($this->any())
+            ->method('getRepository')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['MauticLeadBundle:Lead', $this->leadRepositoryMock],
+                    ]
+                )
+            );
     }
 }
