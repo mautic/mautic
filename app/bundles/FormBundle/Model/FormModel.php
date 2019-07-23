@@ -1122,4 +1122,21 @@ class FormModel extends CommonFormModel
             $formField->setProperties($formFieldProps);
         }
     }
+
+    /**
+     * @param Form   $form
+     * @param string $fieldAlias
+     *
+     * @return Field|null
+     */
+    public function findFormFieldByAlias(Form $form, $fieldAlias)
+    {
+        foreach ($form->getFields() as $field) {
+            if ($field->getAlias() === $fieldAlias) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
 }
