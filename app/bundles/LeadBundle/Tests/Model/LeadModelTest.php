@@ -34,6 +34,7 @@ use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -390,6 +391,12 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with(Stage::class)
             ->willReturn($stageRepositoryMock);
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']]);
+        $this->leadModel->setTranslator($translator);
 
         $this->expectException(ImportFailedException::class);
 
