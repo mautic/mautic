@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
@@ -179,12 +180,13 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $config    = $event->getActionConfig();
-        $lead      = $event->getSubmission()->getLead();
+        $eventSubmission = $event->getSubmission();
+        $lead      = $eventSubmission->getLead();
         $leadEmail = null !== $lead ? $lead->getEmail() : null;
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
-            $this->setMailer($config, $tokens, $emails, $lead);
+            $this->setMailer($config, $tokens, $emails, $eventSubmission);
 
             // Check for !isset to keep BC to existing behavior prior to 2.13.0
             if ((!isset($config['set_replyto']) || !empty($config['set_replyto'])) && !empty($leadEmail)) {
@@ -207,7 +209,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->setMailer($config, $tokens, $leadEmail, $lead, false);
+            $this->setMailer($config, $tokens, $leadEmail, $eventSubmission, false);
 
             $this->mailer->send(true);
         }
@@ -215,7 +217,7 @@ class FormSubscriber implements EventSubscriberInterface
         $owner = null !== $lead ? $lead->getOwner() : null;
         if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
-            $this->setMailer($config, $tokens, $owner->getEmail(), $lead);
+            $this->setMailer($config, $tokens, $owner->getEmail(), $eventSubmission);
 
             $this->mailer->send(true);
         }
@@ -423,10 +425,13 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param      $to
-     * @param bool $internalSend
+     * @param array     $config
+     * @param array     $tokens
+     * @param           $to
+     * @param Submission|null $eventSubmission
+     * @param bool      $internalSend
      */
-    private function setMailer(array $config, array $tokens, $to, Lead $lead = null, $internalSend = true)
+    private function setMailer(array $config, array $tokens, $to, Submission $eventSubmission = null, $internalSend = true)
     {
         $this->mailer->reset();
 
@@ -441,8 +446,16 @@ class FormSubscriber implements EventSubscriberInterface
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
 
-        if ($lead) {
-            $this->mailer->setLead($lead->getProfileFields(), $internalSend);
+        if (isset($config['file_is_attached']) && $config['file_is_attached'] && !is_null($eventSubmission->getFilePaths())) {
+            foreach ($eventSubmission->getFilePaths() as $filePath) {
+                if (file_exists($filePath)) {
+                    $this->mailer->attachFile($filePath);
+                }
+            }
+        }
+
+        if (!is_null($eventSubmission) && !is_null($eventSubmission->getLead())) {
+            $this->mailer->setLead($eventSubmission->getLead()->getProfileFields(), $internalSend);
         }
     }
 }
