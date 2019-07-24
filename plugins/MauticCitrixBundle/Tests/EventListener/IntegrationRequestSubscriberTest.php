@@ -12,12 +12,35 @@
 namespace MauticPlugin\MauticCitrixBundle\Tests\EventListener;
 
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\PluginEvents;
 use MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber;
 use PHPUnit_Framework_TestCase;
 
 class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
 {
+
+    /** @var PluginIntegrationRequestEvent */
+    protected $event;
+
+    /** @var IntegrationRequestSubscriber */
+    protected $subscriber;
+
+    protected function setUp()
+    {
+        $this->subscriber = $this->getMockBuilder(IntegrationRequestSubscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['getParameters', 'getAuthorization'])
+            ->getMock();
+
+        $integration = $this->getMockBuilder(UnifiedIntegrationInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->event = new PluginIntegrationRequestEvent($integration, '\'oauth/v2/token\'', null, null, null, null, null);
+    }
+
+
     /**
      * Tests getSubscribedEvents method.
      */
@@ -31,24 +54,62 @@ class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testGetParametersMethod()
+    public function testExceptionOnEmptyClientId()
     {
-        $event = $this->getMockBuilder(PluginIntegrationRequestEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['setHeaders'])
-            ->getMock();
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No client ID given.');
 
-        $event
-            ->method('getUrl')
-            ->willReturn('\'oauth/v2/token\'');
+        $this->event->setParameters([
+            'client_secret' => 'abc',
+        ]);
 
-        $event
-            ->method('getParameters')
-            ->will($this->onConsecutiveCalls([], [], [], []));
+        $this->subscriber->getParameters($this->event);
+    }
 
-        $subscriber = $this->getMockBuilder(IntegrationRequestSubscriber::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['getParameters', 'getAuthorization'])
-            ->getMock();
+    public function testExceptionOnEmptyClientSecret()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('No client secret given.');
+
+        $this->event->setParameters([
+            'client_id' => 'abc',
+        ]);
+
+        $this->subscriber->getParameters($this->event);
+    }
+
+    public function testExceptionOnEmptyParameters()
+    {
+        $this->expectException(\Exception::class);
+
+        $this->event->setParameters([]);
+
+        $this->subscriber->getParameters($this->event);
+    }
+
+    public function testNoExceptionOnCorrectParameters()
+    {
+        $this->event->setParameters([
+            'client_id' => 'abc',
+            'client_secret' => 'def',
+        ]);
+
+        $this->subscriber->getParameters($this->event);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testHeaders()
+    {
+        $this->event->setParameters([
+            'client_id' => 'abc',
+            'client_secret' => 'def',
+        ]);
+
+        $this->subscriber->getParameters($this->event);
+
+        $this->assertSame($this->event->getHeaders(), array(
+            'Authorization' => 'Basic YWJjOmRlZg==',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ));
     }
 }
