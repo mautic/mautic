@@ -27,6 +27,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
@@ -390,7 +391,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($stagesChangeLogRepo);
         $this->entityManagerMock->expects($this->at(1))
             ->method('getRepository')
-            ->with('MauticStageBundle:Stage')
+            ->with(Stage::class)
             ->willReturn($stageRepositoryMock);
 
         $this->expectException(ImportFailedException::class);
