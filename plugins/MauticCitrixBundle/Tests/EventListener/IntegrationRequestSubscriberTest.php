@@ -39,9 +39,6 @@ class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
         $this->event = new PluginIntegrationRequestEvent($integration, '\'oauth/v2/token\'', null, null, null, null, null);
     }
 
-    /**
-     * Tests getSubscribedEvents method.
-     */
     public function testGetSubscribedEventsMethod()
     {
         $this->assertSame(IntegrationRequestSubscriber::getSubscribedEvents(), [
