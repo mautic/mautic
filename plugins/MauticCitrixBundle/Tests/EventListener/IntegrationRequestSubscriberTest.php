@@ -19,7 +19,6 @@ use PHPUnit_Framework_TestCase;
 
 class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
 {
-
     /** @var PluginIntegrationRequestEvent */
     protected $event;
 
@@ -39,7 +38,6 @@ class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
 
         $this->event = new PluginIntegrationRequestEvent($integration, '\'oauth/v2/token\'', null, null, null, null, null);
     }
-
 
     /**
      * Tests getSubscribedEvents method.
@@ -90,7 +88,7 @@ class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
     public function testNoExceptionOnCorrectParameters()
     {
         $this->event->setParameters([
-            'client_id' => 'abc',
+            'client_id'     => 'abc',
             'client_secret' => 'def',
         ]);
 
@@ -101,15 +99,15 @@ class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
     public function testHeaders()
     {
         $this->event->setParameters([
-            'client_id' => 'abc',
+            'client_id'     => 'abc',
             'client_secret' => 'def',
         ]);
 
         $this->subscriber->getParameters($this->event);
 
-        $this->assertSame($this->event->getHeaders(), array(
+        $this->assertSame($this->event->getHeaders(), [
             'Authorization' => 'Basic YWJjOmRlZg==',
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        ));
+            'Content-Type'  => 'application/x-www-form-urlencoded',
+        ]);
     }
 }
