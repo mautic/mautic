@@ -40,7 +40,7 @@ class Version20190724110039 extends AbstractMauticMigration
             foreach ($multiselectFields as $key => $field) {
                 if ($leadsTable->hasColumn($field['alias'])){
                     if ($leadsTable->hasIndex("{$field['alias']}_search")){
-                        $this->addSql("DROP INDEX `{$field['alias']}_search` ON `{$this->prefix}leads`");    
+                        $this->addSql("DROP INDEX `{$field['alias']}_search` ON `{$this->prefix}leads`");
                     }
                     $this->addSql("ALTER TABLE `{$this->prefix}leads` CHANGE `{$field['alias']}` `{$field['alias']}` TEXT");
                 }            
@@ -69,7 +69,7 @@ class Version20190724110039 extends AbstractMauticMigration
                 if ($leadsTable->hasColumn($field['alias'])){
                     $this->addSql("ALTER TABLE `{$this->prefix}leads` CHANGE `{$field['alias']}` `{$field['alias']}` VARCHAR(255)");
                     if (!$leadsTable->hasIndex("{$field['alias']}_search")){
-                        $this->addSql("CREATE INDEX `{$field['alias']}_search` ON `{$this->prefix}leads`(`{$field['alias']}`)");    
+                        $this->addSql("CREATE INDEX `{$field['alias']}_search` ON `{$this->prefix}leads`(`{$field['alias']}`)");
                     }
                 }            
             }
