@@ -66,6 +66,11 @@ class Submission
     /**
      * @var array
      */
+    private $filePaths;
+
+    /**
+     * @var array
+     */
     private $results = [];
 
     /**
@@ -364,5 +369,21 @@ class Submission
         }
 
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilePaths()
+    {
+        return $this->filePaths;
+    }
+
+    /**
+     * @param array $filePaths
+     */
+    public function setFilePaths($filePaths)
+    {
+        $this->filePaths = $filePaths;
     }
 }

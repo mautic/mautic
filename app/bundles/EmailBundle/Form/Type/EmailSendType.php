@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -57,6 +58,16 @@ class EmailSendType extends AbstractType
                         ['message' => 'mautic.email.chooseemail.notblank']
                     ),
                 ],
+            ]
+        );
+
+        $default = isset($options['data']['file_is_attached']) ? $options['data']['file_is_attached'] : false;
+        $builder->add(
+            'file_is_attached',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.action.sendemail.file.attached',
+                'data'  => $default,
             ]
         );
 
