@@ -613,7 +613,7 @@ class LeadModel extends FormModel
                     );
                 } else {
                     throw new ImportFailedException(
-                        sprintf("Stage with ID '%s' was not found.", $data['stage'])
+                        $this->translator->trans('mautic.lead.import.stage.not.exists', ['id' => $data['stage']])
                     );
                 }
             }
