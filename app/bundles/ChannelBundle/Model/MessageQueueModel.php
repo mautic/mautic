@@ -28,6 +28,9 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class MessageQueueModel extends FormModel
 {
+    /** @var string A default message reschedule interval */
+    const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
+
     /**
      * @var LeadModel
      */
@@ -112,12 +115,13 @@ class MessageQueueModel extends FormModel
         $queuedContacts = [];
         if (!empty($dontSendTo)) {
             foreach ($dontSendTo as $frequencyRuleMet) {
-                $scheduleInterval = '1'.substr($frequencyRuleMet['frequency_time'], 0, 1);
+                // We only deal with date intervals here (no time intervals) so it's safe to use 'P'
+                $scheduleInterval = new \DateInterval('P1'.substr($frequencyRuleMet['frequency_time'], 0, 1));
                 if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
-                    $this->rescheduleMessage($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
+                    $this->reschedule($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
                 } else {
                     // Queue this message to be processed by frequency and priority
-                    $this->addToQueue(
+                    $this->queue(
                         [$leads[$frequencyRuleMet['lead_id']]],
                         $channel,
                         $channelId,
@@ -136,6 +140,68 @@ class MessageQueueModel extends FormModel
     }
 
     /**
+     * Adds messages to the queue
+     *
+     * @param $leads
+     * @param $channel
+     * @param $channelId
+     * @param \DateInterval $scheduledInterval
+     * @param int           $maxAttempts
+     * @param int           $priority
+     * @param null          $campaignEventId
+     * @param array         $options
+     *
+     * @return bool
+     */
+    public function queue(
+        $leads,
+        $channel,
+        $channelId,
+        \DateInterval $scheduledInterval,
+        $maxAttempts = 1,
+        $priority = 1,
+        $campaignEventId = null,
+        $options = []
+    ) {
+        $messageQueues = [];
+
+        $scheduledDate = (new \DateTime())->add($scheduledInterval);
+
+        foreach ($leads as $lead) {
+            $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
+            if (!empty($this->getRepository()->findMessage($channel, $channelId, $leadId))) {
+                continue;
+            }
+
+            $messageQueue = new MessageQueue();
+            if ($campaignEventId) {
+                $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
+            }
+            $messageQueue->setChannel($channel);
+            $messageQueue->setChannelId($channelId);
+            $messageQueue->setDatePublished(new \DateTime());
+            $messageQueue->setMaxAttempts($maxAttempts);
+            $messageQueue->setLead(
+                ($lead instanceof Lead) ? $lead : $this->em->getReference('MauticLeadBundle:Lead', $leadId)
+            );
+            $messageQueue->setPriority($priority);
+            $messageQueue->setScheduledDate($scheduledDate);
+            $messageQueue->setOptions($options);
+
+            $messageQueues[] = $messageQueue;
+        }
+
+        if ($messageQueues) {
+            $this->saveEntities($messageQueues);
+            $this->em->clear(MessageQueue::class);
+        }
+
+        return true;
+    }
+
+    /**
+     * @deprecated to be removed in 3.0; use queue method instead
+     *
      * @param       $leads
      * @param       $channel
      * @param       $channelId
@@ -168,24 +234,26 @@ class MessageQueueModel extends FormModel
 
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
-            if (empty($this->getRepository()->findMessage($channel, $channelId, $leadId))) {
-                $messageQueue = new MessageQueue();
-                if ($campaignEventId) {
-                    $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
-                }
-                $messageQueue->setChannel($channel);
-                $messageQueue->setChannelId($channelId);
-                $messageQueue->setDatePublished(new \DateTime());
-                $messageQueue->setMaxAttempts($maxAttempts);
-                $messageQueue->setLead(
-                    ($lead instanceof Lead) ? $lead : $this->em->getReference('MauticLeadBundle:Lead', $leadId)
-                );
-                $messageQueue->setPriority($priority);
-                $messageQueue->setScheduledDate($scheduledDate);
-                $messageQueue->setOptions($options);
-
-                $messageQueues[] = $messageQueue;
+            if (!empty($this->getRepository()->findMessage($channel, $channelId, $leadId))) {
+                continue;
             }
+
+            $messageQueue = new MessageQueue();
+            if ($campaignEventId) {
+                $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
+            }
+            $messageQueue->setChannel($channel);
+            $messageQueue->setChannelId($channelId);
+            $messageQueue->setDatePublished(new \DateTime());
+            $messageQueue->setMaxAttempts($maxAttempts);
+            $messageQueue->setLead(
+                ($lead instanceof Lead) ? $lead : $this->em->getReference('MauticLeadBundle:Lead', $leadId)
+            );
+            $messageQueue->setPriority($priority);
+            $messageQueue->setScheduledDate($scheduledDate);
+            $messageQueue->setOptions($options);
+
+            $messageQueues[] = $messageQueue;
         }
 
         if ($messageQueues) {
@@ -313,7 +381,7 @@ class MessageQueueModel extends FormModel
                 $message->setStatus(MessageQueue::STATUS_SENT);
             } elseif ($message->isFailed()) {
                 // Failure such as email delivery issue or something so retry in a short time
-                $this->rescheduleMessage($message, '15M');
+                $this->reschedule($message, new \DateInterval(self::DEFAULT_RESCHEDULE_INTERVAL));
             } // otherwise assume the listener did something such as rescheduling the message
         }
 
@@ -324,6 +392,43 @@ class MessageQueueModel extends FormModel
     }
 
     /**
+     * @param               $message
+     * @param \DateInterval $rescheduleInterval
+     * @param null          $leadId
+     * @param null          $channel
+     * @param null          $channelId
+     * @param bool          $persist
+     */
+    public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, $persist = false)
+    {
+        if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
+            $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
+            $persist = true;
+        }
+
+        if (!$message) {
+            return;
+        }
+
+        $message->setAttempts($message->getAttempts() + 1);
+        $message->setLastAttempt(new \DateTime());
+        $rescheduleTo = clone $message->getScheduledDate();
+
+        $rescheduleTo->add($rescheduleInterval);
+        $message->setScheduledDate($rescheduleTo);
+        $message->setStatus(MessageQueue::STATUS_RESCHEDULED);
+
+        if ($persist) {
+            $this->saveEntity($message);
+        }
+
+        // Mark as processed for listeners
+        $message->setProcessed();
+    }
+
+    /**
+     * @deprecated to be removed in 3.0; use reschedule method instead
+     *
      * @param        $message
      * @param string $rescheduleInterval
      * @param null   $leadId
@@ -333,33 +438,9 @@ class MessageQueueModel extends FormModel
      */
     public function rescheduleMessage($message, $rescheduleInterval = null, $leadId = null, $channel = null, $channelId = null, $persist = false)
     {
-        if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
-            $message = $this->getRepository()->findMessage($channel, $channelId, $leadId);
-            $persist = true;
-        }
+        $rescheduleInterval = null == $rescheduleInterval ? self::DEFAULT_RESCHEDULE_INTERVAL : ('P'.$rescheduleInterval);
 
-        if ($message) {
-            $message->setAttempts($message->getAttempts() + 1);
-            $message->setLastAttempt(new \DateTime());
-            $rescheduleTo = clone $message->getScheduledDate();
-
-            if (null == $rescheduleInterval) {
-                $rescheduleInterval = 'PT15M';
-            } else {
-                $rescheduleInterval = (('H' === $rescheduleInterval) ? 'PT' : 'P').$rescheduleInterval;
-            }
-
-            $rescheduleTo->add(new \DateInterval($rescheduleInterval));
-            $message->setScheduledDate($rescheduleTo);
-            $message->setStatus(MessageQueue::STATUS_RESCHEDULED);
-
-            if ($persist) {
-                $this->saveEntity($message);
-            }
-
-            // Mark as processed for listeners
-            $message->setProcessed();
-        }
+        return $this->reschedule($message, new \DateInterval($rescheduleInterval), $leadId, $channel, $channelId, $persist);
     }
 
     /**

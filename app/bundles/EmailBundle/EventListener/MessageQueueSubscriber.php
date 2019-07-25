@@ -65,23 +65,24 @@ class MessageQueueSubscriber extends CommonSubscriber
         $sendTo            = [];
         $messagesByContact = [];
         $options           = [
-                'email_type' => 'marketing',
-            ];
+            'email_type' => 'marketing',
+        ];
 
         /** @var MessageQueue $message */
         foreach ($messages as $id => $message) {
-            if ($email && $message->getLead() && $email->isPublished()) {
-                $contact = $message->getLead()->getProfileFields();
-                if (empty($contact['email'])) {
-                    // No email so just let this slide
-                    $message->setProcessed();
-                    $message->setSuccess();
-                }
-                $sendTo[$contact['id']]            = $contact;
-                $messagesByContact[$contact['id']] = $message;
-            } else {
+            if (!($email && $message->getLead() && $email->isPublished())) {
                 $message->setFailed();
+                continue;
             }
+
+            $contact = $message->getLead()->getProfileFields();
+            if (empty($contact['email'])) {
+                // No email so just let this slide
+                $message->setProcessed();
+                $message->setSuccess();
+            }
+            $sendTo[$contact['id']]            = $contact;
+            $messagesByContact[$contact['id']] = $message;
         }
 
         if (count($sendTo)) {
@@ -91,12 +92,20 @@ class MessageQueueSubscriber extends CommonSubscriber
             // Let's see who was successful
             foreach ($messagesByContact as $contactId => $message) {
                 // If the message is processed, it was rescheduled by sendEmail
-                if (!$message->isProcessed()) {
-                    $message->setProcessed();
-                    if (empty($errors[$contactId])) {
-                        $message->setSuccess();
-                    }
+                if ($message->isProcessed()) {
+                    continue;
                 }
+
+                $message->setProcessed();
+                if (empty($errors[$contactId])) {
+                    $message->setSuccess();
+                    continue;
+                }
+
+                // Setting it to failed so it could be rescheduled
+                // by MessageQueueModel::processMessageQueue.
+                // We will get job loops otherwise.
+                $message->setFailed();
             }
         }
 
