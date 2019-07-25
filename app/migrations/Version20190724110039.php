@@ -11,7 +11,6 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
