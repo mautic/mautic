@@ -40,7 +40,7 @@ class FormFieldEmailType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'donotsubmit_email',
+            'donotsubmit',
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.field.type.donotsubmit',

@@ -169,9 +169,9 @@ return [
 
     'services' => [
         'events' => [
-                'mautic.core.configbundle.subscriber.form' => [
-                    'class'     => \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
-                ],
+            'mautic.core.configbundle.subscriber.form' => [
+                'class'     => \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
+            ],
             'mautic.form.subscriber' => [
                 'class'     => FormSubscriber::class,
                 'arguments' => [
@@ -254,10 +254,10 @@ return [
             ],
         ],
         'forms' => [
-                'mautic.form.type.formconfig' => [
-                    'class' => \Mautic\FormBundle\Form\Type\ConfigFormType::class,
+            'mautic.form.type.formconfig' => [
+                'class'     => \Mautic\FormBundle\Form\Type\ConfigFormType::class,
                     'alias' => 'formconfig',
-                ],
+            ],
             'mautic.form.type.form' => [
                 'class'     => FormType::class,
                 'arguments' => 'mautic.factory',

@@ -43,10 +43,8 @@ class FormValidationSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD                => ['onFormBuilder', 0],
-            FormEvents::ON_FORM_VALIDATE             => [
-                'onFormValidate', 0,
-            ],
+            FormEvents::FORM_ON_BUILD    => ['onFormBuilder', 0],
+            FormEvents::ON_FORM_VALIDATE => ['onFormValidate', 0],
         ];
     }
 
@@ -66,14 +64,16 @@ class FormValidationSubscriber extends CommonSubscriber
             ]
         );
 
-        $event->addValidator(
-            'email.validation',
-            [
-                'eventName' => FormEvents::ON_FORM_VALIDATE,
-                'fieldType' => 'email',
-                'formType'  => FormFieldEmailType::class,
-            ]
-        );
+        if (!empty($this->coreParametersHelper->getParameter('do_not_submit_emails'))) {
+            $event->addValidator(
+                'email.validation',
+                [
+                    'eventName' => FormEvents::ON_FORM_VALIDATE,
+                    'fieldType' => 'email',
+                    'formType'  => FormFieldEmailType::class,
+                ]
+            );
+        }
     }
 
     /**
