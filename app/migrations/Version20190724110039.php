@@ -43,7 +43,7 @@ class Version20190724110039 extends AbstractMauticMigration
                         $this->addSql("DROP INDEX `{$field['alias']}_search` ON `{$this->prefix}leads`");
                     }
                     $this->addSql("ALTER TABLE `{$this->prefix}leads` CHANGE `{$field['alias']}` `{$field['alias']}` TEXT");
-                }            
+                }
             }
         }
     }
@@ -71,7 +71,7 @@ class Version20190724110039 extends AbstractMauticMigration
                     if (!$leadsTable->hasIndex("{$field['alias']}_search")) {
                         $this->addSql("CREATE INDEX `{$field['alias']}_search` ON `{$this->prefix}leads`(`{$field['alias']}`)");
                     }
-                }            
+                }
             }
         }
     }
