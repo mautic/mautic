@@ -702,6 +702,20 @@ class ConfigType extends AbstractType
             ]
         );
         $builder->add(
+            'email_unlimited_marketing',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.email.unlimited.marketing',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.email.unlimited.marketing.tooltip',
+                ],
+                'data'       => empty($options['data']['email_unlimited_marketing']) ? false : true,
+                'required'   => false,
+            ]
+        );
+        $builder->add(
             'show_contact_segments',
             'yesno_button_group',
             [
