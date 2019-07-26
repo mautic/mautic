@@ -115,9 +115,9 @@ $template  = '<div class="col-md-6">{content}</div>';
             <div class="col-md-12">
                 <?php echo $view['form']->row($fields['email_frequency_time']); ?>
             </div>
-        </div>
-        <div class="row">
-            <?php echo $view['form']->row($fields['email_unlimited_marketing']); ?>
+            <div class="col-md-12">
+                <?php echo $view['form']->row($fields['email_unlimited_marketing']); ?>
+            </div>
         </div>
     </div>
 </div>
