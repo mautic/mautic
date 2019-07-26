@@ -12,11 +12,11 @@
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\SmsBundle\Event\SmsSendEvent;
+use Mautic\SmsBundle\SmsEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
 use Mautic\WebhookBundle\WebhookEvents;
-use Mautic\SmsBundle\SmsEvents;
-use Mautic\SmsBundle\Event\SmsSendEvent;
 
 class WebhookSubscriber extends CommonSubscriber
 {
