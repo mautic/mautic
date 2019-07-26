@@ -183,6 +183,21 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->with('email')
             ->willReturn('winner@test.com');
 
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->exactly(3))
             ->method('getId')
             ->willReturn(1);
@@ -233,6 +248,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->expects($this->exactly(2))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('getFieldValue')
             ->with('email')
@@ -290,6 +321,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->expects($this->exactly(2))
             ->method('getDateModified')
             ->willReturn($winnerDateModified);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('getFieldValue')
             ->with('email')
@@ -355,6 +402,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
         $winner->expects($this->once())
             ->method('getDateAdded')
             ->willReturn($winnerDateModified);
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('getFieldValue')
             ->with('email')
@@ -506,6 +569,22 @@ class ContactMergerTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldValue')
             ->with('email')
             ->willReturn('winner@test.com');
+
+        $winner->expects($this->once())
+            ->method('getField')
+            ->with('email')
+            ->willReturn([
+                'value'         => 'winner@test.com',
+                'id'            => 22,
+                'label'         => 'Email',
+                'alias'         => 'email',
+                'type'          => 'email',
+                'group'         => 'core',
+                'object'        => 'lead',
+                'is_fixed'      => true,
+                'default_value' => null,
+            ]);
+
         $winner->expects($this->once())
             ->method('addUpdatedField')
             ->with('email', 'loser@test.com');
