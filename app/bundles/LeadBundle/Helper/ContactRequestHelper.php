@@ -167,10 +167,16 @@ class ContactRequestHelper
         if (!empty($this->queryFields)) {
             list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
-                $this->trackedContact,
+                (!$this->trackedContact->isAnonymous() && $this->coreParametersHelper->getParameter('disable_merge_identified_contacts')) ? null : $this->trackedContact,
+
                 true,
                 true
             );
+
+            if ($foundContact && !$foundContact->getId()) {
+                $this->leadModel->saveEntity($foundContact);
+            }
+
             if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 return $foundContact;

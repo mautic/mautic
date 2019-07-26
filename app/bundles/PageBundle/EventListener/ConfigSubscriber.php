@@ -61,6 +61,7 @@ class ConfigSubscriber extends CommonSubscriber
             'parameters' => [
                 'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
+                'disable_merge_identified_contacts'     => false,
                 'track_by_tracking_url'                 => false,
                 'track_by_fingerprint'                  => false,
                 'facebook_pixel_id'                     => null,

@@ -67,6 +67,18 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
+            'disable_merge_identified_contacts',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.form.disable_merge_identified_contacts',
+                'data'  => isset($options['data']['disable_merge_identified_contacts']) ? (bool) $options['data']['disable_merge_identified_contacts'] : false,
+                'attr'  => [
+                    'tooltip'      => 'mautic.page.config.form.disable_merge_identified_contacts.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'facebook_pixel_id',
             'text',
             [
