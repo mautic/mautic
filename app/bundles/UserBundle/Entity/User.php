@@ -466,7 +466,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             $this->username,
             $this->password,
             $published
-            ) = unserialize($serialized);
+            ) = unserialize($serialized, ['allowed_classes' => false]);
         $this->setIsPublished($published);
     }
 

@@ -101,7 +101,7 @@ class TrackingHelper
     public function getSession($remove = false)
     {
         $sessionName = $this->getSessionName();
-        $sesionValue = unserialize($this->session->get($sessionName));
+        $sesionValue = unserialize($this->session->get($sessionName), ['allowed_classes' => false]);
         if ($remove) {
             $this->session->remove($sessionName);
         }

@@ -68,7 +68,7 @@ class FormatterHelper extends Helper
             case 'array':
                 if (!is_array($val)) {
                     //assume that it's serialized
-                    $unserialized = unserialize($val);
+                    $unserialized = unserialize($val, ['allowed_classes' => false]);
                     if ($unserialized) {
                         $val = $unserialized;
                     }

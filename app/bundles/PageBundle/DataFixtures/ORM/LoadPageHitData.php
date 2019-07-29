@@ -55,7 +55,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
                         $hit->$setter(new \DateTime($val));
                     } elseif ($col == 'browserLanguages') {
-                        $val = unserialize(stripslashes($val));
+                        $val = unserialize(stripslashes($val), ['allowed_classes' => false]);
                         $hit->$setter($val);
                     } else {
                         $hit->$setter($val);

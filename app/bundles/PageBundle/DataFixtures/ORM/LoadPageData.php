@@ -55,7 +55,7 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
                     } elseif (in_array($col, ['dateAdded', 'variantStartDate'])) {
                         $page->$setter(new \DateTime($val));
                     } elseif (in_array($col, ['content', 'variantSettings'])) {
-                        $val = unserialize(stripslashes($val));
+                        $val = unserialize(stripslashes($val), ['allowed_classes' => false]);
                         $page->$setter($val);
                     } else {
                         $page->$setter($val);

@@ -54,7 +54,7 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, 
                 if ($val != 'NULL') {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['content', 'variantSettings'])) {
-                        $val = unserialize(stripslashes($val));
+                        $val = unserialize(stripslashes($val), ['allowed_classes' => false]);
                     }
                     $email->$setter($val);
                 }
