@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider\Oauth2ThreeLegged;
 
 use kamermans\OAuth2\Token\TokenInterface;
-use MauticPlugin\SalesforceBundle\Connection\TokenPersistence;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenPersistence;
 
 class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 {
