@@ -19,9 +19,7 @@ use GuzzleHttp\HandlerStack;
 use kamermans\OAuth2\GrantType\AuthorizationCode;
 use kamermans\OAuth2\GrantType\RefreshToken;
 use kamermans\OAuth2\OAuth2Middleware;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenPersistenceInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenSignerInterface;
@@ -36,9 +34,9 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  * Based on Guzzle OAuth 2.0 Subscriber - kamermans/guzzle-oauth2-subscriber package
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
  */
-class HttpFactory implements AuthProviderInterface
+class HttpFactory
 {
-    const NAME = 'oauth2_three_legged';
+    private const NAME = 'oauth2_three_legged';
 
     /**
      * @var CredentialsInterface
@@ -71,13 +69,13 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param AuthCredentialsInterface|CredentialsInterface $credentials
-     * @param AuthConfigInterface|ConfigInterface|null $config
+     * @param AuthCredentialsInterface|CredentialsInterface                             $credentials
+     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, $config = null): ClientInterface
     {
         if (!$this->credentialsAreConfigured($credentials)) {
             throw new PluginNotConfiguredException('Missing credentials');

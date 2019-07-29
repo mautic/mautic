@@ -6,12 +6,12 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider\Oauth2ThreeLegged;
 
 use GuzzleHttp\ClientInterface;
 use kamermans\OAuth2\OAuth2Middleware;
+use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPersistenceInterface;
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
-use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface as ClientCredentialsSigner;
+use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenPersistenceInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenSignerInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\ConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CodeInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\RedirectUriInterface;
@@ -231,61 +231,40 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testClientConfiguration()
     {
-        $credentials            = $this->getCredentials();
-        $tokenPersistence       = $this->createMock(TokenPersistenceInterface::class);
-        $accessTokenSigner      = $this->createMock(AccessTokenSigner::class);
-        $clientCredentialSigner = $this->createMock(ClientCredentialsSigner::class);
+        $credentials               = $this->getCredentials();
+        $signerInterface           = $this->createMock(SignerInterface::class);
+        $kamermansTokenPersistence = $this->createMock(KamermansTokenPersistenceInterface::class);
+        $accessTokenSigner         = $this->createMock(AccessTokenSigner::class);
 
-        $config = new Class($tokenPersistence, $accessTokenSigner, $clientCredentialSigner) implements ConfigInterface
-        {
-            private $tokenPersistence;
-            private $accessTokenSigner;
-            private $clientCredentialSigner;
+        $clientCredentialSigner = $this->createMock(CredentialsSignerInterface::class);
+        $clientCredentialSigner->expects($this->once())
+            ->method('getCredentialsSigner')
+            ->willReturn($signerInterface);
 
-            /**
-             *  constructor.
-             *
-             * @param $tokenPersistence
-             * @param $accessTokenSigner
-             * @param $clientCredentialSigner
-             */
-            public function __construct($tokenPersistence, $accessTokenSigner, $clientCredentialSigner)
-            {
-                $this->tokenPersistence       = $tokenPersistence;
-                $this->accessTokenSigner      = $accessTokenSigner;
-                $this->clientCredentialSigner = $clientCredentialSigner;
-            }
-
-            public function getAccessTokenPersistence(): TokenPersistenceInterface
-            {
-                return $this->tokenPersistence;
-            }
-
-            public function getAccessTokenSigner(): TokenSignerInterface
-            {
-                return $this->accessTokenSigner;
-            }
-
-            public function getClientCredentialsSigner(): CredentialsSignerInterface
-            {
-                return $this->clientCredentialSigner;
-            }
-        };
-
-        $client = (new HttpFactory())->getClient($credentials, $config);
-
+        $client = (new HttpFactory())->getClient($credentials, $clientCredentialSigner);
         $middleware = $this->extractMiddleware($client);
-
         $reflectedMiddleware = new \ReflectionClass($middleware);
+        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner') === $signerInterface);
 
-        $clientCredentialSigner = $this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner');
-        $this->assertTrue($clientCredentialSigner === $config->getClientCredentialsSigner());
+        $tokenPersistence = $this->createMock(TokenPersistenceInterface::class);
+        $tokenPersistence->expects($this->once())
+            ->method('getTokenPersistence')
+            ->willReturn($kamermansTokenPersistence);
 
-        $accessTokenSigner = $this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner');
-        $this->assertTrue($accessTokenSigner === $config->getAccessTokenSigner());
+        $client = (new HttpFactory())->getClient($credentials, $tokenPersistence);
+        $middleware = $this->extractMiddleware($client);
+        $reflectedMiddleware = new \ReflectionClass($middleware);
+        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence') === $kamermansTokenPersistence);
 
-        $tokenPersistence = $this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence');
-        $this->assertTrue($tokenPersistence === $config->getAccessTokenPersistence());
+        $tokenPersistence = $this->createMock(TokenSignerInterface::class);
+        $tokenPersistence->expects($this->once())
+            ->method('getTokenSigner')
+            ->willReturn($accessTokenSigner);
+
+        $client = (new HttpFactory())->getClient($credentials, $tokenPersistence);
+        $middleware = $this->extractMiddleware($client);
+        $reflectedMiddleware = new \ReflectionClass($middleware);
+        $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'accessTokenSigner') === $accessTokenSigner);
     }
 
     /**

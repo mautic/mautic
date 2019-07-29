@@ -21,7 +21,6 @@ use kamermans\OAuth2\GrantType\GrantTypeInterface;
 use kamermans\OAuth2\GrantType\PasswordCredentials;
 use kamermans\OAuth2\GrantType\RefreshToken;
 use kamermans\OAuth2\OAuth2Middleware;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
@@ -39,9 +38,9 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  * Based on Guzzle OAuth 2.0 Subscriber - kamermans/guzzle-oauth2-subscriber package
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
  */
-class HttpFactory implements AuthProviderInterface
+class HttpFactory
 {
-    const NAME = 'oauth2_two_legged';
+    private const NAME = 'oauth2_two_legged';
 
     /**
      * @var PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface
@@ -75,13 +74,13 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface|ConfigInterface                                                                     $config
+     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface                  $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
      */
-    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, $config = null): ClientInterface
     {
         if (!$this->credentialsAreValid($credentials)) {
             throw new InvalidCredentialsException(
