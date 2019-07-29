@@ -13,23 +13,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
-
-use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
-use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface as ClientCredentialsSigner;
-use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenPersistenceInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenSignerInterface;
 
 interface ConfigInterface extends AuthConfigInterface
 {
     /**
-     * @return ClientCredentialsSigner
+     * @return CredentialsSignerInterface
      */
-    public function getClientCredentialsSigner(): ClientCredentialsSigner;
+    public function getClientCredentialsSigner(): CredentialsSignerInterface;
 
     /**
-     * @return AccessTokenSigner
+     * @return TokenSignerInterface
      */
-    public function getAccessTokenSigner(): AccessTokenSigner;
+    public function getAccessTokenSigner(): TokenSignerInterface;
 
     /**
      * @return TokenPersistenceInterface
