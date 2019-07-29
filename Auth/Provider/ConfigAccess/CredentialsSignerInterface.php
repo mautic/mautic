@@ -15,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess;
 
 use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
 
-interface CredentialsSignerInterface extends SignerInterface
+interface CredentialsSignerInterface
 {
-
+    public function getCredentialsSigner(): SignerInterface;
 }

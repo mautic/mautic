@@ -15,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPersistenceInterface;
 
-interface TokenPersistenceInterface extends KamermansTokenPersistenceInterface
+interface TokenPersistenceInterface
 {
-
+    public function getTokenPersistence(): KamermansTokenPersistenceInterface;
 }
