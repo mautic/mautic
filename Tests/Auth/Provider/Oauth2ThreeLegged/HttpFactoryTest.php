@@ -6,17 +6,17 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider\Oauth2ThreeLegged;
 
 use GuzzleHttp\ClientInterface;
 use kamermans\OAuth2\OAuth2Middleware;
-use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
 use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface as ClientCredentialsSigner;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenPersistenceInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\ConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CodeInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\RedirectUriInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\ScopeInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory;
-use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
@@ -261,12 +261,12 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
                 return $this->tokenPersistence;
             }
 
-            public function getAccessTokenSigner(): AccessTokenSigner
+            public function getAccessTokenSigner(): TokenSignerInterface
             {
                 return $this->accessTokenSigner;
             }
 
-            public function getClientCredentialsSigner(): ClientCredentialsSigner
+            public function getClientCredentialsSigner(): CredentialsSignerInterface
             {
                 return $this->clientCredentialSigner;
             }
