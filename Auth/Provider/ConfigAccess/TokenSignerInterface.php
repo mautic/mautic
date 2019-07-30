@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess;
 
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 
-interface TokenSignerInterface
+interface TokenSignerInterface extends AuthConfigInterface
 {
     public function getTokenSigner(): SignerInterface;
 }

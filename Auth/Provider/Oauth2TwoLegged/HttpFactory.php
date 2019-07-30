@@ -38,7 +38,7 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  * Based on Guzzle OAuth 2.0 Subscriber - kamermans/guzzle-oauth2-subscriber package
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
  */
-class HttpFactory
+class HttpFactory implements AuthProviderInterface
 {
     private const NAME = 'oauth2_two_legged';
 
@@ -73,14 +73,14 @@ class HttpFactory
     }
 
     /**
-     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface $credentials
-     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface                  $config
+     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface    $credentials
+     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface|AuthConfigInterface $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
      */
-    public function getClient(AuthCredentialsInterface $credentials, $config = null): ClientInterface
+    public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
         if (!$this->credentialsAreValid($credentials)) {
             throw new InvalidCredentialsException(
