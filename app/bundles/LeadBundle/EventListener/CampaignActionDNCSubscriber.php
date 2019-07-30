@@ -126,8 +126,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
                 $this->doNotContact->removeDncForContact(
                     $contactId,
                     $channel,
-                    true,
-                    \Mautic\LeadBundle\Entity\DoNotContact::MANUAL
+                    true
                 );
             }
             $persistEntities[] = $contact;
