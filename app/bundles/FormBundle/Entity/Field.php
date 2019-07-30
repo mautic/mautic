@@ -876,8 +876,9 @@ class Field
             return false;
         }
 
-        if ($this->showWhenValueExists === false) {
+        if ($this->showWhenValueExists === false && !$this->isRequired()) {
             // Hide the field if there is the value condition and if we already know the value for this field
+            // If the field is required then we always show it
             if ($submissions) {
                 foreach ($submissions as $submission) {
                     if (!empty($submission[$this->alias]) && !$this->isAutoFill) {
