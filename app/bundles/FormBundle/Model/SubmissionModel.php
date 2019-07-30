@@ -277,7 +277,6 @@ class SubmissionModel extends CommonFormModel
             }
 
             if ($value === '' && $f->isRequired()) {
-
                 //somehow the user got passed the JS validation
                 $msg = $f->getValidationMessage();
                 if (empty($msg)) {
