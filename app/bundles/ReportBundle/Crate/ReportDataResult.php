@@ -111,7 +111,7 @@ class ReportDataResult
 
         $row = $this->data[0];
         foreach ($row as $k => $v) {
-            if (array_key_exists($k, $data['aggregatorColumns'])) {
+            if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
                 $this->types[$k] = 'int';
             } else {
                 $dataColumn      = $data['dataColumns'][$k];
