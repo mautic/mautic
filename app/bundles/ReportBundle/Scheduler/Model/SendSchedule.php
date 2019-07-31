@@ -5,7 +5,7 @@ namespace Mautic\ReportBundle\Scheduler\Model;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Scheduler;
-use Mautic\ReportBundle\Event\PermanentReportFileCreated;
+use Mautic\ReportBundle\Event\PermanentReportFileCreatedEvent;
 use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -48,7 +48,7 @@ class SendSchedule
                 // Send the ZIP file as link in the email message.
                 $this->fileHandler->moveZipToPermanentLocation($report, $zipFilePath);
                 $message = $this->messageSchedule->getMessageForLinkedFile($report);
-                $event   = new PermanentReportFileCreated($report);
+                $event   = new PermanentReportFileCreatedEvent($report);
                 $this->eventDispatcher->dispatch(ReportEvents::REPORT_PERMANENT_FILE_CREATED, $event);
             }
         }

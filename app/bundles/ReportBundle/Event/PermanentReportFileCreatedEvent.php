@@ -12,7 +12,7 @@ namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
 
-class PermanentReportFileCreated extends AbstractReportEvent
+class PermanentReportFileCreatedEvent extends AbstractReportEvent
 {
     /**
      *
