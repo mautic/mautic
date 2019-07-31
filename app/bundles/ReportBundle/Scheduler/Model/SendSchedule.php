@@ -43,7 +43,6 @@ class SendSchedule
             try {
                 // Try to send the ZIP file as an email attachement.
                 $this->fileHandler->fileCanBeAttached($zipFilePath);
-                //throw new FileTooBigException();
                 $this->mailer->attachFile($zipFilePath, basename($zipFilePath), 'application/zip');
             } catch (FileTooBigException) {
                 // Send the ZIP file as link in the email message.
