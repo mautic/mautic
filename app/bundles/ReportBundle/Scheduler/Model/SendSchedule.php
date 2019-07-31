@@ -32,7 +32,6 @@ class SendSchedule
         $emails       = $transformer->reverseTransform($report->getToAddress());
         $subject      = $this->messageSchedule->getSubject($report);
         $message      = $this->messageSchedule->getMessageForAttachedFile($report);
-        $zipFilePath  = null;
 
         try {
             // Try to send the CSV file as an email attachement.
@@ -61,7 +60,7 @@ class SendSchedule
 
         $this->fileHandler->delete($csvFilePath);
 
-        if ($zipFilePath !== null) {
+        if (!empty($zipFilePath)) {
             $this->fileHandler->delete($zipFilePath);
         }
     }
