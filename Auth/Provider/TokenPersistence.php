@@ -61,7 +61,14 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     public function restoreToken(TokenInterface $token): TokenInterface
     {
-        $integration = $this->getIntegration();
+        $apiKeys = $this->getIntegration()->getApiKeys();
+
+        $apiKeys['access_token'] = $this->encryptionHelper->decrypt($apiKeys['access_token']);
+        $apiKeys['refresh_token'] = $this->encryptionHelper->decrypt($apiKeys['refresh_token']);
+        $apiKeys['expires_at'] = $this->encryptionHelper->decrypt($apiKeys['expires_at']);
+
+        // @todo Here we need to inject $apiKeys data into token interface, but how?
+        // @see \kamermans\OAuth2\Token\TokenInterface
 
         $this->token = $token;
 
@@ -77,6 +84,16 @@ class TokenPersistence implements TokenPersistenceInterface
     {
         $integration = $this->getIntegration();
 
+        $apiKeys = [
+            'access_token'  => $this->encryptionHelper->encrypt($token->getAccessToken()),
+            'refresh_token' => $this->encryptionHelper->encrypt($token->getRefreshToken()),
+            'expires_at'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
+        ];
+
+        $integration->setApiKeys($apiKeys);
+        $this->integrationEntityRepository->saveEntity($integration);
+
+
         $this->token = $token;
     }
 
@@ -86,6 +103,9 @@ class TokenPersistence implements TokenPersistenceInterface
     public function deleteToken(): void
     {
         $integration = $this->getIntegration();
+
+        $integration->setApiKeys([]);
+        $this->integrationEntityRepository->saveEntity($integration);
 
         $this->token = null;
     }
