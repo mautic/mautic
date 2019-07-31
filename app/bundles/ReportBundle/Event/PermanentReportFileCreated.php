@@ -15,7 +15,6 @@ use Mautic\ReportBundle\Entity\Report;
 class PermanentReportFileCreated extends AbstractReportEvent
 {
     /**
-     * ReportCleanupEvent constructor.
      *
      * @param Report $report
      */
