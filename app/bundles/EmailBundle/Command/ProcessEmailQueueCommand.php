@@ -103,7 +103,7 @@ EOT
                     $tmpFilename .= '.finalretry';
                     rename($failedFile, $tmpFilename);
 
-                    $message = unserialize(file_get_contents($tmpFilename));
+                    $message = unserialize(file_get_contents($tmpFilename), ['allowed_classes' => [\Swift_Message::class]]);
                     if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
                         $tryAgain = false;
                         if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {

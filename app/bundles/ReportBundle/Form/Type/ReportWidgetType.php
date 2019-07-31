@@ -47,7 +47,7 @@ class ReportWidgetType extends AbstractType
             foreach ($reports as $report) {
                 $choices[$report['name']] = [];
 
-                $graphs = unserialize($report['graphs']);
+                $graphs = unserialize($report['graphs'], ['allowed_classes' => false]);
 
                 foreach ($graphs as $graph) {
                     $graphValue                            = $report['id'].':'.$graph;

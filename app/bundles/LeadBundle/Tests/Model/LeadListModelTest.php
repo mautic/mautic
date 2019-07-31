@@ -50,7 +50,7 @@ class LeadListModelTest extends \PHPUnit_Framework_TestCase
         $mockEntity2 = clone $mockEntity;
         $mockEntity2->expects($this->once())
             ->method('getFilters')
-            ->willReturn(unserialize($filters));
+            ->willReturn(unserialize($filters), ['allowed_classes' => false]);
         $mockEntity2->expects($this->any())
             ->method('getId')
             ->willReturn(2);
@@ -66,7 +66,7 @@ class LeadListModelTest extends \PHPUnit_Framework_TestCase
         $mockEntity4 = clone $mockEntity;
         $mockEntity4->expects($this->once())
             ->method('getFilters')
-            ->willReturn(unserialize($filters4));
+            ->willReturn(unserialize($filters4), ['allowed_classes' => false]);
         $mockEntity4->expects($this->any())
             ->method('getId')
             ->willReturn(4);

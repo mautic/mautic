@@ -84,7 +84,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
                         $field->$setter($form);
                         $form->addField($count, $field);
                     } elseif (in_array($col, ['customParameters', 'properties'])) {
-                        $val = unserialize(stripslashes($val));
+                        $val = unserialize(stripslashes($val), ['allowed_classes' => false]);
                         $field->$setter($val);
                     } else {
                         $field->$setter($val);
@@ -106,7 +106,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
                     if (in_array($col, ['form'])) {
                         $action->$setter($this->getReference('form-'.$val));
                     } elseif (in_array($col, ['properties'])) {
-                        $val = unserialize(stripslashes($val));
+                        $val = unserialize(stripslashes($val), ['allowed_classes' => false]);
                         if ($col == 'settings') {
                             $val['callback'] = stripslashes($val['callback']);
                         }

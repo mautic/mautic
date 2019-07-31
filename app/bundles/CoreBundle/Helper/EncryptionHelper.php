@@ -104,7 +104,7 @@ class EncryptionHelper
                 return false;
             }
             try {
-                return unserialize($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
+                return unserialize($availableCipher->decrypt($encryptedMessage, $this->key, $initVector), ['allowed_classes' => false]);
             } catch (InvalidDecryptionException $ex) {
             }
             $mainTried = true;

@@ -223,7 +223,7 @@ class DynamicContentRepository extends CommonRepository
         $result = $qb->execute()->fetchAll();
 
         foreach ($result as $item) {
-            $properties = unserialize($item['properties']);
+            $properties = unserialize($item['properties'], ['allowed_classes' => false]);
 
             if (isset($properties['dynamicContent'])) {
                 $dwc = $this->getEntity($properties['dynamicContent']);

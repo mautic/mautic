@@ -545,7 +545,7 @@ $view['slots']->set(
                     <ul class="media-list media-list-feed">
                         <?php foreach ($upcomingEvents as $event) : ?>
                         <?php
-                            $metadata = unserialize($event['metadata']);
+                            $metadata = unserialize($event['metadata'], ['allowed_classes' => false]);
                             $errors   = false;
                             if (!empty($metadata['errors'])):
                                 $errors = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];

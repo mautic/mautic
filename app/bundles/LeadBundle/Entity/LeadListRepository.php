@@ -1480,7 +1480,7 @@ class LeadListRepository extends CommonRepository
                                 continue;
                             }
 
-                            $listFilters = unserialize($list['filters']);
+                            $listFilters = unserialize($list['filters'], ['allowed_classes' => false]);
                             if (empty($listFilters)) {
                                 // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
                                 $subQb = $this->createFilterExpressionSubQuery(

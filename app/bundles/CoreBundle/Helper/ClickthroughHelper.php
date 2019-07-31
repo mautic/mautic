@@ -46,6 +46,6 @@ class ClickthroughHelper
             throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
         }
 
-        return unserialize($decoded);
+        return unserialize($decoded, ['allowed_classes' => false]);
     }
 }

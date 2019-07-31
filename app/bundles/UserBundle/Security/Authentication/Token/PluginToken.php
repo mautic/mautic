@@ -112,7 +112,7 @@ class PluginToken extends AbstractToken
      */
     public function unserialize($serialized)
     {
-        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
+        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized, ['allowed_classes' => false]);
         parent::unserialize($parentStr);
     }
 }
