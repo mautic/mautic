@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider;
 
+use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\PluginBundle\Entity\Integration;
@@ -44,11 +45,54 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testRestoreToken()
     {
-        // @todo
-//        $token = $this->createMock(TokenInterface::class);
-//        $integration = $this->createMock(Integration::class);
-//        $this->tokenPersistence->setIntegration($integration);
-//        $this->assertSame($token, $this->tokenPersistence->restoreToken($token));
+        $oldAccessToken = 'old_access_token';
+        $oldRefreshToken = 'old_refresh_token';
+        $oldExpiresAt = 3600;
+        $apiKeys = [
+            'access_token' => $oldAccessToken,
+            'refresh_token' => $oldRefreshToken,
+            'expires_at' => $oldExpiresAt,
+        ];
+
+        $apiAccessToken = 'api_access_token';
+        $apiRefreshToken = 'api_refresh_token';
+        $apiExpiresAt = 3600;
+
+        $factory = new RawTokenFactory();
+        $tokenFromApi = $factory([
+            'access_token' => $apiAccessToken,
+            'refresh_token' => $apiRefreshToken,
+            'expires_in' => $apiExpiresAt,
+        ]);
+
+        $finalApiKeys = [
+            'access_token'  => $this->encryptionHelper->encrypt($tokenFromApi->getAccessToken()),
+            'refresh_token' => $this->encryptionHelper->encrypt($tokenFromApi->getRefreshToken()),
+            // @todo
+            'expires_at'    => $this->encryptionHelper->encrypt($tokenFromApi->getExpiresAt()),
+        ];        
+
+        $integration = $this->createMock(Integration::class);
+        $integration->expects($this->once())
+            ->method('getApiKeys')
+            ->willReturn($apiKeys);
+        $integration->expects($this->once())
+            ->method('setApiKeys')
+            ->with($finalApiKeys);
+
+        $this->encryptionHelper->expects($this->exactly(3))
+            ->method('encrypt');
+        $this->encryptionHelper->expects($this->exactly(3))
+            ->method('decrypt');
+
+        $this->tokenPersistence->setIntegration($integration);
+
+        $newToken = $this->tokenPersistence->restoreToken($tokenFromApi);
+
+        $this->assertSame($tokenFromApi->getAccessToken(), $newToken->getAccessToken());
+        $this->assertSame($tokenFromApi->getRefreshToken(), $newToken->getRefreshToken());
+//        $this->assertSame($tokenFromApi->getExpiresAt(), $newToken->getExpiresAt());
+        
     }
 
     public function testIntegrationNotSetSaveToken()
@@ -62,9 +106,17 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
     public function testSaveToken()
     {
         $token = $this->createMock(TokenInterface::class);
+
+        $this->encryptionHelper->expects($this->exactly(3))
+            ->method('encrypt');
+
         $integration = $this->createMock(Integration::class);
+        $integration->expects($this->once())
+            ->method('setApiKeys');
         $this->tokenPersistence->setIntegration($integration);
+
         $this->assertNull($this->tokenPersistence->saveToken($token));
+
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 

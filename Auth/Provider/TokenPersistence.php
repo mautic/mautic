@@ -40,6 +40,8 @@ class TokenPersistence implements TokenPersistenceInterface
     private $integrationEntityRepository;
 
     /**
+     * Token with decrypted data
+     *
      * @var TokenInterface|null
      */
     private $token;
@@ -65,18 +67,22 @@ class TokenPersistence implements TokenPersistenceInterface
     {
         $apiKeys = $this->getIntegration()->getApiKeys();
 
-        // @see \kamermans\OAuth2\Tests\Persistence\DoctrineCacheTokenPersistenceTest::testRestoreTokenCustomKey method
-        $factory = new RawTokenFactory();
-        $token = $factory(
-            [
-                'access_token' => $this->encryptionHelper->decrypt($apiKeys['access_token']),
-                'refresh_token' => $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
-                // Wee needs to use `expires_in` key because of merge algorithm
-                // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
-                'expires_in' => $this->encryptionHelper->decrypt($apiKeys['expires_at']),
-            ],
-            new RawToken($token->getAccessToken(), $token->getRefreshToken(), $token->getExpiresAt())
+        $previousToken = new RawToken(
+            $this->encryptionHelper->decrypt($apiKeys['access_token']),
+            $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
+            $this->encryptionHelper->decrypt($apiKeys['expires_at'])
         );
+
+        $refreshToken =  [
+            'access_token' => $token->getAccessToken(),
+            'refresh_token' => $token->getRefreshToken(),
+            // Wee needs to use `expires_in` key because of merge algorithm
+            'expires_in' => $token->getExpiresAt() - time(),
+        ];
+
+        // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
+        $factory = new RawTokenFactory();
+        $token = $factory($refreshToken, $previousToken);
 
         $this->saveToken($token);
 
