@@ -27,11 +27,11 @@ class SendSchedule
     {
         $this->mailer->reset(true);
 
-        $transformer  = new ArrayStringTransformer();
-        $report       = $scheduler->getReport();
-        $emails       = $transformer->reverseTransform($report->getToAddress());
-        $subject      = $this->messageSchedule->getSubject($report);
-        $message      = $this->messageSchedule->getMessageForAttachedFile($report);
+        $transformer = new ArrayStringTransformer();
+        $report      = $scheduler->getReport();
+        $emails      = $transformer->reverseTransform($report->getToAddress());
+        $subject     = $this->messageSchedule->getSubject($report);
+        $message     = $this->messageSchedule->getMessageForAttachedFile($report);
 
         try {
             // Try to send the CSV file as an email attachement.
