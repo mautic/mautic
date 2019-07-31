@@ -73,7 +73,7 @@ class TokenPersistence implements TokenPersistenceInterface
                 'refresh_token' => $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
                 // Wee needs to use `expires_in` key because of merge algorithm
                 // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
-                'expires_in' => $this->encryptionHelper->decrypt($apiKeys['expires_in']),
+                'expires_in' => $this->encryptionHelper->decrypt($apiKeys['expires_at']),
             ],
             new RawToken($token->getAccessToken(), $token->getRefreshToken(), $token->getExpiresAt())
         );
@@ -95,7 +95,7 @@ class TokenPersistence implements TokenPersistenceInterface
         $apiKeys = [
             'access_token'  => $this->encryptionHelper->encrypt($token->getAccessToken()),
             'refresh_token' => $this->encryptionHelper->encrypt($token->getRefreshToken()),
-            'expires_in'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
+            'expires_at'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
         ];
 
         $integration->setApiKeys($apiKeys);
