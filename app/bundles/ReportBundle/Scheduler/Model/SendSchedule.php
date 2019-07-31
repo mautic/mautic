@@ -59,9 +59,7 @@ class SendSchedule
         $this->mailer->parsePlainText($message);
         $this->mailer->send(true);
 
-        if ($csvFilePath !== null) {
-            $this->fileHandler->delete($csvFilePath);
-        }
+        $this->fileHandler->delete($csvFilePath);
 
         if ($zipFilePath !== null) {
             $this->fileHandler->delete($zipFilePath);
