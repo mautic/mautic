@@ -36,9 +36,10 @@ class TagTest extends \PHPUnit_Framework_TestCase
     public function testTagValidation()
     {
         $sampleTags = [
-            'hello world'                                         => 'hello world',
-            '&#60;script&#62;console.log(hello)&#60;/script&#62;' => '<script>console.log(hello)</script>',
-            'oěř§ůú.'                                             => 'oěř§ůú.',
+            'hello world'                                              => 'hello world',
+            'hello&#34; world'                                         => 'hello" world',
+            '&#60;script&#62;console.log(hello)&#60;/script&#62;'      => '<script>console.log(hello)</script>',
+            'oěř§ůú.'                                                  => 'oěř§ůú.',
         ];
 
         foreach ($sampleTags as $expected => $tag) {
@@ -51,13 +52,13 @@ class TagTest extends \PHPUnit_Framework_TestCase
     {
         $sampleTags = [
             'hello world'                                         => 'hello world',
-            '&#60;script&#62;console.log(hello)&#60;/script&#62;' => '<script>console.log(hello)</script>',
+            'hello&#34; world'                                    => 'hello&#34; world',
             'oěř§ůú.'                                             => 'oěř§ůú.',
         ];
 
         foreach ($sampleTags as $expected => $tag) {
             $entity = new Tag($tag, false);
-            $this->assertSame($tag, $entity->getTag());
+            $this->assertSame($expected, $entity->getTag());
         }
     }
 }
