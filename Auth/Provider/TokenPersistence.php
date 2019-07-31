@@ -130,7 +130,7 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     public function hasToken(): bool
     {
-        return (bool) $this->token;
+        return $this->token && !empty($this->token->getAccessToken());
     }
 
     /**

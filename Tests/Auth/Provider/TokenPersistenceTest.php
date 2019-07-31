@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider;
 
+use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -134,11 +135,17 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testHasToken()
     {
-        $token = $this->createMock(TokenInterface::class);
         $this->assertFalse($this->tokenPersistence->hasToken());
+
+        $token = new RawToken('kajshfddkadsfdw');
+
         $integration = $this->createMock(Integration::class);
         $this->tokenPersistence->setIntegration($integration);
         $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
+
+        $token = new RawToken();
+        $this->tokenPersistence->saveToken($token);
+        $this->assertFalse($this->tokenPersistence->hasToken());
     }
 }
