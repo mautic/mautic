@@ -14,43 +14,78 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider;
 
 use kamermans\OAuth2\Token\TokenInterface;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\TokenPersistence;
+use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
 
 class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 {
-    private $token;
+    private $encryptionHelper;
+    private $integrationEntityRepository;
     private $tokenPersistence;
 
     public function setUp()
     {
-        $this->token = $this->createMock(TokenInterface::class);
-        $this->tokenPersistence = new TokenPersistence();
+        $this->encryptionHelper = $this->createMock(EncryptionHelper::class);
+        $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
+        $this->tokenPersistence = new TokenPersistence($this->encryptionHelper, $this->integrationEntityRepository);
         parent::setUp();
+    }
+
+    public function testIntegrationNotSetRestoreToken()
+    {
+        $this->expectException(IntegrationNotSetException::class);
+
+        $token = $this->createMock(TokenInterface::class);
+        $this->tokenPersistence->restoreToken($token);
     }
 
     public function testRestoreToken()
     {
-        $this->assertSame($this->token, $this->tokenPersistence->restoreToken($this->token));
+        $token = $this->createMock(TokenInterface::class);
+        $integration = $this->createMock(Integration::class);
+        $this->tokenPersistence->setIntegration($integration);
+        $this->assertSame($token, $this->tokenPersistence->restoreToken($token));
+    }
+
+    public function testIntegrationNotSetSaveToken()
+    {
+        $this->expectException(IntegrationNotSetException::class);
+
+        $token = $this->createMock(TokenInterface::class);
+        $this->tokenPersistence->saveToken($token);
     }
 
     public function testSaveToken()
     {
-        $this->assertNull($this->tokenPersistence->saveToken($this->token));
+        $token = $this->createMock(TokenInterface::class);
+        $integration = $this->createMock(Integration::class);
+        $this->tokenPersistence->setIntegration($integration);
+        $this->assertNull($this->tokenPersistence->saveToken($token));
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 
     public function testDeleteToken()
     {
-        $this->tokenPersistence->saveToken($this->token);
+        $token = $this->createMock(TokenInterface::class);
+        $integration = $this->createMock(Integration::class);
+        $this->tokenPersistence->setIntegration($integration);
+        $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
-        $this->assertNull($this->tokenPersistence->deleteToken());
+
+        $this->tokenPersistence->deleteToken();
         $this->assertFalse($this->tokenPersistence->hasToken());
     }
 
     public function testHasToken()
     {
+        $token = $this->createMock(TokenInterface::class);
         $this->assertFalse($this->tokenPersistence->hasToken());
-        $this->tokenPersistence->saveToken($this->token);
+        $integration = $this->createMock(Integration::class);
+        $this->tokenPersistence->setIntegration($integration);
+        $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 }
