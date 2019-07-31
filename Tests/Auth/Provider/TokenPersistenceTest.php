@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider\Oauth2ThreeLegged;
+namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider;
 
 use kamermans\OAuth2\Token\TokenInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenPersistence;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\TokenPersistence;
 
 class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 {
