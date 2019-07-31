@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
+use kamermans\OAuth2\Token\RawToken;
+use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\PluginBundle\Entity\Integration;
@@ -63,14 +65,20 @@ class TokenPersistence implements TokenPersistenceInterface
     {
         $apiKeys = $this->getIntegration()->getApiKeys();
 
-        $apiKeys['access_token'] = $this->encryptionHelper->decrypt($apiKeys['access_token']);
-        $apiKeys['refresh_token'] = $this->encryptionHelper->decrypt($apiKeys['refresh_token']);
-        $apiKeys['expires_at'] = $this->encryptionHelper->decrypt($apiKeys['expires_at']);
+        // @see \kamermans\OAuth2\Tests\Persistence\DoctrineCacheTokenPersistenceTest::testRestoreTokenCustomKey method
+        $factory = new RawTokenFactory();
+        $token = $factory(
+            [
+                'access_token' => $this->encryptionHelper->decrypt($apiKeys['access_token']),
+                'refresh_token' => $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
+                // Wee needs to use `expires_in` key because of merge algorithm
+                // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
+                'expires_in' => $this->encryptionHelper->decrypt($apiKeys['expires_in']),
+            ],
+            new RawToken($token->getAccessToken(), $token->getRefreshToken(), $token->getExpiresAt())
+        );
 
-        // @todo Here we need to inject $apiKeys data into token interface, but how?
-        // @see \kamermans\OAuth2\Token\TokenInterface
-
-        $this->token = $token;
+        $this->saveToken($token);
 
         return $this->token;
     }
@@ -87,12 +95,11 @@ class TokenPersistence implements TokenPersistenceInterface
         $apiKeys = [
             'access_token'  => $this->encryptionHelper->encrypt($token->getAccessToken()),
             'refresh_token' => $this->encryptionHelper->encrypt($token->getRefreshToken()),
-            'expires_at'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
+            'expires_in'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
         ];
 
         $integration->setApiKeys($apiKeys);
         $this->integrationEntityRepository->saveEntity($integration);
-
 
         $this->token = $token;
     }
