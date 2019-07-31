@@ -103,7 +103,7 @@ class FileHandler
     }
 
     /**
-     * @param $reportId
+     * @param int $reportId
      */
     public function deleteCompressedCsvFileForReportId($reportId)
     {
