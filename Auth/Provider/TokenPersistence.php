@@ -82,9 +82,7 @@ class TokenPersistence implements TokenPersistenceInterface
 
         // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
         $factory = new RawTokenFactory();
-        $token = $factory($refreshToken, $previousToken);
-
-        $this->saveToken($token);
+        $this->token = $factory($refreshToken, $previousToken);
 
         return $this->token;
     }
