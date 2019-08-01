@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-beta';
+    const EXTRA_VERSION = '';
 
     /**
      * @var array
@@ -83,7 +83,7 @@ class AppKernel extends Kernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
-            define('MAUTIC_INSTALLER', 1);
+            defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
