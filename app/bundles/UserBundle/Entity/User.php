@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -466,7 +467,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             $this->username,
             $this->password,
             $published
-            ) = unserialize($serialized, ['allowed_classes' => false]);
+            ) = Serializer::decode($serialized);
         $this->setIsPublished($published);
     }
 

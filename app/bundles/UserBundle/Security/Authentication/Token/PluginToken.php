@@ -11,6 +11,7 @@
 
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
@@ -112,7 +113,7 @@ class PluginToken extends AbstractToken
      */
     public function unserialize($serialized)
     {
-        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized, ['allowed_classes' => false]);
+        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = Serializer::decode($serialized);
         parent::unserialize($parentStr);
     }
 }
