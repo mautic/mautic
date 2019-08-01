@@ -157,5 +157,4 @@ class TokenPersistence implements TokenPersistenceInterface
 
         throw new IntegrationNotSetException('Integration not set');
     }
-
 }
