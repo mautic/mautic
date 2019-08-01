@@ -76,6 +76,10 @@ class ReportCleanup
      */
     private function shouldBeDeleted($filePath)
     {
+        if (!file_exists($filePath)) {
+            return false;
+        }
+
         $created = new \DateTime(date('Y-m-d', filemtime($filePath)));
         $now     = new \DateTime();
         $days    = $created->diff($now)->days;
