@@ -117,8 +117,13 @@ class TokenPersistence implements TokenPersistenceInterface
     {
         $integration = $this->getIntegration();
 
-        $integration->setApiKeys([]);
-        $this->integrationEntityRepository->deleteEntity($integration);
+        $apiKeys = $integration->getApiKeys();
+
+        unset($apiKeys['access_token'], $apiKeys['refresh_token'], $apiKeys['expires_at']);
+
+        $integration->setApiKeys($apiKeys);
+
+        $this->integrationEntityRepository->saveEntity($integration);
 
         $this->token = null;
     }

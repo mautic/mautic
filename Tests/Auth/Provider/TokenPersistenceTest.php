@@ -121,11 +121,57 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 
+    public function testIntegrationNotSetDeleteToken()
+    {
+        $this->expectException(IntegrationNotSetException::class);
+
+        $token = $this->createMock(TokenInterface::class);
+        $this->tokenPersistence->saveToken($token);
+    }
+
     public function testDeleteToken()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $accessToken = 'lsadkjfasd';
+        $refreshToken = 'kjsahfkas';
+        $expiresAt = 5465465;
+        $token = new RawToken($accessToken,$refreshToken, $expiresAt);
+        $expected = [
+            'leaveMe' => 'something',
+        ];
+        $apiKeys = array_merge(
+            [
+                'access_token' => $accessToken,
+                'refresh_token' => $refreshToken,
+                'expires_at' => $expiresAt,
+            ],
+            $expected
+        );
+
+        $encrypted = 'encrypted';
+        $apiKeysEncrypted = [
+            'access_token' => $encrypted,
+            'refresh_token' => $encrypted,
+            'expires_at' => $encrypted,
+        ];
+
         $integration = $this->createMock(Integration::class);
+        $integration->expects($this->once())
+            ->method('getApiKeys')
+            ->willReturn($apiKeys);
+        $integration->expects($this->at(0))
+            ->method('setApiKeys')
+            ->with($apiKeysEncrypted);
+        $integration->expects($this->at(1))
+            ->method('setApiKeys')
+            ->with($expected);
+
         $this->tokenPersistence->setIntegration($integration);
+
+        $this->encryptionHelper->expects($this->exactly(3))
+            ->method('encrypt')
+            ->willReturn($encrypted);
+        $this->integrationEntityRepository->expects($this->exactly(2))
+            ->method('saveEntity');
         $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
 
