@@ -92,8 +92,7 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($tokenFromApi->getAccessToken(), $newToken->getAccessToken());
         $this->assertSame($tokenFromApi->getRefreshToken(), $newToken->getRefreshToken());
-//        $this->assertSame($tokenFromApi->getExpiresAt(), $newToken->getExpiresAt());
-        
+        $this->assertSame($tokenFromApi->getExpiresAt(), $newToken->getExpiresAt());
     }
 
     public function testIntegrationNotSetSaveToken()
