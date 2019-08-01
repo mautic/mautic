@@ -69,7 +69,6 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $finalApiKeys = [
             'access_token'  => $this->encryptionHelper->encrypt($tokenFromApi->getAccessToken()),
             'refresh_token' => $this->encryptionHelper->encrypt($tokenFromApi->getRefreshToken()),
-            // @todo
             'expires_at'    => $this->encryptionHelper->encrypt($tokenFromApi->getExpiresAt()),
         ];        
 
