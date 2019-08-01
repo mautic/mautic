@@ -106,15 +106,30 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testSaveToken()
     {
+        $encrypted = 'encrypted';
+        $apiKeysEncrypted = [
+            'access_token' => $encrypted,
+            'refresh_token' => $encrypted,
+            'expires_at' => $encrypted,
+        ];
+
         $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->any())
+            ->method('getAccessToken')
+            ->willReturn('something');
 
         $this->encryptionHelper->expects($this->exactly(3))
-            ->method('encrypt');
+            ->method('encrypt')
+            ->willReturn($encrypted);
 
         $integration = $this->createMock(Integration::class);
         $integration->expects($this->once())
-            ->method('setApiKeys');
+            ->method('setApiKeys')
+            ->with($apiKeysEncrypted);
         $this->tokenPersistence->setIntegration($integration);
+
+        $this->integrationEntityRepository->expects($this->exactly(1))
+            ->method('saveEntity');
 
         $this->assertNull($this->tokenPersistence->saveToken($token));
 
