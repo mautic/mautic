@@ -112,6 +112,6 @@
 <Files "filemanager.php">
     Require all granted
 </Files>
-<Files "update.php">
+<Files "upgrade.php">
     Require all granted
 </Files>
