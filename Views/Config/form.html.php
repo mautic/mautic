@@ -47,7 +47,7 @@ $activeTab = $activeTab ?: 'details-container';
     <!-- Features -->
 
     <!-- Field Mapping -->
-    <?php if ($integrationObject instanceof ConfigFormSyncInterface): ?>
+    <?php if ($useSyncFeatures): ?>
     <?php $objects = $integrationObject->getSyncConfigObjects(); ?>
         <?php foreach ($form['featureSettings']['sync']['fieldMappings'] as $object => $objectFieldMapping): ?>
         <li class="<?php if ($activeTab == "field-mapping-{$object}"): echo 'active'; endif; ?> " id="fields-<?php echo $object; ?>-tab">
@@ -79,12 +79,12 @@ $activeTab = $activeTab ?: 'details-container';
         if ($integrationObject instanceof ConfigFormFeaturesInterface):
             echo $view['form']->row($form['supportedFeatures']);
 
-            if ($integrationObject instanceof ConfigFormFeatureSettingsInterface || $integrationObject instanceof ConfigFormSyncInterface):
+            if ($useFeatureSettings || $useSyncFeatures):
                 echo "<hr />";
             endif;
         endif;
 
-        if ($integrationObject instanceof ConfigFormSyncInterface):
+        if ($useSyncFeatures):
             echo $view['form']->row($form['featureSettings']['sync']['objects']);
             // @todo echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']);
 
@@ -92,12 +92,12 @@ $activeTab = $activeTab ?: 'details-container';
                 echo $view['form']->row($form['featureSettings']['sync']['integration']);
             endif;
 
-            if ($integrationObject instanceof ConfigFormFeatureSettingsInterface):
+            if ($useFeatureSettings):
                 echo "<hr />";
             endif;
         endif;
 
-        if ($integrationObject instanceof ConfigFormFeatureSettingsInterface):
+        if ($useFeatureSettings):
             echo $view['form']->row($form['featureSettings']['integration']);
         endif;
 
@@ -107,7 +107,7 @@ $activeTab = $activeTab ?: 'details-container';
     <!-- Features -->
 
     <!-- Field Mapping -->
-    <?php if ($integrationObject instanceof ConfigFormSyncInterface): ?>
+    <?php if ($useSyncFeatures): ?>
     <?php foreach ($form['featureSettings']['sync']['fieldMappings'] as $object => $objectFieldMapping): ?>
     <div class="tab-pane fade <?php if ($activeTab == "field-mapping-{$object}"): echo 'in active'; endif; ?> bdr-w-0" id="<?php echo "field-mappings-{$object}"; ?>-container">
         <div class="has-error">

@@ -21,6 +21,7 @@ use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
@@ -208,15 +209,21 @@ class ConfigController extends AbstractFormController
 
         $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formHelper->containsErrors($form['apiKeys']);
 
+        $useSyncFeatures = $integrationObject instanceof ConfigFormSyncInterface;
+
+        $useFeatureSettings = $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'integrationObject' => $integrationObject,
-                    'form'              => $form,
-                    'activeTab'         => $this->request->get('activeTab'),
-                    'showFeaturesTab'   => $showFeaturesTab,
-                    'hasFeatureErrors'  => $hasFeatureErrors,
-                    'hasAuthErrors'     => $hasAuthErrors,
+                    'integrationObject'  => $integrationObject,
+                    'form'               => $form,
+                    'activeTab'          => $this->request->get('activeTab'),
+                    'showFeaturesTab'    => $showFeaturesTab,
+                    'hasFeatureErrors'   => $hasFeatureErrors,
+                    'hasAuthErrors'      => $hasAuthErrors,
+                    'useSyncFeatures'    => $useSyncFeatures,
+                    'useFeatureSettings' => $useFeatureSettings,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
                     ? $integrationObject->getConfigFormContentTemplate()
