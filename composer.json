@@ -101,7 +101,7 @@
         "stack/builder": "^1.0",
         "piwik/device-detector": "~3.7.0",
         "php-http/guzzle6-adapter": "^1.1",
-        "sparkpost/sparkpost": "~2.0.3",
+        "sparkpost/sparkpost": "~2.1.0",
         "doctrine/data-fixtures": "1.2.1",
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",

@@ -5210,35 +5210,38 @@
         },
         {
             "name": "sparkpost/sparkpost",
-            "version": "2.0.3",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SparkPost/php-sparkpost.git",
-                "reference": "34dcd9b35098ffb7565c4e6a51c84c2c38a07a0f"
+                "reference": "0c45993ee9d68d47acbd04b241c8b24b8667f937"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SparkPost/php-sparkpost/zipball/34dcd9b35098ffb7565c4e6a51c84c2c38a07a0f",
-                "reference": "34dcd9b35098ffb7565c4e6a51c84c2c38a07a0f",
+                "url": "https://api.github.com/repos/SparkPost/php-sparkpost/zipball/0c45993ee9d68d47acbd04b241c8b24b8667f937",
+                "reference": "0c45993ee9d68d47acbd04b241c8b24b8667f937",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5 || ^7.0",
+                "php": "^5.6 || ^7.0",
                 "php-http/client-implementation": "^1.0",
                 "php-http/discovery": "^1.0",
                 "php-http/httplug": "^1.0",
                 "php-http/message": "^1.0"
             },
             "require-dev": {
-                "fabpot/php-cs-fixer": "^1.11",
+                "friendsofphp/php-cs-fixer": "^1.11",
                 "mockery/mockery": "^0.9.4",
-                "php-http/guzzle6-adapter": "^1.0"
+                "nyholm/nsa": "^1.0",
+                "php-http/guzzle6-adapter": "^1.0",
+                "phpunit/phpcov": "2.*",
+                "phpunit/phpunit": "^4.8 || ^5.4",
+                "satooshi/php-coveralls": "dev-master"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "SparkPost\\": "lib/SparkPost/",
-                    "SparkPost\\Test\\TestUtils\\": "test/unit/TestUtils/"
+                    "SparkPost\\": "lib/SparkPost"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -5251,7 +5254,7 @@
                 }
             ],
             "description": "Client library for interfacing with the SparkPost API.",
-            "time": "2016-07-29T05:08:27+00:00"
+            "time": "2017-01-10T14:29:09+00:00"
         },
         {
             "name": "stack/builder",
