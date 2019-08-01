@@ -175,9 +175,6 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $integration->expects($this->at(0))
             ->method('setApiKeys')
             ->with($apiKeysEncrypted);
-        $integration->expects($this->at(1))
-            ->method('setApiKeys')
-            ->with($expected);
 
         $this->tokenPersistence->setIntegration($integration);
 
