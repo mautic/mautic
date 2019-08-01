@@ -213,6 +213,8 @@ class ConfigController extends AbstractFormController
 
         $useFeatureSettings = $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
+        $useCallbackUrl = $integrationObject instanceof ConfigFormCallbackRequiredInterface;
+
         return $this->delegateView(
             [
                 'viewParameters'  => [
@@ -224,6 +226,7 @@ class ConfigController extends AbstractFormController
                     'hasAuthErrors'      => $hasAuthErrors,
                     'useSyncFeatures'    => $useSyncFeatures,
                     'useFeatureSettings' => $useFeatureSettings,
+                    'useCallbackUrl'     => $useCallbackUrl,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
                     ? $integrationObject->getConfigFormContentTemplate()
