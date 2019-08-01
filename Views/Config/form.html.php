@@ -12,22 +12,12 @@
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
 
 echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
 
 /** @var \MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
 
 $activeTab = $activeTab ?: 'details-container';
-
-$showFeaturesTab =
-    $integrationObject instanceof ConfigFormFeaturesInterface ||
-    $integrationObject instanceof ConfigFormSyncInterface ||
-    $integrationObject instanceof ConfigFormFeatureSettingsInterface;
-$hasFeatureErrors =
-    ($integrationObject instanceof ConfigFormFeatureSettingsInterface && $view['form']->containsErrors($form['featureSettings']['integration'])) ||
-    (isset($form['featureSettings']['sync']['integration']) && $view['form']->containsErrors($form['featureSettings']['sync']['integration']));
-$hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $view['form']->containsErrors($form['apiKeys']);
 ?>
 
 <?php echo $view['form']->start($form); ?>

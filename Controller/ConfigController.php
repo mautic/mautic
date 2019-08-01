@@ -189,15 +189,37 @@ class ConfigController extends AbstractFormController
      */
     private function showForm()
     {
+        $integrationObject = $this->integrationObject;
+        $form = $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php');
+        $formHelper = $this->get('templating.helper.form');
+
+        $showFeaturesTab =
+            $integrationObject instanceof ConfigFormFeaturesInterface ||
+            $integrationObject instanceof ConfigFormSyncInterface ||
+            $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+
+        $hasFeatureErrors = (
+                $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
+                $formHelper->containsErrors($form['featureSettings']['integration'])
+            ) || (
+                isset($form['featureSettings']['sync']['integration']) &&
+                $formHelper->containsErrors($form['featureSettings']['sync']['integration'])
+            );
+
+        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formHelper->containsErrors($form['apiKeys']);
+
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'integrationObject' => $this->integrationObject,
-                    'form'              => $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php'),
+                    'integrationObject' => $integrationObject,
+                    'form'              => $form,
                     'activeTab'         => $this->request->get('activeTab'),
+                    'showFeaturesTab'   => $showFeaturesTab,
+                    'hasFeatureErrors'  => $hasFeatureErrors,
+                    'hasAuthErrors'     => $hasAuthErrors,
                 ],
-                'contentTemplate' => $this->integrationObject->getConfigFormContentTemplate()
-                    ? $this->integrationObject->getConfigFormContentTemplate()
+                'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
+                    ? $integrationObject->getConfigFormContentTemplate()
                     : 'IntegrationsBundle:Config:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
