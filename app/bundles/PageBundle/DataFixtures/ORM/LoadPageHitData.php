@@ -15,6 +15,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -55,7 +56,7 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                     } elseif (in_array($col, ['dateHit', 'dateLeft'])) {
                         $hit->$setter(new \DateTime($val));
                     } elseif ($col == 'browserLanguages') {
-                        $val = unserialize(stripslashes($val));
+                        $val = Serializer::decode(stripslashes($val));
                         $hit->$setter($val);
                     } else {
                         $hit->$setter($val);
