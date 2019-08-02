@@ -48,7 +48,7 @@ Mautic.campaignOnLoad = function (container, response) {
             var thisSelect = mQuery(event.target).attr('id');
             Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
 
-            mQuery('#'+thisSelect+'_chosen .chosen-search input').on('keydown.toolip', function () {
+            mQuery('#'+thisSelect+'_chosen .chosen-search input').on('keydown.tooltip', function () {
                 // Destroy tooltips that are filtered out
                 Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
             }).on('keyup.tooltip', function() {
@@ -64,7 +64,7 @@ Mautic.campaignOnLoad = function (container, response) {
             var thisSelect = mQuery(event.target).attr('id');
             Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
 
-            mQuery('#'+thisSelect+'_chosen .chosen-search input').off('keyup.toolip')
+            mQuery('#'+thisSelect+'_chosen .chosen-search input').off('keyup.tooltip')
                 .off('keydown.tooltip');
         });
 

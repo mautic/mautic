@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 15;
+    const MINOR_VERSION = 16;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier.
@@ -83,7 +83,7 @@ class AppKernel extends Kernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
-            define('MAUTIC_INSTALLER', 1);
+            defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
