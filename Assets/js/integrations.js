@@ -131,3 +131,9 @@ Mautic.activateIntegrationFieldUpdateActions = function () {
         });
     });
 };
+
+Mautic.authorizeIntegration = function () {
+    mQuery('#integration_details_in_auth').val(1);
+
+    Mautic.postForm(mQuery('form[name="integration_config"]'), 'loadIntegrationAuthWindow');
+};

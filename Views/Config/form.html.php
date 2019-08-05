@@ -80,7 +80,7 @@ $activeTab = $activeTab ?: 'details-container';
                 <div class="row">
                     <div class="col-xs-12 text-center">
                         <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
-                        <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.initiateIntegrationAuthorization()">
+                        <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
                             <i class="fa fa-key "></i>
                             <?php echo $view['translator']->trans('mautic.integration.form.authorize') ?>
                         </button>
