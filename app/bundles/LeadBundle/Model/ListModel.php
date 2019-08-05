@@ -35,6 +35,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Psr\Log\LoggerInterface;
+use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -333,6 +334,10 @@ class ListModel extends FormModel
             return 0;
         } catch (SegmentNotFoundException) {
             // A segment from filter does not exist anymore. Do not rebuild.
+            return 0;
+        } catch (TableNotFoundException $e) {
+            // Invalid filter record, custom objects not well asset or deleted. Do not rebuild but log.
+            $this->logger->addError($e->getMessage());
             return 0;
         }
 
