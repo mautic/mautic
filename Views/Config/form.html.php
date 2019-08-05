@@ -9,10 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
-
 echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
 
 /** @var \MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
@@ -76,12 +72,10 @@ $activeTab = $activeTab ?: 'details-container';
     <?php if ($showFeaturesTab): ?>
     <div class="tab-pane fade <?php if ($activeTab == 'features-container'): echo 'in active'; endif; ?> bdr-w-0" id="features-container">
         <?php
-        if ($integrationObject instanceof ConfigFormFeaturesInterface):
-            echo $view['form']->row($form['supportedFeatures']);
+        echo $view['form']->row($form['supportedFeatures']);
 
-            if ($useFeatureSettings || $useSyncFeatures):
-                echo "<hr />";
-            endif;
+        if ($useFeatureSettings || $useSyncFeatures):
+            echo "<hr />";
         endif;
 
         if ($useSyncFeatures):
