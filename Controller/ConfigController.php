@@ -219,7 +219,7 @@ class ConfigController extends AbstractFormController
 
         $useAuthorizationUrl = $integrationObject instanceof ConfigFormAuthorizeButtonInterface;
 
-        $useCallbackUrl = $integrationObject instanceof ConfigFormCallbackInterface;
+        $callbackUrl = ($integrationObject instanceof ConfigFormCallbackInterface) ? $integrationObject->getCallbackUrl() : false;
 
         return $this->delegateView(
             [
@@ -233,7 +233,7 @@ class ConfigController extends AbstractFormController
                     'useSyncFeatures'     => $useSyncFeatures,
                     'useFeatureSettings'  => $useFeatureSettings,
                     'useAuthorizationUrl' => $useAuthorizationUrl,
-                    'useCallbackUrl'      => $useCallbackUrl,
+                    'callbackUrl'         => $callbackUrl,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
                     ? $integrationObject->getConfigFormContentTemplate()

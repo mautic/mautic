@@ -65,6 +65,30 @@ $activeTab = $activeTab ?: 'details-container';
         <?php echo $view['form']->row($form['isPublished']); ?>
         <hr />
         <?php echo $view['form']->row($form['apiKeys']); ?>
+        <?php
+        if ($useAuthorizationUrl):
+            if (isset($formNotes['authorization'])): ?>
+                <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">
+                    <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($callbackUrl): ?>
+                <div class="well well-sm">
+                    <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
+                    <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
+                </div>
+            <?php endif; ?>
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.initiateIntegrationAuthorization()">
+                            <i class="fa fa-key "></i>
+                            <?php echo $view['translator']->trans('mautic.integration.form.authorize') ?>
+                        </button>
+                    </div>
+                </div>
+            <?php
+        endif;
+        ?>
     </div>
     <!-- Enabled\Auth -->
 
