@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Monolog\Logger;
 
 /**
  * @extends CommonRepository<CompanyLead>
@@ -75,7 +74,8 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param $leadId
+     * @param int $leadId
+     *
      * @return array|null
      */
     public function getPrimaryCompanyByLeadId($leadId)
