@@ -13,4 +13,8 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 interface ConfigFormCallbackInterface
 {
+    /**
+     * @return string
+     */
+    public function getCallbackConfigWarnMessageKey(): string;
 }

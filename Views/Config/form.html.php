@@ -67,11 +67,10 @@ $activeTab = $activeTab ?: 'details-container';
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <?php
         if ($useAuthorizationUrl):
-            if (isset($formNotes['authorization'])): ?>
-                <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">
-                    <?php echo $view['translator']->trans($formNotes['authorization']['note']); ?>
-                </div>
-            <?php endif; ?>
+        ?>
+            <div class="alert alert-warning">
+                <?php echo $view['translator']->trans($integrationObject->getCallbackConfigWarnMessageKey()); ?>
+            </div>
             <?php if ($callbackUrl): ?>
                 <div class="well well-sm">
                     <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
