@@ -98,7 +98,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         if ($content) {
             $leadArray      = $lead->getProfileFields();
             $repo           = $this->em->getRepository('MauticLeadBundle:CompanyLead');
-            $primaryCompany = $repo->getPrimaryCompaniesByLeadId($lead->getId());
+            $primaryCompany = $repo->getPrimaryCompanyByLeadId($lead->getId());
             if ($primaryCompany) {
                 $leadArray['companies'] = $primaryCompany;
             }
