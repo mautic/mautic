@@ -219,7 +219,11 @@ class ConfigController extends AbstractFormController
 
         $useAuthorizationUrl = $integrationObject instanceof ConfigFormAuthorizeButtonInterface;
 
-        $callbackUrl = ($integrationObject instanceof ConfigFormCallbackInterface) ? $integrationObject->getCallbackUrl() : false;
+        $callbackUrl = ($integrationObject instanceof ConfigFormCallbackInterface) ?
+            $this->generateUrl('mautic_integration_public_callback',
+                ['integration' => $integrationObject->getName()]
+            )
+            : false;
 
         return $this->delegateView(
             [

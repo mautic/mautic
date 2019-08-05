@@ -13,10 +13,4 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 interface ConfigFormCallbackInterface
 {
-    public const CONFIG_KEY_CALLBACK_URL = 'callback_url';
-
-    /**
-     * @return string
-     */
-    public function getCallbackUrl(): string;
 }
