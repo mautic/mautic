@@ -22,7 +22,8 @@ use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackRequiredInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthorizeButtonInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
@@ -216,20 +217,23 @@ class ConfigController extends AbstractFormController
 
         $useFeatureSettings = $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
-        $useCallbackUrl = $integrationObject instanceof ConfigFormCallbackRequiredInterface;
+        $useAuthorizationUrl = $integrationObject instanceof ConfigFormAuthorizeButtonInterface;
+
+        $useCallbackUrl = $integrationObject instanceof ConfigFormCallbackInterface;
 
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'integrationObject'  => $integrationObject,
-                    'form'               => $form,
-                    'activeTab'          => $this->request->get('activeTab'),
-                    'showFeaturesTab'    => $showFeaturesTab,
-                    'hasFeatureErrors'   => $hasFeatureErrors,
-                    'hasAuthErrors'      => $hasAuthErrors,
-                    'useSyncFeatures'    => $useSyncFeatures,
-                    'useFeatureSettings' => $useFeatureSettings,
-                    'useCallbackUrl'     => $useCallbackUrl,
+                    'integrationObject'   => $integrationObject,
+                    'form'                => $form,
+                    'activeTab'           => $this->request->get('activeTab'),
+                    'showFeaturesTab'     => $showFeaturesTab,
+                    'hasFeatureErrors'    => $hasFeatureErrors,
+                    'hasAuthErrors'       => $hasAuthErrors,
+                    'useSyncFeatures'     => $useSyncFeatures,
+                    'useFeatureSettings'  => $useFeatureSettings,
+                    'useAuthorizationUrl' => $useAuthorizationUrl,
+                    'useCallbackUrl'      => $useCallbackUrl,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
                     ? $integrationObject->getConfigFormContentTemplate()
