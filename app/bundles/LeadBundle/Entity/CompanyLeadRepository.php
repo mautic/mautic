@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
 /**
  * @extends CommonRepository<CompanyLead>
@@ -75,8 +76,8 @@ class CompanyLeadRepository extends CommonRepository
 
     /**
      * @param int $leadId
-     *
-     * @return array|null
+     * @return array
+     * @throws PrimaryCompanyNotFoundException
      */
     public function getPrimaryCompanyByLeadId($leadId)
     {
@@ -87,7 +88,7 @@ class CompanyLeadRepository extends CommonRepository
             }
         }
 
-        return null;
+        throw new PrimaryCompanyNotFoundException();
     }
 
     /**
