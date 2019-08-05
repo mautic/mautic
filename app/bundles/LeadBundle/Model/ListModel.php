@@ -338,6 +338,7 @@ class ListModel extends FormModel
         } catch (TableNotFoundException $e) {
             // Invalid filter record, custom objects not well asset or deleted. Do not rebuild but log.
             $this->logger->addError($e->getMessage());
+
             return 0;
         }
 

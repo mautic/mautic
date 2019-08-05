@@ -233,7 +233,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         /** @var ContactSegmentService $contactSegmentService */
         $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
-        $reference = $this->fixtures->getReference('table-name-missing-in-filter');
+        $reference             = $this->fixtures->getReference('table-name-missing-in-filter');
 
         $this->expectException(TableNotFoundException::class);
         $segmentContacts = $contactSegmentService->getTotalLeadListLeadsCount($reference);

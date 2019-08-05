@@ -1048,14 +1048,14 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 'public' => true,
                 'filters' => [
                     [
-                        'glue' => 'and',
-                        'type' => 'text',
-                        'object' => 'custom_object',
-                        'field' => 'firstnameLOL',
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'object'   => 'custom_object',
+                        'field'    => 'firstnameLOL',
                         'operator' => '!=',
-                        'filter' => 'xxxxx',
-                        'display' => null,
-                        'table' => ''
+                        'filter'   => 'xxxxx',
+                        'display'  => null,
+                        'table'    => '',
                     ],
                 ],
                 'populate' => false,
