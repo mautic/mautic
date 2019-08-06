@@ -260,14 +260,18 @@ class ConfigController extends AbstractFormController
         $session = $this->get('session');
         $session->remove("{$this->integrationObject->getName()}-fields");
 
-        return new JsonResponse(
-            [
-                'closeModal'    => 1,
-                'enabled'       => $this->integrationConfiguration->getIsPublished(),
-                'name'          => $this->integrationConfiguration->getName(),
-                'mauticContent' => 'integrationsConfig',
-            ]
-        );
+        $response = [
+            'closeModal'    => 1,
+            'enabled'       => $this->integrationConfiguration->getIsPublished(),
+            'name'          => $this->integrationConfiguration->getName(),
+            'mauticContent' => 'integrationsConfig',
+        ];
+
+        if ($this->integrationObject instanceof ConfigFormAuthorizeButtonInterface) {
+            $response['authUrl'] = $this->integrationObject->getAuthorizationUrl();
+        }
+
+        return new JsonResponse($response);
     }
 
 

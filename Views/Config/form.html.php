@@ -72,7 +72,7 @@ $activeTab = $activeTab ?: 'details-container';
         <?php if ($callbackUrl): ?>
         <div class="well well-sm">
             <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
-            <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
+            <input type="text" name="callback_url" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
         </div>
         <?php endif; ?>
         <div class="row">
