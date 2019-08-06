@@ -7,44 +7,57 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
 class CompanyLeadRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetPrimaryCompanyByLeadId()
+    /** @var \PHPUnit_Framework_MockObject_MockObject|CompanyLeadRepository $repoMock */
+    private $repoMock;
+
+    public function setUp()
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|CompanyLeadRepository $repoMock */
-        $repoMock = $this->getMockBuilder(CompanyLeadRepository::class)
+        parent::setUp();
+        $this->repoMock = $this->getMockBuilder(CompanyLeadRepository::class)
             ->setMethodsExcept(['getPrimaryCompanyByLeadId'])
             ->disableOriginalConstructor()
             ->getMock();
+    }
 
-        $repoMock->expects($this->at(0))
+    public function testGetPrimaryCompanyByLeadIdThrowsExceptionIfPrimaryIsMissing()
+    {
+        $this->repoMock->expects($this->once())
             ->method('getCompaniesByLeadId')
             ->willReturn([
                 [
-                    'company_name' => 'ACME #1'
-                ]
+                    'company_name' => 'ACME #1',
+                    'is_primary'   => false
+                ],
             ]);
 
-        $repoMock->expects($this->at(1))
+        $this->expectException(PrimaryCompanyNotFoundException::class);
+        $this->repoMock->getPrimaryCompanyByLeadId(1);
+    }
+
+    public function testGetPrimaryCompanyByLeadIdReturnsCorrectRecord() {
+        $this->repoMock->expects($this->once())
             ->method('getCompaniesByLeadId')
             ->willReturn([
                 [
-                    'company_name' => 'ACME #1'
+                    'company_name' => 'ACME #1',
+                    'is_primary'  => false
                 ],
                 [
                     'company_name' => 'ACME #2',
-                    'is_primary' => true
-                ]
+                    'is_primary'   => true,
+                ],
+                [
+                    'company_name' => 'ACME #3',
+                    'is_primary'   => false,
+                ],
             ]);
 
-        $repoMock->expects($this->exactly(2))->method('getCompaniesByLeadId');
+        $primary = $this->repoMock->getPrimaryCompanyByLeadId(1);
 
-        $this->expectException(PrimaryCompanyNotFoundException::class);
-        $first = $repoMock->getPrimaryCompanyByLeadId(1);
-
-        $primary = $repoMock->getPrimaryCompanyByLeadId(2);
         $this->assertEquals(
             [
                 'company_name' => 'ACME #2',
-                'is_primary' => true
+                'is_primary'   => true,
             ],
             $primary
         );
