@@ -67,7 +67,7 @@ $activeTab = $activeTab ?: 'details-container';
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <?php if ($useAuthorizationUrl): ?>
         <div class="alert alert-warning">
-            <?php echo $view['translator']->trans($integrationObject->getCallbackConfigWarnMessageKey()); ?>
+            <?php echo $view['translator']->trans($integrationObject->getCallbackHelpMessageTranslationKey()); ?>
         </div>
         <?php if ($callbackUrl): ?>
         <div class="well well-sm">
