@@ -41,7 +41,7 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    private const NAME = 'oauth2_two_legged';
+    public const NAME = 'oauth2_two_legged';
 
     /**
      * @var PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface
