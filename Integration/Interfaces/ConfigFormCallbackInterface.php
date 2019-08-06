@@ -14,9 +14,9 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 interface ConfigFormCallbackInterface
 {
     /**
-     * Message ID used in form as description what for iss used callback URL
+     * Message ID used in form as description what for is used callback URL
      *
      * @return string
      */
-    public function getCallbackConfigWarnMessageKey(): string;
+    public function getCallbackHelpMessageTranslationKey(): string;
 }
