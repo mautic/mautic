@@ -13,8 +13,6 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 interface ConfigFormAuthorizeButtonInterface
 {
-    public const CONFIG_KEY_AUTHORIZATION_URL = 'authorization_url';
-
     /**
      * @return string
      */
