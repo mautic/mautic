@@ -65,30 +65,26 @@ $activeTab = $activeTab ?: 'details-container';
         <?php echo $view['form']->row($form['isPublished']); ?>
         <hr />
         <?php echo $view['form']->row($form['apiKeys']); ?>
-        <?php
-        if ($useAuthorizationUrl):
-        ?>
-            <div class="alert alert-warning">
-                <?php echo $view['translator']->trans($integrationObject->getCallbackConfigWarnMessageKey()); ?>
+        <?php if ($useAuthorizationUrl): ?>
+        <div class="alert alert-warning">
+            <?php echo $view['translator']->trans($integrationObject->getCallbackConfigWarnMessageKey()); ?>
+        </div>
+        <?php if ($callbackUrl): ?>
+        <div class="well well-sm">
+            <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
+            <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
+        </div>
+        <?php endif; ?>
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
+                <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
+                    <i class="fa fa-key "></i>
+                    <?php echo $view['translator']->trans('mautic.integration.form.authorize') ?>
+                </button>
             </div>
-            <?php if ($callbackUrl): ?>
-                <div class="well well-sm">
-                    <?php echo $view['translator']->trans('mautic.integration.callbackuri'); ?><br/>
-                    <input type="text" readonly onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $view->escape($callbackUrl); ?>" class="form-control"/>
-                </div>
-            <?php endif; ?>
-                <div class="row">
-                    <div class="col-xs-12 text-center">
-                        <input type="hidden" id="integration_details_in_auth" name="integration_details[in_auth]" autocomplete="false">
-                        <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
-                            <i class="fa fa-key "></i>
-                            <?php echo $view['translator']->trans('mautic.integration.form.authorize') ?>
-                        </button>
-                    </div>
-                </div>
-            <?php
-        endif;
-        ?>
+        </div>
+        <?php endif; ?>
     </div>
     <!-- Enabled\Auth -->
 
