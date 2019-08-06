@@ -133,7 +133,7 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     public function hasToken(): bool
     {
-        return $this->token && !empty($this->token->getAccessToken());
+        return $this->token && !empty($this->getIntegration()->getApiKeys()['access_token']);
     }
 
     /**

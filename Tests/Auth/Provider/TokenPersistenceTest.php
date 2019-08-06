@@ -120,6 +120,10 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->tokenPersistence->saveToken($token));
 
+        $integration->expects($this->once())
+            ->method('getApiKeys')
+            ->willReturn($apiKeysEncrypted);
+
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 
@@ -157,9 +161,12 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         ];
 
         $integration = $this->createMock(Integration::class);
-        $integration->expects($this->once())
+        $integration->expects($this->at(0))
             ->method('getApiKeys')
             ->willReturn($apiKeys);
+        $integration->expects($this->at(1))
+            ->method('getApiKeys')
+            ->willReturn($apiKeysEncrypted);
         $integration->expects($this->at(0))
             ->method('setApiKeys')
             ->with($apiKeysEncrypted);
@@ -172,19 +179,28 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $this->integrationEntityRepository->expects($this->exactly(2))
             ->method('saveEntity');
         $this->tokenPersistence->saveToken($token);
+
         $this->assertTrue($this->tokenPersistence->hasToken());
 
         $this->tokenPersistence->deleteToken();
+
+
         $this->assertFalse($this->tokenPersistence->hasToken());
     }
 
     public function testHasToken()
     {
+        $tokenStr = 'kajshfddkadsfdw';
+
         $this->assertFalse($this->tokenPersistence->hasToken());
 
-        $token = new RawToken('kajshfddkadsfdw');
+        $token = new RawToken($tokenStr);
 
         $integration = $this->createMock(Integration::class);
+        $integration->expects($this->at(1))
+            ->method('getApiKeys')
+            ->willReturn(['access_token' => $tokenStr]);
+
         $this->tokenPersistence->setIntegration($integration);
         $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
@@ -192,5 +208,9 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $token = new RawToken();
         $this->tokenPersistence->saveToken($token);
         $this->assertFalse($this->tokenPersistence->hasToken());
+    }
+
+    private function mochIntegrationAccessKeyContainsAccessToken(Integration $integration, $apikeys)
+    {
     }
 }
