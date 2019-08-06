@@ -76,7 +76,7 @@ class TokenPersistence implements TokenPersistenceInterface
         $refreshToken =  [
             'access_token' => $token->getAccessToken(),
             'refresh_token' => $token->getRefreshToken(),
-            // Wee needs to use `expires_in` key because of merge algorithm
+            // Wee need to use `expires_in` key because of merge algorithm
             'expires_in' => $token->getExpiresAt() - time(),
         ];
 
