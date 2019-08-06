@@ -208,8 +208,4 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $this->tokenPersistence->saveToken($token);
         $this->assertFalse($this->tokenPersistence->hasToken());
     }
-
-    private function mochIntegrationAccessKeyContainsAccessToken(Integration $integration, $apikeys)
-    {
-    }
 }
