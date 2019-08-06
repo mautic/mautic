@@ -2,6 +2,9 @@
 
 namespace Mautic\DynamicContentBundle\Tests\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -11,6 +14,8 @@ use Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -102,6 +107,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->companyModel         = $this->createMock(CompanyModel::class);
 
+        $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
         $this->subscriber           = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
@@ -309,4 +315,61 @@ HTML;
 
         $this->subscriber->onTokenReplacement($event);
     }
+
+    public function testOnTokenReplacementCompletesCompanyFields() {
+        $leadMock = $this->createMock(Lead::class);
+
+        $this->companyLeadRepositoryMock
+            ->method('getPrimaryCompanyByLeadId')
+            ->willReturn([
+                'companyname' => 'ACME'
+            ]);
+
+        $this->pageTokenHelper
+            ->method('findPageTokens')
+            ->willReturn([]);
+
+        $this->assetTokenHelper
+            ->method('findAssetTokens')
+            ->willReturn([]);
+
+        $this->formTokenHelper
+            ->method('findFormTokens')
+            ->willReturn([]);
+
+        $this->focusTokenHelper
+            ->method('findFocusTokens')
+            ->willReturn([]);
+
+        $this->trackableModel
+            ->method('parseContentForTrackables')
+            ->willReturnCallback(
+                function() {
+                    return [func_get_arg(0),[]];
+                }
+            );
+
+        $entityManagerMock = $this->createMock(EntityManager::class);
+        $entityManagerMock->method('getRepository')->willReturnCallback(
+            [$this, 'getRepositoryCallback']
+        );
+
+        $this->subscriber->setEntityManager($entityManagerMock);
+
+        $content = 'This is company name: {contactfield=companyname}';
+
+        $replacementEvent = new TokenReplacementEvent($content, $leadMock);
+        $this->subscriber->onTokenReplacement($replacementEvent);
+
+        $this->assertContains('ACME', $replacementEvent->getContent());
+    }
+
+    public function getRepositoryCallback() {
+        $args = func_get_args();
+        switch ($args[0]) {
+            case CompanyLead::class:
+                return $this->companyLeadRepositoryMock;
+        }
+    }
+}
 }

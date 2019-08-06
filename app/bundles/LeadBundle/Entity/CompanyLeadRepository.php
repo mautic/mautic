@@ -76,7 +76,9 @@ class CompanyLeadRepository extends CommonRepository
 
     /**
      * @param int $leadId
+     *
      * @return array
+     *
      * @throws PrimaryCompanyNotFoundException
      */
     public function getPrimaryCompanyByLeadId($leadId)

@@ -101,10 +101,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             $leadArray      = $lead->getProfileFields();
             $repo           = $this->em->getRepository(CompanyLead::class);
             try {
-                $primaryCompany = $repo->getPrimaryCompanyByLeadId($lead->getId());
+                $primaryCompany         = $repo->getPrimaryCompanyByLeadId($lead->getId());
                 $leadArray['companies'] = [$primaryCompany];
-            } catch (PrimaryCompanyNotFoundException $e) {}
-            
+            } catch (PrimaryCompanyNotFoundException $e) {
+            }
+
             $tokens = array_merge(
                 TokenHelper::findLeadTokens($content, $leadArray),
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
