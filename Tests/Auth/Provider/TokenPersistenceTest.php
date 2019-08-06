@@ -192,16 +192,15 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
     {
         $tokenStr = 'kajshfddkadsfdw';
 
-        $this->assertFalse($this->tokenPersistence->hasToken());
-
         $token = new RawToken($tokenStr);
 
         $integration = $this->createMock(Integration::class);
-        $integration->expects($this->at(1))
+        $integration->expects($this->at(2))
             ->method('getApiKeys')
             ->willReturn(['access_token' => $tokenStr]);
 
         $this->tokenPersistence->setIntegration($integration);
+        $this->assertFalse($this->tokenPersistence->hasToken());
         $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
 
