@@ -4,7 +4,6 @@ namespace Mautic\DynamicContentBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
