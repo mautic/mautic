@@ -106,9 +106,8 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->security             = $this->createMock(CorePermissions::class);
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->companyModel         = $this->createMock(CompanyModel::class);
-
         $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
-        $this->subscriber           = new DynamicContentSubscriber(
+        $this->subscriber                = new DynamicContentSubscriber(
             $this->trackableModel,
             $this->pageTokenHelper,
             $this->assetTokenHelper,
@@ -316,13 +315,14 @@ HTML;
         $this->subscriber->onTokenReplacement($event);
     }
 
-    public function testOnTokenReplacementCompletesCompanyFields() {
+    public function testOnTokenReplacementCompletesCompanyFields()
+    {
         $leadMock = $this->createMock(Lead::class);
 
         $this->companyLeadRepositoryMock
             ->method('getPrimaryCompanyByLeadId')
             ->willReturn([
-                'companyname' => 'ACME'
+                'companyname' => 'ACME',
             ]);
 
         $this->pageTokenHelper
@@ -344,8 +344,8 @@ HTML;
         $this->trackableModel
             ->method('parseContentForTrackables')
             ->willReturnCallback(
-                function() {
-                    return [func_get_arg(0),[]];
+                function () {
+                    return [func_get_arg(0), []];
                 }
             );
 
@@ -364,7 +364,8 @@ HTML;
         $this->assertContains('ACME', $replacementEvent->getContent());
     }
 
-    public function getRepositoryCallback() {
+    public function getRepositoryCallback()
+    {
         $args = func_get_args();
         switch ($args[0]) {
             case CompanyLead::class:
