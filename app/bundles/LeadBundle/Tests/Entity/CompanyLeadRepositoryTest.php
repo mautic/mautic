@@ -26,7 +26,7 @@ class CompanyLeadRepositoryTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 [
                     'company_name' => 'ACME #1',
-                    'is_primary'   => false
+                    'is_primary'   => false,
                 ],
             ]);
 
@@ -34,13 +34,14 @@ class CompanyLeadRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repoMock->getPrimaryCompanyByLeadId(1);
     }
 
-    public function testGetPrimaryCompanyByLeadIdReturnsCorrectRecord() {
+    public function testGetPrimaryCompanyByLeadIdReturnsCorrectRecord()
+    {
         $this->repoMock->expects($this->once())
             ->method('getCompaniesByLeadId')
             ->willReturn([
                 [
                     'company_name' => 'ACME #1',
-                    'is_primary'  => false
+                    'is_primary'   => false,
                 ],
                 [
                     'company_name' => 'ACME #2',
