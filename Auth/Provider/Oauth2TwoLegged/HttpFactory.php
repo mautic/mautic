@@ -21,9 +21,12 @@ use kamermans\OAuth2\GrantType\GrantTypeInterface;
 use kamermans\OAuth2\GrantType\PasswordCredentials;
 use kamermans\OAuth2\GrantType\RefreshToken;
 use kamermans\OAuth2\OAuth2Middleware;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenPersistenceInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\PasswordCredentialsGrantInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ScopeInterface;
@@ -38,7 +41,7 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    const NAME = 'oauth2_two_legged';
+    public const NAME = 'oauth2_two_legged';
 
     /**
      * @var PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface
@@ -46,7 +49,7 @@ class HttpFactory implements AuthProviderInterface
     private $credentials;
 
     /**
-     * @var AuthConfigInterface|ConfigInterface
+     * @var CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface
      */
     private $config;
 
@@ -71,8 +74,8 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface|ConfigInterface                                                                     $config
+     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface    $credentials
+     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface|AuthConfigInterface $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
@@ -227,16 +230,16 @@ class HttpFactory implements AuthProviderInterface
             return;
         }
 
-        if ($clientCredentialsSigner = $this->config->getClientCredentialsSigner()) {
-            $oauth->setClientCredentialsSigner($clientCredentialsSigner);
+        if ($this->config instanceof CredentialsSignerInterface) {
+            $oauth->setClientCredentialsSigner($this->config->getCredentialsSigner());
         }
 
-        if ($accessTokenSigner = $this->config->getAccessTokenSigner()) {
-            $oauth->setAccessTokenSigner($accessTokenSigner);
+        if ($this->config instanceof TokenPersistenceInterface) {
+            $oauth->setTokenPersistence($this->config->getTokenPersistence());
         }
 
-        if ($tokenPersistence = $this->config->getAccessTokenPersistence()) {
-            $oauth->setTokenPersistence($tokenPersistence);
+        if ($this->config instanceof TokenSignerInterface) {
+            $oauth->setAccessTokenSigner($this->config->getTokenSigner());
         }
     }
 }
