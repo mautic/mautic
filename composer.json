@@ -28,5 +28,16 @@
     "php": "^7.1 || ^7.2",
     "guzzlehttp/oauth-subscriber": "^0.3"
   },
+  "scripts": {
+    "test": [
+      "@phpunit"
+    ],
+    "quicktest": [
+      "@unit"
+    ],
+    "phpunit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
+    "unit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
+    "coverage": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage"
+  },
   "minimum-stability": "dev"
 }
