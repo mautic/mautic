@@ -129,7 +129,7 @@ return [
             ],
             'mautic.integrations.helper.auth_integrations' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\AuthIntegrationsHelper::class,
-                'arugments' => [
+                'arguments' => [
                     'mautic.integrations.helper',
                 ]
             ],

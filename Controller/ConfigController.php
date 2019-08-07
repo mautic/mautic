@@ -21,6 +21,11 @@ use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
 use MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper;
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthorizeButtonInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
@@ -189,15 +194,53 @@ class ConfigController extends AbstractFormController
      */
     private function showForm()
     {
+        $integrationObject = $this->integrationObject;
+        $form = $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php');
+        $formHelper = $this->get('templating.helper.form');
+
+        $showFeaturesTab =
+            $integrationObject instanceof ConfigFormFeaturesInterface ||
+            $integrationObject instanceof ConfigFormSyncInterface ||
+            $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+
+        $hasFeatureErrors = (
+                $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
+                $formHelper->containsErrors($form['featureSettings']['integration'])
+            ) || (
+                isset($form['featureSettings']['sync']['integration']) &&
+                $formHelper->containsErrors($form['featureSettings']['sync']['integration'])
+            );
+
+        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formHelper->containsErrors($form['apiKeys']);
+
+        $useSyncFeatures = $integrationObject instanceof ConfigFormSyncInterface;
+
+        $useFeatureSettings = $integrationObject instanceof ConfigFormFeatureSettingsInterface;
+
+        $useAuthorizationUrl = $integrationObject instanceof ConfigFormAuthorizeButtonInterface;
+
+        $callbackUrl = ($integrationObject instanceof ConfigFormCallbackInterface) ?
+            $this->generateUrl('mautic_integration_public_callback',
+                ['integration' => $integrationObject->getName()]
+            )
+            : false;
+
         return $this->delegateView(
             [
                 'viewParameters'  => [
-                    'integrationObject' => $this->integrationObject,
-                    'form'              => $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php'),
-                    'activeTab'         => $this->request->get('activeTab'),
+                    'integrationObject'   => $integrationObject,
+                    'form'                => $form,
+                    'activeTab'           => $this->request->get('activeTab'),
+                    'showFeaturesTab'     => $showFeaturesTab,
+                    'hasFeatureErrors'    => $hasFeatureErrors,
+                    'hasAuthErrors'       => $hasAuthErrors,
+                    'useSyncFeatures'     => $useSyncFeatures,
+                    'useFeatureSettings'  => $useFeatureSettings,
+                    'useAuthorizationUrl' => $useAuthorizationUrl,
+                    'callbackUrl'         => $callbackUrl,
                 ],
-                'contentTemplate' => $this->integrationObject->getConfigFormContentTemplate()
-                    ? $this->integrationObject->getConfigFormContentTemplate()
+                'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
+                    ? $integrationObject->getConfigFormContentTemplate()
                     : 'IntegrationsBundle:Config:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
@@ -217,14 +260,18 @@ class ConfigController extends AbstractFormController
         $session = $this->get('session');
         $session->remove("{$this->integrationObject->getName()}-fields");
 
-        return new JsonResponse(
-            [
-                'closeModal'    => 1,
-                'enabled'       => $this->integrationConfiguration->getIsPublished(),
-                'name'          => $this->integrationConfiguration->getName(),
-                'mauticContent' => 'integrationsConfig',
-            ]
-        );
+        $response = [
+            'closeModal'    => 1,
+            'enabled'       => $this->integrationConfiguration->getIsPublished(),
+            'name'          => $this->integrationConfiguration->getName(),
+            'mauticContent' => 'integrationsConfig',
+        ];
+
+        if ($this->integrationObject instanceof ConfigFormAuthorizeButtonInterface) {
+            $response['authUrl'] = $this->integrationObject->getAuthorizationUrl();
+        }
+
+        return new JsonResponse($response);
     }
 
 
