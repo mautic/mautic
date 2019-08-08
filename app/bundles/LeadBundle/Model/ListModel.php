@@ -336,7 +336,7 @@ class ListModel extends FormModel
             // A segment from filter does not exist anymore. Do not rebuild.
             return 0;
         } catch (TableNotFoundException $e) {
-            // Invalid filter record, custom objects not well asset or deleted. Do not rebuild but log.
+            // Invalid filter table, filter definition is not well asset or it is deleted.  Do not rebuild but log.
             $this->logger->addError($e->getMessage());
 
             return 0;
