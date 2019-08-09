@@ -178,6 +178,13 @@ return [
             'mautic.integrations.auth_provider.oauth2threelegged' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class,
             ],
+            'mautic.integrations.auth_provider.token_persistence_factory' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\TokenPersistenceFactory::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.encryption',
+                ]
+            ] ,
         ],
         'repositories' => [
             'mautic.integrations.repository.field_change' => [
