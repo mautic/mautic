@@ -171,7 +171,7 @@ class HttpFactory implements AuthProviderInterface
         $config = [
             'client_id'     => $this->credentials->getClientId(),
             'client_secret' => $this->credentials->getClientSecret(),
-            'code'          => $this->credentials->getCode(),
+            'code'          => 'code',
         ];
 
         if ($this->credentials instanceof ScopeInterface) {
