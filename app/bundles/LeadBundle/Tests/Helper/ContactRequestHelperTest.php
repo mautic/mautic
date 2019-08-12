@@ -161,10 +161,15 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testLandingPageClickthroughIdentifiesLeadIfEnabled()
     {
-        $this->coreParametersHelper->expects($this->once())
+        $this->coreParametersHelper->expects($this->at(0))
             ->method('getParameter')
             ->with('track_by_tracking_url')
             ->willReturn(true);
+
+        $this->coreParametersHelper->expects($this->at(1))
+            ->method('getParameter')
+            ->with('disable_merge_identified_contacts')
+            ->willReturn(false);
 
         $query = [
             'ct' => [
@@ -210,6 +215,11 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
+            ->method('getParameter')
+            ->with('disable_merge_identified_contacts')
+            ->willReturn(false);
+
+        $this->coreParametersHelper->expects($this->at(2))
             ->method('getParameter')
             ->with('track_by_fingerprint')
             ->willReturn(false);
@@ -294,6 +304,11 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
+            ->method('getParameter')
+            ->with('disable_merge_identified_contacts')
+            ->willReturn(false);
+
+        $this->coreParametersHelper->expects($this->at(2))
             ->method('getParameter')
             ->with('track_by_fingerprint')
             ->willReturn(true);
