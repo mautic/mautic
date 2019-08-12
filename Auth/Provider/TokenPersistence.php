@@ -67,11 +67,15 @@ class TokenPersistence implements TokenPersistenceInterface
     {
         $apiKeys = $this->getIntegration()->getApiKeys();
 
-        $previousToken = new RawToken(
-            $this->encryptionHelper->decrypt($apiKeys['access_token']),
-            $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
-            $this->encryptionHelper->decrypt($apiKeys['expires_at'])
-        );
+        if (!empty($apiKeys['access_token'])) {
+            $previousToken = new RawToken(
+                $this->encryptionHelper->decrypt($apiKeys['access_token']),
+                $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
+                $this->encryptionHelper->decrypt($apiKeys['expires_at'])
+            );
+        } else {
+            $previousToken = new RawToken();
+        }
 
         $refreshToken =  [
             'access_token' => $token->getAccessToken(),
