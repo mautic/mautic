@@ -81,7 +81,7 @@ class TokenPersistence implements TokenPersistenceInterface
             'access_token' => $token->getAccessToken(),
             'refresh_token' => $token->getRefreshToken(),
             // Wee need to use `expires_in` key because of merge algorithm
-            'expires_in' => $token->getExpiresAt() - time(),
+            'expires_in' => $token->getExpiresAt() ? $token->getExpiresAt() - time() : - 1,
         ];
 
         // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
@@ -99,14 +99,17 @@ class TokenPersistence implements TokenPersistenceInterface
     public function saveToken(TokenInterface $token): void
     {
         $integration = $this->getIntegration();
+        $oldApiKeys = $integration->getApiKeys();
 
-        $apiKeys = [
+        $newApiKeys = [
             'access_token'  => $this->encryptionHelper->encrypt($token->getAccessToken()),
             'refresh_token' => $this->encryptionHelper->encrypt($token->getRefreshToken()),
             'expires_at'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
         ];
 
-        $integration->setApiKeys($apiKeys);
+        $newApiKeys = array_merge($oldApiKeys, $newApiKeys);
+
+        $integration->setApiKeys($newApiKeys);
         $this->integrationEntityRepository->saveEntity($integration);
 
         $this->token = $token;
