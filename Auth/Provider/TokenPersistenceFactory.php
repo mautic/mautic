@@ -11,31 +11,21 @@
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
-
+use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 class TokenPersistenceFactory
 {
     /**
-     * @var EntityManager
+     * @var IntegrationsHelper
      */
-    private $entityManager;
+    private $integrationsHelper;
 
     /**
-     * @var EncryptionHelper
+     * @param IntegrationsHelper $integrationsHelper
      */
-    private $encryptionHelper;
-
-    /**
-     * @param EntityManager $entityManager
-     * @param EncryptionHelper $encryptionHelper
-     */
-    public function __construct(EntityManager $entityManager, EncryptionHelper $encryptionHelper)
+    public function __construct(IntegrationsHelper $integrationsHelper)
     {
-        $this->entityManager = $entityManager;
-        $this->encryptionHelper = $encryptionHelper;
+        $this->integrationsHelper = $integrationsHelper;
     }
 
     /**
@@ -45,10 +35,7 @@ class TokenPersistenceFactory
      */
     public function create(Integration $integration)
     {
-        $tokenPersistence = new TokenPersistence(
-            $this->encryptionHelper,
-            $this->entityManager->getRepository(IntegrationEntity::class)
-        );
+        $tokenPersistence = new TokenPersistence($this->integrationsHelper);
 
         $tokenPersistence->setIntegration($integration);
 

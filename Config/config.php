@@ -180,10 +180,7 @@ return [
             ],
             'mautic.integrations.auth_provider.token_persistence_factory' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\TokenPersistenceFactory::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.helper.encryption',
-                ]
+                'arguments' => ['mautic.integrations.helper']
             ] ,
         ],
         'repositories' => [

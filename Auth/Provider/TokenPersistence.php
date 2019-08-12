@@ -17,27 +17,21 @@ use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
 use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
+use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
     /**
-     * @var EncryptionHelper
+     * @var IntegrationsHelper
      */
-    private $encryptionHelper;
+    private $integrationsHelper;
 
     /**
      * @var Integration|null
      */
     private $integration;
-
-    /**
-     * @var IntegrationEntityRepository
-     */
-    private $integrationEntityRepository;
 
     /**
      * Token with decrypted data
@@ -47,13 +41,11 @@ class TokenPersistence implements TokenPersistenceInterface
     private $token;
 
     /**
-     * @param EncryptionHelper $encryptionHelper
-     * @param IntegrationEntityRepository $integrationEntityRepository
+     * @param IntegrationsHelper $integrationsHelper
      */
-    public function __construct(EncryptionHelper $encryptionHelper, IntegrationEntityRepository $integrationEntityRepository)
+    public function __construct(IntegrationsHelper $integrationsHelper)
     {
-        $this->encryptionHelper = $encryptionHelper;
-        $this->integrationEntityRepository = $integrationEntityRepository;
+        $this->integrationsHelper = $integrationsHelper;
     }
 
     /**
@@ -69,9 +61,9 @@ class TokenPersistence implements TokenPersistenceInterface
 
         if (!empty($apiKeys['access_token'])) {
             $previousToken = new RawToken(
-                $this->encryptionHelper->decrypt($apiKeys['access_token']),
-                $this->encryptionHelper->decrypt($apiKeys['refresh_token']),
-                $this->encryptionHelper->decrypt($apiKeys['expires_at'])
+                $apiKeys['access_token'],
+                $apiKeys['refresh_token'],
+                $apiKeys['expires_at']
             );
         } else {
             $previousToken = new RawToken();
@@ -102,21 +94,22 @@ class TokenPersistence implements TokenPersistenceInterface
         $oldApiKeys = $integration->getApiKeys();
 
         $newApiKeys = [
-            'access_token'  => $this->encryptionHelper->encrypt($token->getAccessToken()),
-            'refresh_token' => $this->encryptionHelper->encrypt($token->getRefreshToken()),
-            'expires_at'    => $this->encryptionHelper->encrypt($token->getExpiresAt()),
+            'access_token'  => $token->getAccessToken(),
+            'refresh_token' => $token->getRefreshToken(),
+            'expires_at'    => $token->getExpiresAt(),
         ];
 
         $newApiKeys = array_merge($oldApiKeys, $newApiKeys);
 
         $integration->setApiKeys($newApiKeys);
-        $this->integrationEntityRepository->saveEntity($integration);
+        $this->integrationsHelper->saveIntegrationConfiguration($integration);
 
         $this->token = $token;
     }
 
     /**
      * Delete the saved token data.
+     * @todo
      */
     public function deleteToken(): void
     {
@@ -128,7 +121,7 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $integration->setApiKeys($apiKeys);
 
-        $this->integrationEntityRepository->saveEntity($integration);
+        $this->integrationsHelper->saveIntegrationConfiguration($integration);
 
         $this->token = null;
     }
