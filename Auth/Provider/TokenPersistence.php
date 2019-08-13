@@ -94,6 +94,10 @@ class TokenPersistence implements TokenPersistenceInterface
         $integration = $this->getIntegration();
         $oldApiKeys = $integration->getApiKeys();
 
+        if ($oldApiKeys === null) {
+            $oldApiKeys = [];
+        }
+
         $newApiKeys = [
             'access_token'  => $token->getAccessToken(),
             'refresh_token' => $token->getRefreshToken(),

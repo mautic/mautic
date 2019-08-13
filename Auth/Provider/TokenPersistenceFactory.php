@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,6 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+
 class TokenPersistenceFactory
 {
     /**
@@ -33,7 +36,7 @@ class TokenPersistenceFactory
      *
      * @return TokenPersistence
      */
-    public function create(Integration $integration)
+    public function create(Integration $integration): TokenPersistence
     {
         $tokenPersistence = new TokenPersistence($this->integrationsHelper);
 

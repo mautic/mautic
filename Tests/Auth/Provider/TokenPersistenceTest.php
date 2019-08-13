@@ -147,31 +147,21 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
             $expected
         );
 
-        $encrypted = 'encrypted';
-        $apiKeysEncrypted = [
-            'access_token' => $encrypted,
-            'refresh_token' => $encrypted,
-            'expires_at' => $encrypted,
-        ];
-
         $integration = $this->createMock(Integration::class);
         $integration->expects($this->at(0))
             ->method('getApiKeys')
             ->willReturn($apiKeys);
-        $integration->expects($this->at(1))
+        $integration->expects($this->at(2))
             ->method('getApiKeys')
-            ->willReturn($apiKeysEncrypted);
-        $integration->expects($this->at(0))
+            ->willReturn($apiKeys);
+        $integration->expects($this->at(3))
             ->method('setApiKeys')
-            ->with($apiKeysEncrypted);
+            ->with([]);
 
         $this->tokenPersistence->setIntegration($integration);
 
-        $this->encryptionHelper->expects($this->exactly(3))
-            ->method('encrypt')
-            ->willReturn($encrypted);
-        $this->integrationEntityRepository->expects($this->exactly(2))
-            ->method('saveEntity');
+        $this->integrationsHelper->expects($this->exactly(2))
+            ->method('saveIntegrationConfiguration');
         $this->tokenPersistence->saveToken($token);
 
         $this->assertTrue($this->tokenPersistence->hasToken());
@@ -184,14 +174,22 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testHasToken()
     {
-        $tokenStr = 'kajshfddkadsfdw';
+        $accessToken = 'sjak';
 
-        $token = new RawToken($tokenStr);
+        $oldApiKeys = [];
+
+        $token = new RawToken($accessToken);
 
         $integration = $this->createMock(Integration::class);
+        $integration->expects($this->at(3))
+            ->method('getApiKeys')
+            ->willReturn($oldApiKeys);
         $integration->expects($this->at(2))
             ->method('getApiKeys')
-            ->willReturn(['access_token' => $tokenStr]);
+            ->willReturn(['access_token' => $accessToken]);
+        $integration->expects($this->at(3))
+            ->method('getApiKeys')
+            ->willReturn(['access_token' => $accessToken]);
 
         $this->tokenPersistence->setIntegration($integration);
         $this->assertFalse($this->tokenPersistence->hasToken());
