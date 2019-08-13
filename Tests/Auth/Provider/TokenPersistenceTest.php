@@ -16,23 +16,20 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider;
 use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\TokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
+use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
 class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 {
-    private $encryptionHelper;
-    private $integrationEntityRepository;
+    private $integrationsHelper;
     private $tokenPersistence;
 
     public function setUp()
     {
-        $this->encryptionHelper = $this->createMock(EncryptionHelper::class);
-        $this->integrationEntityRepository = $this->createMock(IntegrationEntityRepository::class);
-        $this->tokenPersistence = new TokenPersistence($this->encryptionHelper, $this->integrationEntityRepository);
+        $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
+        $this->tokenPersistence = new TokenPersistence($this->integrationsHelper);
         parent::setUp();
     }
 
@@ -71,9 +68,6 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
             ->method('getApiKeys')
             ->willReturn($apiKeys);
 
-        $this->encryptionHelper->expects($this->exactly(3))
-            ->method('decrypt');
-
         $this->tokenPersistence->setIntegration($integration);
 
         $newToken = $this->tokenPersistence->restoreToken($tokenFromApi);
@@ -93,36 +87,36 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testSaveToken()
     {
-        $encrypted = 'encrypted';
-        $apiKeysEncrypted = [
-            'access_token' => $encrypted,
-            'refresh_token' => $encrypted,
-            'expires_at' => $encrypted,
+        $oldApiKeys = [
+            'access_token' => 'old_access_token',
+            'something' => 'something',
         ];
 
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())
-            ->method('getAccessToken')
-            ->willReturn('something');
+        $newApiKeys = [
+            'access_token' => 'access_token',
+            'refresh_token' => 'refresh_token',
+            'expires_at' => '0',
+        ];
 
-        $this->encryptionHelper->expects($this->exactly(3))
-            ->method('encrypt')
-            ->willReturn($encrypted);
+        $token = new RawToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at']);
 
         $integration = $this->createMock(Integration::class);
+        $integration->expects($this->at(0))
+            ->method('getApiKeys')
+            ->willReturn($oldApiKeys);
+        $newApiKeys = array_merge($oldApiKeys, $newApiKeys);
         $integration->expects($this->once())
             ->method('setApiKeys')
-            ->with($apiKeysEncrypted);
+            ->with($newApiKeys);
+        $integration->expects($this->at(2))
+            ->method('getApiKeys')
+            ->willReturn($newApiKeys);
         $this->tokenPersistence->setIntegration($integration);
 
-        $this->integrationEntityRepository->expects($this->exactly(1))
-            ->method('saveEntity');
+        $this->integrationsHelper->expects($this->once())
+            ->method('saveIntegrationConfiguration');
 
-        $this->assertNull($this->tokenPersistence->saveToken($token));
-
-        $integration->expects($this->once())
-            ->method('getApiKeys')
-            ->willReturn($apiKeysEncrypted);
+        $this->tokenPersistence->saveToken($token);
 
         $this->assertTrue($this->tokenPersistence->hasToken());
     }

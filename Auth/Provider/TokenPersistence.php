@@ -60,6 +60,7 @@ class TokenPersistence implements TokenPersistenceInterface
         $apiKeys = $this->getIntegration()->getApiKeys();
 
         if (!empty($apiKeys['access_token'])) {
+            // Previous tokens exists
             $previousToken = new RawToken(
                 $apiKeys['access_token'],
                 $apiKeys['refresh_token'],
