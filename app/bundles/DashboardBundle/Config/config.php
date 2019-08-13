@@ -82,7 +82,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.cache.provider',
-
                     'mautic.helper.user',
                 ],
             ],
