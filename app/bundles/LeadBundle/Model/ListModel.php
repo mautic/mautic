@@ -453,7 +453,7 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
-            'dnc_unsubscribed'              => [
+            'dnc_unsubscribed' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
                 'properties' => [
                     'type' => 'boolean',
@@ -465,8 +465,8 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
-            'dnc_unsubscribed_manually'     => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_manually'),
+            'dnc_manual_email' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_manual_email'),
                 'properties' => [
                     'type' => 'boolean',
                     'list' => [
@@ -474,10 +474,10 @@ class ListModel extends FormModel
                         1 => $this->translator->trans('mautic.core.form.yes'),
                     ],
                 ],
-                'operators'  => $this->getOperatorsForFieldType('bool'),
-                'object'     => 'lead',
+                'operators' => $this->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
             ],
-            'dnc_bounced_sms'               => [
+            'dnc_bounced_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
                 'properties' => [
                     'type' => 'boolean',
@@ -489,7 +489,7 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
-            'dnc_unsubscribed_sms'          => [
+            'dnc_unsubscribed_sms' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
                 'properties' => [
                     'type' => 'boolean',
@@ -500,18 +500,6 @@ class ListModel extends FormModel
                 ],
                 'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
-            ],
-            'dnc_unsubscribed_sms_manually' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms_manually'),
-                'properties' => [
-                    'type' => 'boolean',
-                    'list' => [
-                        0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes'),
-                    ],
-                ],
-                'operators'  => $this->getOperatorsForFieldType('bool'),
-                'object'     => 'lead',
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
@@ -562,68 +550,6 @@ class ListModel extends FormModel
                             'gt',
                             'gte',
                             'lt',
-                            'lte',
-                        ],
-                    ]
-                ),
-                'object' => 'lead',
-            ],
-            // Clicked any link from any email
-            'email_id' => [ // kept as email_id for BC
-                'label'      => $this->translator->trans('mautic.lead.list.filter.email_id'),
-                'properties' => [
-                    'type' => 'boolean',
-                    'list' => [
-                        0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes'),
-                    ],
-                ],
-                'operators' => $this->getOperatorsForFieldType('bool'),
-                'object'    => 'lead',
-            ],
-            // Clicked any link from any email relative to time
-            'email_clicked_link_date' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_link_date'),
-                'properties' => ['type' => 'datetime'],
-                'operators'  => $this->getOperatorsForFieldType(
-                    [
-                        'include' => [
-                            '=',
-                            '!=',
-                            'gt',
-                            'lt',
-                            'gte',
-                            'lte',
-                        ],
-                    ]
-                ),
-                'object' => 'lead',
-            ],
-            // Clicked any link from any sms
-            'sms_clicked_link' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link'),
-                'properties' => [
-                    'type' => 'boolean',
-                    'list' => [
-                        0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes'),
-                    ],
-                ],
-                'operators' => $this->getOperatorsForFieldType('bool'),
-                'object'    => 'lead',
-            ],
-            // Clicked any link from any sms relative to time
-            'sms_clicked_link_date' => [
-                'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link_date'),
-                'properties' => ['type' => 'datetime'],
-                'operators'  => $this->getOperatorsForFieldType(
-                    [
-                        'include' => [
-                            '=',
-                            '!=',
-                            'gt',
-                            'lt',
-                            'gte',
                             'lte',
                         ],
                     ]
@@ -744,6 +670,18 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
             ],
+            'email_id' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.email_id'),
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => [
+                        0 => $this->translator->trans('mautic.core.form.no'),
+                        1 => $this->translator->trans('mautic.core.form.yes'),
+                    ],
+                ],
+                'operators' => $this->getOperatorsForFieldType('bool'),
+                'object'    => 'lead',
+            ],
             'redirect_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.redirect_id'),
                 'properties' => [
@@ -854,7 +792,7 @@ class ListModel extends FormModel
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, ['lookup', 'multiselect', 'boolean'])) {
+            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
                 if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [

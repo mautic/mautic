@@ -25,9 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DynamicContentFilterEntryType extends AbstractType
 {
-    private $fieldChoices    = [];
-    private $countryChoices  = [];
-    private $regionChoices   = [];
+    private $fieldChoices = [];
+    private $countryChoices = [];
+    private $regionChoices = [];
     private $timezoneChoices = [];
     private $localeChoices   = [];
 
@@ -56,7 +56,7 @@ class DynamicContentFilterEntryType extends AbstractType
             TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
-                'attr'  => [
+                'attr' => [
                     'class' => 'form-control editor editor-dynamic-content',
                 ],
             ]
@@ -70,7 +70,7 @@ class DynamicContentFilterEntryType extends AbstractType
                     'entry_type'    => DynamicContentFilterEntryFiltersType::class,
                     'entry_options' => [
                         'label' => false,
-                        'attr'  => [
+                        'attr' => [
                             'class' => 'form-control',
                         ],
                         'countries' => $this->countryChoices,
@@ -81,10 +81,10 @@ class DynamicContentFilterEntryType extends AbstractType
                         'fields'    => $this->fieldChoices,
                     ],
                     'error_bubbling' => false,
-                    'mapped'         => true,
-                    'allow_add'      => true,
-                    'allow_delete'   => true,
-                    'label'          => false,
+                    'mapped' => true,
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'label' => false,
                 ]
             )
         );
@@ -105,7 +105,7 @@ class DynamicContentFilterEntryType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'label'          => false,
+                'label' => false,
                 'error_bubbling' => false,
             ]
         );
