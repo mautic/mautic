@@ -203,7 +203,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
         ];
-        
+
         $this->translations['sessions'] = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),
         ];
