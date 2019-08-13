@@ -618,7 +618,8 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // ================================
             (function () {
                 // define variable
-                var minimizeHandler   = "[data-toggle~=minimize]";
+                var minimizeHandler = "[data-toggle~=minimize]",
+                    backgroundImage = $('.mautic-brand').css('background-image');
 
                 // core minimize function
                 function toggleMinimize (e) {
@@ -628,12 +629,20 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         $(element).removeClass("sidebar-minimized");
                         $(this).removeClass("active");
 
+                        if (backgroundImage) {
+                            $('.mautic-brand').css('background-image', backgroundImage);
+                        }
+
                         // publish event
                         $(element).trigger(settings.eventPrefix+".sidebar.maximize", { "element": $(element) });
                     } else {
                         isMinimize = true;
                         $(element).addClass("sidebar-minimized");
                         $(this).addClass("active");
+
+                        if (backgroundImage) {
+                            $('.mautic-brand').css('background-image', 'none');
+                        }
 
                         // publish event
                         $(element).trigger(settings.eventPrefix+".sidebar.minimize", { "element": $(element) });
