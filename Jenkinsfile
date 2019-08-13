@@ -71,23 +71,17 @@ pipeline {
         }
         anyOf {
           branch 'beta'
-          branch 'staging'          
-          branch 'master';
+          branch 'staging';         
         }
       }
       steps {
         script {
-          if (BRANCH_NAME == 'master') {
-            MC_BRANCH_NAME = 'deployed'
-          } else {
-            MC_BRANCH_NAME = BRANCH_NAME
-          }
-          echo "Updating IntegrationsBundle submodule (branch ${BRANCH_NAME}) in mautic-cloud repo (branch ${MC_BRANCH_NAME})"
+          echo "Updating IntegrationsBundle submodule in mautic-cloud repo (branch ${BRANCH_NAME})"
           sshagent (credentials: ['1a066462-6d24-4247-bef6-1da084c8f484']) {
             sh '''
               git config --global user.email "9725490+mautibot@users.noreply.github.com"
               git config --global user.name "Jenkins"
-              git clone git@github.com:mautic-inc/mautic-cloud.git -b '''+MC_BRANCH_NAME+'''
+              git clone git@github.com:mautic-inc/mautic-cloud.git -b $BRANCH_NAME
               cd mautic-cloud
               git submodule update --init --recursive plugins/IntegrationsBundle/
               cd plugins/IntegrationsBundle/
