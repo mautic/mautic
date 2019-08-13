@@ -64,7 +64,26 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
-                    'symfony.filesystem',
+                    'mautic.dashboard.widget_detail.event.factory',
+                ],
+            ],
+        ],
+        'other' => [
+            'mautic.dashboard.widget' => [
+                'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,
+                'arguments' => [
+                    'mautic.dashboard.model.dashboard',
+                    'mautic.helper.user',
+                    'session',
+                ],
+            ],
+            'mautic.dashboard.widget_detail.event.factory' => [
+                'class'     => \Mautic\DashboardBundle\Widget\WidgetDetailEventFactory::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.cache.provider',
+
+                    'mautic.helper.user',
                 ],
             ],
         ],

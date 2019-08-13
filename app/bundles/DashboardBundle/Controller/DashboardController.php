@@ -578,6 +578,7 @@ class DashboardController extends AbstractFormController
      * Gets name from request and defaults it to the timestamp if not provided.
      *
      * @return string
+     * @throws \Exception
      */
     private function getNameFromRequest()
     {
