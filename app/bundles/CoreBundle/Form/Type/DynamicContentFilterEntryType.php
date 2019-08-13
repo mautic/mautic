@@ -56,7 +56,7 @@ class DynamicContentFilterEntryType extends AbstractType
             TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
-                'attr' => [
+                'attr'  => [
                     'class' => 'form-control editor editor-dynamic-content',
                 ],
             ]
@@ -81,10 +81,10 @@ class DynamicContentFilterEntryType extends AbstractType
                         'fields'    => $this->fieldChoices,
                     ],
                     'error_bubbling' => false,
-                    'mapped' => true,
-                    'allow_add' => true,
-                    'allow_delete' => true,
-                    'label' => false,
+                    'mapped'         => true,
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
+                    'label'          => false,
                 ]
             )
         );
@@ -105,7 +105,7 @@ class DynamicContentFilterEntryType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'label' => false,
+                'label'          => false,
                 'error_bubbling' => false,
             ]
         );
