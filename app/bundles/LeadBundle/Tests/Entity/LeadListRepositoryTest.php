@@ -18,14 +18,11 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use Doctrine\DBAL\Types\DateType;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Test\AbstractMauticTestCase;
-use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 
-class LeadListRepositoryTest extends AbstractMauticTestCase
+class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testIncludeSegmentFilterWithFiltersAppendInOrGroups()
     {
@@ -95,51 +92,6 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
         // Segment filters combined by OR to keep consistent behavior with the use of leadlist_id IN (1,2,3)
         $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(1, $found, $string);
-    }
-
-    public function testCustomFieldDateFilterRelativeMonths()
-    {
-        return $this->markTestSkipped('Not yet written');   // @todo it does act differently on test
-
-        list($mockRepository, $reflectedMethod, $connection) = $this->getReflectedGenerateSegmentExpressionMethod(true);
-
-        $parameters = [];
-        $qb         = $connection->createQueryBuilder();
-        $filters    =
-            [
-                [
-                    'glue'     => 'and',
-                    'operator' => '=',
-                    'field'    => 'renewal_date',
-                    'object'   => 'lead',
-                    'type'     => 'date',
-                    'display'  => null,
-                    'filter'   => '-11 months',
-                ],
-            ];
-
-        $this->client = static::createClient([], $this->clientServer);
-        $this->client->disableReboot();
-        $this->client->followRedirects(true);
-
-        $this->container = $this->client->getContainer();
-        $this->em        = $this->container->get('doctrine')->getManager();
-        $fieldModel      = $this->container->get('mautic.lead.model.field');
-
-        $field = new LeadField();
-        $field->setName('renewal_date')
-            ->setAlias('renewal_date')
-            ->setType('date')
-            ->setObject('lead');
-
-        $fieldModel->saveEntity($field);
-
-        // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
-        //$fieldModel->deleteEntity($field);
-
-        $string = (string) $expr;
     }
 
     public function testExcludeSegmentFilterWithFiltersAppendNotExistsSubQuery()
@@ -361,9 +313,9 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
     {
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $mockRepository = $this->getMockBuilder(LeadListRepository::class)
-           ->disableOriginalConstructor()
-           ->setMethods(['getEntityManager', 'getRelativeDateStrings'])
-           ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['getEntityManager'])
+            ->getMock();
 
         $mockConnection = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
@@ -398,15 +350,10 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
                             $name = 'email';
                     }
 
-                    $column            = new Column($name, $mockType);
-                    $mockType          = $this->getMockBuilder(DateType::class)
-                                              ->disableOriginalConstructor()
-                                              ->getMock();
-                    $customFieldColumn = new Column('renewal_date', $mockType);
+                    $column = new Column($name, $mockType);
 
                     return [
-                        $name          => $column,
-                        'renewal_date' => $customFieldColumn,
+                        $name => $column,
                     ];
                 }
             );
@@ -487,9 +434,7 @@ class LeadListRepositoryTest extends AbstractMauticTestCase
                 }
             );
 
-        $mockRepository->method('getRelativeDateStrings')->willReturn([]);
         $reflectedMockRepository = new \ReflectionObject($mockRepository);
-
         $method                  = $reflectedMockRepository->getMethod('generateSegmentExpression');
         $method->setAccessible(true);
 
