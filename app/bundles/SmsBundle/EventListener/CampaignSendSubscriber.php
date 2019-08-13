@@ -19,10 +19,10 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 
-/**
- * Class CampaignSubscriber.
+/***
+ * Class CampaignSendSubscriber
  */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSendSubscriber extends CommonSubscriber
 {
     /**
      * @var SmsModel

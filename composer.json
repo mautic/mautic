@@ -32,6 +32,7 @@
         "symfony/dom-crawler": "~2.8",
         "symfony/browser-kit": "~2.8",
         "symfony/cache": "~3.1",
+        "symfony/serializer": "~2.8",
 
         "symfony/asset": "~2.7",
         "symfony/class-loader": "~2.1",
@@ -93,7 +94,7 @@
         "misd/phone-number-bundle": "^1.1",
         "ip2location/ip2location-php": "^7.2",
         "guzzlehttp/guzzle": "^6.2",
-        "twilio/sdk": "^4.10",
+        "twilio/sdk": "^5.25",
         "debril/rss-atom-bundle": "~2.4.1",
 
         "stack/run": "^1.0",
