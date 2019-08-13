@@ -1719,7 +1719,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function createQueryBuilder(Connection $connection = null)
     {
-        $connection = $connection ?: $this->getConnection();
+        if ($connection===null) {
+            $connection = $this->getConnection();
+        }
 
         return new self($connection);
     }
