@@ -25,9 +25,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DynamicContentFilterEntryType extends AbstractType
 {
-    private $fieldChoices = [];
-    private $countryChoices = [];
-    private $regionChoices = [];
+    private $fieldChoices    = [];
+    private $countryChoices  = [];
+    private $regionChoices   = [];
     private $timezoneChoices = [];
     private $localeChoices   = [];
 
