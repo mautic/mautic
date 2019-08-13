@@ -48,6 +48,9 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
      */
     public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
+        $this->translator = $translator;
+        $this->dispatcher = $dispatcher;
+
         $this->translations['lead_email_read_count'] = [
             'type'                => ForeignFuncFilterQueryBuilder::getServiceId(),
             'foreign_table'       => 'email_stats',
@@ -107,7 +110,7 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
-        $this->translations['dnc_unsubscribed_manually'] = [
+        $this->translations['dnc_manual_email'] = [
             'type' => DoNotContactFilterQueryBuilder::getServiceId(),
         ];
 
@@ -179,6 +182,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'foreign_field' => 'page_id',
         ];
 
+        $this->translations['email_id'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'page_hits',
+            'foreign_field' => 'email_id',
+        ];
+
         $this->translations['redirect_id'] = [
             'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
             'foreign_table' => 'page_hits',
@@ -212,29 +221,6 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'foreign_table' => 'page_hits',
         ];
 
-<<<<<<< HEAD
-=======
-        // Clicked any link from an email ever, kept as email_id for BC
-        $this->translations['email_id'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-
-        // Clicked any link from an email based on time
-        $this->translations['email_clicked_link_date'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-
-        // Clicked any link from a sms based on time
-        $this->translations['sms_clicked_link'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-
-        // Clicked any link from a sms based on time
-        $this->translations['sms_clicked_link_date'] = [
-            'type' => ChannelClickQueryBuilder::getServiceId(),
-        ];
-
->>>>>>> e9de8f189... code style fixes
         $this->translations['sessions'] = [
             'type' => SessionsFilterQueryBuilder::getServiceId(),
         ];
@@ -275,8 +261,12 @@ class ContactSegmentFilterDictionary extends \ArrayIterator
             'where'         => 'campaign_leads.manually_removed = 0',
         ];
 
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
+        $this->translations['lead_asset_download'] = [
+            'type'          => ForeignValueFilterQueryBuilder::getServiceId(),
+            'foreign_table' => 'asset_downloads',
+            'field'         => 'asset_id',
+        ];
+
         $this->fetchTranslationsFromSubscribers();
 
         parent::__construct($this->translations);
