@@ -12,7 +12,7 @@
 namespace MauticPlugin\MauticCitrixBundle\Tests\EventListener;
 
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
-use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\PluginEvents;
 use MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber;
 use PHPUnit_Framework_TestCase;
@@ -32,7 +32,7 @@ class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
             ->setMethodsExcept(['getParameters', 'getAuthorization'])
             ->getMock();
 
-        $integration = $this->getMockBuilder(UnifiedIntegrationInterface::class)
+        $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->disableOriginalConstructor()
             ->getMock();
 
