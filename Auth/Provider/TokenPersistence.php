@@ -122,13 +122,11 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $apiKeys = $integration->getApiKeys();
 
-        unset($apiKeys['access_token'], $apiKeys['refresh_token'], $apiKeys['expires_at']);
+        unset($apiKeys['access_token']);
 
         $integration->setApiKeys($apiKeys);
 
         $this->integrationsHelper->saveIntegrationConfiguration($integration);
-
-        $this->token = null;
     }
 
     /**

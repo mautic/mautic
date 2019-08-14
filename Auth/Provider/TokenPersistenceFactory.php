@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
+use kamermans\OAuth2\Token\RawToken;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
@@ -41,6 +42,16 @@ class TokenPersistenceFactory
         $tokenPersistence = new TokenPersistence($this->integrationsHelper);
 
         $tokenPersistence->setIntegration($integration);
+
+        $apiKeys = $integration->getApiKeys();
+
+        $token  = new RawToken(
+            !empty($apiKeys['access_token']) ? $apiKeys['access_token'] : null,
+            $apiKeys['refresh_token'],
+            $apiKeys['expires_at']
+        );
+
+        $tokenPersistence->restoreToken($token);
 
         return $tokenPersistence;
     }
