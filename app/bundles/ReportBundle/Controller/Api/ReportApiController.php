@@ -72,7 +72,7 @@ class ReportApiController extends CommonApiController
     }
 
     /**
-     * BC just in case a controller is forwarded but shouldn't be used
+     * BC just in case a controller is forwarded but shouldn't be used.
      *
      * @param $id
      *
