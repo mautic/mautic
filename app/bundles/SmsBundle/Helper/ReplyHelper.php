@@ -13,8 +13,12 @@ namespace Mautic\SmsBundle\Helper;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\SmsBundle\Callback\CallbackDeliveryInterface;
 use Mautic\SmsBundle\Callback\CallbackInterface;
+use Mautic\SmsBundle\Callback\CallbackReplyInterface;
+use Mautic\SmsBundle\Callback\DAO\DeliveryStatusDAO;
 use Mautic\SmsBundle\Callback\ResponseInterface;
+use Mautic\SmsBundle\Event\DeliveryEvent;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\SmsEvents;
@@ -71,8 +75,8 @@ class ReplyHelper
     }
 
     /**
-     * @param CallbackInterface $handler
-     * @param Request           $request
+     * @param CallbackDeliveryInterface|CallbackReplyInterface $handler
+     * @param Request                                          $request
      *
      * @return Response
      *
@@ -83,9 +87,33 @@ class ReplyHelper
         // Set the default response
         $response = $this->getDefaultResponse($handler);
 
+        switch ($handler::CALLBACK_TYPE) {
+            case CallbackDeliveryInterface::CALLBACK_TYPE:
+                $deliveryStatusDAO = $handler->getDeliveryStatus($request);
+                $eventResponse     = $this->dispatchDeliveryEvent($contact, $deliveryStatusDAO);
+                break;
+            case CallbackReplyInterface::CALLBACK_TYPE:
+            default:
+            $eventResponse = $this->handleRequestReply($handler, $request);
+                break;
+        }
+
+        if ($eventResponse instanceof Response) {
+            // Last one wins
+            $response = $eventResponse;
+        }
+
+        return $response;
+    }
+
+    private function handleRequestReply(CallbackInterface $handler, Request $request)
+    {
+        // Set the default response
+        $response = $this->getDefaultResponse($handler);
+
         try {
-            $message  = $handler->getMessage($request);
             $contacts = $handler->getContacts($request);
+            $message  = $handler->getMessage($request);
 
             $this->logger->debug(sprintf('SMS REPLY: Processing message "%s"', $message));
             $this->logger->debug(sprintf('SMS REPLY: Found IDs %s', implode(',', $contacts->getKeys())));
@@ -93,13 +121,7 @@ class ReplyHelper
             foreach ($contacts as $contact) {
                 // Set the contact for campaign decisions
                 $this->contactTracker->setSystemContact($contact);
-
                 $eventResponse = $this->dispatchReplyEvent($contact, $message);
-
-                if ($eventResponse instanceof Response) {
-                    // Last one wins
-                    $response = $eventResponse;
-                }
             }
         } catch (BadRequestHttpException $exception) {
             return new Response('invalid request', 400);
@@ -132,6 +154,15 @@ class ReplyHelper
         $this->eventDispatcher->dispatch(SmsEvents::ON_REPLY, $replyEvent);
 
         return $replyEvent->getResponse();
+    }
+
+    private function dispatchDeliveryEvent(Lead $contact, DeliveryStatusDAO $deliveryStatus)
+    {
+        $deliveryEvent = new DeliveryEvent($contact, $deliveryStatus);
+
+        $this->eventDispatcher->dispatch(SmsEvents::ON_DELIVERY, $deliveryEvent);
+
+        return $deliveryEvent->getResponse();
     }
 
     /**

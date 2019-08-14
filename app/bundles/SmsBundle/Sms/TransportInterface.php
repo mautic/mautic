@@ -12,12 +12,14 @@
 namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Entity\Stat;
 
 interface TransportInterface
 {
     /**
-     * @param Lead   $lead
-     * @param string $content
+     * @param Lead      $lead
+     * @param string    $content
+     * @param Stat|null $stat
      *
      * @return bool
      */
