@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationAuthCallbackUrlEvent.
@@ -26,10 +26,10 @@ class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEve
     /**
      * PluginIntegrationAuthCallbackUrlEvent constructor.
      *
-     * @param AbstractIntegration $integration
-     * @param                     $callbackUrl
+     * @param UnifiedIntegrationInterface $integration
+     * @param                             $callbackUrl
      */
-    public function __construct(AbstractIntegration $integration, $callbackUrl)
+    public function __construct(UnifiedIntegrationInterface $integration, $callbackUrl)
     {
         $this->integration = $integration;
         $this->callbackUrl = $callbackUrl;

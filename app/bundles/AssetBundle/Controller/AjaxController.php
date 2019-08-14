@@ -47,6 +47,8 @@ class AjaxController extends CommonAjaxController
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
+     *
+     * @throws \Exception
      */
     protected function fetchRemoteFilesAction(Request $request)
     {

@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Command;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -97,10 +97,11 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $integrationHelper = $container->get('mautic.helper.integration');
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
-        if (!$integrationObject instanceof AbstractIntegration) {
-            $availableIntegrations = array_filter($integrationHelper->getIntegrationObjects(), function (AbstractIntegration $availableIntegration) {
-                return $availableIntegration->isConfigured();
-            });
+        if (!$integrationObject instanceof UnifiedIntegrationInterface) {
+            $availableIntegrations = array_filter($integrationHelper->getIntegrationObjects(),
+                function (UnifiedIntegrationInterface $availableIntegration) {
+                    return $availableIntegration->isConfigured();
+                });
             throw new \RuntimeException(sprintf('The Integration "%s" is not one of the available integrations (%s)', $integration, implode(', ', array_keys($availableIntegrations))));
         }
 

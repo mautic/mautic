@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationKeyEvent.
@@ -26,10 +26,10 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     /**
      * PluginIntegrationKeyEvent constructor.
      *
-     * @param AbstractIntegration $integration
-     * @param array|null          $keys
+     * @param UnifiedIntegrationInterface $integration
+     * @param array|null                  $keys
      */
-    public function __construct(AbstractIntegration $integration, array $keys = null)
+    public function __construct(UnifiedIntegrationInterface $integration, array $keys = null)
     {
         $this->integration = $integration;
         $this->keys        = $keys;

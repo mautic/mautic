@@ -57,7 +57,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
  */
-abstract class AbstractIntegration
+abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
     const FIELD_TYPE_STRING   = 'string';
     const FIELD_TYPE_BOOL     = 'boolean';

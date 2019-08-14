@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Event;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class PluginIntegrationFormDisplayEvent.
@@ -24,12 +24,12 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
     private $settings = [];
 
     /**
-     * PluginIntegrationAuthCallbackUrlEvent constructor.
+     * PluginIntegrationFormDisplayEvent constructor.
      *
-     * @param AbstractIntegration $integration
-     * @param                     $settings
+     * @param UnifiedIntegrationInterface $integration
+     * @param array                       $settings
      */
-    public function __construct(AbstractIntegration $integration, array $settings)
+    public function __construct(UnifiedIntegrationInterface $integration, array $settings)
     {
         $this->integration = $integration;
         $this->settings    = $settings;

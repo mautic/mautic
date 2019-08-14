@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 class EmailMarketingApi
 {
@@ -19,9 +19,11 @@ class EmailMarketingApi
     protected $keys;
 
     /**
-     * @param AbstractIntegration $integration
+     * EmailMarketingApi constructor.
+     *
+     * @param UnifiedIntegrationInterface $integration
      */
-    public function __construct(AbstractIntegration $integration)
+    public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;
         $this->keys        = $integration->getKeys();
