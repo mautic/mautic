@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Provider;
+namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Persistence;
 
 use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\TokenPersistence;
+use MauticPlugin\IntegrationsBundle\Auth\Persistence\TokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
