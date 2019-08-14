@@ -36,6 +36,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ConfigController extends AbstractFormController
 {
@@ -221,7 +222,8 @@ class ConfigController extends AbstractFormController
 
         $callbackUrl = ($integrationObject instanceof ConfigFormCallbackInterface) ?
             $this->generateUrl('mautic_integration_public_callback',
-                ['integration' => $integrationObject->getName()]
+                ['integration' => $integrationObject->getName()],
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
             : false;
 
