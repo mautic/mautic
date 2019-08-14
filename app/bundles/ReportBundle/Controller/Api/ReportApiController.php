@@ -51,7 +51,7 @@ class ReportApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getReportAction(Request $request, $id)
+    public function getEntityAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -69,6 +69,18 @@ class ReportApiController extends CommonApiController
         return $this->handleView(
             $this->view($reportData, Response::HTTP_OK)
         );
+    }
+
+    /**
+     * BC just in case a controller is forwarded but shouldn't be used
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getReportAction($id)
+    {
+        return $this->getEntityAction($id);
     }
 
     /**
