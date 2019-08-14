@@ -86,7 +86,6 @@ class TokenPersistence implements TokenPersistenceInterface
 
     /**
      * Delete the saved token data.
-     * @todo
      */
     public function deleteToken(): void
     {
