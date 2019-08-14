@@ -34,13 +34,6 @@ class TokenPersistence implements TokenPersistenceInterface
     private $integration;
 
     /**
-     * Token with decrypted data
-     *
-     * @var TokenInterface|null
-     */
-    private $token;
-
-    /**
      * @param IntegrationsHelper $integrationsHelper
      */
     public function __construct(IntegrationsHelper $integrationsHelper)
@@ -58,30 +51,13 @@ class TokenPersistence implements TokenPersistenceInterface
     public function restoreToken(TokenInterface $token): TokenInterface
     {
         $apiKeys = $this->getIntegration()->getApiKeys();
+        $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
 
-        if (!empty($apiKeys['access_token'])) {
-            // Previous tokens exists
-            $previousToken = new RawToken(
-                $apiKeys['access_token'],
-                $apiKeys['refresh_token'],
-                $apiKeys['expires_at']
-            );
-        } else {
-            $previousToken = new RawToken();
-        }
-
-        $refreshToken =  [
-            'access_token' => $token->getAccessToken(),
-            'refresh_token' => $token->getRefreshToken(),
-            // Wee need to use `expires_in` key because of merge algorithm
-            'expires_in' => $token->getExpiresAt() ? $token->getExpiresAt() - time() : - 1,
-        ];
-
-        // @see \kamermans\OAuth2\Token\RawTokenFactory::__invoke()
-        $factory = new RawTokenFactory();
-        $this->token = $factory($refreshToken, $previousToken);
-
-        return $this->token;
+        return new RawToken(
+            $apiKeys['access_token'] ?? null,
+            $apiKeys['refresh_token'] ?? null,
+            $apiKeys['expires_at'] ? $apiKeys['expires_at'] - time() : -1
+        );
     }
 
     /**
@@ -97,7 +73,6 @@ class TokenPersistence implements TokenPersistenceInterface
         if ($oldApiKeys === null) {
             $oldApiKeys = [];
         }
-
         $newApiKeys = [
             'access_token'  => $token->getAccessToken(),
             'refresh_token' => $token->getRefreshToken(),
@@ -108,8 +83,6 @@ class TokenPersistence implements TokenPersistenceInterface
 
         $integration->setApiKeys($newApiKeys);
         $this->integrationsHelper->saveIntegrationConfiguration($integration);
-
-        $this->token = $token;
     }
 
     /**
