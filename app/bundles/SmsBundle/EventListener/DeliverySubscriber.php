@@ -12,33 +12,25 @@
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\SmsBundle\Event\DeliveryEvent;
-use Mautic\SmsBundle\Helper\StatCountHelper;
-use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Helper\StatModel;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DeliverySubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TransportChain
+     * @var StatModel
      */
-    private $transportChain;
-
-    /**
-     * @var StatCountHelper
-     */
-    private $statCountHelper;
+    private $statModel;
 
     /**
      * CampaignReplySubscriber constructor.
      *
-     * @param TransportChain  $transportChain
-     * @param StatCountHelper $statCountHelper
+     * @param StatModel $statModel
      */
-    public function __construct(TransportChain $transportChain, StatCountHelper $statCountHelper)
+    public function __construct(StatModel $statModel)
     {
-        $this->transportChain      = $transportChain;
-        $this->statCountHelper     = $statCountHelper;
+        $this->statModel      = $statModel;
     }
 
     /**
@@ -58,6 +50,6 @@ class DeliverySubscriber implements EventSubscriberInterface
      */
     public function onDelivery(DeliveryEvent $event)
     {
-        $this->statCountHelper->updateStatsFromDeliveryStatusDAO($event->getDeliveryStatusDAO());
+        $this->statModel->updateStatsFromDeliveryStatusDAO($event->getDeliveryStatusDAO());
     }
 }

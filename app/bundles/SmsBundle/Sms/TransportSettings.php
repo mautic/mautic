@@ -1,6 +1,6 @@
 <?php
 /*
- * @copyright   2018 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,7 +13,7 @@ namespace Mautic\SmsBundle\Sms;
 class TransportSettings
 {
     /**
-     * @var TransportInterface
+     * @var TransportInterface|TransportSettingsInterface
      */
     private $transport;
 
@@ -27,7 +27,7 @@ class TransportSettings
      */
     public function hasDelivered()
     {
-        return true;
+        return method_exists($this->transport, 'hasDelivered') && $this->transport->hasDelivered();
     }
 
     /**
@@ -35,7 +35,7 @@ class TransportSettings
      */
     public function hasRead()
     {
-        return true;
+        return method_exists($this->transport, 'hasRead') && $this->transport->hasRead();
     }
 
     /**
@@ -43,6 +43,6 @@ class TransportSettings
      */
     public function hasFailed()
     {
-        return true;
+        return method_exists($this->transport, 'hasFailed') && $this->transport->hasFailed();
     }
 }

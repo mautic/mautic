@@ -77,6 +77,19 @@ return [
                     'mautic.lead.repository.lead_event_log',
                 ],
             ],
+            'mautic.sms.subscriber.delivery' => [
+                'class'     => \Mautic\SmsBundle\EventListener\DeliverySubscriber::class,
+                'arguments' => [
+                    'mautic.sms.model.stat',
+                ],
+            ],
+            'mautic.sms.campaignbundle.subscriber.delivery' => [
+                'class'     => \Mautic\SmsBundle\EventListener\CampaignDeliverySubscriber::class,
+                'arguments' => [
+                    'mautic.sms.transport_chain',
+                    'mautic.campaign.executioner.realtime',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
@@ -120,6 +133,12 @@ return [
             ],
         ],
         'other' => [
+            'mautic.sms.model.stat' => [
+                'class'     => \Mautic\SmsBundle\Model\StatModel::class,
+                'arguments' => [
+                    'mautic.sms.model.sms',
+                ],
+            ],
             'mautic.sms.transport_chain' => [
                 'class'     => \Mautic\SmsBundle\Sms\TransportChain::class,
                 'arguments' => [

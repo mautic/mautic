@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\Helper;
+namespace Mautic\SmsBundle\Model;
 
 use Mautic\SmsBundle\Callback\DAO\DeliveryStatusDAO;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 
-class StatCountHelper
+class StatModel
 {
     /**
      * @var SmsModel

@@ -24,11 +24,6 @@ class DeliveryEvent extends Event
     private $response;
 
     /**
-     * @var string
-     */
-    private $trackingHash;
-
-    /**
      * @var Lead
      */
     private $contact;
