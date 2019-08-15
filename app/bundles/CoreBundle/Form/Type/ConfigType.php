@@ -502,6 +502,21 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'ip_lookup_create_organization',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.create.organization.from.ip.lookup',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
+                ],
+                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
+                'required' => false,
+            ]
+        );
+
         $ipLookupFactory = $this->ipLookupFactory;
         $formModifier    = function (FormEvent $event) use ($ipLookupFactory) {
             $data = $event->getData();

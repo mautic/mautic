@@ -124,12 +124,19 @@ class ContactRequestHelper
     {
         $ignoreTrackedDevices = isset($queryFields['ignore_tracked_devices']) ? $queryFields['ignore_tracked_devices'] : false;
         $this->trackedContact = $this->contactTracker->getContact($ignoreTrackedDevices);
+
+        unset($queryFields['page_url']); // This is set now automatically by PageModel
         $this->queryFields    = $queryFields;
+
         try {
             $foundContact         = $this->getContactFromUrl();
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
         } catch (ContactNotFoundException $exception) {
+        }
+
+        if (!$this->trackedContact) {
+            return null;
         }
 
         $this->prepareContactFromRequest();
@@ -172,7 +179,7 @@ class ContactRequestHelper
                 true,
                 true
             );
-            if ($foundContact->getId() !== $this->trackedContact->getId()) {
+            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 return $foundContact;
             }

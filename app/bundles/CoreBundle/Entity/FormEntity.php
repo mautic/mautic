@@ -387,9 +387,9 @@ class FormEntity extends CommonEntity
      */
     public function setIsPublished($isPublished)
     {
-        $this->isChanged('isPublished', $isPublished);
+        $this->isChanged('isPublished', (bool) $isPublished);
 
-        $this->isPublished = $isPublished;
+        $this->isPublished = (bool) $isPublished;
 
         return $this;
     }
