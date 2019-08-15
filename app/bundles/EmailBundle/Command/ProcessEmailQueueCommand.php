@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -103,7 +104,7 @@ EOT
                     $tmpFilename .= '.finalretry';
                     rename($failedFile, $tmpFilename);
 
-                    $message = unserialize(file_get_contents($tmpFilename));
+                    $message = Serializer::decode(file_get_contents($tmpFilename), ['allowed_classes' => [\Swift_Message::class]]);
                     if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
                         $tryAgain = false;
                         if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {

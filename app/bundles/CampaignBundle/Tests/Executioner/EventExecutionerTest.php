@@ -15,8 +15,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
@@ -29,6 +31,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
@@ -80,6 +83,16 @@ class EventExecutionerTest extends \PHPUnit_Framework_TestCase
      */
     private $leadRepository;
 
+    /**
+     * @var EventRepository|\PHPUnit_Framework_MockObject_MockBuilder
+     */
+    private $eventRepository;
+
+    /**
+     * @var Translator|\PHPUnit_Framework_MockObject_MockBuilder
+     */
+    private $translator;
+
     protected function setUp()
     {
         $this->eventCollector        = $this->createMock(EventCollector::class);
@@ -93,6 +106,13 @@ class EventExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->eventScheduler        = $this->createMock(EventScheduler::class);
         $this->removedContactTracker = $this->createMock(RemovedContactTracker::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
+        $this->eventRepository       = $this->getMockBuilder(EventRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     public function testJumpToEventsAreProcessedAfterOtherEvents()
@@ -208,5 +228,66 @@ class EventExecutionerTest extends \PHPUnit_Framework_TestCase
             $this->removedContactTracker,
             $this->leadRepository
         );
+    }
+
+    public function testJumpToEventsExecutedWithoutTarget()
+    {
+        $campaign = new Campaign();
+
+        $event = new Event();
+        $event->setEventType(ActionExecutioner::TYPE)
+            ->setType(CampaignActionJumpToEventSubscriber::EVENT_NAME)
+            ->setCampaign($campaign)
+            ->setProperties(['jumpToEvent' => 999]);
+
+        $lead = $this->getMockBuilder(Lead::class)
+            ->getMock();
+        $lead->method('getId')
+            ->willReturn(1);
+
+        $log = $this->getMockBuilder(LeadEventLog::class)
+            ->getMock();
+        $log->method('getLead')
+            ->willReturn($lead);
+        $log->method('setIsScheduled')
+            ->willReturn($log);
+        $log->method('getEvent')
+            ->willReturn($event);
+        $log->method('getId')
+            ->willReturn(1);
+
+        $logs = new ArrayCollection(
+            [
+                1 => $log,
+            ]
+        );
+
+        $config = new ActionAccessor(
+            [
+                'label'                  => 'mautic.campaign.event.jump_to_event',
+                'description'            => 'mautic.campaign.event.jump_to_event_descr',
+                'formType'               => CampaignEventJumpToEventType::class,
+                'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+                'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
+                'connectionRestrictions' => [
+                    'target' => [
+                        Event::TYPE_DECISION  => ['none'],
+                        Event::TYPE_ACTION    => ['none'],
+                        Event::TYPE_CONDITION => ['none'],
+                    ],
+                ],
+            ]
+        );
+
+        $pendingEvent = new PendingEvent($config, $event, $logs);
+
+        $this->eventRepository->method('getEntities')
+            ->willReturn([]);
+
+        $subscriber = new CampaignActionJumpToEventSubscriber($this->eventRepository, $this->getEventExecutioner(), $this->translator);
+        $subscriber->onJumpToEvent($pendingEvent);
+
+        $this->assertEquals(count($pendingEvent->getSuccessful()), 1);
+        $this->assertEquals(count($pendingEvent->getFailures()), 0);
     }
 }

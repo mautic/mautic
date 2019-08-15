@@ -375,6 +375,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
 
                 // clicker
                 $(document).on("change", toggler, function () {
+                    target = $(toggler).data("target");
                     // checked / unchecked
                     if($(this).is(":checked")) {
                         selectrow(this, "checked");

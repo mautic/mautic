@@ -484,6 +484,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
+
                             break;
                         case 'Account':
                             $entity                = $this->getMauticCompany($dataObject, 'Account');

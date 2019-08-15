@@ -72,8 +72,30 @@ class RequestStorageHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($payload, $request->request->all());
     }
 
+    public function testGetRequestIfNotFound()
+    {
+        $payload = ['some' => 'values'];
+        $key     = MomentumTransport::class.':webhook_request:5b43832134cfb0.36545510';
+
+        $this->cacheStorageMock->expects($this->once())
+            ->method('get')
+            ->with($key)
+            ->willReturn(false);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->helper->getRequest($key);
+    }
+
     public function testGetTransportNameFromKey()
     {
         $this->assertEquals(MomentumTransport::class, $this->helper->getTransportNameFromKey('Mautic\EmailBundle\Swiftmailer\Transport\MomentumTransport:webhook_request:5b43832134cfb0.36545510'));
+    }
+
+    /**
+     * The StorageHelper will add '%mautic.db_table_prefix%' as a prefix to each cache key.
+     */
+    public function testGetTransportNameFromKeyWithGlobalPrefix()
+    {
+        $this->assertEquals(MomentumTransport::class, $this->helper->getTransportNameFromKey('mautic:Mautic|EmailBundle|Swiftmailer|Transport|MomentumTransport:webhook_request:5bfbe8ce671198.00044461'));
     }
 }

@@ -54,6 +54,16 @@ class IpAddressModel
     }
 
     /**
+     * @param string $ip
+     *
+     * @return IpAddress|null
+     */
+    public function findOneByIpAddress($ip)
+    {
+        return $this->entityManager->getRepository(IpAddress::class)->findOneByIpAddress($ip);
+    }
+
+    /**
      * Tries to insert the Lead/IP relation and continues even if UniqueConstraintViolationException is thrown.
      *
      * @param Lead      $contact

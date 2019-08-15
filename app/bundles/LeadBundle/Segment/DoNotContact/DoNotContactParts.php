@@ -48,6 +48,16 @@ class DoNotContactParts
      */
     public function getParameterType()
     {
-        return $this->type === 'bounced' ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+        switch ($this->type) {
+            case 'bounced':
+                return DoNotContact::BOUNCED;
+                break;
+            case 'manual':
+                return DoNotContact::MANUAL;
+                break;
+            default:
+                return DoNotContact::UNSUBSCRIBED;
+                break;
+        }
     }
 }
