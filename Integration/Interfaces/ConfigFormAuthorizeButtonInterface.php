@@ -14,6 +14,11 @@ namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 interface ConfigFormAuthorizeButtonInterface
 {
     /**
+     * @return bool
+     */
+    public function isAuthorized(): bool;
+
+    /**
      * @return string
      */
     public function getAuthorizationUrl(): string;
