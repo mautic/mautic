@@ -19,7 +19,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 interface CallbackInterface
 {
-    const CALLBACK_TYPE = '';
+    const CALLBACK_REPLY    = 'reply';
+    const CALLBACK_DELIVERY = 'delivery';
 
     /**
      * Returns a "transport" string to match the URL path /sms/{transport}/callback.
@@ -40,4 +41,11 @@ interface CallbackInterface
      * @throws NotFoundHttpException
      */
     public function getContacts(Request $request);
+
+    /**
+     * @param Request $request
+     *
+     * @return string
+     */
+    public function getCallbackType(Request $request);
 }

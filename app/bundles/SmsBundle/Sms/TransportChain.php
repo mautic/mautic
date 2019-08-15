@@ -39,6 +39,11 @@ class TransportChain
     private $logger;
 
     /**
+     * @var TransportSettings
+     */
+    private $settings;
+
+    /**
      * TransportChain constructor.
      *
      * @param string            $primaryTransport
@@ -111,6 +116,20 @@ class TransportChain
         $response = $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
 
         return $response;
+    }
+
+    /**
+     * @return TransportSettings
+     *
+     * @throws PrimaryTransportNotEnabledException
+     */
+    public function getSettings()
+    {
+        if (!$this->settings) {
+            $this->settings = new TransportSettings($this->getPrimaryTransport());
+        }
+
+        return $this->settings;
     }
 
     /**

@@ -514,20 +514,28 @@ class Sms extends FormEntity
     /**
      * @return int
      */
-    public function getDeliveriedCount()
+    public function getDeliveredCount()
     {
-        return $this->deliveriedCount;
+        return $this->deliveredCount;
     }
 
     /**
-     * @param int $deliveriedCount
+     * @return float
+     */
+    public function getDeliveredRatio()
+    {
+        return round($this->deliveredCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $deliveredCount
      *
      * @return Sms
      */
-    public function setDeliveriedCount($deliveriedCount)
+    public function setDeliveredCount($deliveredCount)
     {
-        $this->isChanged('deliveriedCount', $deliveriedCount);
-        $this->deliveriedCount = $deliveriedCount;
+        $this->isChanged('deliveredCount', $deliveredCount);
+        $this->deliveredCount = $deliveredCount;
 
         return $this;
     }
@@ -538,6 +546,14 @@ class Sms extends FormEntity
     public function getReadCount()
     {
         return $this->readCount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReadRatio()
+    {
+        return round($this->readCount / $this->sentCount * 100, 2);
     }
 
     /**
@@ -559,6 +575,14 @@ class Sms extends FormEntity
     public function getFailedCount()
     {
         return $this->failedCount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFailedRatio()
+    {
+        return round($this->failedCount / $this->sentCount * 100, 2);
     }
 
     /**

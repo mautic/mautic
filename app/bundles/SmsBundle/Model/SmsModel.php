@@ -464,6 +464,47 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
         }
 
+        if ($this->transport->getSettings()->hasDelivered() && (!$flag || $flag === 'delivered')) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $q->andWhere($q->expr()->eq('t.is_delivered', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.sms.stat.delivered'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasRead() && (!$flag || $flag === 'read')) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $q->andWhere($q->expr()->eq('t.is_read', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.read'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasFailed() && (!$flag || $flag === 'failed')) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.failed'), $data);
+        }
+
         return $chart->render();
     }
 

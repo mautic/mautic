@@ -29,11 +29,6 @@ class DeliveryStatusDAO
     private $isFailed = false;
 
     /**
-     * @var \DateTimeImmutable|null
-     */
-    private $dateOfExecution = null;
-
-    /**
      * @var string
      */
     private $trackingHash;
@@ -84,22 +79,6 @@ class DeliveryStatusDAO
     public function setIsFailed($isFailed)
     {
         $this->isFailed = $isFailed;
-    }
-
-    /**
-     * @return \DateTimeImmutable|null
-     */
-    public function getDateOfExecution()
-    {
-        return $this->dateOfExecution;
-    }
-
-    /**
-     * @param \DateTimeImmutable|null $dateOfExecution
-     */
-    public function setDateOfExecution($dateOfExecution)
-    {
-        $this->dateOfExecution = $dateOfExecution;
     }
 
     /**

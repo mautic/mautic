@@ -87,41 +87,16 @@ class ReplyHelper
         // Set the default response
         $response = $this->getDefaultResponse($handler);
 
-        switch ($handler::CALLBACK_TYPE) {
-            case CallbackDeliveryInterface::CALLBACK_TYPE:
-                $deliveryStatusDAO = $handler->getDeliveryStatus($request);
-                $eventResponse     = $this->dispatchDeliveryEvent($contact, $deliveryStatusDAO);
-                break;
-            case CallbackReplyInterface::CALLBACK_TYPE:
-            default:
-            $eventResponse = $this->handleRequestReply($handler, $request);
-                break;
-        }
-
-        if ($eventResponse instanceof Response) {
-            // Last one wins
-            $response = $eventResponse;
-        }
-
-        return $response;
-    }
-
-    private function handleRequestReply(CallbackInterface $handler, Request $request)
-    {
-        // Set the default response
-        $response = $this->getDefaultResponse($handler);
-
         try {
             $contacts = $handler->getContacts($request);
-            $message  = $handler->getMessage($request);
-
-            $this->logger->debug(sprintf('SMS REPLY: Processing message "%s"', $message));
-            $this->logger->debug(sprintf('SMS REPLY: Found IDs %s', implode(',', $contacts->getKeys())));
-
-            foreach ($contacts as $contact) {
-                // Set the contact for campaign decisions
-                $this->contactTracker->setSystemContact($contact);
-                $eventResponse = $this->dispatchReplyEvent($contact, $message);
+            // Set the contact for campaign decisions
+            switch ($this->getCallbackType($handler, $response)) {
+                case CallbackInterface::CALLBACK_DELIVERY:
+                    $this->handleRequestDelivery($contacts, $handler, $request);
+                    break;
+                case CallbackInterface::CALLBACK_REPLY:
+                    $this->handleRequestReply($contacts, $handler, $request);
+                    break;
             }
         } catch (BadRequestHttpException $exception) {
             return new Response('invalid request', 400);
@@ -142,6 +117,49 @@ class ReplyHelper
     }
 
     /**
+     * @param ArrayCollection   $contacts
+     * @param CallbackInterface $handler
+     * @param Request           $request
+     *
+     * @return Response|null
+     */
+    private function handleRequestDelivery(ArrayCollection $contacts, CallbackInterface $handler, Request $request)
+    {
+        $deliveryStatusDAO = $handler->getDeliveryStatus($request);
+
+        $this->logger->debug(sprintf('SMS DELIVERY: Processing callback'));
+        $this->logger->debug(sprintf('SMS DELIVERY: Found IDs %s', implode(',', $contacts->getKeys())));
+        $eventResponse  = null;
+        foreach ($contacts as $contact) {
+            $this->contactTracker->setSystemContact($contact);
+            $eventResponse     = $this->dispatchDeliveryEvent($contact, $deliveryStatusDAO);
+        }
+
+        return $eventResponse;
+    }
+
+    /**
+     * @param ArrayCollection   $contacts
+     * @param CallbackInterface $handler
+     * @param Request           $request
+     *
+     * @return Response|null
+     */
+    private function handleRequestReply(ArrayCollection $contacts, CallbackInterface $handler, Request $request)
+    {
+        $message  = $handler->getMessage($request);
+        $this->logger->debug(sprintf('SMS REPLY: Processing message "%s"', $message));
+        $this->logger->debug(sprintf('SMS REPLY: Found IDs %s', implode(',', $contacts->getKeys())));
+        $eventResponse  = null;
+        foreach ($contacts as $contact) {
+            $this->contactTracker->setSystemContact($contact);
+            $eventResponse = $this->dispatchReplyEvent($contact, $message);
+        }
+
+        return $eventResponse;
+    }
+
+    /**
      * @param Lead   $contact
      * @param string $message
      *
@@ -156,6 +174,12 @@ class ReplyHelper
         return $replyEvent->getResponse();
     }
 
+    /**
+     * @param Lead              $contact
+     * @param DeliveryStatusDAO $deliveryStatus
+     *
+     * @return Response|null
+     */
     private function dispatchDeliveryEvent(Lead $contact, DeliveryStatusDAO $deliveryStatus)
     {
         $deliveryEvent = new DeliveryEvent($contact, $deliveryStatus);
@@ -185,5 +209,22 @@ class ReplyHelper
         }
 
         return new Response();
+    }
+
+    /**
+     * Default is reply.
+     *
+     * @param CallbackReplyInterface $handler
+     * @param Response               $response
+     *
+     * @return string
+     */
+    private function getCallbackType(CallbackReplyInterface $handler, Response $response)
+    {
+        if (method_exists($handler, 'getCallbackType')) {
+            return $handler->getCallbackType($response);
+        }
+
+        return CallbackInterface::CALLBACK_REPLY;
     }
 }
