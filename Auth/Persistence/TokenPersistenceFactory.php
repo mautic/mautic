@@ -45,7 +45,7 @@ class TokenPersistenceFactory
 
         $apiKeys = $integration->getApiKeys();
 
-        $token  = new RawToken(
+        $token = new RawToken(
             $apiKeys['access_token'] ?? null,
             $apiKeys['refresh_token'] ?? null,
             $apiKeys['expires_at'] ?? null
