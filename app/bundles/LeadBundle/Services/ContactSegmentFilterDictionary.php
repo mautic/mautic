@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Services;
 
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignFuncFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
