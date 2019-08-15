@@ -43,24 +43,20 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testRestoreToken()
     {
-        $oldAccessToken = 'old_access_token';
-        $oldRefreshToken = 'old_refresh_token';
-        $oldExpiresAt = 3600;
+        $accessToken = 'access_token';
+        $refreshToken = 'refresh_token';
+        $expiresAt = 10;
         $apiKeys = [
-            'access_token' => $oldAccessToken,
-            'refresh_token' => $oldRefreshToken,
-            'expires_at' => $oldExpiresAt,
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at' => $expiresAt,
         ];
-
-        $apiAccessToken = 'api_access_token';
-        $apiRefreshToken = 'api_refresh_token';
-        $apiExpiresAt = 3600;
 
         $factory = new RawTokenFactory();
         $tokenFromApi = $factory([
-            'access_token' => $apiAccessToken,
-            'refresh_token' => $apiRefreshToken,
-            'expires_in' => $apiExpiresAt,
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at' => $expiresAt,
         ]);
 
         $integration = $this->createMock(Integration::class);
@@ -74,7 +70,6 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($tokenFromApi->getAccessToken(), $newToken->getAccessToken());
         $this->assertSame($tokenFromApi->getRefreshToken(), $newToken->getRefreshToken());
-        $this->assertSame($tokenFromApi->getExpiresAt(), $newToken->getExpiresAt());
     }
 
     public function testIntegrationNotSetSaveToken()
@@ -131,9 +126,9 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
     public function testDeleteToken()
     {
-        $accessToken = 'lsadkjfasd';
-        $refreshToken = 'kjsahfkas';
-        $expiresAt = 5465465;
+        $accessToken = 'access_token';
+        $refreshToken = 'refresh_token';
+        $expiresAt = 10;
         $token = new RawToken($accessToken,$refreshToken, $expiresAt);
         $expected = [
             'leaveMe' => 'something',
@@ -154,9 +149,6 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
         $integration->expects($this->at(2))
             ->method('getApiKeys')
             ->willReturn($apiKeys);
-        $integration->expects($this->at(3))
-            ->method('setApiKeys')
-            ->with([]);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -168,31 +160,32 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 
         $this->tokenPersistence->deleteToken();
 
-
         $this->assertFalse($this->tokenPersistence->hasToken());
     }
 
     public function testHasToken()
     {
-        $accessToken = 'sjak';
+        $accessToken = 'access_token';
+        $refreshToken = 'refresh_token';
+        $expiresAt = 10;
 
-        $oldApiKeys = [];
-
-        $token = new RawToken($accessToken);
+        $apiKeys = [
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at' => $expiresAt,
+        ];
 
         $integration = $this->createMock(Integration::class);
-        $integration->expects($this->at(3))
-            ->method('getApiKeys')
-            ->willReturn($oldApiKeys);
         $integration->expects($this->at(2))
             ->method('getApiKeys')
-            ->willReturn(['access_token' => $accessToken]);
+            ->willReturn($apiKeys);
         $integration->expects($this->at(3))
             ->method('getApiKeys')
             ->willReturn(['access_token' => $accessToken]);
 
         $this->tokenPersistence->setIntegration($integration);
         $this->assertFalse($this->tokenPersistence->hasToken());
+        $token = new RawToken($accessToken, $refreshToken, $expiresAt);
         $this->tokenPersistence->saveToken($token);
         $this->assertTrue($this->tokenPersistence->hasToken());
 
