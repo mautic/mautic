@@ -764,7 +764,7 @@ class MobileNotificationController extends FormController
     {
         /** @var \Mautic\NotificationBundle\Model\NotificationModel $model */
         $model    = $this->getModel('notification');
-      
+
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $model->getEntity($objectId);
 
@@ -798,7 +798,6 @@ class MobileNotificationController extends FormController
         ) {
             return $this->accessDenied();
         }
-
 
         return $this->generateContactsGrid(
             $objectId,

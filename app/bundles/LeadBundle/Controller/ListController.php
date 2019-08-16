@@ -824,9 +824,9 @@ class ListController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
-         /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        /** @var \Mautic\LeadBundle\Model\ListModel $model */
         $model    = $this->getModel('lead.list');
-        
+
         /** @var \Mautic\LeadBundle\Entity\LeadList $list */
         $list = $model->getEntity($objectId);
 
@@ -858,8 +858,6 @@ class ListController extends FormController
         ) {
             return $this->accessDenied();
         }
-
-
 
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];

@@ -641,7 +641,7 @@ class MonitoringController extends FormController
         if (!$this->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:view')) {
             return $this->accessDenied();
         }
-        
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
