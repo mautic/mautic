@@ -153,9 +153,8 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */
-    public function onReply(DeliveryEvent $event)
+    public function onDelivery(DeliveryEvent $event)
     {
-        $type              = null;
         $deliveryStatusDAO = $event->getDeliveryStatusDAO();
         if ($deliveryStatusDAO->isDelivered()) {
             $type = self::TYPE_DELIVERED;
@@ -163,9 +162,10 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
             $type = self::TYPE_READ;
         } elseif ($deliveryStatusDAO->isFailed()) {
             $type = self::TYPE_FAILED;
+        } else {
+            return;
         }
-        if ($type) {
-            $this->realTimeExecutioner->execute($type, $event, 'sms');
-        }
+
+        $this->realTimeExecutioner->execute($type, $event, 'sms');
     }
 }

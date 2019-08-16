@@ -54,8 +54,8 @@ class StatModel
     {
         $smsStatRepository = $this->smsModel->getStatRepository();
 
-        $this->stat              = $stat              =  $smsStatRepository->findOneBy(['trackingHash' => $deliveryStatusDAO->getTrackingHash()]);
-        $this->sms               = $sms               = $this->stat->getSms();
+        $this->stat              =  $smsStatRepository->findOneBy(['trackingHash' => $deliveryStatusDAO->getTrackingHash()]);
+        $this->sms               = $this->stat->getSms();
         $this->deliveryStatusDAO = $deliveryStatusDAO;
 
         if ($this->deliveryStatusDAO->isDelivered()) {
@@ -64,15 +64,14 @@ class StatModel
             $this->setAsReadAndUpCount();
         } elseif ($this->deliveryStatusDAO->isFailed()) {
             $this->setAsFailedandUpCount();
+        } else {
+            return;
         }
 
-        // If Stat entity changed, save it
-        if ($stat != $this->stat) {
-            $smsStatRepository->saveEntity($this->stat);
-        }
+        $smsStatRepository->saveEntity($this->stat);
 
         // If SMS entity changed
-        if ($sms != $this->sms) {
+        if (!empty($this->sms->getChanges())) {
             $this->smsModel->getRepository()->saveEntity($this->sms);
         }
     }
@@ -83,7 +82,7 @@ class StatModel
     private function setAsDeliveredAndUpCount()
     {
         if (!$this->stat->isDelivered()) {
-            $this->sms->setDeliveriedCount($this->sms->getDeliveriedCount() + 1);
+            $this->sms->setDeliveredCount($this->sms->getDeliveredCount() + 1);
         }
         $this->stat->setIsDelivered(true);
     }

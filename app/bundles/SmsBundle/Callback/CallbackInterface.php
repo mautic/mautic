@@ -11,17 +11,12 @@
 
 namespace Mautic\SmsBundle\Callback;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 interface CallbackInterface
 {
-    const CALLBACK_REPLY    = 'reply';
-    const CALLBACK_DELIVERY = 'delivery';
-
     /**
      * Returns a "transport" string to match the URL path /sms/{transport}/callback.
      *
@@ -30,22 +25,14 @@ interface CallbackInterface
     public function getTransportName();
 
     /**
-     * Return all contacts that match whatever identifiers the service provides (likely number).
+     * Extract the message in the reply from the request.
      *
      * @param Request $request
      *
-     * @return ArrayCollection
+     * @return string|array
      *
-     * @throws NumberNotFoundException
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    public function getContacts(Request $request);
-
-    /**
-     * @param Request $request
-     *
-     * @return string
-     */
-    public function getCallbackType(Request $request);
+    public function getMessage(Request $request);
 }

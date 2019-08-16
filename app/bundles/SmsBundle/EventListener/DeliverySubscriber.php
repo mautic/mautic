@@ -12,7 +12,7 @@
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\SmsBundle\Event\DeliveryEvent;
-use Mautic\SmsBundle\Helper\StatModel;
+use Mautic\SmsBundle\Model\StatModel;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
