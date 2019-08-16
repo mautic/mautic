@@ -1600,7 +1600,7 @@ class EmailController extends FormController
 
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
-           
+
         if ($email === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
