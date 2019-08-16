@@ -65,6 +65,8 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
 
     /**
      * @param CampaignBuilderEvent $event
+     *
+     * @throws \Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
