@@ -767,7 +767,7 @@ class MobileNotificationController extends FormController
       
         /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
         $notification = $model->getEntity($objectId);
-      
+
         if ($notification === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);

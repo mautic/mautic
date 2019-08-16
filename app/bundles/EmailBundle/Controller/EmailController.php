@@ -1632,7 +1632,6 @@ class EmailController extends FormController
             return $this->accessDenied();
         }
 
-
         return $this->generateContactsGrid(
             $objectId,
             $page,
