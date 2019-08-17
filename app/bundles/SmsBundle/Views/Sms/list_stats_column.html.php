@@ -9,6 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+/** @var \Mautic\SmsBundle\Sms\TransportChain $transport */
+use Mautic\SmsBundle\Sms\TransportSettingsInterface;
+
 ?>
 <span class="mt-xs label label-warning has-click-event clickable-stat"
                               data-toggle="tooltip"
@@ -23,9 +26,8 @@
 </span>
 
 <?php
-
-if ($transport->getSettings()->hasDelivered()) {
-    ?>
+if ($transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_DELIVERED)) {
+                                    ?>
     <span class="mt-xs label label-success has-click-event clickable-stat"
           data-toggle="tooltip"
           title="<?php echo $view['translator']->trans('mautic.channel.stat.leadcount.tooltip'); ?>">
@@ -41,12 +43,12 @@ if ($transport->getSettings()->hasDelivered()) {
                                 ); ?></a>
                         </span>
     <?php
-}
+                                }
 ?>
 
 <?php
 
-if ($transport->getSettings()->hasRead()) {
+if ($transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_READ)) {
     ?>
     <span class="mt-xs label label-primary has-click-event clickable-stat"
           data-toggle="tooltip"
@@ -68,7 +70,7 @@ if ($transport->getSettings()->hasRead()) {
 
 <?php
 
-if ($transport->getSettings()->hasFailed()) {
+if ($transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED)) {
     ?>
     <span class="mt-xs label label-danger has-click-event clickable-stat"
           data-toggle="tooltip"

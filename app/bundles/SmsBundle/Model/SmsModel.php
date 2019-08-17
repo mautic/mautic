@@ -28,6 +28,7 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Sms\TransportSettingsInterface;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -464,7 +465,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
         }
 
-        if ($this->transport->getSettings()->hasDelivered() && (!$flag || $flag === 'delivered')) {
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_DELIVERED) && (!$flag || $flag === 'delivered')) {
             $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -477,7 +478,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.sms.stat.delivered'), $data);
         }
 
-        if ($this->transport->getSettings()->hasRead() && (!$flag || $flag === 'read')) {
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_READ) && (!$flag || $flag === 'read')) {
             $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -491,7 +492,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.email.stat.read'), $data);
         }
 
-        if ($this->transport->getSettings()->hasFailed() && (!$flag || $flag === 'failed')) {
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED) && (!$flag || $flag === 'failed')) {
             $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {

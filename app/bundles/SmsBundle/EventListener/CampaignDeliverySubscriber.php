@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\SmsBundle\Event\DeliveryEvent;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Sms\TransportSettingsInterface;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -74,7 +75,7 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->transportChain->getSettings()->hasDelivered()) {
+        if ($this->transportChain->getSettings()->hasSetting(TransportSettingsInterface::STAT_DELIVERED)) {
             $event->addDecision(
                 self::TYPE_DELIVERED,
                 [
@@ -92,7 +93,7 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
             );
         }
 
-        if ($this->transportChain->getSettings()->hasRead()) {
+        if ($this->transportChain->getSettings()->hasSetting(TransportSettingsInterface::STAT_READ)) {
             $event->addDecision(
                 self::TYPE_READ,
                 [
@@ -110,7 +111,7 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
             );
         }
 
-        if ($this->transportChain->getSettings()->hasFailed()) {
+        if ($this->transportChain->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED)) {
             $event->addDecision(
                 self::TYPE_FAILED,
                 [

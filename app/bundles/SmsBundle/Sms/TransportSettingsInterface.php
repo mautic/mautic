@@ -13,18 +13,15 @@ namespace Mautic\SmsBundle\Sms;
 
 interface TransportSettingsInterface
 {
-    /**
-     * @return bool
-     */
-    public function hasDelivered();
+    const STAT_DELIVERED  = 'delivered';
+    const STAT_READ       = 'read';
+    const STAT_FAILED     = 'failed';
+    const FORM_ATTACHMENT = 'attachment';
 
     /**
-     * @return bool
+     *  Define which settings your transport support.
+     *
+     * @return array
      */
-    public function hasRead();
-
-    /**
-     * @return bool
-     */
-    public function hasFailed();
+    public function enabledSettings();
 }

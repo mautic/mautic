@@ -23,26 +23,24 @@ class TransportSettings
     }
 
     /**
-     * @return bool
+     * @return array
      */
-    public function hasDelivered()
+    private function enabledSettings()
     {
-        return method_exists($this->transport, 'hasDelivered') && $this->transport->hasDelivered();
+        if (method_exists($this->transport, 'enabledSettings')) {
+            return $this->transport->enabledSettings();
+        }
+
+        return [];
     }
 
     /**
+     * @param $setting
+     *
      * @return bool
      */
-    public function hasRead()
+    public function hasSetting($setting)
     {
-        return method_exists($this->transport, 'hasRead') && $this->transport->hasRead();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasFailed()
-    {
-        return method_exists($this->transport, 'hasFailed') && $this->transport->hasFailed();
+        return in_array($setting, $this->enabledSettings());
     }
 }
