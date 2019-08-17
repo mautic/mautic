@@ -428,7 +428,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 foreach ($record as $key => $item) {
-                    $dataObject[$key.$newName] = $item;
+                    if (is_bool($item)) {
+                        $dataObject[$key.$newName] = (int) $item;
+                    } else {
+                        $dataObject[$key.$newName] = $item;
+                    }
                 }
 
                 if (isset($dataObject) && $dataObject) {
@@ -724,8 +728,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $existingPersons = $this->getApiHelper()->getPerson(
                     [
-                        'Lead'    => $mappedData['Lead']['create'],
-                        'Contact' => $mappedData['Contact']['create'],
+                        'Lead'    => isset($mappedData['Lead']['create']) ? $mappedData['Lead']['create'] : null,
+                        'Contact' => isset($mappedData['Contact']['create']) ? $mappedData['Contact']['create'] : null,
                     ]
                 );
 
@@ -766,7 +770,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
                     }
 
-                    if ('Lead' === $object && !$personFound) {
+                    if ('Lead' === $object && !$personFound && isset($mappedData[$object]['create'])) {
                         $personData                         = $this->getApiHelper()->createLead($mappedData[$object]['create']);
                         $people[$object][$personData['Id']] = $personData['Id'];
                         $personFound                        = true;
