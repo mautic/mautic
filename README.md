@@ -44,9 +44,9 @@ Installing from source is only recommended if you are comfortable using the comm
 
 ## Requirements
 
-#### Contributors Agreement 
+#### Contributor Agreement 
 
-By contributing to this project, you accept and agree to the [Contributors Agreement](https://www.mautic.org/contributors-agreement) in its entirety.
+By contributing to this project, you accept and agree to the [Contributor Agreement](https://www.mautic.org/contributor-agreement) in its entirety.
 
 #### Development / Build process requirements
 
