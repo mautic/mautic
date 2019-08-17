@@ -276,7 +276,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $isRequired = function (array $field, $object) {
             return
-                ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id'])) ||
+                ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate'])) ||
                 ($object == 'Lead' && in_array($field['name'], ['Company'])) ||
                 (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
         };
@@ -295,7 +295,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $sfObject = trim($sfObject);
-
                     // Check the cache first
                     $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
                     if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -311,7 +310,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
                             if (!empty($fields['fields'])) {
                                 foreach ($fields['fields'] as $fieldInfo) {
-                                    if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id') && $fieldInfo['name'] != 'IsDeleted')
+                                    if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && !in_array($fieldInfo['name'], ['Id', 'IsDeleted', 'CreatedDate'])))
                                         || !isset($fieldInfo['name'])
                                         || (in_array(
                                                 $fieldInfo['type'],
@@ -340,6 +339,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                             'group'       => $sfObject,
                                             'optionLabel' => $fieldInfo['label'],
                                         ];
+
+                                        // CreateDate can be updatable just in Mautic
+                                        if (in_array($fieldInfo['name'], ['CreatedDate'])) {
+                                            $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject]['update_mautic'] = 1;
+                                        }
                                     } else {
                                         $salesFields[$sfObject][$fieldInfo['name']] = [
                                             'type'     => $type,
