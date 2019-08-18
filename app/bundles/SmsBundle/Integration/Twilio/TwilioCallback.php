@@ -72,7 +72,7 @@ class TwilioCallback implements CallbackInterface
     /**
      * @param Request $request
      *
-     * @return array|ReplyDAO|string
+     * @return ReplyDAO
      *
      * @throws NumberNotFoundException
      */
