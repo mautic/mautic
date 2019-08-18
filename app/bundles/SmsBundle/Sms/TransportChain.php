@@ -12,6 +12,7 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Monolog\Logger;
@@ -105,15 +106,16 @@ class TransportChain
     /**
      * @param Lead      $lead
      * @param string    $content
+     * @param Sms       $sms
      * @param Stat|null $stat
      *
      * @return mixed
      *
      * @throws PrimaryTransportNotEnabledException
      */
-    public function sendSms(Lead $lead, $content, Stat $stat= null)
+    public function sendSms(Lead $lead, $content, Sms $sms = null, Stat $stat= null)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
+        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $sms, $stat);
 
         return $response;
     }
