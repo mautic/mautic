@@ -52,9 +52,7 @@ class StatModel
      */
     public function updateStatsFromDeliveryStatusDAO(DeliveryStatusDAO $deliveryStatusDAO)
     {
-        $smsStatRepository = $this->smsModel->getStatRepository();
-
-        $this->stat              =  $smsStatRepository->findOneBy(['trackingHash' => $deliveryStatusDAO->getTrackingHash()]);
+        $this->stat              = $deliveryStatusDAO->getStat();
         $this->sms               = $this->stat->getSms();
         $this->deliveryStatusDAO = $deliveryStatusDAO;
 
@@ -68,7 +66,7 @@ class StatModel
             return;
         }
 
-        $smsStatRepository->saveEntity($this->stat);
+        $this->smsModel->getStatRepository()->saveEntity($this->stat);
 
         // If SMS entity changed
         if (!empty($this->sms->getChanges())) {
