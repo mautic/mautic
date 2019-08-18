@@ -15,8 +15,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
+use Mautic\SmsBundle\Callback\DAO\ReplyDAO;
 use Mautic\SmsBundle\Callback\ResponseInterface;
-use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,9 +50,14 @@ class ReplyHelperTest extends \PHPUnit_Framework_TestCase
     public function testFoundContactsDispatchEvent()
     {
         $handler = $this->createMock(CallbackInterface::class);
+
+        $replyDAO = new ReplyDAO();
+        $replyDAO->setMessage('test');
+        $replyDAO->setContacts(new ArrayCollection([new Lead()]));
+
         $handler->expects($this->once())
-            ->method('getContacts')
-            ->willReturn(new ArrayCollection([new Lead()]));
+            ->method('getMessage')
+            ->willReturn([$replyDAO]);
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -72,9 +77,13 @@ class ReplyHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getResponse')
             ->willReturn($handlerResponse);
 
+        $replyDAO = new ReplyDAO();
+        $replyDAO->setMessage('test');
+        $replyDAO->setContacts(new ArrayCollection([new Lead()]));
+
         $handler->expects($this->once())
-            ->method('getContacts')
-            ->willReturn(new ArrayCollection([new Lead()]));
+            ->method('getMessage')
+            ->willReturn([$replyDAO]);
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -90,19 +99,14 @@ class ReplyHelperTest extends \PHPUnit_Framework_TestCase
     public function testContactsNotFoundDoesNotDispatchEvent()
     {
         $handler = $this->createMock(CallbackInterface::class);
+
+        $replyDAO = new ReplyDAO();
+        $replyDAO->setMessage('test');
+        $replyDAO->setContacts(new ArrayCollection([new Lead()]));
+
         $handler->expects($this->once())
-            ->method('getContacts')
-            ->willReturnCallback(
-                function () {
-                    throw new NumberNotFoundException('');
-                }
-            );
-
-        $this->contactTracker->expects($this->never())
-            ->method('setSystemContact');
-
-        $this->eventDispatcher->expects($this->never())
-            ->method('dispatch');
+            ->method('getMessage')
+            ->willReturn([$replyDAO]);
 
         $this->getHelper()->handleRequest($handler, new Request());
     }
