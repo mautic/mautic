@@ -12,7 +12,6 @@
 namespace Mautic\SmsBundle\Callback\DAO;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\SmsBundle\Entity\Stat;
 
 class DeliveryStatusDAO
 {
@@ -32,14 +31,14 @@ class DeliveryStatusDAO
     private $isFailed = false;
 
     /**
+     * @var string
+     */
+    private $trackingHash;
+
+    /**
      * @var ArrayCollection
      */
     private $contacts;
-
-    /**
-     * @var Stat
-     */
-    private $stat;
 
     /**
      * @return bool
@@ -90,6 +89,22 @@ class DeliveryStatusDAO
     }
 
     /**
+     * @return string
+     */
+    public function getTrackingHash()
+    {
+        return $this->trackingHash;
+    }
+
+    /**
+     * @param string $trackingHash
+     */
+    public function setTrackingHash($trackingHash)
+    {
+        $this->trackingHash = $trackingHash;
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getContacts()
@@ -103,21 +118,5 @@ class DeliveryStatusDAO
     public function setContacts($contacts)
     {
         $this->contacts = $contacts;
-    }
-
-    /**
-     * @return Stat
-     */
-    public function getStat()
-    {
-        return $this->stat;
-    }
-
-    /**
-     * @param Stat $stat
-     */
-    public function setStat($stat)
-    {
-        $this->stat = $stat;
     }
 }
