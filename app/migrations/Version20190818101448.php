@@ -28,7 +28,7 @@ class Version20190818101448 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         $smsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_messages');
-        if ($smsTable->hasColumn('delivered_count') && $smsTable->hasColumn('read_count') && $smsTable->hasColumn('failed_count')) {
+        if ($smsTable->hasColumn('delivered_count') && $smsTable->hasColumn('read_count') && $smsTable->hasColumn('failed_count') && $smsTable->hasColumn('properties')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -49,6 +49,9 @@ class Version20190818101448 extends AbstractMauticMigration
         }
         if (!$smsTable->hasColumn('failed_count')) {
             $this->addSql('ALTER TABLE '.$this->prefix.'sms_messages ADD failed_count INT DEFAULT NULL');
+        }
+        if (!$smsTable->hasColumn('properties')) {
+            $this->addSql("ALTER TABLE {$this->prefix}sms_messages ADD properties LONGTEXT NOT NULL COMMENT '(DC2Type:json_array)'");
         }
     }
 }
