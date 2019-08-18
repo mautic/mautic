@@ -103,6 +103,11 @@ class Sms extends FormEntity
      */
     private $failedCount = 0;
 
+    /**
+     * @var array
+     */
+    private $properties = [];
+
     public function __clone()
     {
         $this->id             = null;
@@ -170,6 +175,8 @@ class Sms extends FormEntity
         $builder->createField('failedCount', 'integer')
             ->columnName('failed_count')
             ->build();
+
+        $builder->addField('properties', 'json_array');
 
         $builder->addCategory();
 
@@ -260,6 +267,7 @@ class Sms extends FormEntity
                     'deliveredCount',
                     'readCount',
                     'failedCount',
+                    'properties',
                 ]
             )
             ->build();
@@ -594,6 +602,27 @@ class Sms extends FormEntity
     {
         $this->isChanged('failedCount', $failedCount);
         $this->failedCount = $failedCount;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    /**
+     * @param array $properties
+     *
+     * @return Sms
+     */
+    public function setProperties($properties)
+    {
+        $this->isChanged('properties', $properties);
+        $this->properties = $properties;
 
         return $this;
     }

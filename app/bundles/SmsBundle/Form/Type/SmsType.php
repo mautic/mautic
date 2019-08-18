@@ -11,30 +11,44 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SmsType.
  */
 class SmsType extends AbstractType
 {
-    private $translator;
+    /**
+     * @var EntityManager
+     */
     private $em;
+
+    /**
+     * @var RequestStack
+     */
     private $request;
 
     /**
-     * @param MauticFactory $factory
+     * @var TranslatorInterface
      */
-    public function __construct(MauticFactory $factory)
+    private $translator;
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(EntityManager $entityManager, RequestStack $request, TranslatorInterface $translator)
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->request    = $factory->getRequest();
+        $this->em         = $entityManager;
+        $this->request    = $request;
+        $this->translator = $translator;
     }
 
     /**
@@ -77,6 +91,15 @@ class SmsType extends AbstractType
                     'class' => 'form-control',
                     'rows'  => 6,
                 ],
+            ]
+        );
+
+        $builder->add(
+            'properties',
+            SmsPropertiesType::class,
+            [
+                'label'=> false,
+                'data' => $options['data']->getProperties(),
             ]
         );
 

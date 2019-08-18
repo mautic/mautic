@@ -93,17 +93,29 @@ return [
         ],
         'forms' => [
             'mautic.form.type.sms' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'request_stack',
+                    'translator',
+                ],
                 'alias'     => 'sms',
+            ],
+            'mautic.form.type.sms.properties' => [
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsPropertiesType::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
             ],
             'mautic.form.type.smsconfig' => [
                 'class' => 'Mautic\SmsBundle\Form\Type\ConfigType',
                 'alias' => 'smsconfig',
             ],
             'mautic.form.type.smssend_list' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsSendType',
-                'arguments' => 'router',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsSendType::class,
+                'arguments' => [
+                    'router',
+                ],
                 'alias'     => 'smssend_list',
             ],
             'mautic.form.type.sms_list' => [

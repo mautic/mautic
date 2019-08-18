@@ -122,4 +122,13 @@ final class SmsEvents
      * @var string
      */
     const ON_CAMPAIGN_DELIVERY = 'mautic.sms.on_campaign_delivery';
+
+    /**
+     * The mautic.sms_properties event is dispatched during the configuration in send text message dialog.
+     *
+     * The event listener receives a Mautic\SmsBundle\Event\SmsPropertiesEvent instance.
+     *
+     * @var string
+     */
+    const SMS_PROPERTIES = 'mautic.sms_properties';
 }
