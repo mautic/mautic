@@ -618,11 +618,12 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // ================================
             (function () {
                 // define variable
-                var minimizeHandler = "[data-toggle~=minimize]",
-                    backgroundImage = $('.mautic-brand').css('background-image');
+                var minimizeHandler = "[data-toggle~=minimize]";
 
                 // core minimize function
                 function toggleMinimize (e) {
+                    var backgroundImage = /^url\(.+$/.test($('.mautic-brand').css('background-image'));
+
                     // toggle class
                     if($(element).hasClass("sidebar-minimized")) {
                         isMinimize = false;
