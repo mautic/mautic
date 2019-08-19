@@ -532,6 +532,10 @@ class Sms extends FormEntity
      */
     public function getDeliveredRatio()
     {
+        if (!$this->deliveredCount) {
+            return 0;
+        }
+
         return round($this->deliveredCount / $this->sentCount * 100, 2);
     }
 
@@ -561,6 +565,10 @@ class Sms extends FormEntity
      */
     public function getReadRatio()
     {
+        if (!$this->readCount) {
+            return 0;
+        }
+
         return round($this->readCount / $this->sentCount * 100, 2);
     }
 
@@ -590,6 +598,10 @@ class Sms extends FormEntity
      */
     public function getFailedRatio()
     {
+        if (!$this->failedCount) {
+            return 0;
+        }
+
         return round($this->failedCount / $this->sentCount * 100, 2);
     }
 
