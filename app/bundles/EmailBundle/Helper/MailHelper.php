@@ -416,7 +416,6 @@ class MailHelper
                     self::searchReplaceTokens($search, $replace, $this->message);
                 }
             }
-
             // Attach assets
             if (!empty($this->assets)) {
                 /** @var \Mautic\AssetBundle\Entity\Asset $asset */
@@ -435,6 +434,11 @@ class MailHelper
             try {
                 if (!$this->transport->isStarted()) {
                     $this->transportStartTime = time();
+                }
+
+                if ($this->factory->getParameter('mailer_convert_embed_images')) {
+                    $convertedContent = $this->convertEmbedImages($this->message->getBody());
+                    $this->message->setBody($convertedContent);
                 }
 
                 $this->mailer->send($this->message, $failures);
@@ -953,19 +957,6 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false, $ignoreEmbedImageConversion = false)
     {
-        if (!$ignoreEmbedImageConversion && $this->factory->getParameter('mailer_convert_embed_images')) {
-            $matches = [];
-            if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-                $replaces = [];
-                foreach ($matches[1] as $match) {
-                    if (strpos($match, 'cid:') === false) {
-                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
-                    }
-                }
-                $content = strtr($content, $replaces);
-            }
-        }
-
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
@@ -984,6 +975,27 @@ class MailHelper
             'contentType' => $contentType,
             'charset'     => $charset,
         ];
+    }
+
+    /**
+     * @param $content
+     *
+     * @return string
+     */
+    private function convertEmbedImages($content)
+    {
+        $matches = [];
+        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+            $replaces = [];
+            foreach ($matches[1] as $match) {
+                if (strpos($match, 'cid:') === false) {
+                    $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                }
+            }
+            $content = strtr($content, $replaces);
+        }
+
+        return $content;
     }
 
     /**
