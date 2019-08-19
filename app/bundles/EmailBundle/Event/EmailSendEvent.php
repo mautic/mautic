@@ -197,7 +197,7 @@ class EmailSendEvent extends CommonEvent
     public function setContent($content)
     {
         if ($this->helper !== null) {
-            $this->helper->setBody($content, 'text/html', null);
+            $this->helper->setBody($content, 'text/html', null, true);
         } else {
             $this->content = $content;
         }

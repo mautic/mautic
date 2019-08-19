@@ -416,6 +416,7 @@ class MailHelper
                     self::searchReplaceTokens($search, $replace, $this->message);
                 }
             }
+
             // Attach assets
             if (!empty($this->assets)) {
                 /** @var \Mautic\AssetBundle\Entity\Asset $asset */
@@ -977,7 +978,7 @@ class MailHelper
     }
 
     /**
-     * @param $content
+     * @param string $content
      *
      * @return string
      */
