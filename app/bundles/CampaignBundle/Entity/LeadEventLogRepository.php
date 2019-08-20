@@ -487,7 +487,7 @@ class LeadEventLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
             ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
             ->where($expr)
-            ->setParameter('campaignId', (int) $campaignId, \PDO::PARAM_INT)
+            ->setParameter('campaignId', $campaignId)
             ->setParameter('now', $now->format('Y-m-d H:i:s'))
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
