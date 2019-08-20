@@ -132,7 +132,11 @@ class LeadEventLog implements ChannelInterface
             ->addJoinColumn('campaign_id', 'id')
             ->build();
 
-        $builder->addIpAddress(true);
+        $builder->createManyToOne('ipAddress', 'Mautic\CoreBundle\Entity\IpAddress')
+            ->cascadeDetach()
+            ->cascadeMerge()
+            ->addJoinColumn('ip_id', 'id', true)
+            ->build();
 
         $builder->createField('dateTriggered', 'datetime')
             ->columnName('date_triggered')
