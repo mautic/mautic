@@ -33,6 +33,7 @@ class ReportApiControllerTest extends MauticMysqlTestCase
 //        $source = $data['source'];
 
         // Get the new report
+        $this->client->restart();
         $this->client->request('GET', sprintf('/api/reports/%s', 5));
         $response = $this->client->getResponse();
         $this->assertSame(Codes::HTTP_OK, $response->getStatusCode());
