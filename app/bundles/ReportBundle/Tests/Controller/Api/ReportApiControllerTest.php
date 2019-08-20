@@ -29,8 +29,8 @@ class ReportApiControllerTest extends MauticMysqlTestCase
         $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
         $this->assertTrue(isset($responseData['report']));
         $this->assertEquals($data['name'], $responseData['report']['name']);
-        $id     = $responseData['report']['id'];
-        $source = $data['source'];
+//        $id     = $responseData['report']['id'];
+//        $source = $data['source'];
 
 //        // Get the new report
 //        $this->client->request('GET', sprintf('/api/reports/%s', $id), $data);
