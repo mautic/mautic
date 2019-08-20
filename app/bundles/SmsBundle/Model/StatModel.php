@@ -107,7 +107,7 @@ class StatModel
     public function setAsFailedandUpCount()
     {
         if (!$this->stat->setIsFailed()) {
-            $this->sms->setFailedCount($this->sms->getReadCount() + 1);
+            $this->sms->setFailedCount($this->sms->getFailedCount() + 1);
         }
         $this->stat->setIsFailed(true);
     }
