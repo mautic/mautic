@@ -66,6 +66,9 @@ class ReportApiController extends CommonApiController
             unset($reportData[$key]);
         }
 
+        // Include report metadata
+        $reportData[$this->entityNameOne] = $entity;
+
         return $this->handleView(
             $this->view($reportData, Response::HTTP_OK)
         );
