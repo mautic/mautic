@@ -174,12 +174,12 @@ class SearchSubscriber extends CommonSubscriber
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.page_source'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.page_source', [], null, 'en_US'):
-            $this->buildPageHitSourceQuery($event);
+                $this->buildPageHitSourceQuery($event);
                 break;
 
             case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.page_source_id', [], null, 'en_US'):
-            $this->buildPageHitSourceIdQuery($event);
+                $this->buildPageHitSourceIdQuery($event);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.page_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.page_id', [], null, 'en_US'):
@@ -187,15 +187,27 @@ class SearchSubscriber extends CommonSubscriber
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
-                    $this->buildSmsSentQuery($event);
+                $this->buildSmsSentQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_delivered'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_delivered', [], null, 'en_US'):
+                $this->buildSmsDeliveredQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_read'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_read', [], null, 'en_US'):
+                $this->buildSmsReadQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_failed'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_failed', [], null, 'en_US'):
+                $this->buildSmsFailedQuery($event);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.web_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.web_sent', [], null, 'en_US'):
-                    $this->buildWebSentQuery($event);
+                $this->buildWebSentQuery($event);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent', [], null, 'en_US'):
-                    $this->buildMobileSentQuery($event);
+                $this->buildMobileSentQuery($event);
                 break;
         }
     }
@@ -381,8 +393,9 @@ class SearchSubscriber extends CommonSubscriber
 
     /**
      * @param LeadBuildSearchEvent $event
+     * @param array                $config
      */
-    private function buildSmsSentQuery(LeadBuildSearchEvent $event)
+    private function buildSmsQuery(LeadBuildSearchEvent $event, array $config)
     {
         $tables = [
             [
@@ -393,11 +406,64 @@ class SearchSubscriber extends CommonSubscriber
             ],
         ];
 
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildSmsSentQuery(LeadBuildSearchEvent $event)
+    {
         $config = [
             'column' => 'ss.sms_id',
         ];
 
-        $this->buildJoinQuery($event, $tables, $config);
+        $this->buildSmsQuery($event, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildSmsDeliveredQuery(LeadBuildSearchEvent $event)
+    {
+        $config = [
+            'column' => 'ss.sms_id',
+            'params' => [
+                'ss.is_delivered' => 1,
+            ],
+        ];
+
+        $this->buildSmsQuery($event, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildSmsReadQuery(LeadBuildSearchEvent $event)
+    {
+        $config = [
+            'column' => 'ss.sms_id',
+            'params' => [
+                'ss.is_read' => 1,
+            ],
+        ];
+
+        $this->buildSmsQuery($event, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildSmsFailedQuery(LeadBuildSearchEvent $event)
+    {
+        $config = [
+            'column' => 'ss.sms_id',
+            'params' => [
+                'ss.is_failed' => 1,
+            ],
+        ];
+
+        $this->buildSmsQuery($event, $config);
     }
 
     /**
