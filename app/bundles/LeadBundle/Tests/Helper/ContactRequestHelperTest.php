@@ -211,7 +211,7 @@ class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->coreParametersHelper->expects($this->at(0))
             ->method('getParameter')
-            ->with('track_by_tracking_url')
+                ->with('track_by_tracking_url')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
