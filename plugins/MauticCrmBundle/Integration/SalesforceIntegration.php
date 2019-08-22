@@ -2414,17 +2414,47 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param string $sfObject
+     * @param string $sfFieldString
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
     public function getDncHistory($sfObject, $sfFieldString)
     {
-        // get last modified date for donot contact in Salesforce
-        $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$sfFieldString.') ORDER BY CreatedDate DESC';
-        $queryUrl      = $this->getQueryUrl();
+        $this->getDoNotContactHistory($sfObject, $sfFieldString, 'DESC');
+    }
 
-        return $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
+    /**
+     * @param string $object
+     * @param string $ids
+     * @param string $order
+     *
+     * @return mixed|array
+     *
+     * @throws ApiErrorException
+     */
+    public function getDoNotContactHistory($object, $ids, $order = 'DESC')
+    {
+        //get last modified date for do not contact in Salesforce
+        $query = sprintf('Select
+                Field,
+                %sId,
+                CreatedDate,
+                isDeleted,
+                NewValue
+            from
+                %sHistory
+            where
+                Field = \'HasOptedOutOfEmail\'
+                and %sId IN (%s)
+            ORDER BY CreatedDate %s', $object, $object, $object, $ids, $order);
+
+        $url      = $this->getQueryUrl();
+        $history  = $this->getApiHelper()->request('query', ['q' => $query], 'GET', false, null, $url);
+
+        return $history;
     }
 
     /**
@@ -2455,8 +2485,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $sfFieldString = "'".implode("','", $leadIds)."'";
 
-        $historySF = $this->getDncHistory($sfObject, $sfFieldString);
-        // if there is no records of when it was modified in SF then just exit
+        $historySF = $this->getDoNotContactHistory($sfObject, $sfFieldString, 'ASC');
+
+        //if there is no records of when it was modified in SF then just exit
         if (empty($historySF['records'])) {
             return;
         }
