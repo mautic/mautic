@@ -244,10 +244,6 @@ class HttpFactory implements AuthProviderInterface
             $oauth->setAccessTokenSigner($this->config->getTokenSigner());
         }
 
-        if ($this->config instanceof TokenSignerInterface) {
-            $oauth->setAccessTokenSigner($this->config->getTokenSigner());
-        }
-
         if ($this->config instanceof TokenFactoryInterface) {
             $oauth->setTokenFactory($this->config->getTokenFactory());
         }
