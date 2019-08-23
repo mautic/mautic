@@ -94,6 +94,10 @@ return [
             ],
             'mautic.integrations.form.config.sync_settings_field_mappings' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                    'translator',
+                ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,

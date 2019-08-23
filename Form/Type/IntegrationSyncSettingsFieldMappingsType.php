@@ -15,16 +15,40 @@ namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
     use FilteredFieldsTrait;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * IntegrationSyncSettingsFieldMappingsType constructor.
+     *
+     * @param LoggerInterface     $logger
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(LoggerInterface $logger, TranslatorInterface $translator)
+    {
+        $this->logger     = $logger;
+        $this->translator = $translator;
+    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -50,7 +74,9 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                 try {
                     $this->filterFields($integrationObject, $objectName, null, 1);
                 } catch (\Exception $exception) {
-                    $error = $exception->getMessage();
+                    $this->logger->debug($exception->getMessage(), ['exception' => $exception]);
+
+                    $error = $this->translator->trans($exception->getMessage());
                 }
 
                 $form = $event->getForm();
