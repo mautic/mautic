@@ -18,4 +18,5 @@ use Exception;
 
 class PluginNotConfiguredException extends Exception
 {
+    protected $message = 'mautic.integration.not_configured';
 }
