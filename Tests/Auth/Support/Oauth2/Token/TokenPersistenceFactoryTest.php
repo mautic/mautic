@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Persistence;
 
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Auth\Persistence\TokenPersistenceFactory;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
 class TokenPersistenceFactoryTest extends \PHPUnit_Framework_TestCase

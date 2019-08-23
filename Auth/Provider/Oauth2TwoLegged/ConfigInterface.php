@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged;
 
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\CredentialsSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenPersistenceInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenSignerInterface;
 

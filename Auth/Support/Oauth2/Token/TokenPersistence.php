@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Persistence;
+namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
 use kamermans\OAuth2\Token\RawToken;
@@ -43,16 +43,16 @@ class TokenPersistence implements TokenPersistenceInterface
     /**
      * Restore the token data into the give token.
      *
-     * @param TokenInterface $token
+     * @param TokenInterface|IntegrationToken $token
      *
-     * @return TokenInterface Restored token
+     * @return TokenInterface|IntegrationToken Restored token
      */
     public function restoreToken(TokenInterface $token): TokenInterface
     {
         $apiKeys = $this->getIntegration()->getApiKeys();
         $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
 
-        return new RawToken(
+        return new IntegrationToken(
             $apiKeys['access_token'] ?? null,
             $apiKeys['refresh_token'] ?? null,
             $apiKeys['expires_at'] ? $apiKeys['expires_at'] - time() : -1
@@ -62,23 +62,25 @@ class TokenPersistence implements TokenPersistenceInterface
     /**
      * Save the token data.
      *
-     * @param TokenInterface $token
+     * @param TokenInterface|IntegrationToken $token
      */
     public function saveToken(TokenInterface $token): void
     {
         $integration = $this->getIntegration();
-        $oldApiKeys = $integration->getApiKeys();
+        $oldApiKeys  = $integration->getApiKeys();
 
         if ($oldApiKeys === null) {
             $oldApiKeys = [];
         }
+
         $newApiKeys = [
             'access_token'  => $token->getAccessToken(),
             'refresh_token' => $token->getRefreshToken(),
             'expires_at'    => $token->getExpiresAt(),
         ];
 
-        $newApiKeys = array_merge($oldApiKeys, $newApiKeys);
+        $extraData  = $token instanceof IntegrationToken ? $token->getExtraData() : [];
+        $newApiKeys = array_merge($oldApiKeys, $extraData, $newApiKeys);
 
         $integration->setApiKeys($newApiKeys);
         $this->integrationsHelper->saveIntegrationConfiguration($integration);

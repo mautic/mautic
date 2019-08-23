@@ -19,12 +19,14 @@ use GuzzleHttp\HandlerStack;
 use kamermans\OAuth2\GrantType\AuthorizationCode;
 use kamermans\OAuth2\GrantType\RefreshToken;
 use kamermans\OAuth2\OAuth2Middleware;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenFactoryInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenFactory;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenPersistenceInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\CredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenPersistenceInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CodeInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\RedirectUriInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
@@ -46,7 +48,7 @@ class HttpFactory implements AuthProviderInterface
     private $credentials;
 
     /**
-     * @var CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface
+     * @var CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface|TokenFactoryInterface
      */
     private $config;
 
@@ -208,6 +210,10 @@ class HttpFactory implements AuthProviderInterface
 
         if ($this->config instanceof TokenSignerInterface) {
             $oauth->setAccessTokenSigner($this->config->getTokenSigner());
+        }
+
+        if ($this->config instanceof TokenFactoryInterface) {
+            $oauth->setTokenFactory($this->config->getTokenFactory());
         }
     }
 }

@@ -179,7 +179,7 @@ return [
                 'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class,
             ],
             'mautic.integrations.auth_provider.token_persistence_factory' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Persistence\TokenPersistenceFactory::class,
+                'class' => \MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory::class,
                 'arguments' => ['mautic.integrations.helper']
             ] ,
         ],

@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess;
 
-use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
+namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
+
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 
-interface CredentialsSignerInterface extends AuthConfigInterface
+interface TokenFactoryInterface extends AuthConfigInterface
 {
-    public function getCredentialsSigner(): SignerInterface;
+    public function getTokenFactory(): callable;
 }

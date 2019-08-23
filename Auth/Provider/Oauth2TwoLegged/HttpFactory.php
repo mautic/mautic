@@ -21,12 +21,14 @@ use kamermans\OAuth2\GrantType\GrantTypeInterface;
 use kamermans\OAuth2\GrantType\PasswordCredentials;
 use kamermans\OAuth2\GrantType\RefreshToken;
 use kamermans\OAuth2\OAuth2Middleware;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenFactoryInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenFactory;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\CredentialsSignerInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenPersistenceInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ConfigAccess\TokenSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\CredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenPersistenceInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\PasswordCredentialsGrantInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ScopeInterface;
@@ -74,8 +76,8 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface    $credentials
-     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface|AuthConfigInterface $config
+     * @param PasswordCredentialsGrantInterface|ClientCredentialsGrantInterface|AuthCredentialsInterface                          $credentials
+     * @param CredentialsSignerInterface|TokenPersistenceInterface|TokenSignerInterface|AuthConfigInterface|TokenFactoryInterface $config
      *
      * @return ClientInterface
      * @throws PluginNotConfiguredException
@@ -240,6 +242,14 @@ class HttpFactory implements AuthProviderInterface
 
         if ($this->config instanceof TokenSignerInterface) {
             $oauth->setAccessTokenSigner($this->config->getTokenSigner());
+        }
+
+        if ($this->config instanceof TokenSignerInterface) {
+            $oauth->setAccessTokenSigner($this->config->getTokenSigner());
+        }
+
+        if ($this->config instanceof TokenFactoryInterface) {
+            $oauth->setTokenFactory($this->config->getTokenFactory());
         }
     }
 }
