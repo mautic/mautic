@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
 
-use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
+use kamermans\OAuth2\Signer\AccessToken\SignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 
-interface CredentialsSignerInterface extends AuthConfigInterface
+interface ConfigTokenSignerInterface extends AuthConfigInterface
 {
-    public function getCredentialsSigner(): SignerInterface;
+    public function getTokenSigner(): SignerInterface;
 }

@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
-class IntegrationTokenFactory
+use kamermans\OAuth2\Token\TokenInterface;
+
+class IntegrationTokenFactory implements TokenFactoryInterface
 {
     private $extraKeysToStore = [];
 
@@ -22,7 +24,7 @@ class IntegrationTokenFactory
         $this->extraKeysToStore = $extraKeysToStore;
     }
 
-    public function __invoke(array $data, IntegrationToken $previousToken = null)
+    public function __invoke(array $data, TokenInterface $previousToken = null)
     {
         $accessToken = null;
         $refreshToken = null;

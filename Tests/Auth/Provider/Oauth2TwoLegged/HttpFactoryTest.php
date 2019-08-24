@@ -12,9 +12,9 @@ use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPers
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
 use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\CredentialsSignerInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenPersistenceInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\TokenSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigCredentialsSignerInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigTokenPersistenceInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigTokenSignerInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\PasswordCredentialsGrantInterface;
@@ -334,7 +334,7 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $kamermansTokenPersistence = $this->createMock(KamermansTokenPersistenceInterface::class);
         $accessTokenSigner         = $this->createMock(AccessTokenSigner::class);
 
-        $clientCredentialSigner = $this->createMock(CredentialsSignerInterface::class);
+        $clientCredentialSigner = $this->createMock(ConfigCredentialsSignerInterface::class);
         $clientCredentialSigner->expects($this->once())
             ->method('getCredentialsSigner')
             ->willReturn($signerInterface);
@@ -344,7 +344,7 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'clientCredentialsSigner') === $signerInterface);
 
-        $tokenPersistence = $this->createMock(TokenPersistenceInterface::class);
+        $tokenPersistence = $this->createMock(ConfigTokenPersistenceInterface::class);
         $tokenPersistence->expects($this->once())
             ->method('getTokenPersistence')
             ->willReturn($kamermansTokenPersistence);
@@ -354,7 +354,7 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $reflectedMiddleware = new \ReflectionClass($middleware);
         $this->assertTrue($this->getProperty($reflectedMiddleware, $middleware, 'tokenPersistence') === $kamermansTokenPersistence);
 
-        $tokenPersistence = $this->createMock(TokenSignerInterface::class);
+        $tokenPersistence = $this->createMock(ConfigTokenSignerInterface::class);
         $tokenPersistence->expects($this->once())
             ->method('getTokenSigner')
             ->willReturn($accessTokenSigner);
