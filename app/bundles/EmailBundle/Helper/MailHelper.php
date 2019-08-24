@@ -967,9 +967,13 @@ class MailHelper
         }
 
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
-            // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
-            if (strpos($content, '</body>') !== false) {
+            // Set or append tracking pixel
+            if (strpos($content, '{tracking_pixel}') !== false) {
+                // email has {tracking_pixel} token
+                $content = str_replace('{tracking_pixel}', $trackingImg, $content);
+            } elseif (strpos($content, '</body>') !== false) {
+                // tracking pixel is appended (default)
                 $content = str_replace('</body>', $trackingImg.'</body>', $content);
             } else {
                 $content .= $trackingImg;
