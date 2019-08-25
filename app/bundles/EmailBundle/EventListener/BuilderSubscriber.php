@@ -115,6 +115,7 @@ class BuilderSubscriber extends CommonSubscriber
             '{webview_text}'     => $this->translator->trans('mautic.email.token.webview_text'),
             '{signature}'        => $this->translator->trans('mautic.email.token.signature'),
             '{subject}'          => $this->translator->trans('mautic.email.subject'),
+            '{tracking_pixel}'   => $this->translator->trans('mautic.email.token.tracking_pixel'),
         ];
 
         if ($event->tokensRequested(array_keys($tokens))) {

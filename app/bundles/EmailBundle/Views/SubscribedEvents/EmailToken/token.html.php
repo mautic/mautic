@@ -43,4 +43,13 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
             </a>
         </div>
     </div>
+    <div class="row ml-2 mr-2 mb-2">
+        <div class="col-sm-6">
+            <?php $token = $view->escape(BuilderTokenHelper::getVisualTokenHtml('{tracking_pixel}', $view['translator']->trans('mautic.email.token.tracking_pixel'))); ?>
+            <a href="#" data-toggle="tooltip" data-token="<?php echo $token; ?>" class="btn btn-default btn-block" title="<?php echo $view['translator']->trans('mautic.email.token.tracking_pixel.descr'); ?>">
+                <i class="fa fa-file-text-o"></i><br />
+                <?php echo $view['translator']->trans('mautic.email.token.tracking_pixel'); ?>
+            </a>
+        </div>
+    </div>
 </div>
