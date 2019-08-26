@@ -17,7 +17,8 @@ use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Auth\Persistence\TokenPersistence;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
+use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
@@ -84,22 +85,26 @@ class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
     {
         $oldApiKeys = [
             'access_token' => 'old_access_token',
-            'something' => 'something',
+            'something'    => 'something',
         ];
 
         $newApiKeys = [
-            'access_token' => 'access_token',
+            'access_token'  => 'access_token',
             'refresh_token' => 'refresh_token',
-            'expires_at' => '0',
+            'expires_at'    => '0',
         ];
 
-        $token = new RawToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at']);
+        $extraData = [
+            'instance_url' => 'abc.123.com'
+        ];
+
+        $token = new IntegrationToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at'], $extraData);
 
         $integration = $this->createMock(Integration::class);
         $integration->expects($this->at(0))
             ->method('getApiKeys')
             ->willReturn($oldApiKeys);
-        $newApiKeys = array_merge($oldApiKeys, $newApiKeys);
+        $newApiKeys = array_merge($oldApiKeys, $extraData, $newApiKeys);
         $integration->expects($this->once())
             ->method('setApiKeys')
             ->with($newApiKeys);
