@@ -157,7 +157,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
                 //Handle case when integration object are named "Contacts" and "Leads"
                 $leadObjectName = 'Lead';
-                if (in_array('Leads', $config['objects'])) {
+                if (in_array(strtolower('Leads'), array_map(function ($i) {
+                    return strtolower($i);
+                }, $config['objects']), true)) {
                     $leadObjectName = 'Leads';
                 }
                 $contactObjectName = 'Contact';
@@ -168,7 +170,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
 
                 $updated = $created = $processed = 0;
-                if (in_array($leadObjectName, $config['objects'])) {
+                if (in_array(strtolower($leadObjectName), array_map(function ($i) {
+                    return strtolower($i);
+                }, $config['objects']), true)) {
                     $leadList = [];
                     $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, $leadObjectName);
                     if (is_array($results)) {

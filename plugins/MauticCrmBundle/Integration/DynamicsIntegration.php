@@ -298,8 +298,15 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        $leadFields    = $this->getFormFieldsByObject('leads', $settings);
-        $contactFields = $this->getFormFieldsByObject('contacts', $settings);
+        $leadFields    = [];
+        $contactFields = [];
+        $settings      = $this->mergeConfigToFeatureSettings();
+        if (isset($settings['objects']) && in_array('leads', $settings['objects'])) {
+            $leadFields    = $this->getFormFieldsByObject('leads', $settings);
+        }
+        if (isset($settings['objects']) && in_array('contacts', $settings['objects'])) {
+            $contactFields = $this->getFormFieldsByObject('contacts', $settings);
+        }
 
         return array_merge($leadFields, $contactFields);
     }
