@@ -96,3 +96,22 @@
         </IfModule>
     </IfModule>
 </IfModule>
+
+# Denie access via HTTP requests to all PHP files.
+<Files "*.php">
+    Require all denied
+</Files>
+
+# Except those whitelisted bellow.
+<Files "index.php">
+    Require all granted
+</Files>
+<Files "index_dev.php">
+    Require all granted
+</Files>
+<Files "filemanager.php">
+    Require all granted
+</Files>
+<Files "upgrade.php">
+    Require all granted
+</Files>

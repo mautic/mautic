@@ -191,7 +191,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->ipLookupHelperMock->expects($this->once())
+        $this->ipLookupHelperMock->expects($this->exactly(2))
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
@@ -222,7 +222,7 @@ class ContactTrackerTest extends \PHPUnit_Framework_TestCase
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->ipLookupHelperMock->expects($this->once())
+        $this->ipLookupHelperMock->expects($this->exactly(2))
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 

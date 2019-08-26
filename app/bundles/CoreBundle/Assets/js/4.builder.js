@@ -522,7 +522,7 @@ Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
         // prevent from being able to close builder
         console.error(error);
     }
-}
+};
 
 Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
     var cleanHtml = Mautic.sanitizeHtmlBeforeSave(html);
@@ -1232,7 +1232,15 @@ Mautic.initSlotListeners = function() {
                 focus.remove();
             });
             cloneLink.click(function(e) {
-                slot.clone().insertAfter(slot);
+                if (type == 'dynamicContent') {
+                    var maxId = Mautic.getDynamicContentMaxId();
+
+                    slot.clone().attr('data-param-dec-id', maxId + 1).insertAfter(slot);
+                    Mautic.createNewDynamicContentItem(parent.mQuery);
+                } else {
+                    slot.clone().insertAfter(slot);
+                }
+
                 Mautic.initSlots(slot.closest('[data-slot-container="1"]'));
             });
 
@@ -1469,10 +1477,8 @@ Mautic.initSlotListeners = function() {
             });
         } else if (type === 'dynamicContent') {
             if (slot.html().match(/__dynamicContent__/)) {
-                var decs = mQuery('[data-slot="dynamicContent"]');
-                var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');})
-                var maxId = Math.max.apply(Math, ids);
-                if (isNaN(maxId) || Number.NEGATIVE_INFINITY == maxId) maxId = 0;
+                var maxId = Mautic.getDynamicContentMaxId();
+
                 slot.attr('data-param-dec-id', maxId + 1);
                 slot.html('Dynamic Content');
                 Mautic.createNewDynamicContentItem(parent.mQuery);
@@ -1979,6 +1985,15 @@ Mautic.getPredefinedLinks = function(callback) {
         }
         return callback(linkList);
     });
+};
+
+Mautic.getDynamicContentMaxId = function() {
+    var decs = mQuery('[data-slot="dynamicContent"]');
+    var ids = mQuery.map(decs, function(e){return mQuery(e).attr('data-param-dec-id');});
+    var maxId = Math.max.apply(Math, ids);
+    if (isNaN(maxId) || Number.NEGATIVE_INFINITY === maxId) maxId = 0;
+
+    return maxId;
 };
 
 // Init inside the builder's iframe
