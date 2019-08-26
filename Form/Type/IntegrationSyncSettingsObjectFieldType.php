@@ -70,13 +70,16 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
             throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
         }
 
+        reset($choices);
+        $defaultChoice = key($choices);
+
         $builder->add(
             'syncDirection',
             ChoiceType::class,
             [
                 'choices'    => $choices,
                 'label'      => false,
-                'empty_data' => ObjectMappingDAO::SYNC_BIDIRECTIONALLY,
+                'empty_data' => $defaultChoice,
                 'attr'       => [
                     'class'            => 'integration-sync-direction',
                     'data-object'      => $options['object'],
