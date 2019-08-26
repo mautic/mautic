@@ -182,13 +182,12 @@ class LanguageHelper
             $manifest  = json_decode($data->body, true);
             $languages = [];
 
-            # translate the manifest (plain array) to a format
-            # expected everywhere else inside mautic (locale keyed sorted array)
-            foreach($manifest['languages'] as $lang) {
-              $languages[$lang['locale']] = $lang;
+            // translate the manifest (plain array) to a format
+            // expected everywhere else inside mautic (locale keyed sorted array)
+            foreach ($manifest['languages'] as $lang) {
+                $languages[$lang['locale']] = $lang;
             }
             ksort($languages);
-
         } catch (\Exception $exception) {
             // Log the error
             $this->logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
