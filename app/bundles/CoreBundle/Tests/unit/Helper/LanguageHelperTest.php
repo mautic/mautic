@@ -96,7 +96,7 @@ class LanguageHelperTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['translations_root'], ['cache'])
             ->willReturnOnConsecutiveCalls($this->translationsPath, $this->tmpPath);
 
-        $languages      = ['languages' => [["name"=>"Spanish", "locale"=>"es"]]];
+        $languages      = ['languages' => [['name'=>'Spanish', 'locale'=>'es']]];
         $response       = new \stdClass();
         $response->code = 200;
         $response->body = json_encode($languages);
