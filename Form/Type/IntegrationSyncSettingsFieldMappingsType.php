@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
 use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
+use MauticPlugin\IntegrationsBundle\Helper\FieldFilterHelper;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -26,8 +27,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 {
-    use FilteredFieldsTrait;
-
     /**
      * @var LoggerInterface
      */
@@ -38,12 +37,6 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
      */
     private $translator;
 
-    /**
-     * IntegrationSyncSettingsFieldMappingsType constructor.
-     *
-     * @param LoggerInterface     $logger
-     * @param TranslatorInterface $translator
-     */
     public function __construct(LoggerInterface $logger, TranslatorInterface $translator)
     {
         $this->logger     = $logger;
@@ -68,11 +61,13 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
             throw new InvalidFormOptionException('integrationObject must be an instance of ConfigFormSyncInterface');
         }
 
+        $fieldFilterHelper = new FieldFilterHelper($integrationObject);
+
         foreach ($options['objects'] as $objectName => $objectLabel) {
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($integrationObject, $objectName) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($integrationObject, $objectName, $fieldFilterHelper) {
                 $error = null;
                 try {
-                    $this->filterFields($integrationObject, $objectName, null, 1);
+                    $fieldFilterHelper->filterFieldsByPage($objectName, 1);
                 } catch (\Exception $exception) {
                     $this->logger->debug($exception->getMessage(), ['exception' => $exception]);
 
@@ -85,10 +80,10 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
                     IntegrationSyncSettingsObjectFieldMappingType::class,
                     [
                         'label'              => false,
-                        'integrationFields'  => $this->getFilteredFields(),
+                        'integrationFields'  => $fieldFilterHelper->getFilteredFields(),
                         'page'               => 1,
                         'keyword'            => null,
-                        'totalFieldCount'    => $this->getTotalFieldCount(),
+                        'totalFieldCount'    => $fieldFilterHelper->getTotalFieldCount(),
                         'object'             => $objectName,
                         'integrationObject'  => $integrationObject,
                         'error_bubbling'     => false,
