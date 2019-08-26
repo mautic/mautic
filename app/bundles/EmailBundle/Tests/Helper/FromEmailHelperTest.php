@@ -441,7 +441,6 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['default@somewhere.com' => 'Default Name'], $fromEmail);
     }
 
-
     public function testContactOwnerIsReturnedWhenMailAsOwnerIsEnabled()
     {
         $this->coreParametersHelper->expects($this->once())
@@ -679,7 +678,7 @@ class FromEmailHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($user);
 
         $helper = $this->getHelper();
-        $from = $helper->getFromAddressArrayConsideringOwner(
+        $from   = $helper->getFromAddressArrayConsideringOwner(
             ['someone@somewhere.com' => null],
             ['owner_id' => 1]
         );

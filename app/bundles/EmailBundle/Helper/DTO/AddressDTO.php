@@ -37,7 +37,6 @@ class AddressDTO
 
         // Decode apostrophes and other special characters
         $this->name = trim(html_entity_decode($this->name, ENT_QUOTES));
-
     }
 
     /**
