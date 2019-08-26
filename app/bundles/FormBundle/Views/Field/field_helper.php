@@ -120,6 +120,12 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     $parseList           = [];
     $ignoreNumericalKeys = false;
 
+    if (!isset($contactFields)) {
+        $contactFields = [];
+    }
+    if (!isset($companyFields)) {
+        $companyFields = [];
+    }
     $formFields = array_merge($contactFields, $companyFields);
     if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($formFields[$field['leadField']])) {
         $leadFieldType = $formFields[$field['leadField']]['type'];

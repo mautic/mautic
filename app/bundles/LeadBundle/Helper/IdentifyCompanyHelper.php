@@ -29,10 +29,9 @@ class IdentifyCompanyHelper
     public static function identifyLeadsCompany($parameters, $lead, CompanyModel $companyModel)
     {
         list($company, $companyEntities) = self::findCompany($parameters, $companyModel);
-
         if (!empty($company)) {
             $leadAdded = false;
-            if (!empty($companyEntities)) {
+            if (count($companyEntities)) {
                 foreach ($companyEntities as $entity) {
                     $companyEntity   = $entity;
                     $companyLeadRepo = $companyModel->getCompanyLeadRepository();
@@ -74,10 +73,12 @@ class IdentifyCompanyHelper
 
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company']);
-        } elseif (isset($parameters['email']) || isset($parameters['companyemail'])) {
-            $companyName = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
         } elseif (isset($parameters['companyname'])) {
             $companyName = filter_var($parameters['companyname']);
+        }
+
+        if (isset($parameters['email']) || isset($parameters['companyemail'])) {
+            $companyDomain = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
         }
 
         if (empty($parameters['companywebsite']) && !empty($parameters['companyemail'])) {
@@ -129,10 +130,18 @@ class IdentifyCompanyHelper
      */
     protected static function domainExists($email)
     {
+        if (!strstr($email, '@')) { //not a valid email adress
+            return false;
+        }
+
         list($user, $domain) = explode('@', $email);
         $arr                 = dns_get_record($domain, DNS_MX);
 
-        if ($arr && $arr[0]['host'] === $domain) {
+        if (empty($arr)) {
+            return false;
+        }
+
+        if ($arr[0]['host'] === $domain) {
             return $domain;
         }
 

@@ -13,6 +13,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -34,6 +35,9 @@ class CheckStep implements StepInterface
      * @var string
      */
     private $kernelRoot;
+
+    /** @var OpenSSLCipher */
+    private $openSSLCipher;
 
     /**
      * Absolute path to cache directory.
@@ -66,17 +70,23 @@ class CheckStep implements StepInterface
     /**
      * Constructor.
      *
-     * @param Configurator $configurator Configurator service
-     * @param string       $kernelRoot   Kernel root path
-     * @param RequestStack $requestStack Request stack
+     * @param Configurator  $configurator  Configurator service
+     * @param string        $kernelRoot    Kernel root path
+     * @param RequestStack  $requestStack  Request stack
+     * @param OpenSSLCipher $openSSLCipher
      */
-    public function __construct(Configurator $configurator, $kernelRoot, RequestStack $requestStack)
-    {
+    public function __construct(
+        Configurator $configurator,
+        $kernelRoot,
+        RequestStack $requestStack,
+        OpenSSLCipher $openSSLCipher
+    ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
         $this->kernelRoot       = $kernelRoot;
         $this->site_url         = $request->getSchemeAndHttpHost().$request->getBasePath();
+        $this->openSSLCipher    = $openSSLCipher;
     }
 
     /**
@@ -160,8 +170,12 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.simplexml';
         }
 
-        if (!extension_loaded('mcrypt')) {
-            $messages[] = 'mautic.install.extension.mcrypt';
+        if ($this->openSSLCipher->isSupported() === false) {
+            $messages[] = 'mautic.install.extension.openssl';
+        }
+
+        if (!function_exists('curl_init')) {
+            $messages[] = 'mautic.install.extension.curl';
         }
 
         if (!function_exists('finfo_open')) {
@@ -225,7 +239,7 @@ class CheckStep implements StepInterface
         if (extension_loaded('xdebug')) {
             $cfgValue = ini_get('xdebug.max_nesting_level');
 
-            if (!call_user_func(create_function('$cfgValue', 'return $cfgValue > 100;'), $cfgValue)) {
+            if ($cfgValue <= 100) {
                 $messages[] = 'mautic.install.xdebug.nesting';
             }
         }
@@ -253,6 +267,10 @@ class CheckStep implements StepInterface
 
         if (!function_exists('imap_open')) {
             $messages[] = 'mautic.install.extension.imap';
+        }
+
+        if (substr($this->site_url, 0, 5) !== 'https') {
+            $messages[] = 'mautic.install.ssl.certificate';
         }
 
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
@@ -352,6 +370,8 @@ class CheckStep implements StepInterface
         }
 
         $last = strtolower($val[strlen($val) - 1]);
+        $val  = (int) $val;
+
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':

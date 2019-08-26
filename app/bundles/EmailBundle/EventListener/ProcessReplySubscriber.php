@@ -71,10 +71,16 @@ class ProcessReplySubscriber implements EventSubscriberInterface
      */
     public function onEmailPreFetch(ParseEmailEvent $event)
     {
-        $lastFetch = $this->cache->get(self::CACHE_KEY);
-        if ($lastFetch) {
-            $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID.' '.$lastFetch.':*');
+        if (!$lastFetchedUID = $this->cache->get(self::CACHE_KEY)) {
+            return;
         }
+
+        $startingUID = $lastFetchedUID + 1;
+
+        // Using * will return the last UID even if the starting UID doesn't exist so let's just use a highball number
+        $endingUID = $startingUID + 1000000000;
+
+        $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." $startingUID:$endingUID");
     }
 
     /**

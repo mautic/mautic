@@ -96,8 +96,9 @@ class ApiSubscriber extends CommonSubscriber
      */
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        $response = $event->getResponse();
-        $content  = $response->getContent();
+        $response   = $event->getResponse();
+        $content    = $response->getContent();
+        $statusCode = $response->getStatusCode();
 
         if ($this->isApiRequest($event) && strpos($content, 'error') !== false) {
             // Override api messages with something useful
@@ -140,22 +141,23 @@ class ApiSubscriber extends CommonSubscriber
                     }
 
                     if ($message) {
-                        $event->setResponse(
-                            new JsonResponse(
-                                [
-                                    'errors' => [
-                                        [
-                                            'message' => $message,
-                                            'code'    => $response->getStatusCode(),
-                                            'type'    => $type,
-                                        ],
+                        $response = new JsonResponse(
+                            [
+                                'errors' => [
+                                    [
+                                        'message' => $message,
+                                        'code'    => $response->getStatusCode(),
+                                        'type'    => $type,
                                     ],
-                                    // @deprecated 2.6.0 to be removed in 3.0
-                                    'error'             => $data['error'],
-                                    'error_description' => $message.' (`error` and `error_description` are deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                                ]
-                            )
+                                ],
+                                // @deprecated 2.6.0 to be removed in 3.0
+                                'error'             => $data['error'],
+                                'error_description' => $message.' (`error` and `error_description` are deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
+                            ],
+                            $statusCode
                         );
+
+                        $event->setResponse($response);
                     }
                 }
             }

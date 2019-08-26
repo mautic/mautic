@@ -476,7 +476,7 @@ class Filemanager
         // dynamic fileroot dir must be used when enabled
         if ($this->dynamic_fileroot != '') {
             $rootDir = $this->dynamic_fileroot;
-            //$rootDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->path_to_files); // instruction could replace the line above
+        //$rootDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->path_to_files); // instruction could replace the line above
         } else {
             $rootDir = $this->get['root'];
         }
@@ -1090,7 +1090,7 @@ class Filemanager
             $this->item['properties']['Height'] = $height;
             $this->item['properties']['Width']  = $width;
             $this->item['properties']['Size']   = filesize($this->getFullPath($current_path));
-            //}
+        //}
         } elseif (file_exists($this->root.$this->config['icons']['path'].strtolower($this->item['filetype']).'.png')) {
             $this->item['preview']            = $this->config['icons']['path'].strtolower($this->item['filetype']).'.png';
             $this->item['properties']['Size'] = filesize($this->getFullPath($current_path));

@@ -12,7 +12,7 @@
 
 <div class="card" style="height: <?php echo $widget->getHeight() ? ($widget->getHeight() - 10).'px' : '300px' ?>">
     <div class="card-header">
-        <h4><?php echo $widget->getName(); ?></h4>
+        <h4><?php echo $view->escape($widget->getName()); ?></h4>
         <?php if ($widget->getId()) : ?>
         <div class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">

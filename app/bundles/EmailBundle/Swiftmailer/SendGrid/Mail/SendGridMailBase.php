@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid\Mail;
 
-use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
+use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use SendGrid\Content;
 use SendGrid\Email;
 use SendGrid\Mail;
@@ -19,13 +19,13 @@ use SendGrid\Mail;
 class SendGridMailBase
 {
     /**
-     * @var PlainTextMassageHelper
+     * @var PlainTextMessageHelper
      */
-    private $plainTextMassageHelper;
+    private $plainTextMessageHelper;
 
-    public function __construct(PlainTextMassageHelper $plainTextMassageHelper)
+    public function __construct(PlainTextMessageHelper $plainTextMessageHelper)
     {
-        $this->plainTextMassageHelper = $plainTextMassageHelper;
+        $this->plainTextMessageHelper = $plainTextMessageHelper;
     }
 
     /**
@@ -44,7 +44,7 @@ class SendGridMailBase
 
         // Plain text message must be first if present
         if ($contentMain->getType() !== 'text/plain') {
-            $plainText = $this->plainTextMassageHelper->getPlainTextFromMessageNotStatic($message);
+            $plainText = $this->plainTextMessageHelper->getPlainTextFromMessageNotStatic($message);
             if ($plainText) {
                 $contentSecond = $contentMain;
                 $contentMain   = new Content('text/plain', $plainText);

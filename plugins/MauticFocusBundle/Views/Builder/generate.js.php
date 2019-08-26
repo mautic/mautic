@@ -131,7 +131,7 @@ switch ($style) {
                 });
                 <?php endif; ?>
 
-                <?php if ($focus['type'] == 'click'): ?>
+                <?php if ($focus['type'] == 'link'): ?>
                 var links = Focus.iframeDoc.getElementsByClassName('mf-link');
                 if (links.length) {
                     links[0].addEventListener('click', function (event) {
@@ -577,9 +577,10 @@ switch ($style) {
                 Focus.iframeResizerEnabled = true;
 
                 return true;
-                <?php endif; ?>
+                <?php else: ?>
 
                 return false;
+                <?php endif; ?>
             },
 
             // Disable iframe resizer

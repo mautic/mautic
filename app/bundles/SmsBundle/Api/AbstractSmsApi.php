@@ -13,6 +13,7 @@ namespace Mautic\SmsBundle\Api;
 
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 
 abstract class AbstractSmsApi
@@ -33,12 +34,12 @@ abstract class AbstractSmsApi
     }
 
     /**
-     * @param string $number
+     * @param Lead   $lead
      * @param string $content
      *
      * @return mixed
      */
-    abstract public function sendSms($number, $content);
+    abstract public function sendSms(Lead $lead, $content);
 
     /**
      * Convert a non-tracked url to a tracked url.

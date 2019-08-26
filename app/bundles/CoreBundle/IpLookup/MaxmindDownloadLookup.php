@@ -66,9 +66,6 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->timezone  = $record->location->timeZone;
             $this->zipcode   = $record->location->postalCode;
         } catch (\Exception $exception) {
-            if ($this->logger) {
-                $this->logger->warn('IP LOOKUP: '.$exception->getMessage());
-            }
         }
     }
 }

@@ -254,3 +254,25 @@ div[data-slot].ui-sortable-helper {
 [data-slot="dynamicContent"] {
     z-index:50;
 }
+
+.chosen-container .chosen-results li {
+    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    &:before {
+        font: normal normal normal 14px/1 FontAwesome;
+    }
+}
+div:empty[data-slot],div.empty[data-slot],.codemodeHtmlContainer:empty {
+    padding:1em 0 0em 0;
+    display:block;
+    position:relative;
+    margin-bottom:2px;
+}
+div:empty[data-slot]:before,div.empty[data-slot]:before,.codemodeHtmlContainer:empty:before {
+    content: "\f044";
+    font: normal normal normal 14px/1 FontAwesome;
+    position:absolute;
+    left: 2px;
+    top: 2px;
+    color:gray;
+    font-size:small;
+}

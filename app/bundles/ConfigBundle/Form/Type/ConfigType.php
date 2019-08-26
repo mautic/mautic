@@ -62,7 +62,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options) {
+            function (FormEvent $event) {
                 $form = $event->getForm();
 
                 foreach ($form as $config => $configForm) {

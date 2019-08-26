@@ -52,6 +52,7 @@ if (!isset($inBuilder)) {
                             <div class="col-md-6">
                                 <?php
                                 echo $view['form']->row($form['name']);
+                                echo $view['form']->row($form['formAttributes']);
                                 echo $view['form']->row($form['description']);
                                 ?>
                             </div>
@@ -196,6 +197,7 @@ if (!isset($inBuilder)) {
             echo $view['form']->row($form['isPublished']);
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
+            echo $view['form']->row($form['noIndex']);
             echo $view['form']->row($form['inKioskMode']);
             echo $view['form']->row($form['renderStyle']);
             echo $view['form']->row($form['template']);
@@ -233,7 +235,7 @@ endif;
 
 $view['slots']->append(
     'modal',
-    $this->render(
+    $view->render(
         'MauticCoreBundle:Helper:modal.html.php',
         [
             'id'            => 'formComponentModal',

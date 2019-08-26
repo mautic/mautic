@@ -34,9 +34,14 @@ trait RequestTrait
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                             // If value is array and count 1, return value of array as string
-                            if (is_array($params[$name]) && count($params[$name]) == 1) {
+                            if (is_array($params[$name]) && 1 == count($params[$name])) {
                                 $params[$name] = end($params[$name]);
                             }
+
+                            if ('' === $params[$name]) {
+                                continue;
+                            }
+
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                             $data = (bool) $data;
                             try {
@@ -46,14 +51,20 @@ trait RequestTrait
                                 break;
                             } catch (\InvalidArgumentException $exception) {
                             }
-                            $params[$name] = $data;
+
+                            // If not manually handled cast to int because Symfony form processing take false as empty
+                            $params[$name] = (int) $data;
                         }
                         break;
                     case 'choice':
                         if ($child->getConfig()->getOption('multiple')) {
                             // Ensure the value is an array
                             if (!is_array($params[$name])) {
-                                $params[$name] = [$params[$name]];
+                                if (false !== strpos($params[$name], '|')) {
+                                    $params[$name] = explode('|', $params[$name]);
+                                } else {
+                                    $params[$name] = [$params[$name]];
+                                }
                             }
                         }
                         break;
@@ -67,13 +78,13 @@ trait RequestTrait
                             // Date placeholder was used so just ignore it to allow import of the field
                             unset($params[$name]);
                         } else {
-                            if (($timestamp = strtotime($params[$name])) === false) {
+                            if (false === ($timestamp = strtotime($params[$name]))) {
                                 $timestamp = null;
                             }
                             if ($timestamp) {
                                 switch ($type) {
                                     case 'datetime':
-                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                                         break;
                                     case 'date':
                                         $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
@@ -130,7 +141,7 @@ trait RequestTrait
                     // Date placeholder was used so just ignore it to allow import of the field
                     unset($fieldData[$leadField['alias']]);
                 } else {
-                    if (($timestamp = strtotime($fieldData[$leadField['alias']])) === false) {
+                    if (false === ($timestamp = strtotime($fieldData[$leadField['alias']]))) {
                         $timestamp = null;
                     }
                     if ($timestamp) {
@@ -150,7 +161,7 @@ trait RequestTrait
                 break;
             case 'multiselect':
                 if (!is_array($fieldData[$leadField['alias']])) {
-                    if (strpos($fieldData[$leadField['alias']], '|') !== false) {
+                    if (false !== strpos($fieldData[$leadField['alias']], '|')) {
                         $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
                     } else {
                         $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];

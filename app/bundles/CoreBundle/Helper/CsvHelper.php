@@ -43,4 +43,37 @@ class CsvHelper
 
         return $data;
     }
+
+    /**
+     * @param array $headers
+     *
+     * @return array
+     */
+    public static function sanitizeHeaders(array $headers)
+    {
+        return array_map('trim', $headers);
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @return array
+     */
+    public static function convertHeadersIntoFields(array $headers)
+    {
+        sort($headers);
+
+        $importedFields = [];
+
+        foreach ($headers as $header) {
+            $fieldName = strtolower(InputHelper::alphanum($header, false, '_'));
+
+            // Skip columns with empty names as they cannot be mapped.
+            if (!empty($fieldName)) {
+                $importedFields[$fieldName] = $header;
+            }
+        }
+
+        return $importedFields;
+    }
 }

@@ -213,7 +213,7 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn('segment.membership');
 
         $reportMock->expects($this->exactly(2))
-            ->method('getColumns')
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->with()
             ->willReturn([]);
 

@@ -55,4 +55,21 @@ class DateTimeHelperTest extends \PHPUnit_Framework_TestCase
         $interval = $helper->buildInterval(4, 'S');
         $this->assertEquals(new \DateInterval('PT4S'), $interval);
     }
+
+    public function testvalidateMysqlDateTimeUnitWillThrowExceptionOnBadUnit()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        DateTimeHelper::validateMysqlDateTimeUnit('D');
+    }
+
+    public function testvalidateMysqlDateTimeUnitWillNotThrowExceptionOnExpectedUnit()
+    {
+        DateTimeHelper::validateMysqlDateTimeUnit('s');
+        DateTimeHelper::validateMysqlDateTimeUnit('i');
+        DateTimeHelper::validateMysqlDateTimeUnit('H');
+        DateTimeHelper::validateMysqlDateTimeUnit('d');
+        DateTimeHelper::validateMysqlDateTimeUnit('W');
+        DateTimeHelper::validateMysqlDateTimeUnit('m');
+        DateTimeHelper::validateMysqlDateTimeUnit('Y');
+    }
 }

@@ -57,6 +57,16 @@ class FormType extends AbstractType
             'attr'       => ['class' => 'form-control'],
         ]);
 
+        $builder->add('formAttributes', 'text', [
+            'label'      => 'mautic.form.field.form.form_attr',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
+            ],
+            'required'   => false,
+        ]);
+
         $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
@@ -105,6 +115,15 @@ class FormType extends AbstractType
                 'tooltip' => 'mautic.form.form.kioskmode.tooltip',
             ],
         ]);
+
+        $builder->add(
+            'noIndex',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.form.form.no_index',
+                'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
+            ]
+        );
 
         // Render style for new form by default
         if ($options['data']->getId() === null) {

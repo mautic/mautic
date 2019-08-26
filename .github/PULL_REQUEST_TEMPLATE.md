@@ -1,3 +1,5 @@
+**Please be sure you are submitting this against the _staging_ branch.**
+
 [//]: # ( Please answer the following questions: )
 
 | Q  | A
@@ -22,7 +24,7 @@
 2. 
 
 #### Steps to test this PR:
-1. 
+1. Load up [this PR](https://mautibox.com)
 2. 
 
 #### List deprecations along with the new alternative:

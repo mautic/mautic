@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -106,7 +105,8 @@ class LeadType extends AbstractType
             );
         }
 
-        $this->getFormFields($builder, $options);
+        $cleaningRules          = $this->getFormFields($builder, $options);
+        $cleaningRules['email'] = 'email';
 
         $builder->add(
             'tags',
@@ -199,7 +199,7 @@ class LeadType extends AbstractType
             );
         }
 
-        $builder->addEventSubscriber(new CleanFormSubscriber(['clean', 'raw', 'email' => 'email']));
+        $builder->addEventSubscriber(new CleanFormSubscriber($cleaningRules));
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

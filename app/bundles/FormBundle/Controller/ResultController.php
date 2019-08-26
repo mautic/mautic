@@ -124,6 +124,7 @@ class ResultController extends CommonFormController
                 'form'           => $form,
                 'withTotalCount' => true,
                 'viewOnlyFields' => $viewOnlyFields,
+                'simpleResults'  => true,
             ]
         );
 
@@ -204,19 +205,19 @@ class ResultController extends CommonFormController
             throw $this->createNotFoundException();
         }
 
-        if (!$this->get('mautic.security')->hasEntityAccess(
-            'form:forms:viewown',
-            'form:forms:viewother',
-            $submission->getForm()->getCreatedBy())
-        ) {
-            return $this->accessDenied();
-        }
-
         $results     = $submission->getResults();
         $fieldEntity = $submission->getFieldByAlias($field);
 
         if (empty($results[$field]) || $fieldEntity === null) {
             throw $this->createNotFoundException();
+        }
+
+        if (empty($fieldEntity->getProperties()['public']) && !$this->get('mautic.security')->hasEntityAccess(
+            'form:forms:viewown',
+            'form:forms:viewother',
+            $submission->getForm()->getCreatedBy())
+        ) {
+            return $this->accessDenied();
         }
 
         /** @var FormUploader $formUploader */

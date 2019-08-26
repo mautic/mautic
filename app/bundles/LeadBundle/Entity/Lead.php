@@ -17,14 +17,12 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class Lead.
- */
 class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -200,6 +198,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $color;
 
     /**
+     * @var LeadManipulator
+     */
+    private $manipulator = null;
+
+    /**
      * Sets if the IP was just created by LeadModel::getCurrentLead().
      *
      * @var bool
@@ -263,9 +266,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $channelRules = [];
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->ipAddresses      = new ArrayCollection();
@@ -292,7 +292,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addLifecycleEvent('checkDateIdentified', 'prePersist')
             ->addLifecycleEvent('checkAttributionDate', 'preUpdate')
             ->addLifecycleEvent('checkAttributionDate', 'prePersist')
-            ->addIndex(['date_added'], 'lead_date_added');
+            ->addLifecycleEvent('checkDateAdded', 'prePersist')
+            ->addIndex(['date_added'], 'lead_date_added')
+            ->addIndex(['date_identified'], 'date_identified');
 
         $builder->createField('id', 'integer')
             ->makePrimaryKey()
@@ -337,9 +339,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addInverseJoinColumn('ip_id', 'id', false)
             ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
             ->setIndexBy('ipAddress')
+            ->cascadeDetach()
             ->cascadeMerge()
             ->cascadePersist()
-            ->cascadeDetach()
             ->build();
 
         $builder->createOneToMany('pushIds', 'Mautic\NotificationBundle\Entity\PushID')
@@ -531,7 +533,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
         } elseif ($prop == 'ipAddresses') {
-            $this->changes['ipAddresses'] = ['', $val->getIpAddress()];
+            $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
+
+            if (empty($this->changes['ipAddressList'])) {
+                $this->changes['ipAddressList'] = [];
+            }
+
+            $this->changes['ipAddressList'][$val->getIpAddress()] = $val;
         } elseif ($prop == 'tags') {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();
@@ -1267,6 +1275,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @return bool
      */
+    public function wasAnonymous()
+    {
+        return $this->dateIdentified == null && $this->isAnonymous() === false;
+    }
+
+    /**
+     * @return bool
+     */
     protected function getFirstSocialIdentity()
     {
         if (isset($this->fields['social'])) {
@@ -1284,6 +1300,26 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param LeadManipulator|null $manipulator
+     *
+     * @return self
+     */
+    public function setManipulator(LeadManipulator $manipulator = null)
+    {
+        $this->manipulator = $manipulator;
+
+        return $this;
+    }
+
+    /**
+     * @return LeadManipulator|null
+     */
+    public function getManipulator()
+    {
+        return $this->manipulator;
     }
 
     /**
@@ -1553,9 +1589,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function checkDateIdentified()
     {
-        if ($this->dateIdentified == null && $this->isAnonymous() === false) {
+        if ($this->wasAnonymous()) {
             $this->dateIdentified            = new \DateTime();
             $this->changes['dateIdentified'] = ['', $this->dateIdentified];
+        }
+    }
+
+    /**
+     * Set date added if not already set.
+     */
+    public function checkDateAdded()
+    {
+        if (null === $this->getDateAdded()) {
+            $this->setDateAdded(new \DateTime());
         }
     }
 
@@ -1703,6 +1749,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->mobile = $mobile;
 
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLeadPhoneNumber()
+    {
+        return $this->getMobile() ?: $this->getPhone();
     }
 
     /**

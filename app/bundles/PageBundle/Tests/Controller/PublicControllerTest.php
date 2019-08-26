@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
@@ -227,7 +228,9 @@ class PublicControllerTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->attributes->set('ignore_mismatch', true);
 
-        $publicController = new \Mautic\PageBundle\Controller\PublicController();
+        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
+
+        $publicController = new \Mautic\PageBundle\Controller\PublicController($deviceTrackingService);
         $publicController->setContainer($container);
         $publicController->setRequest($request);
 

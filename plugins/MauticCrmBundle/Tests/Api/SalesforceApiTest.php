@@ -263,4 +263,141 @@ class SalesforceApiTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($message, $exception->getMessage());
         }
     }
+
+    /**
+     * @testdox Test that a backslash and a single quote are escaped for SF queries
+     *
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
+     */
+    public function testCompanyQueryIsEscapedCorrectly()
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['cleanPushData'])
+            ->getMock();
+
+        $integration->expects($this->exactly(1))
+            ->method('mergeConfigToFeatureSettings')
+            ->willReturn(
+                [
+                    'objects' => [
+                        'company',
+                    ],
+                ]
+            );
+
+        $integration->expects($this->exactly(1))
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                    $this->assertEquals(
+                        $parameters,
+                        [
+                            'q' => 'select Id from Account where Name = \'Some\\\\thing E\\\'lse\' and BillingCountry =  \'Some\\\\Where E\\\'lse\' and BillingCity =  \'Some\\\\Where E\\\'lse\' and BillingState =  \'Some\\\\Where E\\\'lse\'',
+                        ]
+                    );
+                }
+            );
+
+        $api = new SalesforceApi($integration);
+
+        $api->getCompany(
+            [
+                'company' => [
+                    'BillingCountry' => 'Some\\Where E\'lse',
+                    'BillingCity'    => 'Some\\Where E\'lse',
+                    'BillingState'   => 'Some\\Where E\'lse',
+                    'Name'           => 'Some\\thing E\'lse',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @testdox Test that a backslash and a single quote are escaped for SF queries
+     *
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
+     */
+    public function testContactQueryIsEscapedCorrectly()
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['cleanPushData'])
+            ->getMock();
+
+        $integration->expects($this->exactly(1))
+            ->method('mergeConfigToFeatureSettings')
+            ->willReturn(
+                [
+                    'objects' => [
+                        'Contact',
+                    ],
+                ]
+            );
+
+        $integration->expects($this->exactly(1))
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                    $this->assertEquals(
+                        $parameters,
+                        [
+                            'q' => 'select Id from Contact where email = \'con\\\\tact\\\'email@email.com\'',
+                        ]
+                    );
+                }
+            );
+
+        $api = new SalesforceApi($integration);
+
+        $api->getPerson([
+            'Contact' => [
+                'Email' => 'con\\tact\'email@email.com',
+            ],
+        ]);
+    }
+
+    /**
+     * @testdox Test that a backslash and a single quote are escaped for SF queries
+     *
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::escapeQueryValue()
+     */
+    public function testLeadQueryIsEscapedCorrectly()
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->setMethodsExcept(['cleanPushData'])
+            ->getMock();
+
+        $integration->expects($this->exactly(1))
+            ->method('mergeConfigToFeatureSettings')
+            ->willReturn(
+                [
+                    'objects' => [
+                        'Lead',
+                    ],
+                ]
+            );
+
+        $integration->expects($this->exactly(1))
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function ($url, $parameters = [], $method = 'GET', $settings = []) {
+                    $this->assertEquals(
+                        $parameters,
+                        [
+                            'q' => 'select Id from Lead where email = \'con\\\\tact\\\'email@email.com\' and ConvertedContactId = NULL',
+                        ]
+                    );
+                }
+            );
+
+        $api = new SalesforceApi($integration);
+
+        $api->getPerson([
+            'Lead' => [
+                'Email' => 'con\\tact\'email@email.com',
+            ],
+        ]);
+    }
 }

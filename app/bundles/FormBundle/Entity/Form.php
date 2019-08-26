@@ -38,6 +38,11 @@ class Form extends FormEntity
     /**
      * @var string
      */
+    private $formAttributes;
+
+    /**
+     * @var string
+     */
     private $description;
 
     /**
@@ -119,6 +124,11 @@ class Form extends FormEntity
     private $formType;
 
     /**
+     * @var bool
+     */
+    private $noIndex;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
@@ -155,6 +165,8 @@ class Form extends FormEntity
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
@@ -211,6 +223,11 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -294,6 +311,8 @@ class Form extends FormEntity
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
+                    'formAttributes',
                 ]
             )
             ->build();
@@ -769,6 +788,48 @@ class Form extends FormEntity
         $this->formType = $formType;
 
         return $this;
+    }
+
+    /**
+     * Set noIndex.
+     *
+     * @param bool $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $this->isChanged('noIndex', $noIndex);
+        $this->noIndex = $noIndex;
+    }
+
+    /**
+     * Get noIndex.
+     *
+     * @return bool
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param string $formAttributes
+     *
+     * @return Form
+     */
+    public function setFormAttributes($formAttributes)
+    {
+        $this->isChanged('formAttributes', $formAttributes);
+        $this->formAttributes = $formAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
     }
 
     /**

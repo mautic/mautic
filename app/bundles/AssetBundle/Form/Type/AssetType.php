@@ -85,6 +85,18 @@ class AssetType extends AbstractType
         $builder->add('originalFileName', 'hidden', [
             'required' => false,
         ]);
+        $builder->add(
+            'disallow',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.asset.asset.form.disallow.crawlers',
+                'attr'  => [
+                    'tooltip'      => 'mautic.asset.asset.form.disallow.crawlers.descr',
+                    'data-show-on' => '{"asset_storageLocation_0":"checked"}',
+                ],
+                'data'=> empty($options['data']->getDisallow()) ? false : true,
+            ]
+        );
 
         $builder->add('remotePath', 'text', [
             'label'      => 'mautic.asset.asset.form.remotePath',

@@ -59,8 +59,9 @@ class ConfigSubscriber extends CommonSubscriber
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             // parameters defined this way because of the reason as above.
             'parameters' => [
+                'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
-                'track_by_tracking_url'                 => true,
+                'track_by_tracking_url'                 => false,
                 'track_by_fingerprint'                  => false,
                 'facebook_pixel_id'                     => null,
                 'facebook_pixel_trackingpage_enabled'   => false,
@@ -68,6 +69,7 @@ class ConfigSubscriber extends CommonSubscriber
                 'google_analytics_id'                   => null,
                 'google_analytics_trackingpage_enabled' => false,
                 'google_analytics_landingpage_enabled'  => false,
+                'google_analytics_anonymize_ip'         => false,
             ],
         ]);
     }

@@ -107,10 +107,9 @@ class PageSubscriber extends CommonSubscriber
 
                     //pouplate get parameters
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
-
-                    $content = preg_replace('#{form='.$id.'}#', $formHtml, $content);
+                    $content = str_replace('{form='.$id.'}', $formHtml, $content);
                 } else {
-                    $content = preg_replace('#{form='.$id.'}#', '', $content);
+                    $content = str_replace('{form='.$id.'}', '', $content);
                 }
             }
         }

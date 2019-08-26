@@ -4242,7 +4242,9 @@
               editor.selection.restore();
             }
             else {
-              editor.$el.html('<br/>');
+              if (!editor.$el.is('img')) {
+                  editor.$el.html('<br/>');
+              }
             }
           }
         }

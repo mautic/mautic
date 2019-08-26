@@ -25,9 +25,9 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.dashboard.
                     <div class="list-group">
                         <?php foreach ($dashboards as $dashboard => $config) : ?>
                             <div class="list-group-item mt-md <?php echo ($dashboard == $preview) ? 'active' : ''; ?>">
-                                <h4 class="list-group-item-heading"><?php echo $config['name']; ?></h4>
+                                <h4 class="list-group-item-heading"><?php echo $view->escape($config['name']); ?></h4>
                                 <?php if (!empty($config['description'])):?>
-                                <p class="small"><?php echo $config['description']; ?></p>
+                                <p class="small"><?php echo $view->escape($config['description']); ?></p>
                                 <?php endif; ?>
                                 <p class="list-group-item-text">
                                     <a href="<?php echo $view['router']->path('mautic_dashboard_action', ['objectAction' => 'import', 'preview' => $dashboard]); ?>">

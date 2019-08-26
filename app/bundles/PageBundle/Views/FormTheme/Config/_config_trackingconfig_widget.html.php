@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
-                <?php if (in_array($name, ['track_contact_by_ip', 'track_by_tracking_url', 'track_by_fingerprint'])) {
+                <?php if (in_array($name, ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'track_by_fingerprint'])) {
     ?>
                         <div class="col-md-6">
                             <?php echo $view['form']->row($f); ?>
@@ -65,7 +65,7 @@
         <?php echo $view['form']->row($form['google_analytics_id']); ?>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
-                <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled'])) {
+                <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled', 'google_analytics_anonymize_ip'])) {
                 ?>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($f); ?>
