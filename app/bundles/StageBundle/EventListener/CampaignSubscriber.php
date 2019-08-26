@@ -14,7 +14,6 @@ namespace Mautic\StageBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
