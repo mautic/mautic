@@ -34,15 +34,15 @@ class IntegrationToken implements TokenInterface
     /**
      * @return string The access token
      */
-    public function getAccessToken()
+    public function getAccessToken(): string
     {
         return $this->accessToken;
     }
 
     /**
-     * @return string|null The refresh token
+     * @return string The refresh token
      */
-    public function getRefreshToken()
+    public function getRefreshToken(): string
     {
         return $this->refreshToken;
     }
@@ -50,7 +50,7 @@ class IntegrationToken implements TokenInterface
     /**
      * @return int The expiration timestamp
      */
-    public function getExpiresAt()
+    public function getExpiresAt(): int
     {
         return $this->expiresAt;
     }
@@ -58,7 +58,7 @@ class IntegrationToken implements TokenInterface
     /**
      * @return boolean
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         return $this->expiresAt && $this->expiresAt < time();
     }

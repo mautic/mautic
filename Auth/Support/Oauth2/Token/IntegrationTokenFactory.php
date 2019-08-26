@@ -24,7 +24,7 @@ class IntegrationTokenFactory implements TokenFactoryInterface
         $this->extraKeysToStore = $extraKeysToStore;
     }
 
-    public function __invoke(array $data, TokenInterface $previousToken = null)
+    public function __invoke(array $data, TokenInterface $previousToken = null): IntegrationToken
     {
         $accessToken = null;
         $refreshToken = null;
