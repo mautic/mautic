@@ -39,8 +39,6 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->fieldModel = $this->createMock(FieldModel::class);
-        $this->fieldModel->method('getFieldList')
-            ->willReturn([ 'email' => 'Email']);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
         $this->channelListHelper->method('getFeatureChannels')
@@ -49,6 +47,9 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testContactSyncFieldsReturned()
     {
+        $this->fieldModel->method('getFieldList')
+            ->willReturn([ 'email' => 'Email']);
+            
         $fields = $this->getFieldHelper()->getSyncFields(MauticSyncDataExchange::OBJECT_CONTACT);
 
         $this->assertEquals(['mautic_internal_dnc_email', 'mautic_internal_id', 'mautic_internal_contact_timeline', 'email'], array_keys($fields));
@@ -56,9 +57,43 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testCompanySyncFieldsReturned()
     {
+        $this->fieldModel->method('getFieldList')
+            ->willReturn([ 'email' => 'Email']);
+
         $fields = $this->getFieldHelper()->getSyncFields(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->assertEquals(['mautic_internal_id', 'email'], array_keys($fields));
+    }
+
+    public function testGetRequiredFieldsForContact(): void
+    {
+        $this->fieldModel->expects($this->once())
+            ->method('getFieldList')
+            ->willReturn(['some fields']);
+
+        $this->fieldModel->expects($this->once())
+            ->method('getUniqueIdentifierFields')
+            ->willReturn(['some unique fields']);
+
+        $this->assertSame(
+            ['some fields', 'some unique fields'],
+            $this->getFieldHelper()->getRequiredFields('lead')
+        );
+    }
+
+    public function testGetRequiredFieldsForCompany(): void
+    {
+        $this->fieldModel->expects($this->once())
+            ->method('getFieldList')
+            ->willReturn(['some fields']);
+
+        $this->fieldModel->expects($this->never())
+            ->method('getUniqueIdentifierFields');
+
+        $this->assertSame(
+            ['some fields'],
+            $this->getFieldHelper()->getRequiredFields('company')
+        );
     }
 
     private function getFieldHelper()
