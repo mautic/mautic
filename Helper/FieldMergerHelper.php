@@ -75,7 +75,7 @@ class FieldMergerHelper
     {
         // Merge updated fields into current fields
         foreach ($updatedFieldMappings as $fieldName => $fieldMapping) {
-            if (!isset($this->currentFieldMappings[$object][$fieldName])) {
+            if (!isset($this->allFields[$fieldName])) {
                 // Ignore as this field doesn't exist
                 continue;
             }
@@ -88,8 +88,11 @@ class FieldMergerHelper
             }
 
             if (isset($this->currentFieldMappings[$object][$fieldName])) {
-                // Merge
-                $this->currentFieldMappings[$object][$fieldName] = array_merge($this->currentFieldMappings[$object][$fieldName], $fieldMapping);
+                // Merge the data
+                $this->currentFieldMappings[$object][$fieldName] = [
+                    'mappedField'   => $this->getMergedMappedField($fieldMapping, $object, $fieldName),
+                    'syncDirection' => $this->getMergedSyncDirection($fieldMapping, $object, $fieldName),
+                ];
 
                 continue;
             }
@@ -100,8 +103,8 @@ class FieldMergerHelper
                 continue;
             }
 
-            if (!isset($fieldMapping['syncDirection'])) {
-                $fieldMapping['syncDirection'] = $this->getFieldDirection($object, $fieldName);
+            if (empty($fieldMapping['syncDirection'])) {
+                $fieldMapping['syncDirection'] = $this->getDefaultSyncDirection($object, $fieldName);
             }
 
             $this->currentFieldMappings[$object][$fieldName] = $fieldMapping;
@@ -111,9 +114,28 @@ class FieldMergerHelper
     /**
      * @throws InvalidFormOptionException
      */
-    private function getFieldDirection(string $object, string $fieldName): string
+    private function getDefaultSyncDirection(string $object, string $fieldName): string
     {
-        $field = $this->allFields[$fieldName];
+        $supportedDirections = $this->getSupportedSyncDirections($fieldName);
+
+        if (!empty($this->currentFieldMappings[$object][$fieldName]['syncDirection'])
+            && in_array(
+                $this->currentFieldMappings[$object][$fieldName]['syncDirection'],
+                $supportedDirections
+            )) {
+            // Keep the already configured value
+            return $this->currentFieldMappings[$object][$fieldName]['syncDirection'];
+        }
+
+        return reset($supportedDirections);
+    }
+
+    /**
+     * @throws InvalidFormOptionException
+     */
+    private function getSupportedSyncDirections(string $fieldName): array
+    {
+        $field               = $this->allFields[$fieldName];
         $supportedDirections = [];
 
         if ($field->isBidirectionalSyncEnabled()) {
@@ -132,15 +154,30 @@ class FieldMergerHelper
             throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
         }
 
-        if (!empty($this->currentFieldMappings[$object][$fieldName]['syncDirection'])
-            && in_array(
-                $this->currentFieldMappings[$object][$fieldName]['syncDirection'],
-                $supportedDirections
-            )) {
-            // Keep the already configured value
-            return $this->currentFieldMappings[$object][$fieldName]['syncDirection'];
+        return $supportedDirections;
+    }
+
+    private function getMergedSyncDirection(array $fieldMapping, string $object, string $fieldName): string
+    {
+        if (empty($fieldMapping['syncDirection'])) {
+            return $this->getDefaultSyncDirection($object, $fieldName);
+        }
+
+        $supportedDirections = $this->getSupportedSyncDirections($fieldName);
+        if (in_array($fieldMapping['syncDirection'], $supportedDirections)) {
+            return $fieldMapping['syncDirection'];
         }
 
         return reset($supportedDirections);
+    }
+
+    private function getMergedMappedField(array $fieldMapping, string $object, string $fieldName): string
+    {
+        if (empty($fieldMapping['mappedField'])) {
+            // Updating just the sync direction so return original value
+            return $this->currentFieldMappings[$object][$fieldName]['mappedField'];
+        }
+
+        return $fieldMapping['mappedField'];
     }
 }
