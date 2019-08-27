@@ -51,7 +51,7 @@ class FieldPaginationController extends CommonController
             return $this->notFound();
         }
 
-        $keyword         = $request->get('keyword');
+        $keyword         = $request->get('keyword', '');
         $featureSettings = $integrationConfiguration->getFeatureSettings();
         $currentFields   = $this->getFields($integrationObject, $featureSettings, $object);
 
