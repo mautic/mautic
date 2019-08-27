@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
+use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
 class FieldMergerHelper
@@ -29,11 +31,10 @@ class FieldMergerHelper
     private $currentFieldMappings;
 
     /**
-     * FieldMergerHelper constructor.
-     *
-     * @param ConfigFormSyncInterface $integrationObject
-     * @param array                   $currentFieldMappings
+     * @var MappedFieldInfoInterface[]
      */
+    private $allFields;
+
     public function __construct(ConfigFormSyncInterface $integrationObject, array $currentFieldMappings)
     {
         $this->integrationObject    = $integrationObject;
@@ -41,47 +42,44 @@ class FieldMergerHelper
     }
 
     /**
-     * @param string $object
-     * @param array  $updatedFieldMappings
+     * @throws InvalidFormOptionException
      */
     public function mergeSyncFieldMapping(string $object, array $updatedFieldMappings): void
     {
+        $this->allFields = $this->integrationObject->getAllFieldsForMapping($object);
+
         $this->removeNonExistentFieldMappings($object);
 
         $this->bindUpdatedFieldMappings($object, $updatedFieldMappings);
     }
 
-    /**
-     * @return array
-     */
     public function getFieldMappings(): array
     {
         return $this->currentFieldMappings;
     }
 
-    /**
-     * @param string $object
-     */
     private function removeNonExistentFieldMappings(string $object): void
     {
-        $allFields = $this->integrationObject->getAllFieldsForMapping($object);
-
         if (!isset($this->currentFieldMappings[$object])) {
             $this->currentFieldMappings[$object] = [];
         }
 
         // Remove any fields that no longer exist
-        $this->currentFieldMappings[$object] = array_intersect_key($this->currentFieldMappings[$object], $allFields);
+        $this->currentFieldMappings[$object] = array_intersect_key($this->currentFieldMappings[$object], $this->allFields);
     }
 
     /**
-     * @param string $object
-     * @param array  $updatedFieldMappings
+     * @throws InvalidFormOptionException
      */
     private function bindUpdatedFieldMappings(string $object, array $updatedFieldMappings): void
     {
         // Merge updated fields into current fields
         foreach ($updatedFieldMappings as $fieldName => $fieldMapping) {
+            if (!isset($this->allFields[$fieldName])) {
+                // Ignore as this field doesn't exist
+                continue;
+            }
+
             if (isset($this->currentFieldMappings[$object][$fieldName]) && !$fieldMapping) {
                 // Mapping was deleted
                 unset($this->currentFieldMappings[$object][$fieldName]);
@@ -90,25 +88,96 @@ class FieldMergerHelper
             }
 
             if (isset($this->currentFieldMappings[$object][$fieldName])) {
-                // Merge
-                $this->currentFieldMappings[$object][$fieldName] = array_merge($this->currentFieldMappings[$object][$fieldName], $fieldMapping);
+                // Merge the data
+                $this->currentFieldMappings[$object][$fieldName] = [
+                    'mappedField'   => $this->getMergedMappedField($fieldMapping, $object, $fieldName),
+                    'syncDirection' => $this->getMergedSyncDirection($fieldMapping, $object, $fieldName),
+                ];
 
                 continue;
             }
 
-            if (!isset($fieldMapping['mappedField'])) {
+            if (empty($fieldMapping['mappedField'])) {
                 // Ignore this one because just direction was updated without a mapped field
-                unset($this->currentFieldMappings[$object][$fieldName]);
 
                 continue;
             }
 
-            if (!isset($fieldMapping['syncDirection'])) {
-                // Set the default sync direction
-                $fieldMapping['syncDirection'] = ObjectMappingDAO::SYNC_BIDIRECTIONALLY;
+            if (empty($fieldMapping['syncDirection'])) {
+                $fieldMapping['syncDirection'] = $this->getDefaultSyncDirection($object, $fieldName);
             }
 
             $this->currentFieldMappings[$object][$fieldName] = $fieldMapping;
         }
+    }
+
+    /**
+     * @throws InvalidFormOptionException
+     */
+    private function getDefaultSyncDirection(string $object, string $fieldName): string
+    {
+        $supportedDirections = $this->getSupportedSyncDirections($fieldName);
+
+        if (!empty($this->currentFieldMappings[$object][$fieldName]['syncDirection'])
+            && in_array(
+                $this->currentFieldMappings[$object][$fieldName]['syncDirection'],
+                $supportedDirections
+            )) {
+            // Keep the already configured value
+            return $this->currentFieldMappings[$object][$fieldName]['syncDirection'];
+        }
+
+        return reset($supportedDirections);
+    }
+
+    /**
+     * @throws InvalidFormOptionException
+     */
+    private function getSupportedSyncDirections(string $fieldName): array
+    {
+        $field               = $this->allFields[$fieldName];
+        $supportedDirections = [];
+
+        if ($field->isBidirectionalSyncEnabled()) {
+            $supportedDirections[] = ObjectMappingDAO::SYNC_BIDIRECTIONALLY;
+        }
+
+        if ($field->isToIntegrationSyncEnabled()) {
+            $supportedDirections[] = ObjectMappingDAO::SYNC_TO_INTEGRATION;
+        }
+
+        if ($field->isToMauticSyncEnabled()) {
+            $supportedDirections[] = ObjectMappingDAO::SYNC_TO_MAUTIC;
+        }
+
+        if (empty($supportedDirections)) {
+            throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
+        }
+
+        return $supportedDirections;
+    }
+
+    private function getMergedSyncDirection(array $fieldMapping, string $object, string $fieldName): string
+    {
+        if (empty($fieldMapping['syncDirection'])) {
+            return $this->getDefaultSyncDirection($object, $fieldName);
+        }
+
+        $supportedDirections = $this->getSupportedSyncDirections($fieldName);
+        if (in_array($fieldMapping['syncDirection'], $supportedDirections)) {
+            return $fieldMapping['syncDirection'];
+        }
+
+        return reset($supportedDirections);
+    }
+
+    private function getMergedMappedField(array $fieldMapping, string $object, string $fieldName): string
+    {
+        if (empty($fieldMapping['mappedField'])) {
+            // Updating just the sync direction so return original value
+            return $this->currentFieldMappings[$object][$fieldName]['mappedField'];
+        }
+
+        return $fieldMapping['mappedField'];
     }
 }

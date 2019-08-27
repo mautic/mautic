@@ -166,6 +166,7 @@ class ConfigController extends AbstractFormController
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($this->form)) {
             // Regenerate the form
+            $this->resetFieldsInSession();
             $this->form = $this->getForm();
 
             return $this->showForm();
@@ -255,9 +256,7 @@ class ConfigController extends AbstractFormController
      */
     private function closeForm()
     {
-        /** @var Session $session */
-        $session = $this->get('session');
-        $session->remove("{$this->integrationObject->getName()}-fields");
+        $this->resetFieldsInSession();
 
         $response = [
             'closeModal'    => 1,
@@ -273,5 +272,10 @@ class ConfigController extends AbstractFormController
         return new JsonResponse($response);
     }
 
-
+    private function resetFieldsInSession(): void
+    {
+        /** @var Session $session */
+        $session = $this->get('session');
+        $session->remove("{$this->integrationObject->getName()}-fields");
+    }
 }
