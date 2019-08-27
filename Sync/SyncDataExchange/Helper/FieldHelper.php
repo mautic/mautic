@@ -206,6 +206,11 @@ class FieldHelper
             ]
         );
 
+        // We don't use unique identifier field for companies.
+        if ('company' === $object) {
+            return $requiredFields;
+        }
+
         $uniqueIdentifierFields = $this->fieldModel->getUniqueIdentifierFields(
             [
                 'isPublished' => true,
