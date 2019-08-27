@@ -47,7 +47,7 @@ class FieldFilterHelper
 
     public function filterFieldsByKeyword(string $objectName, string $keyword, int $page, int $limit = 15): void
     {
-        $allFields = $this->integrationObject->getAllFieldsForMapping($objectName);
+        $allFields            = $this->integrationObject->getAllFieldsForMapping($objectName);
         $this->filteredFields = $this->getFieldsByKeyword($allFields, $keyword);
 
         // Paginate filtered fields
