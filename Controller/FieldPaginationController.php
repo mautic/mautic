@@ -56,7 +56,11 @@ class FieldPaginationController extends CommonController
         $currentFields   = $this->getFields($integrationObject, $featureSettings, $object);
 
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
-        $fieldFilterHelper->filterFieldsByKeyword($object, $keyword, $page);
+        if ($keyword) {
+            $fieldFilterHelper->filterFieldsByKeyword($object, $keyword, $page);
+        } else {
+            $fieldFilterHelper->filterFieldsByPage($object, $page);
+        }
 
         // Create the form
         $form = $this->get('form.factory')->create(
