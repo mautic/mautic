@@ -75,6 +75,11 @@ class FieldMergerHelper
     {
         // Merge updated fields into current fields
         foreach ($updatedFieldMappings as $fieldName => $fieldMapping) {
+            if (!isset($this->currentFieldMappings[$object][$fieldName])) {
+                // Ignore as this field doesn't exist
+                continue;
+            }
+
             if (isset($this->currentFieldMappings[$object][$fieldName]) && !$fieldMapping) {
                 // Mapping was deleted
                 unset($this->currentFieldMappings[$object][$fieldName]);
@@ -108,25 +113,34 @@ class FieldMergerHelper
      */
     private function getFieldDirection(string $object, string $fieldName): string
     {
-        if (!empty($this->currentFieldMappings[$object][$fieldName]['syncDirection'])) {
+        $field = $this->allFields[$fieldName];
+        $supportedDirections = [];
+
+        if ($field->isBidirectionalSyncEnabled()) {
+            $supportedDirections[] = ObjectMappingDAO::SYNC_BIDIRECTIONALLY;
+        }
+
+        if ($field->isToIntegrationSyncEnabled()) {
+            $supportedDirections[] = ObjectMappingDAO::SYNC_TO_INTEGRATION;
+        }
+
+        if ($field->isToMauticSyncEnabled()) {
+            $supportedDirections[] = ObjectMappingDAO::SYNC_TO_MAUTIC;
+        }
+
+        if (empty($supportedDirections)) {
+            throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
+        }
+
+        if (!empty($this->currentFieldMappings[$object][$fieldName]['syncDirection'])
+            && in_array(
+                $this->currentFieldMappings[$object][$fieldName]['syncDirection'],
+                $supportedDirections
+            )) {
             // Keep the already configured value
             return $this->currentFieldMappings[$object][$fieldName]['syncDirection'];
         }
 
-        $field = $this->allFields[$fieldName];
-
-        if ($field->isBidirectionalSyncEnabled()) {
-           return ObjectMappingDAO::SYNC_BIDIRECTIONALLY;
-        }
-
-        if ($field->isToIntegrationSyncEnabled()) {
-            return ObjectMappingDAO::SYNC_TO_INTEGRATION;
-        }
-
-        if ($field->isToMauticSyncEnabled()) {
-            return ObjectMappingDAO::SYNC_TO_MAUTIC;
-        }
-
-        throw new InvalidFormOptionException('field "'.$field->getName().'" must allow at least 1 direction for sync');
+        return reset($supportedDirections);
     }
 }

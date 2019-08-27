@@ -24,9 +24,8 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
     public function testNonExistingFieldsAreRemoved()
     {
         $fields = $this->getCurrentFieldMappings();
-        unset($fields['Lead']['field1']);
 
-        $integrationObject = $this->getIntegrationObject();
+        $integrationObject = $this->getIntegrationObject(true);
         $fieldMergerHelper = new FieldMergerHelper($integrationObject, $fields);
 
         $updatedFieldMappings = [
@@ -292,7 +291,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|ConfigFormSyncInterface
      */
-    private function getIntegrationObject()
+    private function getIntegrationObject(bool $removeFirstField = false): ConfigFormSyncInterface
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getName')
@@ -310,22 +309,26 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $field5->method('getName')
             ->willReturn('field five');
 
+        $fields = [
+            'field1' => $field1,
+            'field2' => $field2,
+            'field3' => $field3,
+            'field4' => $field4,
+            'field5' => $field5,
+        ];
+
+        if ($removeFirstField) {
+            unset($fields['field1']);
+        }
+
         $integrationObject = $this->createMock(ConfigFormSyncInterface::class);
         $integrationObject->method('getAllFieldsForMapping')
-            ->willReturn(
-                [
-                    'field1' => $field1,
-                    'field2' => $field2,
-                    'field3' => $field3,
-                    'field4' => $field4,
-                    'field5' => $field5,
-                ]
-            );
+            ->willReturn($fields);
 
         return $integrationObject;
     }
 
-    private function getCurrentFieldMappings()
+    private function getCurrentFieldMappings(): array
     {
         return [
             'Lead' => [
