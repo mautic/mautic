@@ -51,6 +51,22 @@ class FieldFilterHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($filteredFields['field5']));
     }
 
+    public function testFieldsFilteredByEmptyKeywordAndPage()
+    {
+        $integrationObject = $this->getIntegrationObject();
+        $fieldFilterHelper = new FieldFilterHelper($integrationObject);
+
+        $fieldFilterHelper->filterFieldsByKeyword('test', '',2, 3);
+        $this->assertEquals(5, $fieldFilterHelper->getTotalFieldCount());
+        $filteredFields = $fieldFilterHelper->getFilteredFields();
+
+        $this->assertFalse(isset($filteredFields['field1']));
+        $this->assertFalse(isset($filteredFields['field2']));
+        $this->assertFalse(isset($filteredFields['field3']));
+        $this->assertTrue(isset($filteredFields['field4']));
+        $this->assertTrue(isset($filteredFields['field5']));
+    }
+
     public function testFieldsFilteredByKeywordAndPage()
     {
         $integrationObject = $this->getIntegrationObject();
