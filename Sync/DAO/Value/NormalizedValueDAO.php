@@ -16,22 +16,23 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Value;
  */
 class NormalizedValueDAO
 {
-    const STRING_TYPE = 'string';
-    const TEXT_TYPE = 'text';
-    const TEXTAREA_TYPE = 'textarea';
-    const URL_TYPE = 'url';
-    const EMAIL_TYPE = 'email';
-    const INT_TYPE = 'int';
-    const FLOAT_TYPE = 'float';
-    const DOUBLE_TYPE = 'double';
+    const BOOLEAN_TYPE = 'boolean';
     const DATE_TYPE = 'date';
     const DATETIME_TYPE = 'datetime';
-    const BOOLEAN_TYPE = 'boolean';
-    const REGION_TYPE = 'region';
-    const SELECT_TYPE = 'select';
-    const MULTISELECT_TYPE = 'multiselect';
+    const DOUBLE_TYPE = 'double';
+    const EMAIL_TYPE = 'email';
+    const FLOAT_TYPE = 'float';
+    const INT_TYPE = 'int';
     const LOOKUP_TYPE = 'lookup';
+    const MULTISELECT_TYPE = 'multiselect';
     const PHONE_TYPE = 'phone';
+    const SELECT_TYPE = 'select';
+    const STRING_TYPE = 'string';
+    const REGION_TYPE = 'region';
+    const TEXT_TYPE = 'text';
+    const TEXTAREA_TYPE = 'textarea';
+    const TIME_TYPE = 'time';
+    const URL_TYPE = 'url';
 
     /**
      * @var string
