@@ -303,7 +303,7 @@ class EventLogger
      */
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {
-        $rotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
+        $rotations              = $this->leadRepository->getContactRotations($contactIds, $campaignId);
         $this->contactRotations = array_replace($this->contactRotations, $rotations);
     }
 
