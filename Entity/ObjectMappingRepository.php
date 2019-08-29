@@ -91,7 +91,7 @@ class ObjectMappingRepository  extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
             ->set('integration_object_name', ':newObjectName')
             ->set('integration_object_id', ':newObjectId')
             ->where(
@@ -107,7 +107,7 @@ class ObjectMappingRepository  extends CommonRepository
             ->setParameter('oldObjectName', $oldObjectName)
             ->setParameter('oldObjectId', $oldObjectId);
 
-        return $qb->execute()->rowCount();
+        return $qb->execute();
     }
 
     /**
