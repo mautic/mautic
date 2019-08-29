@@ -145,7 +145,10 @@ class EventLogger
             // Likely a single contact handle such as decision processing
             $this->hydrateContactRotationsForNewLogs([$contact->getId()], $event->getCampaign()->getId());
         }
-        $log->setRotation($this->contactRotations[$contact->getId()]);
+        // A new contact added with master/slave db may still not have a discernible rotation.
+        if (isset($this->contactRotations[$contact->getId()])) {
+            $log->setRotation($this->contactRotations[$contact->getId()]);
+        }
 
         return $this->deDuplicate($log);
     }
@@ -301,11 +304,7 @@ class EventLogger
     public function hydrateContactRotationsForNewLogs(array $contactIds, $campaignId)
     {
         $rotations = $this->leadRepository->getContactRotations($contactIds, $campaignId);
-        if (1 === count($contactIds)) {
-            $this->contactRotations = array_replace($this->contactRotations, $rotations);
-        } else {
-            $this->contactRotations = $rotations;
-        }
+        $this->contactRotations = array_replace($this->contactRotations, $rotations);
     }
 
     private function persistPendingAndInsertIntoLogStack()
