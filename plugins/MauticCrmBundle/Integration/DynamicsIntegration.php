@@ -342,8 +342,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            //$dynamicsFields[$dynamicsObject] = $fields;
-                            //continue;
+                            $dynamicsFields[$dynamicsObject] = $fields;
+                            continue;
                         }
                         $leadObject = $this->getApiHelper()->getLeadFields($dynamicsObject);
                         if (null === $leadObject || !array_key_exists('value', $leadObject)) {
