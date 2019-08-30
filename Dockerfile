@@ -16,3 +16,4 @@ COPY .docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 COPY .docker/000-default.conf /etc/apache2/sites-enabled
 COPY . /var/www/html
 COPY --from=vendor /app/vendor/ /var/www/html/vendor/
+RUN chmod -R 777 /var/www/html/app/cache/

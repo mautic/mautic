@@ -1,13 +1,13 @@
 version: "3.1"
 services:
-  mariadb:
-    image: mariadb:10.2
+  mysql:
+    image: mysql:5.7
     ports:
       - 3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: SuperPassword123456!
       MYSQL_DATABASE: dev_mautic
-      MYSQL_USER: username
+      MYSQL_USER: mautic
       MYSQL_PASSWORD: password
     volumes:
       - db_data:/var/lib/mysql
@@ -18,8 +18,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:80
+    env_file: .env
     volumes:
-      - .:/var/www/html:cached
+      - .:/var/www/html
   redis:
     image: redis
 volumes:
