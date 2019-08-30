@@ -70,7 +70,7 @@ pipeline {
       }
       steps {
         script {
-          def githubPR = httpRequest acceptType: 'APPLICATION_JSON', authentication: 'c6c13656-2d08-4391-b324-95085e23ce59', url: "https://api.github.com/repos/mautic-inc/mautic-cloud/pulls/${CHANGE_ID}", validResponseCodes: '200'
+          def githubPR = httpRequest acceptType: 'APPLICATION_JSON', authentication: 'c6c13656-2d08-4391-b324-95085e23ce59', url: "https://api.github.com/repos/mautic-inc/plugin-integrations/pulls/${CHANGE_ID}", validResponseCodes: '200'
           def githubPRObject = readJSON text: githubPR.getContent()
 
           echo "Title: "+githubPRObject.title
