@@ -300,11 +300,18 @@ class DynamicsIntegration extends CrmAbstractIntegration
     {
         $leadFields    = [];
         $contactFields = [];
-        $settings      = $this->mergeConfigToFeatureSettings();
-        if (isset($settings['objects']) && in_array('leads', $settings['objects'])) {
+        if (isset($settings['feature_settings']['objects'])) {
+            $objects = $settings['feature_settings']['objects'];
+        } else {
+            $settings                                = $this->mergeConfigToFeatureSettings();
+            $objects                                 = $settings['objects'];
+            $settings['feature_settings']['objects'] = $objects;
+        }
+
+        if (in_array('leads', $objects)) {
             $leadFields    = $this->getFormFieldsByObject('leads', $settings);
         }
-        if (isset($settings['objects']) && in_array('contacts', $settings['objects'])) {
+        if (in_array('contacts', $objects)) {
             $contactFields = $this->getFormFieldsByObject('contacts', $settings);
         }
 
@@ -335,8 +342,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $dynamicsFields[$dynamicsObject] = $fields;
-                            continue;
+                            //$dynamicsFields[$dynamicsObject] = $fields;
+                            //continue;
                         }
                         $leadObject = $this->getApiHelper()->getLeadFields($dynamicsObject);
                         if (null === $leadObject || !array_key_exists('value', $leadObject)) {
