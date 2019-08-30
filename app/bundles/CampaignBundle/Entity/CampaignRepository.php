@@ -423,15 +423,14 @@ class CampaignRepository extends CommonRepository
             ->where(
                 $sq->expr()->andX(
                     $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
-                    $sq->expr()->eq('e.campaign_id', ':campaignId'),
+                    $sq->expr()->eq('e.campaign_id', (int) $campaignId),
                     $sq->expr()->eq('e.rotation', 'cl.rotation')
                 )
             );
 
         $q->andWhere(
             sprintf('NOT EXISTS (%s)', $sq->getSQL())
-        )
-            ->setParameter('campaignId', (int) $campaignId);
+        );
 
         if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
