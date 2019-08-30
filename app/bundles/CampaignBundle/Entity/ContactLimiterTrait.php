@@ -30,7 +30,7 @@ trait ContactLimiterTrait
             $qb->andWhere(
                 $qb->expr()->eq("$alias.lead_id", ':contactId')
             )
-                ->setParameter('contactId', $contactId);
+                ->setParameter('contactId', $contactId, \PDO::PARAM_INT);
         } elseif ($contactIds = $contactLimiter->getContactIdList()) {
             $qb->andWhere(
                 $qb->expr()->in("$alias.lead_id", ':contactIds')
@@ -40,26 +40,26 @@ trait ContactLimiterTrait
             $qb->andWhere(
                 "$alias.lead_id BETWEEN :minContactId AND :maxContactId"
             )
-                ->setParameter('minContactId', $minContactId)
-                ->setParameter('maxContactId', $maxContactId);
+                ->setParameter('minContactId', $minContactId, \PDO::PARAM_INT)
+                ->setParameter('maxContactId', $maxContactId, \PDO::PARAM_INT);
         } elseif ($minContactId) {
             $qb->andWhere(
                 $qb->expr()->gte("$alias.lead_id", ':minContactId')
             )
-                ->setParameter('minContactId', $minContactId);
+                ->setParameter('minContactId', $minContactId, \PDO::PARAM_INT);
         } elseif ($maxContactId) {
             $qb->andWhere(
                 $qb->expr()->lte("$alias.lead_id", ':maxContactId')
             )
-                ->setParameter('maxContactId', $maxContactId);
+                ->setParameter('maxContactId', $maxContactId, \PDO::PARAM_INT);
         }
 
         if ($threadId = $contactLimiter->getThreadId()) {
             if ($maxThreads = $contactLimiter->getMaxThreads()) {
                 if ($threadId <= $maxThreads) {
                     $qb->andWhere("MOD(($alias.lead_id + :threadShift), :maxThreads) = 0")
-                        ->setParameter('threadShift', $threadId - 1)
-                        ->setParameter('maxThreads', $maxThreads);
+                        ->setParameter('threadShift', $threadId - 1, \PDO::PARAM_INT)
+                        ->setParameter('maxThreads', $maxThreads, \PDO::PARAM_INT);
                 }
             }
         }
@@ -81,7 +81,7 @@ trait ContactLimiterTrait
             $qb->andWhere(
                 $qb->expr()->eq("IDENTITY($alias.lead)", ':contact')
             )
-                ->setParameter('contact', $contactId);
+                ->setParameter('contact', $contactId, \PDO::PARAM_INT);
         } elseif ($contactIds = $contactLimiter->getContactIdList()) {
             $qb->andWhere(
                 $qb->expr()->in("IDENTITY($alias.lead)", ':contactIds')
@@ -91,25 +91,25 @@ trait ContactLimiterTrait
             $qb->andWhere(
                 "IDENTITY($alias.lead) BETWEEN :minContactId AND :maxContactId"
             )
-                ->setParameter('minContactId', $minContactId)
-                ->setParameter('maxContactId', $maxContactId);
+                ->setParameter('minContactId', $minContactId, \PDO::PARAM_INT)
+                ->setParameter('maxContactId', $maxContactId, \PDO::PARAM_INT);
         } elseif ($minContactId) {
             $qb->andWhere(
                 $qb->expr()->gte("IDENTITY($alias.lead)", ':minContactId')
             )
-                ->setParameter('minContactId', $minContactId);
+                ->setParameter('minContactId', $minContactId, \PDO::PARAM_INT);
         } elseif ($maxContactId) {
             $qb->andWhere(
                 $qb->expr()->lte("IDENTITY($alias.lead)", ':maxContactId')
             )
-                ->setParameter('maxContactId', $maxContactId);
+                ->setParameter('maxContactId', $maxContactId, \PDO::PARAM_INT);
         }
 
         if ($threadId = $contactLimiter->getThreadId()) {
             if ($maxThreads = $contactLimiter->getMaxThreads()) {
                 $qb->andWhere("MOD((IDENTITY($alias.lead) + :threadShift), :maxThreads) = 0")
-                    ->setParameter('threadShift', $threadId - 1)
-                    ->setParameter('maxThreads', $maxThreads);
+                    ->setParameter('threadShift', $threadId - 1, \PDO::PARAM_INT)
+                    ->setParameter('maxThreads', $maxThreads, \PDO::PARAM_INT);
             }
         }
 
