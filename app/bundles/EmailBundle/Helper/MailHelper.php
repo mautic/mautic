@@ -1416,7 +1416,11 @@ class MailHelper
         // Convert short codes to emoji
         $customHtml = EmojiHelper::toEmoji($customHtml, 'short');
 
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+        // Only set text/html part if there actually is something. Otherwise plaintext-only is not be possible,
+        // there would be an empty text/htlm part.
+        if (!empty($email->getContent())) {
+            $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);
+        }
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
