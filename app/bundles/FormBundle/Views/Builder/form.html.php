@@ -37,6 +37,14 @@ if (!isset($style)) {
 if (!isset($isAjax)) {
     $isAjax = true;
 }
+
+if (!isset($submissions)) {
+    $submissions = null;
+}
+
+if (!isset($lead)) {
+    $lead = null;
+}
 ?>
 
 <?php echo $style; ?>
