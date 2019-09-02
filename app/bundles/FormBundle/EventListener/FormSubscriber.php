@@ -179,11 +179,11 @@ class FormSubscriber implements EventSubscriberInterface
             }
         }
 
-        $config    = $event->getActionConfig();
+        $config          = $event->getActionConfig();
         $eventSubmission = $event->getSubmission();
-        $lead      = $eventSubmission->getLead();
-        $leadEmail = null !== $lead ? $lead->getEmail() : null;
-        $emails    = $this->getEmailsFromString($config['to']);
+        $lead            = $eventSubmission->getLead();
+        $leadEmail       = null !== $lead ? $lead->getEmail() : null;
+        $emails          = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
             $this->setMailer($config, $tokens, $emails, $eventSubmission);
@@ -425,11 +425,11 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array     $config
-     * @param array     $tokens
-     * @param           $to
+     * @param array           $config
+     * @param array           $tokens
+     * @param                 $to
      * @param Submission|null $eventSubmission
-     * @param bool      $internalSend
+     * @param bool            $internalSend
      */
     private function setMailer(array $config, array $tokens, $to, Submission $eventSubmission = null, $internalSend = true)
     {
