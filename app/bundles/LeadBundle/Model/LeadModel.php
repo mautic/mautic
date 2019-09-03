@@ -967,6 +967,7 @@ class LeadModel extends FormModel
      * @param array     $queryFields
      * @param Lead|null $lead
      * @param bool      $returnWithQueryFields
+     * @param bool      $onlyPubliclyUpdateable
      *
      * @return array|Lead
      */
@@ -1003,7 +1004,8 @@ class LeadModel extends FormModel
         }
 
         // If we don't want merge identified contacts, create new one
-        if (!empty($inQuery) && $this->coreParametersHelper->getParameter('disable_merge_identified_contacts') && !$lead->isAnonymous()) {
+        // Assume apply this just in tracking mode
+        if (!empty($inQuery) && $this->coreParametersHelper->getParameter('disable_merge_identified_contacts') && !$lead->isAnonymous() && $onlyPubliclyUpdateable) {
             $lead = new Lead();
         }
 
