@@ -174,8 +174,7 @@ class ContactRequestHelper
         if (!empty($this->queryFields)) {
             list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
-                (!$this->trackedContact->isAnonymous() && $this->coreParametersHelper->getParameter('disable_merge_identified_contacts')) ? null : $this->trackedContact,
-
+                $this->trackedContact,
                 true,
                 true
             );
