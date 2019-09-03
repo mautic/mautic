@@ -191,6 +191,11 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckForDuplicateContact()
     {
+        $this->coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
+            ->with('disable_merge_identified_contacts')
+            ->willReturn(false);
+
         $this->fieldModelMock->expects($this->at(0))
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead'])
@@ -222,6 +227,7 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'coreParametersHelper', $this->coreParametersHelperMock);
 
         $this->assertAttributeEquals(
             [],
@@ -238,6 +244,11 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckForDuplicateContactForOnlyPubliclyUpdatable()
     {
+        $this->coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
+            ->with('disable_merge_identified_contacts')
+            ->willReturn(false);
+
         $this->fieldModelMock->expects($this->at(0))
             ->method('getFieldList')
             ->with(false, false, ['isPublished' => true, 'object' => 'lead', 'isPubliclyUpdatable' => true])
@@ -269,6 +280,7 @@ class LeadModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        $this->setProperty($mockLeadModel, LeadModel::class, 'coreParametersHelper', $this->coreParametersHelperMock);
 
         $this->assertAttributeEquals(
             [],
