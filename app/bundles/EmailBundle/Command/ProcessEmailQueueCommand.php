@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -57,11 +58,10 @@ EOT
         $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
         $container  = $this->getContainer();
         $dispatcher = $container->get('event_dispatcher');
-
-        $skipClear = $input->getOption('do-not-clear');
-        $quiet     = $input->getOption('quiet');
-        $timeout   = $input->getOption('clear-timeout');
-        $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
+        $skipClear  = $input->getOption('do-not-clear');
+        $quiet      = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $timeout    = $input->getOption('clear-timeout');
+        $queueMode  = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');
@@ -103,7 +103,7 @@ EOT
                     $tmpFilename .= '.finalretry';
                     rename($failedFile, $tmpFilename);
 
-                    $message = unserialize(file_get_contents($tmpFilename));
+                    $message = Serializer::decode(file_get_contents($tmpFilename), ['allowed_classes' => true]);
                     if ($message !== false && is_object($message) && get_class($message) === 'Swift_Message') {
                         $tryAgain = false;
                         if ($dispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {

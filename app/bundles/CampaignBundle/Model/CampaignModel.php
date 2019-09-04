@@ -653,7 +653,7 @@ class CampaignModel extends CommonFormModel
 
             return true;
         } catch (\Exception $exception) {
-            $this->logger->log('error', $exception->getMessage());
+            $this->logger->log('error', $exception->getMessage(), ['exception' => $exception]);
 
             return false;
         }
