@@ -148,6 +148,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
             ->where(
                 $subQuery->expr()->andX(
+                    $subQuery->expr()->eq('el.lead_id', 't.lead_id'),
                     $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
                     $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
                     $subQuery->expr()->eq('el.action', $subQuery->expr()->literal($actionInverted)),
