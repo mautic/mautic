@@ -18,6 +18,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\IntegrationsBundle\Helper\RelationsHelper;
 
 /**
  * Interface SyncProcessFactoryInterface
@@ -27,6 +28,7 @@ interface SyncProcessFactoryInterface
     /**
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
+     * @param RelationsHelper           $relationsHelper
      * @param IntegrationSyncProcess    $integrationSyncProcess
      * @param MauticSyncProcess         $mauticSyncProcess
      * @param EventDispatcherInterface  $eventDispatcher
@@ -43,6 +45,7 @@ interface SyncProcessFactoryInterface
     public function create(
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
+        RelationsHelper $relationsHelper,
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess,
         EventDispatcherInterface $eventDispatcher,

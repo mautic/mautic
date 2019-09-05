@@ -10,6 +10,7 @@
  */
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess;
 
+use MauticPlugin\IntegrationsBundle\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
@@ -27,6 +28,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
     /**
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
+     * @param RelationsHelper           $relationsHelper
      * @param IntegrationSyncProcess    $integrationSyncProcess
      * @param MauticSyncProcess         $mauticSyncProcess
      * @param EventDispatcherInterface  $eventDispatcher
@@ -43,6 +45,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
     public function create(
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
+        RelationsHelper $relationsHelper,
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess,
         EventDispatcherInterface $eventDispatcher,
@@ -57,6 +60,7 @@ final class SyncProcessFactory implements SyncProcessFactoryInterface
         return new SyncProcess(
             $syncDateHelper,
             $mappingHelper,
+            $relationsHelper,
             $integrationSyncProcess,
             $mauticSyncProcess,
             $eventDispatcher,

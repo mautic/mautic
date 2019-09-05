@@ -18,6 +18,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
+use MauticPlugin\IntegrationsBundle\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -137,6 +138,7 @@ class SyncProcess
     ) {
         $this->syncDateHelper              = $syncDateHelper;
         $this->mappingHelper               = $mappingHelper;
+        $this->relationsHelper             = $relationsHelper;
         $this->integrationSyncProcess      = $integrationSyncProcess;
         $this->mauticSyncProcess           = $mauticSyncProcess;
         $this->eventDispatcher             = $eventDispatcher;

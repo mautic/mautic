@@ -19,6 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactoryInterface;
@@ -49,6 +50,10 @@ final class SyncService implements SyncServiceInterface
      * @var MappingHelper
      */
     private $mappingHelper;
+    /**
+     * @var RelationsHelper
+     */
+    private $relationsHelper;
 
     /**
      * @var IntegrationSyncProcess
@@ -81,6 +86,7 @@ final class SyncService implements SyncServiceInterface
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      * @param SyncDateHelper              $syncDateHelper
      * @param MappingHelper               $mappingHelper
+     * @param RelationsHelper             $relationsHelper
      * @param SyncIntegrationsHelper      $syncIntegrationsHelper
      * @param EventDispatcherInterface    $eventDispatcher
      * @param Notifier                    $notifier
@@ -104,6 +110,7 @@ final class SyncService implements SyncServiceInterface
         $this->internalSyncDataExchange      = $internalSyncDataExchange;
         $this->syncDateHelper                = $syncDateHelper;
         $this->mappingHelper                 = $mappingHelper;
+        $this->relationsHelper               = $relationsHelper;
         $this->syncIntegrationsHelper        = $syncIntegrationsHelper;
         $this->eventDispatcher               = $eventDispatcher;
         $this->notifier                      = $notifier;
