@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Test\EventListener;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -62,11 +62,11 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+        $mockCoreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator, $mockFactory);
+        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator, $mockCoreParametersHelper);
 
         $args = [
             'lead'  => 64,
@@ -112,11 +112,11 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+        $mockCoreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator, $mockFactory);
+        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator, $mockCoreParametersHelper);
 
         $args = [
             'lead'  => $lead,
@@ -169,11 +169,11 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
+        $mockCoreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator, $mockFactory);
+        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator, $mockCoreParametersHelper);
 
         $args = [
             'lead'  => $lead,

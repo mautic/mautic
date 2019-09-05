@@ -175,7 +175,7 @@ return [
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_user',
                     'translator',
-                    'mautic.factory',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.email.campaignbundle.condition_subscriber' => [

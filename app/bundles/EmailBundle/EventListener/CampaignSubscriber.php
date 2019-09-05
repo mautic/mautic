@@ -18,7 +18,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -69,12 +69,17 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @param LeadModel         $leadModel
-     * @param EmailModel        $emailModel
-     * @param EventModel        $eventModel
-     * @param MessageQueueModel $messageQueueModel
-     * @param SendEmailToUser   $sendEmailToUser
-     * @param MauticFactory     $factory
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @param LeadModel            $leadModel
+     * @param EmailModel           $emailModel
+     * @param EventModel           $eventModel
+     * @param MessageQueueModel    $messageQueueModel
+     * @param SendEmailToUser      $sendEmailToUser
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         LeadModel $leadModel,
@@ -83,15 +88,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         MessageQueueModel $messageQueueModel,
         SendEmailToUser $sendEmailToUser,
         TranslatorInterface $translator,
-        MauticFactory $factory
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->leadModel          = $leadModel;
-        $this->emailModel         = $emailModel;
-        $this->campaignEventModel = $eventModel;
-        $this->messageQueueModel  = $messageQueueModel;
-        $this->sendEmailToUser    = $sendEmailToUser;
-        $this->translator         = $translator;
-        $this->factory            = $factory;
+        $this->leadModel            = $leadModel;
+        $this->emailModel           = $emailModel;
+        $this->campaignEventModel   = $eventModel;
+        $this->messageQueueModel    = $messageQueueModel;
+        $this->sendEmailToUser      = $sendEmailToUser;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -336,7 +341,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $credentialArray[$logId] = $leadCredentials;
         }
 
-        if ('marketing' == $type && !$this->factory->getParameter('email_unlimited_marketing')) {
+        if ('marketing' == $type && !$this->coreParametersHelper->getParameter('email_unlimited_marketing')) {
             // Determine if this lead has received the email before and if so, don't send it again
             $stats = $this->emailModel->getStatRepository()->getSentCountForContacts($contactIds, $emailId);
 
