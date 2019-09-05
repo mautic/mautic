@@ -37,6 +37,11 @@ class ReportDAO
     private $remappedObjects = [];
 
     /**
+     * @var array
+     */
+    private $relations = [];
+
+    /**
      * SyncReportDAO constructor.
      *
      * @param $integration
@@ -171,5 +176,37 @@ class ReportDAO
     public function shouldSync()
     {
         return !empty($this->objects);
+    }
+
+    /**
+     * @param ObjectDAO $objectDAO
+     * @param array     $relations
+     */
+    public function addRelations(ObjectDAO $objectDAO, array $relations)
+    {
+        foreach ($relations as $relObjectName => $relObjectId) {
+            $this->addRelation($objectDAO, $relObjectName, $relObjectId);
+        }
+    }
+
+    /**
+     * @param ObjectDAO $objectDAO
+     * @param string    $relObjectName
+     * @param string    $relObjectId
+     */
+    public function addRelation(ObjectDAO $objectDAO, string $relObjectName, string $relObjectId)
+    {
+        $this->relations[$objectDAO->getObject()][$objectDAO->getObjectId()][$relObjectName] = $relObjectId;
+    }
+
+    /**
+     * @param string $objectName
+     * @param string $objectId
+     *
+     * @return array
+     */
+    public function getRelations(string $objectName, string $objectId): array
+    {
+        return $this->relations[$objectName][$objectId] ?? [];
     }
 }

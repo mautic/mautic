@@ -92,6 +92,7 @@ final class SyncService implements SyncServiceInterface
         MauticSyncDataExchange $internalSyncDataExchange,
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
+        RelationsHelper $relationsHelper,
         SyncIntegrationsHelper $syncIntegrationsHelper,
         EventDispatcherInterface $eventDispatcher,
         Notifier $notifier,
@@ -128,6 +129,7 @@ final class SyncService implements SyncServiceInterface
         $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
             $this->syncDateHelper,
             $this->mappingHelper,
+            $this->relationsHelper,
             $this->integratinSyncProcess,
             $this->mauticSyncProcess,
             $this->eventDispatcher,

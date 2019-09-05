@@ -59,6 +59,11 @@ class SyncProcess
     private $mappingHelper;
 
     /**
+     * @var RelationsHelper
+     */
+    private $relationsHelper;
+
+    /**
      * @var IntegrationSyncProcess
      */
     private $integrationSyncProcess;
@@ -103,6 +108,7 @@ class SyncProcess
      *
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
+     * @param RelationsHelper           $relationsHelper
      * @param IntegrationSyncProcess    $integrationSyncProcess
      * @param MauticSyncProcess         $mauticSyncProcess
      * @param EventDispatcherInterface  $eventDispatcher
@@ -117,6 +123,7 @@ class SyncProcess
     public function __construct(
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
+        RelationsHelper $relationsHelper,
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess,
         EventDispatcherInterface $eventDispatcher,
@@ -187,6 +194,8 @@ class SyncProcess
 
             // Update the mappings in case objects have been converted such as Lead -> Contact
             $this->mappingHelper->remapIntegrationObjects($syncReport->getRemappedObjects());
+
+            // RelationHelper check relations
 
             // Convert the integrations' report into an "order" or instructions for Mautic
             $syncOrder = $this->mauticSyncProcess->getSyncOrder($syncReport, $this->isFirstTimeSync, $this->mappingManualDAO);
