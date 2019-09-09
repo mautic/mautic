@@ -293,6 +293,10 @@ class PointModel extends CommonFormModel
                         $ipAddress
                     );
 
+                    foreach ($action->getTags() as $tag) {
+                        $lead->addTag($tag);
+                    }
+
                     $event = new PointActionEvent($action, $lead);
                     $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 

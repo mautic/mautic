@@ -75,6 +75,11 @@ class Point extends FormEntity
     private $log;
 
     /**
+     * @var ArrayCollection
+     */
+    private $tags;
+
+    /**
      * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
@@ -92,6 +97,7 @@ class Point extends FormEntity
     public function __construct()
     {
         $this->log = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     /**
@@ -125,6 +131,18 @@ class Point extends FormEntity
             ->cascadePersist()
             ->cascadeRemove()
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToMany('tags', 'Mautic\LeadBundle\Entity\Tag')
+            ->setJoinTable('point_tags_xref')
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('point_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(['tag' => 'ASC'])
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
             ->build();
 
         $builder->addCategory();
@@ -172,6 +190,7 @@ class Point extends FormEntity
                     'delta',
                     'properties',
                     'repeatable',
+                    'tags',
                 ]
             )
             ->build();
@@ -431,5 +450,15 @@ class Point extends FormEntity
     public function getRepeatable()
     {
         return $this->repeatable;
+    }
+
+    /**
+     * Get tags.
+     *
+     * @return mixed
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 }

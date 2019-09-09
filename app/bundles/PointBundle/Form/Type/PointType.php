@@ -85,6 +85,17 @@ class PointType extends AbstractType
             'precision' => 0,
         ]);
 
+        $builder->add('tags', 'lead_tag', [
+            'label' => 'mautic.point.action.tag',
+            'by_reference' => false,
+            'attr' => [
+                'data-placeholder' => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                'data-allow-add' => 'true',
+                'onchange' => 'Mautic.createLeadTag(this)',
+            ],
+        ]);
+
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
         if ($type) {
             $formType = (!empty($options['pointActions']['actions'][$type]['formType'])) ?
