@@ -249,10 +249,12 @@ class LeadListRepository extends CommonRepository
             ->where(
                 $q->expr()->andX(
                     $q->expr()->in('x.leadlist_id', $ids),
-                    $q->expr()->eq('l.id', ':leadId')
+                    $q->expr()->eq('l.id', ':leadId'),
+                    $q->expr()->eq('x.manually_removed', ':false')
                 )
             )
-            ->setParameter('leadId', $lead->getId());
+            ->setParameter('leadId', $lead->getId())
+            ->setParameter('false', false, 'boolean');
 
         return  (bool) $q->execute()->fetchColumn();
     }
