@@ -121,7 +121,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'regexp':
             case 'notRegexp':
