@@ -287,8 +287,18 @@ class ObjectChangeGenerator
             $internalField->getName(),
             $internalField->getValue()
         );
-        $internalInformationChangeRequest->setPossibleChangeDateTime($this->internalObject->getChangeDateTime());
-        $internalInformationChangeRequest->setCertainChangeDateTime($internalField->getChangeDateTime());
+
+        $possibleChangeDateTime = $this->internalObject->getChangeDateTime();
+        $certainChangeDateTime = $internalField->getChangeDateTime();
+
+        // If we know certain change datetime and it's newer than possible change datetime
+        // then we have to update possible change datetime otherwise comparision doesn't work correctly
+        if ($certainChangeDateTime && ($certainChangeDateTime > $possibleChangeDateTime)) {
+            $possibleChangeDateTime = $certainChangeDateTime;
+        }
+
+        $internalInformationChangeRequest->setPossibleChangeDateTime($possibleChangeDateTime);
+        $internalInformationChangeRequest->setCertainChangeDateTime($certainChangeDateTime);
 
         // There is a conflict so let the judge determine which value comes out on top
         foreach ($this->judgementModes as $judgeMode) {

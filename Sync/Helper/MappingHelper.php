@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 
+use Mautic\LeadBundle\Entity\Company as CompanyEntity;
+use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
@@ -143,6 +145,29 @@ class MappingHelper
         $this->saveObjectMapping($objectMapping);
 
         return new ObjectDAO($internalObjectName, $objectId);
+    }
+
+    /**
+     * Returns corresponding Mautic entity for the given Mautic object
+     *
+     * @param string $internalObject
+     * @return string
+     */
+    public function getMauticEntity(string $internalObject): string
+    {
+        switch ($internalObject) {
+            case MauticSyncDataExchange::OBJECT_CONTACT:
+                $entity = LeadEntity::class;
+                break;
+            case MauticSyncDataExchange::OBJECT_COMPANY:
+                $entity = CompanyEntity::class;
+                break;
+            default:
+                $entity = $internalObject;
+                break;
+        }
+
+        return $entity;
     }
 
     /**
