@@ -45,9 +45,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         $tableAlias = $this->generateRandomParameterName();
 
         $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
+        /*
         $subQueryBuilder
             ->select('NULL')->from($filter->getTable(), $tableAlias)
             ->andWhere($tableAlias.'.lead_id = l.id');
+        */
+       
+        $subQueryBuilder
+            ->select($tableAlias.'.lead_id')->from($filter->getTable(), $tableAlias);
 
         if (!is_null($filter->getWhere())) {
             $subQueryBuilder->andWhere(str_replace(str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()).'.', $tableAlias.'.', $filter->getWhere()));
@@ -76,6 +81,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'neq':
+                /*
                 $expression = $subQueryBuilder->expr()->orX(
                     $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
@@ -84,11 +90,33 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $subQueryBuilder->andWhere($expression);
 
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
+                */
+               
+                $expression = $subQueryBuilder->expr()->andX(
+                    $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
+                    $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
+                );
+
+                $subQueryBuilder->andWhere($expression);
+
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+
                 break;
             case 'notLike':
+                /*
                 $expression = $subQueryBuilder->expr()->orX(
                     $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
                     $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
+                );
+
+                $subQueryBuilder->andWhere($expression);
+
+                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
+                */
+               
+                $expression = $subQueryBuilder->expr()->andX(                    
+                    $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
+                    $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
                 );
 
                 $subQueryBuilder->andWhere($expression);
@@ -111,7 +139,8 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                //$queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->in('l.id', $subQueryBuilder->getDQL()), $filter->getGlue());
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
