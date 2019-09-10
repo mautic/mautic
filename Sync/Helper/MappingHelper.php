@@ -152,8 +152,9 @@ class MappingHelper
      *
      * @param string $internalObject
      * @return string
+     * @throws ObjectNotSupportedException
      */
-    public function getMauticEntity(string $internalObject): string
+    public function getMauticEntityClassName(string $internalObject): string
     {
         switch ($internalObject) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
@@ -163,8 +164,7 @@ class MappingHelper
                 $entity = CompanyEntity::class;
                 break;
             default:
-                $entity = $internalObject;
-                break;
+                throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObject);
         }
 
         return $entity;
