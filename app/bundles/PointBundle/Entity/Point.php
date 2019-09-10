@@ -96,7 +96,7 @@ class Point extends FormEntity
      */
     public function __construct()
     {
-        $this->log = new ArrayCollection();
+        $this->log  = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
 

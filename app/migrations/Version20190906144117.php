@@ -26,7 +26,7 @@ class Version20190906144117 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix . 'point_tags')) {
+        if ($schema->hasTable($this->prefix.'point_tags')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -36,17 +36,45 @@ class Version20190906144117 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf(
+            'mysql' != $this->connection->getDatabasePlatform()->getName(),
+            'Migration can only be executed safely on \'mysql\'.'
+        );
 
-        $this->addSql('CREATE TABLE ' . $this->prefix . 'point_tags_xref (point_id INT NOT NULL, tag_id INT NOT NULL, INDEX ' . $this->generatePropertyName('point_tags_xref', 'idx', ['point_id']) . ' (point_id), INDEX ' . $this->generatePropertyName('point_tags_xref', 'idx', ['tag_id']) . ' (tag_id), PRIMARY KEY(point_id, tag_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_tags_xref ADD CONSTRAINT ' . $this->generatePropertyName('point_tags_xref', 'fk', ['point_id']) . ' FOREIGN KEY (point_id) REFERENCES ' . $this->prefix . 'points (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE ' . $this->prefix . 'point_tags_xref ADD CONSTRAINT ' . $this->generatePropertyName('point_tags_xref', 'fk', ['tag_id']) . ' FOREIGN KEY (tag_id) REFERENCES ' . $this->prefix . 'lead_tags (id)');
+        $this->addSql(
+            'CREATE TABLE '.$this->prefix.'point_tags_xref (point_id INT NOT NULL, tag_id INT NOT NULL, INDEX '.$this->generatePropertyName(
+                'point_tags_xref',
+                'idx',
+                ['point_id']
+            ).' (point_id), INDEX '.$this->generatePropertyName(
+                'point_tags_xref',
+                'idx',
+                ['tag_id']
+            ).' (tag_id), PRIMARY KEY(point_id, tag_id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB'
+        );
+        $this->addSql(
+            'ALTER TABLE '.$this->prefix.'point_tags_xref ADD CONSTRAINT '.$this->generatePropertyName(
+                'point_tags_xref',
+                'fk',
+                ['point_id']
+            ).' FOREIGN KEY (point_id) REFERENCES '.$this->prefix.'points (id) ON DELETE CASCADE'
+        );
+        $this->addSql(
+            'ALTER TABLE '.$this->prefix.'point_tags_xref ADD CONSTRAINT '.$this->generatePropertyName(
+                'point_tags_xref',
+                'fk',
+                ['tag_id']
+            ).' FOREIGN KEY (tag_id) REFERENCES '.$this->prefix.'lead_tags (id)'
+        );
     }
 
     public function down(Schema $schema)
     {
-        $this->abortIf('mysql' != $this->connection->getDatabasePlatform()->getName(), 'Migration can only be executed safely on \'mysql\'.');
+        $this->abortIf(
+            'mysql' != $this->connection->getDatabasePlatform()->getName(),
+            'Migration can only be executed safely on \'mysql\'.'
+        );
 
-        $this->addSql('DROP TABLE ' . $this->prefix . 'point_tags_xref');
+        $this->addSql('DROP TABLE '.$this->prefix.'point_tags_xref');
     }
 }

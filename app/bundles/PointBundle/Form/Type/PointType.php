@@ -86,13 +86,13 @@ class PointType extends AbstractType
         ]);
 
         $builder->add('tags', 'lead_tag', [
-            'label' => 'mautic.point.action.tag',
+            'label'        => 'mautic.point.action.tag',
             'by_reference' => false,
-            'attr' => [
-                'data-placeholder' => $this->translator->trans('mautic.lead.tags.select_or_create'),
+            'attr'         => [
+                'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
                 'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
-                'data-allow-add' => 'true',
-                'onchange' => 'Mautic.createLeadTag(this)',
+                'data-allow-add'       => 'true',
+                'onchange'             => 'Mautic.createLeadTag(this)',
             ],
         ]);
 
