@@ -148,7 +148,7 @@ class MappingHelper
     }
 
     /**
-     * Returns corresponding Mautic entity for the given Mautic object
+     * Returns corresponding Mautic entity class name for the given Mautic object
      *
      * @param string $internalObject
      * @return string
