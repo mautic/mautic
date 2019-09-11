@@ -133,6 +133,10 @@ class ReportSubscriber extends CommonSubscriber
             $hitPrefix   = 'ph.';
             $redirectHit = 'r.';
             $hitColumns  = [
+                $hitPrefix.'id' => [
+                    'label' => 'mautic.page.report.hits.id',
+                    'type'  => 'int',
+                ],
                 $hitPrefix.'date_hit' => [
                     'label'          => 'mautic.page.report.hits.date_hit',
                     'type'           => 'datetime',
@@ -238,6 +242,11 @@ class ReportSubscriber extends CommonSubscriber
                 'ds.device_os_platform' => [
                     'label' => 'mautic.lead.device_os_platform',
                     'type'  => 'string',
+                ],
+                'lel.source_created_contact' => [
+                    'label'   => 'mautic.page.report.hits.source_created_contact',
+                    'type'    => 'bool',
+                    'formula' => 'IF(lel.action = \'created_contact\', 1, 0)',
                 ],
             ];
 
@@ -381,6 +390,10 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id')
                     ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'page_redirects', 'r', 'r.id = ph.redirect_id')
                     ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_devices', 'ds', 'ds.id = ph.device_id');
+
+                if ($event->hasColumn('lel.source_created_contact')) {
+                    $qb->leftJoin('ph', MAUTIC_TABLE_PREFIX.'lead_event_log', 'lel', 'lel.object_id = ph.id and lel.bundle = \'page\' and lel.object in (\'hit\',\'redirect\')');
+                }
 
                 $event->addIpAddressLeftJoin($qb, 'ph');
                 $event->addCategoryLeftJoin($qb, 'p');
