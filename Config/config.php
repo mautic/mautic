@@ -254,6 +254,7 @@ return [
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.channel.helper.channel_list',
                     'translator',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.sync_process.value_helper' => [
