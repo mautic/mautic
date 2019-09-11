@@ -18,12 +18,15 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldHelper
@@ -59,19 +62,31 @@ class FieldHelper
     private $syncFields = [];
 
     /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
      * FieldHelper constructor.
      *
      * @param FieldModel                       $fieldModel
      * @param VariableExpresserHelperInterface $variableExpresserHelper
      * @param ChannelListHelper                $channelListHelper
      * @param TranslatorInterface              $translator
+     * @param EventDispatcherInterface         $eventDispatcher
      */
-    public function __construct(FieldModel $fieldModel, VariableExpresserHelperInterface $variableExpresserHelper, ChannelListHelper $channelListHelper, TranslatorInterface $translator)
-    {
+    public function __construct(
+        FieldModel $fieldModel,
+        VariableExpresserHelperInterface $variableExpresserHelper,
+        ChannelListHelper $channelListHelper,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->fieldModel              = $fieldModel;
         $this->variableExpresserHelper = $variableExpresserHelper;
         $this->channelListHelper       = $channelListHelper;
         $this->translator              = $translator;
+        $this->eventDispatcher         = $eventDispatcher;
     }
 
     /**
@@ -168,6 +183,10 @@ class FieldHelper
 
         // Add ID as a read only field
         $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
+
+        $event      = new MauticSyncFieldsLoadEvent($objectName, $this->syncFields[$objectName]);
+        $event = $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD, $event);
+        $this->syncFields[$event->getObjectName()] = $event->getFields();
 
         if (MauticSyncDataExchange::OBJECT_CONTACT !== $objectName) {
             uasort($this->syncFields[$objectName], 'strnatcmp');
