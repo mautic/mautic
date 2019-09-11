@@ -65,7 +65,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     public function testContactSyncFieldsReturned()
     {
         $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
-        $syncFields = [ 'email' => 'Email'];
+        $syncFields = ['email' => 'Email'];
 
         $this->mauticSyncFieldsLoadEvent->method('getObjectName')
             ->willReturn($objectName);
@@ -91,14 +91,15 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     public function testCompanySyncFieldsReturned()
     {
         $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
+        $syncFields = ['email' => 'Email'];
 
         $this->mauticSyncFieldsLoadEvent->method('getObjectName')
             ->willReturn($objectName);
         $this->mauticSyncFieldsLoadEvent->method('getFields')
-            ->willReturn([ 'email' => 'Email']);
+            ->willReturn($syncFields);
 
         $this->fieldModel->method('getFieldList')
-            ->willReturn([ 'email' => 'Email']);
+            ->willReturn($syncFields);
 
         $fields = $this->getFieldHelper()->getSyncFields($objectName);
 
