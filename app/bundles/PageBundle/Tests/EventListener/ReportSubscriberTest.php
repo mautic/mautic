@@ -199,7 +199,11 @@ class ReportSubscriberTest extends WebTestCase
             ->method('getContext')
             ->willReturn('page.hits');
 
-        $mockEvent->expects($this->once())
+        $reportMock->expects($this->any())
+            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
+            ->willReturn([]);
+
+        $mockEvent->expects($this->any())
             ->method('getReport')
             ->willReturn($reportMock);
 
