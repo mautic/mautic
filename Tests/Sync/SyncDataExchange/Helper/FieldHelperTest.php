@@ -14,8 +14,10 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
+use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldHelperTest extends \PHPUnit_Framework_TestCase
@@ -35,6 +37,16 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $channelListHelper;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var MauticSyncFieldsLoadEvent|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $mauticSyncFieldsLoadEvent;
+
 
     protected function setUp()
     {
@@ -43,26 +55,62 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
         $this->channelListHelper->method('getFeatureChannels')
             ->willReturn(['Email' => 'email']);
+
+        $this->mauticSyncFieldsLoadEvent = $this->createMock(MauticSyncFieldsLoadEvent::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->eventDispatcher->method('dispatch')
+            ->willReturn($this->mauticSyncFieldsLoadEvent);
     }
 
     public function testContactSyncFieldsReturned()
     {
-        $this->fieldModel->method('getFieldList')
-            ->willReturn([ 'email' => 'Email']);
-            
-        $fields = $this->getFieldHelper()->getSyncFields(MauticSyncDataExchange::OBJECT_CONTACT);
+        $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
+        $syncFields = [ 'email' => 'Email'];
 
-        $this->assertEquals(['mautic_internal_dnc_email', 'mautic_internal_id', 'mautic_internal_contact_timeline', 'email'], array_keys($fields));
+        $this->mauticSyncFieldsLoadEvent->method('getObjectName')
+            ->willReturn($objectName);
+        $this->mauticSyncFieldsLoadEvent->method('getFields')
+            ->willReturn($syncFields);
+
+        $this->fieldModel->method('getFieldList')
+            ->willReturn($syncFields);
+
+        $fields = $this->getFieldHelper()->getSyncFields($objectName);
+
+        $this->assertEquals(
+            [
+                'mautic_internal_dnc_email',
+                'mautic_internal_id',
+                'mautic_internal_contact_timeline',
+                'email',
+            ],
+            array_keys($fields)
+        );
     }
 
     public function testCompanySyncFieldsReturned()
     {
+        $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
+
+        $this->mauticSyncFieldsLoadEvent->method('getObjectName')
+            ->willReturn($objectName);
+        $this->mauticSyncFieldsLoadEvent->method('getFields')
+            ->willReturn([ 'email' => 'Email']);
+
         $this->fieldModel->method('getFieldList')
             ->willReturn([ 'email' => 'Email']);
 
-        $fields = $this->getFieldHelper()->getSyncFields(MauticSyncDataExchange::OBJECT_COMPANY);
+        $fields = $this->getFieldHelper()->getSyncFields($objectName);
 
-        $this->assertEquals(['mautic_internal_id', 'email'], array_keys($fields));
+        $this->assertEquals(
+            [
+                'mautic_internal_dnc_email',
+                'mautic_internal_id',
+                'mautic_internal_contact_timeline',
+                'email',
+            ],
+            array_keys($fields)
+        );
     }
 
     public function testGetRequiredFieldsForContact(): void
@@ -98,6 +146,6 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
     private function getFieldHelper()
     {
-        return new FieldHelper($this->fieldModel, $this->variableExpresserHelper, $this->channelListHelper, $this->createMock(TranslatorInterface::class));
+        return new FieldHelper($this->fieldModel, $this->variableExpresserHelper, $this->channelListHelper, $this->createMock(TranslatorInterface::class), $this->eventDispatcher);
     }
 }

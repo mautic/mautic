@@ -181,12 +181,13 @@ class FieldHelper
             ]
         );
 
-        // Add ID as a read only field
-        $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
-
-        $event      = new MauticSyncFieldsLoadEvent($objectName, $this->syncFields[$objectName]);
+        // Dispatch event to add possibility to add field from some listener
+        $event = new MauticSyncFieldsLoadEvent($objectName, $this->syncFields[$objectName]);
         $event = $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD, $event);
         $this->syncFields[$event->getObjectName()] = $event->getFields();
+
+        // Add ID as a read only field
+        $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
 
         if (MauticSyncDataExchange::OBJECT_CONTACT !== $objectName) {
             uasort($this->syncFields[$objectName], 'strnatcmp');
