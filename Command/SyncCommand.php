@@ -64,6 +64,12 @@ class SyncCommand extends ContainerAwareCommand
                 'Set start date/time for updated values.'
             )
             ->addOption(
+                '--contact-id',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Provide specific Mautic contact IDs you want to sync. If some contact IDs are provided then the start/end dates have no effect. Example: --contact-id 12 --contact-id 13'
+            )
+            ->addOption(
                 '--first-time-sync',
                 '-f',
                 InputOption::VALUE_NONE,

@@ -271,6 +271,14 @@ return [
                     'mautic.integrations.helper.contact_object',
                 ],
             ],
+            'mautic.integrations.sync.data_exchange.mautic.id_report_builder' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\IdReportBuilder::class,
+                'arguments' => [
+                    'mautic.integrations.helper.contact_object',
+                    'mautic.integrations.helper.company_object',
+                    'mautic.integrations.sync.data_exchange.mautic.field_builder'
+                ],
+            ],
             'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder::class,
                 'arguments' => [
@@ -297,6 +305,7 @@ return [
                     'mautic.integrations.helper.sync_mapping',
                     'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder',
+                    'mautic.integrations.sync.data_exchange.mautic.id_report_builder',
                     'mautic.integrations.sync.data_exchange.mautic.order_executioner',
                 ],
             ],

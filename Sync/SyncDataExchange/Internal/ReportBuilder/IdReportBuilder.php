@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2018 Mautic Inc. All rights reserved
+ * @copyright   2019 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://www.mautic.com
@@ -19,10 +19,10 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
-class FullObjectReportBuilder
+class IdReportBuilder
 {
     use ProcessFoundObjectsDecorator;
-
+    
     /**
      * @var ContactObjectHelper
      */
@@ -59,9 +59,8 @@ class FullObjectReportBuilder
     {
         $syncReport       = new ReportDAO(MauticSyncDataExchange::NAME);
         $requestedObjects = $requestDAO->getObjects();
-
-        $limit = 200;
-        $start = $limit * ($requestDAO->getSyncIteration() - 1);
+        $limit            = 200;
+        $start            = $limit * ($requestDAO->getSyncIteration() - 1);
 
         foreach ($requestedObjects as $requestedObjectDAO) {
             try {
@@ -80,12 +79,9 @@ class FullObjectReportBuilder
 
                 switch ($requestedObjectDAO->getObject()) {
                     case MauticSyncDataExchange::OBJECT_CONTACT:
-                        $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
-                            $requestedObjectDAO->getFromDateTime(),
-                            $requestedObjectDAO->getToDateTime(),
-                            $start,
-                            $limit
-                        );
+                        $idChunks     = array_chunk($requestDAO->getInputOptionsDAO()->getContactIds(), $limit);
+                        $idChunk      = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
+                        $foundObjects = $this->contactObjectHelper->findObjectsByIds($idChunk);
 
                         break;
                     case MauticSyncDataExchange::OBJECT_COMPANY:

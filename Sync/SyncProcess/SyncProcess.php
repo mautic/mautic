@@ -130,15 +130,15 @@ class SyncProcess
 
         // Setup/prepare for the sync
         $this->syncDateHelper->setSyncDateTimes($this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime());
-        $this->integrationSyncProcess->setupSync($this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO, $this->integrationSyncDataExchange);
-        $this->mauticSyncProcess->setupSync($this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO, $this->internalSyncDataExchange);
+        $this->integrationSyncProcess->setupSync($this->inputOptionsDAO, $this->mappingManualDAO, $this->integrationSyncDataExchange);
+        $this->mauticSyncProcess->setupSync($this->inputOptionsDAO, $this->mappingManualDAO, $this->internalSyncDataExchange);
 
         if ($this->inputOptionsDAO->pullIsEnabled()) {
-            $this->executeIntegrationSync($this->inputOptionsDAO);
+            $this->executeIntegrationSync();
         }
         
         if ($this->inputOptionsDAO->pushIsEnabled()) {
-            $this->executeInternalSync($this->inputOptionsDAO);
+            $this->executeInternalSync();
         }
 
         // Tell listeners sync is done
@@ -210,7 +210,7 @@ class SyncProcess
                 __CLASS__.':'.__FUNCTION__
             );
 
-            $syncReport = $this->mauticSyncProcess->getSyncReport($this->syncIteration);
+            $syncReport = $this->mauticSyncProcess->getSyncReport($this->syncIteration, $this->inputOptionsDAO);
 
             if (!$syncReport->shouldSync()) {
                 DebugLogger::log(

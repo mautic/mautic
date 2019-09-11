@@ -12,9 +12,8 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request;
 
-/**
- * Class RequestDAO
- */
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+
 class RequestDAO
 {
     /**
@@ -23,9 +22,9 @@ class RequestDAO
     private $syncIteration;
 
     /**
-     * @var bool
+     * @var InputOptionsDAO
      */
-    private $isFirstTimeSync;
+    private $inputOptionsDAO;
 
     /**
      * @var string
@@ -38,16 +37,14 @@ class RequestDAO
     private $objects = [];
 
     /**
-     * RequestDAO constructor.
-     *
-     * @param int    $syncIteration
-     * @param bool   $isFirstTimeSync
-     * @param string $syncToIntegration
+     * @param string          $syncToIntegration
+     * @param int             $syncIteration
+     * @param InputOptionsDAO $inputOptionsDAO
      */
-    public function __construct($syncIteration, $isFirstTimeSync, string $syncToIntegration)
+    public function __construct(string $syncToIntegration, int $syncIteration, InputOptionsDAO $inputOptionsDAO)
     {
         $this->syncIteration     = (int) $syncIteration;
-        $this->isFirstTimeSync   = $isFirstTimeSync;
+        $this->inputOptionsDAO   = $inputOptionsDAO;
         $this->syncToIntegration = $syncToIntegration;
     }
 
@@ -84,7 +81,7 @@ class RequestDAO
      */
     public function isFirstTimeSync(): bool
     {
-        return $this->isFirstTimeSync;
+        return $this->inputOptionsDAO->isFirstTimeSync();
     }
 
     /**
@@ -95,6 +92,16 @@ class RequestDAO
     public function getSyncToIntegration(): string
     {
         return $this->syncToIntegration;
+    }
+
+    /**
+     * Returns DAO object with all input options.
+     *
+     * @return InputOptionsDAO
+     */
+    public function getInputOptionsDAO(): InputOptionsDAO
+    {
+        return $this->inputOptionsDAO;
     }
 
     /**

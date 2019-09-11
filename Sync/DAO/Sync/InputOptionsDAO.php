@@ -43,6 +43,11 @@ class InputOptionsDAO
     private $env;
 
     /**
+     * @var array
+     */
+    private $contactIds;
+
+    /**
      * @var DateTimeInterface|null
      */
     private $startDateTime;
@@ -70,6 +75,9 @@ class InputOptionsDAO
         $this->env           = $input['env'] ?? 'prod';
         $startDateTimeString = $input['start-datetime'] ?? null;
         $endDateTimeString   = $input['end-datetime'] ?? null;
+        $this->contactIds    = array_map(function ($id) {
+            return (int) $id;
+        }, ($input['contact-id'] ?? []));
 
         try {
             $this->startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;
@@ -114,6 +122,14 @@ class InputOptionsDAO
     public function pushIsEnabled(): bool
     {
         return !$this->disablePush;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getContactIds(): array
+    {
+        return $this->contactIds;
     }
 
     /**
