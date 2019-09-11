@@ -68,6 +68,18 @@ class SyncCommand extends ContainerAwareCommand
                 '-f',
                 InputOption::VALUE_NONE,
                 'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes'
+            )
+            ->addOption(
+                '--disable-push',
+                null,
+                InputOption::VALUE_NONE,
+                'Notate if the sync should execute only pushing items from Mautic to the integration'
+            )
+            ->addOption(
+                '--disable-pull',
+                null,
+                InputOption::VALUE_NONE,
+                'Notate if the sync should execute only pulling items from integration to the Mautic'
             );
 
         parent::configure();

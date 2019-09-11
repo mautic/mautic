@@ -28,6 +28,16 @@ class InputOptionsDAO
     private $firstTimeSync;
 
     /**
+     * @var bool
+     */
+    private $disablePush;
+
+    /**
+     * @var bool
+     */
+    private $disablePull;
+
+    /**
      * @var string
      */
     private $env;
@@ -51,6 +61,8 @@ class InputOptionsDAO
     {
         $this->integration   = $input->getArgument('integration');
         $this->firstTimeSync = (bool) $input->getOption('first-time-sync');
+        $this->disablePush   = (bool) $input->getOption('disable-push');
+        $this->disablePull   = (bool) $input->getOption('disable-pull');
         $this->env           = $input->getOption('env');
         $startDateTimeString = $input->getOption('start-datetime');
         $endDateTimeString   = $input->getOption('end-datetime');
@@ -82,6 +94,22 @@ class InputOptionsDAO
     public function isFirstTimeSync(): bool
     {
         return $this->firstTimeSync;
+    }
+
+    /**
+     * @return bool
+     */
+    public function pullIsEnabled(): bool
+    {
+        return !$this->disablePull;
+    }
+
+    /**
+     * @return bool
+     */
+    public function pushIsEnabled(): bool
+    {
+        return !$this->disablePush;
     }
 
     /**

@@ -133,9 +133,13 @@ class SyncProcess
         $this->integrationSyncProcess->setupSync($this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO, $this->integrationSyncDataExchange);
         $this->mauticSyncProcess->setupSync($this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO, $this->internalSyncDataExchange);
 
-        // Execute the sync
-        $this->executeIntegrationSync($this->inputOptionsDAO);
-        $this->executeInternalSync($this->inputOptionsDAO);
+        if ($this->inputOptionsDAO->pullIsEnabled()) {
+            $this->executeIntegrationSync($this->inputOptionsDAO);
+        }
+        
+        if ($this->inputOptionsDAO->pushIsEnabled()) {
+            $this->executeInternalSync($this->inputOptionsDAO);
+        }
 
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
