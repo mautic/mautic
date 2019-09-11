@@ -53,19 +53,23 @@ class InputOptionsDAO
     private $endDateTime;
 
     /**
-     * @param InputInterface $input
+     * @param array $input
      * 
      * @throws InvalidValueException
      */
-    public function __construct(InputInterface $input)
+    public function __construct(array $input)
     {
-        $this->integration   = $input->getArgument('integration');
-        $this->firstTimeSync = (bool) $input->getOption('first-time-sync');
-        $this->disablePush   = (bool) $input->getOption('disable-push');
-        $this->disablePull   = (bool) $input->getOption('disable-pull');
-        $this->env           = $input->getOption('env');
-        $startDateTimeString = $input->getOption('start-datetime');
-        $endDateTimeString   = $input->getOption('end-datetime');
+        if (empty($input['integration'])) {
+            throw new InvalidValueException("A integration must be specified. None provided.");
+        }
+
+        $this->integration   = $input['integration'];
+        $this->firstTimeSync = (bool) $input['first-time-sync'] ?? false;
+        $this->disablePush   = (bool) $input['disable-push'] ?? false;
+        $this->disablePull   = (bool) $input['disable-pull'] ?? false;
+        $this->env           = $input['env'] ?? 'prod';
+        $startDateTimeString = $input['start-datetime'] ?? null;
+        $endDateTimeString   = $input['end-datetime'] ?? null;
 
         try {
             $this->startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;

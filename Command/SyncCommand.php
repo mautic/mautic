@@ -93,7 +93,7 @@ class SyncCommand extends ContainerAwareCommand
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $inputOptions = new InputOptionsDAO($input);
+            $inputOptions = new InputOptionsDAO(array_merge($input->getArguments(), $input->getOptions()));
         } catch (InvalidValueException $e) {
             $io->error($e->getMessage());
 
