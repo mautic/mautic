@@ -12,7 +12,6 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 
 use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
-use Symfony\Component\Console\Input\InputInterface;
 use DateTimeInterface;
 
 class InputOptionsDAO
@@ -36,11 +35,6 @@ class InputOptionsDAO
      * @var bool
      */
     private $disablePull;
-
-    /**
-     * @var string
-     */
-    private $env;
 
     /**
      * @var array
@@ -72,7 +66,6 @@ class InputOptionsDAO
         $this->firstTimeSync = (bool) $input['first-time-sync'] ?? false;
         $this->disablePush   = (bool) $input['disable-push'] ?? false;
         $this->disablePull   = (bool) $input['disable-pull'] ?? false;
-        $this->env           = $input['env'] ?? 'prod';
         $startDateTimeString = $input['start-datetime'] ?? null;
         $endDateTimeString   = $input['end-datetime'] ?? null;
         $this->contactIds    = array_map(function ($id) {
@@ -130,14 +123,6 @@ class InputOptionsDAO
     public function getContactIds(): array
     {
         return $this->contactIds;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEnv(): string
-    {
-        return $this->env;
     }
 
     /**
