@@ -21,9 +21,12 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    private const INTEGRATION_NAME = 'Test';
+    
     /**
      * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -48,8 +51,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildingContactReport()
     {
-        $requestDAO = new RequestDAO(1, false, 'Test');
-
+        $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
         $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
         $requestObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, $fromDateTime, $toDateTime);
@@ -76,8 +78,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $report = $this->getReportBuilder()->buildReport($requestDAO);
-
+        $report  = $this->getReportBuilder()->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_CONTACT);
 
         $this->assertTrue(isset($objects[1]));
@@ -86,8 +87,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildingCompanyReport()
     {
-        $requestDAO = new RequestDAO(1, false, 'Test');
-
+        $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
         $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
         $requestObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_COMPANY, $fromDateTime, $toDateTime);
@@ -114,8 +114,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $report = $this->getReportBuilder()->buildReport($requestDAO);
-
+        $report  = $this->getReportBuilder()->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->assertTrue(isset($objects[1]));
