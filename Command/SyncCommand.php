@@ -55,19 +55,25 @@ class SyncCommand extends ContainerAwareCommand
                 '--start-datetime',
                 '-t',
                 InputOption::VALUE_OPTIONAL,
-                'Set start date/time for updated values.'
+                'Set start date/time for updated values in UTC timezone.'
             )
             ->addOption(
                 '--end-datetime',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Set start date/time for updated values.'
+                'Set start date/time for updated values in UTC timezone.'
             )
             ->addOption(
-                '--contact-id',
+                '--mautic-object-id',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Provide specific Mautic contact IDs you want to sync. If some contact IDs are provided then the start/end dates have no effect. Example: --contact-id 12 --contact-id 13'
+                'Provide specific Mautic object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --mautic-object-id=contact:12 --mautic-object-id=company:13'
+            )
+            ->addOption(
+                '--integration-object-id',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Provide specific integration object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --integration-object-id=Account:12 --integration-object-id=Lead:13'
             )
             ->addOption(
                 '--first-time-sync',
