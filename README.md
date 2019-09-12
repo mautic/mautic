@@ -54,8 +54,8 @@ Similarly, you can push specific Mautic contacts to the integration you are deve
 
 ```php
 $mauticObjectIds = new \MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO();
-$mauticObjectIds->addObjectId('contact', 12);
-$mauticObjectIds->addObjectId('contact', 13);
+$mauticObjectIds->addObjectId('contact', '12');
+$mauticObjectIds->addObjectId('contact', '13');
 
 $inputOptions = new MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO(
     [
