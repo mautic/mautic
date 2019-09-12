@@ -23,8 +23,6 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 
 class FullObjectReportBuilder
 {
-    use ProcessFoundObjectsDecorator;
-
     /**
      * @var ContactObjectHelper
      */
