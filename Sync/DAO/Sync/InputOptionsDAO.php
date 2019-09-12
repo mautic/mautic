@@ -12,7 +12,10 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 
 use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use DateTimeInterface;
+use DateTimeImmutable;
+use DateTimeZone;
 
 class InputOptionsDAO
 {
@@ -37,9 +40,14 @@ class InputOptionsDAO
     private $disablePull;
 
     /**
-     * @var array
+     * @var ObjectIdsDAO|null
      */
-    private $contactIds;
+    private $mauticObjectIds;
+
+    /**
+     * @var ObjectIdsDAO|null
+     */
+    private $integrationObjectIds;
 
     /**
      * @var DateTimeInterface|null
@@ -52,6 +60,17 @@ class InputOptionsDAO
     private $endDateTime;
 
     /**
+     * Example $input:
+     * [
+     *      'integration' => 'Magento', // required
+     *      'first-time-sync' => true,
+     *      'disable-push' => false,
+     *      'disable-pull' => false,
+     *      'mautic-object-id' => ['contact:12', 'contact:13'] or a ObjectIdsDAO object,
+     *      'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'] or a ObjectIdsDAO object,
+     *      'start-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
+     *      'end-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
+     * ]
      * @param array $input
      * 
      * @throws InvalidValueException
@@ -59,30 +78,17 @@ class InputOptionsDAO
     public function __construct(array $input)
     {
         if (empty($input['integration'])) {
-            throw new InvalidValueException("A integration must be specified. None provided.");
+            throw new InvalidValueException("An integration must be specified. None provided.");
         }
 
-        $this->integration   = $input['integration'];
-        $this->firstTimeSync = (bool) $input['first-time-sync'] ?? false;
-        $this->disablePush   = (bool) $input['disable-push'] ?? false;
-        $this->disablePull   = (bool) $input['disable-pull'] ?? false;
-        $startDateTimeString = $input['start-datetime'] ?? null;
-        $endDateTimeString   = $input['end-datetime'] ?? null;
-        $this->contactIds    = array_map(function ($id) {
-            return (int) $id;
-        }, ($input['contact-id'] ?? []));
-
-        try {
-            $this->startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;
-        } catch (\Exception $e) {
-            throw new InvalidValueException("'$startDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
-        }
-
-        try {
-            $this->endDateTime = ($endDateTimeString) ? new DateTimeImmutable($endDateTimeString) : null;
-        } catch (\Exception $e) {
-            throw new InvalidValueException("'$endDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
-        }
+        $this->integration          = $input['integration'];
+        $this->firstTimeSync        = (bool) ($input['first-time-sync'] ?? false);
+        $this->disablePush          = (bool) ($input['disable-push'] ?? false);
+        $this->disablePull          = (bool) ($input['disable-pull'] ?? false);
+        $this->startDateTime        = $this->validateDateTime($input, 'start-datetime');
+        $this->endDateTime          = $this->validateDateTime($input, 'end-datetime');
+        $this->mauticObjectIds      = $this->validateObjectIds($input, 'mautic-object-id');
+        $this->integrationObjectIds = $this->validateObjectIds($input, 'integration-object-id');
     }
 
     /**
@@ -118,11 +124,19 @@ class InputOptionsDAO
     }
 
     /**
-     * @return int[]
+     * @return ObjectIdsDAO|null
      */
-    public function getContactIds(): array
+    public function getMauticObjectIds(): ?ObjectIdsDAO
     {
-        return $this->contactIds;
+        return $this->mauticObjectIds;
+    }
+
+    /**
+     * @return ObjectIdsDAO|null
+     */
+    public function getIntegrationObjectIds(): ?ObjectIdsDAO
+    {
+        return $this->integrationObjectIds;
     }
 
     /**
@@ -139,5 +153,53 @@ class InputOptionsDAO
     public function getEndDateTime(): ?\DateTimeInterface
     {
         return $this->endDateTime;
+    }
+
+    /**
+     * @param array $input
+     * @param string $optionName
+     * 
+     * @return DateTimeInterface|null
+     * 
+     * @throws InvalidValueException
+     */
+    private function validateDateTime(array $input, string $optionName): ?DateTimeInterface
+    {
+        if (empty($input[$optionName])) {
+            return null;
+        }
+
+        if ($input[$optionName] instanceof DateTimeInterface) {
+            return $input[$optionName];
+        } else {
+            try {
+                return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
+            } catch (\Exception $e) {
+                throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
+            }
+        }
+    }
+
+    /**
+     * @param array $input
+     * @param string $optionName
+     * 
+     * @return ObjectIdsDAO|null
+     * 
+     * @throws InvalidValueException
+     */
+    private function validateObjectIds(array $input, string $optionName): ?ObjectIdsDAO
+    {
+        if (empty($input[$optionName])) {
+            return null;
+        }
+        
+        if ($input[$optionName] instanceof ObjectIdsDAO) {
+            return $input[$optionName];
+        } elseif (is_array($input[$optionName])) {
+            return ObjectIdsDAO::createFromCliOptions($input[$optionName]);
+        } else {
+            throw new InvalidValueException("{$optionName} option has an unexpected type. Use an array or ObjectIdsDAO object.");
+        }
     }
 }
