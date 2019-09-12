@@ -18,6 +18,8 @@ use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 
 class FullObjectReportBuilder
 {
@@ -59,9 +61,8 @@ class FullObjectReportBuilder
     {
         $syncReport       = new ReportDAO(MauticSyncDataExchange::NAME);
         $requestedObjects = $requestDAO->getObjects();
-
-        $limit = 200;
-        $start = $limit * ($requestDAO->getSyncIteration() - 1);
+        $limit            = 200;
+        $start            = $limit * ($requestDAO->getSyncIteration() - 1);
 
         foreach ($requestedObjects as $requestedObjectDAO) {
             try {
@@ -70,8 +71,8 @@ class FullObjectReportBuilder
                     sprintf(
                         "Searching for %s objects between %s and %s (%d,%d)",
                         $requestedObjectDAO->getObject(),
-                        $requestedObjectDAO->getFromDateTime()->format('Y:m:d H:i:s'),
-                        $requestedObjectDAO->getToDateTime()->format('Y:m:d H:i:s'),
+                        $requestedObjectDAO->getFromDateTime()->format(DATE_ATOM),
+                        $requestedObjectDAO->getToDateTime()->format(DATE_ATOM),
                         $start,
                         $limit
                     ),
@@ -80,12 +81,18 @@ class FullObjectReportBuilder
 
                 switch ($requestedObjectDAO->getObject()) {
                     case MauticSyncDataExchange::OBJECT_CONTACT:
-                        $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
-                            $requestedObjectDAO->getFromDateTime(),
-                            $requestedObjectDAO->getToDateTime(),
-                            $start,
-                            $limit
-                        );
+                        if ($requestDAO->getInputOptionsDAO()->getIntegrationObjectIds()) {
+                            $idChunks     = array_chunk($requestDAO->getInputOptionsDAO()->getIntegrationObjectIds()->getObjectIdsFor('contact'), $limit);
+                            $idChunk      = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
+                            $foundObjects = $this->contactObjectHelper->findObjectsByIds($idChunk);
+                        } else {
+                            $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
+                                $requestedObjectDAO->getFromDateTime(),
+                                $requestedObjectDAO->getToDateTime(),
+                                $start,
+                                $limit
+                            );
+                        }
 
                         break;
                     case MauticSyncDataExchange::OBJECT_COMPANY:
@@ -100,7 +107,7 @@ class FullObjectReportBuilder
                         throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $requestedObjectDAO->getObject());
                 }
 
-                $this->processObjects($requestedObjectDAO, $syncReport, $foundObjects, $this->fieldBuilder);
+                $this->processObjects($requestedObjectDAO, $syncReport, $foundObjects);
 
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
@@ -112,5 +119,37 @@ class FullObjectReportBuilder
         }
 
         return $syncReport;
+    }
+
+    /**
+     * @param ObjectDAO $requestedObjectDAO
+     * @param ReportDAO $syncReport
+     * @param array     $foundObjects
+     */
+    private function processObjects(ObjectDAO $requestedObjectDAO, ReportDAO $syncReport, array $foundObjects)
+    {
+        $fields = $requestedObjectDAO->getFields();
+        foreach ($foundObjects as $object) {
+            $modifiedDateTime = new \DateTime(
+                !empty($object['date_modified']) ? $object['date_modified'] : $object['date_added'],
+                new \DateTimeZone('UTC')
+            );
+            $reportObjectDAO  = new ReportObjectDAO($requestedObjectDAO->getObject(), $object['id'], $modifiedDateTime);
+            $syncReport->addObject($reportObjectDAO);
+
+            foreach ($fields as $field) {
+                try {
+                    $reportFieldDAO = $this->fieldBuilder->buildObjectField($field, $object, $requestedObjectDAO, $syncReport->getIntegration());
+                    $reportObjectDAO->addField($reportFieldDAO);
+                } catch (FieldNotFoundException $exception) {
+                    // Field is not supported so keep going
+                    DebugLogger::log(
+                        MauticSyncDataExchange::NAME,
+                        $exception->getMessage(),
+                        __CLASS__.':'.__FUNCTION__
+                    );
+                }
+            }
+        }
     }
 }

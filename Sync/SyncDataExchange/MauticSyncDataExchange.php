@@ -27,7 +27,6 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\O
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\IdReportBuilder;
 
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
@@ -61,11 +60,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $partialObjectReportBuilder;
 
     /**
-     * @var IdReportBuilder
-     */
-    private $idReportBuilder;
-
-    /**
      * @var OrderExecutioner
      */
     private $orderExecutioner;
@@ -76,7 +70,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param MappingHelper              $mappingHelper
      * @param FullObjectReportBuilder    $fullObjectReportBuilder
      * @param PartialObjectReportBuilder $partialObjectReportBuilder
-     * @param IdReportBuilder            $idReportBuilder
      * @param OrderExecutioner           $orderExecutioner
      */
     public function __construct(
@@ -85,7 +78,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         MappingHelper $mappingHelper,
         FullObjectReportBuilder $fullObjectReportBuilder,
         PartialObjectReportBuilder $partialObjectReportBuilder,
-        IdReportBuilder $idReportBuilder,
         OrderExecutioner $orderExecutioner
     )
     {
@@ -94,7 +86,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         $this->mappingHelper              = $mappingHelper;
         $this->fullObjectReportBuilder    = $fullObjectReportBuilder;
         $this->partialObjectReportBuilder = $partialObjectReportBuilder;
-        $this->idReportBuilder            = $idReportBuilder;
         $this->orderExecutioner           = $orderExecutioner;
     }
 
@@ -105,9 +96,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
-        if ($requestDAO->getInputOptionsDAO()->getContactIds()) {
-            return $this->idReportBuilder->buildReport($requestDAO);
-        } elseif ($requestDAO->isFirstTimeSync()) {
+        if ($requestDAO->isFirstTimeSync() || $requestDAO->getInputOptionsDAO()->getIntegrationObjectIds()) {
             return $this->fullObjectReportBuilder->buildReport($requestDAO);
         }
 
