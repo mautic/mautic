@@ -232,12 +232,8 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
             $this->membershipBuilder->build($campaign, $this->contactLimiter, $this->runLimit, ($this->quiet) ? null : $this->output);
         } catch (\Exception $exception) {
-            if ('prod' !== MAUTIC_ENV) {
-                // Throw the exception for dev/test mode
-                throw $exception;
-            }
-
             $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+            throw $exception;
         }
 
         // Don't detach in tests since this command will be ran multiple times in the same process
