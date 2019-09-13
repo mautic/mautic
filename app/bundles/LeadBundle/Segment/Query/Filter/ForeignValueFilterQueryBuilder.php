@@ -44,13 +44,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
-        /*
-        $subQueryBuilder
-            ->select('NULL')->from($filter->getTable(), $tableAlias)
-            ->andWhere($tableAlias.'.lead_id = l.id');
-        */
-       
+        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();        
         $subQueryBuilder
             ->select($tableAlias.'.lead_id')->from($filter->getTable(), $tableAlias);
 
@@ -59,39 +53,39 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         switch ($filterOperator) {
-            case 'empty':
-                $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()));
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
-                break;
+            case 'empty': 
             case 'notEmpty':
-                $subQueryBuilder->andWhere($subQueryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()));
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                //Using a join table is necessary for empty/not empty to work properly
+                //An Exists or IN subquery would not provide the proper result if there is no record for the lead in the foreign table
+                //If we join the foreign table by lead_id and check for the filtered field for Null/notnull, the result will contain both those leads that have no record in the foreign table and those that have but with the value of NULL
+                //Most often if a lead has not or has not done something that is usually stored in a foreign table, there is no record for that data
+                //As empty/not empty you want to check whether that record is present or not
+
+                $tableAlias = $this->generateRandomParameterName();
+
+                $queryBuilder->leftJoin(
+                    $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads'),
+                    $filter->getTable(),
+                    $tableAlias,
+                    $tableAlias.'.lead_id = l.id'
+                );
+
+                if ($filterOperator == 'empty') {
+                    $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()), $filter->getGlue());                
+                } else {
+                    $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()), $filter->getGlue());                    
+                }
                 break;
             case 'notIn':
-                // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
-                // We are not using EXISTS...NOT IN because it results in including everyone who has at least one entry that doesn't
-                // match the criteria. For example, with tags, if the contact has the tag in the filter but also another tag, they'll
-                // be included in the results which is not what we want.
-                $expression = $subQueryBuilder->expr()->in(
-                    $tableAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
+                $expression = $subQueryBuilder->expr()->andX(
+                    $subQueryBuilder->expr()->in($tableAlias.'.'.$filter->getField(),$filterParametersHolder),
+                    $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
                 );
 
                 $subQueryBuilder->andWhere($expression);
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'neq':
-                /*
-                $expression = $subQueryBuilder->expr()->orX(
-                    $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
-                    $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
-                );
-
-                $subQueryBuilder->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
-                */
-               
                 $expression = $subQueryBuilder->expr()->andX(
                     $subQueryBuilder->expr()->eq($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
@@ -103,18 +97,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 break;
             case 'notLike':
-                /*
-                $expression = $subQueryBuilder->expr()->orX(
-                    $subQueryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()),
-                    $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder)
-                );
-
-                $subQueryBuilder->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
-                */
-               
-                $expression = $subQueryBuilder->expr()->andX(                    
+                $expression = $subQueryBuilder->expr()->andX(
                     $subQueryBuilder->expr()->like($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
                 );
@@ -124,13 +107,21 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->notIn('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             case 'regexp':
-            case 'notRegexp':
-                $not        = ($filterOperator === 'notRegexp') ? ' NOT' : '';
-                $expression = $tableAlias.'.'.$filter->getField().$not.' REGEXP '.$filterParametersHolder;
+                $expression = $tableAlias.'.'.$filter->getField().' REGEXP '.$filterParametersHolder;
 
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->in('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+                break;
+            case 'notRegexp':
+                $expression = $subQueryBuilder->expr()->andX(
+                    $tableAlias.'.'.$filter->getField().'  REGEXP '.$filterParametersHolder,
+                    $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
+                );
+
+                $subQueryBuilder->andWhere($expression);
+
+                $queryBuilder->addLogic($queryBuilder->expr()->notIn('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
                 $expression = $subQueryBuilder->expr()->$filterOperator(
@@ -139,8 +130,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
                 $subQueryBuilder->andWhere($expression);
 
-                //$queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
-                $queryBuilder->addLogic($queryBuilder->expr()->in('l.id', $subQueryBuilder->getDQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->in('l.id', $subQueryBuilder->getSQL()), $filter->getGlue());
         }
 
         $queryBuilder->setParametersPairs($parameters, $filterParameters);
