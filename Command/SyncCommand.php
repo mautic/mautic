@@ -70,13 +70,12 @@ class SyncCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Provide specific Mautic object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --mautic-object-id=contact:12 --mautic-object-id=company:13'
             )
-            // Not implemented yet:
-            // ->addOption(
-            //     '--integration-object-id',
-            //     null,
-            //     InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-            //     'Provide specific integration object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --integration-object-id=Account:12 --integration-object-id=Lead:13'
-            // )
+            ->addOption(
+                '--integration-object-id',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Provide specific integration object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. It depends on each integration if this is supported. Example: --integration-object-id=Account:12 --integration-object-id=Lead:13'
+            )
             ->addOption(
                 '--first-time-sync',
                 '-f',

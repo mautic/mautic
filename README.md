@@ -50,6 +50,8 @@ There is also option to force sync of specific objects. With the `--disable-pull
 
 The format of the `--mautic-object-id` values is `object type[colon]object ID`. Mautic can sync 2 object types: `contact` and `company`. The latter is not implemented yet.
 
+The `--integration-object-id` uses the same format as `--mautic-object-id` but it's up to each integration to support it.
+
 Similarly, you can push specific Mautic contacts to the integration you are developing like the following example. It can be useful if you want to push as a campaign/form/point action.
 
 ```php
