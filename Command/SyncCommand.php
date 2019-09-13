@@ -22,6 +22,8 @@ use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 
 class SyncCommand extends ContainerAwareCommand
 {
+    public const NAME = 'mautic:integrations:sync';
+
     /**
      * @var SyncServiceInterface
      */
@@ -42,7 +44,7 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:integrations:sync')
+        $this->setName(self::NAME)
             ->setDescription('Fetch objects from integration.')
             ->addArgument(
                 'integration',
@@ -117,7 +119,7 @@ class SyncCommand extends ContainerAwareCommand
 
             $this->syncService->processIntegrationSync($inputOptions);
         } catch (\Exception $e) {
-            if ($inputOptions->getEnv() === 'dev' || MAUTIC_ENV === 'dev') {
+            if ($input->getOption('env') === 'dev' || (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev')) {
                 throw $e;
             }
 
