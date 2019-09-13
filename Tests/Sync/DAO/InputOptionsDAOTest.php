@@ -16,6 +16,7 @@ use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use DateTimeImmutable;
 use DateTimeZone;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +28,7 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
                 'first-time-sync'       => true,
                 'disable-push'          => false,
                 'disable-pull'          => true,
-                'mautic-object-id'      => ['contact:12', 'contact:13'],
+                'mautic-object-id'      => ['contact:12', 'contact:13', 'company:45'],
                 'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'],
                 'start-datetime'        => '2019-09-12T12:01:20',
                 'end-datetime'          => '2019-10-12T12:01:20',
@@ -38,7 +39,8 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($objectIdsDAO->isFirstTimeSync());
         $this->assertFalse($objectIdsDAO->pullIsEnabled());
         $this->assertTrue($objectIdsDAO->pushIsEnabled());
-        $this->assertSame(['12', '13'], $objectIdsDAO->getMauticObjectIds()->getObjectIdsFor('contact'));
+        $this->assertSame(['12', '13'], $objectIdsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT));
+        $this->assertSame(['45'], $objectIdsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_COMPANY));
         $this->assertSame(['hfskjdhf', 'hfskjdhr'], $objectIdsDAO->getIntegrationObjectIds()->getObjectIdsFor('Lead'));
         $this->assertSame('2019-09-12T12:01:20+00:00', $objectIdsDAO->getStartDateTime()->format(DATE_ATOM));
         $this->assertSame('2019-10-12T12:01:20+00:00', $objectIdsDAO->getEndDateTime()->format(DATE_ATOM));

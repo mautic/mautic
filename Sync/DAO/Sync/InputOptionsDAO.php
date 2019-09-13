@@ -16,6 +16,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class InputOptionsDAO
 {
@@ -80,7 +81,7 @@ class InputOptionsDAO
         if (empty($input['integration'])) {
             throw new InvalidValueException("An integration must be specified. None provided.");
         }
-
+        $input                      = $this->fixNaming($input);
         $this->integration          = $input['integration'];
         $this->firstTimeSync        = (bool) ($input['first-time-sync'] ?? false);
         $this->disablePush          = (bool) ($input['disable-push'] ?? false);
@@ -201,5 +202,34 @@ class InputOptionsDAO
         } else {
             throw new InvalidValueException("{$optionName} option has an unexpected type. Use an array or ObjectIdsDAO object.");
         }
+    }
+
+    /**
+     * This method exists only because Mautic leads were renamed to contacts. Users will be able
+     * to use the "contact" keywoard and developers "lead" as the integration bundle use "lead" everywhere.
+     *
+     * @param array $input
+     * 
+     * @return array
+     */
+    private function fixNaming(array $input): array
+    {
+        if (empty($input['mautic-object-id'])) {
+            return $input;
+        }
+
+        if (!is_array($input['mautic-object-id'])) {
+            return $input;
+        }
+
+        foreach ($input['mautic-object-id'] as $key => $mauticObjectId) {
+            $input['mautic-object-id'][$key] = preg_replace(
+                '/^contact:/',
+                MauticSyncDataExchange::OBJECT_CONTACT.':',
+                $mauticObjectId
+            );
+        }
+
+        return $input;
     }
 }
