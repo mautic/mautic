@@ -158,7 +158,7 @@ class ContactSegmentQueryBuilder
         $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));
 
         $tableAlias = $this->generateRandomParameterName();
-        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id');
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', $tableAlias, $tableAlias.'.lead_id = l.id', 'FORCE INDEX (PRIMARY)');
         $queryBuilder->addSelect($tableAlias.'.lead_id AS '.$tableAlias.'_lead_id');
 
         $expression = $queryBuilder->expr()->eq($tableAlias.'.leadlist_id', $segmentId);
