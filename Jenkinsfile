@@ -82,6 +82,7 @@ pipeline {
             echo "Merging PR to beta"
             withEnv(["PRNUMBER=${CHANGE_ID}"]) {
             sshagent (credentials: ['1a066462-6d24-4247-bef6-1da084c8f484']) {
+            dir('plugins/IntegrationsBundle') {
               sh '''
                 gitsha="$(git rev-parse HEAD)"
                 if [ "$(git --no-pager show -s HEAD --format='%ae')" = "nobody@nowhere" ]; then
@@ -95,7 +96,7 @@ pipeline {
                 git push origin HEAD:beta
                 git checkout "$gitsha"
               '''
-            }}
+            }}}
           }
         }
       }
