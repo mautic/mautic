@@ -154,8 +154,9 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
                 // Get bounced recipients in an array
                 $bouncedRecipients = $message['bounce']['bouncedRecipients'];
                 foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bouncedRecipient['diagnosticCode'], DoNotContact::BOUNCED, $emailId);
-                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bouncedRecipient['diagnosticCode']);
+                        $bounceCode = array_key_exists('diagnosticCode', $bouncedRecipient) ? $bouncedRecipient['diagnosticCode'] : 'unknown';
+                        $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bounceCode, DoNotContact::BOUNCED, $emailId);
+                        $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bounceCode);
                 }
 
                 return;
