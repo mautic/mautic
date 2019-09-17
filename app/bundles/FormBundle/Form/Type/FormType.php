@@ -57,6 +57,16 @@ class FormType extends AbstractType
             'attr'       => ['class' => 'form-control'],
         ]);
 
+        $builder->add('formAttributes', 'text', [
+            'label'      => 'mautic.form.field.form.form_attr',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
+            ],
+            'required'   => false,
+        ]);
+
         $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
