@@ -101,6 +101,11 @@ class LeadSubscriber extends CommonSubscriber
 
         $changes = $lead->getChanges(true);
 
+        if (!empty($changes['owner'])) {
+            // Force record of owner change if present in changelist
+            $changes['fields']['owner'] = $changes['owner'];
+        }
+
         if (isset($changes['fields'])) {
             $this->recordFieldChanges($changes['fields'], $lead->getId(), Lead::class);
         }
