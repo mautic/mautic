@@ -17,13 +17,14 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 
 class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $fieldChangeRepository;
-    private $variableExpresserHelperInterface;
+    private $variableExpresserHelper;
     private $syncIntegrationsHelper;
     private $subscriber;
 
@@ -32,11 +33,11 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->fieldChangeRepository = $this->createMock(FieldChangeRepository::class);
-        $this->variableExpresserHelperInterface = $this->createMock(VariableExpresserHelperInterface::class);
+        $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
         $this->syncIntegrationsHelper = $this->createMock(SyncIntegrationsHelper::class);
         $this->subscriber = new LeadSubscriber(
             $this->fieldChangeRepository,
-            $this->variableExpresserHelperInterface,
+            $this->variableExpresserHelper,
             $this->syncIntegrationsHelper
         );
     }
@@ -59,7 +60,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
-    public function testOnLeadPostSaveAnonymousLeadObjectSyncNotEnabled()
+    public function testOnLeadPostSaveLeadObjectSyncNotEnabled()
     {
         $lead = $this->createMock(Lead::class);
         $lead->expects($this->at(0))
@@ -77,6 +78,48 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('hasObjectSyncEnabled')
             ->with(MauticSyncDataExchange::OBJECT_CONTACT)
             ->willReturn(false);
+
+        $this->subscriber->onLeadPostSave($event);
+    }
+
+    public function testOnLeadPostSave()
+    {
+        $fieldName = 'fieldName';
+        $oldValue = 'oldValue';
+        $newValue = 'newValue';
+        $fieldChanges = [
+            'fields' => [
+                $fieldName => [
+                    $oldValue,
+                    $newValue,
+                ],
+            ],
+        ];
+        $objectId = 1;
+        $objectType = Lead::class;
+
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->at(0))
+            ->method('isAnonymous')
+            ->willReturn(false);
+        $lead->expects($this->once())
+            ->method('getChanges')
+            ->willReturn($fieldChanges);
+        $lead->expects($this->once())
+            ->method('getId')
+            ->willReturn($objectId);
+
+        $event = $this->createMock(LeadEvent::class);
+        $event->expects($this->once())
+            ->method('getLead')
+            ->willReturn($lead);
+
+        $this->syncIntegrationsHelper->expects($this->once())
+            ->method('hasObjectSyncEnabled')
+            ->with(MauticSyncDataExchange::OBJECT_CONTACT)
+            ->willReturn(true);
+
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
 
         $this->subscriber->onLeadPostSave($event);
     }
@@ -112,5 +155,43 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
             ],
             LeadSubscriber::getSubscribedEvents()
         );
+    }
+
+    private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
+    {
+        $integrationName = 'testIntegration';
+
+        $this->syncIntegrationsHelper->expects($this->any())
+            ->method('getEnabledIntegrations')
+            ->willReturn([$integrationName]);
+
+        $fieldNames = [];
+        foreach ($fieldChanges as $fieldName => list($oldValue, $newValue)) {
+            $valueDao = $this->createmock(EncodedValueDAO::class);
+            $valueDao->expects($this->once())
+                ->method('getType')
+                ->willReturn($objectType);
+            $valueDao->expects($this->once())
+                ->method('getValue')
+                ->willReturn($newValue);
+
+            $this->variableExpresserHelper->expects($this->once())
+                ->method('encodeVariable')
+                ->with($newValue)
+                ->willReturn($valueDao);
+
+            $fieldNames[] = $fieldName;
+        }
+
+        $this->fieldChangeRepository->expects($this->once())
+            ->method('deleteEntitiesForObjectByColumnName')
+            ->with($objectId, $objectType, $fieldNames);
+
+//        $this->fieldChangeRepository->expects($this->once())
+//            ->method('saveEntities')
+//            ->with($this->callback())
+
+        $this->fieldChangeRepository->expects($this->once())
+            ->method('clear');
     }
 }
