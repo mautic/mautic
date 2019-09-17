@@ -29,7 +29,7 @@ class SmsPropertiesEvent extends Event
     /**
      * @var array
      */
-    private $fields;
+    private $fields = [];
 
     /**
      * @param FormBuilder $builder
