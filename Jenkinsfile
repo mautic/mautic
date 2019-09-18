@@ -1,3 +1,5 @@
+def REPO_NAME = env.JOB_NAME.split("/")[0]
+
 pipeline {
   options {
     skipDefaultCheckout()
@@ -132,6 +134,43 @@ pipeline {
               git push
             '''
           }
+        }
+      }
+    }
+  }
+  post {
+    failure {
+      script {
+        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+          slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on branch ${env.BRANCH_NAME}. (${env.BUILD_URL}console)")
+        }
+        if (env.CHANGE_AUTHOR != null && !env.CHANGE_TITLE.contains("WIP")) {
+          def githubToSlackMap = [
+            'alanhartless':'alan.hartless',
+            'anton-vlasenko':'anton.vlasenko',
+            'dongilbert':'don.gilbert',
+            'escopecz':'jan.linhart',
+            'galvani':'jan.kozak',
+            'Gregy':'petr.gregor',
+            'hluchas':'lukas.drahy',
+            'javjim-mautic':'javier.jimeno',
+            'mtshaw3':'mike.shaw',
+            'ondrejsibl':'ondrej.sibl',
+            'pavel-hladik':'pavel.hladik'
+          ]
+          if (githubToSlackMap.("${env.CHANGE_AUTHOR}")) {
+            slackSend (channel: "@"+"${githubToSlackMap.("${env.CHANGE_AUTHOR}")}", color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console")
+          }
+          else {
+            slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console\nsending alert to channel, there is no Github to Slack mapping for '${CHANGE_AUTHOR}'")
+          }
+        }
+      }
+    }
+    fixed {
+      script {
+        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+          slackSend (color: '#00FF00', message: "${REPO_NAME} build on branch ${env.BRANCH_NAME} is fixed. (${env.BUILD_URL}console)")
         }
       }
     }
