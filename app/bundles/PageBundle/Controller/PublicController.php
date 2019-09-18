@@ -449,7 +449,7 @@ class PublicController extends CommonFormController
         $query = $this->request->query->all();
 
         // Unset the clickthrough from the URL query
-        $ct = $query['ct'];
+        $ct = $query['ct'] ?? '';
         unset($query['ct']);
 
         // Tak on anything left to the URL
@@ -461,7 +461,7 @@ class PublicController extends CommonFormController
         // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
         // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
         $ipAddress = $this->container->get('mautic.helper.ip_lookup')->getIpAddress();
-        if ($ipAddress->isTrackable()) {
+        if ($ct && $ipAddress->isTrackable()) {
             // Search replace lead fields in the URL
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
