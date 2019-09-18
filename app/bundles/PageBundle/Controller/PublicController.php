@@ -449,7 +449,7 @@ class PublicController extends CommonFormController
         $query = $this->request->query->all();
 
         // Unset the clickthrough from the URL query
-        $ct = $query['ct'] ?? '';
+        $ct = $query['ct'] ? '';
         unset($query['ct']);
 
         // Tak on anything left to the URL
