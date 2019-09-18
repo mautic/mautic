@@ -649,8 +649,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function from($from, $alias = null, $indexHint = '')
     {
         return $this->add('from', [
-            'table' => $from,
-            'alias' => $alias,
+            'table'     => $from,
+            'alias'     => $alias,
             'indexHint' => $indexHint,
         ], true);
     }
@@ -1193,14 +1193,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         foreach ($this->sqlParts['from'] as $from) {
             if ($from['alias'] === null) {
                 if (!empty($from['indexHint'])){
-                    $tableSql       = $from['table'].' '.$from['indexHint'];    
+                    $tableSql       = $from['table'].' '.$from['indexHint'];
                 } else {
                     $tableSql       = $from['table'];
                 }
                 $tableReference = $from['table'];
             } else {
                 if (!empty($from['indexHint'])){
-                    $tableSql       = $from['table'].' '.$from['alias'].' '.$from['indexHint'];    
+                    $tableSql       = $from['table'].' '.$from['alias'].' '.$from['indexHint'];
                 } else {
                     $tableSql       = $from['table'].' '.$from['alias'];
                 }                
@@ -1378,7 +1378,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                     throw QueryException::nonUniqueAlias($join['joinAlias'], array_keys($knownAliases));
                 }
                 $sql .= ' '.strtoupper($join['joinType'])
-                    .' JOIN '.$join['joinTable'].' '.$join['joinAlias'].(!empty($join['joinIndexHint'])?' '.$join['joinIndexHint']:'')
+                    .' JOIN '.$join['joinTable'].' '.$join['joinAlias'].(!empty($join['joinIndexHint']) ? ' '.$join['joinIndexHint'] : '')
                     .' ON '.((string) $join['joinCondition']);
                 $knownAliases[$join['joinAlias']] = true;
             }

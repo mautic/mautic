@@ -44,7 +44,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = $this->generateRandomParameterName();
 
-        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();        
+        $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
         $subQueryBuilder
             ->select($tableAlias.'.lead_id')->from($filter->getTable(), $tableAlias);
 
@@ -53,7 +53,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         switch ($filterOperator) {
-            case 'empty': 
+            case 'empty':
             case 'notEmpty':
                 //Using a join table is necessary for empty/not empty to work properly
                 //An Exists or IN subquery would not provide the proper result if there is no record for the lead in the foreign table
@@ -71,14 +71,14 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 );
 
                 if ($filterOperator == 'empty') {
-                    $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()), $filter->getGlue());                
+                    $queryBuilder->addLogic($queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField()), $filter->getGlue());
                 } else {
-                    $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()), $filter->getGlue());                    
+                    $queryBuilder->addLogic($queryBuilder->expr()->isNotNull($tableAlias.'.'.$filter->getField()), $filter->getGlue());
                 }
                 break;
             case 'notIn':
                 $expression = $subQueryBuilder->expr()->andX(
-                    $subQueryBuilder->expr()->in($tableAlias.'.'.$filter->getField(),$filterParametersHolder),
+                    $subQueryBuilder->expr()->in($tableAlias.'.'.$filter->getField(), $filterParametersHolder),
                     $subQueryBuilder->expr()->isNotNull($tableAlias.'.lead_id')
                 );
 
