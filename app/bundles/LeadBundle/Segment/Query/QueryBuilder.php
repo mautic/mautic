@@ -1192,18 +1192,18 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         // Loop through all FROM clauses
         foreach ($this->sqlParts['from'] as $from) {
             if ($from['alias'] === null) {
-                if (!empty($from['indexHint'])){
+                if (!empty($from['indexHint'])) {
                     $tableSql       = $from['table'].' '.$from['indexHint'];
                 } else {
                     $tableSql       = $from['table'];
                 }
                 $tableReference = $from['table'];
             } else {
-                if (!empty($from['indexHint'])){
+                if (!empty($from['indexHint'])) {
                     $tableSql       = $from['table'].' '.$from['alias'].' '.$from['indexHint'];
                 } else {
                     $tableSql       = $from['table'].' '.$from['alias'];
-                }                
+                }
                 $tableReference = $from['alias'];
             }
 
