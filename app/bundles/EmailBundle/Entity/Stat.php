@@ -150,6 +150,7 @@ class Stat
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
             ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
+            ->addIndex(['lead_id', 'date_read'], 'email_lead_date_read');
 
         $builder->addId();
 
