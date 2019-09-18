@@ -1553,13 +1553,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $parts     = $this->getQueryParts();
 
         $leadTable = $parts['from'][0]['alias'];
-        if (!isset($parts['join'][$leadTable])) {
-            return $leadTable.'.id';
-        }
 
         if ($leadTable == 'orp') {
             return 'orp.lead_id';
         }
+
+        if (!isset($parts['join'][$leadTable])) {
+            return $leadTable.'.id';
+        }    
 
         $joins     = $parts['join'][$leadTable];
 
