@@ -96,7 +96,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
-        if ($requestDAO->isFirstTimeSync() || $requestDAO->getInputOptionsDAO()->getIntegrationObjectIds()) {
+        if ($requestDAO->isFirstTimeSync() || $requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
             return $this->fullObjectReportBuilder->buildReport($requestDAO);
         }
 

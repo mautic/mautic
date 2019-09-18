@@ -79,8 +79,8 @@ class FullObjectReportBuilder
 
                 switch ($requestedObjectDAO->getObject()) {
                     case MauticSyncDataExchange::OBJECT_CONTACT:
-                        if ($requestDAO->getInputOptionsDAO()->getIntegrationObjectIds()) {
-                            $idChunks     = array_chunk($requestDAO->getInputOptionsDAO()->getIntegrationObjectIds()->getObjectIdsFor('contact'), $limit);
+                        if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
+                            $idChunks     = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT), $limit);
                             $idChunk      = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
                             $foundObjects = $this->contactObjectHelper->findObjectsByIds($idChunk);
                         } else {
