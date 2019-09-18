@@ -13,6 +13,8 @@ namespace Mautic\SmsBundle\Sms;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\Stat;
 use Monolog\Logger;
 
 class TransportChain
@@ -100,9 +102,9 @@ class TransportChain
      *
      * @throws \Exception
      */
-    public function sendSms(Lead $lead, $content)
+    public function sendSms(Lead $lead, $content, Sms $sms = null, Stat $stat = null)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content);
+        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $sms, $stat);
 
         return $response;
     }
