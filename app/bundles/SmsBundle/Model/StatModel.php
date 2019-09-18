@@ -63,7 +63,7 @@ class StatModel
         } elseif ($this->deliveryStatusDAO->isRead()) {
             $this->setAsReadAndUpCount();
         } elseif ($this->deliveryStatusDAO->isFailed()) {
-            $this->setAsFailedandUpCount();
+            $this->setAsFailedAndUpCount();
         } else {
             return;
         }
@@ -104,7 +104,7 @@ class StatModel
     /**
      * Pretend up count for already failed messages.
      */
-    public function setAsFailedandUpCount()
+    public function setAsFailedAndUpCount()
     {
         if (!$this->stat->isFailed()) {
             $this->sms->setFailedCount($this->sms->getFailedCount() + 1);
