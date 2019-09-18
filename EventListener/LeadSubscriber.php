@@ -105,7 +105,7 @@ class LeadSubscriber extends CommonSubscriber
 
         if (!empty($changes['owner'])) {
             // Force record of owner change if present in changelist
-            $changes['fields']['owner'] = $changes['owner'];
+            $changes['fields']['owner_id'] = $changes['owner'];
         }
 
         if (isset($changes['fields'])) {
