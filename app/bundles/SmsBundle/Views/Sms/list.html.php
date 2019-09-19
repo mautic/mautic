@@ -123,14 +123,10 @@ if (count($items)):
                     </td>
                     <td>
                         <div>
-                            <?php if ($type == 'template'): ?>
-                                <?php echo $view->render(
-                                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                    ['item' => $item, 'model' => 'sms']
-                                ); ?>
-                            <?php else: ?>
-                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted disabled"></i>
-                            <?php endif; ?>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                                ['item' => $item, 'model' => 'sms']
+                            ); ?>
                             <a href="<?php echo $view['router']->path(
                                 'mautic_sms_action',
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
