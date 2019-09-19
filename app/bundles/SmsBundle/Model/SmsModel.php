@@ -310,7 +310,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'content' => $tokenEvent->getContent(),
                     ];
 
-                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $sms, $stat);
+                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $stat);
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
