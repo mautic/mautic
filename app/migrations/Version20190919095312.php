@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
  */
 class Version20190919095312 extends AbstractMauticMigration
 {
-     /**
+    /**
      * @param Schema $schema
      *
      * @throws SkipMigrationException
