@@ -366,7 +366,9 @@ return [
             ],
             'mautic.integrations.helper.relations' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\RelationsHelper::class,
-                'arguments' => [],
+                'arguments' => [
+                    'mautic.integrations.helper.sync_mapping',
+                ],
             ],
             'mautic.integrations.sync.notifier' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier::class,

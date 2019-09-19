@@ -197,7 +197,10 @@ class SyncProcess
             // Update the mappings in case objects have been converted such as Lead -> Contact
             $this->mappingHelper->remapIntegrationObjects($syncReport->getRemappedObjects());
 
+
+
             // RelationHelper check relations
+            $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
 
             // Convert the integrations' report into an "order" or instructions for Mautic
             $syncOrder = $this->mauticSyncProcess->getSyncOrder($syncReport, $this->isFirstTimeSync, $this->mappingManualDAO);

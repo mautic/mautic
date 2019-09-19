@@ -184,8 +184,8 @@ class ReportDAO
      */
     public function addRelations(ObjectDAO $objectDAO, array $relations)
     {
-        foreach ($relations as $relObjectName => $relObjectId) {
-            $this->addRelation($objectDAO, $relObjectName, $relObjectId);
+        foreach ($relations as $relObjectName => $relation) {
+            $this->addRelation($objectDAO, $relObjectName, $relation);
         }
     }
 
@@ -194,9 +194,9 @@ class ReportDAO
      * @param string    $relObjectName
      * @param string    $relObjectId
      */
-    public function addRelation(ObjectDAO $objectDAO, string $relObjectName, string $relObjectId)
+    public function addRelation(ObjectDAO $objectDAO, string $fieldName, RelationDao $relation)
     {
-        $this->relations[$objectDAO->getObject()][$objectDAO->getObjectId()][$relObjectName] = $relObjectId;
+        $this->relations[$objectDAO->getObject()][$objectDAO->getObjectId()][$fieldName] = $relation;
     }
 
     /**
@@ -205,8 +205,32 @@ class ReportDAO
      *
      * @return array
      */
-    public function getRelations(string $objectName, string $objectId): array
+    public function getRelations(): array
+    {
+        return $this->relations;
+    }
+
+    /**
+     * @param string $objectName
+     * @param string $objectId
+     *
+     * @return array
+     */
+    public function getRelationsForObject(string $objectName, string $objectId): array
     {
         return $this->relations[$objectName][$objectId] ?? [];
+    }
+
+
+    /**
+     * @param string $objectName
+     * @param string $objectId
+     * @param string $fieldName
+     *
+     * @return RelationDAO
+     */
+    public function getRelationsForField(string $objectName, string $objectId, string $fieldName): ?RelationDAO
+    {
+        return $this->relations[$objectName][$objectId][$fieldName] ?? null;
     }
 }
