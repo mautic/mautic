@@ -527,7 +527,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    isset($options['template']) ? $options['template'] : false
+                    isset($options['sms_type']) ? $options['sms_type'] : null
                 );
 
                 foreach ($entities as $entity) {
