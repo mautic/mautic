@@ -278,11 +278,11 @@ class ContactSegmentService
         $qbO = new QueryBuilder($queryBuilder->getConnection());
         $qbO->select('orp.lead_id as id, orp.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
-        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
-        $qbO->andWhere($qbO->expr()->notIn('orp.lead_id', $queryBuilder->getSQL()));
+        $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
         $qbO->setParameters($queryBuilder->getParameters());
-
+        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
+        $qbO->andWhere($qbO->expr()->isNull('members.id'));
+        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
         $qbO->setParameter(':orpsegid', $segment->getId());
         $this->addLeadLimiter($qbO, $batchLimiters, 'orp.lead_id');
 
