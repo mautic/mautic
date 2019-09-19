@@ -175,20 +175,21 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         }
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return 0;
+            return 1;
         }
 
         $this->contactLimiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
 
+        $success = true;
         if ($id) {
             $campaign = $this->campaignRepository->getEntity($id);
             if ($campaign === null) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return 0;
+                return 1;
             }
 
-            $this->updateCampaign($campaign);
+            $success = $this->updateCampaign($campaign);
         } else {
             $campaigns = $this->campaignRepository->getEntities(
                 [
@@ -200,7 +201,8 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 // Get first item; using reset as the key will be the ID and not 0
                 $campaign = reset($results);
 
-                $this->updateCampaign($campaign);
+                // Order matters here, we want to update each campaign regardless of earlier errors
+                $success = $this->updateCampaign($campaign) && $success;
 
                 unset($results, $campaign);
             }
@@ -208,11 +210,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return $success ? 0 : 1;
     }
 
     /**
      * @param Campaign $campaign
+     *
+     * @return bool
      *
      * @throws \Exception
      */
@@ -222,6 +226,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             return;
         }
 
+        $success = true;
         try {
             $this->output->writeln(
                 '<info>'.$this->translator->trans('mautic.campaign.rebuild.rebuilding', ['%id%' => $campaign->getId()]).'</info>'
@@ -232,8 +237,12 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
             $this->membershipBuilder->build($campaign, $this->contactLimiter, $this->runLimit, ($this->quiet) ? null : $this->output);
         } catch (\Exception $exception) {
+            if ('prod' !== MAUTIC_ENV) {
+                // Throw the exception for dev/test mode
+                throw $exception;
+            }
             $this->logger->error('CAMPAIGN: '.$exception->getMessage());
-            throw $exception;
+            $success = false;
         }
 
         // Don't detach in tests since this command will be ran multiple times in the same process
@@ -242,5 +251,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         }
 
         $this->output->writeln('');
+
+        return $success;
     }
 }

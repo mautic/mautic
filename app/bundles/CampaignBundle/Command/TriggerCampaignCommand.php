@@ -282,24 +282,27 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($id) {
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
-                $this->triggerCampaign($campaign);
+                $success = $this->triggerCampaign($campaign);
             } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+                $success = false;
             }
 
             $this->completeRun();
 
-            return 0;
+            return $success ? 0 : 1;
         }
 
         // All published campaigns
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
         $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
+        $success   = true;
 
         while (($next = $campaigns->next()) !== false) {
             // Key is ID and not 0
             $campaign = reset($next);
-            $this->triggerCampaign($campaign);
+            // Order matters here, we want to trigger each campaign regardless of earlier errors
+            $success = $this->triggerCampaign($campaign) && $success;
             if ($this->limiter->hasCampaignLimit()) {
                 $this->limiter->resetCampaignLimitRemaining();
             }
@@ -307,7 +310,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return $success ? 0 : 1;
     }
 
     /**
@@ -333,6 +336,8 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @param Campaign $campaign
      *
+     * @return bool
+     *
      * @throws \Exception
      */
     private function triggerCampaign(Campaign $campaign)
@@ -346,6 +351,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         }
 
         $this->campaign = $campaign;
+        $success        = true;
 
         try {
             $this->output->writeln('<info>'.$this->translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $campaign->getId()]).'</info>');
@@ -373,14 +379,21 @@ class TriggerCampaignCommand extends ModeratedCommand
                 $this->executeInactive();
             }
         } catch (\Exception $exception) {
+            if ('prod' !== MAUTIC_ENV) {
+                // Throw the exception for dev/test mode
+                throw $exception;
+            }
+
             $this->logger->error('CAMPAIGN: '.$exception->getMessage());
-            throw $exception;
+            $success = false;
         }
 
         // Don't detach in tests since this command will be ran multiple times in the same process
         if ('test' !== MAUTIC_ENV) {
             $this->campaignRepository->detachEntity($campaign);
         }
+
+        return $success;
     }
 
     /**
