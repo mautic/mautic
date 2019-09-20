@@ -21,6 +21,12 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
+/**
+ * This test must run in a separate process because it sets the global constant
+ * MAUTIC_INTEGRATION_SYNC_IN_PROGRESS which breaks other tests.
+ * 
+ * @runTestsInSeparateProcesses
+ */
 class SyncCommandTest extends \PHPUnit_Framework_TestCase
 {
     private const INTEGRATION_NAME = 'Test';
