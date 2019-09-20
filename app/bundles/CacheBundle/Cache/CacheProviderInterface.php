@@ -15,5 +15,8 @@ use Symfony\Component\Cache\Simple\Psr6Cache;
 
 interface CacheProviderInterface
 {
-    public function getSimpleCache(): Psr6Cache;
+    /**
+     * @return Psr6Cache
+     */
+    public function getSimpleCache();
 }
