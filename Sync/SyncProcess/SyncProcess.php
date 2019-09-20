@@ -26,13 +26,10 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\Integ
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
-/**
- * Class SyncProcess
- */
 class SyncProcess
 {
-
     /**
      * @var MappingManualDAO
      */
@@ -79,19 +76,9 @@ class SyncProcess
     private $notifier;
 
     /**
-     * @var bool
+     * @var InputOptionsDAO
      */
-    private $isFirstTimeSync = false;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncFromDateTime;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $syncToDateTime;
+    private $inputOptionsDAO;
 
     /**
      * @var int
@@ -99,8 +86,6 @@ class SyncProcess
     private $syncIteration;
 
     /**
-     * SyncProcess constructor.
-     *
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
      * @param IntegrationSyncProcess    $integrationSyncProcess
@@ -110,9 +95,7 @@ class SyncProcess
      * @param MappingManualDAO          $mappingManualDAO
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
-     * @param bool                      $isFirstTimeSync
-     * @param \DateTimeInterface|null   $syncFromDateTime
-     * @param \DateTimeInterface|null   $syncToDateTime
+     * @param InputOptionsDAO           $inputOptionsDAO
      */
     public function __construct(
         SyncDateHelper $syncDateHelper,
@@ -124,22 +107,18 @@ class SyncProcess
         MappingManualDAO $mappingManualDAO,
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
-        $isFirstTimeSync = false,
-        \DateTimeInterface $syncFromDateTime = null,
-        \DateTimeInterface $syncToDateTime = null
+        InputOptionsDAO $inputOptionsDAO
     ) {
         $this->syncDateHelper              = $syncDateHelper;
         $this->mappingHelper               = $mappingHelper;
         $this->integrationSyncProcess      = $integrationSyncProcess;
         $this->mauticSyncProcess           = $mauticSyncProcess;
         $this->eventDispatcher             = $eventDispatcher;
-        $this->notifier = $notifier;
+        $this->notifier                    = $notifier;
         $this->mappingManualDAO            = $mappingManualDAO;
         $this->internalSyncDataExchange    = $internalSyncDataExchange;
         $this->integrationSyncDataExchange = $integrationSyncDataExchange;
-        $this->isFirstTimeSync             = $isFirstTimeSync;
-        $this->syncFromDateTime            = $syncFromDateTime;
-        $this->syncToDateTime              = $syncToDateTime;
+        $this->inputOptionsDAO             = $inputOptionsDAO;
     }
 
     /**
@@ -150,18 +129,22 @@ class SyncProcess
         defined('MAUTIC_INTEGRATION_ACTIVE_SYNC') or define('MAUTIC_INTEGRATION_ACTIVE_SYNC', 1);
 
         // Setup/prepare for the sync
-        $this->syncDateHelper->setSyncDateTimes($this->syncFromDateTime, $this->syncToDateTime);
-        $this->integrationSyncProcess->setupSync($this->isFirstTimeSync, $this->mappingManualDAO, $this->integrationSyncDataExchange);
-        $this->mauticSyncProcess->setupSync($this->isFirstTimeSync, $this->mappingManualDAO, $this->internalSyncDataExchange);
+        $this->syncDateHelper->setSyncDateTimes($this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime());
+        $this->integrationSyncProcess->setupSync($this->inputOptionsDAO, $this->mappingManualDAO, $this->integrationSyncDataExchange);
+        $this->mauticSyncProcess->setupSync($this->inputOptionsDAO, $this->mappingManualDAO, $this->internalSyncDataExchange);
 
-        // Execute the sync
-        $this->executeIntegrationSync();
-        $this->executeInternalSync();
+        if ($this->inputOptionsDAO->pullIsEnabled()) {
+            $this->executeIntegrationSync();
+        }
+        
+        if ($this->inputOptionsDAO->pushIsEnabled()) {
+            $this->executeInternalSync();
+        }
 
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
             IntegrationEvents::INTEGRATION_POST_EXECUTE,
-            new SyncEvent($this->mappingManualDAO->getIntegration(), $this->syncFromDateTime, $this->syncToDateTime)
+            new SyncEvent($this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime())
         );
     }
 
@@ -189,7 +172,7 @@ class SyncProcess
             $this->mappingHelper->remapIntegrationObjects($syncReport->getRemappedObjects());
 
             // Convert the integrations' report into an "order" or instructions for Mautic
-            $syncOrder = $this->mauticSyncProcess->getSyncOrder($syncReport, $this->isFirstTimeSync, $this->mappingManualDAO);
+            $syncOrder = $this->mauticSyncProcess->getSyncOrder($syncReport, $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO);
             if (!$syncOrder->shouldSync()) {
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
@@ -227,7 +210,7 @@ class SyncProcess
                 __CLASS__.':'.__FUNCTION__
             );
 
-            $syncReport = $this->mauticSyncProcess->getSyncReport($this->syncIteration);
+            $syncReport = $this->mauticSyncProcess->getSyncReport($this->syncIteration, $this->inputOptionsDAO);
 
             if (!$syncReport->shouldSync()) {
                 DebugLogger::log(
@@ -239,7 +222,7 @@ class SyncProcess
             }
 
             // Convert the internal report into an "order" or instructions for the integration
-            $syncOrder = $this->integrationSyncProcess->getSyncOrder($syncReport, $this->isFirstTimeSync, $this->mappingManualDAO);
+            $syncOrder = $this->integrationSyncProcess->getSyncOrder($syncReport, $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO);
 
             if (!$syncOrder->shouldSync()) {
                 DebugLogger::log(

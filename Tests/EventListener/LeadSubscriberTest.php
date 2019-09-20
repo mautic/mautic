@@ -71,6 +71,9 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($lead);
 
+        $this->syncIntegrationsHelper->expects($this->never())
+            ->method('hasObjectSyncEnabled');
+
         $this->subscriber->onLeadPostSave($event);
     }
 
@@ -230,6 +233,9 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('hasObjectSyncEnabled')
             ->with(MauticSyncDataExchange::OBJECT_COMPANY)
             ->willReturn(false);
+
+        $event->expects($this->never())
+            ->method('getCompany');
 
         $this->subscriber->onCompanyPostSave($event);
     }

@@ -25,9 +25,12 @@ use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
 {
+    private const INTEGRATION_NAME = 'Test';
+
     /**
      * @var SyncDateHelper|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -52,9 +55,8 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testThatMauticGetSyncReportIsCalledBasedOnRequest()
     {
-        $integration = 'Test';
         $objectName  = 'Contact';
-        $mappingManual = new MappingManualDAO($integration);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
@@ -75,7 +77,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
             ->willReturnCallback(
-                function (RequestDAO $requestDAO) use ($integration) {
+                function (RequestDAO $requestDAO) {
                     $requestObjects = $requestDAO->getObjects();
                     $this->assertCount(1, $requestObjects);
 
@@ -85,7 +87,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
                     $this->assertEquals(['email', 'firstname'], $requestObject->getFields());
                     $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $requestObject->getObject());
 
-                    return new ReportDAO($integration);
+                    return new ReportDAO(self::INTEGRATION_NAME);
                 }
             );
 
@@ -94,13 +96,12 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testThatMauticGetSyncReportIsNotCalledBasedOnRequest()
     {
-        $integration = 'Test';
         $objectName  = 'Contact';
-        $mappingManual = new MappingManualDAO($integration);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
 
         $this->syncDateHelper->expects($this->never())
             ->method('getSyncFromDateTime')
-            ->with($integration, $objectName);
+            ->with(self::INTEGRATION_NAME, $objectName);
 
         // SyncDateExchangeInterface::getSyncReport should sync because an object was added to the report
         $this->syncDataExchange->expects($this->never())
@@ -113,21 +114,20 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
 
     public function testOrderIsBuiltBasedOnMapping()
     {
-        $integration = 'Test';
-        $objectName  = 'Contact';
-        $mappingManual = new MappingManualDAO($integration);
+        $objectName    = 'Contact';
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
         $mappingManual->addObjectMapping($objectMapping);
 
-        $toSyncDateTime   = new \DateTimeImmutable();
+        $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
             ->method('getSyncDateTime')
             ->willReturn($toSyncDateTime);
 
-        $syncReport = new ReportDAO($integration);
-        $objectDAO = new ReportObjectDAO($objectName, 2);
+        $syncReport = new ReportDAO(self::INTEGRATION_NAME);
+        $objectDAO  = new ReportObjectDAO($objectName, 2);
         $objectDAO->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
         $objectDAO->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
         $syncReport->addObject($objectDAO);
@@ -162,7 +162,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
     {
         $syncProcess = new MauticSyncProcess($this->syncDateHelper, $this->objectChangeGenerator);
 
-        $syncProcess->setupSync(false, $mappingManualDAO, $this->syncDataExchange);
+        $syncProcess->setupSync(new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]), $mappingManualDAO, $this->syncDataExchange);
 
         return $syncProcess;
     }

@@ -21,20 +21,16 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterf
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
-use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactoryInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
 
 /**
  * Class SyncService
  */
 final class SyncService implements SyncServiceInterface
 {
-    /**
-     * @var SyncProcessFactoryInterface
-     */
-    private $integrationSyncProcessFactory;
-
     /**
      * @var SyncDataExchangeInterface
      */
@@ -77,7 +73,6 @@ final class SyncService implements SyncServiceInterface
     /**
      * SyncService constructor.
      *
-     * @param SyncProcessFactoryInterface $integrationSyncProcessFactory
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      * @param SyncDateHelper              $syncDateHelper
      * @param MappingHelper               $mappingHelper
@@ -88,7 +83,6 @@ final class SyncService implements SyncServiceInterface
      * @param MauticSyncProcess           $mauticSyncProcess
      */
     public function __construct(
-        SyncProcessFactoryInterface $integrationSyncProcessFactory,
         MauticSyncDataExchange $internalSyncDataExchange,
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
@@ -99,53 +93,42 @@ final class SyncService implements SyncServiceInterface
         MauticSyncProcess $mauticSyncProcess
     )
     {
-        $this->integrationSyncProcessFactory = $integrationSyncProcessFactory;
-        $this->internalSyncDataExchange      = $internalSyncDataExchange;
-        $this->syncDateHelper                = $syncDateHelper;
-        $this->mappingHelper                 = $mappingHelper;
-        $this->syncIntegrationsHelper        = $syncIntegrationsHelper;
-        $this->eventDispatcher               = $eventDispatcher;
-        $this->notifier                      = $notifier;
-        $this->integratinSyncProcess         = $integrationSyncProcess;
-        $this->mauticSyncProcess             = $mauticSyncProcess;
+        $this->internalSyncDataExchange = $internalSyncDataExchange;
+        $this->syncDateHelper           = $syncDateHelper;
+        $this->mappingHelper            = $mappingHelper;
+        $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
+        $this->eventDispatcher          = $eventDispatcher;
+        $this->notifier                 = $notifier;
+        $this->integratinSyncProcess    = $integrationSyncProcess;
+        $this->mauticSyncProcess        = $mauticSyncProcess;
     }
 
     /**
-     * @param string                  $integration
-     * @param bool                    $firstTimeSync
-     * @param \DateTimeInterface|null $syncFromDateTime
-     * @param \DateTimeInterface|null $syncToDateTime
+     * @param InputOptionsDAO $inputOptionsDAO
      *
      * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
-    public function processIntegrationSync(
-        string $integration,
-        $firstTimeSync,
-        \DateTimeInterface $syncFromDateTime = null,
-        \DateTimeInterface $syncToDateTime = null
-    )
+    public function processIntegrationSync(InputOptionsDAO $inputOptionsDAO): void
     {
-        $integrationSyncProcess = $this->integrationSyncProcessFactory->create(
+        $integrationSyncProcess = new SyncProcess(
             $this->syncDateHelper,
             $this->mappingHelper,
             $this->integratinSyncProcess,
             $this->mauticSyncProcess,
             $this->eventDispatcher,
             $this->notifier,
+            $this->syncIntegrationsHelper->getMappingManual($inputOptionsDAO->getIntegration()),
             $this->internalSyncDataExchange,
-            $this->syncIntegrationsHelper->getSyncDataExchange($integration),
-            $this->syncIntegrationsHelper->getMappingManual($integration),
-            $firstTimeSync,
-            $syncFromDateTime,
-            $syncToDateTime
+            $this->syncIntegrationsHelper->getSyncDataExchange($inputOptionsDAO->getIntegration()),
+            $inputOptionsDAO
         );
 
         DebugLogger::log(
-            $integration,
+            $inputOptionsDAO->getIntegration(),
             sprintf(
                 "Starting %s sync from %s date/time",
-                ($firstTimeSync) ? "first time" : "subsequent",
-                ($syncFromDateTime) ? $syncFromDateTime->format('Y-m-d H:i:s') : "yet to be determined"
+                ($inputOptionsDAO->isFirstTimeSync()) ? "first time" : "subsequent",
+                ($inputOptionsDAO->getStartDateTime()) ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : "yet to be determined"
             ),
             __CLASS__.':'.__FUNCTION__
         );
@@ -154,7 +137,7 @@ final class SyncService implements SyncServiceInterface
             $integrationSyncProcess->execute();
         } catch (ClientException $exception) {
             // The sync failed to communicate with the integration so log it
-            DebugLogger::log($integration, $exception->getMessage(), null, [], LogLevel::ERROR);
+            DebugLogger::log($inputOptionsDAO->getIntegration(), $exception->getMessage(), null, [], LogLevel::ERROR);
         }
     }
 

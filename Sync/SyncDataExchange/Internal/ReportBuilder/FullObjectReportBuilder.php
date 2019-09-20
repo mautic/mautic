@@ -11,17 +11,15 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 
 class FullObjectReportBuilder
 {
@@ -41,8 +39,6 @@ class FullObjectReportBuilder
     private $fieldBuilder;
 
     /**
-     * FullObjectReportBuilder constructor.
-     *
      * @param ContactObjectHelper $contactObjectHelper
      * @param CompanyObjectHelper $companyObjectHelper
      * @param FieldBuilder        $fieldBuilder
@@ -63,9 +59,8 @@ class FullObjectReportBuilder
     {
         $syncReport       = new ReportDAO(MauticSyncDataExchange::NAME);
         $requestedObjects = $requestDAO->getObjects();
-
-        $limit = 200;
-        $start = $limit * ($requestDAO->getSyncIteration() - 1);
+        $limit            = 200;
+        $start            = $limit * ($requestDAO->getSyncIteration() - 1);
 
         foreach ($requestedObjects as $requestedObjectDAO) {
             try {
@@ -74,8 +69,8 @@ class FullObjectReportBuilder
                     sprintf(
                         "Searching for %s objects between %s and %s (%d,%d)",
                         $requestedObjectDAO->getObject(),
-                        $requestedObjectDAO->getFromDateTime()->format('Y:m:d H:i:s'),
-                        $requestedObjectDAO->getToDateTime()->format('Y:m:d H:i:s'),
+                        $requestedObjectDAO->getFromDateTime()->format(DATE_ATOM),
+                        $requestedObjectDAO->getToDateTime()->format(DATE_ATOM),
                         $start,
                         $limit
                     ),
@@ -84,12 +79,18 @@ class FullObjectReportBuilder
 
                 switch ($requestedObjectDAO->getObject()) {
                     case MauticSyncDataExchange::OBJECT_CONTACT:
-                        $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
-                            $requestedObjectDAO->getFromDateTime(),
-                            $requestedObjectDAO->getToDateTime(),
-                            $start,
-                            $limit
-                        );
+                        if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
+                            $idChunks     = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT), $limit);
+                            $idChunk      = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
+                            $foundObjects = $this->contactObjectHelper->findObjectsByIds($idChunk);
+                        } else {
+                            $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
+                                $requestedObjectDAO->getFromDateTime(),
+                                $requestedObjectDAO->getToDateTime(),
+                                $start,
+                                $limit
+                            );
+                        }
 
                         break;
                     case MauticSyncDataExchange::OBJECT_COMPANY:
