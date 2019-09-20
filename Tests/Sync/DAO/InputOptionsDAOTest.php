@@ -22,7 +22,7 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
 {
     public function testWorkflowFromCliWithAllValuesSet(): void
     {
-        $objectIdsDAO = new InputOptionsDAO(
+        $inputOptionsDAO = new InputOptionsDAO(
             [
                 'integration'           => 'Magento',
                 'first-time-sync'       => true,
@@ -35,15 +35,15 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertSame('Magento', $objectIdsDAO->getIntegration());
-        $this->assertTrue($objectIdsDAO->isFirstTimeSync());
-        $this->assertFalse($objectIdsDAO->pullIsEnabled());
-        $this->assertTrue($objectIdsDAO->pushIsEnabled());
-        $this->assertSame(['12', '13'], $objectIdsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT));
-        $this->assertSame(['45'], $objectIdsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_COMPANY));
-        $this->assertSame(['hfskjdhf', 'hfskjdhr'], $objectIdsDAO->getIntegrationObjectIds()->getObjectIdsFor('Lead'));
-        $this->assertSame('2019-09-12T12:01:20+00:00', $objectIdsDAO->getStartDateTime()->format(DATE_ATOM));
-        $this->assertSame('2019-10-12T12:01:20+00:00', $objectIdsDAO->getEndDateTime()->format(DATE_ATOM));
+        $this->assertSame('Magento', $inputOptionsDAO->getIntegration());
+        $this->assertTrue($inputOptionsDAO->isFirstTimeSync());
+        $this->assertFalse($inputOptionsDAO->pullIsEnabled());
+        $this->assertTrue($inputOptionsDAO->pushIsEnabled());
+        $this->assertSame(['12', '13'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT));
+        $this->assertSame(['45'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_COMPANY));
+        $this->assertSame(['hfskjdhf', 'hfskjdhr'], $inputOptionsDAO->getIntegrationObjectIds()->getObjectIdsFor('Lead'));
+        $this->assertSame('2019-09-12T12:01:20+00:00', $inputOptionsDAO->getStartDateTime()->format(DATE_ATOM));
+        $this->assertSame('2019-10-12T12:01:20+00:00', $inputOptionsDAO->getEndDateTime()->format(DATE_ATOM));
     }
 
     public function testWorkflowFromCliWithNoValuesSet(): void
@@ -54,15 +54,15 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
 
     public function testWorkflowFromCliWithOnlyIntegrationValuesSet(): void
     {
-        $objectIdsDAO = new InputOptionsDAO(['integration' => 'Magento']);
-        $this->assertSame('Magento', $objectIdsDAO->getIntegration());
-        $this->assertFalse($objectIdsDAO->isFirstTimeSync());
-        $this->assertTrue($objectIdsDAO->pullIsEnabled());
-        $this->assertTrue($objectIdsDAO->pushIsEnabled());
-        $this->assertNull($objectIdsDAO->getMauticObjectIds());
-        $this->assertNull($objectIdsDAO->getIntegrationObjectIds());
-        $this->assertNull($objectIdsDAO->getStartDateTime());
-        $this->assertNull($objectIdsDAO->getEndDateTime());
+        $inputOptionsDAO = new InputOptionsDAO(['integration' => 'Magento']);
+        $this->assertSame('Magento', $inputOptionsDAO->getIntegration());
+        $this->assertFalse($inputOptionsDAO->isFirstTimeSync());
+        $this->assertTrue($inputOptionsDAO->pullIsEnabled());
+        $this->assertTrue($inputOptionsDAO->pushIsEnabled());
+        $this->assertNull($inputOptionsDAO->getMauticObjectIds());
+        $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
+        $this->assertNull($inputOptionsDAO->getStartDateTime());
+        $this->assertNull($inputOptionsDAO->getEndDateTime());
     }
 
     public function testWorkflowFromServiceWithAllValuesSet(): void
@@ -71,7 +71,7 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
         $integrationObjectIds = new ObjectIdsDAO();
         $start                = new DateTimeImmutable('2019-09-12T12:01:20', new DateTimeZone('UTC'));
         $end                  = new DateTimeImmutable('2019-10-12T12:01:20', new DateTimeZone('UTC'));
-        $objectIdsDAO         = new InputOptionsDAO(
+        $inputOptionsDAO      = new InputOptionsDAO(
             [
                 'integration'           => 'Magento',
                 'first-time-sync'       => true,
@@ -84,13 +84,13 @@ class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertSame('Magento', $objectIdsDAO->getIntegration());
-        $this->assertTrue($objectIdsDAO->isFirstTimeSync());
-        $this->assertFalse($objectIdsDAO->pullIsEnabled());
-        $this->assertTrue($objectIdsDAO->pushIsEnabled());
-        $this->assertSame($mauticObjectIds, $objectIdsDAO->getMauticObjectIds());
-        $this->assertSame($integrationObjectIds, $objectIdsDAO->getIntegrationObjectIds());
-        $this->assertSame($start, $objectIdsDAO->getStartDateTime());
-        $this->assertSame($end, $objectIdsDAO->getEndDateTime());
+        $this->assertSame('Magento', $inputOptionsDAO->getIntegration());
+        $this->assertTrue($inputOptionsDAO->isFirstTimeSync());
+        $this->assertFalse($inputOptionsDAO->pullIsEnabled());
+        $this->assertTrue($inputOptionsDAO->pushIsEnabled());
+        $this->assertSame($mauticObjectIds, $inputOptionsDAO->getMauticObjectIds());
+        $this->assertSame($integrationObjectIds, $inputOptionsDAO->getIntegrationObjectIds());
+        $this->assertSame($start, $inputOptionsDAO->getStartDateTime());
+        $this->assertSame($end, $inputOptionsDAO->getEndDateTime());
     }
 }
