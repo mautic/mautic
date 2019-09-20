@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Simple\Psr6Cache;
 /**
  * Class CacheProvider provides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
  */
-final class CacheProvider implements TagAwareAdapterInterface
+final class CacheProvider implements CacheProviderInterface, TagAwareAdapterInterface
 {
     /**
      * @var TagAwareAdapterInterface
