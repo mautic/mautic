@@ -223,7 +223,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     private function updateCampaign(Campaign $campaign)
     {
         if (!$campaign->isPublished()) {
-            return;
+            return true;
         }
 
         $success = true;
