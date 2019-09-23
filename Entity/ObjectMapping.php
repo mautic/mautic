@@ -68,6 +68,11 @@ class ObjectMapping
     private $isDeleted = false;
 
     /**
+     * @var string
+     */
+    private $integrationReferenceId;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      *
      * @return void
@@ -79,9 +84,10 @@ class ObjectMapping
         $builder
             ->setTable('sync_object_mapping')
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
-            ->addIndex(['integration', 'integration_object_name', 'integration_object_id'], 'integration_object')
+            ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
             ->addIndex(['integration', 'internal_object_name', 'internal_object_id'], 'internal_object')
             ->addIndex(['integration', 'internal_object_name', 'integration_object_name'], 'object_match')
+            ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'object_match')
             ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
@@ -130,12 +136,21 @@ class ObjectMapping
             ->createField('isDeleted', Type::BOOLEAN)
             ->columnName('is_deleted')
             ->build();
+
+        $builder
+            ->createField('integrationReferenceId', Type::STRING)
+            ->columnName('integration_reference_id')
+            ->nullable()
+            ->build();
+
     }
 
     /**
      * ObjectMapping constructor.
      *
      * @param \DateTime|null $dateCreated
+     *
+     * @throws \Exception
      */
     public function __construct(\DateTime $dateCreated = null)
     {
@@ -148,9 +163,9 @@ class ObjectMapping
     }
 
     /**
-     * @return int
+     * @return int|null ?int
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -348,6 +363,26 @@ class ObjectMapping
     public function setIsDeleted($isDeleted)
     {
         $this->isDeleted = $isDeleted;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntegrationReferenceId(): string
+    {
+        return $this->integrationReferenceId;
+    }
+
+    /**
+     * @param string $integrationReferenceId
+     *
+     * @return ObjectMapping
+     */
+    public function setIntegrationReferenceId(string $integrationReferenceId)
+    {
+        $this->integrationReferenceId = $integrationReferenceId;
 
         return $this;
     }
