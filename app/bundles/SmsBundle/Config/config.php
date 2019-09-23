@@ -12,6 +12,12 @@
 return [
     'services' => [
         'events' => [
+            'mautic.sms.broadcast.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\BroadcastSubscriber::class,
+                'arguments' => [
+                    'mautic.sms.broadcast.executioner',
+                ],
+            ],
             'mautic.sms.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
@@ -127,6 +133,22 @@ return [
                     'integrationAlias' => 'Twilio',
                 ],
             ],
+
+            'mautic.sms.broadcast.executioner' => [
+                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastExecutioner::class,
+                'arguments'    => [
+                    'mautic.sms.model.sms',
+                    'mautic.sms.broadcast.query',
+                    'translator',
+                ],
+            ],
+            'mautic.sms.broadcast.query' => [
+                'class'        => \Mautic\SmsBundle\Broadcast\BroadcastQuery::class,
+                'arguments'    => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.sms.model.sms',
+                ],
+            ],
         ],
         'models' => [
             'mautic.sms.model.sms' => [
@@ -136,6 +158,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.channel.model.queue',
                     'mautic.sms.transport_chain',
+                    'mautic.helper.cache_storage',
                 ],
             ],
         ],

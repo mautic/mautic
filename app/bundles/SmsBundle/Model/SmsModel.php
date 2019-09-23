@@ -15,6 +15,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
@@ -59,19 +60,26 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     protected $transport;
 
     /**
+     * @var CacheStorageHelper
+     */
+    private $cacheStorageHelper;
+
+    /**
      * SmsModel constructor.
      *
-     * @param TrackableModel    $pageTrackableModel
-     * @param LeadModel         $leadModel
-     * @param MessageQueueModel $messageQueueModel
-     * @param TransportChain    $transport
+     * @param TrackableModel     $pageTrackableModel
+     * @param LeadModel          $leadModel
+     * @param MessageQueueModel  $messageQueueModel
+     * @param TransportChain     $transport
+     * @param CacheStorageHelper $cacheStorageHelper
      */
-    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport)
+    public function __construct(TrackableModel $pageTrackableModel, LeadModel $leadModel, MessageQueueModel $messageQueueModel, TransportChain $transport, CacheStorageHelper $cacheStorageHelper)
     {
         $this->pageTrackableModel = $pageTrackableModel;
         $this->leadModel          = $leadModel;
         $this->messageQueueModel  = $messageQueueModel;
         $this->transport          = $transport;
+        $this->cacheStorageHelper = $cacheStorageHelper;
     }
 
     /**
@@ -177,6 +185,28 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $entity;
+    }
+
+    /**
+     * Return a list of entities.
+     *
+     * @param array $args [start, limit, filter, orderBy, orderByDir]
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     */
+    public function getEntities(array $args = [])
+    {
+        $entities = parent::getEntities($args);
+
+        foreach ($entities as $entity) {
+            $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'sms', $entity->getId(), 'pending'));
+
+            if ($pending !== false) {
+                $entity->setPendingCount($pending);
+            }
+        }
+
+        return $entities;
     }
 
     /**
@@ -311,16 +341,15 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     ];
 
                     $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $stat);
-
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
-                        unset($stat);
                     } else {
                         $sendResult['sent'] = true;
                         $stats[]            = $stat;
                         ++$sentCount;
                     }
-
+                    unset($stat);
+                    //   unset($stat);
                     $results[$leadId] = $sendResult;
 
                     unset($smsEvent, $tokenEvent, $sendResult, $metadata);
@@ -331,11 +360,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         if ($sentCount) {
             $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
             $this->getStatRepository()->saveEntities($stats);
-            // send statId to results
-            $stat = reset($stats);
-            if ($stat instanceof Stat) {
+
+            foreach ($stats as $stat) {
                 $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
             }
+
             $this->em->clear(Stat::class);
         }
 
