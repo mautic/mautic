@@ -13,8 +13,6 @@ namespace Mautic\SmsBundle\Broadcast;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
-use Mautic\SmsBundle\Broadcast\Exception\LimitQuotaException;
-use Mautic\SmsBundle\Broadcast\Result\Counter;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -37,9 +35,9 @@ class BroadcastExecutioner
     private $broadcastQuery;
 
     /**
-     * @var Counter
+     * @var BroadcastResult
      */
-    private $counter;
+    private $result;
 
     /**
      * @var TranslatorInterface
@@ -70,16 +68,17 @@ class BroadcastExecutioner
         while (($next = $smses->next()) !== false) {
             $sms                  = reset($next);
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], null, null, $event->getLimit());
-            $this->counter        = new Counter();
+            $this->result         = new BroadcastResult();
             try {
                 $this->send($sms, $this->contactLimiter);
-                $event->setResults(
-                    sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),
-                    $this->counter->getSentCount(),
-                    $this->counter->getFailedCount()
-                );
             } catch (\Exception $exception) {
             }
+
+            $event->setResults(
+                sprintf('%s: %s', $this->translator->trans('mautic.sms.sms'), $sms->getName()),
+                $this->result->getSentCount(),
+                $this->result->getFailedCount()
+            );
         }
     }
 
@@ -92,33 +91,19 @@ class BroadcastExecutioner
     private function send(Sms $sms)
     {
         $contactIds = $this->broadcastQuery->getPendingContactsIds($sms, $this->contactLimiter);
-
         while (!empty($contactIds)) {
-            $results    = $this->smsModel->sendSms($sms, $contactIds, ['failed'=>true]);
-            $this->processResults($results);
+            $results    = $this->smsModel->sendSms($sms, $contactIds, ['channel'=>['sms', $sms->getId()]]);
+            $this->result->process($results);
 
             $nextContactMinBatch = end($contactIds);
             $this->contactLimiter->setBatchMinContactId($nextContactMinBatch + 1);
-            $this->contactLimiter->reduceCampaignLimitRemaining(count($results));
 
-            $contactIds = $this->broadcastQuery->getPendingContactsIds($sms, $this->contactLimiter);
-        }
-    }
-
-    /**
-     * @param array $results
-     *
-     * @throws \Exception
-     */
-    private function processResults(array $results)
-    {
-        die(print_r($results));
-        foreach ($results as $result) {
-            if ($result['sent'] === true) {
-                $this->counter->sent();
-            } else {
-                $this->counter->failed();
+            if ($this->contactLimiter->hasCampaignLimit()) {
+                $this->contactLimiter->reduceCampaignLimitRemaining(count($results));
             }
+
+            // Next batch
+            $contactIds = $this->broadcastQuery->getPendingContactsIds($sms, $this->contactLimiter);
         }
     }
 }

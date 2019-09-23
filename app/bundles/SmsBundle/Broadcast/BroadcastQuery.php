@@ -59,8 +59,7 @@ class BroadcastQuery
     {
         $query = $this->getBasicQuery($sms);
         $query->select('DISTINCT l.id');
-        $this->updateQueryFromContactLimiter('lll.', $query, $contactLimiter);
-
+        $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
         $contacts = $query->execute()->fetchAll();
 
         return array_column($contacts, 'id');
@@ -99,21 +98,27 @@ class BroadcastQuery
                 )
             )
         );
-        $this->excludeStatsRecords();
+        $this->excludeStatsRecords($sms->getId());
         $this->excludeDnc();
         $this->excludeQueue();
 
         return $this->query;
     }
 
-    private function excludeStatsRecords()
+    /**
+     * @param int $smsId
+     */
+    private function excludeStatsRecords(int $smsId)
     {
         // Do not include leads that have already received text message
         $statQb = $this->entityManager->getConnection()->createQueryBuilder();
         $statQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 'stat')
             ->where(
-                $statQb->expr()->eq('stat.lead_id', 'l.id')
+                $statQb->expr()->andX(
+                $statQb->expr()->eq('stat.lead_id', 'l.id'),
+                $statQb->expr()->eq('stat.sms_id', $smsId)
+                    )
             );
 
         $this->query->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()));

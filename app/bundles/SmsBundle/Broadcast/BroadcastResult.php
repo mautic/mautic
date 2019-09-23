@@ -9,10 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\Broadcast\Result;
+namespace Mautic\SmsBundle\Broadcast;
 
-class Counter
+class BroadcastResult
 {
+
     /**
      * @var int
      */
@@ -22,6 +23,20 @@ class Counter
      * @var int
      */
     private $failedCount = 0;
+
+    /**
+     * @param array $results
+     */
+    public function process(array $results)
+    {
+        foreach ($results as $result) {
+            if (isset($result['sent']) && $result['sent'] === true) {
+                $this->sent();
+            } else {
+                $this->failed();
+            }
+        }
+    }
 
     public function sent()
     {
