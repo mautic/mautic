@@ -302,6 +302,7 @@ class ObjectMapping
      * @param \DateTimeInterface|null $lastSyncDate
      *
      * @return ObjectMapping
+     * @throws \Exception
      */
     public function setLastSyncDate(?\DateTimeInterface $lastSyncDate)
     {
