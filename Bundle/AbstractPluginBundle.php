@@ -15,7 +15,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use \Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
-use MauticPlugin\CustomObjectsBundle\Migration\Engine;
+use MauticPlugin\IntegrationsBundle\Migration\Engine;
 
 /**
  * Base Bundle class which should be extended by addon bundles.
