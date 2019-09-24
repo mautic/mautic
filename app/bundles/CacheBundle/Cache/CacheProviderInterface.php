@@ -20,31 +20,4 @@ interface CacheProviderInterface extends TagAwareAdapterInterface
      * @return Psr6Cache
      */
     public function getSimpleCache();
-
-    /**
-     * @param string $key
-     *
-     * @return bool
-     *
-     * @throws InvalidArgumentException
-     */
-    public function hasItem($key);
-
-    /**
-     * @param $key
-     *
-     * @return CacheItem
-     *
-     * @throws InvalidArgumentException
-     */
-    public function getItem($key);
-
-    /**
-     * @param array $keys
-     *
-     * @return CacheItem[]|\Traversable
-     *
-     * @throws InvalidArgumentException
-     */
-    public function getItems(array $keys = []);
 }
