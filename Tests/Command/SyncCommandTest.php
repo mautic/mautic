@@ -26,6 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
  * MAUTIC_INTEGRATION_SYNC_IN_PROGRESS which breaks other tests.
  * 
  * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class SyncCommandTest extends \PHPUnit_Framework_TestCase
 {
