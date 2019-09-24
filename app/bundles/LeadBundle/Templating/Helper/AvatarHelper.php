@@ -35,8 +35,8 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * @param Lead $lead
-     * @param      $filePath
+     * @param Lead   $lead
+     * @param string $filePath
      *
      * @throws FileNotFoundException
      */
