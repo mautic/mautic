@@ -11,8 +11,10 @@
 
 namespace Mautic\FormBundle\Event\Service;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
 use Symfony\Component\Routing\RouterInterface;
@@ -92,6 +94,15 @@ class FieldValueTransformer
                     $contactFieldAlias = $field->getLeadField();
                     if (!empty($contactFieldMatches[$contactFieldAlias])) {
                         $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
+                    }
+
+                    if (ArrayHelper::getValue(FormFieldFileType::PROPERTY_PREFERED_PROFILE_IMAGE, $field->getProperties())) {
+                        try {
+                            $filePath = $this->uploader->getCompleteFilePath($field, $submissionEvent->getResults()[$field->getAlias()]);
+                            $this->avatarHelper->createAvatarFromFile($submissionEvent->getLead(), $filePath);
+                            $this->contactFieldsToUpdate['preferred_profile_image'] = 'custom';
+                        } catch (\Exception $exception) {
+                        }
                     }
 
                     break;

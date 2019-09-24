@@ -53,7 +53,7 @@ class AvatarHelper extends Helper
         }
 
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        if (in_array($ext, $this->imageTypes)) {
+        if (!in_array($ext, $this->imageTypes)) {
             throw new \Exception('File is not image');
         }
 
