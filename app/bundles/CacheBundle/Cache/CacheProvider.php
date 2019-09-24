@@ -13,7 +13,6 @@ namespace Mautic\CacheBundle\Cache;
 
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Simple\Psr6Cache;
@@ -21,7 +20,7 @@ use Symfony\Component\Cache\Simple\Psr6Cache;
 /**
  * Class CacheProvider provides caching mechanism using adapters, it provides both PSR-6 and PSR-16.
  */
-final class CacheProvider implements CacheProviderInterface, TagAwareAdapterInterface
+final class CacheProvider implements CacheProviderInterface
 {
     /**
      * @var TagAwareAdapterInterface
