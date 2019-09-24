@@ -11,8 +11,12 @@
 
 namespace Mautic\FormBundle\Event\Service;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\FormFieldFileType;
+use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
 use Symfony\Component\Routing\RouterInterface;
 
 class FieldValueTransformer
@@ -38,13 +42,25 @@ class FieldValueTransformer
     private $isTransformed = false;
 
     /**
+     * @var AvatarHelper
+     */
+    private $avatarHelper;
+
+    /**
+     * @var FormUploader
+     */
+    private $uploader;
+
+    /**
      * FieldValueTransformer constructor.
      *
      * @param RouterInterface $router
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, AvatarHelper $avatarHelper, FormUploader $uploader)
     {
-        $this->router = $router;
+        $this->router       = $router;
+        $this->avatarHelper = $avatarHelper;
+        $this->uploader     = $uploader;
     }
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
@@ -79,6 +95,15 @@ class FieldValueTransformer
                     $contactFieldAlias = $field->getLeadField();
                     if (!empty($contactFieldMatches[$contactFieldAlias])) {
                         $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
+                    }
+
+                    if (ArrayHelper::getValue(FormFieldFileType::PROPERTY_PREFERED_PROFILE_IMAGE, $field->getProperties())) {
+                        try {
+                            ///$this->uploader->getCompleteFilePath($field, )
+                            //  $this->avatarHelper->setAvatarFromFile($submissionEvent->getLead(), uploadFile)
+                            $this->contactFieldsToUpdate['preferred_profile_image'] = 'custom';
+                        } catch (\Exception $exception) {
+                        }
                     }
 
                     break;
