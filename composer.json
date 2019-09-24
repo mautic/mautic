@@ -4,6 +4,12 @@
   "type": "mautic-plugin",
   "version": "2.0.0",
   "keywords": ["mautic","plugin","integration"],
+  "config": {
+    "process-timeout": 2000,
+    "platform": {
+      "php": "7.1.18"
+    }
+  },
   "authors": [
     {
       "name": "Jan Kozak",
