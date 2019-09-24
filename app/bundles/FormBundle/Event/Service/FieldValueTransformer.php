@@ -100,7 +100,7 @@ class FieldValueTransformer
                         try {
                             $filePath = $this->uploader->getCompleteFilePath($field, $submissionEvent->getResults()[$field->getAlias()]);
                             $this->avatarHelper->createAvatarFromFile($submissionEvent->getLead(), $filePath);
-                            $this->contactFieldsToUpdate['preferred_profile_image'] = 'custom';
+                            $this->contactFieldsToUpdate['preferredProfileImage'] = 'custom';
                         } catch (\Exception $exception) {
                         }
                     }
@@ -108,7 +108,6 @@ class FieldValueTransformer
                     break;
             }
         }
-
         $submissionEvent->setTokens($tokens);
         $submissionEvent->setContactFieldMatches($contactFieldMatches);
         $this->isIsTransformed();

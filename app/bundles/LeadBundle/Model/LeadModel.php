@@ -628,6 +628,10 @@ class LeadModel extends FormModel
             }
         }
 
+        if (isset($data['preferredProfileImage'])) {
+            $lead->setPreferredProfileImage($data['preferredProfileImage']);
+        }
+
         //save the field values
         $fieldValues = $lead->getFields();
 
