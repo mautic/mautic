@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,7 +14,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 
 /**
- * Class ObjectChangeDAO.
+ * Class ObjectChangeDAO
  */
 class ObjectChangeDAO
 {
@@ -74,7 +72,7 @@ class ObjectChangeDAO
      * @param mixed              $mappedId       ID of the source object
      * @param \DateTimeInterface $changeDateTime Date\Time the object was last changed
      */
-    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId, ?\DateTimeInterface $changeDateTime = null)
+    public function __construct($integration, $object, $objectId, $mappedObject, $mappedId, \DateTimeInterface $changeDateTime = null)
     {
         $this->integration    = $integration;
         $this->object         = $object;
@@ -98,7 +96,7 @@ class ObjectChangeDAO
      *
      * @return ObjectChangeDAO
      */
-    public function addField(FieldDAO $fieldDAO, string $state = ReportFieldDAO::FIELD_CHANGED): self
+    public function addField(FieldDAO $fieldDAO, string $state = ReportFieldDAO::FIELD_CHANGED): ObjectChangeDAO
     {
         $this->fields[$fieldDAO->getName()]                = $fieldDAO;
         $this->fieldsByState[$state][$fieldDAO->getName()] = $fieldDAO;
@@ -123,7 +121,7 @@ class ObjectChangeDAO
     /**
      * @param mixed $objectId
      */
-    public function setObjectId($objectId): void
+    public function setObjectId($objectId)
     {
         $this->objectId = $objectId;
     }
@@ -137,7 +135,7 @@ class ObjectChangeDAO
     }
 
     /**
-     * Returns the name/type for the object in this system that is being synced to the other.
+     * Returns the name/type for the object in this system that is being synced to the other
      *
      * @return string
      */
@@ -147,7 +145,7 @@ class ObjectChangeDAO
     }
 
     /**
-     * Returns the ID for the object in this system that is being synced to the other.
+     * Returns the ID for the object in this system that is being synced to the other
      *
      * @return mixed
      */
@@ -231,7 +229,7 @@ class ObjectChangeDAO
      *
      * @return ObjectChangeDAO
      */
-    public function setChangeDateTime(?\DateTimeInterface $changeDateTime = null)
+    public function setChangeDateTime(\DateTimeInterface $changeDateTime = null)
     {
         if (null === $changeDateTime) {
             $changeDateTime = new \DateTime();

@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Command;
 
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 use MauticPlugin\IntegrationsBundle\Command\SyncCommand;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Tester\CommandTester;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 /**
  * This test must run in a separate process because it sets the global constant
  * MAUTIC_INTEGRATION_SYNC_IN_PROGRESS which breaks other tests.
- *
+ * 
  * @runTestsInSeparateProcesses
  */
 class SyncCommandTest extends \PHPUnit_Framework_TestCase
@@ -49,7 +49,7 @@ class SyncCommandTest extends \PHPUnit_Framework_TestCase
         $application       = new Application();
 
         $application->add(new SyncCommand($this->syncService));
-
+        
         // env is global option. Must be defined.
         $application->getDefinition()->addOption(
             new InputOption(
@@ -60,7 +60,7 @@ class SyncCommandTest extends \PHPUnit_Framework_TestCase
                 'DEV'
             )
         );
-
+        
         $this->commandTester = new CommandTester(
             $application->find(SyncCommand::NAME)
         );
@@ -86,8 +86,8 @@ class SyncCommandTest extends \PHPUnit_Framework_TestCase
             }));
 
         $code = $this->commandTester->execute([
-            'integration'        => self::INTEGRATION_NAME,
-            '--disable-push'     => true,
+            'integration' => self::INTEGRATION_NAME,
+            '--disable-push' => true,
             '--mautic-object-id' => ['contact:123', 'contact:345'],
         ]);
 
@@ -100,7 +100,7 @@ class SyncCommandTest extends \PHPUnit_Framework_TestCase
             ->method('processIntegrationSync')
             ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
-
+                
                 return true;
             }))
             ->will($this->throwException(new \Exception()));

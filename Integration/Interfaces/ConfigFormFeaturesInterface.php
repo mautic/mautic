@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,13 +11,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
+
 interface ConfigFormFeaturesInterface
 {
-    const FEATURE_SYNC          = 'sync';
+    const FEATURE_SYNC = 'sync';
     const FEATURE_PUSH_ACTIVITY = 'push_activity';
 
     /**
-     * Return an array of value => label pairs for the features this integration supports.
+     * Return an array of value => label pairs for the features this integration supports
      *
      * @return array
      */

@@ -22,19 +22,19 @@ use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
 use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
 
-class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
+class TokenPersistenceTest  extends \PHPUnit_Framework_TestCase
 {
     private $integrationsHelper;
     private $tokenPersistence;
 
-    public function setUp(): void
+    public function setUp()
     {
         $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
-        $this->tokenPersistence   = new TokenPersistence($this->integrationsHelper);
+        $this->tokenPersistence = new TokenPersistence($this->integrationsHelper);
         parent::setUp();
     }
 
-    public function testIntegrationNotSetRestoreToken(): void
+    public function testIntegrationNotSetRestoreToken()
     {
         $this->expectException(IntegrationNotSetException::class);
 
@@ -42,22 +42,22 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         $this->tokenPersistence->restoreToken($token);
     }
 
-    public function testRestoreToken(): void
+    public function testRestoreToken()
     {
-        $accessToken  = 'access_token';
+        $accessToken = 'access_token';
         $refreshToken = 'refresh_token';
-        $expiresAt    = 10;
-        $apiKeys      = [
-            'access_token'  => $accessToken,
+        $expiresAt = 10;
+        $apiKeys = [
+            'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
-            'expires_at'    => $expiresAt,
+            'expires_at' => $expiresAt,
         ];
 
-        $factory      = new RawTokenFactory();
+        $factory = new RawTokenFactory();
         $tokenFromApi = $factory([
-            'access_token'  => $accessToken,
+            'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
-            'expires_at'    => $expiresAt,
+            'expires_at' => $expiresAt,
         ]);
 
         $integration = $this->createMock(Integration::class);
@@ -73,7 +73,7 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($tokenFromApi->getRefreshToken(), $newToken->getRefreshToken());
     }
 
-    public function testIntegrationNotSetSaveToken(): void
+    public function testIntegrationNotSetSaveToken()
     {
         $this->expectException(IntegrationNotSetException::class);
 
@@ -81,7 +81,7 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         $this->tokenPersistence->saveToken($token);
     }
 
-    public function testSaveToken(): void
+    public function testSaveToken()
     {
         $oldApiKeys = [
             'access_token' => 'old_access_token',
@@ -95,7 +95,7 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         ];
 
         $extraData = [
-            'instance_url' => 'abc.123.com',
+            'instance_url' => 'abc.123.com'
         ];
 
         $token = new IntegrationToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at'], $extraData);
@@ -121,7 +121,7 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 
-    public function testIntegrationNotSetDeleteToken(): void
+    public function testIntegrationNotSetDeleteToken()
     {
         $this->expectException(IntegrationNotSetException::class);
 
@@ -129,20 +129,20 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         $this->tokenPersistence->saveToken($token);
     }
 
-    public function testDeleteToken(): void
+    public function testDeleteToken()
     {
-        $accessToken  = 'access_token';
+        $accessToken = 'access_token';
         $refreshToken = 'refresh_token';
-        $expiresAt    = 10;
-        $token        = new RawToken($accessToken, $refreshToken, $expiresAt);
-        $expected     = [
+        $expiresAt = 10;
+        $token = new RawToken($accessToken,$refreshToken, $expiresAt);
+        $expected = [
             'leaveMe' => 'something',
         ];
         $apiKeys = array_merge(
             [
-                'access_token'  => $accessToken,
+                'access_token' => $accessToken,
                 'refresh_token' => $refreshToken,
-                'expires_at'    => $expiresAt,
+                'expires_at' => $expiresAt,
             ],
             $expected
         );
@@ -168,16 +168,16 @@ class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->tokenPersistence->hasToken());
     }
 
-    public function testHasToken(): void
+    public function testHasToken()
     {
-        $accessToken  = 'access_token';
+        $accessToken = 'access_token';
         $refreshToken = 'refresh_token';
-        $expiresAt    = 10;
+        $expiresAt = 10;
 
         $apiKeys = [
-            'access_token'  => $accessToken,
+            'access_token' => $accessToken,
             'refresh_token' => $refreshToken,
-            'expires_at'    => $expiresAt,
+            'expires_at' => $expiresAt,
         ];
 
         $integration = $this->createMock(Integration::class);

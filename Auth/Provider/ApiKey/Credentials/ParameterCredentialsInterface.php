@@ -26,4 +26,5 @@ interface ParameterCredentialsInterface extends AuthCredentialsInterface
      * @return null|string
      */
     public function getApiKey(): ?string;
+
 }

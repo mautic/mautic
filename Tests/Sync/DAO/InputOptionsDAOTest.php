@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2019 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,10 +11,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\DAO\Mapping;
 
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use DateTimeImmutable;
 use DateTimeZone;
-use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 

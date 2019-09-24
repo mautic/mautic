@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Handler;
+
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -119,7 +118,7 @@ class ContactNotificationHandler implements HandlerInterface
             [
                 'integrationObject'   => $notificationDAO->getIntegrationObject(),
                 'integrationObjectId' => $notificationDAO->getIntegrationObjectId(),
-                'message'             => $notificationDAO->getMessage(),
+                'message'             => $notificationDAO->getMessage()
             ]
         );
 
@@ -156,7 +155,7 @@ class ContactNotificationHandler implements HandlerInterface
                 [
                     'message'     => $message,
                     'integration' => $this->integrationDisplayName,
-                    'object'      => $this->objectDisplayName,
+                    'object'      => $this->objectDisplayName
                 ]
             );
 

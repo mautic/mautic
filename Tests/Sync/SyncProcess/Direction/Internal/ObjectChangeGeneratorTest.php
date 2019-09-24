@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,15 +11,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess\Direction\Internal;
 
+
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
@@ -43,18 +42,18 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     private $fieldHelper;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->syncJudge   = $this->createMock(SyncJudgeInterface::class);
         $this->valueHelper = $this->createMock(ValueHelper::class);
         $this->fieldHelper = $this->createMock(FieldHelper::class);
     }
 
-    public function testFieldsAreAddedToObjectChangeAndIntegrationFirstNameWins(): void
+    public function testFieldsAreAddedToObjectChangeAndIntegrationFirstNameWins()
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                function(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
                     return $normalizedValueDAO;
                 }
             );
@@ -72,7 +71,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                function($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
                     return $integrationInformationChangeRequest;
                 }
             );
@@ -111,11 +110,11 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Robert', $changedFields['firstname']->getValue()->getNormalizedValue());
     }
 
-    public function testFieldsAreAddedToObjectChangeAndInternalFirstNameWins(): void
+    public function testFieldsAreAddedToObjectChangeAndInternalFirstNameWins()
     {
         $this->valueHelper->method('getValueForMautic')
             ->willReturnCallback(
-                function (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
+                function(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) {
                     return $normalizedValueDAO;
                 }
             );
@@ -133,7 +132,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
+                function($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
                     return $internalInformationChangeRequest;
                 }
             );
@@ -197,7 +196,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     private function getIntegrationSyncReport(string $integration, string $objectName)
     {
-        $syncReport   = new ReportDAO($integration);
+        $syncReport = new ReportDAO($integration);
         $reportObject = new ReportObjectDAO($objectName, 2);
         $reportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'), ReportFieldDAO::FIELD_REQUIRED));
         $reportObject->addField(new ReportFieldDAO('first_name', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Robert')));

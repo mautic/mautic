@@ -21,13 +21,13 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 
 /**
- * Class LeadSubscriber.
+ * Class LeadSubscriber
  */
 class LeadSubscriber extends CommonSubscriber
 {
@@ -95,6 +95,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
+
         if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(MauticSyncDataExchange::OBJECT_CONTACT)) {
             // Only track if an integration is syncing with contacts
             return;
@@ -114,7 +115,7 @@ class LeadSubscriber extends CommonSubscriber
         if (isset($changes['dnc_channel_status'])) {
             $dncChanges = [];
             foreach ($changes['dnc_channel_status'] as $channel => $change) {
-                $oldValue = $change['old_reason'] ?? '';
+                $oldValue = isset($change['old_reason']) ? $change['old_reason'] : '';
                 $newValue = $change['reason'];
 
                 $dncChanges['mautic_internal_dnc_'.$channel] = [$oldValue, $newValue];
@@ -184,14 +185,14 @@ class LeadSubscriber extends CommonSubscriber
     {
         $toPersist     = [];
         $changedFields = [];
-        $objectId      = (int) $objectId;
-        foreach ($fieldChanges as $key => [$oldValue, $newValue]) {
+        $objectId = (int)$objectId;
+        foreach ($fieldChanges as $key => list($oldValue, $newValue)) {
             $valueDAO          = $this->variableExpressor->encodeVariable($newValue);
             $changedFields[]   = $key;
-            $fieldChangeEntity = (new FieldChange())
+            $fieldChangeEntity = (new FieldChange)
                 ->setObjectType($objectType)
                 ->setObjectId($objectId)
-                ->setModifiedAt(new \DateTime())
+                ->setModifiedAt(new \DateTime)
                 ->setColumnName($key)
                 ->setColumnType($valueDAO->getType())
                 ->setColumnValue($valueDAO->getValue());

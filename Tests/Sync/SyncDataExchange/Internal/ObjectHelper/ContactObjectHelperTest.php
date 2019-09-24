@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,11 +11,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\ObjectHelper;
 
+
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -52,23 +51,23 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $doNotContactModel;
 
-    protected function setUp(): void
+    protected function setUp()
     {
-        $this->model             = $this->createMock(LeadModel::class);
-        $this->repository        = $this->createMock(LeadRepository::class);
-        $this->connection        = $this->createMock(Connection::class);
-        $this->fieldModel        = $this->createMock(FieldModel::class);
+        $this->model = $this->createMock(LeadModel::class);
+        $this->repository = $this->createMock(LeadRepository::class);
+        $this->connection = $this->createMock(Connection::class);
+        $this->fieldModel = $this->createMock(FieldModel::class);
         $this->doNotContactModel = $this->createMock(DoNotContact::class);
 
         $this->fieldModel->method('getFieldList')
             ->willReturn(
                 [
-                    'email' => [],
+                    'email' => []
                 ]
             );
     }
 
-    public function testCreate(): void
+    public function testCreate()
     {
         $this->model->expects($this->exactly(2))
             ->method('saveEntity');
@@ -90,7 +89,7 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testUpdate(): void
+    public function testUpdate()
     {
         $this->model->expects($this->exactly(2))
             ->method('saveEntity');
@@ -113,10 +112,10 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     $contact1,
-                    $contact2,
+                    $contact2
                 ]
             );
-        $objectMappings = $this->getObjectHelper()->update([3, 4], $objects);
+        $objectMappings = $this->getObjectHelper()->update([3,4], $objects);
 
         foreach ($objectMappings as $key => $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
@@ -126,7 +125,7 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testDoNotContactIsAdded(): void
+    public function testDoNotContactIsAdded()
     {
         $this->doNotContactModel->expects($this->once())
             ->method('addDncForContact')
@@ -149,7 +148,7 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         $this->getObjectHelper()->update([1], $objects);
     }
 
-    public function testDoNotContactIsRemoved(): void
+    public function testDoNotContactIsRemoved()
     {
         $this->doNotContactModel->expects($this->once())
             ->method('removeDncForContact')
@@ -172,7 +171,7 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         $this->getObjectHelper()->update([1], $objects);
     }
 
-    public function testUnrecognizedDoNotContactDefaultsToManualDNC(): void
+    public function testUnrecognizedDoNotContactDefaultsToManualDNC()
     {
         $this->doNotContactModel->expects($this->once())
             ->method('addDncForContact')

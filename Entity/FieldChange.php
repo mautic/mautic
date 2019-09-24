@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -61,8 +59,10 @@ class FieldChange
 
     /**
      * @param ORM\ClassMetadata $metadata
+     *
+     * @return void
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -143,7 +143,7 @@ class FieldChange
      *
      * @return FieldChange
      */
-    public function setObjectId(int $id): self
+    public function setObjectId(int $id): FieldChange
     {
         $this->objectId = $id;
 
@@ -163,7 +163,7 @@ class FieldChange
      *
      * @return FieldChange
      */
-    public function setObjectType(string $type): self
+    public function setObjectType(string $type): FieldChange
     {
         $this->objectType = $type;
 
@@ -179,11 +179,11 @@ class FieldChange
     }
 
     /**
-     * @param \DateTime $time
+     * @param \DateTime $value
      *
      * @return FieldChange
      */
-    public function setModifiedAt(\DateTime $time): self
+    public function setModifiedAt(\DateTime $time): FieldChange
     {
         $this->modifiedAt = $time;
 
@@ -203,7 +203,7 @@ class FieldChange
      *
      * @return FieldChange
      */
-    public function setColumnName(string $name): self
+    public function setColumnName(string $name): FieldChange
     {
         $this->columnName = $name;
 
@@ -223,7 +223,7 @@ class FieldChange
      *
      * @return FieldChange
      */
-    public function setColumnType(string $type): self
+    public function setColumnType(string $type): FieldChange
     {
         $this->columnType = $type;
 
@@ -243,7 +243,7 @@ class FieldChange
      *
      * @return FieldChange
      */
-    public function setColumnValue(string $value): self
+    public function setColumnValue(string $value): FieldChange
     {
         $this->columnValue = $value;
 

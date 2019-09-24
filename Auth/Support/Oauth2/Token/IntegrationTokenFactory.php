@@ -24,11 +24,11 @@ class IntegrationTokenFactory implements TokenFactoryInterface
         $this->extraKeysToStore = $extraKeysToStore;
     }
 
-    public function __invoke(array $data, ?TokenInterface $previousToken = null): IntegrationToken
+    public function __invoke(array $data, TokenInterface $previousToken = null): IntegrationToken
     {
-        $accessToken  = null;
+        $accessToken = null;
         $refreshToken = null;
-        $expiresAt    = null;
+        $expiresAt = null;
 
         // Read "access_token" attribute
         if (isset($data['access_token'])) {

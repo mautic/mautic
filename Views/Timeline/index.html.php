@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * @copyright   2018 Mautic Inc. All rights reserved

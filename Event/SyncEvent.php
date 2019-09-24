@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,7 +14,9 @@ namespace MauticPlugin\IntegrationsBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class SyncEvent.
+ * Class SyncEvent
+ *
+ * @package MauticPlugin\IntegrationsBundle\Event
  */
 class SyncEvent extends Event
 {
@@ -31,11 +31,11 @@ class SyncEvent extends Event
      */
     private $toDateTime;
 
-    public function __construct(string $integrationName, ?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null)
+    public function __construct(string $integrationName, \DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
     {
         $this->integrationName = $integrationName;
-        $this->fromDateTime    = $fromDateTime;
-        $this->toDateTime      = $toDateTime;
+        $this->fromDateTime = $fromDateTime;
+        $this->toDateTime = $toDateTime;
     }
 
     /**
@@ -51,8 +51,7 @@ class SyncEvent extends Event
      *
      * @return bool
      */
-    public function isIntegration(string $integrationName): bool
-    {
+    public function isIntegration(string $integrationName): bool {
         return $this->getIntegrationName() === $integrationName;
     }
 
@@ -71,4 +70,6 @@ class SyncEvent extends Event
     {
         return $this->toDateTime;
     }
+
+
 }

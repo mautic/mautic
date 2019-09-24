@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -29,7 +27,7 @@ class IntegrationFeatureSettingsType extends AbstractType
      *
      * @throws IntegrationNotFoundException
      */
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integrationObject = $options['integrationObject'];
         if (!$integrationObject instanceof IntegrationInterface) {
@@ -41,7 +39,7 @@ class IntegrationFeatureSettingsType extends AbstractType
                 'integration',
                 $integrationObject->getFeatureSettingsConfigFormName(),
                 [
-                    'label' => false,
+                    'label' => false
                 ]
             );
         }
@@ -52,7 +50,7 @@ class IntegrationFeatureSettingsType extends AbstractType
                 IntegrationSyncSettingsType::class,
                 [
                     'label'             => false,
-                    'integrationObject' => $integrationObject,
+                    'integrationObject' => $integrationObject
                 ]
             );
         }
@@ -61,11 +59,11 @@ class IntegrationFeatureSettingsType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             [
-                'integrationObject',
+                'integrationObject'
             ]
         );
     }

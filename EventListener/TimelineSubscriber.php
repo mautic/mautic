@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,8 +11,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\EventListener;
 
+
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\EventListener\TimelineEventLogTrait;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -49,9 +49,10 @@ class TimelineSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0]
         ];
     }
+
 
     /**
      * @param LeadTimelineEvent $event
@@ -62,7 +63,7 @@ class TimelineSubscriber implements EventSubscriberInterface
      * @param null              $object
      * @param null              $action
      */
-    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null): void
+    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null)
     {
         $eventTypeName = $this->translator->trans($eventTypeName);
         $event->addEventType($eventType, $eventTypeName);
@@ -122,7 +123,7 @@ class TimelineSubscriber implements EventSubscriberInterface
     /**
      * @param LeadTimelineEvent $event
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event): void
+    public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         $this->addEvents(
             $event,
@@ -133,4 +134,5 @@ class TimelineSubscriber implements EventSubscriberInterface
             null
         );
     }
+
 }

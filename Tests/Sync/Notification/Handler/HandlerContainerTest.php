@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,21 +11,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Notification\Handler;
 
+
 use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerInterface;
+use MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 
 class HandlerContainerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testExceptionThrownIfIntegrationNotFound(): void
+    public function testExceptionThrownIfIntegrationNotFound()
     {
         $this->expectException(HandlerNotSupportedException::class);
 
         $handler = new HandlerContainer();
-        $handler->getHandler('foo', 'bar');
+        $handler->getHandler('foo' , 'bar');
     }
 
-    public function testExceptionThrownIfObjectNotFound(): void
+    public function testExceptionThrownIfObjectNotFound()
     {
         $this->expectException(HandlerNotSupportedException::class);
 
@@ -41,10 +40,10 @@ class HandlerContainerTest extends \PHPUnit_Framework_TestCase
 
         $handler->registerHandler($mockHandler);
 
-        $handler->getHandler('foo', 'bar');
+        $handler->getHandler('foo' , 'bar');
     }
 
-    public function testHandlerIsRegistered(): void
+    public function testHandlerIsRegistered()
     {
         $handler = new HandlerContainer();
 
@@ -56,7 +55,7 @@ class HandlerContainerTest extends \PHPUnit_Framework_TestCase
 
         $handler->registerHandler($mockHandler);
 
-        $returnedHandler = $handler->getHandler('foo', 'bar');
+        $returnedHandler = $handler->getHandler('foo' , 'bar');
 
         $this->assertEquals($mockHandler, $returnedHandler);
     }

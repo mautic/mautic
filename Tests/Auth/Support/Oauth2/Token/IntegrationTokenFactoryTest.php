@@ -18,7 +18,7 @@ use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationTokenFa
 
 class IntegrationTokenFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTokenGeneratedWithExpires(): void
+    public function testTokenGeneratedWithExpires()
     {
         $factory = new IntegrationTokenFactory();
         $data    = [
@@ -34,7 +34,7 @@ class IntegrationTokenFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($token->isExpired());
     }
 
-    public function testTokenGeneratedWithExpiresAt(): void
+    public function testTokenGeneratedWithExpiresAt()
     {
         $factory = new IntegrationTokenFactory();
         $data    = [
@@ -50,7 +50,7 @@ class IntegrationTokenFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($token->isExpired());
     }
 
-    public function testTokenGeneratedWithPreviousRefreshToken(): void
+    public function testTokenGeneratedWithPreviousRefreshToken()
     {
         $factory = new IntegrationTokenFactory();
         $data    = [
@@ -66,7 +66,7 @@ class IntegrationTokenFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($token->isExpired());
     }
 
-    public function testTokenGeneratedWithExtraData(): void
+    public function testTokenGeneratedWithExtraData()
     {
         $factory = new IntegrationTokenFactory(['foo']);
         $data    = [

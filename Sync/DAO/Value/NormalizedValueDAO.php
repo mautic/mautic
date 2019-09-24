@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -14,27 +12,27 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Value;
 
 /**
- * Class NormalizedValueDAO.
+ * Class NormalizedValueDAO
  */
 class NormalizedValueDAO
 {
-    const BOOLEAN_TYPE     = 'boolean';
-    const DATE_TYPE        = 'date';
-    const DATETIME_TYPE    = 'datetime';
-    const DOUBLE_TYPE      = 'double';
-    const EMAIL_TYPE       = 'email';
-    const FLOAT_TYPE       = 'float';
-    const INT_TYPE         = 'int';
-    const LOOKUP_TYPE      = 'lookup';
+    const BOOLEAN_TYPE = 'boolean';
+    const DATE_TYPE = 'date';
+    const DATETIME_TYPE = 'datetime';
+    const DOUBLE_TYPE = 'double';
+    const EMAIL_TYPE = 'email';
+    const FLOAT_TYPE = 'float';
+    const INT_TYPE = 'int';
+    const LOOKUP_TYPE = 'lookup';
     const MULTISELECT_TYPE = 'multiselect';
-    const PHONE_TYPE       = 'phone';
-    const SELECT_TYPE      = 'select';
-    const STRING_TYPE      = 'string';
-    const REGION_TYPE      = 'region';
-    const TEXT_TYPE        = 'text';
-    const TEXTAREA_TYPE    = 'textarea';
-    const TIME_TYPE        = 'time';
-    const URL_TYPE         = 'url';
+    const PHONE_TYPE = 'phone';
+    const SELECT_TYPE = 'select';
+    const STRING_TYPE = 'string';
+    const REGION_TYPE = 'region';
+    const TEXT_TYPE = 'text';
+    const TEXTAREA_TYPE = 'textarea';
+    const TIME_TYPE = 'time';
+    const URL_TYPE = 'url';
 
     /**
      * @var string
@@ -62,7 +60,7 @@ class NormalizedValueDAO
     {
         $this->type            = $type;
         $this->value           = $value;
-        $this->normalizedValue = $normalizedValue ?: $value;
+        $this->normalizedValue = ($normalizedValue) ? $normalizedValue : $value;
     }
 
     /**

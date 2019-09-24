@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Handler;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 
@@ -25,7 +24,7 @@ class HandlerContainer
     /**
      * @param HandlerInterface $handler
      */
-    public function registerHandler(HandlerInterface $handler): void
+    public function registerHandler(HandlerInterface $handler)
     {
         if (!isset($this->handlers[$handler->getIntegration()])) {
             $this->handlers[$handler->getIntegration()] = [];
@@ -39,7 +38,6 @@ class HandlerContainer
      * @param string $object
      *
      * @return HandlerInterface
-     *
      * @throws HandlerNotSupportedException
      */
     public function getHandler(string $integration, string $object)
@@ -60,8 +58,8 @@ class HandlerContainer
      */
     public function getHandlers()
     {
-        return array_reduce($this->handlers, function ($accumulator, $integrationHandlers) {
-            return array_merge($accumulator, $integrationHandlers);
+        return array_reduce($this->handlers, function($accumulator, $integrationHandlers) {
+            return array_merge($accumulator, $integrationHandlers);    
         }, []);
     }
 }

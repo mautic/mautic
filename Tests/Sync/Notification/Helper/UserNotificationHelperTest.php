@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Notification\Helper;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
@@ -41,7 +40,7 @@ class UserNotificationHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $translator;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->writer      = $this->createMock(Writer::class);
         $this->userHelper  = $this->createMock(UserHelper::class);
@@ -49,7 +48,7 @@ class UserNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
     }
 
-    public function testNotificationSentToOwner(): void
+    public function testNotificationSentToOwner()
     {
         $helper = $this->getHelper();
 
@@ -78,7 +77,7 @@ class UserNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $helper->writeNotification('test', 'test', 'test', 'test', 1, 'foobar');
     }
 
-    public function testNotificationSentToAdmins(): void
+    public function testNotificationSentToAdmins()
     {
         $helper = $this->getHelper();
 

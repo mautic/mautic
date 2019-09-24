@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,6 +11,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Helper;
 
+
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 
 class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +21,7 @@ class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $syncDateHelper;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->syncDateHelper = $this->getMockBuilder(SyncDateHelper::class)
             ->disableOriginalConstructor()
@@ -30,7 +29,7 @@ class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testSpecifiedFromDateTimeIsReturned(): void
+    public function testSpecifiedFromDateTimeIsReturned()
     {
         $syncFromDateTime = new \DateTimeImmutable('2018-10-08 00:00:00');
 
@@ -39,7 +38,7 @@ class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($syncFromDateTime, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));
     }
 
-    public function testLastSyncDateForIntegrationSyncObjectIsReturned(): void
+    public function testLastSyncDateForIntegrationSyncObjectIsReturned()
     {
         $objectLastSyncDate = new \DateTimeImmutable('2018-10-08 00:00:00');
 
@@ -49,7 +48,7 @@ class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($objectLastSyncDate, $this->syncDateHelper->getSyncFromDateTime('Test', 'Object'));
     }
 
-    public function testSyncToDateTimeIsReturnedIfSpecified(): void
+    public function testSyncToDateTimeIsReturnedIfSpecified()
     {
         $syncToDateTime = new \DateTimeImmutable('2018-10-08 00:00:00');
 
@@ -58,7 +57,8 @@ class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($syncToDateTime, $this->syncDateHelper->getSyncToDateTime());
     }
 
-    public function testSyncDateTimeIsReturnedForSyncToDateTimeIfNotSpecified(): void
+
+    public function testSyncDateTimeIsReturnedForSyncToDateTimeIfNotSpecified()
     {
         $this->syncDateHelper->setSyncDateTimes();
 

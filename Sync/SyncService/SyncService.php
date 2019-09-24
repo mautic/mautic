@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -15,21 +13,21 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
 
 use GuzzleHttp\Exception\ClientException;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
-use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
 
 /**
- * Class SyncService.
+ * Class SyncService
  */
 final class SyncService implements SyncServiceInterface
 {
@@ -75,14 +73,14 @@ final class SyncService implements SyncServiceInterface
     /**
      * SyncService constructor.
      *
-     * @param MauticSyncDataExchange   $internalSyncDataExchange
-     * @param SyncDateHelper           $syncDateHelper
-     * @param MappingHelper            $mappingHelper
-     * @param SyncIntegrationsHelper   $syncIntegrationsHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param Notifier                 $notifier
-     * @param IntegrationSyncProcess   $integrationSyncProcess
-     * @param MauticSyncProcess        $mauticSyncProcess
+     * @param MauticSyncDataExchange      $internalSyncDataExchange
+     * @param SyncDateHelper              $syncDateHelper
+     * @param MappingHelper               $mappingHelper
+     * @param SyncIntegrationsHelper      $syncIntegrationsHelper
+     * @param EventDispatcherInterface    $eventDispatcher
+     * @param Notifier                    $notifier
+     * @param IntegrationSyncProcess      $integrationSyncProcess
+     * @param MauticSyncProcess           $mauticSyncProcess
      */
     public function __construct(
         MauticSyncDataExchange $internalSyncDataExchange,
@@ -93,7 +91,8 @@ final class SyncService implements SyncServiceInterface
         Notifier $notifier,
         IntegrationSyncProcess $integrationSyncProcess,
         MauticSyncProcess $mauticSyncProcess
-    ) {
+    )
+    {
         $this->internalSyncDataExchange = $internalSyncDataExchange;
         $this->syncDateHelper           = $syncDateHelper;
         $this->mappingHelper            = $mappingHelper;
@@ -127,9 +126,9 @@ final class SyncService implements SyncServiceInterface
         DebugLogger::log(
             $inputOptionsDAO->getIntegration(),
             sprintf(
-                'Starting %s sync from %s date/time',
-                $inputOptionsDAO->isFirstTimeSync() ? 'first time' : 'subsequent',
-                $inputOptionsDAO->getStartDateTime() ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : 'yet to be determined'
+                "Starting %s sync from %s date/time",
+                ($inputOptionsDAO->isFirstTimeSync()) ? "first time" : "subsequent",
+                ($inputOptionsDAO->getStartDateTime()) ? $inputOptionsDAO->getStartDateTime()->format('Y-m-d H:i:s') : "yet to be determined"
             ),
             __CLASS__.':'.__FUNCTION__
         );
@@ -145,7 +144,7 @@ final class SyncService implements SyncServiceInterface
     /**
      * @param DebugLogger $logger
      */
-    public function initiateDebugLogger(DebugLogger $logger): void
+    public function initiateDebugLogger(DebugLogger $logger)
     {
         // Yes it's a hack to prevent from having to pass the logger as a dependency into dozens of classes
         // So not doing anything with the logger, just need Symfony to initiate the service

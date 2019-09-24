@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,15 +11,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 
 class FullObjectReportBuilder
 {
@@ -69,7 +67,7 @@ class FullObjectReportBuilder
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
                     sprintf(
-                        'Searching for %s objects between %s and %s (%d,%d)',
+                        "Searching for %s objects between %s and %s (%d,%d)",
                         $requestedObjectDAO->getObject(),
                         $requestedObjectDAO->getFromDateTime()->format(DATE_ATOM),
                         $requestedObjectDAO->getToDateTime()->format(DATE_ATOM),
@@ -102,13 +100,13 @@ class FullObjectReportBuilder
                             $start,
                             $limit
                         );
-
                         break;
                     default:
                         throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $requestedObjectDAO->getObject());
                 }
 
                 $this->processObjects($requestedObjectDAO, $syncReport, $foundObjects);
+
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
@@ -126,7 +124,7 @@ class FullObjectReportBuilder
      * @param ReportDAO $syncReport
      * @param array     $foundObjects
      */
-    private function processObjects(ObjectDAO $requestedObjectDAO, ReportDAO $syncReport, array $foundObjects): void
+    private function processObjects(ObjectDAO $requestedObjectDAO, ReportDAO $syncReport, array $foundObjects)
     {
         $fields = $requestedObjectDAO->getFields();
         foreach ($foundObjects as $object) {

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Integration;
+
 
 use Mautic\PluginBundle\Entity\Integration;
 
@@ -33,7 +32,7 @@ trait ConfigurationTrait
     /**
      * @param Integration $integration
      */
-    public function setIntegrationConfiguration(Integration $integration): void
+    public function setIntegrationConfiguration(Integration $integration)
     {
         $this->integration = $integration;
     }

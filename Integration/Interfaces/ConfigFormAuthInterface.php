@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,10 +11,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
+
 interface ConfigFormAuthInterface
 {
     /**
-     * Return the name of the form type service for the authorization tab which should include all the fields required for the API to work.
+     * Return the name of the form type service for the authorization tab which should include all the fields required for the API to work
      *
      * @return string
      */

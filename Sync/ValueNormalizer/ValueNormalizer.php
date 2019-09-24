@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,7 +14,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 /**
- * Class ValueNormalizer.
+ * Class ValueNormalizer
  */
 final class ValueNormalizer implements ValueNormalizerInterface
 {
@@ -44,14 +42,13 @@ final class ValueNormalizer implements ValueNormalizerInterface
             case NormalizedValueDAO::FLOAT_TYPE:
                 return new NormalizedValueDAO($type, $value, (float) $value);
             case NormalizedValueDAO::DOUBLE_TYPE:
-                return new NormalizedValueDAO($type, $value, (float) $value);
+                return new NormalizedValueDAO($type, $value, (double) $value);
             case NormalizedValueDAO::DATE_TYPE:
             case NormalizedValueDAO::DATETIME_TYPE:
                 return new NormalizedValueDAO($type, $value, new \DateTime($value));
             case NormalizedValueDAO::BOOLEAN_TYPE:
-                $value = 'false' === $value ? false : $value;
-                $value = 'true' === $value ? true : $value;
-
+                $value = ($value === 'false') ? false : $value;
+                $value = ($value === 'true') ? true : $value;
                 return new NormalizedValueDAO($type, $value, (bool) $value);
             default:
                 throw new \InvalidArgumentException('Variable type, '.$type.', not supported');

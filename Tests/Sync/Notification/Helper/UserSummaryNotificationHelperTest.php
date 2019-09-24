@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Notification\Helper;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
@@ -41,7 +40,7 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $translator;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->writer      = $this->createMock(Writer::class);
         $this->userHelper  = $this->createMock(UserHelper::class);
@@ -49,7 +48,7 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
     }
 
-    public function testNotificationSentToOwner(): void
+    public function testNotificationSentToOwner()
     {
         $helper = $this->getHelper();
         $helper->storeSummaryNotification('Foo', 'Bar', 1);
@@ -58,7 +57,8 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->userHelper->expects($this->exactly(2))
             ->method('getOwners')
             ->willReturnCallback(
-                function (string $object, array $ids) {
+                function (string $object, array $ids)
+                {
                     return [1 => $ids];
                 }
             );
@@ -92,7 +92,7 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $helper->writeNotifications('test', 'test');
     }
 
-    public function testNotificationSentToAdmins(): void
+    public function testNotificationSentToAdmins()
     {
         $helper = $this->getHelper();
         $helper->storeSummaryNotification('Foo', 'Bar', 1);
@@ -132,7 +132,7 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $helper->writeNotifications('test', 'test');
     }
 
-    public function testMoreThan25ObjectsResultInCountMessage(): void
+    public function testMoreThan25ObjectsResultInCountMessage()
     {
         $helper = $this->getHelper();
 
@@ -153,7 +153,8 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->willReturnCallback(
-                function ($string, $params) {
+                function ($string, $params)
+                {
                     $expectedStrings = [
                         'mautic.integration.sync.user_notification.header',
                         'mautic.integration.sync.user_notification.count_message',

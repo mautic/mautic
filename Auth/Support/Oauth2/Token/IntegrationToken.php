@@ -56,7 +56,7 @@ class IntegrationToken implements TokenInterface
     }
 
     /**
-     * @return bool
+     * @return boolean
      */
     public function isExpired(): bool
     {

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,13 +11,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
+
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 interface IntegrationInterface extends UnifiedIntegrationInterface
 {
     /**
-     * Return the integration's name.
+     * Return the integration's name
      *
      * @return string
      */

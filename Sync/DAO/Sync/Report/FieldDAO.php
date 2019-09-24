@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,12 +14,12 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 /**
- * Class FieldDAO.
+ * Class FieldDAO
  */
 class FieldDAO
 {
-    const FIELD_CHANGED   = 'changed';
-    const FIELD_REQUIRED  = 'required';
+    const FIELD_CHANGED = 'changed';
+    const FIELD_REQUIRED = 'required';
     const FIELD_UNCHANGED = 'unchanged';
 
     /**
@@ -87,7 +85,7 @@ class FieldDAO
      *
      * @return FieldDAO
      */
-    public function setChangeDateTime(\DateTimeInterface $changeDateTime): self
+    public function setChangeDateTime(\DateTimeInterface $changeDateTime): FieldDAO
     {
         $this->changeDateTime = $changeDateTime;
 

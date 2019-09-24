@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,7 +11,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
@@ -23,11 +21,12 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 {
     private const INTEGRATION_NAME = 'Test';
-
+    
     /**
      * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -43,14 +42,14 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
      */
     private $fieldBuilder;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
         $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
         $this->fieldBuilder        = $this->createMock(FieldBuilder::class);
     }
 
-    public function testBuildingContactReport(): void
+    public function testBuildingContactReport()
     {
         $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
@@ -75,7 +74,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                         'id'            => 1,
                         'email'         => 'test@test.com',
                         'date_modified' => '2018-10-08 00:30:00',
-                    ],
+                    ]
                 ]
             );
 
@@ -86,7 +85,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
-    public function testBuildingCompanyReport(): void
+    public function testBuildingCompanyReport()
     {
         $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
@@ -111,7 +110,7 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                         'id'            => 1,
                         'email'         => 'test@test.com',
                         'date_modified' => '2018-10-08 00:30:00',
-                    ],
+                    ]
                 ]
             );
 

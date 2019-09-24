@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Notification\Helper;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
@@ -25,14 +24,14 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $router;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->router = $this->createMock(Router::class);
     }
 
-    public function testContactRoute(): void
-    {
-        $this->router->method('generate')
+   public function testContactRoute()
+   {
+       $this->router->method('generate')
            ->willReturnCallback(
                function (string $name, array $params) {
                    $this->assertEquals('mautic_contact_action', $name);
@@ -42,9 +41,9 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
            );
 
         $this->getRouteHelper()->getRoute(MauticSyncDataExchange::OBJECT_CONTACT, 1);
-    }
+   }
 
-    public function testCompanyRoute(): void
+    public function testCompanyRoute()
     {
         $this->router->method('generate')
             ->willReturnCallback(
@@ -56,14 +55,15 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testExceptionThrownWithUnsupportedObject(): void
+    public function testExceptionThrownWithUnsupportedObject()
     {
         $this->expectException(ObjectNotSupportedException::class);
 
         $this->getRouteHelper()->getRoute('FooBar', 1);
     }
 
-    public function testLink(): void
+
+    public function testLink()
     {
         $this->router->method('generate')
             ->willReturnCallback(
@@ -78,7 +78,7 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('<a href="foo.bar">Hello</a>', $link);
     }
 
-    public function testLinkCsv(): void
+    public function testLinkCsv()
     {
         $this->router->method('generate')
             ->willReturnCallback(
@@ -89,7 +89,7 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $csv = $this->getRouteHelper()->getLinkCsv(MauticSyncDataExchange::OBJECT_CONTACT, [1, 2]);
+        $csv = $this->getRouteHelper()->getLinkCsv(MauticSyncDataExchange::OBJECT_CONTACT, [1,2]);
         $this->assertEquals('[<a href="foo.bar">1</a>], [<a href="foo.bar">2</a>]', $csv);
     }
 

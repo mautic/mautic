@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials;
 
+
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface HeaderCredentialsInterface extends AuthCredentialsInterface

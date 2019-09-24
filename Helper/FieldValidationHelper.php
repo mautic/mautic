@@ -53,7 +53,7 @@ class FieldValidationHelper
     public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
     {
         $this->fieldHelper = $fieldHelper;
-        $this->translator  = $translator;
+        $this->translator = $translator;
     }
 
     /**
@@ -88,7 +88,7 @@ class FieldValidationHelper
                 $this->validateIntegrationRequiredFields($fieldMappingForm, $missingFields);
 
                 $this->validateMauticRequiredFields($fieldMappingForm, $object, $objectFieldMappings);
-            } catch (\Throwable $exception) {
+            } catch (\Exception $exception) {
                 $fieldMappingForm->addError(new FormError($exception->getMessage()));
             }
         }
@@ -185,7 +185,6 @@ class FieldValidationHelper
      * @param array  $objectFieldMappings
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     private function findMissingInternalRequiredFieldMappings(string $object, array $objectFieldMappings): array

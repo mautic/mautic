@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper;
+
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -48,21 +47,22 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $mauticSyncFieldsLoadEvent;
 
-    protected function setUp(): void
+
+    protected function setUp()
     {
-        $this->fieldModel              = $this->createMock(FieldModel::class);
+        $this->fieldModel = $this->createMock(FieldModel::class);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
+        $this->channelListHelper = $this->createMock(ChannelListHelper::class);
         $this->channelListHelper->method('getFeatureChannels')
             ->willReturn(['Email' => 'email']);
 
         $this->mauticSyncFieldsLoadEvent = $this->createMock(MauticSyncFieldsLoadEvent::class);
-        $this->eventDispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->eventDispatcher->method('dispatch')
             ->willReturn($this->mauticSyncFieldsLoadEvent);
     }
 
-    public function testContactSyncFieldsReturned(): void
+    public function testContactSyncFieldsReturned()
     {
         $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
         $syncFields = ['email' => 'Email'];
@@ -88,7 +88,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCompanySyncFieldsReturned(): void
+    public function testCompanySyncFieldsReturned()
     {
         $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
         $syncFields = ['email' => 'Email'];

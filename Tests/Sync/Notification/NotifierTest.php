@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Notification;
+
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -25,7 +24,7 @@ use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync
 
 class NotifierTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         parent::setUp();
 
@@ -33,7 +32,7 @@ class NotifierTest extends MauticMysqlTestCase
         $this->installDatabaseFixtures([dirname(__DIR__).'/../../../../app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
     }
 
-    public function testNotifications(): void
+    public function testNotifications()
     {
         /** @var Connection $connection */
         $connection = $this->container->get('doctrine.dbal.default_connection');

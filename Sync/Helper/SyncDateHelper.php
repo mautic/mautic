@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
+
 
 use Doctrine\DBAL\Connection;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
@@ -57,11 +56,11 @@ class SyncDateHelper
      * @param \DateTimeInterface|null $fromDateTime
      * @param \DateTimeInterface|null $toDateTime
      */
-    public function setSyncDateTimes(?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null): void
+    public function setSyncDateTimes(\DateTimeInterface $fromDateTime = null, \DateTimeInterface $toDateTime = null)
     {
-        $this->syncFromDateTime    = $fromDateTime;
-        $this->syncToDateTime      = $toDateTime;
-        $this->syncDateTime        = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->syncFromDateTime = $fromDateTime;
+        $this->syncToDateTime   = $toDateTime;
+        $this->syncDateTime     = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $this->lastObjectSyncDates = [];
     }
 

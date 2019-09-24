@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,12 +11,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
+
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
@@ -28,6 +25,8 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 
 class PartialObjectReportBuilder
 {
@@ -156,7 +155,7 @@ class PartialObjectReportBuilder
      *
      * @throws ObjectNotSupportedException
      */
-    private function processFieldChange(array $fieldChange, RequestObjectDAO $objectDAO): void
+    private function processFieldChange(array $fieldChange, RequestObjectDAO $objectDAO)
     {
         $objectId = (int) $fieldChange['object_id'];
 
@@ -197,7 +196,6 @@ class PartialObjectReportBuilder
      * @param RequestObjectDAO $requestObjectDAO
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     private function findObjectsWithMissingFields(RequestObjectDAO $requestObjectDAO): array
@@ -229,11 +227,9 @@ class PartialObjectReportBuilder
         switch ($objectName) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
                 $mauticObjects = $this->contactObjectHelper->findObjectsByIds(array_keys($this->objectsWithMissingFields));
-
                 break;
             case MauticSyncDataExchange::OBJECT_COMPANY:
                 $mauticObjects = $this->companyObjectHelper->findObjectsByIds(array_keys($this->objectsWithMissingFields));
-
                 break;
             default:
                 throw new ObjectNotFoundException($objectName);
@@ -246,7 +242,7 @@ class PartialObjectReportBuilder
      * @param array            $incompleteObjects
      * @param RequestObjectDAO $requestObjectDAO
      */
-    private function completeObjectsWithMissingFields(array $incompleteObjects, RequestObjectDAO $requestObjectDAO): void
+    private function completeObjectsWithMissingFields(array $incompleteObjects, RequestObjectDAO $requestObjectDAO)
     {
         foreach ($incompleteObjects as $incompleteObject) {
             $missingFields   = $this->objectsWithMissingFields[$incompleteObject['id']];
@@ -277,7 +273,6 @@ class PartialObjectReportBuilder
      * @param string $entityName
      *
      * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     private function getObjectNameFromEntityName(string $entityName)

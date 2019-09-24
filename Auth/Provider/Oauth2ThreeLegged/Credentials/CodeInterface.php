@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
+
 interface CodeInterface
 {
     /**
      * @return string|null
      */
     public function getCode(): ?string;
+
 }

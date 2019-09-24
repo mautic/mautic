@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -18,12 +16,12 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
-use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Tests\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 
 class SyncServiceTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    public function setUp()
     {
         parent::setUp();
 
@@ -31,7 +29,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $this->installDatabaseFixtures([dirname(__DIR__).'/../../../../app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
     }
 
-    public function testSync(): void
+    public function testSync()
     {
         $this->markTestSkipped('disabled for now');
 
@@ -67,7 +65,8 @@ class SyncServiceTest extends MauticMysqlTestCase
 
         $this->assertEquals(
             [
-                4 => [
+                4 =>
+                    [
                         'id'         => 4,
                         'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
                         'first_name' => 'Lewis',
@@ -75,7 +74,8 @@ class SyncServiceTest extends MauticMysqlTestCase
                         'email'      => 'LewisTSyed@gustr.com',
                         'street1'    => '107 Yorkie Lane',
                     ],
-                3 => [
+                3 =>
+                    [
                         'id'         => 3,
                         'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
                         'first_name' => 'Nellie',

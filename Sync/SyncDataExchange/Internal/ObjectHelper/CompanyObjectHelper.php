@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
+
 
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Company;
@@ -39,6 +38,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
      * @var Connection
      */
     private $connection;
+
 
     public function __construct(CompanyModel $model, CompanyRepository $repository, Connection $connection)
     {
@@ -69,7 +69,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
-                    'Created company ID %d',
+                    "Created company ID %d",
                     $company->getId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -101,9 +101,9 @@ class CompanyObjectHelper implements ObjectHelperInterface
         DebugLogger::log(
             MauticSyncDataExchange::NAME,
             sprintf(
-                'Found %d companies to update with ids %s',
+                "Found %d companies to update with ids %s",
                 count($companies),
-                implode(', ', $ids)
+                implode(", ", $ids)
             ),
             __CLASS__.':'.__FUNCTION__
         );
@@ -124,7 +124,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
-                    'Updated company ID %d',
+                    "Updated company ID %d",
                     $company->getId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -143,7 +143,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * Unfortunately the CompanyRepository doesn't give us what we need so we have to write our own queries.
+     * Unfortunately the CompanyRepository doesn't give us what we need so we have to write our own queries
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
@@ -215,6 +215,8 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        return $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAll();
+
+        return $results;
     }
 }

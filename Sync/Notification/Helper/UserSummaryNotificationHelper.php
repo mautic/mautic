@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
@@ -91,7 +90,7 @@ class UserSummaryNotificationHelper
      * @throws ObjectNotSupportedException
      * @throws \Doctrine\ORM\ORMException
      */
-    public function writeNotifications(string $mauticObject, string $listTranslationKey): void
+    public function writeNotifications(string $mauticObject, string $listTranslationKey)
     {
         $this->mauticObject       = $mauticObject;
         $this->listTranslationKey = $listTranslationKey;
@@ -117,7 +116,7 @@ class UserSummaryNotificationHelper
      * @param string $objectDisplayName
      * @param int    $id
      */
-    public function storeSummaryNotification(string $integrationDisplayName, string $objectDisplayName, int $id): void
+    public function storeSummaryNotification(string $integrationDisplayName, string $objectDisplayName, int $id)
     {
         if (!isset($this->userNotifications[$integrationDisplayName])) {
             $this->userNotifications[$integrationDisplayName] = [];
@@ -136,7 +135,7 @@ class UserSummaryNotificationHelper
      * @throws \Doctrine\ORM\ORMException
      * @throws ObjectNotSupportedException
      */
-    private function findAndSendToUsers(array $ids): void
+    private function findAndSendToUsers(array $ids)
     {
         $owners = $this->userHelper->getOwners($this->mauticObject, $ids);
 
@@ -163,7 +162,7 @@ class UserSummaryNotificationHelper
      * @throws ObjectNotSupportedException
      * @throws \Doctrine\ORM\ORMException
      */
-    private function writeNotification(array $ids, int $userId): void
+    private function writeNotification(array $ids, int $userId)
     {
         $count = count($ids);
 
@@ -173,7 +172,7 @@ class UserSummaryNotificationHelper
                     'mautic.integration.sync.user_notification.header',
                     [
                         '%integration%' => $this->integrationDisplayName,
-                        '%object%'      => ucfirst($this->objectDisplayName),
+                        '%object%'      => ucfirst($this->objectDisplayName)
                     ]
                 ),
                 $this->translator->trans(
@@ -191,13 +190,13 @@ class UserSummaryNotificationHelper
                 'mautic.integration.sync.user_notification.header',
                 [
                     '%integration%' => $this->integrationDisplayName,
-                    '%object%'      => ucfirst($this->objectDisplayName),
+                    '%object%'      => ucfirst($this->objectDisplayName)
                 ]
             ),
             $this->translator->trans(
                 $this->listTranslationKey,
                 [
-                    '%contacts%' => $this->routeHelper->getLinkCsv($this->mauticObject, $ids),
+                    '%contacts%' => $this->routeHelper->getLinkCsv($this->mauticObject, $ids)
                 ]
             ),
             $userId

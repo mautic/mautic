@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -18,11 +16,11 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 /**
- * Class VariableExpresserHelper.
+ * Class VariableExpresserHelper
  */
 final class VariableExpresserHelper implements VariableExpresserHelperInterface
 {
-    const TRUE_BOOLEAN_VALUE  = 'true';
+    const TRUE_BOOLEAN_VALUE = 'true';
     const FALSE_BOOLEAN_VALUE = 'false';
 
     /**
@@ -84,7 +82,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         if (is_bool($var)) {
             return new EncodedValueDAO(
                 EncodedValueDAO::BOOLEAN_TYPE,
-                true === $var ? self::TRUE_BOOLEAN_VALUE : self::FALSE_BOOLEAN_VALUE
+                $var === true ? self::TRUE_BOOLEAN_VALUE : self::FALSE_BOOLEAN_VALUE
             );
         }
 

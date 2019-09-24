@@ -21,7 +21,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
 class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testNonExistingFieldsAreRemoved(): void
+    public function testNonExistingFieldsAreRemoved()
     {
         $fields = $this->getCurrentFieldMappings();
 
@@ -32,7 +32,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
             'field1' => [
                 'mappedField'   => 'mautic_test_field',
                 'syncDirection' => 'bidirectional',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -45,7 +45,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testFieldUnsetIfMappingIsDeleted(): void
+    public function testFieldUnsetIfMappingIsDeleted()
     {
         $fields = $this->getCurrentFieldMappings();
         unset($fields['Lead']['field1']);
@@ -54,7 +54,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $fieldMergerHelper = new FieldMergerHelper($integrationObject, $fields);
 
         $updatedFieldMappings = [
-            'field1' => [],
+            'field1' => []
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -67,7 +67,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testCurrentFieldMappingsAreMerged(): void
+    public function testCurrentFieldMappingsAreMerged()
     {
         $fields            = $this->getCurrentFieldMappings();
         $integrationObject = $this->getIntegrationObject();
@@ -77,7 +77,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
             'field1' => [
                 'mappedField'   => 'mautic_test_field',
                 'syncDirection' => 'mautic',
-            ],
+            ]
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
@@ -105,7 +105,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testCurrentFieldMappingsAreMergedWithJustMappedFieldUpdated(): void
+    public function testCurrentFieldMappingsAreMergedWithJustMappedFieldUpdated()
     {
         $fields            = $this->getCurrentFieldMappings();
         $integrationObject = $this->getIntegrationObject();
@@ -114,7 +114,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field4' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
@@ -142,7 +142,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testCurrentFieldMappingsAreMergedWithJustSyncDirectionUpdated(): void
+    public function testCurrentFieldMappingsAreMergedWithJustSyncDirectionUpdated()
     {
         $fields            = $this->getCurrentFieldMappings();
         $integrationObject = $this->getIntegrationObject();
@@ -151,7 +151,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field4' => [
                 'syncDirection' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
-            ],
+            ]
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
@@ -179,7 +179,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testFieldUnsetIfDirectionIsUpdatedWithoutMappedField(): void
+    public function testFieldUnsetIfDirectionIsUpdatedWithoutMappedField()
     {
         $fields = $this->getCurrentFieldMappings();
         unset($fields['Lead']['field1']);
@@ -191,7 +191,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
             'field1' => [
                 'mappedField'   => '',
                 'syncDirection' => 'bidirectional',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -204,7 +204,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testDefaultSyncDirectionSetWithExisting(): void
+    public function testDefaultSyncDirectionSetWithExisting()
     {
         $fields = $this->getCurrentFieldMappings();
 
@@ -226,7 +226,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field4' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -240,7 +240,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testDefaultSyncDirectionSetWithBidirectionalSupported(): void
+    public function testDefaultSyncDirectionSetWithBidirectionalSupported()
     {
         $fields = $this->getCurrentFieldMappings();
 
@@ -263,7 +263,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field1' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -277,7 +277,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testDefaultSyncDirectionSetWithIntegrationDirectionalSupported(): void
+    public function testDefaultSyncDirectionSetWithIntegrationDirectionalSupported()
     {
         $fields = $this->getCurrentFieldMappings();
         unset($fields['Lead']['field1']);
@@ -301,7 +301,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field1' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -315,7 +315,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testDefaultSyncDirectionSetWithMauticDirectionalSupported(): void
+    public function testDefaultSyncDirectionSetWithMauticDirectionalSupported()
     {
         $fields = $this->getCurrentFieldMappings();
         unset($fields['Lead']['field1']);
@@ -339,7 +339,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field1' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -353,7 +353,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testCurrentSyncDirectionOverwrittenWithSupportedDirectionalSync(): void
+    public function testCurrentSyncDirectionOverwrittenWithSupportedDirectionalSync()
     {
         $fields = $this->getCurrentFieldMappings();
 
@@ -376,7 +376,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field1' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -390,7 +390,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
     }
 
-    public function testDefaultSyncDirectionThrowsExceptionIfFieldDoesNotHaveSyncDirectionSupportDefined(): void
+    public function testDefaultSyncDirectionThrowsExceptionIfFieldDoesNotHaveSyncDirectionSupportDefined()
     {
         $this->expectException(InvalidFormOptionException::class);
 
@@ -415,7 +415,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
         $updatedFieldMappings = [
             'field1' => [
                 'mappedField' => 'mautic_test_field',
-            ],
+            ]
         ];
 
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
@@ -485,7 +485,7 @@ class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
                     'mappedField'   => 'mautic_field5',
                     'syncDirection' => ObjectMappingDAO::SYNC_TO_INTEGRATION,
                 ],
-            ],
+            ]
         ];
     }
 }

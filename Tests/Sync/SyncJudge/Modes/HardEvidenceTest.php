@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,6 +11,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncJudge\Modes;
 
+
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
@@ -20,7 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\HardEvidence;
 
 class HardEvidenceTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLeftWinner(): void
+    public function testLeftWinner()
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -45,7 +44,7 @@ class HardEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($leftChangeRequest, $winner);
     }
 
-    public function testRightWinner(): void
+    public function testRightWinner()
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -70,7 +69,7 @@ class HardEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($rightChangeRequest, $winner);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfEqual(): void
+    public function testUnresolvedConflictExceptionThrownIfEqual()
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -94,7 +93,7 @@ class HardEvidenceTest extends \PHPUnit_Framework_TestCase
         HardEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownWhenLeftCertainChangeDateTimeIsNull(): void
+    public function testUnresolvedConflictExceptionThrownWhenLeftCertainChangeDateTimeIsNull()
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -117,7 +116,7 @@ class HardEvidenceTest extends \PHPUnit_Framework_TestCase
         HardEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownWhenRightCertainChangeDateTimeIsNull(): void
+    public function testUnresolvedConflictExceptionThrownWhenRightCertainChangeDateTimeIsNull()
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',

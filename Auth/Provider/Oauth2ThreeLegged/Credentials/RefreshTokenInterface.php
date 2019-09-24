@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
+
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface RefreshTokenInterface extends AuthCredentialsInterface

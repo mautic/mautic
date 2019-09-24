@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -34,7 +32,7 @@ class MauticSyncFieldsLoadEvent extends Event
     public function __construct(string $objectName, array $fields)
     {
         $this->objectName = $objectName;
-        $this->fields     = $fields;
+        $this->fields = $fields;
     }
 
     /**
@@ -49,7 +47,7 @@ class MauticSyncFieldsLoadEvent extends Event
      * @param string $key
      * @param string $name
      */
-    public function addField(string $key, string $name): void
+    public function addField(string $key, string $name)
     {
         $this->fields[$key] = $name;
     }

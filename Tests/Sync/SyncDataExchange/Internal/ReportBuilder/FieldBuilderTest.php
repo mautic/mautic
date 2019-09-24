@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\Internal\ReportBuilder;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
@@ -38,17 +37,17 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
      */
     private $contactObjectHelper;
 
-    protected function setUp(): void
+    protected function setUp()
     {
-        $this->router      = $this->createMock(Router::class);
+        $this->router = $this->createMock(Router::class);
         $this->fieldHelper = $this->getMockBuilder(FieldHelper::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName'])
+            ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName',])
             ->getMock();
         $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
     }
 
-    public function testIdFieldIsAdded(): void
+    public function testIdFieldIsAdded()
     {
         $field = $this->getFieldBuilder()->buildObjectField('mautic_internal_id', ['id' => 1], new ObjectDAO('Test'), 'Test');
 
@@ -56,7 +55,7 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $field->getValue()->getNormalizedValue());
     }
 
-    public function testDoNotContactFieldIsAdded(): void
+    public function testDoNotContactFieldIsAdded()
     {
         $this->contactObjectHelper->expects($this->once())
             ->method('getDoNotContactStatus')
@@ -69,7 +68,7 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $field->getValue()->getNormalizedValue());
     }
 
-    public function testTimelineFieldIsAdded(): void
+    public function testTimelineFieldIsAdded()
     {
         $this->router->expects($this->once())
             ->method('generate')
@@ -88,7 +87,7 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $field->getValue()->getNormalizedValue());
     }
 
-    public function testCustomFieldsAreAdded(): void
+    public function testCustomFieldsAreAdded()
     {
         $this->fieldHelper->expects($this->once())
             ->method('getFieldList')
@@ -96,8 +95,8 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     'email' => [
-                        'type' => 'email',
-                    ],
+                        'type' => 'email'
+                    ]
                 ]
             );
 
@@ -107,7 +106,7 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test@test.com', $field->getValue()->getNormalizedValue());
     }
 
-    public function testUnrecognizedFieldThrowsException(): void
+    public function testUnrecognizedFieldThrowsException()
     {
         $this->fieldHelper->expects($this->once())
             ->method('getFieldList')
@@ -115,8 +114,8 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     'email' => [
-                        'type' => 'email',
-                    ],
+                        'type' => 'email'
+                    ]
                 ]
             );
 

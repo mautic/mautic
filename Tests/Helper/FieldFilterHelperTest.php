@@ -19,7 +19,7 @@ use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 class FieldFilterHelperTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFieldsFilteredByPage(): void
+    public function testFieldsFilteredByPage()
     {
         $integrationObject = $this->getIntegrationObject();
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
@@ -35,7 +35,7 @@ class FieldFilterHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($filteredFields['field5']));
     }
 
-    public function testFieldsFilteredByKeyword(): void
+    public function testFieldsFilteredByKeyword()
     {
         $integrationObject = $this->getIntegrationObject();
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
@@ -51,7 +51,7 @@ class FieldFilterHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($filteredFields['field5']));
     }
 
-    public function testFieldsFilteredByKeywordAndPage(): void
+    public function testFieldsFilteredByKeywordAndPage()
     {
         $integrationObject = $this->getIntegrationObject();
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);

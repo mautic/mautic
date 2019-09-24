@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -45,7 +43,7 @@ class ConfigIntegrationsHelper
     /**
      * @param ConfigFormInterface $integration
      */
-    public function addIntegration(ConfigFormInterface $integration): void
+    public function addIntegration(ConfigFormInterface $integration)
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -72,7 +70,7 @@ class ConfigIntegrationsHelper
     /**
      * @param Integration $integrationConfiguration
      */
-    public function saveIntegrationConfiguration(Integration $integrationConfiguration): void
+    public function saveIntegrationConfiguration(Integration $integrationConfiguration)
     {
         $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);
     }

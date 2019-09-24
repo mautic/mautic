@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,16 +11,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\DAO\Mapping;
 
+
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
 {
-    private $integrationName       = 'Test';
+    private $integrationName = 'Test';
     private $integrationObjectName = 'Contact';
 
-    public function testMappedIntegrationNamesAreReturnedBasedOnInternalObjectName(): void
+    public function testMappedIntegrationNamesAreReturnedBasedOnInternalObjectName()
     {
         $this->assertEquals(
             [$this->integrationObjectName],
@@ -30,7 +29,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testMappedInternalNamesAreReturnedBasedOnIntegrationObjectName(): void
+    public function testMappedInternalNamesAreReturnedBasedOnIntegrationObjectName()
     {
         $this->assertEquals(
             [MauticSyncDataExchange::OBJECT_CONTACT],
@@ -38,19 +37,19 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testThatOneWayInternalObjectFieldsAreNotReturnedWhenNotRequired(): void
+    public function testThatOneWayInternalObjectFieldsAreNotReturnedWhenNotRequired()
     {
         $this->assertEquals(
             [
                 'email',    // required and bidirectional
                 'country',  // bidirectional
-                'firstname', // sync from mautic to integration
+                'firstname' // sync from mautic to integration
             ],
             $this->getMappingManualDAO()->getInternalObjectFieldsToSyncToIntegration(MauticSyncDataExchange::OBJECT_CONTACT)
         );
     }
 
-    public function testThatRequiredInternalObjectFieldsAreReturned(): void
+    public function testThatRequiredInternalObjectFieldsAreReturned()
     {
         $this->assertEquals(
             ['email'],
@@ -58,19 +57,19 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testThatOneWayIntegrationObjectFieldsAreNotReturnedWhenNotRequired(): void
+    public function testThatOneWayIntegrationObjectFieldsAreNotReturnedWhenNotRequired()
     {
         $this->assertEquals(
             [
                 'email',    // required and bidirectional
                 'country',  // bidirectional
-                'last_name', // sync from mautic to integration
+                'last_name' // sync from mautic to integration
             ],
             $this->getMappingManualDAO()->getIntegrationObjectFieldsToSyncToMautic($this->integrationObjectName)
         );
     }
 
-    public function testThatRequiredIntegrationObjectFieldsAreReturned(): void
+    public function testThatRequiredIntegrationObjectFieldsAreReturned()
     {
         $this->assertEquals(
             ['email'],
@@ -78,7 +77,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testMappedIntegrationFieldIsReturned(): void
+    public function testMappedIntegrationFieldIsReturned()
     {
         $this->assertEquals(
             'last_name',
@@ -90,7 +89,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testMappedInternalFieldIsReturned(): void
+    public function testMappedInternalFieldIsReturned()
     {
         $this->assertEquals(
             'lastname',

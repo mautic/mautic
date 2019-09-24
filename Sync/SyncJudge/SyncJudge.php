@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,11 +14,11 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncJudge;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\FuzzyEvidence;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\HardEvidence;
+use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\FuzzyEvidence;
 
 /**
- * Class SyncJudge.
+ * Class SyncJudge
  */
 final class SyncJudge implements SyncJudgeInterface
 {
@@ -30,7 +28,6 @@ final class SyncJudge implements SyncJudgeInterface
      * @param InformationChangeRequestDAO $rightChangeRequest
      *
      * @return InformationChangeRequestDAO
-     *
      * @throws ConflictUnresolvedException
      */
     public function adjudicate(

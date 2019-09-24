@@ -24,7 +24,7 @@ class FieldFilterHelper
     private $totalFieldCount = 0;
 
     /**
-     * @var MappedFieldInfoInterface[]
+     * @var array|MappedFieldInfoInterface[]
      */
     private $filteredFields = [];
 
@@ -61,7 +61,7 @@ class FieldFilterHelper
     }
 
     /**
-     * @return MappedFieldInfoInterface[]
+     * @return array|MappedFieldInfoInterface[]
      */
     public function getFilteredFields(): array
     {
@@ -69,7 +69,7 @@ class FieldFilterHelper
     }
 
     /**
-     * @return MappedFieldInfoInterface[]
+     * @return array|MappedFieldInfoInterface[]
      */
     private function getPageOfFields(array $fields, int $page, int $limit): array
     {
@@ -79,7 +79,7 @@ class FieldFilterHelper
     }
 
     /**
-     * @return MappedFieldInfoInterface[]
+     * @return array|MappedFieldInfoInterface[]
      */
     private function getFieldsByKeyword(array $fields, string $keyword): array
     {

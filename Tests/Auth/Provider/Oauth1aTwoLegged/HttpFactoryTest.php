@@ -13,27 +13,27 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Auth\Oauth1a;
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
-use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit_Framework_TestCase;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends PHPUnit_Framework_TestCase
 {
-    public function testType(): void
+    public function testType()
     {
         $this->assertEquals('oauth1a_two_legged', (new HttpFactory())->getAuthType());
     }
 
-    public function testGetClientWithEmptyCredentials(): void
+    public function testGetClientWithEmptyCredentials()
     {
         $credentials = $this->createMock(CredentialsInterface::class);
-        $httpFactory = new HttpFactory();
+        $httpFactory = new HttpFactory;
         $this->expectException(PluginNotConfiguredException::class);
         $httpFactory->getClient($credentials);
     }
 
-    public function testGetClientWithFullCredentials(): void
+    public function testGetClientWithFullCredentials()
     {
         $credentials = $this->createMock(CredentialsInterface::class);
         $credentials->method('getConsumerKey')->willReturn('ConsumerKeyValue');
@@ -41,9 +41,9 @@ class HttpFactoryTest extends PHPUnit_Framework_TestCase
         $credentials->method('getToken')->willReturn('TokenValue');
         $credentials->method('getTokenSecret')->willReturn('TokenSecretValue');
         $credentials->method('getAuthUrl')->willReturn('AuthUrlValue');
-        $httpFactory = new HttpFactory();
-        $client      = $httpFactory->getClient($credentials);
-        $config      = $client->getConfig();
+        $httpFactory = new HttpFactory;
+        $client = $httpFactory->getClient($credentials);
+        $config = $client->getConfig();
 
         $this->assertSame('oauth', $config['auth']);
         $this->assertSame('AuthUrlValue', $config['base_uri']->getPath());

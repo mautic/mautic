@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,22 +11,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange;
 
-use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO AS ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
@@ -81,7 +79,8 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         FullObjectReportBuilder $fullObjectReportBuilder,
         PartialObjectReportBuilder $partialObjectReportBuilder,
         OrderExecutioner $orderExecutioner
-    ) {
+    )
+    {
         $this->fieldChangeRepository      = $fieldChangeRepository;
         $this->fieldHelper                = $fieldHelper;
         $this->mappingHelper              = $mappingHelper;
@@ -107,7 +106,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     /**
      * @param OrderDAO $syncOrderDAO
      */
-    public function executeSyncOrder(OrderDAO $syncOrderDAO): void
+    public function executeSyncOrder(OrderDAO $syncOrderDAO)
     {
         $this->orderExecutioner->execute($syncOrderDAO);
     }
@@ -118,7 +117,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      * @param ReportObjectDAO  $integrationObjectDAO
      *
      * @return ReportObjectDAO
-     *
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      * @throws ObjectDeletedException
@@ -150,7 +148,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     /**
      * @param ObjectChangeDAO[] $objectChanges
      */
-    public function cleanupProcessedObjects(array $objectChanges): void
+    public function cleanupProcessedObjects(array $objectChanges)
     {
         foreach ($objectChanges as $changedObjectDAO) {
             try {
@@ -167,4 +165,5 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
             }
         }
     }
+
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,12 +9,14 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+
 namespace MauticPlugin\IntegrationsBundle\Integration\BC;
+
 
 use Mautic\PluginBundle\Entity\Integration;
 
 /**
- * Trait BcIntegrationSettingsTrait.
+ * Trait BcIntegrationSettingsTrait
  */
 trait BcIntegrationSettingsTrait
 {
@@ -25,7 +25,7 @@ trait BcIntegrationSettingsTrait
      *
      * @param Integration $integration
      */
-    public function setIntegrationSettings(Integration $integration): void
+    public function setIntegrationSettings(Integration $integration)
     {
         $this->setIntegrationConfiguration($integration);
     }
@@ -37,7 +37,7 @@ trait BcIntegrationSettingsTrait
      */
     public function getIntegrationSettings(): ?Integration
     {
-        return $this->hasIntegrationConfiguration() ? $this->getIntegrationConfiguration() : null;
+        return ($this->hasIntegrationConfiguration()) ? $this->getIntegrationConfiguration() : null;
     }
 
     /**

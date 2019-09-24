@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials;
 
+
 interface ScopeInterface
 {
     /**
      * @return string|null
      */
     public function getScope(): ?string;
+
 }

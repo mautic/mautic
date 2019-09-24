@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,7 +14,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 /**
- * Class InformationChangeRequestDAO.
+ * Class InformationChangeRequestDAO
  */
 class InformationChangeRequestDAO
 {
@@ -126,7 +124,7 @@ class InformationChangeRequestDAO
      *
      * @return InformationChangeRequestDAO
      */
-    public function setPossibleChangeDateTime(?\DateTimeInterface $possibleChangeDateTime = null): self
+    public function setPossibleChangeDateTime(\DateTimeInterface $possibleChangeDateTime = null): InformationChangeRequestDAO
     {
         $this->possibleChangeDateTime = $possibleChangeDateTime;
 
@@ -146,7 +144,7 @@ class InformationChangeRequestDAO
      *
      * @return InformationChangeRequestDAO
      */
-    public function setCertainChangeDateTime(?\DateTimeInterface $certainChangeDateTime = null): self
+    public function setCertainChangeDateTime(\DateTimeInterface $certainChangeDateTime = null): InformationChangeRequestDAO
     {
         $this->certainChangeDateTime = $certainChangeDateTime;
 

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -32,21 +30,21 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
     private $syncIntegrationsHelper;
     private $subscriber;
 
-    public function setUp(): void
+    public function setUp()
     {
         parent::setUp();
 
-        $this->fieldChangeRepository   = $this->createMock(FieldChangeRepository::class);
+        $this->fieldChangeRepository = $this->createMock(FieldChangeRepository::class);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->syncIntegrationsHelper  = $this->createMock(SyncIntegrationsHelper::class);
-        $this->subscriber              = new LeadSubscriber(
+        $this->syncIntegrationsHelper = $this->createMock(SyncIntegrationsHelper::class);
+        $this->subscriber = new LeadSubscriber(
             $this->fieldChangeRepository,
             $this->variableExpresserHelper,
             $this->syncIntegrationsHelper
         );
     }
 
-    public function testGetSubscribedEvents(): void
+    public function testGetSubscribedEvents()
     {
         $this->assertEquals(
             [
@@ -59,7 +57,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testOnLeadPostSaveAnonymousLead(): void
+    public function testOnLeadPostSaveAnonymousLead()
     {
         $lead = $this->createMock(Lead::class);
         $lead->expects($this->at(0))
@@ -79,7 +77,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
-    public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
+    public function testOnLeadPostSaveLeadObjectSyncNotEnabled()
     {
         $lead = $this->createMock(Lead::class);
         $lead->expects($this->at(0))
@@ -101,7 +99,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
-    public function testOnLeadPostSaveNoAction(): void
+    public function testOnLeadPostSaveNoAction()
     {
         $fieldChanges = [];
 
@@ -126,11 +124,11 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
-    public function testOnLeadPostSaveRecordChanges(): void
+    public function testOnLeadPostSaveRecordChanges()
     {
-        $fieldName    = 'fieldName';
-        $oldValue     = 'oldValue';
-        $newValue     = 'newValue';
+        $fieldName = 'fieldName';
+        $oldValue = 'oldValue';
+        $newValue = 'newValue';
         $fieldChanges = [
             'fields' => [
                 $fieldName => [
@@ -139,7 +137,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $objectId   = 1;
+        $objectId = 1;
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
@@ -168,16 +166,16 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
-    public function testOnLeadPostSaveRecordChangesWithOwnerChange(): void
+    public function testOnLeadPostSaveRecordChangesWithOwnerChange()
     {
-        $newOwnerId   = 5;
+        $newOwnerId = 5;
         $fieldChanges = [
             'owner' => [
                 2,
                 $newOwnerId,
-            ],
+            ]
         ];
-        $objectId   = 1;
+        $objectId = 1;
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
@@ -208,11 +206,11 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
-    public function testOnLeadPostDelete(): void
+    public function testOnLeadPostDelete()
     {
         $deletedId = '5';
 
-        $lead            = new Lead();
+        $lead = new Lead();
         $lead->deletedId = $deletedId;
 
         $event = $this->createMock(LeadEvent::class);
@@ -227,7 +225,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostDelete($event);
     }
 
-    public function testOnCompanyPostSaveSyncNotEnabled(): void
+    public function testOnCompanyPostSaveSyncNotEnabled()
     {
         $event = $this->createMock(CompanyEvent::class);
 
@@ -242,7 +240,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onCompanyPostSave($event);
     }
 
-    public function testOnCompanyPostSaveSyncNoAction(): void
+    public function testOnCompanyPostSaveSyncNoAction()
     {
         $fieldChanges = [];
 
@@ -264,11 +262,11 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onCompanyPostSave($event);
     }
 
-    public function testOnCompanyPostSaveSyncRecordChanges(): void
+    public function testOnCompanyPostSaveSyncRecordChanges()
     {
-        $fieldName    = 'fieldName';
-        $oldValue     = 'oldValue';
-        $newValue     = 'newValue';
+        $fieldName = 'fieldName';
+        $oldValue = 'oldValue';
+        $newValue = 'newValue';
         $fieldChanges = [
             'fields' => [
                 $fieldName => [
@@ -277,7 +275,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $objectId   = 1;
+        $objectId = 1;
         $objectType = Company::class;
 
         $company = $this->createMock(Company::class);
@@ -290,6 +288,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $company->expects($this->once())
             ->method('getId')
             ->willReturn($objectId);
+
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
@@ -306,16 +305,16 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onCompanyPostSave($event);
     }
 
-    public function testOnCompanyPostSaveRecordChangesWithOwnerChange(): void
+    public function testOnCompanyPostSaveRecordChangesWithOwnerChange()
     {
-        $newOwnerId   = 5;
+        $newOwnerId = 5;
         $fieldChanges = [
             'owner' => [
                 2,
                 $newOwnerId,
-            ],
+            ]
         ];
-        $objectId   = 1;
+        $objectId = 1;
         $objectType = Company::class;
 
         $company = $this->createMock(Company::class);
@@ -343,11 +342,11 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onCompanyPostSave($event);
     }
 
-    public function testOnCompanyPostDelete(): void
+    public function testOnCompanyPostDelete()
     {
         $deletedId = '5';
 
-        $lead            = new Company();
+        $lead = new Company();
         $lead->deletedId = $deletedId;
 
         $event = $this->createMock(CompanyEvent::class);
@@ -364,7 +363,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
-        $integrationName     = 'testIntegration';
+        $integrationName = 'testIntegration';
         $enabledIntegrations = [$integrationName];
 
         $this->syncIntegrationsHelper->expects($this->any())
@@ -372,8 +371,8 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn($enabledIntegrations);
 
         $fieldNames = [];
-        $i          = 0;
-        foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
+        $i = 0;
+        foreach ($fieldChanges as $fieldName => list($oldValue, $newValue)) {
             $valueDao = new EncodedValueDAO($objectType, (string) $newValue);
 
             $this->variableExpresserHelper->expects($this->at($i))

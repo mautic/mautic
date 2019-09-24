@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -75,7 +73,6 @@ class MappingHelper
      * @param ObjectDAO        $integrationObjectDAO
      *
      * @return ObjectDAO
-     *
      * @throws ObjectDeletedException
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
@@ -110,8 +107,7 @@ class MappingHelper
                 if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
                     $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
                 }
-            } catch (FieldNotFoundException $e) {
-            }
+            } catch (FieldNotFoundException $e) {}
         }
 
         if (empty($identifiers)) {
@@ -122,11 +118,9 @@ class MappingHelper
         switch ($internalObjectName) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
                 $foundObjects = $this->contactObjectHelper->findObjectsByFieldValues($identifiers);
-
                 break;
             case MauticSyncDataExchange::OBJECT_COMPANY:
                 $foundObjects = $this->companyObjectHelper->findObjectsByFieldValues($identifiers);
-
                 break;
             default:
                 throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
@@ -154,12 +148,10 @@ class MappingHelper
     }
 
     /**
-     * Returns corresponding Mautic entity class name for the given Mautic object.
+     * Returns corresponding Mautic entity class name for the given Mautic object
      *
      * @param string $internalObject
-     *
      * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     public function getMauticEntityClassName(string $internalObject): string
@@ -167,11 +159,9 @@ class MappingHelper
         switch ($internalObject) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
                 $entity = LeadEntity::class;
-
                 break;
             case MauticSyncDataExchange::OBJECT_COMPANY:
                 $entity = CompanyEntity::class;
-
                 break;
             default:
                 throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObject);
@@ -186,7 +176,6 @@ class MappingHelper
      * @param ObjectDAO $internalObjectDAO
      *
      * @return ObjectDAO
-     *
      * @throws ObjectDeletedException
      */
     public function findIntegrationObject(string $integration, string $integrationObjectName, ObjectDAO $internalObjectDAO)
@@ -214,7 +203,7 @@ class MappingHelper
     /**
      * @param ObjectMapping[] $mappings
      */
-    public function saveObjectMappings(array $mappings): void
+    public function saveObjectMappings(array $mappings)
     {
         foreach ($mappings as $mapping) {
             $this->saveObjectMapping($mapping);
@@ -224,7 +213,7 @@ class MappingHelper
     /**
      * @param array $mappings
      */
-    public function updateObjectMappings(array $mappings): void
+    public function updateObjectMappings(array $mappings)
     {
         foreach ($mappings as $mapping) {
             try {
@@ -238,9 +227,10 @@ class MappingHelper
     /**
      * @param RemappedObjectDAO[] $mappings
      */
-    public function remapIntegrationObjects(array $mappings): void
+    public function remapIntegrationObjects(array $mappings)
     {
-        foreach ($mappings as $mapping) {
+        foreach ($mappings as $mapping)
+        {
             $this->objectMappingRepository->updateIntegrationObject(
                 $mapping->getIntegration(),
                 $mapping->getOldObjectName(),
@@ -254,7 +244,7 @@ class MappingHelper
     /**
      * @param ObjectChangeDAO[] $objects
      */
-    public function markAsDeleted(array $objects): void
+    public function markAsDeleted(array $objects)
     {
         foreach ($objects as $object) {
             $this->objectMappingRepository->markAsDeleted($object->getIntegration(), $object->getObject(), $object->getObjectId());
@@ -264,7 +254,7 @@ class MappingHelper
     /**
      * @param ObjectMapping $objectMapping
      */
-    private function saveObjectMapping(ObjectMapping $objectMapping): void
+    private function saveObjectMapping(ObjectMapping $objectMapping)
     {
         $this->objectMappingRepository->saveEntity($objectMapping);
         $this->objectMappingRepository->clear();
@@ -275,20 +265,20 @@ class MappingHelper
      *
      * @throws ObjectNotFoundException
      */
-    private function updateObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO): void
+    private function updateObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO)
     {
         /** @var ObjectMapping $objectMapping */
         $objectMapping = $this->objectMappingRepository->findOneBy(
             [
                 'integration'           => $updatedObjectMappingDAO->getIntegration(),
                 'integrationObjectName' => $updatedObjectMappingDAO->getIntegrationObjectName(),
-                'integrationObjectId'   => $updatedObjectMappingDAO->getIntegrationObjectId(),
+                'integrationObjectId'   => $updatedObjectMappingDAO->getIntegrationObjectId()
             ]
         );
 
         if (!$objectMapping) {
             throw new ObjectNotFoundException(
-                $updatedObjectMappingDAO->getIntegrationObjectName().':'.$updatedObjectMappingDAO->getIntegrationObjectId()
+                $updatedObjectMappingDAO->getIntegrationObjectName().":".$updatedObjectMappingDAO->getIntegrationObjectId()
             );
         }
 

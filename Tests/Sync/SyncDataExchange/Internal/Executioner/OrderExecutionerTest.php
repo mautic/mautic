@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\Internal\Executioner;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
@@ -38,14 +37,14 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
      */
     private $companyObjectHelper;
 
-    protected function setup(): void
+    protected function setup()
     {
-        $this->mappingHelper       = $this->createMock(MappingHelper::class);
+        $this->mappingHelper = $this->createMock(MappingHelper::class);
         $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
         $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
     }
 
-    public function testContactsAreUpdatedAndCreated(): void
+    public function testContactsAreUpdatedAndCreated()
     {
         $this->contactObjectHelper->expects($this->exactly(1))
             ->method('update');
@@ -66,7 +65,7 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->getOrderExecutioner()->execute($syncOrder);
     }
 
-    public function testCompaniesAreUpdatedAndCreated(): void
+    public function testCompaniesAreUpdatedAndCreated()
     {
         $this->companyObjectHelper->expects($this->exactly(1))
             ->method('update');
@@ -87,7 +86,7 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->getOrderExecutioner()->execute($syncOrder);
     }
 
-    public function testMixedObjectsAreUpdatedAndCreated(): void
+    public function testMixedObjectsAreUpdatedAndCreated()
     {
         $this->companyObjectHelper->expects($this->exactly(1))
             ->method('update');
@@ -105,7 +104,7 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('create');
 
         // Merge companies and contacts for the test
-        $syncOrder        = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_CONTACT);
+        $syncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_CONTACT);
         $companySyncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_COMPANY);
         foreach ($companySyncOrder->getChangedObjectsByObjectType(MauticSyncDataExchange::OBJECT_COMPANY) as $objectChange) {
             $syncOrder->addObjectChange($objectChange);
@@ -126,7 +125,6 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
      * @param $objectName
      *
      * @return OrderDAO
-     *
      * @throws \Exception
      */
     private function getSyncOrder($objectName)

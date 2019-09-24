@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess\Direction\Helper;
+
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
@@ -26,7 +25,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $translator;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->method('trans')
@@ -37,7 +36,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
             );
     }
 
-    public function testUnkonwnReturnedForMissingRequiredIntegrationValue(): void
+    public function testUnkonwnReturnedForMissingRequiredIntegrationValue()
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -53,7 +52,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingNonRequiredIntegrationValue(): void
+    public function testUnkonwnIsNotReturnedForMissingNonRequiredIntegrationValue()
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -69,7 +68,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingOppositeSyncIntegrationValue(): void
+    public function testUnkonwnIsNotReturnedForMissingOppositeSyncIntegrationValue()
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -85,7 +84,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnReturnedForMissingRequiredMauticValue(): void
+    public function testUnkonwnReturnedForMissingRequiredMauticValue()
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -101,7 +100,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingNonRequiredInternalValue(): void
+    public function testUnkonwnIsNotReturnedForMissingNonRequiredInternalValue()
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -117,7 +116,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingOppositeSyncInternalnValue(): void
+    public function testUnkonwnIsNotReturnedForMissingOppositeSyncInternalnValue()
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 

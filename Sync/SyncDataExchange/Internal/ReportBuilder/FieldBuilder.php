@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,7 +11,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
+
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO AS ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
@@ -78,7 +77,6 @@ class FieldBuilder
      * @param string           $integration
      *
      * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
     public function buildObjectField(
@@ -96,7 +94,7 @@ class FieldBuilder
         }
 
         // Special handling of DNC fields
-        if (0 === strpos($field, 'mautic_internal_dnc_')) {
+        if (strpos($field, 'mautic_internal_dnc_') === 0) {
             return $this->addDoNotContactField($field);
         }
 
@@ -154,7 +152,7 @@ class FieldBuilder
                 'mautic_plugin_timeline_view',
                 [
                     'integration' => $integration,
-                    'leadId'      => $this->mauticObject['id'],
+                    'leadId'      => $this->mauticObject['id']
                 ],
                 UrlGeneratorInterface::ABSOLUTE_URL
             )
@@ -167,7 +165,6 @@ class FieldBuilder
      * @param string $field
      *
      * @return ReportFieldDAO
-     *
      * @throws FieldNotFoundException
      */
     private function addCustomField(string $field)
@@ -186,7 +183,7 @@ class FieldBuilder
         return new ReportFieldDAO(
             $field,
             $normalizedValue,
-            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_UNCHANGED
+            (in_array($field, $requiredFields)) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_UNCHANGED
         );
     }
 }

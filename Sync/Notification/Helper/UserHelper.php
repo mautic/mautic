@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
+
 
 use Doctrine\DBAL\Connection;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
@@ -39,7 +38,6 @@ class UserHelper
      * @param array  $ids
      *
      * @return array
-     *
      * @throws ObjectNotSupportedException
      */
     public function getOwners(string $object, array $ids): array
@@ -72,18 +70,18 @@ class UserHelper
         return $owners;
     }
 
+
     /**
      * @param string $object
      * @param int    $id
      *
      * @return string|null
-     *
      * @throws ObjectNotSupportedException
      */
     public function getOwner(string $object, int $id): ?string
     {
         $qb      = $this->connection->createQueryBuilder();
-        $result  = $qb->select('o.owner_id')
+        $result = $qb->select('o.owner_id')
             ->from(MAUTIC_TABLE_PREFIX.$this->getObjectTable($object), 'o')
             ->where(
                 $qb->expr()->eq('o.id', $id)
@@ -92,6 +90,7 @@ class UserHelper
 
         return $result ? (int) $result : null;
     }
+
 
     /**
      * @return array
@@ -123,7 +122,6 @@ class UserHelper
      * @param string $object
      *
      * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     private function getObjectTable(string $object): string

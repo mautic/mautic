@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -22,7 +20,7 @@ class ConfigIntegrationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container): void
+    public function process(ContainerBuilder $container)
     {
         $taggedServices     = $container->findTaggedServiceIds('mautic.config_integration');
         $integrationsHelper = $container->findDefinition('mautic.integrations.helper.config_integrations');

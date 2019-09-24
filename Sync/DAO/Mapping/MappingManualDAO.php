@@ -17,7 +17,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 /**
- * Class MappingManualDAO.
+ * Class MappingManualDAO
  */
 class MappingManualDAO
 {
@@ -59,7 +59,7 @@ class MappingManualDAO
     /**
      * @param ObjectMappingDAO $objectMappingDAO
      */
-    public function addObjectMapping(ObjectMappingDAO $objectMappingDAO): void
+    public function addObjectMapping(ObjectMappingDAO $objectMappingDAO)
     {
         $internalObjectName    = $objectMappingDAO->getInternalObjectName();
         $integrationObjectName = $objectMappingDAO->getIntegrationObjectName();
@@ -102,7 +102,6 @@ class MappingManualDAO
      * @param string $internalObjectName
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getMappedIntegrationObjectsNames(string $internalObjectName): array
@@ -118,7 +117,6 @@ class MappingManualDAO
      * @param string $integrationObjectName
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getMappedInternalObjectsNames(string $integrationObjectName): array
@@ -139,12 +137,11 @@ class MappingManualDAO
     }
 
     /**
-     * Get a list of fields that should sync from Mautic to the integration.
+     * Get a list of fields that should sync from Mautic to the integration
      *
      * @param string $internalObjectName
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getInternalObjectFieldsToSyncToIntegration(string $internalObjectName): array
@@ -160,7 +157,7 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
-                if (ObjectMappingDAO::SYNC_TO_MAUTIC === $fieldMapping->getSyncDirection() && !$fieldMapping->isRequired()) {
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_MAUTIC && !$fieldMapping->isRequired()) {
                     // Ignore because this field is a one way sync from the integration to Mautic nor is required
                     continue;
                 }
@@ -173,12 +170,11 @@ class MappingManualDAO
     }
 
     /**
-     * Get a list of internal fields that are required.
+     * Get a list of internal fields that are required
      *
      * @param string $internalObjectName
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getInternalObjectRequiredFieldNames(string $internalObjectName): array
@@ -214,12 +210,11 @@ class MappingManualDAO
     }
 
     /**
-     * Get a list of fields that should sync from the integration to Mautic.
+     * Get a list of fields that should sync from the integration to Mautic
      *
      * @param string $integrationObjectName
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getIntegrationObjectFieldsToSyncToMautic(string $integrationObjectName): array
@@ -236,7 +231,7 @@ class MappingManualDAO
             $objectMappingDAO = $this->objectsMapping[$internalObjectName][$integrationObjectName];
             $fieldMappings    = $objectMappingDAO->getFieldMappings();
             foreach ($fieldMappings as $fieldMapping) {
-                if (ObjectMappingDAO::SYNC_TO_INTEGRATION === $fieldMapping->getSyncDirection() && !$fieldMapping->isRequired()) {
+                if ($fieldMapping->getSyncDirection() === ObjectMappingDAO::SYNC_TO_INTEGRATION && !$fieldMapping->isRequired()) {
                     // Ignore because this field is a one way sync from Mautic to the integration nor a required field
                     continue;
                 }
@@ -249,12 +244,11 @@ class MappingManualDAO
     }
 
     /**
-     * Get a list of integration fields that are required.
+     * Get a list of integration fields that are required
      *
      * @param string $integrationObjectName
      *
      * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getIntegrationObjectRequiredFieldNames(string $integrationObjectName): array
@@ -288,7 +282,6 @@ class MappingManualDAO
      * @param string $internalFieldName
      *
      * @return string
-     *
      * @throws FieldNotFoundException
      * @throws ObjectNotFoundException
      */
@@ -320,7 +313,6 @@ class MappingManualDAO
      * @param string $integrationFieldName
      *
      * @return string
-     *
      * @throws FieldNotFoundException
      * @throws ObjectNotFoundException
      */

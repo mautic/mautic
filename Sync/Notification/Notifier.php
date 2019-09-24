@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification;
+
 
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
@@ -57,13 +56,13 @@ class Notifier
     }
 
     /**
-     * @param NotificationDAO[] $notifications
-     * @param string            $integrationHandler
+     * @param NotificationDAO[]  $notifications
+     * @param string $integrationHandler
      *
      * @throws HandlerNotSupportedException
      * @throws IntegrationNotFoundException
      */
-    public function noteMauticSyncIssue(array $notifications, $integrationHandler = MauticSyncDataExchange::NAME): void
+    public function noteMauticSyncIssue(array $notifications, $integrationHandler = MauticSyncDataExchange::NAME)
     {
         foreach ($notifications as $notification) {
             $handler = $this->handlerContainer->getHandler($integrationHandler, $notification->getMauticObject());
@@ -76,9 +75,9 @@ class Notifier
     }
 
     /**
-     * Finalizes notifications such as pushing summary entries to the user notifications.
+     * Finalizes notifications such as pushing summary entries to the user notifications
      */
-    public function finalizeNotifications(): void
+    public function finalizeNotifications()
     {
         foreach ($this->handlerContainer->getHandlers() as $handler) {
             $handler->finalize();

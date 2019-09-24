@@ -14,22 +14,23 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\TestsAuth\Provider\BasicAuth;
 
 use GuzzleHttp\Exception\ConnectException;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testType(): void
+    public function testType()
     {
         $this->assertEquals('basic_auth', (new HttpFactory())->getAuthType());
     }
 
-    public function testMissingUsernameThrowsException(): void
+    public function testMissingUsernameThrowsException()
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new Class implements CredentialsInterface
+        {
             public function getUsername(): ?string
             {
                 return '';
@@ -44,11 +45,12 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         (new HttpFactory())->getClient($credentials);
     }
 
-    public function testMissingPasswordThrowsException(): void
+    public function testMissingPasswordThrowsException()
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new Class implements CredentialsInterface
+        {
             public function getUsername(): ?string
             {
                 return '123';
@@ -63,9 +65,10 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         (new HttpFactory())->getClient($credentials);
     }
 
-    public function testInstantiatedClientIsReturned(): void
+    public function testInstantiatedClientIsReturned()
     {
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new Class implements CredentialsInterface
+        {
             public function getUsername(): ?string
             {
                 return 'foo';
@@ -83,7 +86,8 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credentials2 = new class() implements CredentialsInterface {
+        $credentials2 = new Class implements CredentialsInterface
+        {
             public function getUsername(): ?string
             {
                 return 'bar';
@@ -99,9 +103,10 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($client1 === $client3);
     }
 
-    public function testHeaderIsSet(): void
+    public function testHeaderIsSet()
     {
-        $credentials = new class() implements CredentialsInterface {
+        $credentials = new Class implements CredentialsInterface
+        {
             public function getUsername(): ?string
             {
                 return 'foo';
@@ -124,7 +129,7 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
             $headers = $exception->getRequest()->getHeaders();
             $this->assertArrayHasKey('Authorization', $headers);
 
-            $this->assertEquals('Basic '.base64_encode('foo:bar'), $headers['Authorization'][0]);
+            $this->assertEquals('Basic '.base64_encode("foo:bar"), $headers['Authorization'][0]);
         }
     }
 }

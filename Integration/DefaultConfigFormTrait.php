@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,10 +11,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Integration;
 
+
 trait DefaultConfigFormTrait
 {
     /**
-     * Use the default.
+     * Use the default
      *
      * @return null|string
      */
@@ -26,7 +25,7 @@ trait DefaultConfigFormTrait
     }
 
     /**
-     * Use the default.
+     * Use the default
      *
      * @return null|string
      */
@@ -36,7 +35,7 @@ trait DefaultConfigFormTrait
     }
 
     /**
-     * Use the default.
+     * Use the default
      *
      * @return null|string
      */

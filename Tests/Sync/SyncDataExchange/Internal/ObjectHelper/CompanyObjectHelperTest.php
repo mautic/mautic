@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,6 +10,7 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\ObjectHelper;
+
 
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Company;
@@ -38,14 +37,14 @@ class CompanyObjectHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $connection;
 
-    protected function setUp(): void
+    protected function setUp()
     {
-        $this->model      = $this->createMock(CompanyModel::class);
+        $this->model = $this->createMock(CompanyModel::class);
         $this->repository = $this->createMock(CompanyRepository::class);
         $this->connection = $this->createMock(Connection::class);
     }
 
-    public function testCreate(): void
+    public function testCreate()
     {
         $this->model->expects($this->exactly(2))
             ->method('saveEntity');
@@ -67,7 +66,7 @@ class CompanyObjectHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testUpdate(): void
+    public function testUpdate()
     {
         $this->model->expects($this->exactly(2))
             ->method('saveEntity');
@@ -90,10 +89,10 @@ class CompanyObjectHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     $company1,
-                    $company2,
+                    $company2
                 ]
             );
-        $objectMappings = $this->getObjectHelper()->update([3, 4], $objects);
+        $objectMappings = $this->getObjectHelper()->update([3,4], $objects);
 
         foreach ($objectMappings as $key => $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());

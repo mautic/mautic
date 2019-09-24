@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -24,7 +22,7 @@ trait Oauth1aTwoLeggedKeysTrait
     /**
      * @param FormBuilderInterface $builder
      */
-    private function addKeyFields(FormBuilderInterface $builder): void
+    private function addKeyFields(FormBuilderInterface $builder)
     {
         $builder->add(
             'consumerKey',

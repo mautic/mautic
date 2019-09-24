@@ -64,12 +64,11 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         foreach ($options['objects'] as $objectName => $objectLabel) {
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($integrationObject, $objectName, $fieldFilterHelper): void {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($integrationObject, $objectName, $fieldFilterHelper) {
                 $error = null;
-
                 try {
                     $fieldFilterHelper->filterFieldsByPage($objectName, 1);
-                } catch (\Throwable $exception) {
+                } catch (\Exception $exception) {
                     $this->logger->debug($exception->getMessage(), ['exception' => $exception]);
 
                     $error = $this->translator->trans($exception->getMessage());
