@@ -40,7 +40,7 @@ class AvatarHelper extends Helper
      *
      * @throws FileNotFoundException
      */
-    public function setAvatarFromFile(Lead $lead, $filePath)
+    public function createAvatarFromFile(Lead $lead, $filePath)
     {
         if (!file_exists($filePath)) {
             throw new FileNotFoundException();
