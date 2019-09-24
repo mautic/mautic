@@ -15,5 +15,4 @@ namespace MauticPlugin\IntegrationsBundle\Exception;
 
 class IntegrationMappingException extends \Exception
 {
-
 }

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
-use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
@@ -49,7 +48,7 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     public function restoreToken(TokenInterface $token): TokenInterface
     {
-        $apiKeys = $this->getIntegration()->getApiKeys();
+        $apiKeys               = $this->getIntegration()->getApiKeys();
         $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
 
         return new IntegrationToken(
@@ -69,7 +68,7 @@ class TokenPersistence implements TokenPersistenceInterface
         $integration = $this->getIntegration();
         $oldApiKeys  = $integration->getApiKeys();
 
-        if ($oldApiKeys === null) {
+        if (null === $oldApiKeys) {
             $oldApiKeys = [];
         }
 
@@ -103,7 +102,7 @@ class TokenPersistence implements TokenPersistenceInterface
     }
 
     /**
-     * Returns true if a token exists (although it may not be valid)
+     * Returns true if a token exists (although it may not be valid).
      *
      * @return bool
      */

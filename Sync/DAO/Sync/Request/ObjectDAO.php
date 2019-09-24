@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -9,11 +11,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request;
 
 /**
- * Class ObjectDAO
+ * Class ObjectDAO.
  */
 class ObjectDAO
 {
@@ -31,7 +32,7 @@ class ObjectDAO
     private $fromDateTime;
 
     /**
-     * Date/Time the sync started
+     * Date/Time the sync started.
      *
      * @var \DateTimeInterface|null
      */
@@ -62,9 +63,9 @@ class ObjectDAO
      */
     public function __construct(
         string $object,
-        \DateTimeInterface $fromDateTime = null,
-        \DateTimeInterface $toDateTime = null,
-        \DateTimeInterface $objectLastSyncDateTime = null
+        ?\DateTimeInterface $fromDateTime = null,
+        ?\DateTimeInterface $toDateTime = null,
+        ?\DateTimeInterface $objectLastSyncDateTime = null
     ) {
         $this->object                 = $object;
         $this->fromDateTime           = $fromDateTime;
@@ -103,7 +104,7 @@ class ObjectDAO
     /**
      * @param array $fields
      */
-    public function setRequiredFields(array $fields)
+    public function setRequiredFields(array $fields): void
     {
         $this->requiredFields = $fields;
     }

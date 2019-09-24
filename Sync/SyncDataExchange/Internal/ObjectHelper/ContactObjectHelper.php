@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,12 +13,11 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
-
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
@@ -61,18 +62,18 @@ class ContactObjectHelper implements ObjectHelperInterface
     /**
      * ContactObject constructor.
      *
-     * @param LeadModel      $model
-     * @param LeadRepository $repository
-     * @param Connection     $connection
-     * @param FieldModel     $fieldModel
-     * @param DoNotContactModel   $dncModel
+     * @param LeadModel         $model
+     * @param LeadRepository    $repository
+     * @param Connection        $connection
+     * @param FieldModel        $fieldModel
+     * @param DoNotContactModel $dncModel
      */
     public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
     {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
-        $this->fieldModel = $fieldModel;
+        $this->model       = $model;
+        $this->repository  = $repository;
+        $this->connection  = $connection;
+        $this->fieldModel  = $fieldModel;
         $this->dncModel    = $dncModel;
     }
 
@@ -84,7 +85,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     public function create(array $objects): array
     {
         $availableFields = $this->getAvailableFields();
-        $objectMappings = [];
+        $objectMappings  = [];
 
         foreach ($objects as $object) {
             $contact = new Lead();
@@ -103,7 +104,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             $this->model->saveEntity($contact);
 
             // Process the pseudo field
-            $this->processPseudoFields($contact, $pseudoFields,  $object->getIntegration());
+            $this->processPseudoFields($contact, $pseudoFields, $object->getIntegration());
 
             // Detach to free RAM
             $this->repository->detachEntity($contact);
@@ -111,7 +112,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
-                    "Created lead ID %d",
+                    'Created lead ID %d',
                     $contact->getId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -143,14 +144,14 @@ class ContactObjectHelper implements ObjectHelperInterface
         DebugLogger::log(
             MauticSyncDataExchange::NAME,
             sprintf(
-                "Found %d leads to update with ids %s",
+                'Found %d leads to update with ids %s',
                 count($contacts),
-                implode(", ", $ids)
+                implode(', ', $ids)
             ),
             __CLASS__.':'.__FUNCTION__
         );
 
-        $availableFields = $this->getAvailableFields();
+        $availableFields      = $this->getAvailableFields();
         $updatedMappedObjects = [];
 
         foreach ($contacts as $contact) {
@@ -179,7 +180,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
-                    "Updated lead ID %d",
+                    'Updated lead ID %d',
                     $contact->getId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -198,7 +199,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries
+     * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries.
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
@@ -275,11 +276,8 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
-
 
     /**
      * @param int    $contactId
@@ -327,15 +325,14 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param Lead   $contact
-     * @param FieldDAO[]  $fields
-     * @param string $integration
+     * @param Lead       $contact
+     * @param FieldDAO[] $fields
+     * @param string     $integration
      */
-    private function processPseudoFields(Lead $contact, array $fields, string $integration)
+    private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {
-
         foreach ($fields as $name => $field) {
-            if (strpos($name, 'mautic_internal_dnc_') === 0) {
+            if (0 === strpos($name, 'mautic_internal_dnc_')) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
 
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());

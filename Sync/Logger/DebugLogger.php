@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Logger;
-
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -39,7 +40,7 @@ class DebugLogger
      * @param array  $context
      * @param string $urgency
      */
-    public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG)
+    public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG): void
     {
         if (!static::$logger) {
             return;
@@ -49,6 +50,6 @@ class DebugLogger
             $context['logged from'] = $loggedFrom;
         }
 
-        static::$logger->$urgency(strtoupper($integration)." SYNC: ".$message, $context);
+        static::$logger->$urgency(strtoupper($integration).' SYNC: '.$message, $context);
     }
 }

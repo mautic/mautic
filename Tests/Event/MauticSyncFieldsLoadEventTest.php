@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -15,17 +17,17 @@ use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 
 class MauticSyncFieldsLoadEventTest extends \PHPUnit_Framework_TestCase
 {
-    public function testWorkflow()
+    public function testWorkflow(): void
     {
         $objectName = 'object';
-        $fields = [
+        $fields     = [
             'fieldKey' => 'fieldName',
         ];
 
-        $newFieldKey = 'newFieldKey';
+        $newFieldKey   = 'newFieldKey';
         $newFieldValue = 'newFieldValue';
 
-        $event = new MauticSyncFieldsLoadEvent($objectName,$fields);
+        $event = new MauticSyncFieldsLoadEvent($objectName, $fields);
         $this->assertSame($objectName, $event->getObjectName());
         $this->assertSame($fields, $event->getFields());
         $event->addField($newFieldKey, $newFieldValue);

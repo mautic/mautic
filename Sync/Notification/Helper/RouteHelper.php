@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,14 +13,12 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\Routing\Router;
 
 class RouteHelper
 {
-
     /**
      * @var Router
      */
@@ -39,6 +39,7 @@ class RouteHelper
      * @param int    $id
      *
      * @return string
+     *
      * @throws ObjectNotSupportedException
      */
     public function getRoute(string $object, int $id): string
@@ -58,6 +59,7 @@ class RouteHelper
      * @param string $linkText
      *
      * @return string
+     *
      * @throws ObjectNotSupportedException
      */
     public function getLink(string $object, int $id, string $linkText): string
@@ -72,6 +74,7 @@ class RouteHelper
      * @param array  $ids
      *
      * @return array
+     *
      * @throws ObjectNotSupportedException
      */
     public function getRoutes(string $object, array $ids): array
@@ -91,10 +94,11 @@ class RouteHelper
     }
 
     /**
-     * @param string      $object
-     * @param array       $ids
+     * @param string $object
+     * @param array  $ids
      *
      * @return string
+     *
      * @throws ObjectNotSupportedException
      */
     public function getLinkCsv(string $object, array $ids): string
@@ -112,6 +116,7 @@ class RouteHelper
      * @param string $object
      *
      * @return string
+     *
      * @throws ObjectNotSupportedException
      */
     private function getObjectRoute(string $object): string

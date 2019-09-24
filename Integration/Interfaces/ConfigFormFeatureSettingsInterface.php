@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,11 +13,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-
 interface ConfigFormFeatureSettingsInterface
 {
     /**
-     * Return the name of the form type service for the feature settings
+     * Return the name of the form type service for the feature settings.
      *
      * @return string
      */

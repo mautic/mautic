@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,11 +13,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 
-use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
-use DateTimeInterface;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class InputOptionsDAO
@@ -71,15 +72,16 @@ class InputOptionsDAO
      *      'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'] or a ObjectIdsDAO object,
      *      'start-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
      *      'end-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
-     * ]
+     * ].
+     *
      * @param array $input
-     * 
+     *
      * @throws InvalidValueException
      */
     public function __construct(array $input)
     {
         if (empty($input['integration'])) {
-            throw new InvalidValueException("An integration must be specified. None provided.");
+            throw new InvalidValueException('An integration must be specified. None provided.');
         }
         $input                      = $this->fixNaming($input);
         $this->integration          = $input['integration'];
@@ -157,11 +159,11 @@ class InputOptionsDAO
     }
 
     /**
-     * @param array $input
+     * @param array  $input
      * @param string $optionName
-     * 
+     *
      * @return DateTimeInterface|null
-     * 
+     *
      * @throws InvalidValueException
      */
     private function validateDateTime(array $input, string $optionName): ?DateTimeInterface
@@ -175,18 +177,18 @@ class InputOptionsDAO
         } else {
             try {
                 return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
             }
         }
     }
 
     /**
-     * @param array $input
+     * @param array  $input
      * @param string $optionName
-     * 
+     *
      * @return ObjectIdsDAO|null
-     * 
+     *
      * @throws InvalidValueException
      */
     private function validateObjectIds(array $input, string $optionName): ?ObjectIdsDAO
@@ -194,7 +196,7 @@ class InputOptionsDAO
         if (empty($input[$optionName])) {
             return null;
         }
-        
+
         if ($input[$optionName] instanceof ObjectIdsDAO) {
             return $input[$optionName];
         } elseif (is_array($input[$optionName])) {
@@ -209,7 +211,7 @@ class InputOptionsDAO
      * to use the "contact" keywoard and developers "lead" as the integration bundle use "lead" everywhere.
      *
      * @param array $input
-     * 
+     *
      * @return array
      */
     private function fixNaming(array $input): array

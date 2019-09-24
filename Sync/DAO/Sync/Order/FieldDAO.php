@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -14,7 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 /**
- * Class FieldDAO
+ * Class FieldDAO.
  */
 class FieldDAO
 {

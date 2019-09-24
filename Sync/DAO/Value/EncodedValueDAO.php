@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,16 +14,16 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Value;
 
 /**
- * Class EncodedValueDAO
+ * Class EncodedValueDAO.
  */
 class EncodedValueDAO
 {
-    const STRING_TYPE = 'string';
-    const INT_TYPE = 'int';
-    const FLOAT_TYPE = 'float';
-    const DOUBLE_TYPE = 'double';
+    const STRING_TYPE   = 'string';
+    const INT_TYPE      = 'int';
+    const FLOAT_TYPE    = 'float';
+    const DOUBLE_TYPE   = 'double';
     const DATETIME_TYPE = 'datetime';
-    const BOOLEAN_TYPE = 'boolean';
+    const BOOLEAN_TYPE  = 'boolean';
 
     /**
      * @var string
@@ -35,12 +37,13 @@ class EncodedValueDAO
 
     /**
      * VariableEncodeDAO constructor.
+     *
      * @param string $type
      * @param string $value
      */
     public function __construct($type, $value)
     {
-        $this->type = $type;
+        $this->type  = $type;
         $this->value = $value;
     }
 

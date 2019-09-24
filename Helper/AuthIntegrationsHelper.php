@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,9 +14,8 @@
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
+use MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 
 class AuthIntegrationsHelper
 {
@@ -41,7 +42,7 @@ class AuthIntegrationsHelper
     /**
      * @param AuthenticationInterface $integration
      */
-    public function addIntegration(AuthenticationInterface $integration)
+    public function addIntegration(AuthenticationInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -50,11 +51,12 @@ class AuthIntegrationsHelper
      * @param string $integration
      *
      * @return AuthenticationInterface
+     *
      * @throws IntegrationNotFoundException
      */
     public function getIntegration(string $integration): AuthenticationInterface
     {
-        if (!isset($this->integrations[$integration])){
+        if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.authentication_integration");
         }
 
@@ -67,7 +69,7 @@ class AuthIntegrationsHelper
     /**
      * @param Integration $integrationConfiguration
      */
-    public function saveIntegrationConfiguration(Integration $integrationConfiguration)
+    public function saveIntegrationConfiguration(Integration $integrationConfiguration): void
     {
         $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);
     }

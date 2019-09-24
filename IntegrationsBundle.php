@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -19,13 +21,11 @@ use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegration
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Class IntegrationsBundle
- *
- * @package MauticPlugin\IntegrationsBundle
+ * Class IntegrationsBundle.
  */
 class IntegrationsBundle extends PluginBundleBase
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new IntegrationsPass());
         $container->addCompilerPass(new AuthenticationIntegrationPass());

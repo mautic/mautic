@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -50,7 +52,7 @@ class UpdatedObjectMappingDAO
         $this->integration           = $integration;
         $this->integrationObjectName = $integrationObjectName;
         $this->integrationObjectId   = $integrationObjectId;
-        $this->objectModifiedDate    = ($objectModifiedDate instanceof \DateTimeImmutable) ? new \DateTime(
+        $this->objectModifiedDate    = $objectModifiedDate instanceof \DateTimeImmutable ? new \DateTime(
             $objectModifiedDate->format('Y-m-d H:i:s'),
             $objectModifiedDate->getTimezone()
         ) : $objectModifiedDate;

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\TestsAuth\Provider\ApiKey;
 
-
 use GuzzleHttp\Exception\ConnectException;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
@@ -24,28 +23,26 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testType()
+    public function testType(): void
     {
         $this->assertEquals('api_key', (new HttpFactory())->getAuthType());
     }
 
-    public function testInvalidCredentialsThrowsException()
+    public function testInvalidCredentialsThrowsException(): void
     {
         $this->expectException(InvalidCredentialsException::class);
 
-        $credentials = new Class implements AuthCredentialsInterface
-        {
+        $credentials = new class() implements AuthCredentialsInterface {
         };
 
         (new HttpFactory())->getClient($credentials);
     }
 
-    public function testMissingCredentialsThrowsException()
+    public function testMissingCredentialsThrowsException(): void
     {
         $this->expectException(PluginNotConfiguredException::class);
 
-        $credentials = new Class implements HeaderCredentialsInterface
-        {
+        $credentials = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '';
@@ -60,10 +57,9 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         (new HttpFactory())->getClient($credentials);
     }
 
-    public function testInstantiatedClientIsReturned()
+    public function testInstantiatedClientIsReturned(): void
     {
-        $credentials = new Class implements HeaderCredentialsInterface
-        {
+        $credentials = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return 'abc';
@@ -81,8 +77,7 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $client2 = $factory->getClient($credentials);
         $this->assertTrue($client1 === $client2);
 
-        $credential2 = new Class implements HeaderCredentialsInterface
-        {
+        $credential2 = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '123';
@@ -98,10 +93,9 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($client1 === $client3);
     }
 
-    public function testHeaderCredentialsSetsHeader()
+    public function testHeaderCredentialsSetsHeader(): void
     {
-        $credentials = new Class implements HeaderCredentialsInterface
-        {
+        $credentials = new class() implements HeaderCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '123';
@@ -122,10 +116,9 @@ class HttpFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('123', $headers['abc']);
     }
 
-    public function testParameterCredentialsAppendsToken()
+    public function testParameterCredentialsAppendsToken(): void
     {
-        $credentials = new Class implements ParameterCredentialsInterface
-        {
+        $credentials = new class() implements ParameterCredentialsInterface {
             public function getApiKey(): ?string
             {
                 return '123';

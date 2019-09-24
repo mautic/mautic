@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -66,8 +68,8 @@ class CompanyNotificationHandler implements HandlerInterface
 
     /**
      * @param NotificationDAO $notificationDAO
-     * @param string $integrationDisplayName
-     * @param string $objectDisplayName
+     * @param string          $integrationDisplayName
+     * @param string          $objectDisplayName
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
@@ -80,9 +82,9 @@ class CompanyNotificationHandler implements HandlerInterface
             $notificationDAO->getMauticObjectId(),
             'sync',
             [
-                'integrationObject' => $notificationDAO->getIntegrationObject(),
+                'integrationObject'   => $notificationDAO->getIntegrationObject(),
                 'integrationObjectId' => $notificationDAO->getIntegrationObjectId(),
-                'message' => $notificationDAO->getMessage()
+                'message'             => $notificationDAO->getMessage(),
             ]
         );
 

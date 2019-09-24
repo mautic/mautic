@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -17,14 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 interface AuthenticationInterface extends IntegrationInterface
 {
     /**
-     * Returns true if the integration has already been authorized with the 3rd party service
+     * Returns true if the integration has already been authorized with the 3rd party service.
      *
      * @return bool
      */
     public function isAuthenticated(): bool;
 
     /**
-     * This would be where one will use a client to store access tokens such as
+     * This would be where one will use a client to store access tokens such as.
      *
      *
      * @param Request $request

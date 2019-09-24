@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,11 +15,11 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncProcess\Direction\Integ
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 
@@ -28,12 +30,12 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     private $valueHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueHelper = $this->createMock(ValueHelper::class);
     }
 
-    public function testFieldIsAddedToObjectChange()
+    public function testFieldIsAddedToObjectChange(): void
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
@@ -84,7 +86,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isset($changedFields['first_name']));
     }
 
-    public function testFieldIsNotAddedToObjectChangeIfNotFound()
+    public function testFieldIsNotAddedToObjectChangeIfNotFound(): void
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
@@ -155,7 +157,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     private function getInternalSyncReport($includeFirstNameField = true)
     {
-        $syncReport = new ReportDAO(MauticSyncDataExchange::NAME);
+        $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, 1);
         $internalReportObject->addField(
             new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'), ReportFieldDAO::FIELD_REQUIRED)

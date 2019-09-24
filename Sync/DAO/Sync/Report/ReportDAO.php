@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -17,7 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 /**
- * Class ReportDAO
+ * Class ReportDAO.
  */
 class ReportDAO
 {
@@ -76,7 +78,7 @@ class ReportDAO
      * @param string $newObjectName
      * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null)
+    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
         if (null === $newObjectId) {
             $newObjectId = $oldObjectId;
@@ -91,13 +93,14 @@ class ReportDAO
      * @param $fieldName
      *
      * @return InformationChangeRequestDAO
+     *
      * @throws ObjectNotFoundException
      * @throws FieldNotFoundException
      */
     public function getInformationChangeRequest($objectName, $objectId, $fieldName)
     {
         if (empty($this->objects[$objectName][$objectId])) {
-            throw new ObjectNotFoundException($objectName.":".$objectId);
+            throw new ObjectNotFoundException($objectName.':'.$objectId);
         }
 
         /** @var ObjectDAO $reportObject */

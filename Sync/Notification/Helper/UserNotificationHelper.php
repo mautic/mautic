@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
-
 
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -85,7 +86,7 @@ class UserNotificationHelper
         string $mauticObject,
         string $id,
         string $linkText
-    ) {
+    ): void {
         $this->integrationDisplayName = $integrationDisplayName;
         $this->objectDisplayName      = $objectDisplayName;
         $link                         = $this->routeHelper->getLink($mauticObject, $id, $linkText);
@@ -109,21 +110,21 @@ class UserNotificationHelper
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    private function writeMessage(string $message, string $link, int $userId)
+    private function writeMessage(string $message, string $link, int $userId): void
     {
         $this->writer->writeUserNotification(
             $this->translator->trans(
                 'mautic.integration.sync.user_notification.header',
                 [
                     '%integration%' => $this->integrationDisplayName,
-                    '%object%'      => $this->objectDisplayName
+                    '%object%'      => $this->objectDisplayName,
                 ]
             ),
             $this->translator->trans(
                 'mautic.integration.sync.user_notification.sync_error',
                 [
-                    '%name%'   => $link,
-                    '%message%' => $message
+                    '%name%'    => $link,
+                    '%message%' => $message,
                 ]
             ),
             $userId

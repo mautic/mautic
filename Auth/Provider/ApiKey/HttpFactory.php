@@ -22,15 +22,14 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
- * Factory for building HTTP clients using basic auth
+ * Factory for building HTTP clients using basic auth.
  */
 class HttpFactory implements AuthProviderInterface
 {
@@ -61,6 +60,7 @@ class HttpFactory implements AuthProviderInterface
      * @param AuthConfigInterface|null                                                          $config
      *
      * @return ClientInterface
+     *
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
      */
@@ -125,7 +125,7 @@ class HttpFactory implements AuthProviderInterface
     {
         return new Client(
             [
-                'headers' => [$this->credentials->getKeyName() => $this->credentials->getApiKey()]
+                'headers' => [$this->credentials->getKeyName() => $this->credentials->getApiKey()],
             ]
         );
     }
@@ -150,7 +150,7 @@ class HttpFactory implements AuthProviderInterface
 
         return new Client(
             [
-                'handler' => $handler
+                'handler' => $handler,
             ]
         );
     }

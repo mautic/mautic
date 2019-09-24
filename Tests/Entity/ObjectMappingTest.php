@@ -1,39 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\IntegrationsBundle\Tests\Entity;
 
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 
 class ObjectMappingTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var \DateTime
      */
     private $dateCreated;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->dateCreated = new \DateTime();
 
         parent::setUp();
     }
 
-    public function test__construct()
+    public function test__construct(): void
     {
         $objectMapping = new ObjectMapping($this->dateCreated);
         $this->assertInstanceOf(ObjectMapping::class, $objectMapping);
         $this->assertEquals($this->dateCreated, $objectMapping->getDateCreated());
     }
 
-    public function testSetAndGetIntegrationReferenceId()
+    public function testSetAndGetIntegrationReferenceId(): void
     {
         $objectMapping = new ObjectMapping($this->dateCreated);
         $objectMapping->setIntegrationReferenceId('ref');
         $this->assertEquals('ref', $objectMapping->getIntegrationReferenceId());
     }
 
-    public function testLoadMetadata()
+    public function testLoadMetadata(): void
     {
         $metadata = new \Doctrine\ORM\Mapping\ClassMetadata(ObjectMapping::class);
         ObjectMapping::loadMetadata($metadata);
@@ -49,7 +50,7 @@ class ObjectMappingTest extends \PHPUnit_Framework_TestCase
             'lastSyncDate',
             'internalStorage',
             'isDeleted',
-            'integrationReferenceId'
+            'integrationReferenceId',
         ];
         $this->assertEquals($expectedFieldNames, $metadata->getFieldNames());
 

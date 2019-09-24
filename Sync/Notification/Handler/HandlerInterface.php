@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Handler;
-
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 
@@ -34,7 +35,7 @@ interface HandlerInterface
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void;
 
     /**
-     * Finalize notifications such as pushing summary entries to the user notifications tray
+     * Finalize notifications such as pushing summary entries to the user notifications tray.
      */
     public function finalize(): void;
 }

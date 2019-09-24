@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,12 +15,12 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
@@ -73,6 +75,7 @@ class ObjectChangeGenerator
      * @param ReportObjectDAO  $integrationObject
      *
      * @return ObjectChangeDAO
+     *
      * @throws ObjectNotFoundException
      */
     public function getSyncObjectChange(
@@ -111,7 +114,7 @@ class ObjectChangeGenerator
             DebugLogger::log(
                 $this->mappingManual->getIntegration(),
                 sprintf(
-                    "Mautic to integration: no match found for %s:%s",
+                    'Mautic to integration: no match found for %s:%s',
                     $internalObject->getObject(),
                     (string) $internalObject->getObjectId()
                 ),
@@ -136,7 +139,7 @@ class ObjectChangeGenerator
      *
      * @throws ObjectNotFoundException
      */
-    private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO)
+    private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void
     {
         try {
             $fieldState = $this->internalObject->getField($fieldMappingDAO->getInternalField())->getState();
@@ -162,7 +165,7 @@ class ObjectChangeGenerator
             $fieldState
         );
 
-        /**
+        /*
          * Below here is just debug logging
          */
 

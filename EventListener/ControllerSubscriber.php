@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -55,13 +57,14 @@ class ControllerSubscriber implements EventSubscriberInterface
     /**
      * @param FilterControllerEvent $event
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(FilterControllerEvent $event): void
     {
         $request = $event->getRequest();
 
         if ('Mautic\PluginBundle\Controller\PluginController::configAction' === $request->get('_controller')) {
             $integrationName = $request->get('name');
             $page            = $request->get('page');
+
             try {
                 $this->integrationsHelper->getIntegration($integrationName);
                 $request->attributes->add(

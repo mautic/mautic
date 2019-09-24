@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 
@@ -22,6 +23,7 @@ class FuzzyEvidence implements JudgementModeInterface
      * @param InformationChangeRequestDAO $rightChangeRequest
      *
      * @return InformationChangeRequestDAO
+     *
      * @throws ConflictUnresolvedException
      */
     public static function adjudicate(

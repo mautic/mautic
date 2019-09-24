@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Sync\Helper;
-
 
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
@@ -46,7 +47,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $objectMappingRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
         $this->contactObjectHelper     = $this->createMock(ContactObjectHelper::class);
@@ -54,7 +55,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
     }
 
-    public function testObjectReturnedIfKnwonMappingExists()
+    public function testObjectReturnedIfKnwonMappingExists(): void
     {
         $mappingManual        = new MappingManualDAO('test');
         $integrationObjectDAO = new ObjectDAO('Object', 1);
@@ -77,7 +78,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($internalObjectDAO['last_sync_date'], $foundInternalObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
 
-    public function testMauticObjectSearchedAndEmptyObjectReturnedIfNoIdentifierFieldsAreMapped()
+    public function testMauticObjectSearchedAndEmptyObjectReturnedIfNoIdentifierFieldsAreMapped(): void
     {
         $this->fieldModel->expects($this->once())
             ->method('getUniqueIdentifierFields')
@@ -93,13 +94,13 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $foundInternalObject->getObjectId());
     }
 
-    public function testEmptyObjectIsReturnedWhenMauticContactIsNotFound()
+    public function testEmptyObjectIsReturnedWhenMauticContactIsNotFound(): void
     {
         $this->fieldModel->expects($this->once())
             ->method('getUniqueIdentifierFields')
             ->willReturn(
                 [
-                    'email' => 'Email'
+                    'email' => 'Email',
                 ]
             );
 
@@ -124,18 +125,18 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $foundInternalObject->getObjectId());
     }
 
-    public function testMauticContactIsFoundAndReturnedAsObjectDAO()
+    public function testMauticContactIsFoundAndReturnedAsObjectDAO(): void
     {
         $this->fieldModel->expects($this->once())
             ->method('getUniqueIdentifierFields')
             ->willReturn(
                 [
-                    'email' => 'Email'
+                    'email' => 'Email',
                 ]
             );
 
         $internalObjectName   = MauticSyncDataExchange::OBJECT_CONTACT;
-        $changeDateTime = new \DateTime();
+        $changeDateTime       = new \DateTime();
         $integrationObjectDAO = new ObjectDAO('Object', 1, $changeDateTime);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));
 
@@ -154,8 +155,8 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     [
-                        'id' => 3
-                    ]
+                        'id' => 3,
+                    ],
                 ]
             );
         $this->companyObjectHelper->expects($this->never())
@@ -167,18 +168,18 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $foundInternalObject->getObjectId());
     }
 
-    public function testMauticCompanyIsFoundAndReturnedAsObjectDAO()
+    public function testMauticCompanyIsFoundAndReturnedAsObjectDAO(): void
     {
         $this->fieldModel->expects($this->once())
             ->method('getUniqueIdentifierFields')
             ->willReturn(
                 [
-                    'email' => 'Email'
+                    'email' => 'Email',
                 ]
             );
 
         $internalObjectName   = MauticSyncDataExchange::OBJECT_COMPANY;
-        $changeDateTime = new \DateTime();
+        $changeDateTime       = new \DateTime();
         $integrationObjectDAO = new ObjectDAO('Object', 1, $changeDateTime);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));
 
@@ -197,8 +198,8 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 [
                     [
-                        'id' => 3
-                    ]
+                        'id' => 3,
+                    ],
                 ]
             );
         $this->contactObjectHelper->expects($this->never())
@@ -210,7 +211,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $foundInternalObject->getObjectId());
     }
 
-    public function testIntegrationObjectReturnedIfMapped()
+    public function testIntegrationObjectReturnedIfMapped(): void
     {
         $objectName     = 'Object';
         $objectId       = 1;
@@ -233,7 +234,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($changeDateTime, $foundIntegrationObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
 
-    public function testEmptyIntegrationObjectReturnedIfNotMapped()
+    public function testEmptyIntegrationObjectReturnedIfNotMapped(): void
     {
         $objectName     = 'Object';
         $this->objectMappingRepository->expects($this->once())
@@ -247,7 +248,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $foundIntegrationObject->getChangeDateTime());
     }
 
-    public function testDeletedExceptionThrownIfIntegrationObjectHasBeenNotedAsDeleted()
+    public function testDeletedExceptionThrownIfIntegrationObjectHasBeenNotedAsDeleted(): void
     {
         $this->expectException(ObjectDeletedException::class);
 

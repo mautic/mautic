@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,23 +13,22 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 
 class ObjectChangeGenerator
@@ -103,6 +104,7 @@ class ObjectChangeGenerator
      * @param ReportObjectDAO  $integrationObject
      *
      * @return ObjectChangeDAO
+     *
      * @throws ObjectNotFoundException
      */
     public function getSyncObjectChange(
@@ -141,7 +143,7 @@ class ObjectChangeGenerator
             DebugLogger::log(
                 $this->mappingManual->getIntegration(),
                 sprintf(
-                    "Integration to Mautic; no match found for %s:%s",
+                    'Integration to Mautic; no match found for %s:%s',
                     $integrationObject->getObject(),
                     (string) $integrationObject->getObjectId()
                 ),
@@ -166,7 +168,7 @@ class ObjectChangeGenerator
      *
      * @throws ObjectNotFoundException
      */
-    private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO)
+    private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void
     {
         try {
             $integrationFieldState = $this->integrationObject->getField($fieldMappingDAO->getIntegrationField())->getState();
@@ -204,7 +206,7 @@ class ObjectChangeGenerator
             $internalFieldState
         );
 
-        /**
+        /*
          * Below here is just debug logging
          */
 
@@ -213,7 +215,7 @@ class ObjectChangeGenerator
             DebugLogger::log(
                 $this->mappingManual->getIntegration(),
                 sprintf(
-                    "Integration to Mautic; syncing %s %s with a value of %s",
+                    'Integration to Mautic; syncing %s %s with a value of %s',
                     $internalFieldState,
                     $fieldMappingDAO->getInternalField(),
                     var_export($newValue->getNormalizedValue(), true)
@@ -246,7 +248,7 @@ class ObjectChangeGenerator
         FieldMappingDAO $fieldMappingDAO,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
         string $fieldState
-    ) {
+    ): void {
         try {
             $internalField = $this->internalObject->getField($fieldMappingDAO->getInternalField());
         } catch (FieldNotFoundException $exception) {
@@ -289,7 +291,7 @@ class ObjectChangeGenerator
         );
 
         $possibleChangeDateTime = $this->internalObject->getChangeDateTime();
-        $certainChangeDateTime = $internalField->getChangeDateTime();
+        $certainChangeDateTime  = $internalField->getChangeDateTime();
 
         // If we know certain change datetime and it's newer than possible change datetime
         // then we have to update possible change datetime otherwise comparision doesn't work correctly
@@ -316,7 +318,7 @@ class ObjectChangeGenerator
                 DebugLogger::log(
                     $this->mappingManual->getIntegration(),
                     sprintf(
-                        "Integration to Mautic; no winner was determined using the %s judging mode for object %s field %s",
+                        'Integration to Mautic; no winner was determined using the %s judging mode for object %s field %s',
                         $judgeMode,
                         $this->internalObject->getObject(),
                         $fieldMappingDAO->getInternalField()
@@ -342,7 +344,7 @@ class ObjectChangeGenerator
         InformationChangeRequestDAO $integrationInformationChangeRequest,
         InformationChangeRequestDAO $internalInformationChangeRequest,
         string $fieldState
-    ) {
+    ): void {
         $winningChangeRequest = $this->syncJudge->adjudicate(
             $judgeMode,
             $internalInformationChangeRequest,
