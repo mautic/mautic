@@ -9,10 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Symfony\Component\HttpFoundation\Request;
+use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
 
 class ClickthroughHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,11 +23,17 @@ class ClickthroughHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
     }
 
-    public function testObjectInArrayIsDetected()
+    /**
+     * @covers \Mautic\CoreBundle\Helper\Serializer::decode
+     */
+    public function testObjectInArrayIsDetectedOrIgnored()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        if (version_compare(PHP_VERSION, '7.0', '<')) {
+            // PHP 5
+            $this->expectException(\InvalidArgumentException::class);
+        }
 
-        $array = ['foo' => new Request()];
+        $array = ['foo' => new WakeupCall()];
 
         $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
     }

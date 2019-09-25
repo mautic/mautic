@@ -27,6 +27,10 @@ class Serializer
     public static function decode($serializedString, array $options = ['allowed_classes' => false])
     {
         if (version_compare(phpversion(), '7.0.0', '<')) {
+            if (stripos($serializedString, 'o:') !== false) {
+                throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));
+            }
+
             return unserialize($serializedString);
         }
 
