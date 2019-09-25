@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Migration;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\IntegrationsBundle\Exception\PathNotFoundException;
 
@@ -70,13 +71,18 @@ class Engine
 
         $this->entityManager->beginTransaction();
 
-        foreach ($migrationClasses as $migrationClass) {
-            /** @var AbstractMigration $migration */
-            $migration = new $migrationClass($this->entityManager, $this->tablePrefix);
+        try {
+            foreach ($migrationClasses as $migrationClass) {
+                /** @var AbstractMigration $migration */
+                $migration = new $migrationClass($this->entityManager, $this->tablePrefix);
 
-            if ($migration->shouldExecute()) {
-                $migration->execute();
+                if ($migration->shouldExecute()) {
+                    $migration->execute();
+                }
             }
+        } catch (DBALException $e) {
+            $this->entityManager->rollback();
+            throw $e;
         }
 
         $this->entityManager->commit();
