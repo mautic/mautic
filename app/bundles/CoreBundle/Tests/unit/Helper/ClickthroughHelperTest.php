@@ -12,12 +12,22 @@
 namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 class ClickthroughHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testEncodingCanBeDecoded()
     {
         $array = ['foo' => 'bar'];
+
+        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
+    }
+
+    public function testObjectInArrayIsDetected()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $array = ['foo' => new Request()];
 
         $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
     }
