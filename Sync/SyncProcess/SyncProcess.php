@@ -285,9 +285,9 @@ class SyncProcess
     }
 
     /**
-     * @param ReportDAO $syncReport
+     * {@inheritdoc}
      */
-    private function manageRelations($syncReport)
+    private function manageRelations(ReportDAO $syncReport)
     {
         // Map relations
         $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
@@ -296,28 +296,46 @@ class SyncProcess
         $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
         if (!empty($objectsToSynchronize)) {
-            $mauticObjectIds = new ObjectIdsDAO();
-
-            foreach($objectsToSynchronize as $object) {
-                $mauticObjectIds->addObjectId($object->getObject(), $object->getObjectId());
-            }
-
-            $integration = $this->mappingManualDAO->getIntegration();
-
-            $inputOptions = new InputOptionsDAO([
-                'integration'           => $integration,
-                'integration-object-id' => $mauticObjectIds,
-            ]);
-
-            $this->processParallelSync($inputOptions);
-
-            // Now we can map relations for objects we have just synchronised
-            $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
+            $this->synchronizeMissingObjects($objectsToSynchronize, $syncReport);
         }
     }
 
     /**
-     * @param InputOptionsDAO $inputOptions
+     * {@inheritdoc}
+     */
+    private function synchronizeMissingObjects(array $objectsToSynchronize, ReportDAO $syncReport)
+    {
+        $inputOptions = $this->getInputOptionsForObjects($objectsToSynchronize);
+
+        // We need to synchronize missing relation ids
+        $this->processParallelSync($inputOptions);
+
+        // Now we can map relations for objects we have just synchronised
+        $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getInputOptionsForObjects(array $objectsToSynchronize): InputOptionsDAO
+    {
+        $mauticObjectIds = new ObjectIdsDAO();
+
+        foreach($objectsToSynchronize as $object) {
+            $mauticObjectIds->addObjectId($object->getObject(), $object->getObjectId());
+        }
+
+        $integration  = $this->mappingManualDAO->getIntegration();
+        $inputOptions = new InputOptionsDAO([
+            'integration'           => $integration,
+            'integration-object-id' => $mauticObjectIds,
+        ]);
+
+        return $inputOptions;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     private function processParallelSync($inputOptions)
     {
@@ -328,7 +346,10 @@ class SyncProcess
         $this->integrationSyncProcess = $currentSyncProcess;
     }
 
-    private function shouldStopIntegrationSync()
+    /**
+     * {@inheritdoc}
+     */
+    private function shouldStopIntegrationSync(): bool
     {
         // We don't want to iterate sync for specific ids
         if (null !== $this->inputOptionsDAO->getIntegrationObjectIds()) {

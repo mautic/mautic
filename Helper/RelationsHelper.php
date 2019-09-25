@@ -28,8 +28,7 @@ class RelationsHelper
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDao
-     * @param RelationsDAO     $relationsDAO
+     * {@inheritdoc}
      */
     public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport)
     {
@@ -40,18 +39,17 @@ class RelationsHelper
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    public function getObjectsToSynchronize()
+    public function getObjectsToSynchronize(): array
     {
         return $this->objectsToSynchronize;
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDao
-     * @param array            $objectRelations
+     * {@inheritdoc}
      */
-    private function processRelationsForObjectName(MappingManualDAO $mappingManualDao, array $objectRelations, $syncReport)
+    private function processRelationsForObjectName(MappingManualDAO $mappingManualDao, array $objectRelations, ReportDAO $syncReport)
     {
         foreach ($objectRelations as $objectRelation) {
             $this->processRelationsForObject($mappingManualDao, $objectRelation, $syncReport);
@@ -59,10 +57,9 @@ class RelationsHelper
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDao
-     * @param RelationDAO[]    $objectRelation
+     * {@inheritdoc}
      */
-    private function processRelationsForObject(MappingManualDAO $mappingManualDao, array $objectRelation, $syncReport)
+    private function processRelationsForObject(MappingManualDAO $mappingManualDao, array $objectRelation, ReportDAO $syncReport)
     {
         foreach ($objectRelation as $relationObject) {
             if (0 < $relationObject->getRelObjectInternalId()) {
@@ -70,35 +67,21 @@ class RelationsHelper
             }
 
             $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
-            try {
-                $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
-            }
-            catch(ObjectNotFoundException $e) {
-                // object shouldn't be synchronized
-                return;
-            }
+            $relObjectId  = $this->getObjectInternalId($relObjectDao, $relationObject, $mappingManualDao);
 
-            if (0 < $relObjects[0]->getObjectId()) {
-                $relationObject->setRelObjectInternalId($relObjects[0]->getObjectId());
-                $objectDAO = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());
-                $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue()->setValue($relObjects[0]->getObjectId());
-                continue;
+            if (0 < $relObjectId) {
+                $this->addObjectInternalId($relObjectId, $relationObject, $syncReport);
             }
-            $this->objectsToSynchronize[] = $relObjectDao;
+            else {
+                $this->objectsToSynchronize[] = $relObjectDao;
+            }
         }
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDao
-     * @param string           $relObjectName
-     * @param string           $objectDao
-     *
-     * @return array
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * {@inheritdoc}
      */
-    private function findInternalObjects(MappingManualDAO $mappingManualDao, $relObjectName, $objectDao)
+    private function findInternalObjects(MappingManualDAO $mappingManualDao, $relObjectName, $objectDao): array
     {
         $internalObjectsNames = $mappingManualDao->getMappedInternalObjectsNames($relObjectName);
 
@@ -108,5 +91,31 @@ class RelationsHelper
         }
 
         return $objects;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function addObjectInternalId(int $relObjectId, RelationDAO $relationObject, ReportDAO $syncReport)
+    {
+        $relationObject->setRelObjectInternalId($relObjectId);
+        $objectDAO = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());
+        $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue()->setValue($relObjectId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    private function getObjectInternalId(ObjectDAO $relObjectDao, RelationDAO $relationObject, MappingManualDAO $mappingManualDao): ?int
+    {
+        try {
+            $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
+        }
+        catch (ObjectNotFoundException $e) {
+            // object shouldn't be synchronized
+            return null;
+        }
+
+        return $relObjects[0]->getObjectId();
     }
 }
