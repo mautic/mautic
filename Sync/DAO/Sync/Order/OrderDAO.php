@@ -15,6 +15,7 @@ use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 
 /**
  * Class OrderDAO
@@ -87,6 +88,11 @@ class OrderDAO
      * @var NotificationDAO[]
      */
     private $notifications = [];
+
+    /**
+     * @var RelationsDAO
+     */
+    private $relations = [];
 
     /**
      * OrderDAO constructor.
@@ -371,5 +377,21 @@ class OrderDAO
     public function getObjectCount(): int
     {
         return $this->objectCounter;
+    }
+
+    /**
+     * @param RelationsDAO $relations
+     */
+    public function setRelations($relations)
+    {
+        $this->relations = $relations;
+    }
+
+    /**
+     * @return RelationsDAO
+     */
+    public function getRelations(): RelationsDAO
+    {
+        return $this->relations;
     }
 }

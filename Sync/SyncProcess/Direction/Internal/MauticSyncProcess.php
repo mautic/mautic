@@ -12,6 +12,7 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
@@ -36,9 +37,9 @@ class MauticSyncProcess
     private $objectChangeGenerator;
 
     /**
-     * @var bool
+     * @var InputOptionsDAO
      */
-    private $isFirstTimeSync;
+    private $inputOptionsDAO;
 
     /**
      * @var MappingManualDAO
@@ -51,8 +52,6 @@ class MauticSyncProcess
     private $syncDataExchange;
 
     /**
-     * MauticSyncProcess constructor.
-     *
      * @param SyncDateHelper        $syncDateHelper
      * @param ObjectChangeGenerator $objectChangeGenerator
      */
@@ -63,13 +62,13 @@ class MauticSyncProcess
     }
 
     /**
-     * @param bool                      $isFirstTimeSync
-     * @param MappingManualDAO          $mappingManualDAO
+     * @param InputOptionsDAO        $inputOptionsDAO
+     * @param MappingManualDAO       $mappingManualDAO
      * @param MauticSyncDataExchange $syncDataExchange
      */
-    public function setupSync(bool $isFirstTimeSync, MappingManualDAO $mappingManualDAO, MauticSyncDataExchange $syncDataExchange)
+    public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, MauticSyncDataExchange $syncDataExchange)
     {
-        $this->isFirstTimeSync  = $isFirstTimeSync;
+        $this->inputOptionsDAO  = $inputOptionsDAO;
         $this->mappingManualDAO = $mappingManualDAO;
         $this->syncDataExchange = $syncDataExchange;
     }
@@ -78,11 +77,12 @@ class MauticSyncProcess
      * @param int $syncIteration
      *
      * @return ReportDAO
+     * 
      * @throws ObjectNotFoundException
      */
     public function getSyncReport(int $syncIteration)
     {
-        $internalRequestDAO = new RequestDAO($syncIteration, $this->isFirstTimeSync, $this->mappingManualDAO->getIntegration());
+        $internalRequestDAO = new RequestDAO($this->mappingManualDAO->getIntegration(), $syncIteration, $this->inputOptionsDAO);
 
         $internalObjectsNames = $this->mappingManualDAO->getInternalObjectNames();
         foreach ($internalObjectsNames as $internalObjectName) {
@@ -142,7 +142,7 @@ class MauticSyncProcess
      */
     public function getSyncOrder(ReportDAO $syncReport)
     {
-        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->isFirstTimeSync, $this->mappingManualDAO->getIntegration());
+        $syncOrder = new OrderDAO($this->syncDateHelper->getSyncDateTime(), $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO->getIntegration());
 
         $integrationObjectsNames = $this->mappingManualDAO->getIntegrationObjectNames();
         foreach ($integrationObjectsNames as $integrationObjectName) {

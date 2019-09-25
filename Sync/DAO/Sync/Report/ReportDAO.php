@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
@@ -37,9 +38,9 @@ class ReportDAO
     private $remappedObjects = [];
 
     /**
-     * @var array
+     * @var RelationsDAO
      */
-    private $relations = [];
+    private $relations;
 
     /**
      * SyncReportDAO constructor.
@@ -49,6 +50,7 @@ class ReportDAO
     public function __construct($integration)
     {
         $this->integration = $integration;
+        $this->relations   = new RelationsDAO();
     }
 
     /**
@@ -179,58 +181,12 @@ class ReportDAO
     }
 
     /**
-     * @param ObjectDAO $objectDAO
-     * @param array     $relations
-     */
-    public function addRelations(ObjectDAO $objectDAO, array $relations)
-    {
-        foreach ($relations as $relObjectName => $relation) {
-            $this->addRelation($objectDAO, $relObjectName, $relation);
-        }
-    }
-
-    /**
-     * @param ObjectDAO $objectDAO
-     * @param string    $relObjectName
-     * @param string    $relObjectId
-     */
-    public function addRelation(ObjectDAO $objectDAO, string $fieldName, RelationDao $relation)
-    {
-        $this->relations[$objectDAO->getObject()][$objectDAO->getObjectId()][$fieldName] = $relation;
-    }
-
-    /**
-     * @param string $objectName
-     * @param string $objectId
      *
-     * @return array
+     * @return RelationsDAO
      */
-    public function getRelations(): array
+    public function getRelations(): RelationsDAO
     {
         return $this->relations;
     }
 
-    /**
-     * @param string $objectName
-     * @param string $objectId
-     *
-     * @return array
-     */
-    public function getRelationsForObject(string $objectName, string $objectId): array
-    {
-        return $this->relations[$objectName][$objectId] ?? [];
-    }
-
-
-    /**
-     * @param string $objectName
-     * @param string $objectId
-     * @param string $fieldName
-     *
-     * @return RelationDAO
-     */
-    public function getRelationsForField(string $objectName, string $objectId, string $fieldName): ?RelationDAO
-    {
-        return $this->relations[$objectName][$objectId][$fieldName] ?? null;
-    }
 }

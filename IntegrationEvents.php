@@ -57,4 +57,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_KEYS_AFTER_DECRYPTION = 'mautic.integration.keys_after_decryption';
+
+    /**
+     * The mautic.integration.mautic_sync_field_load event is dispatched when Mautic sync fields are build.
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD = 'mautic.integration.mautic_sync_field_load';
 }

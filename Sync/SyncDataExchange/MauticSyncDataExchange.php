@@ -28,12 +28,9 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 
-/**
- * Class MauticSyncDataExchange
- */
 class MauticSyncDataExchange implements SyncDataExchangeInterface
 {
-    const NAME = 'mautic';
+    const NAME           = 'mautic';
     const OBJECT_CONTACT = 'lead'; // kept as lead for BC
     const OBJECT_COMPANY = 'company';
 
@@ -68,8 +65,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
     private $orderExecutioner;
 
     /**
-     * MauticSyncDataExchange constructor.
-     *
      * @param FieldChangeRepository      $fieldChangeRepository
      * @param FieldHelper                $fieldHelper
      * @param MappingHelper              $mappingHelper
@@ -101,7 +96,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
-        if ($requestDAO->isFirstTimeSync()) {
+        if ($requestDAO->isFirstTimeSync() || $requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
             return $this->fullObjectReportBuilder->buildReport($requestDAO);
         }
 
@@ -137,7 +132,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
 
         $fieldChanges = $this->fieldChangeRepository->findChangesForObject(
             $mappingManualDAO->getIntegration(),
-            $internalObjectName,
+            $this->mappingHelper->getMauticEntityClassName($internalObjectName),
             $internalObjectDAO->getObjectId()
         );
 

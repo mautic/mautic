@@ -228,7 +228,8 @@ return [
                     'mautic.lead.repository.lead',
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.field',
-                    'mautic.lead.model.dnc'
+                    'mautic.lead.model.dnc',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
@@ -254,6 +255,7 @@ return [
                     'mautic.integrations.helper.variable_expresser',
                     'mautic.channel.helper.channel_list',
                     'translator',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.sync_process.value_helper' => [
@@ -299,9 +301,6 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic.order_executioner',
                 ],
             ],
-            'mautic.integrations.sync.process_factory' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcessFactory::class,
-            ],
             'mautic.integrations.sync.integration_process.object_change_generator' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator::class,
                 'arguments' => [
@@ -334,7 +333,6 @@ return [
             'mautic.integrations.sync.service' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService::class,
                 'arguments' => [
-                    'mautic.integrations.sync.process_factory',
                     'mautic.integrations.sync.data_exchange.mautic',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.helper.sync_mapping',

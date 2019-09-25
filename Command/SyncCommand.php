@@ -11,31 +11,32 @@
 
 namespace MauticPlugin\IntegrationsBundle\Command;
 
-use DateTimeImmutable;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 
 class SyncCommand extends ContainerAwareCommand
 {
+    public const NAME = 'mautic:integrations:sync';
+
     /**
      * @var SyncServiceInterface
      */
     private $syncService;
 
     /**
-     * SyncCommand constructor.
-     *
-     * @param SyncServiceInterface     $syncService
+     * @param SyncServiceInterface $syncService
      */
     public function __construct(SyncServiceInterface $syncService)
     {
         parent::__construct();
 
-        $this->syncService     = $syncService;
+        $this->syncService = $syncService;
     }
 
     /**
@@ -43,7 +44,7 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('mautic:integrations:sync')
+        $this->setName(self::NAME)
             ->setDescription('Fetch objects from integration.')
             ->addArgument(
                 'integration',
@@ -55,19 +56,43 @@ class SyncCommand extends ContainerAwareCommand
                 '--start-datetime',
                 '-t',
                 InputOption::VALUE_OPTIONAL,
-                'Set start date/time for updated values.'
+                'Set start date/time for updated values in UTC timezone.'
             )
             ->addOption(
                 '--end-datetime',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Set start date/time for updated values.'
+                'Set start date/time for updated values in UTC timezone.'
+            )
+            ->addOption(
+                '--mautic-object-id',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Provide specific Mautic object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. Example: --mautic-object-id=contact:12 --mautic-object-id=company:13'
+            )
+            ->addOption(
+                '--integration-object-id',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Provide specific integration object IDs you want to sync. If some object IDs are provided then the start/end dates have no effect. It depends on each integration if this is supported. Example: --integration-object-id=Account:12 --integration-object-id=Lead:13'
             )
             ->addOption(
                 '--first-time-sync',
                 '-f',
                 InputOption::VALUE_NONE,
                 'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes'
+            )
+            ->addOption(
+                '--disable-push',
+                null,
+                InputOption::VALUE_NONE,
+                'Notate if the sync should execute only pushing items from Mautic to the integration'
+            )
+            ->addOption(
+                '--disable-pull',
+                null,
+                InputOption::VALUE_NONE,
+                'Notate if the sync should execute only pulling items from integration to the Mautic'
             );
 
         parent::configure();
@@ -78,35 +103,22 @@ class SyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io                  = new SymfonyStyle($input, $output);
-        $integration         = $input->getArgument('integration');
-        $startDateTimeString = $input->getOption('start-datetime');
-        $endDateTimeString = $input->getOption('end-datetime');
-        $firstTimeSync       = $input->getOption('first-time-sync');
-        $env                 = $input->getOption('env');
+        $io = new SymfonyStyle($input, $output);
 
         try {
-            $startDateTime = ($startDateTimeString) ? new DateTimeImmutable($startDateTimeString) : null;
-        } catch (\Exception $e) {
-            $io->error("'$startDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
+            $inputOptions = new InputOptionsDAO(array_merge($input->getArguments(), $input->getOptions()));
+        } catch (InvalidValueException $e) {
+            $io->error($e->getMessage());
 
             return 1;
         }
 
         try {
-            $endDateTime = ($endDateTimeString) ? new DateTimeImmutable($endDateTimeString) : null;
+            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
+
+            $this->syncService->processIntegrationSync($inputOptions);
         } catch (\Exception $e) {
-            $io->error("'$endDateTimeString' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
-
-            return 1;
-        }
-
-        try {
-            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $integration);
-
-            $this->syncService->processIntegrationSync($integration, $firstTimeSync, $startDateTime, $endDateTime);
-        } catch (\Exception $e) {
-            if ($env === 'dev' || MAUTIC_ENV === 'dev') {
+            if ($input->getOption('env') === 'dev' || (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev')) {
                 throw $e;
             }
 

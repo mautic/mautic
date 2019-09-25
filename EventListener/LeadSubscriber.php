@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
@@ -77,8 +79,8 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @param Events\LeadEvent $event
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
      */
     public function onLeadPostSave(Events\LeadEvent $event): void
     {
@@ -100,6 +102,11 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $changes = $lead->getChanges(true);
+
+        if (!empty($changes['owner'])) {
+            // Force record of owner change if present in changelist
+            $changes['fields']['owner_id'] = $changes['owner'];
+        }
 
         if (isset($changes['fields'])) {
             $this->recordFieldChanges($changes['fields'], $lead->getId(), Lead::class);
@@ -129,8 +136,8 @@ class LeadSubscriber extends CommonSubscriber
     /**
      * @param Events\CompanyEvent $event
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException
+     * @throws IntegrationNotFoundException
+     * @throws ObjectNotFoundException
      */
     public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
@@ -146,6 +153,11 @@ class LeadSubscriber extends CommonSubscriber
 
         $company = $event->getCompany();
         $changes = $company->getChanges(true);
+
+        if (!empty($changes['owner'])) {
+            // Force record of owner change if present in changelist
+            $changes['fields']['owner_id'] = $changes['owner'];
+        }
 
         if (!isset($changes['fields'])) {
             return;
@@ -167,7 +179,7 @@ class LeadSubscriber extends CommonSubscriber
      * @param int    $objectId
      * @param string $objectType
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
+     * @throws IntegrationNotFoundException
      */
     private function recordFieldChanges(array $fieldChanges, $objectId, string $objectType): void
     {

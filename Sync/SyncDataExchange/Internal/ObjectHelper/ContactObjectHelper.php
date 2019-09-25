@@ -15,6 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectH
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -25,6 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
@@ -59,21 +61,28 @@ class ContactObjectHelper implements ObjectHelperInterface
     private $dncModel;
 
     /**
+     * @var CompanyModel
+     */
+    private $companyModel;
+
+    /**
      * ContactObject constructor.
      *
-     * @param LeadModel      $model
-     * @param LeadRepository $repository
-     * @param Connection     $connection
-     * @param FieldModel     $fieldModel
-     * @param DoNotContactModel   $dncModel
+     * @param LeadModel         $model
+     * @param LeadRepository    $repository
+     * @param Connection        $connection
+     * @param FieldModel        $fieldModel
+     * @param DoNotContactModel $dncModel
+     * @param CompanyModel      $companyModel
      */
-    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
+    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel, CompanyModel $companyModel)
     {
-        $this->model      = $model;
-        $this->repository = $repository;
-        $this->connection = $connection;
-        $this->fieldModel = $fieldModel;
-        $this->dncModel    = $dncModel;
+        $this->model        = $model;
+        $this->repository   = $repository;
+        $this->connection   = $connection;
+        $this->fieldModel   = $fieldModel;
+        $this->dncModel     = $dncModel;
+        $this->companyModel = $companyModel;
     }
 
     /**
@@ -162,7 +171,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             $pseudoFields = [];
             foreach ($fields as $field) {
                 if (in_array($field->getName(), $availableFields)) {
-                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                    $this->addUpdatedFieldToContact($contact, $field);
                 } else {
                     $pseudoFields[$field->getName()] = $field;
                 }
@@ -196,6 +205,16 @@ class ContactObjectHelper implements ObjectHelperInterface
 
         return $updatedMappedObjects;
     }
+
+    private function addUpdatedFieldToContact($contact, $field)
+    {
+        $value = $field->getValue()->getNormalizedValue();
+        if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDao) {
+            $value = $this->companyModel->getEntity($value->getValue())->getName(); // todo change value object
+        }
+        $contact->addUpdatedField($field->getName(), $value);
+    }
+
 
     /**
      * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries

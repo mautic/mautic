@@ -26,9 +26,12 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    private const INTEGRATION_NAME = 'Test';
+
     /**
      * @var FieldChangeRepository|\PHPUnit_Framework_MockObject_MockObject
      */
@@ -68,8 +71,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testTrackedContactChanges()
     {
-        $requestDAO = new RequestDAO(1, false, 'Test');
-
+        $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
         $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
         $requestObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, $fromDateTime, $toDateTime);
@@ -134,8 +136,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testTrackedCompanyChanges()
     {
-        $requestDAO = new RequestDAO(1, false, 'Test');
-
+        $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
         $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
         $requestObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_COMPANY, $fromDateTime, $toDateTime);
