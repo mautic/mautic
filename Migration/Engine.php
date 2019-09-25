@@ -42,7 +42,7 @@ class Engine
     {
         $this->entityManager  = $entityManager;
         $this->tablePrefix    = $tablePrefix;
-        $this->migrationsPath = __DIR__.'/../Migrations/';
+        $this->migrationsPath = $pluginPath.'/Migrations/';
     }
 
     /**

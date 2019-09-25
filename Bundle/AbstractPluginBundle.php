@@ -40,7 +40,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         $migrationEngine = new Engine(
             $entityManager,
             $tablePrefix,
-            static::getParentClassPath()
+            __DIR__.'/../../'.$plugin->getBundle()
         );
 
         static::installAllTablesIfMissing(
@@ -51,18 +51,6 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         );
 
         $migrationEngine->up();
-    }
-
-    /**
-     * @return string
-     * @throws ReflectionException
-     */
-    protected static function getParentClassPath(): string
-    {
-        $reflector = new \ReflectionClass(self::class);
-        $fileName = $reflector->getFileName();
-
-        return dirname($fileName);
     }
 
     /**
