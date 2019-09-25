@@ -87,7 +87,7 @@ class ObjectMapping
             ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
             ->addIndex(['integration', 'internal_object_name', 'internal_object_id'], 'internal_object')
             ->addIndex(['integration', 'internal_object_name', 'integration_object_name'], 'object_match')
-            ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'object_match')
+            ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'integration_reference')
             ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
