@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Migration;
 
 use Doctrine\ORM\EntityManager;
+use MauticPlugin\IntegrationsBundle\Exception\PathNotFoundException;
 
 class Engine
 {
@@ -41,7 +42,7 @@ class Engine
     {
         $this->entityManager  = $entityManager;
         $this->tablePrefix    = $tablePrefix;
-        $this->migrationsPath = $pluginPath.'/Migrations/';
+        $this->migrationsPath = __DIR__.'/Migrations/';
     }
 
     /**
@@ -99,7 +100,7 @@ class Engine
         $fileNames = scandir($this->migrationsPath);
 
         if (false === $fileNames) {
-            throw new \InvalidArgumentException(
+            throw new PathNotFoundException(
                 sprintf("'%s' directory not found", $this->migrationsPath)
             );
         }
