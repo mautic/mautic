@@ -12,10 +12,12 @@
 namespace MauticPlugin\IntegrationsBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
+use Exception;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use \Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\IntegrationsBundle\Migration\Engine;
+use ReflectionException;
 
 /**
  * Base Bundle class which should be extended by addon bundles.
@@ -28,7 +30,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
      * @param array|null    $metadata
      * @param Schema|null   $installedSchema
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
@@ -38,7 +40,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         $migrationEngine = new Engine(
             $entityManager,
             $tablePrefix,
-            dirname(__FILE__)
+            static::getParentClassPath()
         );
 
         static::installAllTablesIfMissing(
@@ -49,5 +51,31 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         );
 
         $migrationEngine->up();
+    }
+
+    /**
+     * @return string
+     * @throws ReflectionException
+     */
+    protected static function getParentClassPath(): string
+    {
+        $reflector = new \ReflectionClass(self::class);
+        $fn = $reflector->getFileName();
+
+        return dirname($fn);
+    }
+
+    /**
+     * Returns the bundle name that this bundle overrides.
+     *
+     * Despite its name, this method does not imply any parent/child relationship
+     * between the bundles, just a way to extend and override an existing
+     * bundle.
+     *
+     * @return string The Bundle name it overrides or null if no parent
+     */
+    public function getParent(): string
+    {
+        return '';
     }
 }
