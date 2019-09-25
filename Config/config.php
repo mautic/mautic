@@ -10,6 +10,11 @@
  */
 
 return [
+    'name'        => 'Integrations',
+    'description' => 'Adds support for plugin integrations',
+    'version'     => '0.0.1',
+    'author'      => 'Mautic, Inc.',
+
     'routes' => [
         'main' => [
             'mautic_integration_config' => [
