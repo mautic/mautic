@@ -12,6 +12,7 @@ namespace MauticPlugin\IntegrationsBundle\Helper;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
@@ -69,7 +70,14 @@ class RelationsHelper
             }
 
             $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
-            $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
+            try {
+                $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
+            }
+            catch(ObjectNotFoundException $e) {
+                // object shouldn't be synchronized
+                return;
+            }
+
             if (0 < $relObjects[0]->getObjectId()) {
                 $relationObject->setRelObjectInternalId($relObjects[0]->getObjectId());
                 $objectDAO = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());

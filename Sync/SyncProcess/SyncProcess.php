@@ -15,6 +15,7 @@ use MauticPlugin\IntegrationsBundle\Event\SyncEvent;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
@@ -27,6 +28,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterf
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
@@ -93,6 +95,11 @@ class SyncProcess
     private $syncIteration;
 
     /**
+     * @var SyncService
+     */
+    private $syncService;
+
+    /**
      * @param SyncDateHelper            $syncDateHelper
      * @param MappingHelper             $mappingHelper
      * @param RelationsHelper           $relationsHelper
@@ -104,6 +111,7 @@ class SyncProcess
      * @param SyncDataExchangeInterface $internalSyncDataExchange
      * @param SyncDataExchangeInterface $integrationSyncDataExchange
      * @param InputOptionsDAO           $inputOptionsDAO
+     * @param SyncService               $syncService
      */
     public function __construct(
         SyncDateHelper $syncDateHelper,
@@ -117,7 +125,7 @@ class SyncProcess
         SyncDataExchangeInterface $internalSyncDataExchange,
         SyncDataExchangeInterface $integrationSyncDataExchange,
         InputOptionsDAO $inputOptionsDAO,
-        $syncService
+        SyncService $syncService
     ) {
         $this->syncDateHelper              = $syncDateHelper;
         $this->mappingHelper               = $mappingHelper;
@@ -183,34 +191,8 @@ class SyncProcess
             // Update the mappings in case objects have been converted such as Lead -> Contact
             $this->mappingHelper->remapIntegrationObjects($syncReport->getRemappedObjects());
 
-            // RelationHelper check relations
-            $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
-
-            // todo move it
-            $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
-
-            if (!empty($objectsToSynchronize)) {
-                $mauticObjectIds = new ObjectIdsDAO();
-
-                foreach($objectsToSynchronize as $object) {
-                    $mauticObjectIds->addObjectId($object->getObject(), $object->getObjectId());
-                }
-
-                $integration = $this->mappingManualDAO->getIntegration();
-
-                $inputOptions = new InputOptionsDAO([
-                    'integration'           => $integration,
-                    'integration-object-id' => $mauticObjectIds,
-                ]);
-
-                $currentSyncProcess = clone $this->integrationSyncProcess;
-
-                $this->syncService->processIntegrationSync($inputOptions);
-
-                $this->integrationSyncProcess = $currentSyncProcess;
-
-                $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
-            }
+            // Maps relations, synchronizes missing objects if necessary
+            $this->manageRelations($syncReport);
 
             // Convert the integrations' report into an "order" or instructions for Mautic
             $syncOrder = $this->mauticSyncProcess->getSyncOrder($syncReport, $this->inputOptionsDAO->isFirstTimeSync(), $this->mappingManualDAO);
@@ -236,7 +218,7 @@ class SyncProcess
             // Execute the sync instructions
             $this->internalSyncDataExchange->executeSyncOrder($syncOrder);
 
-            if (null !== $this->inputOptionsDAO->getIntegrationObjectIds()) {
+            if ($this->shouldStopIntegrationSync()) {
                 break;
             }
 
@@ -300,6 +282,60 @@ class SyncProcess
             // Fetch the next iteration/batch
             ++$this->syncIteration;
         } while (true);
+    }
+
+    /**
+     * @param ReportDAO $syncReport
+     */
+    private function manageRelations($syncReport)
+    {
+        // Map relations
+        $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
+
+        // Relation objects we need to synchronize
+        $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
+
+        if (!empty($objectsToSynchronize)) {
+            $mauticObjectIds = new ObjectIdsDAO();
+
+            foreach($objectsToSynchronize as $object) {
+                $mauticObjectIds->addObjectId($object->getObject(), $object->getObjectId());
+            }
+
+            $integration = $this->mappingManualDAO->getIntegration();
+
+            $inputOptions = new InputOptionsDAO([
+                'integration'           => $integration,
+                'integration-object-id' => $mauticObjectIds,
+            ]);
+
+            $this->processParallelSync($inputOptions);
+
+            // Now we can map relations for objects we have just synchronised
+            $this->relationsHelper->processRelations($this->mappingManualDAO, $syncReport);
+        }
+    }
+
+    /**
+     * @param InputOptionsDAO $inputOptions
+     */
+    private function processParallelSync($inputOptions)
+    {
+        $currentSyncProcess = clone $this->integrationSyncProcess;
+        $this->syncService->processIntegrationSync($inputOptions);
+
+        // We need to bring back current $inputOptions which were overwritten by new sync
+        $this->integrationSyncProcess = $currentSyncProcess;
+    }
+
+    private function shouldStopIntegrationSync()
+    {
+        // We don't want to iterate sync for specific ids
+        if (null !== $this->inputOptionsDAO->getIntegrationObjectIds()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

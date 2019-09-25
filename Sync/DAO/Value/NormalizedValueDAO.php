@@ -33,6 +33,7 @@ class NormalizedValueDAO
     const TEXTAREA_TYPE = 'textarea';
     const TIME_TYPE = 'time';
     const URL_TYPE = 'url';
+    const REFERENCE_TYPE = 'reference';
 
     /**
      * @var string

@@ -206,15 +206,18 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $updatedMappedObjects;
     }
 
+    /**
+     * @param $contact
+     * @param $field
+     */
     private function addUpdatedFieldToContact($contact, $field)
     {
         $value = $field->getValue()->getNormalizedValue();
         if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDao) {
-            $value = $this->companyModel->getEntity($value->getValue())->getName(); // todo change value object
+            $value = $this->companyModel->getEntity($value->getValue())->getName();
         }
         $contact->addUpdatedField($field->getName(), $value);
     }
-
 
     /**
      * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries
