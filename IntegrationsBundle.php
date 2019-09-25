@@ -25,6 +25,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class IntegrationsBundle extends AbstractPluginBundle
 {
+    /**
+     * @param ContainerBuilder $container
+     */
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new IntegrationsPass());
