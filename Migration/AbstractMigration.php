@@ -115,7 +115,7 @@ abstract class AbstractMigration implements MigrationInterface
      */
     protected function columnsToString(array $columns): string
     {
-        return implode(',', $columns);
+        return implode(',', "`$columns`");
     }
 
     /**
