@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use \Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\IntegrationsBundle\Migration\Engine;
-use ReflectionException;
+use Symfony\Component\Debug\Exception\UndefinedMethodException;
 
 /**
  * Base Bundle class which should be extended by addon bundles.
@@ -43,12 +43,14 @@ abstract class AbstractPluginBundle extends PluginBundleBase
             __DIR__.'/../../'.$plugin->getBundle()
         );
 
-        static::installAllTablesIfMissing(
-            $entityManager->getConnection()->getSchemaManager()->createSchema(),
-            $tablePrefix,
-            $factory,
-            $metadata
-        );
+        if (method_exists(__CLASS__, 'installAllTablesIfMissing')) {
+            static::installAllTablesIfMissing(
+                $entityManager->getConnection()->getSchemaManager()->createSchema(),
+                $tablePrefix,
+                $factory,
+                $metadata
+            );
+        }
 
         $migrationEngine->up();
     }
