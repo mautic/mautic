@@ -60,9 +60,9 @@ abstract class AbstractPluginBundle extends PluginBundleBase
     protected static function getParentClassPath(): string
     {
         $reflector = new \ReflectionClass(self::class);
-        $fn = $reflector->getFileName();
+        $fileName = $reflector->getFileName();
 
-        return dirname($fn);
+        return dirname($fileName);
     }
 
     /**
