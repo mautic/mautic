@@ -68,7 +68,7 @@ class ObjectMapping
     private $isDeleted = false;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $integrationReferenceId;
 
@@ -165,7 +165,7 @@ class ObjectMapping
     /**
      * @return int|null ?int
      */
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
@@ -185,7 +185,7 @@ class ObjectMapping
     /**
      * @return \DateTime|null
      */
-    public function getDateCreated(): ?\DateTime
+    public function getDateCreated()
     {
         return $this->dateCreated;
     }
@@ -193,7 +193,7 @@ class ObjectMapping
     /**
      * @return string
      */
-    public function getIntegration(): string
+    public function getIntegration()
     {
         return $this->integration;
     }
@@ -213,7 +213,7 @@ class ObjectMapping
     /**
      * @return string
      */
-    public function getInternalObjectName(): string
+    public function getInternalObjectName()
     {
         return $this->internalObjectName;
     }
@@ -233,7 +233,7 @@ class ObjectMapping
     /**
      * @return int
      */
-    public function getInternalObjectId(): int
+    public function getInternalObjectId()
     {
         return $this->internalObjectId;
     }
@@ -253,7 +253,7 @@ class ObjectMapping
     /**
      * @return string
      */
-    public function getIntegrationObjectName(): string
+    public function getIntegrationObjectName()
     {
         return $this->integrationObjectName;
     }
@@ -273,7 +273,7 @@ class ObjectMapping
     /**
      * @return string
      */
-    public function getIntegrationObjectId(): string
+    public function getIntegrationObjectId()
     {
         return $this->integrationObjectId;
     }
@@ -293,7 +293,7 @@ class ObjectMapping
     /**
      * @return \DateTimeInterface
      */
-    public function getLastSyncDate(): \DateTimeInterface
+    public function getLastSyncDate()
     {
         return $this->lastSyncDate;
     }
@@ -304,7 +304,7 @@ class ObjectMapping
      * @return ObjectMapping
      * @throws \Exception
      */
-    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate)
+    public function setLastSyncDate($lastSyncDate)
     {
         if (null === $lastSyncDate) {
             $lastSyncDate = new \DateTime();
@@ -318,7 +318,7 @@ class ObjectMapping
     /**
      * @return array
      */
-    public function getInternalStorage(): array
+    public function getInternalStorage()
     {
         return $this->internalStorage;
     }
@@ -328,7 +328,7 @@ class ObjectMapping
      *
      * @return ObjectMapping
      */
-    public function setInternalStorage(array $internalStorage)
+    public function setInternalStorage($internalStorage)
     {
         $this->internalStorage = $internalStorage;
 
@@ -351,7 +351,7 @@ class ObjectMapping
     /**
      * @return bool
      */
-    public function isDeleted(): bool
+    public function isDeleted()
     {
         return $this->isDeleted;
     }
@@ -369,19 +369,19 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getIntegrationReferenceId(): string
+    public function getIntegrationReferenceId()
     {
         return $this->integrationReferenceId;
     }
 
     /**
-     * @param string $integrationReferenceId
+     * @param string|null $integrationReferenceId
      *
      * @return ObjectMapping
      */
-    public function setIntegrationReferenceId(string $integrationReferenceId)
+    public function setIntegrationReferenceId($integrationReferenceId)
     {
         $this->integrationReferenceId = $integrationReferenceId;
 
