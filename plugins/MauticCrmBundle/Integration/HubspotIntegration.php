@@ -301,7 +301,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             return [];
         }
         foreach ($data['properties'] as $key => $field) {
-            $fieldsValues[$key] = $field['value'];
+            $value              = str_replace(';', '|', $field['value']);
+            $fieldsValues[$key] = $value;
         }
         if ($object == 'Lead' && !isset($fieldsValues['email'])) {
             foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
@@ -538,7 +539,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                 'feature_settings' => ['objects' => $config['objects']],
             ]
         );
-
         $this->amendLeadDataBeforePush($mappedData);
 
         if (empty($mappedData)) {
@@ -571,5 +571,17 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         return false;
+    }
+
+    /**
+     * Amend mapped lead data before pushing to CRM.
+     *
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforePush(&$mappedData)
+    {
+        foreach ($mappedData as &$data) {
+            $data = str_replace('|', ';', $data);
+        }
     }
 }
