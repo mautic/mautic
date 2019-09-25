@@ -30,7 +30,7 @@ class Version_0_0_1 extends AbstractMigration
     protected function isApplicable(Schema $schema): bool
     {
         try {
-            return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('integrationReferenceId');
+            return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('integration_reference_id');
         } catch (SchemaException $e) {
             return false;
         }
@@ -43,8 +43,22 @@ class Version_0_0_1 extends AbstractMigration
     {
         $this->addSql("
             ALTER TABLE `{$this->concatPrefix($this->table)}`
-            ADD `integration_reference_id` varchar(255) NULL AFTER `internal_object_name`,
-            ADD INDEX (integration_reference_id)
+            DROP INDEX `integration_object`
+        ");
+
+        $this->addSql("
+            ALTER TABLE `{$this->concatPrefix($this->table)}`
+            ADD `integration_reference_id` varchar(255) NULL AFTER `internal_object_name`
+        ");
+
+        $this->addSql("
+            CREATE INDEX integration_object
+            ON {$this->concatPrefix($this->table)}(integration, integration_object_name, integration_object_id, integration_reference_id);
+        ");
+
+        $this->addSql("
+            CREATE INDEX integration_reference
+            ON {$this->concatPrefix($this->table)}(integration, integration_object_name, integration_reference_id, integration_object_id);
         ");
     }
 }
