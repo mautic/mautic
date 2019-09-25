@@ -43,7 +43,7 @@ class Version_0_0_1 extends AbstractMigration
     {
         $this->addSql("
             ALTER TABLE `{$this->concatPrefix($this->table)}`
-            DROP INDEX `integration_object`
+            DROP INDEX `{$this->concatPrefix('integration_object')}`
         ");
 
         $this->addSql("
@@ -52,12 +52,12 @@ class Version_0_0_1 extends AbstractMigration
         ");
 
         $this->addSql("
-            CREATE INDEX integration_object
+            CREATE INDEX {$this->concatPrefix('integration_object')}
             ON {$this->concatPrefix($this->table)}(integration, integration_object_name, integration_object_id, integration_reference_id);
         ");
 
         $this->addSql("
-            CREATE INDEX integration_reference
+            CREATE INDEX {$this->concatPrefix('integration_reference')}
             ON {$this->concatPrefix($this->table)}(integration, integration_object_name, integration_reference_id, integration_object_id);
         ");
     }
