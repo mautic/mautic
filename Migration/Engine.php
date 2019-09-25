@@ -50,7 +50,12 @@ class Engine
      */
     public function up(): void
     {
-        $migrationClasses = $this->getMigrationClasses();
+        try {
+            $migrationClasses = $this->getMigrationClasses();
+        } catch (PathNotFoundException $e) {
+            return;
+        }
+
 
         if (!$migrationClasses) {
             return;
