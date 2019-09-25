@@ -41,7 +41,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
             dirname(__FILE__)
         );
 
-        self::installAllTablesIfMissing(
+        static::installAllTablesIfMissing(
             $entityManager->getConnection()->getSchemaManager()->createSchema(),
             $tablePrefix,
             $factory,
