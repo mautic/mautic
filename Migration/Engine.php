@@ -102,7 +102,7 @@ class Engine
      */
     private function getMigrationFileNames(): array
     {
-        $fileNames = scandir($this->migrationsPath);
+        $fileNames = @scandir($this->migrationsPath);
 
         if (false === $fileNames) {
             throw new PathNotFoundException(
