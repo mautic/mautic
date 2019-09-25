@@ -80,12 +80,12 @@ class Engine
                     $migration->execute();
                 }
             }
+
+            $this->entityManager->commit();
         } catch (DBALException $e) {
             $this->entityManager->rollback();
             throw $e;
         }
-
-        $this->entityManager->commit();
     }
 
     /**
