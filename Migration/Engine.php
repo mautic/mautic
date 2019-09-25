@@ -34,15 +34,22 @@ class Engine
     private $migrationsPath;
 
     /**
+     * @var string
+     */
+    private $bundleName;
+
+    /**
      * @param EntityManager $entityManager
      * @param string        $tablePrefix
      * @param string        $pluginPath
+     * @param string        $bundleName
      */
-    public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath)
+    public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath, string $bundleName)
     {
         $this->entityManager  = $entityManager;
         $this->tablePrefix    = $tablePrefix;
         $this->migrationsPath = $pluginPath.'/Migrations/';
+        $this->bundleName     = $bundleName;
     }
 
     /**
@@ -88,7 +95,7 @@ class Engine
         foreach ($migrationFileNames as $fileName) {
             require_once $this->migrationsPath.$fileName;
             $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className          = "MauticPlugin\CustomObjectsBundle\Migrations\\${className}";
+            $className          = "MauticPlugin\\".$this->bundleName."\Migrations\\${className}";
             $migrationClasses[] = $className;
         }
 

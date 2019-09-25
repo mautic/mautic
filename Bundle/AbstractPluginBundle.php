@@ -40,7 +40,8 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         $migrationEngine = new Engine(
             $entityManager,
             $tablePrefix,
-            __DIR__.'/../../'.$plugin->getBundle()
+            __DIR__.'/../../'.$plugin->getBundle(),
+            $plugin->getBundle()
         );
 
         if (method_exists(__CLASS__, 'installAllTablesIfMissing')) {
