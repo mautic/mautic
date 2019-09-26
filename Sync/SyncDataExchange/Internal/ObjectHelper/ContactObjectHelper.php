@@ -207,10 +207,10 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param $contact
-     * @param $field
+     * @param Lead     $contact
+     * @param FieldDAO $field
      */
-    private function addUpdatedFieldToContact($contact, $field)
+    private function addUpdatedFieldToContact(Lead $contact, FieldDAO $field)
     {
         $value = $field->getValue()->getNormalizedValue();
         if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDao) {
