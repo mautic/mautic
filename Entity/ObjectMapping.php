@@ -70,7 +70,7 @@ class ObjectMapping
     /**
      * @var string|null
      */
-    private $integrationReference;
+    private $integrationReferenceId;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -84,10 +84,10 @@ class ObjectMapping
         $builder
             ->setTable('sync_object_mapping')
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
-            ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference'], 'integration_object')
+            ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
             ->addIndex(['integration', 'internal_object_name', 'internal_object_id'], 'internal_object')
             ->addIndex(['integration', 'internal_object_name', 'integration_object_name'], 'object_match')
-            ->addIndex(['integration', 'integration_object_name', 'integration_reference', 'integration_object_id'], 'integration_reference')
+            ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'integration_reference')
             ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
         $builder->addId();
@@ -371,19 +371,19 @@ class ObjectMapping
     /**
      * @return string|null
      */
-    public function getIntegrationReference()
+    public function getIntegrationReferenceId()
     {
-        return $this->integrationReference;
+        return $this->integrationReferenceId;
     }
 
     /**
-     * @param string|null $integrationReference
+     * @param string|null $integrationReferenceId
      *
      * @return ObjectMapping
      */
-    public function setIntegrationReference($integrationReference)
+    public function setIntegrationReferenceId($integrationReferenceId)
     {
-        $this->integrationReference = $integrationReference;
+        $this->integrationReferenceId = $integrationReferenceId;
 
         return $this;
     }
