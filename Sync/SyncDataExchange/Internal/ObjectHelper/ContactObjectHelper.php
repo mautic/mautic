@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
+use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -321,6 +323,8 @@ class ContactObjectHelper implements ObjectHelperInterface
             $availableFields = $this->fieldModel->getFieldList(false, false);
 
             $this->availableFields = array_keys($availableFields);
+            $this->availableFields[] = 'owner_id';
+
         }
 
         return $this->availableFields;
