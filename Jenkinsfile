@@ -1,3 +1,5 @@
+def REPO_NAME = env.JOB_NAME.split("/")[0]
+
 pipeline {
   options {
     skipDefaultCheckout()
@@ -82,7 +84,10 @@ pipeline {
             echo "Merging PR to beta"
             withEnv(["PRNUMBER=${CHANGE_ID}"]) {
             sshagent (credentials: ['1a066462-6d24-4247-bef6-1da084c8f484']) {
+            dir('plugins/IntegrationsBundle') {
               sh '''
+                git config --global user.email "9725490+mautibot@users.noreply.github.com"
+                git config --global user.name "Jenkins"
                 gitsha="$(git rev-parse HEAD)"
                 if [ "$(git --no-pager show -s HEAD --format='%ae')" = "nobody@nowhere" ]; then
                     echo "Skipping Jenkinse's merge commit which we do not need"
@@ -95,19 +100,19 @@ pipeline {
                 git push origin HEAD:beta
                 git checkout "$gitsha"
               '''
-            }}
+            }}}
           }
         }
       }
     }
-    stage('Fill Hash') {
+    stage('Set Revision') {
       when {
         not {
           changeRequest()
         }
         anyOf {
           branch 'beta'
-          branch 'staging';         
+          branch 'staging';
         }
       }
       steps {
@@ -119,16 +124,55 @@ pipeline {
               git config --global user.name "Jenkins"
               git clone git@github.com:mautic-inc/mautic-cloud.git -b $BRANCH_NAME
               cd mautic-cloud
-              git submodule update --init --recursive plugins/IntegrationsBundle/
-              cd plugins/IntegrationsBundle/
-              git pull origin $BRANCH_NAME
-              SUBMODULE_COMMIT=$(git log -1 | awk 'NR==1{print $2}')
-              cd ../..
-              git add plugins/IntegrationsBundle
-              git commit -m "IntegrationsBundle updated with commit $SUBMODULE_COMMIT"
-              git push
+              if [ -n "$(grep IntegrationsBundle .gitmodules)" ]; then
+                git submodule update --init --recursive plugins/IntegrationsBundle/
+                cd plugins/IntegrationsBundle/
+                git pull origin $BRANCH_NAME
+                SUBMODULE_COMMIT=$(git log -1 | awk 'NR==1{print $2}')
+                cd ../..
+                git add plugins/IntegrationsBundle
+                git commit -m "IntegrationsBundle updated with commit $SUBMODULE_COMMIT"
+                git push
+              fi
             '''
           }
+        }
+      }
+    }
+  }
+  post {
+    failure {
+      script {
+        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+          slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on branch ${env.BRANCH_NAME}. (${env.BUILD_URL}console)")
+        }
+        if (env.CHANGE_AUTHOR != null && !env.CHANGE_TITLE.contains("WIP")) {
+          def githubToSlackMap = [
+            'alanhartless':'alan.hartless',
+            'anton-vlasenko':'anton.vlasenko',
+            'dongilbert':'don.gilbert',
+            'escopecz':'jan.linhart',
+            'galvani':'jan.kozak',
+            'Gregy':'petr.gregor',
+            'hluchas':'lukas.drahy',
+            'javjim-mautic':'javier.jimeno',
+            'mtshaw3':'mike.shaw',
+            'ondrejsibl':'ondrej.sibl',
+            'pavel-hladik':'pavel.hladik'
+          ]
+          if (githubToSlackMap.("${env.CHANGE_AUTHOR}")) {
+            slackSend (channel: "@"+"${githubToSlackMap.("${env.CHANGE_AUTHOR}")}", color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console")
+          }
+          else {
+            slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console\nsending alert to channel, there is no Github to Slack mapping for '${CHANGE_AUTHOR}'")
+          }
+        }
+      }
+    }
+    fixed {
+      script {
+        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+          slackSend (color: '#00FF00', message: "${REPO_NAME} build on branch ${env.BRANCH_NAME} is fixed. (${env.BUILD_URL}console)")
         }
       }
     }
