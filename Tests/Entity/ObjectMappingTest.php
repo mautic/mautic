@@ -53,12 +53,12 @@ class ObjectMappingTest extends \PHPUnit_Framework_TestCase
         ];
         $this->assertEquals($expectedFieldNames, $metadata->getFieldNames());
 
-        $referenceIdMapping = $metadata->table['indexes']['integration_reference_id'];
+        $referenceIdMapping = $metadata->table['indexes']['integration_reference'];
         $this->assertEquals(
             [
                 'integration',
                 'integration_object_name',
-                'integration_reference',
+                'integration_reference_id',
                 'integration_object_id',
             ],
             $referenceIdMapping['columns'],

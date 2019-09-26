@@ -85,8 +85,6 @@ class ObjectMapping
             ->setTable('sync_object_mapping')
             ->setCustomRepositoryClass(ObjectMappingRepository::class)
             ->addIndex(['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], 'integration_object')
-            ->addIndex(['integration', 'internal_object_name', 'internal_object_id'], 'internal_object')
-            ->addIndex(['integration', 'internal_object_name', 'integration_object_name'], 'object_match')
             ->addIndex(['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], 'integration_reference')
             ->addIndex(['integration', 'last_sync_date'], 'integration_last_sync_date');
 
@@ -138,8 +136,8 @@ class ObjectMapping
             ->build();
 
         $builder
-            ->createField('integrationReference', Type::STRING)
-            ->columnName('integration_reference')
+            ->createField('integrationReferenceId', Type::STRING)
+            ->columnName('integration_reference_id')
             ->nullable()
             ->build();
 
