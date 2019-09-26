@@ -18,7 +18,8 @@ class RelationsDAO
     private $relations = [];
 
     /**
-     * {@inheritdoc}
+     * @param ObjectDAO $objectDAO
+     * @param array     $relations
      */
     public function addRelations(ObjectDAO $objectDAO, array $relations)
     {
@@ -28,15 +29,18 @@ class RelationsDAO
     }
 
     /**
-     * {@inheritdoc}
+     * @param ObjectDAO   $objectDAO
+     * @param string      $fieldName
+     * @param RelationDAO $relation
      */
     public function addRelation(ObjectDAO $objectDAO, string $fieldName, RelationDao $relation)
     {
         $this->relations[$objectDAO->getObject()][$objectDAO->getObjectId()][$fieldName] = $relation;
     }
 
+
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getRelations(): array
     {
@@ -44,23 +48,34 @@ class RelationsDAO
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $objectName
+     *
+     * @return array
      */
     public function getRelationsForObjectName(string $objectName): array
     {
         return $this->relations[$objectName] ?? [];
     }
 
+
     /**
-     * {@inheritdoc}
+     * @param string $objectName
+     * @param string $objectId
+     *
+     * @return array
      */
     public function getRelationsForObject(string $objectName, string $objectId): array
     {
         return $this->relations[$objectName][$objectId] ?? [];
     }
 
+
     /**
-     * {@inheritdoc}
+     * @param string $objectName
+     * @param string $objectId
+     * @param string $fieldName
+     *
+     * @return RelationDAO|null
      */
     public function getRelationsForField(string $objectName, string $objectId, string $fieldName): ?RelationDAO
     {

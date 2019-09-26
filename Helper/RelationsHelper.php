@@ -28,7 +28,8 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @param MappingManualDAO $mappingManualDao
+     * @param ReportDAO        $syncReport
      */
     public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport)
     {
@@ -39,7 +40,7 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getObjectsToSynchronize(): array
     {
@@ -47,7 +48,9 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @param MappingManualDAO $mappingManualDao
+     * @param array            $objectRelations
+     * @param ReportDAO        $syncReport
      */
     private function processRelationsForObjectName(MappingManualDAO $mappingManualDao, array $objectRelations, ReportDAO $syncReport)
     {
@@ -57,7 +60,9 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @param MappingManualDAO $mappingManualDao
+     * @param array            $objectRelation
+     * @param ReportDAO        $syncReport
      */
     private function processRelationsForObject(MappingManualDAO $mappingManualDao, array $objectRelation, ReportDAO $syncReport)
     {
@@ -79,9 +84,16 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @param MappingManualDAO $mappingManualDao
+     * @param string           $relObjectName
+     * @param ObjectDAO        $objectDao
+     *
+     * @return array
+     * @throws ObjectNotFoundException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
-    private function findInternalObjects(MappingManualDAO $mappingManualDao, $relObjectName, $objectDao): array
+    private function findInternalObjects(MappingManualDAO $mappingManualDao, string $relObjectName, ObjectDAO $objectDao): array
     {
         $internalObjectsNames = $mappingManualDao->getMappedInternalObjectsNames($relObjectName);
 
@@ -94,7 +106,11 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @param int         $relObjectId
+     * @param RelationDAO $relationObject
+     * @param ReportDAO   $syncReport
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
      */
     private function addObjectInternalId(int $relObjectId, RelationDAO $relationObject, ReportDAO $syncReport)
     {
@@ -104,7 +120,13 @@ class RelationsHelper
     }
 
     /**
-     * {@inheritdoc}
+     * @param ObjectDAO        $relObjectDao
+     * @param RelationDAO      $relationObject
+     * @param MappingManualDAO $mappingManualDao
+     *
+     * @return int|null
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
     private function getObjectInternalId(ObjectDAO $relObjectDao, RelationDAO $relationObject, MappingManualDAO $mappingManualDao): ?int
     {

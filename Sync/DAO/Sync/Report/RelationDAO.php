@@ -10,6 +10,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 
+/**
+ * Class RelationDAO
+ * @package MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report
+ */
 class RelationDAO
 {
     /**
@@ -52,32 +56,36 @@ class RelationDAO
         $this->relObjectIntegrationId = $relObjectIntegrationId;
     }
 
+
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getObjectName(): ?string
     {
         return $this->objectName;
     }
 
+
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getRelObjectName(): ?string
     {
         return $this->relObjectName;
     }
 
+
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getRelFieldName(): ?string
     {
         return $this->relFieldName;
     }
 
+
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getObjectIntegrationId(): ?string
     {
@@ -85,7 +93,7 @@ class RelationDAO
     }
 
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     public function getRelObjectIntegrationId(): ?string
     {
@@ -93,7 +101,7 @@ class RelationDAO
     }
 
     /**
-     * {@inheritdoc}
+     * @return int|null
      */
     public function getRelObjectInternalId(): ?int
     {
@@ -101,7 +109,7 @@ class RelationDAO
     }
 
     /**
-     * {@inheritdoc}
+     * @param int $relObjectInternalId
      */
     public function setRelObjectInternalId(int $relObjectInternalId)
     {

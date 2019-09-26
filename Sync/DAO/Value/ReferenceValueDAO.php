@@ -18,8 +18,6 @@ class ReferenceValueDAO
     private $value;
 
     /**
-     * ReferenceValueDAO constructor.
-     *
      * @param mixed $value
      */
     public function __construct($value)
