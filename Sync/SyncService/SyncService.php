@@ -19,7 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
-use MauticPlugin\IntegrationsBundle\Helper\RelationsHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Psr\Log\LogLevel;

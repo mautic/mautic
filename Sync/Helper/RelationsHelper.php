@@ -8,12 +8,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Helper;
+namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
@@ -34,10 +33,15 @@ class RelationsHelper
     public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport)
     {
         $this->objectsToSynchronize = [];
-        foreach ($syncReport->getRelations()->getRelations() as $objectRelations) {
-            $this->processRelationsForObjectName($mappingManualDao, $objectRelations, $syncReport);
+        foreach ($syncReport->getRelationObject()->getRelations() as $relationObject) {
+            if (0 < $relationObject->getRelObjectInternalId()) {
+                continue;
+            }
+
+            $this->processRelation($mappingManualDao, $syncReport, $relationObject);
         }
     }
+
 
     /**
      * @return array
@@ -48,38 +52,24 @@ class RelationsHelper
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDao
-     * @param array            $objectRelations
-     * @param ReportDAO        $syncReport
+     * @param $mappingManualDao
+     * @param $syncReport
+     * @param $relationObject
+     *
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
+     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
-    private function processRelationsForObjectName(MappingManualDAO $mappingManualDao, array $objectRelations, ReportDAO $syncReport)
+    private function processRelation($mappingManualDao, $syncReport, $relationObject)
     {
-        foreach ($objectRelations as $objectRelation) {
-            $this->processRelationsForObject($mappingManualDao, $objectRelation, $syncReport);
+        $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
+        $relObjectId  = $this->getObjectInternalId($relObjectDao, $relationObject, $mappingManualDao);
+
+        if (0 < $relObjectId) {
+            $this->addObjectInternalId($relObjectId, $relationObject, $syncReport);
         }
-    }
-
-    /**
-     * @param MappingManualDAO $mappingManualDao
-     * @param array            $objectRelation
-     * @param ReportDAO        $syncReport
-     */
-    private function processRelationsForObject(MappingManualDAO $mappingManualDao, array $objectRelation, ReportDAO $syncReport)
-    {
-        foreach ($objectRelation as $relationObject) {
-            if (0 < $relationObject->getRelObjectInternalId()) {
-                continue;
-            }
-
-            $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
-            $relObjectId  = $this->getObjectInternalId($relObjectDao, $relationObject, $mappingManualDao);
-
-            if (0 < $relObjectId) {
-                $this->addObjectInternalId($relObjectId, $relationObject, $syncReport);
-            }
-            else {
-                $this->objectsToSynchronize[] = $relObjectDao;
-            }
+        else {
+            $this->objectsToSynchronize[] = $relObjectDao;
         }
     }
 

@@ -91,8 +91,6 @@ class OrderExecutioner
                 );
             }
         }
-
-        // map these associations
     }
 
     /**

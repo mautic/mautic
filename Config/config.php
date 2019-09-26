@@ -336,7 +336,7 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.helper.sync_mapping',
-                    'mautic.integrations.helper.relations',
+                    'mautic.integrations.sync.helper.relations',
                     'mautic.integrations.helper.sync_integrations',
                     'event_dispatcher',
                     'mautic.integrations.sync.notifier',
@@ -362,8 +362,8 @@ return [
                     'mautic.integrations.helper.company_object',
                 ],
             ],
-            'mautic.integrations.helper.relations' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Helper\RelationsHelper::class,
+            'mautic.integrations.sync.helper.relations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_mapping',
                 ],

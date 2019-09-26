@@ -181,10 +181,9 @@ class ReportDAO
     }
 
     /**
-     *
      * @return RelationsDAO
      */
-    public function getRelations(): RelationsDAO
+    public function getRelationObject(): RelationsDAO
     {
         return $this->relations;
     }

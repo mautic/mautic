@@ -21,10 +21,10 @@ class RelationsDAO
      * @param ObjectDAO $objectDAO
      * @param array     $relations
      */
-    public function addRelations(ObjectDAO $objectDAO, array $relations)
+    public function addRelations(/*ObjectDAO $objectDAO,*/ array $relations)
     {
         foreach ($relations as $relObjectName => $relation) {
-            $this->addRelation($objectDAO, $relObjectName, $relation);
+            $this->addRelation($relation);
         }
     }
 
@@ -33,11 +33,10 @@ class RelationsDAO
      * @param string      $fieldName
      * @param RelationDAO $relation
      */
-    public function addRelation(ObjectDAO $objectDAO, string $fieldName, RelationDao $relation)
+    public function addRelation(RelationDao $relation)
     {
-        $this->relations[$objectDAO->getObject()][$objectDAO->getObjectId()][$fieldName] = $relation;
+        $this->relations[] = $relation;
     }
-
 
     /**
      * @return array
@@ -45,40 +44,5 @@ class RelationsDAO
     public function getRelations(): array
     {
         return $this->relations;
-    }
-
-    /**
-     * @param string $objectName
-     *
-     * @return array
-     */
-    public function getRelationsForObjectName(string $objectName): array
-    {
-        return $this->relations[$objectName] ?? [];
-    }
-
-
-    /**
-     * @param string $objectName
-     * @param string $objectId
-     *
-     * @return array
-     */
-    public function getRelationsForObject(string $objectName, string $objectId): array
-    {
-        return $this->relations[$objectName][$objectId] ?? [];
-    }
-
-
-    /**
-     * @param string $objectName
-     * @param string $objectId
-     * @param string $fieldName
-     *
-     * @return RelationDAO|null
-     */
-    public function getRelationsForField(string $objectName, string $objectId, string $fieldName): ?RelationDAO
-    {
-        return $this->relations[$objectName][$objectId][$fieldName] ?? null;
     }
 }

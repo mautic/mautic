@@ -20,7 +20,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
-use MauticPlugin\IntegrationsBundle\Helper\RelationsHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
