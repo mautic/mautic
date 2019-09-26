@@ -15,14 +15,10 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsDAO
 {
-    /**
-     * @var array
-     */
     private $relations = [];
 
     /**
-     * @param ObjectDAO $objectDAO
-     * @param array     $relations
+     * {@inheritdoc}
      */
     public function addRelations(ObjectDAO $objectDAO, array $relations)
     {
@@ -32,9 +28,7 @@ class RelationsDAO
     }
 
     /**
-     * @param ObjectDAO $objectDAO
-     * @param string    $relObjectName
-     * @param string    $relObjectId
+     * {@inheritdoc}
      */
     public function addRelation(ObjectDAO $objectDAO, string $fieldName, RelationDao $relation)
     {
@@ -42,10 +36,7 @@ class RelationsDAO
     }
 
     /**
-     * @param string $objectName
-     * @param string $objectId
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getRelations(): array
     {
@@ -53,10 +44,7 @@ class RelationsDAO
     }
 
     /**
-     * @param string $objectName
-     * @param string $objectId
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getRelationsForObjectName(string $objectName): array
     {
@@ -64,10 +52,7 @@ class RelationsDAO
     }
 
     /**
-     * @param string $objectName
-     * @param string $objectId
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getRelationsForObject(string $objectName, string $objectId): array
     {
@@ -75,11 +60,7 @@ class RelationsDAO
     }
 
     /**
-     * @param string $objectName
-     * @param string $objectId
-     * @param string $fieldName
-     *
-     * @return RelationDAO
+     * {@inheritdoc}
      */
     public function getRelationsForField(string $objectName, string $objectId, string $fieldName): ?RelationDAO
     {

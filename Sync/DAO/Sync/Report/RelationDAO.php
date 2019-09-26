@@ -38,7 +38,7 @@ class RelationDAO
     private $relObjectIntegrationId;
 
     /**
-     * @var string
+     * @var int
      */
     private $relObjectInternalId;
 
@@ -53,57 +53,57 @@ class RelationDAO
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getObjectName()
+    public function getObjectName(): ?string
     {
         return $this->objectName;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getRelObjectName()
+    public function getRelObjectName(): ?string
     {
         return $this->relObjectName;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getRelFieldName()
+    public function getRelFieldName(): ?string
     {
         return $this->relFieldName;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getObjectIntegrationId()
+    public function getObjectIntegrationId(): ?string
     {
         return $this->objectIntegrationId;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getRelObjectIntegrationId()
+    public function getRelObjectIntegrationId(): ?string
     {
         return $this->relObjectIntegrationId;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getRelObjectInternalId()
+    public function getRelObjectInternalId(): ?int
     {
         return $this->relObjectInternalId;
     }
 
     /**
-     * @param string $relObjectInternalId
+     * {@inheritdoc}
      */
-    public function setRelObjectInternalId($relObjectInternalId)
+    public function setRelObjectInternalId(int $relObjectInternalId)
     {
         $this->relObjectInternalId = $relObjectInternalId;
     }
