@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -30,6 +31,11 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
      * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
      */
     private $model;
+
+    /**
+     * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $companyModel;
 
     /**
      * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
@@ -54,6 +60,7 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->model = $this->createMock(LeadModel::class);
+        $this->companyModel = $this->createMock(CompanyModel::class);
         $this->repository = $this->createMock(LeadRepository::class);
         $this->connection = $this->createMock(Connection::class);
         $this->fieldModel = $this->createMock(FieldModel::class);
@@ -199,6 +206,6 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getObjectHelper()
     {
-        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
+        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel, $this->companyModel);
     }
 }
