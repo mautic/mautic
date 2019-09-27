@@ -59,11 +59,11 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->model = $this->createMock(LeadModel::class);
-        $this->companyModel = $this->createMock(CompanyModel::class);
-        $this->repository = $this->createMock(LeadRepository::class);
-        $this->connection = $this->createMock(Connection::class);
-        $this->fieldModel = $this->createMock(FieldModel::class);
+        $this->model             = $this->createMock(LeadModel::class);
+        $this->companyModel      = $this->createMock(CompanyModel::class);
+        $this->repository        = $this->createMock(LeadRepository::class);
+        $this->connection        = $this->createMock(Connection::class);
+        $this->fieldModel        = $this->createMock(FieldModel::class);
         $this->doNotContactModel = $this->createMock(DoNotContact::class);
 
         $this->fieldModel->method('getFieldList')

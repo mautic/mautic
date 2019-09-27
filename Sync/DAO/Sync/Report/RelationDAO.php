@@ -10,10 +10,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 
-/**
- * Class RelationDAO
- * @package MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report
- */
 class RelationDAO
 {
     /**

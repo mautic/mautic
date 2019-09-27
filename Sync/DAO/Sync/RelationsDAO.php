@@ -10,7 +10,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsDAO
@@ -18,10 +17,9 @@ class RelationsDAO
     private $relations = [];
 
     /**
-     * @param ObjectDAO $objectDAO
-     * @param array     $relations
+     * @param array $relations
      */
-    public function addRelations(/*ObjectDAO $objectDAO,*/ array $relations)
+    public function addRelations(array $relations)
     {
         foreach ($relations as $relObjectName => $relation) {
             $this->addRelation($relation);
@@ -29,8 +27,6 @@ class RelationsDAO
     }
 
     /**
-     * @param ObjectDAO   $objectDAO
-     * @param string      $fieldName
      * @param RelationDAO $relation
      */
     public function addRelation(RelationDao $relation)

@@ -285,7 +285,7 @@ class SyncProcess
     }
 
     /**
-     * {@inheritdoc}
+     * @param ReportDAO $syncReport
      */
     private function manageRelations(ReportDAO $syncReport)
     {
@@ -301,7 +301,8 @@ class SyncProcess
     }
 
     /**
-     * {@inheritdoc}
+     * @param array     $objectsToSynchronize
+     * @param ReportDAO $syncReport
      */
     private function synchronizeMissingObjects(array $objectsToSynchronize, ReportDAO $syncReport)
     {
@@ -315,7 +316,10 @@ class SyncProcess
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $objectsToSynchronize
+     *
+     * @return InputOptionsDAO
+     * @throws \MauticPlugin\IntegrationsBundle\Exception\InvalidValueException
      */
     private function getInputOptionsForObjects(array $objectsToSynchronize): InputOptionsDAO
     {
@@ -335,7 +339,9 @@ class SyncProcess
     }
 
     /**
-     * {@inheritdoc}
+     * @param $inputOptions
+     *
+     * @throws IntegrationNotFoundException
      */
     private function processParallelSync($inputOptions)
     {
@@ -347,16 +353,12 @@ class SyncProcess
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     private function shouldStopIntegrationSync(): bool
     {
         // We don't want to iterate sync for specific ids
-        if (null !== $this->inputOptionsDAO->getIntegrationObjectIds()) {
-            return true;
-        }
-
-        return false;
+        return (null !== $this->inputOptionsDAO->getIntegrationObjectIds());
     }
 
     /**

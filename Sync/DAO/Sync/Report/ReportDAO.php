@@ -40,7 +40,7 @@ class ReportDAO
     /**
      * @var RelationsDAO
      */
-    private $relations;
+    private $relationsObject;
 
     /**
      * SyncReportDAO constructor.
@@ -49,8 +49,8 @@ class ReportDAO
      */
     public function __construct($integration)
     {
-        $this->integration = $integration;
-        $this->relations   = new RelationsDAO();
+        $this->integration     = $integration;
+        $this->relationsObject = new RelationsDAO();
     }
 
     /**
@@ -185,7 +185,7 @@ class ReportDAO
      */
     public function getRelationObject(): RelationsDAO
     {
-        return $this->relations;
+        return $this->relationsObject;
     }
 
 }

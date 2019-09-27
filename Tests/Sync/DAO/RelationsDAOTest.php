@@ -17,13 +17,13 @@ class RelationsDAOTest extends \PHPUnit_Framework_TestCase
 {
     public function testAddRelations()
     {
-        $relationsDAO = new RelationsDAO;
+        $relationsDAO           = new RelationsDAO;
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
         $objectName             = 'Contact';
         $relObjectName          = 'Account';
 
-        $relationObject   = new RelationDAO(
+        $relationObject = new RelationDAO(
             $objectName,
             $relObjectName,
             $relObjectName,

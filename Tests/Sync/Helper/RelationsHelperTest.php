@@ -79,7 +79,6 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($objectsToSynchronize[0]->getObject(), $relObjectName);
     }
 
-
     public function testProcessRelationsWithSychronisedObjects()
     {
         $relationsHelper = new RelationsHelper($this->mappingHelper);

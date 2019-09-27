@@ -59,8 +59,7 @@ class OrderExecutioner
 
 
     /**
-     * @param OrderDAO          $syncOrderDAO
-     * @param RelationsDAO|null $relationsDAO
+     * @param OrderDAO $syncOrderDAO
      */
     public function execute(OrderDAO $syncOrderDAO)
     {

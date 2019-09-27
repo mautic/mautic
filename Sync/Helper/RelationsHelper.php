@@ -52,15 +52,15 @@ class RelationsHelper
     }
 
     /**
-     * @param $mappingManualDao
-     * @param $syncReport
-     * @param $relationObject
+     * @param MappingManualDAO $mappingManualDao
+     * @param ReportDAO        $syncReport
+     * @param RelationDAO      $relationObject
      *
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
-    private function processRelation($mappingManualDao, $syncReport, $relationObject)
+    private function processRelation(MappingManualDAO $mappingManualDao, ReportDAO $syncReport, RelationDAO $relationObject)
     {
         $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
         $relObjectId  = $this->getObjectInternalId($relObjectDao, $relationObject, $mappingManualDao);

@@ -90,11 +90,6 @@ class OrderDAO
     private $notifications = [];
 
     /**
-     * @var RelationsDAO
-     */
-    private $relations = [];
-
-    /**
      * OrderDAO constructor.
      *
      * @param \DateTimeInterface $syncDateTime
@@ -377,21 +372,5 @@ class OrderDAO
     public function getObjectCount(): int
     {
         return $this->objectCounter;
-    }
-
-    /**
-     * @param RelationsDAO $relations
-     */
-    public function setRelations($relations)
-    {
-        $this->relations = $relations;
-    }
-
-    /**
-     * @return RelationsDAO
-     */
-    public function getRelations(): RelationsDAO
-    {
-        return $this->relations;
     }
 }

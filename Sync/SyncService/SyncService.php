@@ -46,6 +46,7 @@ final class SyncService implements SyncServiceInterface
      * @var MappingHelper
      */
     private $mappingHelper;
+
     /**
      * @var RelationsHelper
      */
@@ -65,6 +66,7 @@ final class SyncService implements SyncServiceInterface
      * @var SyncIntegrationsHelper
      */
     private $syncIntegrationsHelper;
+
     /**
      * @var EventDispatcherInterface
      */
