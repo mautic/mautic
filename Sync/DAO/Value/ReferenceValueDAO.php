@@ -20,7 +20,7 @@ class ReferenceValueDAO
     /**
      * @param mixed $value
      */
-    public function __construct(mixed $value)
+    public function __construct($value)
     {
         $this->value = $value;
     }
@@ -28,7 +28,7 @@ class ReferenceValueDAO
     /**
      * @return mixed
      */
-    public function getValue(): mixed
+    public function getValue()
     {
         return $this->value;
     }
@@ -36,12 +36,12 @@ class ReferenceValueDAO
     /**
      * @param mixed
      */
-    public function setValue(mixed $value)
+    public function setValue($value)
     {
         $this->value = $value;
     }
 
-    public function __toString(): string
+    public function __toString()
     {
         return (string) $this->value ?? '';
     }
