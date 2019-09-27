@@ -39,7 +39,6 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relationsHelper  = new RelationsHelper($this->mappingHelper);
         $syncReport       = $this->createMock(ReportDAO::class);
         $mappingManual    = $this->createMock(MappingManualDAO::class);
-        $objectDao        = new ObjectDAO('Object', 1);
 
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
