@@ -35,6 +35,7 @@
                 <directory>Tests</directory>
                 <directory>Translations</directory>
                 <directory>Views</directory>
+                <directory>vendor</directory>
             </exclude>
         </whitelist>
     </filter>
