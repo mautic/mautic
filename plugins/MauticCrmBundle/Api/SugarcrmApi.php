@@ -502,7 +502,7 @@ class SugarcrmApi extends CrmApi
             }
 
             $data   = ['filter' => 'all'];
-            $fields = ['id', 'email1'];
+            $fields = ['id', 'email1', 'email'];
 
             $parameters = [
                     'filter' => [['$and' => $filter]],
@@ -525,10 +525,12 @@ class SugarcrmApi extends CrmApi
                     if (isset($record['email'][0]['email_address']) && $record['email'][0]['email_address'] != '') {
                         $emails      = $record['email'];
                         $found_email = $record['email'][0]['email_address'];
-                        foreach ($record['name_value_list'] as $email) {
-                            if ($email['email_address'] != '' && $email['primary_address'] == 1) {
-                                $found_email = $email;
-                                break;
+                        if (isset($record['name_value_list'])) {
+                            foreach ($record['name_value_list'] as $email) {
+                                if ($email['email_address'] != '' && $email['primary_address'] == 1) {
+                                    $found_email = $email;
+                                    break;
+                                }
                             }
                         }
                         if ($type == 'BYID') {
