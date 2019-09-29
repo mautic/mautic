@@ -13,7 +13,6 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executi
 
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
@@ -56,7 +55,6 @@ class OrderExecutioner
         $this->contactObjectHelper = $contactObjectHelper;
         $this->companyObjectHelper = $companyObjectHelper;
     }
-
 
     /**
      * @param OrderDAO $syncOrderDAO
@@ -128,7 +126,7 @@ class OrderExecutioner
                 throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }
 
-         $this->mappingHelper->updateObjectMappings($updatedObjectMappings);
+        $this->mappingHelper->updateObjectMappings($updatedObjectMappings);
     }
 
     /**
