@@ -93,7 +93,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             $pseudoFields = [];
             foreach ($fields as $field) {
                 if (in_array($field->getName(), $availableFields)) {
-                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
+                    $this->addUpdatedFieldToContact($contact, $field);
                 } else {
                     $pseudoFields[$field->getName()] = $field;
                 }
