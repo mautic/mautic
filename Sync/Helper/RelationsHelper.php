@@ -81,7 +81,7 @@ class RelationsHelper
      * 
      * @throws ObjectNotFoundException
      */
-    public function getInternalObjectId(MappingManualDAO $mappingManualDao, RelationDAO $relationObject, ObjectDAO $relObjectDao): int
+    private function getInternalObjectId(MappingManualDAO $mappingManualDao, RelationDAO $relationObject, ObjectDAO $relObjectDao): int
     {
         $relObjects       = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
         $internalObjectId = $relObjects[0]->getObjectId();
