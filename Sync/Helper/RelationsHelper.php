@@ -33,7 +33,7 @@ class RelationsHelper
     public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport)
     {
         $this->objectsToSynchronize = [];
-        foreach ($syncReport->getRelationObject()->getRelations() as $relationObject) {
+        foreach ($syncReport->getRelations() as $relationObject) {
             if (0 < $relationObject->getRelObjectInternalId()) {
                 continue;
             }
