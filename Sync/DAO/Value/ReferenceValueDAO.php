@@ -13,20 +13,12 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Value;
 class ReferenceValueDAO
 {
     /**
-     * @var mixed
+     * @var int
      */
     private $value;
 
     /**
-     * @param mixed $value
-     */
-    public function __construct($value)
-    {
-        $this->value = $value;
-    }
-
-    /**
-     * @return mixed
+     * @return int
      */
     public function getValue()
     {
@@ -34,7 +26,7 @@ class ReferenceValueDAO
     }
 
     /**
-     * @param mixed
+     * @param int
      */
     public function setValue($value)
     {

@@ -205,9 +205,9 @@ class ContactObjectHelper implements ObjectHelperInterface
     {
         $value = $field->getValue()->getNormalizedValue();
 
-        if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDAO) {
+        if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDAO && null !== $value->getValue()) {
             try {
-                $value = $this->getCompanyNameById($value->getValue(), $value->getValue());
+                $value = $this->getCompanyNameById($value->getValue());
             } catch (ObjectNotFoundException $e) {
             }
         }
@@ -337,7 +337,7 @@ class ContactObjectHelper implements ObjectHelperInterface
      * 
      * @throws ObjectNotFoundException
      */
-    private function getCompanyNameById(int $id, $default = null): string
+    private function getCompanyNameById(int $id): string
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('c.companyname');
