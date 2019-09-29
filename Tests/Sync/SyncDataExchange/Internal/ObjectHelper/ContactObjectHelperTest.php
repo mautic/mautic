@@ -106,7 +106,9 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         $objectChangeDaoB = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_CONTACT, 1, 'MappedObject', 1, new \DateTime());
         $objects          = [$objectChangeDaoA, $objectChangeDaoB];
         $companyId        = 1234;
-        $companyValue     = new ReferenceValueDAO($companyId);
+        $companyValue     = new ReferenceValueDAO();
+        $companyValue->setValue($companyId);
+
         $emailField       = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
         $companyField     = new FieldDAO(
             MauticSyncDataExchange::OBJECT_COMPANY,
