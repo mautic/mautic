@@ -11,34 +11,74 @@
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
+use Iterator;
+use Countable;
 
-class RelationsDAO
+class RelationsDAO implements Iterator, Countable
 {
+    /**
+     * @var RelationDAO[]
+     */
     private $relations = [];
 
     /**
-     * @param array $relations
+     * @var int
      */
-    public function addRelations(array $relations)
-    {
-        foreach ($relations as $relObjectName => $relation) {
-            $this->addRelation($relation);
-        }
-    }
+    private $position = 0;
 
     /**
      * @param RelationDAO $relation
      */
-    public function addRelation(RelationDao $relation)
+    public function addRelation(RelationDAO $relation): void
     {
         $this->relations[] = $relation;
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    public function getRelations(): array
+    public function current(): RelationDAO
     {
-        return $this->relations;
+        return $this->relations[$this->position];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next(): void
+    {
+        ++$this->position;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key(): int
+    {
+        return $this->position;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valid(): bool
+    {
+        return isset($this->relations[$this->position]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind(): void
+    {
+        $this->position = 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        return count($this->relations);
     }
 }

@@ -54,52 +54,52 @@ class RelationDAO
 
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getObjectName(): ?string
+    public function getObjectName(): string
     {
         return $this->objectName;
     }
 
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRelObjectName(): ?string
+    public function getRelObjectName(): string
     {
         return $this->relObjectName;
     }
 
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRelFieldName(): ?string
+    public function getRelFieldName(): string
     {
         return $this->relFieldName;
     }
 
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getObjectIntegrationId(): ?string
+    public function getObjectIntegrationId(): string
     {
         return $this->objectIntegrationId;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getRelObjectIntegrationId(): ?string
+    public function getRelObjectIntegrationId(): string
     {
         return $this->relObjectIntegrationId;
     }
 
     /**
-     * @return int|null
+     * @return int
      */
-    public function getRelObjectInternalId(): ?int
+    public function getRelObjectInternalId(): int
     {
         return $this->relObjectInternalId;
     }
