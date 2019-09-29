@@ -29,17 +29,31 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $mappingHelper;
 
+    /**
+     * @var RelationsHelper
+     */
+    private $relationsHelper;
+
+    /**
+     * @var ReportDAO|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $syncReport;
+
+    /**
+     * @var MappingManualDAO|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $mappingManual;
+
     protected function setUp()
     {
-        $this->mappingHelper = $this->createMock(MappingHelper::class);
+        $this->mappingHelper   = $this->createMock(MappingHelper::class);
+        $this->relationsHelper = new RelationsHelper($this->mappingHelper);
+        $this->syncReport      = $this->createMock(ReportDAO::class);
+        $this->mappingManual   = $this->createMock(MappingManualDAO::class);
     }
 
     public function testProcessRelationsWithUnsychronisedObjects()
     {
-        $relationsHelper  = new RelationsHelper($this->mappingHelper);
-        $syncReport       = $this->createMock(ReportDAO::class);
-        $mappingManual    = $this->createMock(MappingManualDAO::class);
-
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
         $relObjectName          = 'Account';
@@ -55,11 +69,11 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relationsObject = new RelationsDAO();
         $relationsObject->addRelation($relationObject);
 
-        $syncReport->expects($this->once())
+        $this->syncReport->expects($this->once())
             ->method('getRelations')
             ->willReturn($relationsObject);
 
-        $mappingManual->expects($this->once())
+        $this->mappingManual->expects($this->once())
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
@@ -69,9 +83,9 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('findMauticObject')
             ->willReturn($internalObject);
 
-        $relationsHelper->processRelations($mappingManual, $syncReport);
+        $this->relationsHelper->processRelations($this->mappingManual, $this->syncReport);
 
-        $objectsToSynchronize = $relationsHelper->getObjectsToSynchronize();
+        $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
         $this->assertCount(1, $objectsToSynchronize);
 
@@ -81,10 +95,6 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessRelationsWithSychronisedObjects()
     {
-        $relationsHelper = new RelationsHelper($this->mappingHelper);
-        $syncReport      = $this->createMock(ReportDAO::class);
-        $mappingManual   = $this->createMock(MappingManualDAO::class);
-
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
         $internalRelObjectId    = 13;
@@ -110,16 +120,15 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relationsObject = new RelationsDAO();
         $relationsObject->addRelation($relationObject);
 
-        $syncReport->expects($this->once())
+        $this->syncReport->expects($this->once())
             ->method('getRelations')
             ->willReturn($relationsObject);
 
-
-        $syncReport->expects($this->once())
+        $this->syncReport->expects($this->once())
             ->method('getObject')
             ->willReturn($objectDao);
 
-        $mappingManual->expects($this->once())
+        $this->mappingManual->expects($this->once())
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
@@ -129,9 +138,9 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('findMauticObject')
             ->willReturn($internalObject);
 
-        $relationsHelper->processRelations($mappingManual, $syncReport);
+        $this->relationsHelper->processRelations($this->mappingManual, $this->syncReport);
 
-        $objectsToSynchronize = $relationsHelper->getObjectsToSynchronize();
+        $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
         $this->assertCount(0, $objectsToSynchronize);
         $this->assertEquals($internalRelObjectId, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getValue());

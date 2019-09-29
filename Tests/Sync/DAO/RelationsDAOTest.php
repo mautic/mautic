@@ -22,8 +22,7 @@ class RelationsDAOTest extends \PHPUnit_Framework_TestCase
         $integrationRelObjectId = 'IntegrationId-456';
         $objectName             = 'Contact';
         $relObjectName          = 'Account';
-
-        $relationObject = new RelationDAO(
+        $relationObject         = new RelationDAO(
             $objectName,
             $relObjectName,
             $relObjectName,
@@ -34,12 +33,11 @@ class RelationsDAOTest extends \PHPUnit_Framework_TestCase
         $relations = ['AccountId' => $relationObject];
 
         $relationsDAO->addRelations($relations);
-        $returnedRelations = $relationsDAO->getRelations();
 
-        $this->assertEquals($returnedRelations[0], $relationObject);
-        $this->assertEquals($returnedRelations[0]->getObjectName(), $objectName);
-        $this->assertEquals($returnedRelations[0]->getRelObjectName(), $relObjectName);
-        $this->assertEquals($returnedRelations[0]->getObjectIntegrationId(), $integrationObjectId);
-        $this->assertEquals($returnedRelations[0]->getRelObjectIntegrationId(), $integrationRelObjectId);
+        $this->assertEquals($relationsDAO->current(), $relationObject);
+        $this->assertEquals($relationsDAO->current()->getObjectName(), $objectName);
+        $this->assertEquals($relationsDAO->current()->getRelObjectName(), $relObjectName);
+        $this->assertEquals($relationsDAO->current()->getObjectIntegrationId(), $integrationObjectId);
+        $this->assertEquals($relationsDAO->current()->getRelObjectIntegrationId(), $integrationRelObjectId);
     }
 }
