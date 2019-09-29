@@ -56,7 +56,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relationsObject->addRelation($relationObject);
 
         $syncReport->expects($this->once())
-            ->method('getRelationObject')
+            ->method('getRelations')
             ->willReturn($relationsObject);
 
         $mappingManual->expects($this->once())
@@ -111,7 +111,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relationsObject->addRelation($relationObject);
 
         $syncReport->expects($this->once())
-            ->method('getRelationObject')
+            ->method('getRelations')
             ->willReturn($relationsObject);
 
 
