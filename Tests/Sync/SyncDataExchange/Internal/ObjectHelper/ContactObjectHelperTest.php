@@ -13,17 +13,19 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Sync\SyncDataExchange\ObjectHelp
 
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Statement;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\CompanyModel;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 
 class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,11 +33,6 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
      * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
      */
     private $model;
-
-    /**
-     * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $companyModel;
 
     /**
      * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
@@ -59,8 +56,9 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
         $this->model             = $this->createMock(LeadModel::class);
-        $this->companyModel      = $this->createMock(CompanyModel::class);
         $this->repository        = $this->createMock(LeadRepository::class);
         $this->connection        = $this->createMock(Connection::class);
         $this->fieldModel        = $this->createMock(FieldModel::class);
@@ -69,7 +67,8 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         $this->fieldModel->method('getFieldList')
             ->willReturn(
                 [
-                    'email' => []
+                    'email'                                => [],
+                    MauticSyncDataExchange::OBJECT_COMPANY => [],
                 ]
             );
     }
@@ -103,10 +102,19 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
-        $objects = [
-            0 => new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_CONTACT, 0, 'MappedObject', 0, new \DateTime()),
-            1 => new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_CONTACT, 1, 'MappedObject', 1, new \DateTime()),
-        ];
+        $objectChangeDaoA = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_CONTACT, 0, 'MappedObject', 0, new \DateTime());
+        $objectChangeDaoB = new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_CONTACT, 1, 'MappedObject', 1, new \DateTime());
+        $objects          = [$objectChangeDaoA, $objectChangeDaoB];
+        $companyId        = 1234;
+        $companyValue     = new ReferenceValueDAO($companyId);
+        $emailField       = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
+        $companyField     = new FieldDAO(
+            MauticSyncDataExchange::OBJECT_COMPANY,
+            new NormalizedValueDAO('reference', $companyValue, $companyValue)
+        );
+
+        $objectChangeDaoA->addField($emailField);
+        $objectChangeDaoA->addField($companyField);
 
         $contact1 = $this->createMock(Lead::class);
         $contact1->method('getId')
@@ -122,9 +130,36 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
                     $contact2
                 ]
             );
+
+        $queryBuilder = new QueryBuilder($this->connection);
+        $statement = $this->createMock(Statement::class);
+
+        $this->connection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $this->connection->expects($this->once())
+            ->method('executeQuery')
+            ->with(
+                'SELECT c.companyname FROM companies c WHERE c.id = :id',
+                ['id' => $companyId]
+            )
+            ->willReturn($statement);
+
+        $statement->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn('Company A');
+
+        $contact1->expects($this->exactly(2))
+            ->method('addUpdatedField')
+            ->withConsecutive(
+                ['email', 'john@doe.com'],
+                [MauticSyncDataExchange::OBJECT_COMPANY, 'Company A']
+            );
+
         $objectMappings = $this->getObjectHelper()->update([3,4], $objects);
 
-        foreach ($objectMappings as $key => $objectMapping) {
+        foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
             $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
@@ -206,6 +241,6 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getObjectHelper()
     {
-        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel, $this->companyModel);
+        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
     }
 }

@@ -15,7 +15,6 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectH
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -27,6 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
@@ -61,28 +61,19 @@ class ContactObjectHelper implements ObjectHelperInterface
     private $dncModel;
 
     /**
-     * @var CompanyModel
-     */
-    private $companyModel;
-
-    /**
-     * ContactObject constructor.
-     *
      * @param LeadModel         $model
      * @param LeadRepository    $repository
      * @param Connection        $connection
      * @param FieldModel        $fieldModel
      * @param DoNotContactModel $dncModel
-     * @param CompanyModel      $companyModel
      */
-    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel, CompanyModel $companyModel)
+    public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
     {
-        $this->model        = $model;
-        $this->repository   = $repository;
-        $this->connection   = $connection;
-        $this->fieldModel   = $fieldModel;
-        $this->dncModel     = $dncModel;
-        $this->companyModel = $companyModel;
+        $this->model      = $model;
+        $this->repository = $repository;
+        $this->connection = $connection;
+        $this->fieldModel = $fieldModel;
+        $this->dncModel   = $dncModel;
     }
 
     /**
@@ -213,9 +204,14 @@ class ContactObjectHelper implements ObjectHelperInterface
     private function addUpdatedFieldToContact(Lead $contact, FieldDAO $field)
     {
         $value = $field->getValue()->getNormalizedValue();
-        if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDao) {
-            $value = $this->companyModel->getEntity($value->getValue())->getName();
+
+        if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDAO) {
+            try {
+                $value = $this->getCompanyNameById($value->getValue(), $value->getValue());
+            } catch (ObjectNotFoundException $e) {
+            }
         }
+
         $contact->addUpdatedField($field->getName(), $value);
     }
 
@@ -332,6 +328,30 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
 
         return (int) $status;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return string
+     * 
+     * @throws ObjectNotFoundException
+     */
+    private function getCompanyNameById(int $id, $default = null): string
+    {
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('c.companyname');
+        $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
+        $qb->where('c.id = :id');
+        $qb->setParameter('id', $id);
+
+        $name = $qb->execute()->fetchColumn();
+
+        if (false === $name) {
+            throw new ObjectNotFoundException("Company with ID {$id} was not found.");
+        }
+
+        return $name;
     }
 
     /**
