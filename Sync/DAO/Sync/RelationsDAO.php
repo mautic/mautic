@@ -27,6 +27,16 @@ class RelationsDAO implements Iterator, Countable
     private $position = 0;
 
     /**
+     * @param RelationDAO[] $relations
+     */
+    public function addRelations(array $relations)
+    {
+        foreach ($relations as $relation) {
+            $this->addRelation($relation);
+        }
+    }
+
+    /**
      * @param RelationDAO $relation
      */
     public function addRelation(RelationDAO $relation): void
