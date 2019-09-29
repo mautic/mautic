@@ -65,11 +65,32 @@ class RelationsHelper
         $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
 
         try {
-            $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
-            $this->addObjectInternalId($relObjects[0]->getObjectId(), $relationObject, $syncReport);
+            $internalObjectId = $this->getInternalObjectId($mappingManualDao, $relationObject, $relObjectDao);
+            $this->addObjectInternalId($internalObjectId, $relationObject, $syncReport);
         } catch (ObjectNotFoundException $e) {
             $this->objectsToSynchronize[] = $relObjectDao;
         }
+    }
+
+    /**
+     * @param MappingManualDAO $mappingManualDao
+     * @param RelationDAO $relationObject
+     * @param ObjectDAO $relObjectDao
+     * 
+     * @return int
+     * 
+     * @throws ObjectNotFoundException
+     */
+    public function getInternalObjectId(MappingManualDAO $mappingManualDao, RelationDAO $relationObject, ObjectDAO $relObjectDao): int
+    {
+        $relObjects       = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
+        $internalObjectId = $relObjects[0]->getObjectId();
+
+        if ($internalObjectId) {
+            return $internalObjectId;
+        }
+
+        throw new ObjectNotFoundException("Internal Object ID was empty");
     }
 
     /**
