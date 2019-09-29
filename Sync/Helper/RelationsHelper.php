@@ -63,12 +63,11 @@ class RelationsHelper
     private function processRelation(MappingManualDAO $mappingManualDao, ReportDAO $syncReport, RelationDAO $relationObject)
     {
         $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
-        $relObjectId  = $this->getObjectInternalId($relObjectDao, $relationObject, $mappingManualDao);
 
-        if (0 < $relObjectId) {
-            $this->addObjectInternalId($relObjectId, $relationObject, $syncReport);
-        }
-        else {
+        try {
+            $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
+            $this->addObjectInternalId($relObjects[0]->getObjectId(), $relationObject, $syncReport);
+        } catch (ObjectNotFoundException $e) {
             $this->objectsToSynchronize[] = $relObjectDao;
         }
     }
@@ -107,27 +106,5 @@ class RelationsHelper
         $relationObject->setRelObjectInternalId($relObjectId);
         $objectDAO = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());
         $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue()->setValue($relObjectId);
-    }
-
-    /**
-     * @param ObjectDAO        $relObjectDao
-     * @param RelationDAO      $relationObject
-     * @param MappingManualDAO $mappingManualDao
-     *
-     * @return int|null
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
-     */
-    private function getObjectInternalId(ObjectDAO $relObjectDao, RelationDAO $relationObject, MappingManualDAO $mappingManualDao): ?int
-    {
-        try {
-            $relObjects = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
-        }
-        catch (ObjectNotFoundException $e) {
-            // object shouldn't be synchronized
-            return null;
-        }
-
-        return $relObjects[0]->getObjectId();
     }
 }
