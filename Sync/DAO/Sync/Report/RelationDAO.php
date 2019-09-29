@@ -97,9 +97,9 @@ class RelationDAO
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getRelObjectInternalId(): int
+    public function getRelObjectInternalId(): ?int
     {
         return $this->relObjectInternalId;
     }
