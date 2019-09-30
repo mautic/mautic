@@ -34,8 +34,8 @@
                 <directory>Config</directory>
                 <directory>Tests</directory>
                 <directory>Translations</directory>
-                <directory>vendor</directory>
                 <directory>Views</directory>
+                <directory>vendor</directory>
             </exclude>
         </whitelist>
     </filter>
