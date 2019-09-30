@@ -398,6 +398,11 @@ class ContactObjectHelper implements ObjectHelperInterface
                 );
             }
 
+            if ('owner_id' == $name) {
+                $ownerId = $field->getValue()->getNormalizedValue();
+                $this->model->updateLeadOwner($contact, $ownerId);
+            }
+
             // Ignore all others as unrecognized
         }
     }
