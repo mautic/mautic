@@ -321,8 +321,6 @@ class ContactObjectHelper implements ObjectHelperInterface
             $availableFields = $this->fieldModel->getFieldList(false, false);
 
             $this->availableFields = array_keys($availableFields);
-            $this->availableFields[] = 'owner_id';
-
         }
 
         return $this->availableFields;
@@ -356,6 +354,11 @@ class ContactObjectHelper implements ObjectHelperInterface
                     true,
                     true
                 );
+            }
+
+            if ('owner_id' == $name) {
+                $ownerId = $field->getValue()->getNormalizedValue();
+                $this->model->updateLeadOwner($contact, $ownerId);
             }
 
             // Ignore all others as unrecognized
