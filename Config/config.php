@@ -233,7 +233,8 @@ return [
                     'mautic.lead.repository.lead',
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.field',
-                    'mautic.lead.model.dnc'
+                    'mautic.lead.model.dnc',
+                    'mautic.lead.model.company',
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
@@ -340,6 +341,7 @@ return [
                     'mautic.integrations.sync.data_exchange.mautic',
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.helper.sync_mapping',
+                    'mautic.integrations.sync.helper.relations',
                     'mautic.integrations.helper.sync_integrations',
                     'event_dispatcher',
                     'mautic.integrations.sync.notifier',
@@ -363,6 +365,12 @@ return [
                     'mautic.integrations.repository.object_mapping',
                     'mautic.integrations.helper.contact_object',
                     'mautic.integrations.helper.company_object',
+                ],
+            ],
+            'mautic.integrations.sync.helper.relations' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper.sync_mapping',
                 ],
             ],
             'mautic.integrations.sync.notifier' => [

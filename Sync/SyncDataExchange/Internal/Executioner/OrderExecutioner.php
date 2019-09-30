@@ -92,7 +92,7 @@ class OrderExecutioner
 
     /**
      * @param string $objectName
-     * @param        $updateObjects
+     * @param array  $updateObjects
      *
      * @throws ObjectNotSupportedException
      */

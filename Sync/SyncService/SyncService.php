@@ -19,6 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Psr\Log\LogLevel;
@@ -47,6 +48,11 @@ final class SyncService implements SyncServiceInterface
     private $mappingHelper;
 
     /**
+     * @var RelationsHelper
+     */
+    private $relationsHelper;
+
+    /**
      * @var IntegrationSyncProcess
      */
     private $integratinSyncProcess;
@@ -60,6 +66,7 @@ final class SyncService implements SyncServiceInterface
      * @var SyncIntegrationsHelper
      */
     private $syncIntegrationsHelper;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -76,6 +83,7 @@ final class SyncService implements SyncServiceInterface
      * @param MauticSyncDataExchange      $internalSyncDataExchange
      * @param SyncDateHelper              $syncDateHelper
      * @param MappingHelper               $mappingHelper
+     * @param RelationsHelper             $relationsHelper
      * @param SyncIntegrationsHelper      $syncIntegrationsHelper
      * @param EventDispatcherInterface    $eventDispatcher
      * @param Notifier                    $notifier
@@ -86,6 +94,7 @@ final class SyncService implements SyncServiceInterface
         MauticSyncDataExchange $internalSyncDataExchange,
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
+        RelationsHelper $relationsHelper,
         SyncIntegrationsHelper $syncIntegrationsHelper,
         EventDispatcherInterface $eventDispatcher,
         Notifier $notifier,
@@ -96,6 +105,7 @@ final class SyncService implements SyncServiceInterface
         $this->internalSyncDataExchange = $internalSyncDataExchange;
         $this->syncDateHelper           = $syncDateHelper;
         $this->mappingHelper            = $mappingHelper;
+        $this->relationsHelper          = $relationsHelper;
         $this->syncIntegrationsHelper   = $syncIntegrationsHelper;
         $this->eventDispatcher          = $eventDispatcher;
         $this->notifier                 = $notifier;
@@ -113,6 +123,7 @@ final class SyncService implements SyncServiceInterface
         $integrationSyncProcess = new SyncProcess(
             $this->syncDateHelper,
             $this->mappingHelper,
+            $this->relationsHelper,
             $this->integratinSyncProcess,
             $this->mauticSyncProcess,
             $this->eventDispatcher,
@@ -120,7 +131,8 @@ final class SyncService implements SyncServiceInterface
             $this->syncIntegrationsHelper->getMappingManual($inputOptionsDAO->getIntegration()),
             $this->internalSyncDataExchange,
             $this->syncIntegrationsHelper->getSyncDataExchange($inputOptionsDAO->getIntegration()),
-            $inputOptionsDAO
+            $inputOptionsDAO,
+            $this
         );
 
         DebugLogger::log(
