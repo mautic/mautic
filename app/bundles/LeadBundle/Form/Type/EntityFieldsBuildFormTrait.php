@@ -275,6 +275,9 @@ trait EntityFieldsBuildFormTrait
                                 $cleaningRules[$field['alias']] = 'html';
                             }
                             break;
+                        case 'html':
+                            $cleaningRules[$field['alias']] = 'html';
+                            break;
                     }
 
                     $builder->add(
