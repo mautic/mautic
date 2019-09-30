@@ -112,7 +112,7 @@ pipeline {
         }
         anyOf {
           branch 'beta'
-          branch 'staging';         
+          branch 'staging';
         }
       }
       steps {
