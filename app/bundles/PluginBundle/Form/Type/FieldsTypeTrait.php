@@ -152,6 +152,18 @@ trait FieldsTypeTrait
                         if ($fieldObject) {
                             $updateName .= '_'.$fieldObject;
                         }
+
+                        $forceDirection = false;
+                        $disabled = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
+                        $data = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
+
+                        // Force to use just one way for certainly fields
+                        if (isset($fields[$field]['update_mautic'])) {
+                            $data = (bool) $fields[$field]['update_mautic'];
+                            $disabled = true;
+                            $forceDirection = true;
+                        }
+
                         $form->add(
                             $updateName.$index,
                             'button_group',
@@ -161,12 +173,13 @@ trait FieldsTypeTrait
                                     '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
                                 ],
                                 'label'       => false,
-                                'data'        => isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1,
+                                'data'        => $data,
                                 'empty_value' => false,
                                 'attr'        => [
-                                    'data-toggle' => 'tooltip',
-                                    'title'       => 'mautic.plugin.direction.data.update',
-                                    'disabled'    => (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false,
+                                    'data-toggle'   => 'tooltip',
+                                    'title'         => 'mautic.plugin.direction.data.update',
+                                    'disabled'      => $disabled,
+                                    'forceDirection'=> $forceDirection,
                                 ],
                             ]
                         );

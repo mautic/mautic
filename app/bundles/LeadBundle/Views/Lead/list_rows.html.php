@@ -69,11 +69,11 @@
                         <?php if (in_array($item->getId(), array_keys($noContactList)))  : ?>
                             <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                         <?php endif; ?>
-                        <div><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>
-                        <div class="small"><?php echo $item->getSecondaryIdentifier(); ?></div>
+                        <div><?php echo $view->escape($item->isAnonymous() ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier()); ?></div>
+                        <div class="small"><?php echo $view->escape($item->getSecondaryIdentifier()); ?></div>
                     </a>
                 </td>
-                <td class="visible-md visible-lg"><?php echo $fields['core']['email']['value']; ?></td>
+                <td class="visible-md visible-lg"><?php echo $view->escape($fields['core']['email']['value']); ?></td>
                 <td class="visible-md visible-lg">
                     <?php
                     $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
@@ -91,7 +91,7 @@
                     elseif (!empty($fields['core']['country']['value'])):
                         $location[] = $fields['core']['country']['value'];
                     endif;
-                    echo implode(', ', $location);
+                    echo $view->escape(implode(', ', $location));
                     ?>
                     <div class="clearfix"></div>
                 </td>
@@ -101,7 +101,7 @@
                     $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';
                     ?>
                     <?php if ($item->getStage()):?>
-                    <span class="label label-default"<?php echo $style; ?>><?php echo $item->getStage()->getName(); ?></span>
+                    <span class="label label-default"<?php echo $style; ?>><?php echo $view->escape($item->getStage()->getName()); ?></span>
                     <?php endif?>
                 </td>
                 <td class="visible-md visible-lg text-center">

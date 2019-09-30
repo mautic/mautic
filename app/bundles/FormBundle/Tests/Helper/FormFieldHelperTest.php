@@ -74,22 +74,22 @@ class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
             [
                 $this->getField('Checkbox Single', 'checkboxgrp'),
                 'myvalue',
-                '<input id="mauticform_checkboxgrp_checkbox1" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox2" value="notmyvalue"/>',
-                '<input id="mauticform_checkboxgrp_checkbox1" value="myvalue" checked /><input id="mauticform_checkboxgrp_checkbox2" value="notmyvalue"/>',
+                '<input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Single').'1" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Single').'2" value="notmyvalue"/>',
+                '<input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Single').'1" value="myvalue" checked /><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Single').'2" value="notmyvalue"/>',
                 'Single value checkbox groups should have their values set appropriately via GET.',
             ],
             [
                 $this->getField('Checkbox Multi', 'checkboxgrp'),
                 'myvalue|alsomyvalue',
-                '<input id="mauticform_checkboxgrp_checkbox1" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox2" value="alsomyvalue"/><input id="mauticform_checkboxgrp_checkbox3" value="notmyvalue"/>',
-                '<input id="mauticform_checkboxgrp_checkbox1" value="myvalue" checked /><input id="mauticform_checkboxgrp_checkbox2" value="alsomyvalue" checked /><input id="mauticform_checkboxgrp_checkbox3" value="notmyvalue"/>',
+                '<input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'1" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'2" value="alsomyvalue"/><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'3" value="notmyvalue"/>',
+                '<input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'1" value="myvalue" checked /><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'2" value="alsomyvalue" checked /><input id="mauticform_checkboxgrp_checkbox_'.$this->getAliasFromName('Checkbox Multi').'3" value="notmyvalue"/>',
                 'Multi-value checkbox groups should have their values set appropriately via GET.',
             ],
             [
                 $this->getField('Radio Single', 'radiogrp'),
                 'myvalue',
-                '<input id="mauticform_radiogrp_radio1" value="myvalue"/><input id="mauticform_radiogrp_radio1" value="notmyvalue"/>',
-                '<input id="mauticform_radiogrp_radio1" value="myvalue" checked /><input id="mauticform_radiogrp_radio1" value="notmyvalue"/>',
+                '<input id="mauticform_radiogrp_radio_'.$this->getAliasFromName('Radio Single').'1" value="myvalue"/><input id="mauticform_radiogrp_radio_'.$this->getAliasFromName('Radio Single').'1" value="notmyvalue"/>',
+                '<input id="mauticform_radiogrp_radio_'.$this->getAliasFromName('Radio Single').'1" value="myvalue" checked /><input id="mauticform_radiogrp_radio_'.$this->getAliasFromName('Radio Single').'1" value="notmyvalue"/>',
                 'Single value radio groups should have their values set appropriately via GET.',
             ],
             [
@@ -113,9 +113,19 @@ class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
         $field = new Field();
 
         $field->setLabel($name);
-        $field->setAlias(strtolower(str_replace(' ', '', $name)));
+        $field->setAlias($this->getAliasFromName($name));
         $field->setType($type);
 
         return $field;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function getAliasFromName($name)
+    {
+        return strtolower(str_replace(' ', '', $name));
     }
 }
