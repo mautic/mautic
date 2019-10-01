@@ -23,7 +23,7 @@ class ReferenceValueDAO
     private $type;
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getValue(): ?int
     {
@@ -38,7 +38,7 @@ class ReferenceValueDAO
         $this->value = $value;
     }
     /**
-     * @return string
+     * @return string|null
      */
     public function getType(): ?string
     {

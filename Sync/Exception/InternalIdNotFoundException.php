@@ -15,8 +15,6 @@ namespace MauticPlugin\IntegrationsBundle\Sync\Exception;
 class InternalIdNotFoundException extends \Exception
 {
     /**
-     * InternalIdNotFoundException constructor.
-     *
      * @param string $object
      */
     public function __construct(string $object)
