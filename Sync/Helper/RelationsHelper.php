@@ -13,6 +13,7 @@ namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
@@ -65,9 +66,12 @@ class RelationsHelper
         $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
 
         try {
+            $internalObjectName = $this->getInternalObjectName($mappingManualDao, $relationObject->getRelObjectName());
             $internalObjectId = $this->getInternalObjectId($mappingManualDao, $relationObject, $relObjectDao);
-            $this->addObjectInternalId($internalObjectId, $relationObject, $syncReport);
+            $this->addObjectInternalId($internalObjectId, $internalObjectName, $relationObject, $syncReport);
         } catch (ObjectNotFoundException $e) {
+            return; // We are not mapping this object
+        } catch (InternalIdNotFoundException  $e) {
             $this->objectsToSynchronize[] = $relObjectDao;
         }
     }
@@ -79,18 +83,18 @@ class RelationsHelper
      * 
      * @return int
      * 
-     * @throws ObjectNotFoundException
+     * @throws InternalIdNotFoundException
      */
     private function getInternalObjectId(MappingManualDAO $mappingManualDao, RelationDAO $relationObject, ObjectDAO $relObjectDao): int
     {
-        $relObjects       = $this->findInternalObjects($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
-        $internalObjectId = $relObjects[0]->getObjectId();
+        $relObject       = $this->findInternalObject($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
+        $internalObjectId = $relObject->getObjectId();
 
         if ($internalObjectId) {
             return $internalObjectId;
         }
 
-        throw new ObjectNotFoundException("Internal Object ID was empty");
+        throw new InternalIdNotFoundException($relationObject->getRelObjectName());
     }
 
     /**
@@ -98,21 +102,16 @@ class RelationsHelper
      * @param string           $relObjectName
      * @param ObjectDAO        $objectDao
      *
-     * @return array
+     * @return ObjectDAO
      * @throws ObjectNotFoundException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
-    private function findInternalObjects(MappingManualDAO $mappingManualDao, string $relObjectName, ObjectDAO $objectDao): array
+    private function findInternalObject(MappingManualDAO $mappingManualDao, string $relObjectName, ObjectDAO $objectDao): ObjectDAO
     {
-        $internalObjectsNames = $mappingManualDao->getMappedInternalObjectsNames($relObjectName);
+        $internalObjectsName = $this->getInternalObjectName($mappingManualDao, $relObjectName);
 
-        $objects = [];
-        foreach($internalObjectsNames as $internalObjectsName) {
-            $objects[] = $this->mappingHelper->findMauticObject($mappingManualDao, $internalObjectsName, $objectDao);
-        }
-
-        return $objects;
+        return $this->mappingHelper->findMauticObject($mappingManualDao, $internalObjectsName, $objectDao);
     }
 
     /**
@@ -122,10 +121,26 @@ class RelationsHelper
      *
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
      */
-    private function addObjectInternalId(int $relObjectId, RelationDAO $relationObject, ReportDAO $syncReport)
+    private function addObjectInternalId(int $relObjectId, string $relInternalType, RelationDAO $relationObject, ReportDAO $syncReport)
     {
         $relationObject->setRelObjectInternalId($relObjectId);
         $objectDAO = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());
-        $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue()->setValue($relObjectId);
+        $referenceValue = $objectDAO->getField($relationObject->getRelFieldName())->getValue()->getNormalizedValue();
+        $referenceValue->setType($relInternalType);
+        $referenceValue->setValue($relObjectId);
+    }
+
+    /**
+     * @param MappingManualDAO $mappingManualDao
+     * @param string           $relObjectName
+     *
+     * @return mixed
+     * @throws ObjectNotFoundException
+     */
+    private function getInternalObjectName(MappingManualDAO $mappingManualDao, string $relObjectName)
+    {
+        $internalObjectsNames = $mappingManualDao->getMappedInternalObjectsNames($relObjectName);
+
+        return $internalObjectsNames[0];
     }
 }
