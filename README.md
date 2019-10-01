@@ -70,3 +70,19 @@ $inputOptions = new MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDA
 /** @var \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface $syncService **/
 $syncService->processIntegrationSync($inputOptions);
 ```
+
+## Tests
+
+This plugin is covered with some unit tests, functional tests, static analysis and code style check that run also in CI on every push.
+
+### Useful commands
+
+Always run following commands from the `plugins/SalesforceBundle` directory.
+
+#### `$ composer test`
+
+With this command you can run all the tests for this plugin. Functional tests included.
+
+#### `$ composer quicktest`
+
+With this command you can run all the tests for this plugin except functional tests which makes it fast.
