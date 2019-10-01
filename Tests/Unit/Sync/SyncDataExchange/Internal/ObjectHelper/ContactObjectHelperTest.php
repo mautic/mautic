@@ -108,6 +108,7 @@ class ContactObjectHelperTest extends \PHPUnit_Framework_TestCase
         $companyId        = 1234;
         $companyValue     = new ReferenceValueDAO();
         $companyValue->setValue($companyId);
+        $companyValue->setType(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $emailField       = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
         $companyField     = new FieldDAO(
