@@ -22,3 +22,14 @@ parameters:
       - 'Tests/*'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingPropertyTypeHint:
       - 'Tests/*'
+    SlevomatCodingStandard\Sniffs\Variables\UnusedVariableSniff.UnusedVariable:
+      - 'Sync/Helper/MappingHelper.php'
+      - 'Helper/FieldValidationHelper.php'
+      - 'Form/Type/IntegrationSyncSettingsFieldMappingsType.php'
+      - 'DependencyInjection/Compiler/SyncIntegrationsPass.php'
+      - 'DependencyInjection/Compiler/IntegrationsPass.php'
+      - 'DependencyInjection/Compiler/ConfigIntegrationPass.php'
+      - 'DependencyInjection/Compiler/AuthenticationIntegrationPass.php'
+    SlevomatCodingStandard\Sniffs\Classes\UnusedPrivateElementsSniff.WriteOnlyProperty:
+      - 'Helper/FieldValidationHelper.php'
+

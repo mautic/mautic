@@ -196,7 +196,7 @@ class FieldValidationHelper
 
         // Get Mautic mapped fields
         $mauticMappedFields = [];
-        foreach ($objectFieldMappings as $field => $mapping) {
+        foreach ($objectFieldMappings as $mapping) {
             if (empty($mapping['mappedField'])) {
                 continue;
             }

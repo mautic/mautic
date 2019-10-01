@@ -38,9 +38,6 @@ class SyncServiceTest extends MauticMysqlTestCase
         // Sleep one second to ensure that the modified date/time stamps of the contacts just created are in the past
         sleep(1);
 
-        // Record now because we're going to sync again
-        $now = new \DateTime();
-
         $prefix     = $this->container->getParameter('mautic.db_table_prefix');
         $connection = $this->container->get('doctrine.dbal.default_connection');
 

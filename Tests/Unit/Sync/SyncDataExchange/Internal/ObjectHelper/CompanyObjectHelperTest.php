@@ -95,7 +95,7 @@ class CompanyObjectHelperTest extends \PHPUnit_Framework_TestCase
             );
         $objectMappings = $this->getObjectHelper()->update([3, 4], $objects);
 
-        foreach ($objectMappings as $key => $objectMapping) {
+        foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
             $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));

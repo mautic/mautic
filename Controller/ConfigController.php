@@ -117,7 +117,7 @@ class ConfigController extends AbstractFormController
      */
     private function submitForm()
     {
-        if ($cancelled = $this->isFormCancelled($this->form)) {
+        if ($this->isFormCancelled($this->form)) {
             return $this->closeForm();
         }
 

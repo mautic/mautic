@@ -21,7 +21,6 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactNotificationHandler implements HandlerInterface
 {
@@ -34,11 +33,6 @@ class ContactNotificationHandler implements HandlerInterface
      * @var LeadEventLogRepository
      */
     private $leadEventRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * @var EntityManagerInterface
@@ -63,20 +57,17 @@ class ContactNotificationHandler implements HandlerInterface
     /**
      * @param Writer                        $writer
      * @param LeadEventLogRepository        $leadEventRepository
-     * @param TranslatorInterface           $translator
      * @param EntityManagerInterface        $em
      * @param UserSummaryNotificationHelper $userNotificationHelper
      */
     public function __construct(
         Writer $writer,
         LeadEventLogRepository $leadEventRepository,
-        TranslatorInterface $translator,
         EntityManagerInterface $em,
         UserSummaryNotificationHelper $userNotificationHelper
     ) {
         $this->writer                 = $writer;
         $this->leadEventRepository    = $leadEventRepository;
-        $this->translator             = $translator;
         $this->em                     = $em;
         $this->userNotificationHelper = $userNotificationHelper;
     }

@@ -408,7 +408,6 @@ return [
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.lead.repository.lead_event_log',
-                    'translator',
                     'doctrine.orm.entity_manager',
                     'mautic.integrations.sync.notification.helper_user_summary_notification',
                 ],

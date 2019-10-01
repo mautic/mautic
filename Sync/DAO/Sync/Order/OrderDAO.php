@@ -115,7 +115,7 @@ class OrderDAO
         $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;
         ++$this->objectCounter;
 
-        if ($knownId = $objectChangeDAO->getObjectId()) {
+        if ($objectChangeDAO->getObjectId()) {
             $this->identifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
 
             return $this;
@@ -305,7 +305,7 @@ class OrderDAO
     public function getSuccessfullySyncedObjects()
     {
         $synced = [];
-        foreach ($this->changedObjects as $object => $objectChanges) {
+        foreach ($this->changedObjects as $objectChanges) {
             /** @var ObjectChangeDAO $objectChange */
             foreach ($objectChanges as $objectChange) {
                 if (isset($this->retryTheseLater[$objectChange->getMappedObject()])) {
