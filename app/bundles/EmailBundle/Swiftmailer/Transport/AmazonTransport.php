@@ -143,9 +143,11 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
             if ($message['notificationType'] == 'Bounce' && $message['bounce']['bounceType'] == 'Permanent') {
                 $emailId = null;
 
-                foreach ($message['mail']['headers'] as $header) {
-                    if ($header['name'] === 'X-EMAIL-ID') {
-                        $emailId = $header['value'];
+                if (isset($message['mail']['headers'])) {
+                    foreach ($message['mail']['headers'] as $header) {
+                        if ($header['name'] === 'X-EMAIL-ID') {
+                            $emailId = $header['value'];
+                        }
                     }
                 }
 
