@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Controller;
-
 
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -24,6 +25,7 @@ class AuthController extends CommonController
     {
         /** @var AuthIntegrationsHelper $authIntegrationsHelper */
         $authIntegrationsHelper = $this->get('mautic.integrations.helper.auth_integrations');
+
         try {
             $authIntegration = $authIntegrationsHelper->getIntegration($integration);
 

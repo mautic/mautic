@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Event;
-
 
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\Event;
@@ -36,7 +37,7 @@ class KeysDecryptionEvent extends Event
     public function __construct(Integration $integrationConfiguration, array $keys)
     {
         $this->integrationConfiguration = $integrationConfiguration;
-        $this->keys = $keys;
+        $this->keys                     = $keys;
     }
 
     /**
@@ -58,7 +59,7 @@ class KeysDecryptionEvent extends Event
     /**
      * @param array $keys
      */
-    public function setKeys(array $keys)
+    public function setKeys(array $keys): void
     {
         $this->keys = $keys;
     }

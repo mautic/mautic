@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -27,7 +29,7 @@ class IntegrationSyncSettingsType extends AbstractType
      *
      * @throws IntegrationNotFoundException
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $integrationObject = $options['integrationObject'];
         if (!$integrationObject instanceof IntegrationInterface || !$integrationObject instanceof ConfigFormSyncInterface) {
@@ -72,7 +74,7 @@ class IntegrationSyncSettingsType extends AbstractType
             [
                 'label'             => false,
                 'integrationObject' => $integrationObject,
-                'objects'           => $objects
+                'objects'           => $objects,
             ]
         );
 
@@ -90,11 +92,11 @@ class IntegrationSyncSettingsType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
-                'integrationObject'
+                'integrationObject',
             ]
         );
     }

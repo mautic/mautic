@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type\Auth;
-
 
 use MauticPlugin\IntegrationsBundle\Form\Type\NotBlankIfPublishedConstraintTrait;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -26,7 +27,7 @@ trait BasicAuthKeysTrait
      * @param string               $usernameLabel
      * @param string               $passwordLabel
      */
-    private function addKeyFields(FormBuilderInterface $builder, $usernameLabel = 'mautic.core.username', $passwordLabel = 'mautic.core.password')
+    private function addKeyFields(FormBuilderInterface $builder, $usernameLabel = 'mautic.core.username', $passwordLabel = 'mautic.core.password'): void
     {
         $builder->add(
             'username',

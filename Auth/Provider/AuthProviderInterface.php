@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider;
 
-
 use GuzzleHttp\ClientInterface;
 
 interface AuthProviderInterface

@@ -64,7 +64,6 @@ class Engine
             return;
         }
 
-
         if (!$migrationClasses) {
             return;
         }
@@ -84,6 +83,7 @@ class Engine
             $this->entityManager->commit();
         } catch (DBALException $e) {
             $this->entityManager->rollback();
+
             throw $e;
         }
     }
@@ -101,7 +101,7 @@ class Engine
         foreach ($migrationFileNames as $fileName) {
             require_once $this->migrationsPath.$fileName;
             $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className          = "MauticPlugin\\".$this->bundleName."\Migrations\\${className}";
+            $className          = 'MauticPlugin\\'.$this->bundleName."\Migrations\\${className}";
             $migrationClasses[] = $className;
         }
 

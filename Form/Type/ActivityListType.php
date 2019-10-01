@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
-
 
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
@@ -25,8 +26,6 @@ class ActivityListType extends AbstractType
     private $leadModel;
 
     /**
-     * ActivityListType constructor.
-     *
      * @param LeadModel $leadModel
      */
     public function __construct(LeadModel $leadModel)
@@ -37,7 +36,7 @@ class ActivityListType extends AbstractType
     /**
      * @param OptionsResolver $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -45,7 +44,7 @@ class ActivityListType extends AbstractType
                 'label'      => 'mautic.integration.feature.push_activity.included_events',
                 'label_attr' => [
                     'class'       => 'control-label',
-                    'tooltip' => 'mautic.integration.feature.push_activity.included_events.tooltip',
+                    'tooltip'     => 'mautic.integration.feature.push_activity.included_events.tooltip',
                 ],
                 'multiple'   => true,
                 'required'   => false,

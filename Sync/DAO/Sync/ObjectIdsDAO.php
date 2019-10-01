@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -23,8 +25,8 @@ class ObjectIdsDAO
      * [
      *      'objectA' => [12, 13],
      *      'objectB' => ['asfdaswty', 'wetegdfsd'],
-     * ]
-     * 
+     * ].
+     *
      * @var array[]
      */
     private $objects = [];
@@ -40,15 +42,15 @@ class ObjectIdsDAO
      * Simply put, an array of object types and IDs separated by colon.
      *
      * @param string[] $cliOptions
-     * 
+     *
      * @return ObjectIdsDAO
      */
-    public static function createFromCliOptions(array $cliOptions): ObjectIdsDAO
+    public static function createFromCliOptions(array $cliOptions): self
     {
-        $objectsIdDAO = new ObjectIdsDAO();
+        $objectsIdDAO = new self();
 
         foreach ($cliOptions as $cliOption) {
-            if (is_string($cliOption) && strpos($cliOption, ':') !== false) {
+            if (is_string($cliOption) && false !== strpos($cliOption, ':')) {
                 $objectsIdDAO->addObjectId(...explode(':', $cliOption));
             }
         }
@@ -71,7 +73,7 @@ class ObjectIdsDAO
 
     /**
      * @return string[]
-     * 
+     *
      * @throws ObjectNotFoundException
      */
     public function getObjectIdsFor(string $objectType): array

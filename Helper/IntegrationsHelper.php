@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Helper;
 
@@ -60,7 +61,7 @@ class IntegrationsHelper
     /**
      * @param IntegrationInterface $integration
      */
-    public function addIntegration(IntegrationInterface $integration)
+    public function addIntegration(IntegrationInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -69,6 +70,7 @@ class IntegrationsHelper
      * @param string $integration
      *
      * @return IntegrationInterface
+     *
      * @throws IntegrationNotFoundException
      */
     public function getIntegration(string $integration)
@@ -86,7 +88,7 @@ class IntegrationsHelper
     /**
      * @param Integration $configuration
      */
-    public function saveIntegrationConfiguration(Integration $configuration)
+    public function saveIntegrationConfiguration(Integration $configuration): void
     {
         // Encrypt the keys before saving
         $decryptedApiKeys = $configuration->getApiKeys();
@@ -110,6 +112,7 @@ class IntegrationsHelper
      * @param IntegrationInterface $integration
      *
      * @return Integration
+     *
      * @throws IntegrationNotFoundException
      */
     public function getIntegrationConfiguration(IntegrationInterface $integration)

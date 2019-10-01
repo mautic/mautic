@@ -43,6 +43,7 @@ class FieldPaginationController extends CommonController
         // Find the integration
         /** @var ConfigIntegrationsHelper $integrationsHelper */
         $integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
+
         try {
             /** @var ConfigFormSyncInterface $integrationObject */
             $integrationObject        = $integrationsHelper->getIntegration($integration);
@@ -89,7 +90,7 @@ class FieldPaginationController extends CommonController
 
         $prefix   = "integration_config[featureSettings][sync][fieldMappings][$object]";
         $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-        if (substr($idPrefix, -1) == '_') {
+        if ('_' == substr($idPrefix, -1)) {
             $idPrefix = substr($idPrefix, 0, -1);
         }
 
@@ -107,7 +108,7 @@ class FieldPaginationController extends CommonController
 
     private function getFields(ConfigFormSyncInterface $integrationObject, array $featureSettings, string $object): array
     {
-        $fields = (isset($featureSettings['sync']['fieldMappings'])) ? $featureSettings['sync']['fieldMappings'] : [];
+        $fields = $featureSettings['sync']['fieldMappings'] ?? [];
 
         if (!isset($fields[$object])) {
             $fields[$object] = [];
@@ -115,7 +116,7 @@ class FieldPaginationController extends CommonController
 
         // Pull those changed from session
         $session       = $this->get('session');
-        $sessionFields = $session->get(sprintf("%s-fields", $integrationObject->getName()), []);
+        $sessionFields = $session->get(sprintf('%s-fields', $integrationObject->getName()), []);
 
         if (!isset($sessionFields[$object])) {
             return $fields[$object];

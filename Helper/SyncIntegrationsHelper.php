@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -49,7 +51,7 @@ class SyncIntegrationsHelper
     /**
      * @param SyncInterface $integration
      */
-    public function addIntegration(SyncInterface $integration)
+    public function addIntegration(SyncInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }

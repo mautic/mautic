@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -15,15 +17,10 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 
-
-/**
- * Interface SyncDataExchangeInterface
- * @package MauticPlugin\IntegrationsBundle\Facade\SyncDataExchangeService
- */
 interface SyncDataExchangeInterface
 {
     /**
-     * Sync to integration
+     * Sync to integration.
      *
      * @param RequestDAO $requestDAO
      *
@@ -32,7 +29,7 @@ interface SyncDataExchangeInterface
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO;
 
     /**
-     * Sync from integration
+     * Sync from integration.
      *
      * @param OrderDAO $syncOrderDAO
      */

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -26,9 +29,9 @@ class ReferenceValueDAO
     }
 
     /**
-     * @param int
+     * @param int $value
      */
-    public function setValue($value)
+    public function setValue($value): void
     {
         $this->value = $value;
     }

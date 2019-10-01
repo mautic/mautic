@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -15,9 +17,6 @@ use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 
-/**
- * Class ConfigIntegrationsHelper.
- */
 class ConfigIntegrationsHelper
 {
     /**
@@ -31,8 +30,6 @@ class ConfigIntegrationsHelper
     private $integrationsHelper;
 
     /**
-     * AuthIntegrationsHelper constructor.
-     *
      * @param IntegrationsHelper $integrationsHelper
      */
     public function __construct(IntegrationsHelper $integrationsHelper)
@@ -43,7 +40,7 @@ class ConfigIntegrationsHelper
     /**
      * @param ConfigFormInterface $integration
      */
-    public function addIntegration(ConfigFormInterface $integration)
+    public function addIntegration(ConfigFormInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -70,7 +67,7 @@ class ConfigIntegrationsHelper
     /**
      * @param Integration $integrationConfiguration
      */
-    public function saveIntegrationConfiguration(Integration $integrationConfiguration)
+    public function saveIntegrationConfiguration(Integration $integrationConfiguration): void
     {
         $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -29,7 +31,7 @@ class UpdateFieldController extends CommonController
     {
         // Clear the session of previously stored fields in case it got stuck
         $session       = $this->get('session');
-        $updatedFields = $session->get(sprintf("%s-fields", $integration), []);
+        $updatedFields = $session->get(sprintf('%s-fields', $integration), []);
 
         if (!isset($updatedFields[$object])) {
             $updatedFields[$object] = [];
@@ -47,7 +49,7 @@ class UpdateFieldController extends CommonController
             $updatedFields[$object][$field]['syncDirection'] = $syncDirection;
         }
 
-        $session->set(sprintf("%s-fields", $integration), $updatedFields);
+        $session->set(sprintf('%s-fields', $integration), $updatedFields);
 
         return new JsonResponse([]);
     }

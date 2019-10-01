@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,16 +13,16 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange;
 
-use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
+use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 
 class ExampleSyncDataExchange implements SyncDataExchangeInterface
 {
@@ -78,14 +80,14 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
      *
      * @param OrderDAO $syncOrderDAO
      */
-    public function executeSyncOrder(OrderDAO $syncOrderDAO)
+    public function executeSyncOrder(OrderDAO $syncOrderDAO): void
     {
         $byEmail = [];
 
         $orderedObjects = $syncOrderDAO->getUnidentifiedObjects();
         foreach ($orderedObjects as $objectName => $unidentifiedObjects) {
             /**
-             * @var mixed           $key
+             * @var mixed
              * @var ObjectChangeDAO $unidentifiedObject
              */
             foreach ($unidentifiedObjects as $unidentifiedObject) {
@@ -118,7 +120,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         $orderedObjects = $syncOrderDAO->getIdentifiedObjects();
         foreach ($orderedObjects as $objectName => $identifiedObjects) {
             /**
-             * @var mixed           $key
+             * @var mixed
              * @var ObjectChangeDAO $identifiedObject
              */
             foreach ($identifiedObjects as $id => $identifiedObject) {
@@ -128,7 +130,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 // Build the person's profile
                 $person = [
                     'id'     => $id,
-                    'object' => $objectName
+                    'object' => $objectName,
                 ];
                 foreach ($fields as $field) {
                     $person[$field->getName()] = $this->valueNormalizer->normalizeForIntegration($field->getValue());
@@ -156,6 +158,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                         $changeObject,
                         $result['last_modified']
                     );
+
                     break;
                 case 201: //created
                     $syncOrderDAO->addObjectMapping(
@@ -164,9 +167,11 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                         $result['id'],
                         $result['last_modified']
                     );
+
                     break;
                 case 404: // assume this object has been deleted
                     $syncOrderDAO->deleteObject($changeObject);
+
                     break;
                 case 405: // simulated "this lead has been converted to a contact"
                     $syncOrderDAO->remapObject(
@@ -175,9 +180,11 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                         $result['converted_id'],
                         self::OBJECT_LEAD
                     );
+
                     break;
                 case 500: // there was some kind of temporary issue so just retry this later
                     $syncOrderDAO->retrySyncLater($changeObject);
+
                     break;
                 default:
                     // Assume the rest are just failures so don't do anything and the sync process will not continue to sync the objects
@@ -257,7 +264,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         // Query integration's API for objects changed between $fromDateTime and $toDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
 
-        $payload = [
+        return [
             [
                 'id'            => 1,
                 'first_name'    => 'John',
@@ -287,8 +294,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
                 'last_modified' => '2018-08-02T10:07:00+05:00',
             ],
         ];
-
-        return $payload;
     }
 
     /**
@@ -304,7 +309,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             $person['id']            = $id;
             $person['last_modified'] = $now;
             $response[]              = $person;
-            $id++;
+            ++$id;
         }
 
         foreach ($this->payload['update'] as $person) {

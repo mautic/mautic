@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Form\Type;
 
-
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -19,14 +20,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 trait NotBlankIfPublishedConstraintTrait
 {
     /**
-     * Get not blank restraint if published
+     * Get not blank restraint if published.
      *
-     * @return Callback
+     * @return callback
      */
     private function getNotBlankConstraint()
     {
         return new Callback(
-            function ($validateMe, ExecutionContextInterface $context) {
+            function ($validateMe, ExecutionContextInterface $context): void {
                 /** @var Integration $data */
                 $data = $context->getRoot()->getData();
                 if (!empty($data->getIsPublished()) && empty($validateMe)) {

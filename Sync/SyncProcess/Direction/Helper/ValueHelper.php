@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -39,8 +41,6 @@ class ValueHelper
     private $syncDirection;
 
     /**
-     * ValueHelper constructor.
-     *
      * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
@@ -104,7 +104,7 @@ class ValueHelper
         }
 
         // If the value is not empty (including 0 or false), do not force a value
-        if (null !== $value && $value !== '') {
+        if (null !== $value && '' !== $value) {
             return $value;
         }
 

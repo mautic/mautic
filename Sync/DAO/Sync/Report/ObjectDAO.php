@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,9 +15,6 @@ namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 
-/**
- * Class ObjectDAO
- */
 class ObjectDAO
 {
     /**
@@ -39,13 +38,11 @@ class ObjectDAO
     private $changeDateTime = null;
 
     /**
-     * ObjectDAO constructor.
-     *
      * @param string                  $object
      * @param mixed                   $objectId
      * @param \DateTimeInterface|null $changeDateTime
      */
-    public function __construct($object, $objectId, \DateTimeInterface $changeDateTime = null)
+    public function __construct($object, $objectId, ?\DateTimeInterface $changeDateTime = null)
     {
         $this->object         = $object;
         $this->objectId       = $objectId;
@@ -65,7 +62,7 @@ class ObjectDAO
      *
      * @return ObjectDAO
      */
-    public function setChangeDateTime(\DateTimeInterface $changeDateTime): ObjectDAO
+    public function setChangeDateTime(\DateTimeInterface $changeDateTime): self
     {
         $this->changeDateTime = $changeDateTime;
 

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged;
 
-
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface CredentialsInterface extends AuthCredentialsInterface

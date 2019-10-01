@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,17 +13,16 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 
 class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,7 +46,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $mappingManual;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->mappingHelper   = $this->createMock(MappingHelper::class);
         $this->relationsHelper = new RelationsHelper($this->mappingHelper);
@@ -52,7 +54,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $this->mappingManual   = $this->createMock(MappingManualDAO::class);
     }
 
-    public function testProcessRelationsWithUnsychronisedObjects()
+    public function testProcessRelationsWithUnsychronisedObjects(): void
     {
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
@@ -93,7 +95,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($objectsToSynchronize[0]->getObject(), $relObjectName);
     }
 
-    public function testProcessRelationsWithSychronisedObjects()
+    public function testProcessRelationsWithSychronisedObjects(): void
     {
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
@@ -107,7 +109,6 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $fieldDao  = new FieldDAO('AccountId', $normalizedValue);
         $objectDao = new ObjectDAO('Contact', 1);
         $objectDao->addField($fieldDao);
-
 
         $relationObject = new RelationDAO(
             'Contact',
