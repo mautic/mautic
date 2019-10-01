@@ -50,7 +50,7 @@
     "phpunit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
     "unit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
     "coverage": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
-    "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=6 Auth Bundle Command Config Configuration Controller DependencyInjection Entity Event EventListener Exception Facade Form Helper Integration Mapping Migration Migrations Services Sync Tests",
+    "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=max Auth Bundle Command Config Configuration Controller DependencyInjection Entity Event EventListener Exception Facade Form Helper Integration Mapping Migration Migrations Sync Tests",
     "csfixer": "vendor/bin/ecs check .",
     "fixcs": "vendor/bin/ecs check . --fix"
   },
