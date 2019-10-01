@@ -71,7 +71,7 @@ class UserNotificationHelper
      * @param string $integrationDisplayName
      * @param string $objectDisplayName
      * @param string $mauticObject
-     * @param string $id
+     * @param int    $id
      * @param string $linkText
      *
      * @throws \Doctrine\ORM\ORMException
@@ -82,7 +82,7 @@ class UserNotificationHelper
         string $integrationDisplayName,
         string $objectDisplayName,
         string $mauticObject,
-        string $id,
+        int $id,
         string $linkText
     ): void {
         $this->integrationDisplayName = $integrationDisplayName;

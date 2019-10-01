@@ -74,14 +74,14 @@ class UserHelper
      * @param string $object
      * @param int    $id
      *
-     * @return string|null
+     * @return int|null
      *
      * @throws ObjectNotSupportedException
      */
-    public function getOwner(string $object, int $id): ?string
+    public function getOwner(string $object, int $id): ?int
     {
-        $qb      = $this->connection->createQueryBuilder();
-        $result  = $qb->select('o.owner_id')
+        $qb     = $this->connection->createQueryBuilder();
+        $result = $qb->select('o.owner_id')
             ->from(MAUTIC_TABLE_PREFIX.$this->getObjectTable($object), 'o')
             ->where(
                 $qb->expr()->eq('o.id', $id)
