@@ -33,9 +33,9 @@ class CompanyHelper
     /**
      * @param int $id
      *
-     * @return string
+     * @return string|bool
      */
-    public function getCompanyName(int $id): string
+    public function getCompanyName(int $id)
     {
         return $this->connection->createQueryBuilder()
             ->select('c.companyname')

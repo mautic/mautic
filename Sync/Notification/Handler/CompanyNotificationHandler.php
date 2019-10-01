@@ -92,7 +92,7 @@ class CompanyNotificationHandler implements HandlerInterface
             $objectDisplayName,
             $notificationDAO->getMauticObject(),
             $notificationDAO->getMauticObjectId(),
-            $this->companyHelper->getCompanyName($notificationDAO->getMauticObjectId())
+            (string) $this->companyHelper->getCompanyName($notificationDAO->getMauticObjectId())
         );
     }
 
