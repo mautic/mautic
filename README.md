@@ -77,7 +77,7 @@ This plugin is covered with some unit tests, functional tests, static analysis a
 
 ### Useful commands
 
-Always run following commands from the `plugins/SalesforceBundle` directory.
+Always run following commands from the `plugins/IntegrationsBundle` directory.
 
 #### `$ composer test`
 
