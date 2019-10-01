@@ -66,6 +66,19 @@ pipeline {
         }
       }
     }
+    stage('Styling') {
+      steps {
+        container('hosted-tester') {
+          ansiColor('xterm') {
+            dir('plugins/IntegrationsBundle') {
+              sh """
+                vendor/bin/ecs check .
+              """
+            }
+          }
+        }
+      }
+    }
     stage('Automerge to beta') {
       when {
         changeRequest target: 'staging'
