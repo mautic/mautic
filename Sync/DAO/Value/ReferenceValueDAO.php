@@ -18,7 +18,7 @@ class ReferenceValueDAO
     private $value;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $type;
 
