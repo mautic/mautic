@@ -171,6 +171,12 @@ return [
                     'mautic.helper.encryption',
                 ],
             ],
+            'mautic.integrations.internal.object_provider' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\Internal\ObjectProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class,
             ],
