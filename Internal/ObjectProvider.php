@@ -28,7 +28,7 @@ class ObjectProvider
 
     /**
      * Cached internal objects.
-     * 
+     *
      * @var ObjectInterface[]
      */
     private $objects = [];
@@ -43,9 +43,9 @@ class ObjectProvider
 
     /**
      * @param string $name
-     * 
+     *
      * @return ObjectInterface
-     * 
+     *
      * @throws ObjectNotFoundException
      */
     public function getObjectByName(string $name): ObjectInterface
@@ -64,8 +64,6 @@ class ObjectProvider
     /**
      * Dispatches an event to collect all internal objects.
      * It caches the objects to a local property so it won't dispatch every time but only once.
-     *
-     * @return void
      */
     private function collectObjects(): void
     {

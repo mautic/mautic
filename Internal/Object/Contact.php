@@ -18,7 +18,7 @@ final class Contact implements ObjectInterface
     const NAME = 'lead'; // kept as lead for BC
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName(): string
     {

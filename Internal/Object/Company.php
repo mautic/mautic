@@ -18,7 +18,7 @@ final class Company implements ObjectInterface
     const NAME = 'company';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getName(): string
     {

@@ -19,7 +19,7 @@ interface ObjectInterface
 
     /**
      * Returns name key of the object.
-     * 
+     *
      * @return string
      */
     public function getName(): string;
