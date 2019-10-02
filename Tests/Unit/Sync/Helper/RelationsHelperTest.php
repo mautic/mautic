@@ -21,6 +21,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -101,7 +102,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relObjectName          = 'Account';
         $relFieldName           = 'AccountId';
 
-        $referenceVlaue  = new ReferenceValueDAO($integrationRelObjectId);
+        $referenceVlaue  = new ReferenceValueDAO();
         $normalizedValue = new NormalizedValueDAO(NormalizedValueDAO::REFERENCE_TYPE, $integrationRelObjectId, $referenceVlaue);
 
         $fieldDao  = new FieldDAO('AccountId', $normalizedValue);
@@ -132,7 +133,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
-        $internalObject = new ObjectDAO('company', $internalRelObjectId);
+        $internalObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_COMPANY, $internalRelObjectId);
 
         $this->mappingHelper->expects($this->once())
             ->method('findMauticObject')
