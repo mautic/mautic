@@ -215,6 +215,30 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param       $fieldsToUpdate
+     * @param array $objects
+     *
+     * @return array
+     */
+    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    {
+        if (null === $objects) {
+            $objects = ['Leads', 'Contacts'];
+        }
+
+        if (isset($fieldsToUpdate['leadFields'])) {
+            // Pass in the whole config
+            $fields = $fieldsToUpdate;
+        } else {
+            $fields = array_flip($fieldsToUpdate);
+        }
+
+        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
+
+        return $fieldsToUpdate;
+    }
+
+    /**
      * Format the lead data to the structure that HubSpot requires for the createOrUpdate request.
      *
      * @param array $leadData All the lead fields mapped
