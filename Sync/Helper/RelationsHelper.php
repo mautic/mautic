@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,12 +13,12 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsHelper
 {
@@ -31,7 +34,7 @@ class RelationsHelper
      * @param MappingManualDAO $mappingManualDao
      * @param ReportDAO        $syncReport
      */
-    public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport)
+    public function processRelations(MappingManualDAO $mappingManualDao, ReportDAO $syncReport): void
     {
         $this->objectsToSynchronize = [];
         foreach ($syncReport->getRelations() as $relationObject) {
@@ -42,7 +45,6 @@ class RelationsHelper
             $this->processRelation($mappingManualDao, $syncReport, $relationObject);
         }
     }
-
 
     /**
      * @return array
@@ -61,7 +63,7 @@ class RelationsHelper
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
-    private function processRelation(MappingManualDAO $mappingManualDao, ReportDAO $syncReport, RelationDAO $relationObject)
+    private function processRelation(MappingManualDAO $mappingManualDao, ReportDAO $syncReport, RelationDAO $relationObject): void
     {
         $relObjectDao = new ObjectDAO($relationObject->getRelObjectName(), $relationObject->getRelObjectIntegrationId());
 
@@ -78,9 +80,9 @@ class RelationsHelper
 
     /**
      * @param MappingManualDAO $mappingManualDao
-     * @param RelationDAO $relationObject
-     * @param ObjectDAO $relObjectDao
-     * 
+     * @param RelationDAO      $relationObject
+     * @param ObjectDAO        $relObjectDao
+     *
      * @return int
      * 
      * @throws InternalIdNotFoundException
@@ -116,12 +118,13 @@ class RelationsHelper
 
     /**
      * @param int         $relObjectId
+     * @param string      $relInternalType
      * @param RelationDAO $relationObject
      * @param ReportDAO   $syncReport
      *
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
      */
-    private function addObjectInternalId(int $relObjectId, string $relInternalType, RelationDAO $relationObject, ReportDAO $syncReport)
+    private function addObjectInternalId(int $relObjectId, string $relInternalType, RelationDAO $relationObject, ReportDAO $syncReport): void
     {
         $relationObject->setRelObjectInternalId($relObjectId);
         $objectDAO = $syncReport->getObject($relationObject->getObjectName(), $relationObject->getObjectIntegrationId());

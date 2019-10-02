@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -23,9 +25,8 @@ class FieldChangeRepository extends CommonRepository
      * @param int    $objectId
      * @param string $objectType
      * @param array  $columnNames
-     *
      */
-    public function deleteEntitiesForObjectByColumnName(int $objectId, string $objectType, array $columnNames)
+    public function deleteEntitiesForObjectByColumnName(int $objectId, string $objectType, array $columnNames): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -33,9 +34,9 @@ class FieldChangeRepository extends CommonRepository
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
                 $qb->expr()->andX(
-                    $qb->expr()->eq('object_type', ":objectType"),
-                    $qb->expr()->eq('object_id', ":objectId"),
-                    $qb->expr()->in('column_name', ":columnNames")
+                    $qb->expr()->eq('object_type', ':objectType'),
+                    $qb->expr()->eq('object_id', ':objectId'),
+                    $qb->expr()->in('column_name', ':columnNames')
                 )
             )
             ->setParameter('objectType', $objectType)
@@ -47,12 +48,11 @@ class FieldChangeRepository extends CommonRepository
     /**
      * Takes an object id & type and deletes all entities that match.
      *
-     * @param int    $objectId
-     * @param string $objectType
+     * @param int         $objectId
+     * @param string      $objectType
      * @param string|null $integration
-     *
      */
-    public function deleteEntitiesForObject(int $objectId, string $objectType, string $integration = null)
+    public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -65,8 +65,8 @@ class FieldChangeRepository extends CommonRepository
         }
 
         $expr->addMultiple([
-            $qb->expr()->eq('object_type', ":objectType"),
-            $qb->expr()->eq('object_id', ":objectId")
+            $qb->expr()->eq('object_type', ':objectType'),
+            $qb->expr()->eq('object_id', ':objectId'),
         ]);
         $qb->setParameter('objectType', $objectType)
             ->setParameter('objectId', (int) $objectId);

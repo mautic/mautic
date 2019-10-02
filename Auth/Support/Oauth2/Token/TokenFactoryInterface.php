@@ -17,5 +17,5 @@ use kamermans\OAuth2\Token\TokenInterface;
 
 interface TokenFactoryInterface
 {
-    public function __invoke(array $data, TokenInterface $previousToken = null): IntegrationToken;
+    public function __invoke(array $data, ?TokenInterface $previousToken = null): IntegrationToken;
 }

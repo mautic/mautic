@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,7 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Bundle;
 use Doctrine\DBAL\Schema\Schema;
 use Exception;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use \Mautic\PluginBundle\Bundle\PluginBundleBase;
+use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\IntegrationsBundle\Migration\Engine;
 
@@ -31,7 +33,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
      *
      * @throws Exception
      */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, ?Schema $installedSchema = null): void
     {
         $entityManager = $factory->getEntityManager();
         $tablePrefix   = $factory->getParameter('mautic.db_table_prefix');

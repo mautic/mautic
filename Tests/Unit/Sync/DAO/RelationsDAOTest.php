@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,14 +13,14 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsDAOTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAddRelations()
+    public function testAddRelations(): void
     {
-        $relationsDAO           = new RelationsDAO;
+        $relationsDAO           = new RelationsDAO();
         $integrationObjectId    = 'IntegrationId-123';
         $integrationRelObjectId = 'IntegrationId-456';
         $objectName             = 'Contact';

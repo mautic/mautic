@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncJudge\Modes;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
@@ -19,7 +20,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
 
 class BestEvidenceTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLeftWinnerWithCertainChangeDateTime()
+    public function testLeftWinnerWithCertainChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -44,7 +45,7 @@ class BestEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($leftChangeRequest, $winner);
     }
 
-    public function testRightWinnerWithCertainChangeDateTime()
+    public function testRightWinnerWithCertainChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -69,7 +70,7 @@ class BestEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($rightChangeRequest, $winner);
     }
 
-    public function testLeftWinnerWithPossibleChangeDateTime()
+    public function testLeftWinnerWithPossibleChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -94,7 +95,7 @@ class BestEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($leftChangeRequest, $winner);
     }
 
-    public function testRightWinnerWithPossibleChangeDateTime()
+    public function testRightWinnerWithPossibleChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -119,7 +120,7 @@ class BestEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($rightChangeRequest, $winner);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfEqual()
+    public function testUnresolvedConflictExceptionThrownIfEqual(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -143,7 +144,7 @@ class BestEvidenceTest extends \PHPUnit_Framework_TestCase
         BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownWhenLeftPossibleChangeDateTimeIsNull()
+    public function testUnresolvedConflictExceptionThrownWhenLeftPossibleChangeDateTimeIsNull(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -166,7 +167,7 @@ class BestEvidenceTest extends \PHPUnit_Framework_TestCase
         BestEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownWhenRightPossibleChangeDateTimeIsNull()
+    public function testUnresolvedConflictExceptionThrownWhenRightPossibleChangeDateTimeIsNull(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',

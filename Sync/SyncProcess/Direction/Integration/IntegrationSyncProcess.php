@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,15 +13,14 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
@@ -75,7 +76,7 @@ class IntegrationSyncProcess
      * @param MappingManualDAO          $mappingManualDAO
      * @param SyncDataExchangeInterface $syncDataExchange
      */
-    public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange)
+    public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange): void
     {
         $this->inputOptionsDAO  = $inputOptionsDAO;
         $this->mappingManualDAO = $mappingManualDAO;
@@ -86,6 +87,7 @@ class IntegrationSyncProcess
      * @param int $syncIteration
      *
      * @return ReportDAO
+     *
      * @throws ObjectNotFoundException
      */
     public function getSyncReport(int $syncIteration)
@@ -95,12 +97,12 @@ class IntegrationSyncProcess
         foreach ($integrationObjectsNames as $integrationObjectName) {
             $integrationObjectFields = $this->mappingManualDAO->getIntegrationObjectFieldsToSyncToMautic($integrationObjectName);
 
-            if (count($integrationObjectFields) === 0) {
+            if (0 === count($integrationObjectFields)) {
                 // No fields configured for a sync
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     sprintf(
-                        "Integration to Mautic; there are no fields for the %s object",
+                        'Integration to Mautic; there are no fields for the %s object',
                         $integrationObjectName
                     ),
                     __CLASS__.':'.__FUNCTION__
@@ -118,7 +120,7 @@ class IntegrationSyncProcess
                     "Integration to Mautic; syncing from %s to %s for the %s object with %d fields but giving the option to sync from the object's last sync date of %s",
                     $objectSyncFromDateTime->format('Y-m-d H:i:s'),
                     $objectSyncToDateTime->format('Y-m-d H:i:s'),
-                    ($lastObjectSyncDateTime) ? $lastObjectSyncDateTime->format('Y-m-d H:i:s') : 'null',
+                    $lastObjectSyncDateTime ? $lastObjectSyncDateTime->format('Y-m-d H:i:s') : 'null',
                     $integrationObjectName,
                     count($integrationObjectFields)
                 ),
@@ -141,19 +143,17 @@ class IntegrationSyncProcess
             $integrationRequestDAO->addObject($integrationRequestObject);
         }
 
-        $integrationSyncReport = $integrationRequestDAO->shouldSync()
+        return $integrationRequestDAO->shouldSync()
             ? $this->syncDataExchange->getSyncReport($integrationRequestDAO)
             :
             new ReportDAO($this->mappingManualDAO->getIntegration());
-
-        return $integrationSyncReport;
     }
-
 
     /**
      * @param ReportDAO $syncReport
      *
      * @return OrderDAO
+     *
      * @throws ObjectNotFoundException
      */
     public function getSyncOrder(ReportDAO $syncReport)
@@ -170,7 +170,7 @@ class IntegrationSyncProcess
                 DebugLogger::log(
                     $this->mappingManualDAO->getIntegration(),
                     sprintf(
-                        "Mautic to integration; syncing %d objects for the %s object mapped to the %s integration object",
+                        'Mautic to integration; syncing %d objects for the %s object mapped to the %s integration object',
                         count($internalObjects),
                         $internalObjectName,
                         $mappedIntegrationObjectName

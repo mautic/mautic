@@ -45,15 +45,13 @@ class FieldValidationHelper
     private $fieldMappings;
 
     /**
-     * FieldValidationHelper constructor.
-     *
      * @param FieldHelper         $fieldHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
     {
         $this->fieldHelper = $fieldHelper;
-        $this->translator = $translator;
+        $this->translator  = $translator;
     }
 
     /**
@@ -88,7 +86,7 @@ class FieldValidationHelper
                 $this->validateIntegrationRequiredFields($fieldMappingForm, $missingFields);
 
                 $this->validateMauticRequiredFields($fieldMappingForm, $object, $objectFieldMappings);
-            } catch (\Exception $exception) {
+            } catch (\Throwable $exception) {
                 $fieldMappingForm->addError(new FormError($exception->getMessage()));
             }
         }
@@ -185,6 +183,7 @@ class FieldValidationHelper
      * @param array  $objectFieldMappings
      *
      * @return array
+     *
      * @throws ObjectNotFoundException
      */
     private function findMissingInternalRequiredFieldMappings(string $object, array $objectFieldMappings): array
@@ -197,7 +196,7 @@ class FieldValidationHelper
 
         // Get Mautic mapped fields
         $mauticMappedFields = [];
-        foreach ($objectFieldMappings as $field => $mapping) {
+        foreach ($objectFieldMappings as $mapping) {
             if (empty($mapping['mappedField'])) {
                 continue;
             }

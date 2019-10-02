@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
 
-
 use Doctrine\DBAL\Connection;
 
 class CompanyHelper
@@ -22,8 +23,6 @@ class CompanyHelper
     private $connection;
 
     /**
-     * CompanyHelper constructor.
-     *
      * @param Connection $connection
      */
     public function __construct(Connection $connection)
@@ -34,9 +33,9 @@ class CompanyHelper
     /**
      * @param int $id
      *
-     * @return string
+     * @return string|bool
      */
-    public function getCompanyName(int $id): string
+    public function getCompanyName(int $id)
     {
         return $this->connection->createQueryBuilder()
             ->select('c.companyname')

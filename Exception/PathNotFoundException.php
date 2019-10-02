@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,7 +15,6 @@ namespace MauticPlugin\IntegrationsBundle\Exception;
 
 use Exception;
 
-class PathNotFoundException  extends Exception
+class PathNotFoundException extends Exception
 {
-
 }

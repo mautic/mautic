@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
@@ -12,14 +12,13 @@
 echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
 
 /** @var \MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
-
 $activeTab = $activeTab ?: 'details-container';
 ?>
 
 <?php echo $view['form']->start($form); ?>
 <ul class="nav nav-tabs">
     <!-- Enabled\Auth -->
-    <li class="<?php if ($activeTab == 'details-container'): echo 'active'; endif; ?> " id="details-tab">
+    <li class="<?php if ('details-container' === $activeTab): echo 'active'; endif; ?> " id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">
             <?php echo $view['translator']->trans('mautic.plugin.integration.tab.details'); ?>
             <?php if ($hasAuthErrors): ?>
@@ -61,7 +60,7 @@ $activeTab = $activeTab ?: 'details-container';
 
 <div class="tab-content pa-md bg-white">
     <!-- Enabled\Auth -->
-    <div class="tab-pane fade <?php if ($activeTab == 'details-container'): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
+    <div class="tab-pane fade <?php if ('details-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
         <hr />
         <?php echo $view['form']->row($form['apiKeys']); ?>
@@ -81,10 +80,10 @@ $activeTab = $activeTab ?: 'details-container';
                 <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
                     <i class="fa fa-key "></i>
                     <?php if ($integrationObject->isAuthorized()): ?>
-                        <?php echo $view['translator']->trans('mautic.integration.form.reauthorize') ?>
+                        <?php echo $view['translator']->trans('mautic.integration.form.reauthorize'); ?>
                     <?php else: ?>
-                        <?php echo $view['translator']->trans('mautic.integration.form.authorize') ?>
-                    <?php endif ?>
+                        <?php echo $view['translator']->trans('mautic.integration.form.authorize'); ?>
+                    <?php endif; ?>
                 </button>
             </div>
         </div>
@@ -94,12 +93,12 @@ $activeTab = $activeTab ?: 'details-container';
 
     <!-- Features -->
     <?php if ($showFeaturesTab): ?>
-    <div class="tab-pane fade <?php if ($activeTab == 'features-container'): echo 'in active'; endif; ?> bdr-w-0" id="features-container">
+    <div class="tab-pane fade <?php if ('features-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="features-container">
         <?php
         echo $view['form']->row($form['supportedFeatures']);
 
         if ($useFeatureSettings || $useSyncFeatures):
-            echo "<hr />";
+            echo '<hr />';
         endif;
 
         if ($useSyncFeatures):
@@ -111,7 +110,7 @@ $activeTab = $activeTab ?: 'details-container';
             endif;
 
             if ($useFeatureSettings):
-                echo "<hr />";
+                echo '<hr />';
             endif;
         endif;
 

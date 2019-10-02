@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -36,7 +38,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ConfigController extends AbstractFormController
 {
@@ -81,6 +82,7 @@ class ConfigController extends AbstractFormController
         // Find the integration
         /** @var ConfigIntegrationsHelper $integrationsHelper */
         $this->integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
+
         try {
             $this->integrationObject        = $this->integrationsHelper->getIntegration($integration);
             $this->integrationConfiguration = $this->integrationObject->getIntegrationConfiguration();
@@ -115,19 +117,19 @@ class ConfigController extends AbstractFormController
      */
     private function submitForm()
     {
-        if ($cancelled = $this->isFormCancelled($this->form)) {
+        if ($this->isFormCancelled($this->form)) {
             return $this->closeForm();
         }
 
         // Dispatch event prior to saving the Integration
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->get('event_dispatcher');
-        $configEvent = new ConfigSaveEvent($this->integrationConfiguration);
+        $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
         $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE, $configEvent);
 
         // Get the fields before the form binds partial data due to pagination
         $settings      = $this->integrationConfiguration->getFeatureSettings();
-        $fieldMappings = (isset($settings['sync']['fieldMappings'])) ? $settings['sync']['fieldMappings'] : [];
+        $fieldMappings = $settings['sync']['fieldMappings'] ?? [];
 
         // Submit the form
         $this->form->handleRequest($this->request);
@@ -182,7 +184,7 @@ class ConfigController extends AbstractFormController
     private function getForm()
     {
         return $this->get('form.factory')->create(
-            $this->integrationObject->getConfigFormName() ? $this->integrationObject->getConfigFormName() : IntegrationConfigType::class,
+            $this->integrationObject->getConfigFormName() ?: IntegrationConfigType::class,
             $this->integrationConfiguration,
             [
                 'action'      => $this->generateUrl('mautic_integration_config', ['integration' => $this->integrationObject->getName()]),
@@ -197,8 +199,8 @@ class ConfigController extends AbstractFormController
     private function showForm()
     {
         $integrationObject = $this->integrationObject;
-        $form = $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php');
-        $formHelper = $this->get('templating.helper.form');
+        $form              = $this->setFormTheme($this->form, 'IntegrationsBundle:Config:form.html.php');
+        $formHelper        = $this->get('templating.helper.form');
 
         $showFeaturesTab =
             $integrationObject instanceof ConfigFormFeaturesInterface ||
@@ -221,7 +223,7 @@ class ConfigController extends AbstractFormController
 
         $useAuthorizationUrl = $integrationObject instanceof ConfigFormAuthorizeButtonInterface;
 
-        $callbackUrl = ($integrationObject instanceof ConfigFormCallbackInterface) ?
+        $callbackUrl = $integrationObject instanceof ConfigFormCallbackInterface ?
             $integrationObject->getRedirectUri()
             : false;
 
@@ -240,8 +242,7 @@ class ConfigController extends AbstractFormController
                     'callbackUrl'         => $callbackUrl,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
-                    ? $integrationObject->getConfigFormContentTemplate()
-                    : 'IntegrationsBundle:Config:form.html.php',
+                    ?: 'IntegrationsBundle:Config:form.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,14 +13,14 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Integration;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO as OrderFieldDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -28,7 +30,6 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class IntegrationSyncProcessTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,7 +55,7 @@ class IntegrationSyncProcessTest extends \PHPUnit_Framework_TestCase
      */
     private $syncDataExchange;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->syncDateHelper        = $this->createMock(SyncDateHelper::class);
         $this->mappingHelper         = $this->createMock(MappingHelper::class);
@@ -62,7 +63,7 @@ class IntegrationSyncProcessTest extends \PHPUnit_Framework_TestCase
         $this->syncDataExchange      = $this->createMock(SyncDataExchangeInterface::class);
     }
 
-    public function testThatIntegrationGetSyncReportIsCalledBasedOnRequest()
+    public function testThatIntegrationGetSyncReportIsCalledBasedOnRequest(): void
     {
         $objectName    = 'Contact';
         $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
@@ -108,7 +109,7 @@ class IntegrationSyncProcessTest extends \PHPUnit_Framework_TestCase
         $this->getSyncProcess($mappingManual)->getSyncReport(1);
     }
 
-    public function testThatIntegrationGetSyncReportIsNotCalledBasedOnRequest()
+    public function testThatIntegrationGetSyncReportIsNotCalledBasedOnRequest(): void
     {
         $objectName    = 'Contact';
         $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
@@ -126,7 +127,7 @@ class IntegrationSyncProcessTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::INTEGRATION_NAME, $report->getIntegration());
     }
 
-    public function testOrderIsBuiltBasedOnMapping()
+    public function testOrderIsBuiltBasedOnMapping(): void
     {
         $objectName    = 'Contact';
         $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
@@ -160,7 +161,7 @@ class IntegrationSyncProcessTest extends \PHPUnit_Framework_TestCase
         $this->objectChangeGenerator->expects($this->once())
             ->method('getSyncObjectChange')
             ->willReturn($objectChangeDAO);
-        
+
         $syncOrder = $this->getSyncProcess($mappingManual)->getSyncOrder($syncReport);
 
         // The change should have been added to the order as an identified object

@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
 
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;

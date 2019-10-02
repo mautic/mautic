@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -74,10 +76,8 @@ class ObjectMapping
 
     /**
      * @param ORM\ClassMetadata $metadata
-     *
-     * @return void
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -140,7 +140,6 @@ class ObjectMapping
             ->columnName('integration_reference_id')
             ->nullable()
             ->build();
-
     }
 
     /**
@@ -150,7 +149,7 @@ class ObjectMapping
      *
      * @throws \Exception
      */
-    public function __construct(\DateTime $dateCreated = null)
+    public function __construct(?\DateTime $dateCreated = null)
     {
         if (null === $dateCreated) {
             $dateCreated = new \DateTime();
@@ -300,6 +299,7 @@ class ObjectMapping
      * @param \DateTimeInterface|null $lastSyncDate
      *
      * @return ObjectMapping
+     *
      * @throws \Exception
      */
     public function setLastSyncDate($lastSyncDate)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,13 +13,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping;
 
-/**
- * Class ObjectMappingDAO
- */
 class ObjectMappingDAO
 {
-    const SYNC_TO_MAUTIC = 'mautic';
-    const SYNC_TO_INTEGRATION = 'integration';
+    const SYNC_TO_MAUTIC       = 'mautic';
+    const SYNC_TO_INTEGRATION  = 'integration';
     const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
     /**
@@ -46,8 +45,6 @@ class ObjectMappingDAO
     private $fieldMappings = [];
 
     /**
-     * ObjectMappingDAO constructor.
-     *
      * @param string $internalObjectName
      * @param string $integrationObjectName
      */
@@ -65,7 +62,7 @@ class ObjectMappingDAO
      *
      * @return ObjectMappingDAO
      */
-    public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, $isRequired = false): ObjectMappingDAO
+    public function addFieldMapping($internalField, $integrationField, $direction = self::SYNC_BIDIRECTIONALLY, $isRequired = false): self
     {
         $this->fieldMappings[] = new FieldMappingDAO(
             $this->internalObjectName,

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\IntegrationsBundle;
 
 final class IntegrationEvents
 {
     /**
-     * The mautic.integration.sync_post_execute_integration event is dispatched after a sync is executed
+     * The mautic.integration.sync_post_execute_integration event is dispatched after a sync is executed.
      *
      * The event listener receives a Mautic\IntegrationsBundle\Event\SyncEvent object.
      *

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
-
 interface ConfigFormInterface extends IntegrationInterface
 {
     /**
@@ -20,7 +21,7 @@ interface ConfigFormInterface extends IntegrationInterface
     public function getDisplayName(): string;
 
     /**
-     * Return the name/class of the form type to override the default or just return NULL to use the default
+     * Return the name/class of the form type to override the default or just return NULL to use the default.
      *
      * @return string|null Name of the form type service
      */

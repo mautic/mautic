@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,9 +18,6 @@ use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 
-/**
- * Class OrderDAO
- */
 class OrderDAO
 {
     /**
@@ -49,7 +48,7 @@ class OrderDAO
     /**
      * Array of all changed objects.
      *
-     * @var array|ObjectChangeDAO[]
+     * @var ObjectChangeDAO[]
      */
     private $changedObjects = [];
 
@@ -89,11 +88,9 @@ class OrderDAO
     private $notifications = [];
 
     /**
-     * OrderDAO constructor.
-     *
      * @param \DateTimeInterface $syncDateTime
-     * @param   bool             $isFirstTimeSync
-     * @param  string            $integration
+     * @param bool               $isFirstTimeSync
+     * @param string             $integration
      */
     public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration)
     {
@@ -107,18 +104,18 @@ class OrderDAO
      *
      * @return OrderDAO
      */
-    public function addObjectChange(ObjectChangeDAO $objectChangeDAO): OrderDAO
+    public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
     {
         if (!isset($this->identifiedObjects[$objectChangeDAO->getObject()])) {
             $this->identifiedObjects[$objectChangeDAO->getObject()]    = [];
             $this->unidentifiedObjects[$objectChangeDAO->getObject()]  = [];
-            $this->changedObjects[$objectChangeDAO->getObject()] = [];
+            $this->changedObjects[$objectChangeDAO->getObject()]       = [];
         }
 
         $this->changedObjects[$objectChangeDAO->getObject()][] = $objectChangeDAO;
-        $this->objectCounter++;
+        ++$this->objectCounter;
 
-        if ($knownId = $objectChangeDAO->getObjectId()) {
+        if ($objectChangeDAO->getObjectId()) {
             $this->identifiedObjects[$objectChangeDAO->getObject()][$objectChangeDAO->getObjectId()] = $objectChangeDAO;
 
             return $this;
@@ -163,7 +160,7 @@ class OrderDAO
     }
 
     /**
-     * Create a new mapping between the Mautic and Integration objects
+     * Create a new mapping between the Mautic and Integration objects.
      *
      * @param ObjectChangeDAO         $objectChangeDAO
      * @param string                  $integrationObjectName
@@ -174,8 +171,8 @@ class OrderDAO
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
         $integrationObjectId,
-        \DateTimeInterface $objectModifiedDate = null
-    ) {
+        ?\DateTimeInterface $objectModifiedDate = null
+    ): void {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();
         }
@@ -191,16 +188,15 @@ class OrderDAO
         $this->objectMappings[] = $objectMapping;
     }
 
-
     /**
-     * Update an existing mapping in the case of conversions (i.e. Lead converted to Contact)
+     * Update an existing mapping in the case of conversions (i.e. Lead converted to Contact).
      *
      * @param mixed  $oldObjectId
      * @param string $oldObjectName
      * @param string $newObjectName
      * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null)
+    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
         if (null === $newObjectId) {
             $newObjectId = $oldObjectId;
@@ -210,12 +206,12 @@ class OrderDAO
     }
 
     /**
-     * Update the last sync date of an existing mapping
+     * Update the last sync date of an existing mapping.
      *
      * @param ObjectChangeDAO         $objectChangeDAO
      * @param \DateTimeInterface|null $objectModifiedDate
      */
-    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, \DateTimeInterface $objectModifiedDate = null)
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
         if (null === $objectModifiedDate) {
             $objectModifiedDate = new \DateTime();
@@ -230,22 +226,22 @@ class OrderDAO
     }
 
     /**
-     * Mark an object as deleted in the integration so Mautic doesn't continue to attempt to sync it
+     * Mark an object as deleted in the integration so Mautic doesn't continue to attempt to sync it.
      *
      * @param ObjectChangeDAO $objectChangeDAO
      */
-    public function deleteObject(ObjectChangeDAO $objectChangeDAO)
+    public function deleteObject(ObjectChangeDAO $objectChangeDAO): void
     {
         $this->deleteTheseObjects[] = $objectChangeDAO;
     }
 
     /**
      * If there is a temporary issue with syncing the object, tell the sync engine to not wipe out the tracked changes on Mautic's object fields
-     * so that they are attempted again for the next sync
+     * so that they are attempted again for the next sync.
      *
      * @param ObjectChangeDAO $objectChangeDAO
      */
-    public function retrySyncLater(ObjectChangeDAO $objectChangeDAO)
+    public function retrySyncLater(ObjectChangeDAO $objectChangeDAO): void
     {
         if (!isset($this->retryTheseLater[$objectChangeDAO->getMappedObject()])) {
             $this->retryTheseLater[$objectChangeDAO->getMappedObject()] = [];
@@ -258,7 +254,7 @@ class OrderDAO
      * @param ObjectChangeDAO $objectChangeDAO
      * @param string          $message
      */
-    public function noteObjectSyncIssue(ObjectChangeDAO $objectChangeDAO, string $message)
+    public function noteObjectSyncIssue(ObjectChangeDAO $objectChangeDAO, string $message): void
     {
         $this->notifications[] = new NotificationDAO($objectChangeDAO, $message);
     }
@@ -309,7 +305,7 @@ class OrderDAO
     public function getSuccessfullySyncedObjects()
     {
         $synced = [];
-        foreach ($this->changedObjects as $object => $objectChanges) {
+        foreach ($this->changedObjects as $objectChanges) {
             /** @var ObjectChangeDAO $objectChange */
             foreach ($objectChanges as $objectChange) {
                 if (isset($this->retryTheseLater[$objectChange->getMappedObject()])) {

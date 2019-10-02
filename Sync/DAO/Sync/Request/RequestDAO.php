@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -8,7 +10,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request;
 
@@ -85,7 +86,7 @@ class RequestDAO
     }
 
     /**
-     * The integration that will be synced to
+     * The integration that will be synced to.
      *
      * @return string
      */
@@ -105,7 +106,7 @@ class RequestDAO
     }
 
     /**
-     * Returns true if there are objects to sync
+     * Returns true if there are objects to sync.
      *
      * @return bool
      */

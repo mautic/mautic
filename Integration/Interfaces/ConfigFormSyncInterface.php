@@ -19,7 +19,7 @@ interface ConfigFormSyncInterface extends IntegrationInterface
 {
     /**
      * Return an array of Integration objects in the format of [$object => $translatableObjectNameString].
-     * i.e. ['Customer' => 'mautic.something.object.customer', 'Account' => 'mautic.something.object.account'];
+     * i.e. ['Customer' => 'mautic.something.object.customer', 'Account' => 'mautic.something.object.account'];.
      *
      * @return array
      */
@@ -27,41 +27,41 @@ interface ConfigFormSyncInterface extends IntegrationInterface
 
     /**
      * Return an array of Integration objects and what Mautic objects they are mapped to.
-     * i.e. ['Customer' => MauticSyncDataExchange::OBJECT_CONTACT, 'Account' =>  MauticSyncDataExchange::OBJECT_COMPANY];
+     * i.e. ['Customer' => MauticSyncDataExchange::OBJECT_CONTACT, 'Account' =>  MauticSyncDataExchange::OBJECT_COMPANY];.
      *
      * @return array
      */
     public function getSyncMappedObjects(): array;
 
     /**
-     * Return an array of required fields
+     * Return an array of required fields.
      *
      * @param string $object
      *
-     * @return array|MappedFieldInfoInterface[]
+     * @return MappedFieldInfoInterface[]
      */
     public function getRequiredFieldsForMapping(string $object): array;
 
     /**
-     * Return an array of optional fields
+     * Return an array of optional fields.
      *
      * @param string $object
      *
-     * @return array|MappedFieldInfoInterface[]
+     * @return MappedFieldInfoInterface[]
      */
     public function getOptionalFieldsForMapping(string $object): array;
 
     /**
-     * Return an array of all fields
+     * Return an array of all fields.
      *
      * @param string $object
      *
-     * @return array|MappedFieldInfoInterface[]
+     * @return MappedFieldInfoInterface[]
      */
     public function getAllFieldsForMapping(string $object): array;
 
     /**
-     * Return a custom form field name to be included in the features array specific to sync
+     * Return a custom form field name to be included in the features array specific to sync.
      *
      * @return string|null
      */

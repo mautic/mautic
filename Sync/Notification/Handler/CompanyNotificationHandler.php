@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -35,8 +37,6 @@ class CompanyNotificationHandler implements HandlerInterface
     private $companyHelper;
 
     /**
-     * CompanyNotificationHandler constructor.
-     *
      * @param Writer                 $writer
      * @param UserNotificationHelper $userNotificationHelper
      * @param CompanyHelper          $companyHelper
@@ -66,8 +66,8 @@ class CompanyNotificationHandler implements HandlerInterface
 
     /**
      * @param NotificationDAO $notificationDAO
-     * @param string $integrationDisplayName
-     * @param string $objectDisplayName
+     * @param string          $integrationDisplayName
+     * @param string          $objectDisplayName
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
@@ -80,9 +80,9 @@ class CompanyNotificationHandler implements HandlerInterface
             $notificationDAO->getMauticObjectId(),
             'sync',
             [
-                'integrationObject' => $notificationDAO->getIntegrationObject(),
+                'integrationObject'   => $notificationDAO->getIntegrationObject(),
                 'integrationObjectId' => $notificationDAO->getIntegrationObjectId(),
-                'message' => $notificationDAO->getMessage()
+                'message'             => $notificationDAO->getMessage(),
             ]
         );
 
@@ -92,7 +92,7 @@ class CompanyNotificationHandler implements HandlerInterface
             $objectDisplayName,
             $notificationDAO->getMauticObject(),
             $notificationDAO->getMauticObjectId(),
-            $this->companyHelper->getCompanyName($notificationDAO->getMauticObjectId())
+            (string) $this->companyHelper->getCompanyName($notificationDAO->getMauticObjectId())
         );
     }
 

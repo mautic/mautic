@@ -17,7 +17,7 @@ use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 
 class IntegrationTokenTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $expires   = time() + 100;
         $extraData = ['foo' => 'bar'];
@@ -29,14 +29,14 @@ class IntegrationTokenTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($extraData, $token->getExtraData());
     }
 
-    public function testIsExpired()
+    public function testIsExpired(): void
     {
         $token = new IntegrationToken('accessToken', 'refreshToken', time() - 100);
 
         $this->assertTrue($token->isExpired());
     }
 
-    public function testIsNotExpired()
+    public function testIsNotExpired(): void
     {
         $token = new IntegrationToken('accessToken', 'refreshToken', time() + 100);
 

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,9 +13,9 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
-use Iterator;
 use Countable;
+use Iterator;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsDAO implements Iterator, Countable
 {
@@ -29,7 +32,7 @@ class RelationsDAO implements Iterator, Countable
     /**
      * @param RelationDAO[] $relations
      */
-    public function addRelations(array $relations)
+    public function addRelations(array $relations): void
     {
         foreach ($relations as $relation) {
             $this->addRelation($relation);

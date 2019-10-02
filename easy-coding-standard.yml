@@ -1,0 +1,35 @@
+imports:
+  - { resource: 'vendor/symplify/easy-coding-standard/config/set/clean-code.yaml' }
+  - { resource: 'vendor/symplify/easy-coding-standard/config/set/php71.yaml' }
+  - { resource: 'vendor/symplify/easy-coding-standard/config/set/symfony.yaml' }
+
+services:
+  PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer:
+    align_equals: true
+    align_double_arrow: true
+
+parameters:
+  exclude_checkers:
+    - 'PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer'
+    - 'Symplify\CodingStandard\Fixer\Commenting\RemoveUselessDocBlockFixer'
+    - 'PhpCsFixer\Fixer\Import\OrderedImportsFixer'
+  exclude_files:
+    - 'vendor/*'
+  skip:
+    PhpCsFixer\Fixer\ArraNotation\TrailingCommaInMultilineArrayFixer:
+      - 'Config/config.php' # Forces us to do not use full path class names
+    SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingParameterTypeHint:
+      - 'Tests/*'
+    SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingPropertyTypeHint:
+      - 'Tests/*'
+    SlevomatCodingStandard\Sniffs\Variables\UnusedVariableSniff.UnusedVariable:
+      - 'Sync/Helper/MappingHelper.php'
+      - 'Helper/FieldValidationHelper.php'
+      - 'Form/Type/IntegrationSyncSettingsFieldMappingsType.php'
+      - 'DependencyInjection/Compiler/SyncIntegrationsPass.php'
+      - 'DependencyInjection/Compiler/IntegrationsPass.php'
+      - 'DependencyInjection/Compiler/ConfigIntegrationPass.php'
+      - 'DependencyInjection/Compiler/AuthenticationIntegrationPass.php'
+    SlevomatCodingStandard\Sniffs\Classes\UnusedPrivateElementsSniff.WriteOnlyProperty:
+      - 'Helper/FieldValidationHelper.php'
+

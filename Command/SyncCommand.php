@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -11,14 +13,14 @@
 
 namespace MauticPlugin\IntegrationsBundle\Command;
 
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class SyncCommand extends ContainerAwareCommand
 {
@@ -42,7 +44,7 @@ class SyncCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName(self::NAME)
             ->setDescription('Fetch objects from integration.')
@@ -117,8 +119,8 @@ class SyncCommand extends ContainerAwareCommand
             defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
 
             $this->syncService->processIntegrationSync($inputOptions);
-        } catch (\Exception $e) {
-            if ($input->getOption('env') === 'dev' || (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev')) {
+        } catch (\Throwable $e) {
+            if ('dev' === $input->getOption('env') || (defined('MAUTIC_ENV') && MAUTIC_ENV === 'dev')) {
                 throw $e;
             }
 
