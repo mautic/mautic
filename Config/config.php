@@ -151,6 +151,7 @@ return [
                 'class'     => \MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
+                    'mautic.integrations.internal.object_provider',
                 ],
             ],
             'mautic.integrations.helper.config_integrations' => [
