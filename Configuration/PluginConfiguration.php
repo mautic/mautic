@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -30,7 +33,7 @@ class PluginConfiguration implements ConfigurationInterface
                 ->scalarNode('version')
                     ->validate()
                         ->ifTrue(function ($s) {
-                            return preg_match('#[0-9]+\.[0-9]+(\.[0-9]+)?#', $s) !== 1;
+                            return 1 !== preg_match('#[0-9]+\.[0-9]+(\.[0-9]+)?#', $s);
                         })
                         ->thenInvalid('Invalid version definition')->end()
                     ->end()

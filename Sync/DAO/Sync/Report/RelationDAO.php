@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -42,7 +45,6 @@ class RelationDAO
      */
     private $relObjectInternalId;
 
-
     public function __construct(string $objectName, string $relFieldName, string $relObjectName, string $objectIntegrationId, string $relObjectIntegrationId)
     {
         $this->objectName             = $objectName;
@@ -52,7 +54,6 @@ class RelationDAO
         $this->relObjectIntegrationId = $relObjectIntegrationId;
     }
 
-
     /**
      * @return string
      */
@@ -60,7 +61,6 @@ class RelationDAO
     {
         return $this->objectName;
     }
-
 
     /**
      * @return string
@@ -70,7 +70,6 @@ class RelationDAO
         return $this->relObjectName;
     }
 
-
     /**
      * @return string
      */
@@ -78,7 +77,6 @@ class RelationDAO
     {
         return $this->relFieldName;
     }
-
 
     /**
      * @return string
@@ -107,7 +105,7 @@ class RelationDAO
     /**
      * @param int $relObjectInternalId
      */
-    public function setRelObjectInternalId(int $relObjectInternalId)
+    public function setRelObjectInternalId(int $relObjectInternalId): void
     {
         $this->relObjectInternalId = $relObjectInternalId;
     }

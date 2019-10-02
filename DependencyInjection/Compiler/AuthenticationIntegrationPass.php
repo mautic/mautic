@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -20,7 +22,7 @@ class AuthenticationIntegrationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $taggedServices     = $container->findTaggedServiceIds('mautic.authentication_integration');
         $integrationsHelper = $container->findDefinition('mautic.integrations.helper.auth_integrations');

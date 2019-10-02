@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Migration;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\EntityManager;
 
 abstract class AbstractMigration implements MigrationInterface
 {

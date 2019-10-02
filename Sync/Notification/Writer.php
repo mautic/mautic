@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Notification;
-
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -35,8 +36,6 @@ class Writer
     private $em;
 
     /**
-     * Writer constructor.
-     *
      * @param NotificationModel      $notificationModel
      * @param AuditLogModel          $auditLogModel
      * @param EntityManagerInterface $entityManager
@@ -58,7 +57,7 @@ class Writer
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function writeUserNotification(string $header, string $message, int $userId)
+    public function writeUserNotification(string $header, string $message, int $userId): void
     {
         $this->notificationModel->addNotification(
             $message,
@@ -78,7 +77,7 @@ class Writer
      * @param string   $action
      * @param array    $details
      */
-    public function writeAuditLogEntry(string $bundle, string $object, ?int $objectId, string $action, array $details)
+    public function writeAuditLogEntry(string $bundle, string $object, ?int $objectId, string $action, array $details): void
     {
         $log = [
             'bundle'   => $bundle,

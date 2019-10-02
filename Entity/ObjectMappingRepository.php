@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -11,11 +13,10 @@
 
 namespace MauticPlugin\IntegrationsBundle\Entity;
 
-
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class ObjectMappingRepository  extends CommonRepository
+class ObjectMappingRepository extends CommonRepository
 {
     /**
      * @param $integration
@@ -45,7 +46,7 @@ class ObjectMappingRepository  extends CommonRepository
 
         $result = $qb->execute()->fetch();
 
-        return $result ? $result : null;
+        return $result ?: null;
     }
 
     /**
@@ -76,7 +77,7 @@ class ObjectMappingRepository  extends CommonRepository
 
         $result = $qb->execute()->fetch();
 
-        return $result ? $result : null;
+        return $result ?: null;
     }
 
     /**
@@ -122,7 +123,7 @@ class ObjectMappingRepository  extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping','m')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
             ->set('is_deleted', 1)
             ->where(
                 $qb->expr()->andX(

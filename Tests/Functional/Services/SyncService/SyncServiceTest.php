@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -16,12 +18,12 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
-use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
+use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 
 class SyncServiceTest extends MauticMysqlTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -29,15 +31,12 @@ class SyncServiceTest extends MauticMysqlTestCase
         $this->installDatabaseFixtures([dirname(__DIR__).'/../../../../../app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
     }
 
-    public function testSync()
+    public function testSync(): void
     {
         $this->markTestSkipped('disabled for now');
 
         // Sleep one second to ensure that the modified date/time stamps of the contacts just created are in the past
         sleep(1);
-
-        // Record now because we're going to sync again
-        $now = new \DateTime();
 
         $prefix     = $this->container->getParameter('mautic.db_table_prefix');
         $connection = $this->container->get('doctrine.dbal.default_connection');
@@ -65,8 +64,7 @@ class SyncServiceTest extends MauticMysqlTestCase
 
         $this->assertEquals(
             [
-                4 =>
-                    [
+                4 => [
                         'id'         => 4,
                         'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
                         'first_name' => 'Lewis',
@@ -74,8 +72,7 @@ class SyncServiceTest extends MauticMysqlTestCase
                         'email'      => 'LewisTSyed@gustr.com',
                         'street1'    => '107 Yorkie Lane',
                     ],
-                3 =>
-                    [
+                3 => [
                         'id'         => 3,
                         'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
                         'first_name' => 'Nellie',

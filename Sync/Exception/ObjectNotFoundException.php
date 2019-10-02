@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -11,12 +13,9 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Exception;
 
-
 class ObjectNotFoundException extends \Exception
 {
     /**
-     * ObjectNotFoundException constructor.
-     *
      * @param string $object
      */
     public function __construct(string $object)

@@ -15,13 +15,13 @@ namespace MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
- * Factory for building HTTP clients using basic auth
+ * Factory for building HTTP clients using basic auth.
  */
 class HttpFactory implements AuthProviderInterface
 {
@@ -47,6 +47,7 @@ class HttpFactory implements AuthProviderInterface
      * @param AuthConfigInterface                           $config
      *
      * @return ClientInterface
+     *
      * @throws PluginNotConfiguredException
      */
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
@@ -64,7 +65,7 @@ class HttpFactory implements AuthProviderInterface
             [
                 'auth' => [
                     $credentials->getUsername(),
-                    $credentials->getPassword()
+                    $credentials->getPassword(),
                 ],
             ]
         );

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,7 +13,6 @@
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncJudge\Modes;
 
-
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
@@ -19,7 +20,7 @@ use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\FuzzyEvidence;
 
 class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
 {
-    public function testLeftWinnerWithCertainChangeDateTime()
+    public function testLeftWinnerWithCertainChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -44,7 +45,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($leftChangeRequest, $winner);
     }
 
-    public function testRightWinnerWithCertainChangeDateTime()
+    public function testRightWinnerWithCertainChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -69,7 +70,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($rightChangeRequest, $winner);
     }
 
-    public function testLeftWinnerWithPossibleChangeDateTime()
+    public function testLeftWinnerWithPossibleChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -94,7 +95,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($leftChangeRequest, $winner);
     }
 
-    public function testRightWinnerWithPossibleChangeDateTime()
+    public function testRightWinnerWithPossibleChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -119,7 +120,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($rightChangeRequest, $winner);
     }
 
-    public function testLeftWinnerWithCertainChangeDateTimeNewerThanRightPossibleChangeDateTime()
+    public function testLeftWinnerWithCertainChangeDateTimeNewerThanRightPossibleChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -144,7 +145,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($leftChangeRequest, $winner);
     }
 
-    public function testRightWinnerWithCertainChangeDateTimeNewerThanLeftPossibleChangeDateTime()
+    public function testRightWinnerWithCertainChangeDateTimeNewerThanLeftPossibleChangeDateTime(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -169,7 +170,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($rightChangeRequest, $winner);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfLeftCertainIsEqualToRightPossible()
+    public function testUnresolvedConflictExceptionThrownIfLeftCertainIsEqualToRightPossible(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -193,7 +194,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfRightCertainIsEqualToLeftPossible()
+    public function testUnresolvedConflictExceptionThrownIfRightCertainIsEqualToLeftPossible(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -217,7 +218,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfLeftCertainIsNull()
+    public function testUnresolvedConflictExceptionThrownIfLeftCertainIsNull(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -240,7 +241,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfRightCertainIsNull()
+    public function testUnresolvedConflictExceptionThrownIfRightCertainIsNull(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -263,7 +264,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfLeftPossibleIsNull()
+    public function testUnresolvedConflictExceptionThrownIfLeftPossibleIsNull(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',
@@ -286,7 +287,7 @@ class FuzzyEvidenceTest extends \PHPUnit_Framework_TestCase
         FuzzyEvidence::adjudicate($leftChangeRequest, $rightChangeRequest);
     }
 
-    public function testUnresolvedConflictExceptionThrownIfRightPossibleIsNull()
+    public function testUnresolvedConflictExceptionThrownIfRightPossibleIsNull(): void
     {
         $leftChangeRequest = new InformationChangeRequestDAO(
             'Test',

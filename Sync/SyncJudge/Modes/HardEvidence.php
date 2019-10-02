@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes;
-
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
@@ -25,13 +26,14 @@ class HardEvidence implements JudgementModeInterface
      * @param InformationChangeRequestDAO $rightChangeRequest
      *
      * @return InformationChangeRequestDAO
+     *
      * @throws ConflictUnresolvedException
      */
     public static function adjudicate(
         InformationChangeRequestDAO $leftChangeRequest,
         InformationChangeRequestDAO $rightChangeRequest
     ): InformationChangeRequestDAO {
-        if ($leftChangeRequest->getCertainChangeDateTime() === null || $rightChangeRequest->getCertainChangeDateTime() === null) {
+        if (null === $leftChangeRequest->getCertainChangeDateTime() || null === $rightChangeRequest->getCertainChangeDateTime()) {
             throw new ConflictUnresolvedException();
         }
 
@@ -40,11 +42,11 @@ class HardEvidence implements JudgementModeInterface
             $rightChangeRequest->getCertainChangeDateTime()
         );
 
-        if ($certainChangeCompare === SyncJudgeInterface::NO_WINNER) {
+        if (SyncJudgeInterface::NO_WINNER === $certainChangeCompare) {
             throw new ConflictUnresolvedException();
         }
 
-        if ($certainChangeCompare === SyncJudgeInterface::LEFT_WINNER) {
+        if (SyncJudgeInterface::LEFT_WINNER === $certainChangeCompare) {
             return $leftChangeRequest;
         }
 

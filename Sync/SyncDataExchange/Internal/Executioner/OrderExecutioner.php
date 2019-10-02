@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner;
-
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
@@ -43,8 +44,6 @@ class OrderExecutioner
     private $syncOrder;
 
     /**
-     * OrderExecutioner constructor.
-     *
      * @param MappingHelper       $mappingHelper
      * @param ContactObjectHelper $contactObjectHelper
      * @param CompanyObjectHelper $companyObjectHelper
@@ -59,7 +58,7 @@ class OrderExecutioner
     /**
      * @param OrderDAO $syncOrderDAO
      */
-    public function execute(OrderDAO $syncOrderDAO)
+    public function execute(OrderDAO $syncOrderDAO): void
     {
         $this->syncOrder = $syncOrderDAO;
 
@@ -96,13 +95,13 @@ class OrderExecutioner
      *
      * @throws ObjectNotSupportedException
      */
-    private function updateObjects(string $objectName, array $updateObjects)
+    private function updateObjects(string $objectName, array $updateObjects): void
     {
         $updateCount = count($updateObjects);
         DebugLogger::log(
             MauticSyncDataExchange::NAME,
             sprintf(
-                "Updating %d %s object(s)",
+                'Updating %d %s object(s)',
                 $updateCount,
                 $objectName
             ),
@@ -118,9 +117,11 @@ class OrderExecutioner
         switch ($objectName) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
                 $updatedObjectMappings = $this->contactObjectHelper->update($identifiedObjectIds, $updateObjects);
+
                 break;
             case MauticSyncDataExchange::OBJECT_COMPANY:
                 $updatedObjectMappings = $this->companyObjectHelper->update($identifiedObjectIds, $updateObjects);
+
                 break;
             default:
                 throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
@@ -135,14 +136,14 @@ class OrderExecutioner
      *
      * @throws ObjectNotSupportedException
      */
-    private function createObjects(string $objectName, array $createObjects)
+    private function createObjects(string $objectName, array $createObjects): void
     {
         $createCount = count($createObjects);
 
         DebugLogger::log(
             MauticSyncDataExchange::NAME,
             sprintf(
-                "Creating %d %s object(s)",
+                'Creating %d %s object(s)',
                 $createCount,
                 $objectName
             ),
@@ -156,9 +157,11 @@ class OrderExecutioner
         switch ($objectName) {
             case MauticSyncDataExchange::OBJECT_CONTACT:
                 $objectMappings = $this->contactObjectHelper->create($createObjects);
+
                 break;
             case MauticSyncDataExchange::OBJECT_COMPANY:
                 $objectMappings = $this->companyObjectHelper->create($createObjects);
+
                 break;
             default:
                 throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);

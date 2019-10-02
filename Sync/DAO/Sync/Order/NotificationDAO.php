@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -10,7 +12,6 @@
  */
 
 namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
-
 
 class NotificationDAO
 {
@@ -25,8 +26,6 @@ class NotificationDAO
     private $message;
 
     /**
-     * NotificationDAO constructor.
-     *
      * @param ObjectChangeDAO $objectChangeDAO
      * @param string          $message
      */

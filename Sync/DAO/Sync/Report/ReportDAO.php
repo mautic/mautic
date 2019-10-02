@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -17,9 +19,6 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
-/**
- * Class ReportDAO
- */
 class ReportDAO
 {
     /**
@@ -43,14 +42,12 @@ class ReportDAO
     private $relationsDAO;
 
     /**
-     * SyncReportDAO constructor.
-     *
      * @param $integration
      */
     public function __construct($integration)
     {
         $this->integration     = $integration;
-        $this->relationsDAO = new RelationsDAO();
+        $this->relationsDAO    = new RelationsDAO();
     }
 
     /**
@@ -83,7 +80,7 @@ class ReportDAO
      * @param string $newObjectName
      * @param mixed  $newObjectId
      */
-    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null)
+    public function remapObject($oldObjectName, $oldObjectId, $newObjectName, $newObjectId = null): void
     {
         if (null === $newObjectId) {
             $newObjectId = $oldObjectId;
@@ -98,13 +95,14 @@ class ReportDAO
      * @param $fieldName
      *
      * @return InformationChangeRequestDAO
+     *
      * @throws ObjectNotFoundException
      * @throws FieldNotFoundException
      */
     public function getInformationChangeRequest($objectName, $objectId, $fieldName)
     {
         if (empty($this->objects[$objectName][$objectId])) {
-            throw new ObjectNotFoundException($objectName.":".$objectId);
+            throw new ObjectNotFoundException($objectName.':'.$objectId);
         }
 
         /** @var ObjectDAO $reportObject */
@@ -187,5 +185,4 @@ class ReportDAO
     {
         return $this->relationsDAO;
     }
-
 }

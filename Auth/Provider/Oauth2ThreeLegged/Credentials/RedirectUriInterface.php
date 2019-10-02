@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
-
 interface RedirectUriInterface
 {
     /**
      * @return string
      */
     public function getRedirectUri(): string;
-
 }

@@ -43,7 +43,7 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
      */
     public function __construct(TranslatorInterface $translator, FieldHelper $fieldHelper)
     {
-        $this->translator = $translator;
+        $this->translator  = $translator;
         $this->fieldHelper = $fieldHelper;
     }
 
@@ -116,7 +116,7 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
             [
                 'label'  => false,
                 'mapped' => false,
-                'data'   => $options['totalFieldCount']
+                'data'   => $options['totalFieldCount'],
             ]
         );
     }

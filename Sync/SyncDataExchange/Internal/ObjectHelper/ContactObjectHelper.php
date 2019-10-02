@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -11,22 +13,21 @@
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
-
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {
@@ -84,7 +85,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     public function create(array $objects): array
     {
         $availableFields = $this->getAvailableFields();
-        $objectMappings = [];
+        $objectMappings  = [];
 
         foreach ($objects as $object) {
             $contact = new Lead();
@@ -103,7 +104,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             $this->model->saveEntity($contact);
 
             // Process the pseudo field
-            $this->processPseudoFields($contact, $pseudoFields,  $object->getIntegration());
+            $this->processPseudoFields($contact, $pseudoFields, $object->getIntegration());
 
             // Detach to free RAM
             $this->repository->detachEntity($contact);
@@ -111,7 +112,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
-                    "Created lead ID %d",
+                    'Created lead ID %d',
                     $contact->getId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -143,14 +144,14 @@ class ContactObjectHelper implements ObjectHelperInterface
         DebugLogger::log(
             MauticSyncDataExchange::NAME,
             sprintf(
-                "Found %d leads to update with ids %s",
+                'Found %d leads to update with ids %s',
                 count($contacts),
-                implode(", ", $ids)
+                implode(', ', $ids)
             ),
             __CLASS__.':'.__FUNCTION__
         );
 
-        $availableFields = $this->getAvailableFields();
+        $availableFields      = $this->getAvailableFields();
         $updatedMappedObjects = [];
 
         foreach ($contacts as $contact) {
@@ -179,7 +180,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             DebugLogger::log(
                 MauticSyncDataExchange::NAME,
                 sprintf(
-                    "Updated lead ID %d",
+                    'Updated lead ID %d',
                     $contact->getId()
                 ),
                 __CLASS__.':'.__FUNCTION__
@@ -201,11 +202,11 @@ class ContactObjectHelper implements ObjectHelperInterface
      * @param Lead     $contact
      * @param FieldDAO $field
      */
-    private function addUpdatedFieldToContact(Lead $contact, FieldDAO $field)
+    private function addUpdatedFieldToContact(Lead $contact, FieldDAO $field): void
     {
         $value = $field->getValue()->getNormalizedValue();
 
-        if ($field->getName() === MauticSyncDataExchange::OBJECT_COMPANY && $value instanceof ReferenceValueDAO && null !== $value->getValue()) {
+        if (MauticSyncDataExchange::OBJECT_COMPANY === $field->getName() && $value instanceof ReferenceValueDAO && null !== $value->getValue()) {
             try {
                 $value = $this->getCompanyNameById($value->getValue());
             } catch (ObjectNotFoundException $e) {
@@ -216,7 +217,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries
+     * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries.
      *
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
@@ -293,11 +294,8 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
-
 
     /**
      * @param int    $contactId
@@ -334,7 +332,7 @@ class ContactObjectHelper implements ObjectHelperInterface
      * @param int $id
      *
      * @return string
-     * 
+     *
      * @throws ObjectNotFoundException
      */
     private function getCompanyNameById(int $id): string
@@ -369,15 +367,14 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param Lead   $contact
-     * @param FieldDAO[]  $fields
-     * @param string $integration
+     * @param Lead       $contact
+     * @param FieldDAO[] $fields
+     * @param string     $integration
      */
-    private function processPseudoFields(Lead $contact, array $fields, string $integration)
+    private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {
-
         foreach ($fields as $name => $field) {
-            if (strpos($name, 'mautic_internal_dnc_') === 0) {
+            if (0 === strpos($name, 'mautic_internal_dnc_')) {
                 $channel   = str_replace('mautic_internal_dnc_', '', $name);
 
                 $dncReason = $this->getDoNotContactReason($field->getValue()->getNormalizedValue());

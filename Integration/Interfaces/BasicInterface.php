@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -16,7 +18,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 interface BasicInterface extends UnifiedIntegrationInterface
 {
     /**
-     * Return the integration's name
+     * Return the integration's name.
      *
      * @return string
      */
@@ -26,5 +28,4 @@ interface BasicInterface extends UnifiedIntegrationInterface
      * @return string
      */
     public function getIcon(): string;
-
 }

@@ -86,3 +86,11 @@ With this command you can run all the tests for this plugin. Functional tests in
 #### `$ composer quicktest`
 
 With this command you can run all the tests for this plugin except functional tests which makes it fast.
+
+#### `$ composer phpunit -- --filter x`
+
+With this command you can filter which tests you want to run. Replace `x` with whatever test class name or method you focus on.
+
+#### `$ composer fixcs`
+
+If you wan to automatically fix code styles then run this.
