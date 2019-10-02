@@ -93,7 +93,7 @@ class RelationsHelper
         $internalObjectId = $relObject->getObjectId();
 
         if ($internalObjectId) {
-            return $internalObjectId;
+            return (int) $internalObjectId;
         }
 
         throw new InternalIdNotFoundException($relationObject->getRelObjectName());
