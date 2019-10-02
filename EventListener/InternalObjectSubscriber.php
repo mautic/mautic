@@ -15,9 +15,9 @@ namespace MauticPlugin\IntegrationsBundle\EventListener;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
 
 class InternalObjectSubscriber implements EventSubscriberInterface
 {

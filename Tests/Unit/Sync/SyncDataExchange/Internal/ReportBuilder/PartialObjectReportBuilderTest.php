@@ -16,6 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Inter
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
@@ -75,7 +76,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
         $requestDAO    = new RequestDAO(self::INTEGRATION_NAME, 1, new InputOptionsDAO(['integration' => self::INTEGRATION_NAME]));
         $fromDateTime  = new \DateTimeImmutable('2018-10-08 00:00:00');
         $toDateTime    = new \DateTimeImmutable('2018-10-08 00:01:00');
-        $requestObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, $fromDateTime, $toDateTime);
+        $requestObject = new ObjectDAO(Contact::NAME, $fromDateTime, $toDateTime);
         $requestObject->addField('email');
         $requestObject->addField('firstname');
         $requestDAO->addObject($requestObject);
@@ -128,7 +129,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 
         $report = $this->getReportBuilder()->buildReport($requestDAO);
 
-        $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_CONTACT);
+        $objects = $report->getObjects(Contact::NAME);
 
         $this->assertTrue(isset($objects[1]));
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());

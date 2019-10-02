@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Executioner;
 
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
@@ -62,7 +63,7 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
         $this->companyObjectHelper->expects($this->never())
             ->method('create');
 
-        $syncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_CONTACT);
+        $syncOrder = $this->getSyncOrder(Contact::NAME);
         $this->getOrderExecutioner()->execute($syncOrder);
     }
 
@@ -105,7 +106,7 @@ class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
             ->method('create');
 
         // Merge companies and contacts for the test
-        $syncOrder        = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_CONTACT);
+        $syncOrder        = $this->getSyncOrder(Contact::NAME);
         $companySyncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_COMPANY);
         foreach ($companySyncOrder->getChangedObjectsByObjectType(MauticSyncDataExchange::OBJECT_COMPANY) as $objectChange) {
             $syncOrder->addObjectChange($objectChange);

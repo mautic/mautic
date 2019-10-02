@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\Routing\Router;
 
 class RouteHelperTest extends \PHPUnit_Framework_TestCase
@@ -41,7 +41,7 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
                }
            );
 
-        $this->getRouteHelper()->getRoute(MauticSyncDataExchange::OBJECT_CONTACT, 1);
+        $this->getRouteHelper()->getRoute(Contact::NAME, 1);
     }
 
     public function testCompanyRoute(): void
@@ -74,7 +74,7 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $link = $this->getRouteHelper()->getLink(MauticSyncDataExchange::OBJECT_CONTACT, 1, 'Hello');
+        $link = $this->getRouteHelper()->getLink(Contact::NAME, 1, 'Hello');
         $this->assertEquals('<a href="foo.bar">Hello</a>', $link);
     }
 
@@ -89,7 +89,7 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $csv = $this->getRouteHelper()->getLinkCsv(MauticSyncDataExchange::OBJECT_CONTACT, [1, 2]);
+        $csv = $this->getRouteHelper()->getLinkCsv(Contact::NAME, [1, 2]);
         $this->assertEquals('[<a href="foo.bar">1</a>], [<a href="foo.bar">2</a>]', $csv);
     }
 

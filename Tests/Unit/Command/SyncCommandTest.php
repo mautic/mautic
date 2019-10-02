@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Command;
 
 use MauticPlugin\IntegrationsBundle\Command\SyncCommand;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
@@ -78,7 +78,7 @@ class SyncCommandTest extends \PHPUnit_Framework_TestCase
             ->method('processIntegrationSync')
             ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
-                $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT));
+                $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
                 $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
                 $this->assertTrue($inputOptionsDAO->pullIsEnabled());
                 $this->assertFalse($inputOptionsDAO->pushIsEnabled());

@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -123,7 +124,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setIntegration($object->getIntegration())
                 ->setIntegrationObjectName($object->getMappedObject())
                 ->setIntegrationObjectId($object->getMappedObjectId())
-                ->setInternalObjectName(MauticSyncDataExchange::OBJECT_CONTACT)
+                ->setInternalObjectName(Contact::NAME)
                 ->setInternalObjectId($contact->getId());
             $objectMappings[] = $objectMapping;
         }

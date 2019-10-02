@@ -21,6 +21,7 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
@@ -95,7 +96,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')
-            ->with(MauticSyncDataExchange::OBJECT_CONTACT)
+            ->with(Contact::NAME)
             ->willReturn(false);
 
         $this->subscriber->onLeadPostSave($event);
@@ -120,7 +121,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')
-            ->with(MauticSyncDataExchange::OBJECT_CONTACT)
+            ->with(Contact::NAME)
             ->willReturn(true);
 
         $this->subscriber->onLeadPostSave($event);
@@ -160,7 +161,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')
-            ->with(MauticSyncDataExchange::OBJECT_CONTACT)
+            ->with(Contact::NAME)
             ->willReturn(true);
 
         $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
@@ -198,7 +199,7 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')
-            ->with(MauticSyncDataExchange::OBJECT_CONTACT)
+            ->with(Contact::NAME)
             ->willReturn(true);
 
         $fieldChanges['fields']['owner_id'] = $fieldChanges['owner'];

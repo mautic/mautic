@@ -16,6 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Functional\Sync\Notification;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
@@ -50,7 +51,7 @@ class NotifierTest extends MauticMysqlTestCase
                 ExampleIntegration::NAME,
                 'Foo',
                 1,
-                MauticSyncDataExchange::OBJECT_CONTACT,
+                Contact::NAME,
                 1
             ),
             'This is the message'

@@ -15,6 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
@@ -104,7 +105,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $internalObjectName   = MauticSyncDataExchange::OBJECT_CONTACT;
+        $internalObjectName   = Contact::NAME;
         $integrationObjectDAO = new ObjectDAO('Object', 1);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));
 
@@ -135,7 +136,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $internalObjectName   = MauticSyncDataExchange::OBJECT_CONTACT;
+        $internalObjectName   = Contact::NAME;
         $changeDateTime       = new \DateTime();
         $integrationObjectDAO = new ObjectDAO('Object', 1, $changeDateTime);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));

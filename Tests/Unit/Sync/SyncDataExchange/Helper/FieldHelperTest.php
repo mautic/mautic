@@ -16,8 +16,8 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helpe
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -65,7 +65,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testContactSyncFieldsReturned(): void
     {
-        $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
+        $objectName = Contact::NAME;
         $syncFields = ['email' => 'Email'];
 
         $this->mauticSyncFieldsLoadEvent->method('getObjectName')
@@ -91,7 +91,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testCompanySyncFieldsReturned(): void
     {
-        $objectName = MauticSyncDataExchange::OBJECT_CONTACT;
+        $objectName = Contact::NAME;
         $syncFields = ['email' => 'Email'];
 
         $this->mauticSyncFieldsLoadEvent->method('getObjectName')
