@@ -90,10 +90,10 @@ class RelationsHelper
     private function getInternalObjectId(MappingManualDAO $mappingManualDao, RelationDAO $relationObject, ObjectDAO $relObjectDao): int
     {
         $relObject        = $this->findInternalObject($mappingManualDao, $relationObject->getRelObjectName(), $relObjectDao);
-        $internalObjectId = $relObject->getObjectId();
+        $internalObjectId = (int) $relObject->getObjectId();
 
         if ($internalObjectId) {
-            return (int) $internalObjectId;
+            return $internalObjectId;
         }
 
         throw new InternalIdNotFoundException($relationObject->getRelObjectName());
