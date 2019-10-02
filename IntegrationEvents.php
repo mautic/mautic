@@ -68,4 +68,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD = 'mautic.integration.mautic_sync_field_load';
+
+    /**
+     * The mautic.integration.INTEGRATION_COLLECT_INTERNAL_OBJECTS event is dispatched when a list of Mautic internal objects is build.
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_COLLECT_INTERNAL_OBJECTS = 'mautic.integration.INTEGRATION_COLLECT_INTERNAL_OBJECTS';
 }
