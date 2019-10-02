@@ -65,6 +65,9 @@ return [
                     'mautic.integrations.helper.sync_integrations',
                 ],
             ],
+            'mautic.integrations.subscriber.internal_object' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\InternalObjectSubscriber::class,
+            ],
             'mautic.integrations.subscriber.controller' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\EventListener\ControllerSubscriber::class,
                 'arguments' => [
