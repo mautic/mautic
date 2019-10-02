@@ -144,6 +144,6 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(0, $objectsToSynchronize);
         $this->assertEquals($internalRelObjectId, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getValue());
-        $this->assertEquals('company', $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getType());
+        $this->assertEquals(MauticSyncDataExchange::OBJECT_COMPANY, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getType());
     }
 }
