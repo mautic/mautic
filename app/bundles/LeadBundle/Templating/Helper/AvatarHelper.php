@@ -58,7 +58,7 @@ class AvatarHelper extends Helper
         }
 
         $fs = new Filesystem();
-        $fs->copy($filePath, $avatarDir.DIRECTORY_SEPARATOR.'avatar'.$lead->getId());
+        $fs->copy($filePath, $avatarDir.DIRECTORY_SEPARATOR.'avatar'.$lead->getId(), true);
     }
 
     /**
