@@ -220,7 +220,7 @@ class ContactObjectHelper implements ObjectHelperInterface
      */
     private function getReferenceValueForField(ReferenceValueDAO $value): ?string
     {
-        if ($value->getType() === MauticSyncDataExchange::OBJECT_COMPANY && 0 < $value->getValue()) {
+        if (MauticSyncDataExchange::OBJECT_COMPANY === $value->getType() && 0 < $value->getValue()) {
             try {
                 return $this->getCompanyNameById($value->getValue());
             } catch (ObjectNotFoundException $e) {

@@ -40,6 +40,7 @@ class ReferenceValueDAO
     {
         $this->value = $value;
     }
+
     /**
      * @return string|null
      */
@@ -51,7 +52,7 @@ class ReferenceValueDAO
     /**
      * @param string $type
      */
-    public function setType(string $type)
+    public function setType(string $type): void
     {
         $this->type = $type;
     }
