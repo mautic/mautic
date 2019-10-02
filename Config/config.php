@@ -67,6 +67,10 @@ return [
             ],
             'mautic.integrations.subscriber.internal_object' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\EventListener\InternalObjectSubscriber::class,
+                'arguments' => [
+                    'mautic.integrations.helper.contact_object',
+                    'mautic.integrations.helper.company_object',
+                ],
             ],
             'mautic.integrations.subscriber.controller' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\EventListener\ControllerSubscriber::class,
@@ -261,8 +265,8 @@ return [
                 'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_mapping',
-                    'mautic.integrations.helper.contact_object',
-                    'mautic.integrations.helper.company_object',
+                    'event_dispatcher',
+                    'mautic.integrations.internal.object_provider',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_helper' => [

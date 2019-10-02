@@ -15,8 +15,6 @@ namespace MauticPlugin\IntegrationsBundle\Internal\Object;
 
 interface ObjectInterface
 {
-    const NAME = 'undefined';
-
     /**
      * Returns name key of the object.
      *

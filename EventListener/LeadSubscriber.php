@@ -91,7 +91,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(Contact::class)) {
+        if (!$this->syncIntegrationsHelper->hasObjectSyncEnabled(Contact::NAME)) {
             // Only track if an integration is syncing with contacts
             return;
         }

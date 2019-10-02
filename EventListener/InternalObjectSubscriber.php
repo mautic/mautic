@@ -13,14 +13,40 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\EventListener;
 
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class InternalObjectSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var ContactObjectHelper
+     */
+    private $contactObjectHelper;
+
+    /**
+     * @var CompanyObjectHelper
+     */
+    private $companyObjectHelper;
+
+    /**
+     * @param ContactObjectHelper $contactObjectHelper
+     * @param CompanyObjectHelper $companyObjectHelper
+     */
+    public function __construct(
+        ContactObjectHelper $contactObjectHelper,
+        CompanyObjectHelper $companyObjectHelper
+    ) {
+        $this->contactObjectHelper = $contactObjectHelper;
+        $this->companyObjectHelper = $companyObjectHelper;
+    }
+
     /**
      * @return array
      */
@@ -28,6 +54,14 @@ class InternalObjectSubscriber implements EventSubscriberInterface
     {
         return [
             IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
+            IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => [
+                ['updateContacts', 0],
+                ['updateCompanies', 0],
+            ],
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => [
+                ['createContacts', 0],
+                ['createCompanies', 0],
+            ],
         ];
     }
 
@@ -38,5 +72,67 @@ class InternalObjectSubscriber implements EventSubscriberInterface
     {
         $event->addObject(new Contact());
         $event->addObject(new Company());
+    }
+
+    /**
+     * @param InternalObjectUpdateEvent $event
+     */
+    public function updateContacts(InternalObjectUpdateEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setUpdatedObjectMappings(
+            $this->contactObjectHelper->update(
+                $event->getIdentifiedObjectIds(),
+                $event->getUpdateObjects()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectUpdateEvent $event
+     */
+    public function updateCompanies(InternalObjectUpdateEvent $event): void
+    {
+        if (Company::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setUpdatedObjectMappings(
+            $this->contactObjectHelper->update(
+                $event->getIdentifiedObjectIds(),
+                $event->getUpdateObjects()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectCreateEvent $event
+     */
+    public function createContacts(InternalObjectCreateEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setObjectMappings($this->contactObjectHelper->create($event->getCreateObjects()));
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectCreateEvent $event
+     */
+    public function createCompanies(InternalObjectCreateEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setObjectMappings($this->companyObjectHelper->create($event->getCreateObjects()));
+        $event->stopPropagation();
     }
 }
