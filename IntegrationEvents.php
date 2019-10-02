@@ -77,4 +77,22 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_COLLECT_INTERNAL_OBJECTS = 'mautic.integration.INTEGRATION_COLLECT_INTERNAL_OBJECTS';
+
+    /**
+     * The mautic.integration.INTEGRATION_CREATE_INTERNAL_OBJECTS event is dispatched when a list of Mautic internal objects should be created.
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_CREATE_INTERNAL_OBJECTS = 'mautic.integration.INTEGRATION_CREATE_INTERNAL_OBJECTS';
+
+    /**
+     * The mautic.integration.INTEGRATION_UPDATE_INTERNAL_OBJECTS event is dispatched when a list of Mautic internal objects should be updated.
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_UPDATE_INTERNAL_OBJECTS = 'mautic.integration.INTEGRATION_UPDATE_INTERNAL_OBJECTS';
 }
