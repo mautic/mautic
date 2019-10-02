@@ -33,7 +33,7 @@ class ReferenceValueDAO
     /**
      * @param int
      */
-    public function setValue(int $value)
+    public function setValue(int $value): void
     {
         $this->value = $value;
     }
