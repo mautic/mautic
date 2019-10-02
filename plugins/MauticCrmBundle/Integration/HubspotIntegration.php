@@ -228,7 +228,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if (isset($fieldsToUpdate['leadFields'])) {
             // Pass in the whole config
-            $fields = $fieldsToUpdate;
+            $fields = $fieldsToUpdate['leadFields'];
         } else {
             $fields = array_flip($fieldsToUpdate);
         }
