@@ -21,9 +21,14 @@ class ReferenceValueDAO
     private $value;
 
     /**
-     * @return int
+     * @var string|null
      */
-    public function getValue()
+    private $type;
+
+    /**
+     * @return int|null
+     */
+    public function getValue(): ?int
     {
         return $this->value;
     }
@@ -31,9 +36,25 @@ class ReferenceValueDAO
     /**
      * @param int $value
      */
-    public function setValue($value): void
+    public function setValue(int $value): void
     {
         $this->value = $value;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType(string $type): void
+    {
+        $this->type = $type;
     }
 
     public function __toString(): string

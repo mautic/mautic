@@ -23,6 +23,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,7 +76,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getRelations')
             ->willReturn($relationsObject);
 
-        $this->mappingManual->expects($this->once())
+        $this->mappingManual->expects($this->any())
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
@@ -103,7 +104,7 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
         $relObjectName          = 'Account';
         $relFieldName           = 'AccountId';
 
-        $referenceVlaue  = new ReferenceValueDAO($integrationRelObjectId);
+        $referenceVlaue  = new ReferenceValueDAO();
         $normalizedValue = new NormalizedValueDAO(NormalizedValueDAO::REFERENCE_TYPE, $integrationRelObjectId, $referenceVlaue);
 
         $fieldDao  = new FieldDAO('AccountId', $normalizedValue);
@@ -129,11 +130,11 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getObject')
             ->willReturn($objectDao);
 
-        $this->mappingManual->expects($this->once())
+        $this->mappingManual->expects($this->any())
             ->method('getMappedInternalObjectsNames')
             ->willReturn(['company']);
 
-        $internalObject = new ObjectDAO('company', $internalRelObjectId);
+        $internalObject = new ObjectDAO(MauticSyncDataExchange::OBJECT_COMPANY, $internalRelObjectId);
 
         $this->mappingHelper->expects($this->once())
             ->method('findMauticObject')
@@ -145,5 +146,6 @@ class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(0, $objectsToSynchronize);
         $this->assertEquals($internalRelObjectId, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getValue());
+        $this->assertEquals(MauticSyncDataExchange::OBJECT_COMPANY, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getType());
     }
 }

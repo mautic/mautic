@@ -59,7 +59,7 @@ class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 
             $objectMappings = $this->objectMappingRepository->getIntegrationMappingsForInternalObject(
                 MauticSyncDataExchange::OBJECT_CONTACT,
-                $contact->getId()
+                (int) $contact->getId()
             );
 
             foreach ($objectMappings as $objectMapping) {

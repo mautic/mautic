@@ -206,14 +206,28 @@ class ContactObjectHelper implements ObjectHelperInterface
     {
         $value = $field->getValue()->getNormalizedValue();
 
-        if (MauticSyncDataExchange::OBJECT_COMPANY === $field->getName() && $value instanceof ReferenceValueDAO && null !== $value->getValue()) {
+        if ($value instanceof ReferenceValueDAO) {
+            $value = $this->getReferenceValueForField($value);
+        }
+
+        $contact->addUpdatedField($field->getName(), $value);
+    }
+
+    /**
+     * @param ReferenceValueDAO $value
+     *
+     * @return string|null
+     */
+    private function getReferenceValueForField(ReferenceValueDAO $value): ?string
+    {
+        if (MauticSyncDataExchange::OBJECT_COMPANY === $value->getType() && 0 < $value->getValue()) {
             try {
-                $value = $this->getCompanyNameById($value->getValue());
+                return $this->getCompanyNameById($value->getValue());
             } catch (ObjectNotFoundException $e) {
             }
         }
 
-        $contact->addUpdatedField($field->getName(), $value);
+        return null;
     }
 
     /**
