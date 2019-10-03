@@ -25,18 +25,25 @@ class AuthController extends CommonController
     {
         /** @var AuthIntegrationsHelper $authIntegrationsHelper */
         $authIntegrationsHelper = $this->get('mautic.integrations.helper.auth_integrations');
+        $template               = 'IntegrationsBundle:Auth:authenticated.html.php';
+        $authenticationError    = false;
 
         try {
             $authIntegration = $authIntegrationsHelper->getIntegration($integration);
-
-            return $this->render(
-                'IntegrationsBundle:Auth:authenticated.html.php',
-                ['message' => $authIntegration->authenticateIntegration($request)]
-            );
+            $message         = $authIntegration->authenticateIntegration($request);
+        } catch (UnauthorizedException $exception) {
+            $message             = $exception->getMessage();
+            $authenticationError = true;
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
-        } catch (UnauthorizedException $exception) {
-            return $this->accessDenied();
         }
+
+        return $this->render(
+            $template,
+            [
+                'message'             => $message,
+                'authenticationError' => $authenticationError,
+            ]
+        );
     }
 }

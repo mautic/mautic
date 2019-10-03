@@ -12,6 +12,9 @@ declare(strict_types=1);
  */
 
 $view->extend('MauticCoreBundle:Default:slim.html.php');
+
+$alertClass = $authenticationError ? 'danger' : 'success';
+
 ?>
 <style>
     #app-content {
@@ -20,7 +23,7 @@ $view->extend('MauticCoreBundle:Default:slim.html.php');
 </style>
 <div class="row">
     <div class="col-lg-12">
-        <div class="alert alert-primary margin" style="margin:20px" role="alert">
+        <div class="alert alert-<?php echo $alertClass; ?> margin" style="margin:20px" role="alert">
             <?php echo $message; ?>
         </div>
     </div>
