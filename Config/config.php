@@ -309,6 +309,7 @@ return [
                     'mautic.integrations.helper.contact_object',
                     'mautic.integrations.helper.company_object',
                     'mautic.integrations.sync.data_exchange.mautic.field_builder',
+                    'mautic.integrations.internal.object_provider',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic' => [

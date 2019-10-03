@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
@@ -77,24 +76,32 @@ class PartialObjectReportBuilder
     private $syncReport;
 
     /**
+     * @var ObjectProvider
+     */
+    private $objectProvider;
+
+    /**
      * @param FieldChangeRepository $fieldChangeRepository
      * @param FieldHelper           $fieldHelper
      * @param ContactObjectHelper   $contactObjectHelper
      * @param CompanyObjectHelper   $companyObjectHelper
      * @param FieldBuilder          $fieldBuilder
+     * @param ObjectProvider        $objectProvider
      */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
         FieldHelper $fieldHelper,
         ContactObjectHelper $contactObjectHelper,
         CompanyObjectHelper $companyObjectHelper,
-        FieldBuilder $fieldBuilder
+        FieldBuilder $fieldBuilder,
+        ObjectProvider $objectProvider
     ) {
-        $this->fieldChangeRepository = $fieldChangeRepository;
-        $this->fieldHelper           = $fieldHelper;
-        $this->contactObjectHelper   = $contactObjectHelper;
-        $this->companyObjectHelper   = $companyObjectHelper;
-        $this->fieldBuilder          = $fieldBuilder;
+        $this->fieldChangeRepository   = $fieldChangeRepository;
+        $this->fieldHelper             = $fieldHelper;
+        $this->contactObjectHelper     = $contactObjectHelper;
+        $this->companyObjectHelper     = $companyObjectHelper;
+        $this->fieldBuilder            = $fieldBuilder;
+        $this->objectProvider          = $objectProvider;
     }
 
     /**
@@ -163,7 +170,13 @@ class PartialObjectReportBuilder
             $this->lastProcessedTrackedId[$objectDAO->getObject()] = $objectId;
         }
 
-        $object           = $this->getObjectNameFromEntityName($fieldChange['object_type']);
+        try {
+            $object = $this->objectProvider->getObjectByEntityName($fieldChange['object_type'])->getName();
+        } catch (ObjectNotFoundException $e) {
+            // Throw this exception instead to keep BC.
+            throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $fieldChange['object_type']);
+        }
+
         $objectId         = (int) $fieldChange['object_id'];
         $modifiedDateTime = new \DateTime($fieldChange['modified_at'], new \DateTimeZone('UTC'));
 
@@ -268,25 +281,6 @@ class PartialObjectReportBuilder
                     );
                 }
             }
-        }
-    }
-
-    /**
-     * @param string $entityName
-     *
-     * @return string
-     *
-     * @throws ObjectNotSupportedException
-     */
-    private function getObjectNameFromEntityName(string $entityName)
-    {
-        switch ($entityName) {
-            case Lead::class:
-                return MauticSyncDataExchange::OBJECT_CONTACT;
-            case Company::class:
-                return MauticSyncDataExchange::OBJECT_COMPANY;
-            default:
-                throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $entityName);
         }
     }
 }
