@@ -16,7 +16,9 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Inter
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Company as InternalCompany;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
@@ -59,6 +61,16 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
      */
     private $fieldBuilder;
 
+    /**
+     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $objectProvider;
+
+    /**
+     * @var PartialObjectReportBuilder
+     */
+    private $reportBuilder;
+
     protected function setUp(): void
     {
         $this->fieldChangeRepository = $this->createMock(FieldChangeRepository::class);
@@ -66,9 +78,18 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName'])
             ->getMock();
-        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
-        $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
-        $this->fieldBuilder        = $this->createMock(FieldBuilder::class);
+        $this->contactObjectHelper   = $this->createMock(ContactObjectHelper::class);
+        $this->companyObjectHelper   = $this->createMock(CompanyObjectHelper::class);
+        $this->fieldBuilder          = $this->createMock(FieldBuilder::class);
+        $this->objectProvider        = $this->createMock(ObjectProvider::class);
+        $this->reportBuilder         = new PartialObjectReportBuilder(
+            $this->fieldChangeRepository,
+            $this->fieldHelper,
+            $this->contactObjectHelper,
+            $this->companyObjectHelper,
+            $this->fieldBuilder,
+            $this->objectProvider
+        );
     }
 
     public function testTrackedContactChanges(): void
@@ -115,6 +136,11 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn([$fieldChange]);
 
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByEntityName')
+            ->with(Lead::class)
+            ->willReturn(new Contact());
+
         // Find the complete object
         $this->contactObjectHelper->expects($this->once())
             ->method('findObjectsByIds')
@@ -127,8 +153,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $report = $this->getReportBuilder()->buildReport($requestDAO);
-
+        $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
         $this->assertTrue(isset($objects[1]));
@@ -180,6 +205,11 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn([$fieldChange]);
 
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByEntityName')
+            ->with(Company::class)
+            ->willReturn(new InternalCompany());
+
         // Find the complete object
         $this->companyObjectHelper->expects($this->once())
             ->method('findObjectsByIds')
@@ -194,26 +224,11 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $report = $this->getReportBuilder()->buildReport($requestDAO);
-
+        $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->assertTrue(isset($objects[1]));
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
         $this->assertEquals('Bob and Cat', $objects[1]->getField('companyname')->getValue()->getNormalizedValue());
-    }
-
-    /**
-     * @return PartialObjectReportBuilder
-     */
-    private function getReportBuilder()
-    {
-        return new PartialObjectReportBuilder(
-            $this->fieldChangeRepository,
-            $this->fieldHelper,
-            $this->contactObjectHelper,
-            $this->companyObjectHelper,
-            $this->fieldBuilder
-        );
     }
 }
