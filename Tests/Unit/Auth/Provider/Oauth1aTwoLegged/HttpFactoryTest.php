@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Auth\Oauth1a;
+namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth1aTwoLegged;
 
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
 use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
