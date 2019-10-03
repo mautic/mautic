@@ -306,10 +306,9 @@ return [
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
-                    'mautic.integrations.helper.contact_object',
-                    'mautic.integrations.helper.company_object',
                     'mautic.integrations.sync.data_exchange.mautic.field_builder',
                     'mautic.integrations.internal.object_provider',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic' => [

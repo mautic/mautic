@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
@@ -21,12 +23,10 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestOb
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PartialObjectReportBuilder
 {
@@ -39,16 +39,6 @@ class PartialObjectReportBuilder
      * @var FieldHelper
      */
     private $fieldHelper;
-
-    /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
-
-    /**
-     * @var CompanyObjectHelper
-     */
-    private $companyObjectHelper;
 
     /**
      * @var FieldBuilder
@@ -81,27 +71,29 @@ class PartialObjectReportBuilder
     private $objectProvider;
 
     /**
-     * @param FieldChangeRepository $fieldChangeRepository
-     * @param FieldHelper           $fieldHelper
-     * @param ContactObjectHelper   $contactObjectHelper
-     * @param CompanyObjectHelper   $companyObjectHelper
-     * @param FieldBuilder          $fieldBuilder
-     * @param ObjectProvider        $objectProvider
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @param FieldChangeRepository    $fieldChangeRepository
+     * @param FieldHelper              $fieldHelper
+     * @param FieldBuilder             $fieldBuilder
+     * @param ObjectProvider           $objectProvider
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
         FieldHelper $fieldHelper,
-        ContactObjectHelper $contactObjectHelper,
-        CompanyObjectHelper $companyObjectHelper,
         FieldBuilder $fieldBuilder,
-        ObjectProvider $objectProvider
+        ObjectProvider $objectProvider,
+        EventDispatcherInterface $dispatcher
     ) {
-        $this->fieldChangeRepository   = $fieldChangeRepository;
-        $this->fieldHelper             = $fieldHelper;
-        $this->contactObjectHelper     = $contactObjectHelper;
-        $this->companyObjectHelper     = $companyObjectHelper;
-        $this->fieldBuilder            = $fieldBuilder;
-        $this->objectProvider          = $objectProvider;
+        $this->fieldChangeRepository = $fieldChangeRepository;
+        $this->fieldHelper           = $fieldHelper;
+        $this->fieldBuilder          = $fieldBuilder;
+        $this->objectProvider        = $objectProvider;
+        $this->dispatcher            = $dispatcher;
     }
 
     /**
@@ -143,7 +135,7 @@ class PartialObjectReportBuilder
                         __CLASS__.':'.__FUNCTION__
                     );
                 }
-            } catch (ObjectNotSupportedException $exception) {
+            } catch (ObjectNotFoundException $exception) {
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
                     $exception->getMessage(),
@@ -159,7 +151,7 @@ class PartialObjectReportBuilder
      * @param array            $fieldChange
      * @param RequestObjectDAO $objectDAO
      *
-     * @throws ObjectNotSupportedException
+     * @throws ObjectNotFoundException
      */
     private function processFieldChange(array $fieldChange, RequestObjectDAO $objectDAO): void
     {
@@ -170,13 +162,7 @@ class PartialObjectReportBuilder
             $this->lastProcessedTrackedId[$objectDAO->getObject()] = $objectId;
         }
 
-        try {
-            $object = $this->objectProvider->getObjectByEntityName($fieldChange['object_type'])->getName();
-        } catch (ObjectNotFoundException $e) {
-            // Throw this exception instead to keep BC.
-            throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $fieldChange['object_type']);
-        }
-
+        $object           = $this->objectProvider->getObjectByEntityName($fieldChange['object_type'])->getName();
         $objectId         = (int) $fieldChange['object_id'];
         $modifiedDateTime = new \DateTime($fieldChange['modified_at'], new \DateTimeZone('UTC'));
 
@@ -237,20 +223,13 @@ class PartialObjectReportBuilder
             return [];
         }
 
-        switch ($objectName) {
-            case MauticSyncDataExchange::OBJECT_CONTACT:
-                $mauticObjects = $this->contactObjectHelper->findObjectsByIds(array_keys($this->objectsWithMissingFields));
+        $event = new InternalObjectFindByIdsEvent(
+            $this->objectProvider->getObjectByName($objectName),
+            array_keys($this->objectsWithMissingFields)
+        );
+        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID, $event);
 
-                break;
-            case MauticSyncDataExchange::OBJECT_COMPANY:
-                $mauticObjects = $this->companyObjectHelper->findObjectsByIds(array_keys($this->objectsWithMissingFields));
-
-                break;
-            default:
-                throw new ObjectNotFoundException($objectName);
-        }
-
-        return $mauticObjects;
+        return $event->getFoundObjects();
     }
 
     /**

@@ -15,6 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\EventListener;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
@@ -58,9 +59,13 @@ class InternalObjectSubscriber implements EventSubscriberInterface
                 ['updateContacts', 0],
                 ['updateCompanies', 0],
             ],
-            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS  => [
+            IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS => [
                 ['createContacts', 0],
                 ['createCompanies', 0],
+            ],
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID => [
+                ['findContactsByIds', 0],
+                ['findCompaniesByIds', 0],
             ],
         ];
     }
@@ -133,6 +138,32 @@ class InternalObjectSubscriber implements EventSubscriberInterface
         }
 
         $event->setObjectMappings($this->companyObjectHelper->create($event->getCreateObjects()));
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectFindByIdsEvent $event
+     */
+    public function findContactsByIds(InternalObjectFindByIdsEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setFoundObjects($this->contactObjectHelper->findObjectsByIds($event->getIds()));
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectFindByIdsEvent $event
+     */
+    public function findCompaniesByIds(InternalObjectFindByIdsEvent $event): void
+    {
+        if (Company::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setFoundObjects($this->companyObjectHelper->findObjectsByIds($event->getIds()));
         $event->stopPropagation();
     }
 }

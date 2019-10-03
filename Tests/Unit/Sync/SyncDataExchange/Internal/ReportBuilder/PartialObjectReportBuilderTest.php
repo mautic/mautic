@@ -16,6 +16,8 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Inter
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Company as InternalCompany;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
@@ -26,11 +28,10 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,14 +48,9 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
     private $fieldHelper;
 
     /**
-     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $contactObjectHelper;
-
-    /**
-     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $companyObjectHelper;
+    private $dispatcher;
 
     /**
      * @var FieldBuilder|\PHPUnit_Framework_MockObject_MockObject
@@ -78,17 +74,15 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName'])
             ->getMock();
-        $this->contactObjectHelper   = $this->createMock(ContactObjectHelper::class);
-        $this->companyObjectHelper   = $this->createMock(CompanyObjectHelper::class);
+        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
         $this->fieldBuilder          = $this->createMock(FieldBuilder::class);
         $this->objectProvider        = $this->createMock(ObjectProvider::class);
         $this->reportBuilder         = new PartialObjectReportBuilder(
             $this->fieldChangeRepository,
             $this->fieldHelper,
-            $this->contactObjectHelper,
-            $this->companyObjectHelper,
             $this->fieldBuilder,
-            $this->objectProvider
+            $this->objectProvider,
+            $this->dispatcher
         );
     }
 
@@ -136,22 +130,39 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn([$fieldChange]);
 
+        $internalObject = new Contact();
+
         $this->objectProvider->expects($this->once())
             ->method('getObjectByEntityName')
             ->with(Lead::class)
-            ->willReturn(new Contact());
+            ->willReturn($internalObject);
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with(Contact::NAME)
+            ->willReturn($internalObject);
 
         // Find the complete object
-        $this->contactObjectHelper->expects($this->once())
-            ->method('findObjectsByIds')
-            ->with([1])
-            ->willReturn([
-                [
-                    'id'        => 1,
-                    'email'     => 'test@test.com',
-                    'firstname' => 'Bob',
-                ],
-            ]);
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID,
+                $this->callback(function (InternalObjectFindByIdsEvent $event) use ($internalObject) {
+                    $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame([1], $event->getIds());
+
+                    // Mock a subscriber:
+                    $event->setFoundObjects([
+                        [
+                            'id'        => 1,
+                            'email'     => 'test@test.com',
+                            'firstname' => 'Bob and Cat',
+                        ],
+                    ]);
+
+                    return true;
+                })
+            );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
@@ -205,23 +216,38 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn([$fieldChange]);
 
+        $internalObject = new InternalCompany();
+
         $this->objectProvider->expects($this->once())
             ->method('getObjectByEntityName')
             ->with(Company::class)
-            ->willReturn(new InternalCompany());
+            ->willReturn($internalObject);
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with(InternalCompany::NAME)
+            ->willReturn($internalObject);
 
         // Find the complete object
-        $this->companyObjectHelper->expects($this->once())
-            ->method('findObjectsByIds')
-            ->with([1])
-            ->willReturn(
-                [
-                    [
-                        'id'          => 1,
-                        'email'       => 'test@test.com',
-                        'companyname' => 'Bob and Cat',
-                    ],
-                ]
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID,
+                $this->callback(function (InternalObjectFindByIdsEvent $event) use ($internalObject) {
+                    $this->assertSame([1], $event->getIds());
+                    $this->assertSame($internalObject, $event->getObject());
+
+                    // Mock a subscriber:
+                    $event->setFoundObjects([
+                        [
+                            'id'          => 1,
+                            'email'       => 'test@test.com',
+                            'companyname' => 'Bob and Cat',
+                        ],
+                    ]);
+
+                    return true;
+                })
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);

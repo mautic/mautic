@@ -95,4 +95,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_UPDATE_INTERNAL_OBJECTS = 'mautic.integration.INTEGRATION_UPDATE_INTERNAL_OBJECTS';
+
+    /**
+     * The mautic.integration.INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID event is dispatched when a list of Mautic internal object records by ID be requested.
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID = 'mautic.integration.INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID';
 }
