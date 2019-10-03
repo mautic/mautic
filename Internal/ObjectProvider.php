@@ -90,8 +90,7 @@ class ObjectProvider
         if (empty($this->objects)) {
             $event = new InternalObjectEvent();
             $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS, $event);
+            $this->objects = $event->getObjects();
         }
-
-        $this->objects = $event->getObjects();
     }
 }
