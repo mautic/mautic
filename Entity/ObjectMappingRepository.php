@@ -151,7 +151,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return ObjectMapping[]
      */
-    public function getIntegrationMappingsForInternalObject(string $internalObject, int $internalObjectId)
+    public function getIntegrationMappingsForInternalObject(string $internalObject, int $internalObjectId): array
     {
         $qb = $this->createQueryBuilder('m');
         $qb->select('m')
