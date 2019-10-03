@@ -129,6 +129,9 @@ class PageType extends AbstractType
             [
                 'label' => 'mautic.page.config.preference_center',
                 'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.preference_center.tooltip',
+                ],
             ]
         );
 
