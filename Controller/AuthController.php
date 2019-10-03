@@ -29,7 +29,10 @@ class AuthController extends CommonController
         try {
             $authIntegration = $authIntegrationsHelper->getIntegration($integration);
 
-            return $authIntegration->authenticateIntegration($request);
+            return $this->render(
+                'IntegrationsBundle:Auth:authenticated.html.php',
+                ['message' => $authIntegration->authenticateIntegration($request)]
+            );
         } catch (IntegrationNotFoundException $exception) {
             return $this->notFound();
         } catch (UnauthorizedException $exception) {
