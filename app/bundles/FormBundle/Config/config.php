@@ -427,8 +427,6 @@ return [
                 'class'     => \Mautic\FormBundle\Event\Service\FieldValueTransformer::class,
                 'arguments' => [
                     'router',
-                    'mautic.helper.template.avatar',
-                    'mautic.form.helper.form_uploader',
                 ],
             ],
         ],
