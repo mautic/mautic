@@ -44,7 +44,7 @@ class FieldValueTransformer
      */
     public function __construct(RouterInterface $router)
     {
-        $this->router       = $router;
+        $this->router = $router;
     }
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent)
@@ -55,6 +55,7 @@ class FieldValueTransformer
         $fields              = $submissionEvent->getForm()->getFields();
         $contactFieldMatches = $submissionEvent->getContactFieldMatches();
         $tokens              = $submissionEvent->getTokens();
+
         /** @var Field $field */
         foreach ($fields as $field) {
             switch ($field->getType()) {
@@ -79,9 +80,11 @@ class FieldValueTransformer
                     if (!empty($contactFieldMatches[$contactFieldAlias])) {
                         $this->contactFieldsToUpdate[$contactFieldAlias] = $contactFieldMatches[$contactFieldAlias] = $newValue;
                     }
+
                     break;
             }
         }
+
         $submissionEvent->setTokens($tokens);
         $submissionEvent->setContactFieldMatches($contactFieldMatches);
         $this->isIsTransformed();
