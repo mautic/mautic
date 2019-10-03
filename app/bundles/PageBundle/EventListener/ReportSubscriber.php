@@ -133,6 +133,10 @@ class ReportSubscriber extends CommonSubscriber
             $hitPrefix   = 'ph.';
             $redirectHit = 'r.';
             $hitColumns  = [
+                $hitPrefix.'id' => [
+                    'label' => 'mautic.page.report.hits.id',
+                    'type'  => 'int',
+                ],
                 $hitPrefix.'date_hit' => [
                     'label'          => 'mautic.page.report.hits.date_hit',
                     'type'           => 'datetime',
