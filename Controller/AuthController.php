@@ -25,7 +25,6 @@ class AuthController extends CommonController
     {
         /** @var AuthIntegrationsHelper $authIntegrationsHelper */
         $authIntegrationsHelper = $this->get('mautic.integrations.helper.auth_integrations');
-        $template               = 'IntegrationsBundle:Auth:authenticated.html.php';
         $authenticationError    = false;
 
         try {
@@ -39,7 +38,7 @@ class AuthController extends CommonController
         }
 
         return $this->render(
-            $template,
+            'IntegrationsBundle:Auth:authenticated.html.php',
             [
                 'message'             => $message,
                 'authenticationError' => $authenticationError,
