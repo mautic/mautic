@@ -77,7 +77,7 @@ class SetContactAvatarFormSubscriber extends CommonSubscriber
                     }
                     try {
                         $filePath = $this->uploader->getCompleteFilePath($field, $results[$field->getAlias()]);
-                        $this->avatarHelper->createAvatarFromFile($submissionEvent->getLead(), $filePath);
+                        $this->avatarHelper->createAvatarFromFile($contact, $filePath);
                         $contact->setPreferredProfileImage('custom');
                         $this->leadModel->saveEntity($contact);
 
