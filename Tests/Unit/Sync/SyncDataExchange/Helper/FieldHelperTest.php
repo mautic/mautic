@@ -17,6 +17,7 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,11 +50,22 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $mauticSyncFieldsLoadEvent;
 
+    /**
+     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $objectProvider;
+
+    /**
+     * @var FieldHelper
+     */
+    private $fieldHelper;
+
     protected function setUp(): void
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
         $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
+        $this->objectProvider          = $this->createMock(ObjectProvider::class);
         $this->channelListHelper->method('getFeatureChannels')
             ->willReturn(['Email' => 'email']);
 
@@ -61,6 +73,15 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher           = $this->createMock(EventDispatcherInterface::class);
         $this->eventDispatcher->method('dispatch')
             ->willReturn($this->mauticSyncFieldsLoadEvent);
+
+        $this->fieldHelper = new FieldHelper(
+            $this->fieldModel,
+            $this->variableExpresserHelper,
+            $this->channelListHelper,
+            $this->createMock(TranslatorInterface::class),
+            $this->eventDispatcher,
+            $this->objectProvider
+        );
     }
 
     public function testContactSyncFieldsReturned(): void
@@ -76,7 +97,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->fieldModel->method('getFieldList')
             ->willReturn($syncFields);
 
-        $fields = $this->getFieldHelper()->getSyncFields($objectName);
+        $fields = $this->fieldHelper->getSyncFields($objectName);
 
         $this->assertEquals(
             [
@@ -102,7 +123,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->fieldModel->method('getFieldList')
             ->willReturn($syncFields);
 
-        $fields = $this->getFieldHelper()->getSyncFields($objectName);
+        $fields = $this->fieldHelper->getSyncFields($objectName);
 
         $this->assertEquals(
             [
@@ -127,7 +148,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             ['some fields', 'some unique fields'],
-            $this->getFieldHelper()->getRequiredFields('lead')
+            $this->fieldHelper->getRequiredFields('lead')
         );
     }
 
@@ -142,12 +163,20 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             ['some fields'],
-            $this->getFieldHelper()->getRequiredFields('company')
+            $this->fieldHelper->getRequiredFields('company')
         );
     }
 
-    private function getFieldHelper()
+    public function testGetFieldObjectName(): void
     {
-        return new FieldHelper($this->fieldModel, $this->variableExpresserHelper, $this->channelListHelper, $this->createMock(TranslatorInterface::class), $this->eventDispatcher);
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with(Contact::NAME)
+            ->willReturn(new Contact());
+
+        $this->assertSame(
+            Contact::ENTITY,
+            $this->fieldHelper->getFieldObjectName(Contact::NAME)
+        );
     }
 }

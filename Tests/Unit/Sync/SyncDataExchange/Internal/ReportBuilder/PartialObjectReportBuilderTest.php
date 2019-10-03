@@ -72,7 +72,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
         $this->fieldChangeRepository = $this->createMock(FieldChangeRepository::class);
         $this->fieldHelper           = $this->getMockBuilder(FieldHelper::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getNormalizedFieldType', 'getFieldObjectName'])
+            ->setMethodsExcept(['getNormalizedFieldType'])
             ->getMock();
         $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
         $this->fieldBuilder          = $this->createMock(FieldBuilder::class);
@@ -118,6 +118,11 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 new FieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob'))
             );
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getFieldObjectName')
+            ->with(Contact::NAME)
+            ->willReturn(Lead::class);
 
         // Find and return tracked changes
         $this->fieldChangeRepository->expects($this->once())
@@ -205,6 +210,11 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 new FieldDAO('companyname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob and Cat'))
             );
 
+        $this->fieldHelper->expects($this->once())
+            ->method('getFieldObjectName')
+            ->with(InternalCompany::NAME)
+            ->willReturn(Company::class);
+
         // Find and return tracked changes
         $this->fieldChangeRepository->expects($this->once())
             ->method('findChangesBefore')
@@ -251,7 +261,7 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
-        $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
+        $objects = $report->getObjects(InternalCompany::NAME);
 
         $this->assertTrue(isset($objects[1]));
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());

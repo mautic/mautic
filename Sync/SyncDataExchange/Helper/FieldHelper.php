@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
@@ -67,24 +67,32 @@ class FieldHelper
     private $eventDispatcher;
 
     /**
+     * @var ObjectProvider
+     */
+    private $objectProvider;
+
+    /**
      * @param FieldModel                       $fieldModel
      * @param VariableExpresserHelperInterface $variableExpresserHelper
      * @param ChannelListHelper                $channelListHelper
      * @param TranslatorInterface              $translator
      * @param EventDispatcherInterface         $eventDispatcher
+     * @param ObjectProvider                   $objectProvider
      */
     public function __construct(
         FieldModel $fieldModel,
         VariableExpresserHelperInterface $variableExpresserHelper,
         ChannelListHelper $channelListHelper,
         TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ObjectProvider $objectProvider
     ) {
         $this->fieldModel              = $fieldModel;
         $this->variableExpresserHelper = $variableExpresserHelper;
         $this->channelListHelper       = $channelListHelper;
         $this->translator              = $translator;
         $this->eventDispatcher         = $eventDispatcher;
+        $this->objectProvider          = $objectProvider;
     }
 
     /**
@@ -131,13 +139,11 @@ class FieldHelper
      */
     public function getFieldObjectName(string $objectName): string
     {
-        switch ($objectName) {
-            case MauticSyncDataExchange::OBJECT_CONTACT:
-                return Lead::class;
-            case MauticSyncDataExchange::OBJECT_COMPANY:
-                return Company::class;
-            default:
-                throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
+        try {
+            return $this->objectProvider->getObjectByName($objectName)->getEntityName();
+        } catch (ObjectNotFoundException $e) {
+            // Throwing different exception to keep BC.
+            throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $objectName);
         }
     }
 
