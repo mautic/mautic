@@ -20,7 +20,7 @@ $view->extend('MauticCoreBundle:Default:slim.html.php');
 </style>
 <div class="row">
     <div class="col-lg-12">
-        <div class="alert alert-success margin" style="margin:20px" role="alert">
+        <div class="alert alert-primary margin" style="margin:20px" role="alert">
             <?php echo $message; ?>
         </div>
     </div>
