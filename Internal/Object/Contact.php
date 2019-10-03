@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Internal\Object;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 final class Contact implements ObjectInterface
 {
-    const NAME = 'lead'; // kept as lead for BC
+    const NAME   = 'lead'; // kept as lead for BC
+    const ENTITY = Lead::class;
 
     /**
      * {@inheritdoc}
@@ -23,5 +26,13 @@ final class Contact implements ObjectInterface
     public function getName(): string
     {
         return self::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityName(): string
+    {
+        return self::ENTITY;
     }
 }

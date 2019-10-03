@@ -21,4 +21,11 @@ interface ObjectInterface
      * @return string
      */
     public function getName(): string;
+
+    /**
+     * Returns full Doctrine entity class name of the object.
+     *
+     * @return string
+     */
+    public function getEntityName(): string;
 }
