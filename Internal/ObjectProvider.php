@@ -53,12 +53,32 @@ class ObjectProvider
         $this->collectObjects();
 
         foreach ($this->objects as $object) {
-            if ($object->getName() === $object) {
+            if ($object->getName() === $name) {
                 return $object;
             }
         }
 
-        throw new ObjectNotFoundException("Internal object {$name} was not found");
+        throw new ObjectNotFoundException("Internal object '{$name}' was not found");
+    }
+
+    /**
+     * @param string $entityName
+     *
+     * @return ObjectInterface
+     *
+     * @throws ObjectNotFoundException
+     */
+    public function getObjectByEntityName(string $entityName): ObjectInterface
+    {
+        $this->collectObjects();
+
+        foreach ($this->objects as $object) {
+            if ($object->getEntityName() === $entityName) {
+                return $object;
+            }
+        }
+
+        throw new ObjectNotFoundException("Internal object was not found for entity '{$entityName}'");
     }
 
     /**
