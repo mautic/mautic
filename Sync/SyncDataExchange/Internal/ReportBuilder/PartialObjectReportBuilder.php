@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
@@ -223,11 +223,9 @@ class PartialObjectReportBuilder
             return [];
         }
 
-        $event = new InternalObjectFindByIdsEvent(
-            $this->objectProvider->getObjectByName($objectName),
-            array_keys($this->objectsWithMissingFields)
-        );
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID, $event);
+        $event = new InternalObjectFindEvent($this->objectProvider->getObjectByName($objectName));
+        $event->setIds(array_keys($this->objectsWithMissingFields));
+        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $event);
 
         return $event->getFoundObjects();
     }

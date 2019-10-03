@@ -13,42 +13,55 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $contactObjectHelper;
+    private $objectProvider;
 
     /**
-     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $companyObjectHelper;
+    private $dispatcher;
 
     /**
      * @var FieldBuilder|\PHPUnit_Framework_MockObject_MockObject
      */
     private $fieldBuilder;
 
+    /**
+     * @var FullObjectReportBuilder
+     */
+    private $reportBuilder;
+
     protected function setUp(): void
     {
-        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
-        $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
-        $this->fieldBuilder        = $this->createMock(FieldBuilder::class);
+        $this->objectProvider = $this->createMock(ObjectProvider::class);
+        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
+        $this->fieldBuilder   = $this->createMock(FieldBuilder::class);
+        $this->reportBuilder  = new FullObjectReportBuilder(
+            $this->fieldBuilder,
+            $this->objectProvider,
+            $this->dispatcher
+        );
     }
 
     public function testBuildingContactReport(): void
@@ -67,20 +80,38 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
             );
 
-        $this->contactObjectHelper->expects($this->once())
-            ->method('findObjectsBetweenDates')
-            ->with($fromDateTime, $toDateTime, 0, 200)
-            ->willReturn(
-                [
-                    [
-                        'id'            => 1,
-                        'email'         => 'test@test.com',
-                        'date_modified' => '2018-10-08 00:30:00',
-                    ],
-                ]
+        $internalObject = new Contact();
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with(Contact::NAME)
+            ->willReturn($internalObject);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
+                    $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
+                    $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
+                    $this->assertSame(0, $event->getStart());
+                    $this->assertSame(200, $event->getLimit());
+
+                    // Mock a subscriber:
+                    $event->setFoundObjects([
+                        [
+                            'id'            => 1,
+                            'email'         => 'test@test.com',
+                            'date_modified' => '2018-10-08 00:30:00',
+                        ],
+                    ]);
+
+                    return true;
+                })
             );
 
-        $report  = $this->getReportBuilder()->buildReport($requestDAO);
+        $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
         $this->assertTrue(isset($objects[1]));
@@ -103,31 +134,41 @@ class FullObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
                 new FieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'))
             );
 
-        $this->companyObjectHelper->expects($this->once())
-            ->method('findObjectsBetweenDates')
-            ->with($fromDateTime, $toDateTime, 0, 200)
-            ->willReturn(
-                [
-                    [
-                        'id'            => 1,
-                        'email'         => 'test@test.com',
-                        'date_modified' => '2018-10-08 00:30:00',
-                    ],
-                ]
+        $internalObject = new Company();
+
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with(Company::NAME)
+            ->willReturn($internalObject);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
+                    $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
+                    $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
+                    $this->assertSame(0, $event->getStart());
+                    $this->assertSame(200, $event->getLimit());
+
+                    // Mock a subscriber:
+                    $event->setFoundObjects([
+                        [
+                            'id'            => 1,
+                            'email'         => 'test@test.com',
+                            'date_modified' => '2018-10-08 00:30:00',
+                        ],
+                    ]);
+
+                    return true;
+                })
             );
 
-        $report  = $this->getReportBuilder()->buildReport($requestDAO);
+        $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->assertTrue(isset($objects[1]));
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
-    }
-
-    /**
-     * @return FullObjectReportBuilder
-     */
-    private function getReportBuilder()
-    {
-        return new FullObjectReportBuilder($this->contactObjectHelper, $this->companyObjectHelper, $this->fieldBuilder);
     }
 }

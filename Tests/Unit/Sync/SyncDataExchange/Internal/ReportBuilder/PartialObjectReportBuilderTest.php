@@ -16,7 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Inter
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Company as InternalCompany;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
@@ -146,8 +146,8 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID,
-                $this->callback(function (InternalObjectFindByIdsEvent $event) use ($internalObject) {
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame([1], $event->getIds());
 
@@ -232,8 +232,8 @@ class PartialObjectReportBuilderTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID,
-                $this->callback(function (InternalObjectFindByIdsEvent $event) use ($internalObject) {
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame([1], $event->getIds());
                     $this->assertSame($internalObject, $event->getObject());
 

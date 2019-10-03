@@ -296,9 +296,9 @@ return [
             'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder::class,
                 'arguments' => [
-                    'mautic.integrations.helper.contact_object',
-                    'mautic.integrations.helper.company_object',
                     'mautic.integrations.sync.data_exchange.mautic.field_builder',
+                    'mautic.integrations.internal.object_provider',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder' => [

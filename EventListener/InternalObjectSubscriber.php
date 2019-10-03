@@ -15,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\EventListener;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindByIdsEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
@@ -63,9 +63,11 @@ class InternalObjectSubscriber implements EventSubscriberInterface
                 ['createContacts', 0],
                 ['createCompanies', 0],
             ],
-            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS_BY_ID => [
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
                 ['findContactsByIds', 0],
+                ['findContactsByDateRange', 0],
                 ['findCompaniesByIds', 0],
+                ['findCompaniesByDateRange', 0],
             ],
         ];
     }
@@ -142,11 +144,11 @@ class InternalObjectSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param InternalObjectFindByIdsEvent $event
+     * @param InternalObjectFindEvent $event
      */
-    public function findContactsByIds(InternalObjectFindByIdsEvent $event): void
+    public function findContactsByIds(InternalObjectFindEvent $event): void
     {
-        if (Contact::NAME !== $event->getObject()->getName()) {
+        if (Contact::NAME !== $event->getObject()->getName() || empty($event->getIds())) {
             return;
         }
 
@@ -155,15 +157,55 @@ class InternalObjectSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param InternalObjectFindByIdsEvent $event
+     * @param InternalObjectFindEvent $event
      */
-    public function findCompaniesByIds(InternalObjectFindByIdsEvent $event): void
+    public function findCompaniesByIds(InternalObjectFindEvent $event): void
     {
-        if (Company::NAME !== $event->getObject()->getName()) {
+        if (Company::NAME !== $event->getObject()->getName() || empty($event->getIds())) {
             return;
         }
 
         $event->setFoundObjects($this->companyObjectHelper->findObjectsByIds($event->getIds()));
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectFindEvent $event
+     */
+    public function findContactsByDateRange(InternalObjectFindEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+            return;
+        }
+
+        $event->setFoundObjects(
+            $this->contactObjectHelper->findObjectsBetweenDates(
+                $event->getDateRange()->getFromDate(),
+                $event->getDateRange()->getToDate(),
+                $event->getStart(),
+                $event->getLimit()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectFindEvent $event
+     */
+    public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
+    {
+        if (Company::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+            return;
+        }
+
+        $event->setFoundObjects(
+            $this->companyObjectHelper->findObjectsBetweenDates(
+                $event->getDateRange()->getFromDate(),
+                $event->getDateRange()->getToDate(),
+                $event->getStart(),
+                $event->getLimit()
+            )
+        );
         $event->stopPropagation();
     }
 }

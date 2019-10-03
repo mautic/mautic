@@ -13,43 +13,49 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\DateRange;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FullObjectReportBuilder
 {
-    /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
-
-    /**
-     * @var CompanyObjectHelper
-     */
-    private $companyObjectHelper;
-
     /**
      * @var FieldBuilder
      */
     private $fieldBuilder;
 
     /**
-     * @param ContactObjectHelper $contactObjectHelper
-     * @param CompanyObjectHelper $companyObjectHelper
-     * @param FieldBuilder        $fieldBuilder
+     * @var ObjectProvider
      */
-    public function __construct(ContactObjectHelper $contactObjectHelper, CompanyObjectHelper $companyObjectHelper, FieldBuilder $fieldBuilder)
-    {
-        $this->contactObjectHelper = $contactObjectHelper;
-        $this->companyObjectHelper = $companyObjectHelper;
-        $this->fieldBuilder        = $fieldBuilder;
+    private $objectProvider;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @param FieldBuilder             $fieldBuilder
+     * @param ObjectProvider           $objectProvider
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(
+        FieldBuilder $fieldBuilder,
+        ObjectProvider $objectProvider,
+        EventDispatcherInterface $dispatcher
+    ) {
+        $this->fieldBuilder   = $fieldBuilder;
+        $this->objectProvider = $objectProvider;
+        $this->dispatcher     = $dispatcher;
     }
 
     /**
@@ -79,37 +85,34 @@ class FullObjectReportBuilder
                     __CLASS__.':'.__FUNCTION__
                 );
 
-                switch ($requestedObjectDAO->getObject()) {
-                    case MauticSyncDataExchange::OBJECT_CONTACT:
-                        if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
-                            $idChunks     = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT), $limit);
-                            $idChunk      = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
-                            $foundObjects = $this->contactObjectHelper->findObjectsByIds($idChunk);
-                        } else {
-                            $foundObjects = $this->contactObjectHelper->findObjectsBetweenDates(
-                                $requestedObjectDAO->getFromDateTime(),
-                                $requestedObjectDAO->getToDateTime(),
-                                $start,
-                                $limit
-                            );
-                        }
+                $event = new InternalObjectFindEvent(
+                    $this->objectProvider->getObjectByName($requestedObjectDAO->getObject())
+                );
 
-                        break;
-                    case MauticSyncDataExchange::OBJECT_COMPANY:
-                        $foundObjects = $this->companyObjectHelper->findObjectsBetweenDates(
+                if ($requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
+                    $idChunks = array_chunk($requestDAO->getInputOptionsDAO()->getMauticObjectIds()->getObjectIdsFor(MauticSyncDataExchange::OBJECT_CONTACT), $limit);
+                    $idChunk  = $idChunks[($requestDAO->getSyncIteration() - 1)] ?? [];
+                    $event->setIds($idChunk);
+                } else {
+                    $event->setDateRange(
+                        new DateRange(
                             $requestedObjectDAO->getFromDateTime(),
-                            $requestedObjectDAO->getToDateTime(),
-                            $start,
-                            $limit
-                        );
-
-                        break;
-                    default:
-                        throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $requestedObjectDAO->getObject());
+                            $requestedObjectDAO->getToDateTime()
+                        )
+                    );
+                    $event->setStart($start);
+                    $event->setLimit($limit);
                 }
 
+                $this->dispatcher->dispatch(
+                    IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                    $event
+                );
+
+                $foundObjects = $event->getFoundObjects();
+
                 $this->processObjects($requestedObjectDAO, $syncReport, $foundObjects);
-            } catch (ObjectNotSupportedException $exception) {
+            } catch (ObjectNotFoundException $exception) {
                 DebugLogger::log(
                     MauticSyncDataExchange::NAME,
                     $exception->getMessage(),
