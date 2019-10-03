@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Integration\Interfaces;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 interface AuthenticationInterface extends IntegrationInterface
 {
@@ -31,7 +30,7 @@ interface AuthenticationInterface extends IntegrationInterface
      *
      * @param Request $request
      *
-     * @return Response
+     * @return string message to render if succeeded
      */
-    public function authenticateIntegration(Request $request): Response;
+    public function authenticateIntegration(Request $request): string;
 }
