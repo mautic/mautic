@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
@@ -193,7 +194,7 @@ class FieldHelper
         // Add ID as a read only field
         $this->syncFields[$objectName]['mautic_internal_id'] = $this->translator->trans('mautic.core.id');
 
-        if (MauticSyncDataExchange::OBJECT_CONTACT !== $objectName) {
+        if (Contact::NAME !== $objectName) {
             uasort($this->syncFields[$objectName], 'strnatcmp');
 
             return $this->syncFields[$objectName];

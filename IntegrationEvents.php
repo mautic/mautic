@@ -104,4 +104,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_FIND_INTERNAL_RECORDS = 'mautic.integration.INTEGRATION_FIND_INTERNAL_RECORDS';
+
+    /**
+     * The mautic.integration.INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE event is dispatched when a Mautic internal object route is requested.
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE = 'mautic.integration.INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE';
 }

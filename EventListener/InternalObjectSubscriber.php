@@ -16,6 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\EventListener;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
@@ -23,6 +24,7 @@ use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Router;
 
 class InternalObjectSubscriber implements EventSubscriberInterface
 {
@@ -37,15 +39,23 @@ class InternalObjectSubscriber implements EventSubscriberInterface
     private $companyObjectHelper;
 
     /**
+     * @var Router
+     */
+    private $router;
+
+    /**
      * @param ContactObjectHelper $contactObjectHelper
      * @param CompanyObjectHelper $companyObjectHelper
+     * @param Router              $router
      */
     public function __construct(
         ContactObjectHelper $contactObjectHelper,
-        CompanyObjectHelper $companyObjectHelper
+        CompanyObjectHelper $companyObjectHelper,
+        Router $router
     ) {
         $this->contactObjectHelper = $contactObjectHelper;
         $this->companyObjectHelper = $companyObjectHelper;
+        $this->router              = $router;
     }
 
     /**
@@ -68,6 +78,10 @@ class InternalObjectSubscriber implements EventSubscriberInterface
                 ['findContactsByDateRange', 0],
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
+            ],
+            IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => [
+                ['buildContactRoute', 0],
+                ['buildCompanyRoute', 0],
             ],
         ];
     }
@@ -204,6 +218,48 @@ class InternalObjectSubscriber implements EventSubscriberInterface
                 $event->getDateRange()->getToDate(),
                 $event->getStart(),
                 $event->getLimit()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectRouteEvent $event
+     */
+    public function buildContactRoute(InternalObjectRouteEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setRoute(
+            $this->router->generate(
+                'mautic_contact_action',
+                [
+                    'objectAction' => 'view',
+                    'objectId'     => $event->getId(),
+                ]
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectRouteEvent $event
+     */
+    public function buildCompanyRoute(InternalObjectRouteEvent $event): void
+    {
+        if (Company::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setRoute(
+            $this->router->generate(
+                'mautic_company_action',
+                [
+                    'objectAction' => 'view',
+                    'objectId'     => $event->getId(),
+                ]
             )
         );
         $event->stopPropagation();

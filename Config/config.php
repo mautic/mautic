@@ -70,6 +70,7 @@ return [
                 'arguments' => [
                     'mautic.integrations.helper.contact_object',
                     'mautic.integrations.helper.company_object',
+                    'router',
                 ],
             ],
             'mautic.integrations.subscriber.controller' => [
@@ -442,7 +443,8 @@ return [
             'mautic.integrations.sync.notification.helper_route' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper::class,
                 'arguments' => [
-                    'router',
+                    'mautic.integrations.internal.object_provider',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.notification.helper_user_notification' => [
