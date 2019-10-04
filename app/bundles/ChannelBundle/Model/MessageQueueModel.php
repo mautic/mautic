@@ -140,7 +140,7 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * Adds messages to the queue
+     * Adds messages to the queue.
      *
      * @param $leads
      * @param $channel
