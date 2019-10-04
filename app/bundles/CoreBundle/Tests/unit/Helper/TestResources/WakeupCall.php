@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Unit\Helper\TestResources;
+namespace Mautic\CoreBundle\Tests\unit\Helper\TestResources;
 
 class WakeupCall
 {
