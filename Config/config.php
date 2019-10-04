@@ -278,6 +278,7 @@ return [
                     'mautic.channel.helper.channel_list',
                     'translator',
                     'event_dispatcher',
+                    'mautic.integrations.internal.object_provider',
                 ],
             ],
             'mautic.integrations.sync.sync_process.value_helper' => [
