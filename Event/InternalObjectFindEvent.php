@@ -50,6 +50,11 @@ class InternalObjectFindEvent extends Event
     private $limit;
 
     /**
+     * @var array
+     */
+    private $fieldValues = [];
+
+    /**
      * @param ObjectInterface $object
      */
     public function __construct(ObjectInterface $object)
@@ -143,5 +148,21 @@ class InternalObjectFindEvent extends Event
     public function setLimit(?int $limit): void
     {
         $this->limit = $limit;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldValues(): array
+    {
+        return $this->fieldValues;
+    }
+
+    /**
+     * @param array $fieldValues
+     */
+    public function setFieldValues(array $fieldValues): void
+    {
+        $this->fieldValues = $fieldValues;
     }
 }

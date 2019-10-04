@@ -76,8 +76,10 @@ class InternalObjectSubscriber implements EventSubscriberInterface
             IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS => [
                 ['findContactsByIds', 0],
                 ['findContactsByDateRange', 0],
+                ['findContactsByFieldValues', 0],
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
+                ['findCompaniesByFieldValues', 0],
             ],
             IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => [
                 ['buildContactRoute', 0],
@@ -218,6 +220,40 @@ class InternalObjectSubscriber implements EventSubscriberInterface
                 $event->getDateRange()->getToDate(),
                 $event->getStart(),
                 $event->getLimit()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectFindEvent $event
+     */
+    public function findContactsByFieldValues(InternalObjectFindEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName() || empty($event->getFieldValues())) {
+            return;
+        }
+
+        $event->setFoundObjects(
+            $this->contactObjectHelper->findObjectsByFieldValues(
+                $event->getFieldValues()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectFindEvent $event
+     */
+    public function findCompaniesByFieldValues(InternalObjectFindEvent $event): void
+    {
+        if (Company::NAME !== $event->getObject()->getName() || empty($event->getFieldValues())) {
+            return;
+        }
+
+        $event->setFoundObjects(
+            $this->companyObjectHelper->findObjectsByFieldValues(
+                $event->getFieldValues()
             )
         );
         $event->stopPropagation();

@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
 
-use Mautic\LeadBundle\Entity\Company as CompanyEntity;
-use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -27,9 +28,8 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper
 {
@@ -39,32 +39,36 @@ class MappingHelper
     private $fieldModel;
 
     /**
-     * @var ContactObjectHelper
-     */
-    private $contactObjectHelper;
-
-    /**
-     * @var CompanyObjectHelper
-     */
-    private $companyObjectHelper;
-
-    /**
      * @var ObjectMappingRepository
      */
     private $objectMappingRepository;
 
     /**
-     * @param FieldModel              $fieldModel
-     * @param ObjectMappingRepository $objectMappingRepository
-     * @param ContactObjectHelper     $contactObjectHelper
-     * @param CompanyObjectHelper     $companyObjectHelper
+     * @var ObjectProvider
      */
-    public function __construct(FieldModel $fieldModel, ObjectMappingRepository $objectMappingRepository, ContactObjectHelper $contactObjectHelper, CompanyObjectHelper $companyObjectHelper)
-    {
+    private $objectProvider;
+
+    /**
+     * @var ObjectMappingRepository
+     */
+    private $dispatcher;
+
+    /**
+     * @param FieldModel               $fieldModel
+     * @param ObjectMappingRepository  $objectMappingRepository
+     * @param ObjectProvider           $objectProvider
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(
+        FieldModel $fieldModel,
+        ObjectMappingRepository $objectMappingRepository,
+        ObjectProvider $objectProvider,
+        EventDispatcherInterface $dispatcher
+    ) {
         $this->fieldModel              = $fieldModel;
         $this->objectMappingRepository = $objectMappingRepository;
-        $this->contactObjectHelper     = $contactObjectHelper;
-        $this->companyObjectHelper     = $companyObjectHelper;
+        $this->objectProvider          = $objectProvider;
+        $this->dispatcher              = $dispatcher;
     }
 
     /**
@@ -117,18 +121,23 @@ class MappingHelper
             return new ObjectDAO($internalObjectName, null);
         }
 
-        switch ($internalObjectName) {
-            case MauticSyncDataExchange::OBJECT_CONTACT:
-                $foundObjects = $this->contactObjectHelper->findObjectsByFieldValues($identifiers);
-
-                break;
-            case MauticSyncDataExchange::OBJECT_COMPANY:
-                $foundObjects = $this->companyObjectHelper->findObjectsByFieldValues($identifiers);
-
-                break;
-            default:
-                throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
+        try {
+            $event = new InternalObjectFindEvent(
+                $this->objectProvider->getObjectByName($internalObjectName)
+            );
+        } catch (ObjectNotFoundException $e) {
+            // Throw this exception for BC.
+            throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObjectName);
         }
+
+        $event->setFieldValues($identifiers);
+
+        $this->dispatcher->dispatch(
+            IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+            $event
+        );
+
+        $foundObjects = $event->getFoundObjects();
 
         if (!$foundObjects) {
             // No contacts were found
@@ -162,20 +171,12 @@ class MappingHelper
      */
     public function getMauticEntityClassName(string $internalObject): string
     {
-        switch ($internalObject) {
-            case MauticSyncDataExchange::OBJECT_CONTACT:
-                $entity = LeadEntity::class;
-
-                break;
-            case MauticSyncDataExchange::OBJECT_COMPANY:
-                $entity = CompanyEntity::class;
-
-                break;
-            default:
-                throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObject);
+        try {
+            return $this->objectProvider->getObjectByName($internalObject)->getEntityName();
+        } catch (ObjectNotFoundException $e) {
+            // Throw this exception instead to keep BC.
+            throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $internalObject);
         }
-
-        return $entity;
     }
 
     /**
