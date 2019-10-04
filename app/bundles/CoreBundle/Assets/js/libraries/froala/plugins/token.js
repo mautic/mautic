@@ -52,12 +52,12 @@
                     if (k.match(/assetlink=/i) && v.match(/a:/)){
                         delete tokens[k];
                         var nv = v.replace('a:', '');
-                        k = '<a title=\'Asset Link\' href=\'' + k + '\'>' + nv + '</a>';
+                        k = '<a title="Asset Link" href="' + k + '">' + nv + '</a>';
                         tokens[k] = nv;
                     } else if (k.match(/pagelink=/i) && v.match(/a:/)){
                         delete tokens[k];
                         nv = v.replace('a:', '');
-                        k = '<a title=\'Page Link\' href=\'' + k + '\'>' + nv + '</a>';
+                        k = '<a title="Page Link" href=""' + k + '">' + nv + '</a>';
                         tokens[k] = nv;
                     } else if (k.match(/dwc=/i)){
                         var tn = k.substr(5, k.length - 6);
