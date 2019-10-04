@@ -28,14 +28,11 @@ class ClickthroughHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testObjectInArrayIsDetectedOrIgnored()
     {
-        if (version_compare(PHP_VERSION, '7.0', '<')) {
-            // PHP 5
-            $this->expectException(\InvalidArgumentException::class);
-        }
+        $this->expectException(\InvalidArgumentException::class);
 
         $array = ['foo' => new WakeupCall()];
 
-        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
+        ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array));
     }
 
     public function testOnlyArraysCanBeDecodedToPreventObjectWakeupVulnerability()
