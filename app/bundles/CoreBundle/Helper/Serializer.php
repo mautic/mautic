@@ -19,6 +19,8 @@ class Serializer
      * PHP <7 do not accept the second parameter, throw warning and return false so we have to handle it diffenetly.
      * This helper method is secure for PHP >= 7 by default and handle all PHP versions.
      *
+     * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
+     *
      * @param string $serializedString
      * @param array  $options
      *
@@ -26,6 +28,10 @@ class Serializer
      */
     public static function decode($serializedString, array $options = ['allowed_classes' => false])
     {
+        if (stripos($serializedString, 'o:') !== false) {
+            throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));
+        }
+
         if (version_compare(phpversion(), '7.0.0', '<')) {
             return unserialize($serializedString);
         }
