@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\ValueNormalizer;
 
 use DateTimeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     public function testNullDateTimeValue(): void
     {
-        $valueNormalizer = new ValueNormalizer();
+        $valueNormalizer    = new ValueNormalizer();
         $normalizedValueDAO = $valueNormalizer->normalizeForMautic(NormalizedValueDAO::DATETIME_TYPE, null);
 
         $this->assertInstanceOf(DateTimeInterface::class, $normalizedValueDAO->getNormalizedValue());
