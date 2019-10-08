@@ -5,7 +5,7 @@ Mautic.reportOnLoad = function (container) {
         Mautic.activateSearchAutocomplete('list-search', 'report');
     }
 
-    // Append an index of the number of filters on the edit form
+    // Append an index of the.371 number of filters on the edit form
     if (mQuery('div[id=report_filters]').length) {
         mQuery('div[id=report_filters]').attr('data-index', Mautic.getHighestIndex('report_filters'));
         mQuery('div[id=report_tableOrder]').attr('data-index', Mautic.getHighestIndex('report_tableOrder'));
@@ -368,7 +368,7 @@ Mautic.getHighestIndex = function (selector) {
     var selectorChildren = mQuery('#' + selector + ' > div');
 
     selectorChildren.each(function() {
-        var index = mQuery(this).attr('id').split('_')[2];
+        var index = parseInt(mQuery(this).attr('id').split('_')[2]);
         highestIndex = (index > highestIndex) ? index : highestIndex;
     });
 
