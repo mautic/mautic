@@ -44,7 +44,13 @@ final class ValueNormalizer implements ValueNormalizerInterface
                 return new NormalizedValueDAO($type, $value, (float) $value);
             case NormalizedValueDAO::DATE_TYPE:
             case NormalizedValueDAO::DATETIME_TYPE:
-                return new NormalizedValueDAO($type, $value, new \DateTime($value));
+                // We expect a string value.
+                if (is_string($value)) {
+                    return new NormalizedValueDAO($type, $value, new \DateTime($value));
+                }
+
+                // Other value types we normalize to null.
+                return new NormalizedValueDAO($type, $value, null);
             case NormalizedValueDAO::BOOLEAN_TYPE:
                 $value = 'false' === $value ? false : $value;
                 $value = 'true' === $value ? true : $value;
