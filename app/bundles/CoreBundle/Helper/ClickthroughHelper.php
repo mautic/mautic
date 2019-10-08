@@ -42,8 +42,8 @@ class ClickthroughHelper
             return [];
         }
 
-        if (strpos(strtolower($decoded), 'a') !== 0) {
-            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
+        if (stripos($decoded, 'a') !== 0) {
+            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array', $decoded));
         }
 
         return Serializer::decode($decoded);
