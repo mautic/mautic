@@ -153,7 +153,7 @@ pipeline {
               if [ -n "$(grep IntegrationsBundle .gitmodules)" ]; then
                 git submodule update --init --recursive plugins/IntegrationsBundle/
                 cd plugins/IntegrationsBundle/
-                git pull origin $BRANCH_NAME
+                git reset --hard origin/$BRANCH_NAME
                 SUBMODULE_COMMIT=$(git log -1 | awk 'NR==1{print $2}')
                 cd ../..
                 git add plugins/IntegrationsBundle
