@@ -18,26 +18,9 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ValueHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    protected function setUp(): void
-    {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->method('trans')
-            ->willReturnCallback(
-                function ($key) {
-                    return $key;
-                }
-            );
-    }
-
     public function testExceptionForMissingRequiredIntegrationValue(): void
     {
         $this->expectException(InvalidValueException::class);
@@ -133,6 +116,6 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getValueHelper()
     {
-        return new ValueHelper($this->translator);
+        return new ValueHelper();
     }
 }

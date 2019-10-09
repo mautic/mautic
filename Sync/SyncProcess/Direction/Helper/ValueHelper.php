@@ -17,15 +17,9 @@ use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ValueHelper
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var NormalizedValueDAO
      */
@@ -40,14 +34,6 @@ class ValueHelper
      * @var string
      */
     private $syncDirection;
-
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
 
     /**
      * @param NormalizedValueDAO $normalizedValueDAO
