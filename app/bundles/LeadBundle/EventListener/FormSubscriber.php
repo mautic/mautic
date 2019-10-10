@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -51,6 +52,7 @@ class FormSubscriber implements EventSubscriberInterface
                 ['onFormSubmitActionScoreContactsCompanies', 4],
                 ['onFormSubmitActionRemoveFromDoNotContact', 5],
             ],
+            LeadEvents::LEAD_ON_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
         ];
     }
 
@@ -285,6 +287,26 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($event->getLead()) {
             $this->doNotContact->removeDncForContact($event->getLead()->getId(), 'email');
+        }
+    }
+
+    /**
+     * @param SubmissionEvent $event
+     */
+    public function onLeadSegmentsChange(SubmissionEvent $event)
+    {
+        $properties = $event->getActionConfig();
+
+        $lead       = $this->leadModel->getCurrentLead();
+        $addTo      = $properties['addToLists'];
+        $removeFrom = $properties['removeFromLists'];
+
+        if (!empty($addTo)) {
+            $this->leadModel->addToLists($lead, $addTo);
+        }
+
+        if (!empty($removeFrom)) {
+            $this->leadModel->removeFromLists($lead, $removeFrom);
         }
     }
 }

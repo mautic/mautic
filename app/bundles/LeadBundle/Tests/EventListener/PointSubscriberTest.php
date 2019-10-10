@@ -18,10 +18,22 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private \Mautic\LeadBundle\EventListener\PointSubscriber $subscriber;
 
+    /** @var TriggerExecutedEvent */
+    private $triggerExecutedEvent;
+
+    /** @var TriggerEvent */
+    private $triggerEventEntity;
+
     protected function setUp(): void
     {
         $this->leadModel  = $this->createMock(LeadModel::class);
         $this->subscriber = new PointSubscriber($this->leadModel);
+        $this->triggerExecutedEvent = $this->createMock(TriggerExecutedEvent::class);
+        $this->triggerEventEntity   = $this->createMock(TriggerEvent::class);
+
+        $this->triggerExecutedEvent
+            ->method('getTriggerEvent')
+            ->willReturn($this->triggerEventEntity);
     }
 
     public function testOnPointTriggerExecutedIfNotChangeTagsTyoe(): void
@@ -51,5 +63,31 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with($contact, ['tagA'], []);
 
         $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
+    }
+
+    public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent()
+    {
+        $this->triggerEventEntity
+            ->method('getProperties')
+            ->willReturn([
+                'addToLists'      => 1,
+                'removeFromLists' => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('addToLists');
+        $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
+    }
+
+    public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent()
+    {
+        $this->triggerEventEntity
+            ->method('getProperties')
+            ->willReturn([
+                'removeFromLists' => 1,
+                'addToLists'      => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('removeFromLists');
+        $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
     }
 }

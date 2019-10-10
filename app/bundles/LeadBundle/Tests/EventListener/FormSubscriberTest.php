@@ -54,6 +54,10 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 
+
+    /** @var MockObject&SubmissionEvent */
+    private \PHPUnit\Framework\MockObject\MockObject $submissionEvent;
+
     protected function setUp(): void
     {
         $this->leadModel          = $this->createMock(LeadModel::class);
@@ -62,6 +66,8 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
         $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
         $this->doNotContact       = $this->createMock(DoNotContact::class);
+        $this->lead               = new Lead();
+        $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,
             $this->contactTracker,
@@ -70,6 +76,7 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->pointGroupModel,
             $this->doNotContact
         );
+
     }
 
     public function testOnFormSubmitActionChangePoints(): void
@@ -92,5 +99,31 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onFormSubmitActionChangePoints($submissionEvent);
 
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
+    }
+
+    public function testThatTheLeadIsAddedToTheSegmentOnLeadOnSegmentsChangeEvent(): void
+    {
+        $this->submissionEvent
+            ->method('getActionConfig')
+            ->willReturn([
+                'addToLists'      => 1,
+                'removeFromLists' => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('addToLists');
+        $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
+    }
+
+    public function testThatTheLeadIsRemovedFromTheSegmentOnLeadOnSegmentsChangeEvent(): void
+    {
+        $this->submissionEvent
+            ->method('getActionConfig')
+            ->willReturn([
+                'removeFromLists' => 1,
+                'addToLists'      => null,
+            ]);
+
+        $this->leadModel->expects($this->once())->method('removeFromLists');
+        $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
     }
 }
