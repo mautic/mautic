@@ -32,7 +32,7 @@ class PurgeStaleNotificationsCommand extends ContainerAwareCommand
                 'stale-days',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Notificiations from "X" days ago will be considered stale.',
+                'Notifications from "X" days ago will be considered stale.',
                 '-7 day'
             ),
             new InputOption(
