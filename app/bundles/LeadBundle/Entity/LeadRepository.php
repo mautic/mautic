@@ -584,7 +584,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         }
 
-        if (!empty($joinCondition)) {
+        if (!empty($joinTable)) {
             $qb->join(
                 $this->getTableAlias(),
                 MAUTIC_TABLE_PREFIX.$joinTable,
