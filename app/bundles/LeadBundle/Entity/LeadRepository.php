@@ -584,12 +584,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         }
 
-        $qb->join(
-            $this->getTableAlias(),
-            MAUTIC_TABLE_PREFIX.$joinTable,
-            'entity',
-            $joinCondition
-        );
+        if (!empty($joinCondition)) {
+            $qb->join(
+                $this->getTableAlias(),
+                MAUTIC_TABLE_PREFIX.$joinTable,
+                'entity',
+                $joinCondition
+            );
+        }
 
         if (is_array($additionalJoins)) {
             foreach ($additionalJoins as $t) {
