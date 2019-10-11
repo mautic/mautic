@@ -51,7 +51,7 @@ The <info>%command.name%</info> command is used to purge stale user's notificati
 
 <info>php %command.full_name%</info>
 
-You can optionally set the --stale-days flag to consider what is a stale notification:
+You can set the --stale-days flag to change the number of days to consider stale:
 
 <info>php %command.full_name% --stale-days="-3 days"</info>
 EOT
