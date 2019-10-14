@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Internal;
+namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\ObjectInterface;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ObjectProvider

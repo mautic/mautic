@@ -21,8 +21,8 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 

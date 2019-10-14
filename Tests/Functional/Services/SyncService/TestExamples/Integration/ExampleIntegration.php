@@ -16,9 +16,9 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\
 use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 

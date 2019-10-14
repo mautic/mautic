@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Command;
 
 use MauticPlugin\IntegrationsBundle\Command\SyncCommand;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;

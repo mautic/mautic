@@ -16,9 +16,9 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helpe
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;

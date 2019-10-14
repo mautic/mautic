@@ -16,7 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;

@@ -16,13 +16,13 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Inter
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutionerTest extends \PHPUnit_Framework_TestCase

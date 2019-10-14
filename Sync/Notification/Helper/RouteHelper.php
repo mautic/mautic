@@ -15,9 +15,9 @@ namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

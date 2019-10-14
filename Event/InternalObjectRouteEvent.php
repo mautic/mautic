@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Event;
 
-use MauticPlugin\IntegrationsBundle\Internal\Object\ObjectInterface;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class InternalObjectRouteEvent extends Event

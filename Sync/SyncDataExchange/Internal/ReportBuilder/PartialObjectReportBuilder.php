@@ -16,7 +16,6 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportB
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestObjectDAO;
@@ -25,6 +24,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

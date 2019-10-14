@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Integration;
 
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
@@ -27,6 +26,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;

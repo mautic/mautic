@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\DAO\Mapping;
 
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
 class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
 {

@@ -17,10 +17,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactNotificationHandler implements HandlerInterface

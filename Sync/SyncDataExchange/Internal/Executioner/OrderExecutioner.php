@@ -16,11 +16,11 @@ namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executi
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

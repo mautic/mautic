@@ -11,14 +11,14 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Internal\Object;
+namespace MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Company as CompanyEntity;
 
-final class Contact implements ObjectInterface
+final class Company implements ObjectInterface
 {
-    const NAME   = 'lead'; // kept as lead for BC
-    const ENTITY = Lead::class;
+    const NAME   = 'company';
+    const ENTITY = CompanyEntity::class;
 
     /**
      * {@inheritdoc}

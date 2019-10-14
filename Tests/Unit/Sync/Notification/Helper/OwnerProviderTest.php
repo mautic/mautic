@@ -15,11 +15,11 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OwnerProviderTest extends \PHPUnit_Framework_TestCase

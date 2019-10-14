@@ -15,12 +15,12 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RouteHelperTest extends \PHPUnit_Framework_TestCase

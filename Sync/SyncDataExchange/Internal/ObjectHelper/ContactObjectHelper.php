@@ -21,13 +21,13 @@ use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactObjectHelper implements ObjectHelperInterface

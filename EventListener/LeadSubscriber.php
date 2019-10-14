@@ -22,8 +22,8 @@ use MauticPlugin\IntegrationsBundle\Entity\FieldChange;
 use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 

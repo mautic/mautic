@@ -15,14 +15,14 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Inter
 
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;

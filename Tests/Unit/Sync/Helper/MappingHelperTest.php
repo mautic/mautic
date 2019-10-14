@@ -17,15 +17,15 @@ use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelperTest extends \PHPUnit_Framework_TestCase

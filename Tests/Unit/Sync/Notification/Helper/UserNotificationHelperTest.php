@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class UserNotificationHelperTest extends \PHPUnit_Framework_TestCase

@@ -18,7 +18,6 @@ use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -28,6 +27,7 @@ use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

@@ -16,9 +16,9 @@ namespace MauticPlugin\IntegrationsBundle\Helper;
 use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
-use MauticPlugin\IntegrationsBundle\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
 class SyncIntegrationsHelper

@@ -17,7 +17,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
 class InputOptionsDAO
 {

@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Event;
 
-use MauticPlugin\IntegrationsBundle\Internal\Object\ObjectInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Component\EventDispatcher\Event;
 
 class InternalObjectUpdateEvent extends Event

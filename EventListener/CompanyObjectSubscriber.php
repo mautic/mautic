@@ -20,7 +20,7 @@ use MauticPlugin\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Router;

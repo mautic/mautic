@@ -187,7 +187,7 @@ return [
                 ],
             ],
             'mautic.integrations.internal.object_provider' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Internal\ObjectProvider::class,
+                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider::class,
                 'arguments' => [
                     'event_dispatcher',
                 ],
