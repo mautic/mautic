@@ -81,7 +81,7 @@ $indexCount = 1;
                 <div class="row">
                     <div class="form-group col-xs-12 ">
                         <div class="choice-wrapper">
-                            <div class="btn-group btn-block" data-toggle="buttons">
+                            <div class="btn-group btn-block" data-toggle="buttons" <?php if ($child->vars['attr']['forceDirection']) : echo 'data-force-direction="1"'; endif; ?>>
                                 <?php $checked = $child->vars['value'] === '0'; ?>
                                 <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>">
                                     <input type="radio"

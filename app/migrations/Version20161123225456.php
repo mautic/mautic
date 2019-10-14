@@ -14,6 +14,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Helper\Serializer;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -39,7 +40,7 @@ class Version20161123225456 extends AbstractMauticMigration
         if (count($booleanFields)) {
             $fields = [];
             foreach ($booleanFields as $key => $field) {
-                $fields[$field['alias']] = unserialize($field['properties']);
+                $fields[$field['alias']] = Serializer::decode($field['properties']);
             }
 
             $this->fixEmails($qb, $fields);
@@ -80,7 +81,7 @@ class Version20161123225456 extends AbstractMauticMigration
         if (count($emails)) {
             foreach ($emails as $email) {
                 $update         = false;
-                $dynamicContent = unserialize($email['dynamic_content']);
+                $dynamicContent = Serializer::decode($email['dynamic_content']);
                 foreach ($dynamicContent as &$dc) {
                     foreach ($dc['filters'] as &$filter) {
                         foreach ($filter['filters'] as &$checkMe) {
@@ -118,7 +119,7 @@ class Version20161123225456 extends AbstractMauticMigration
         if (count($segments)) {
             foreach ($segments as $segment) {
                 $update  = false;
-                $filters = unserialize($segment['filters']);
+                $filters = Serializer::decode($segment['filters']);
                 foreach ($filters as &$filter) {
                     $this->fixField($filter, $update, $fields);
                 }

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -330,6 +331,22 @@ class FocusModel extends FormModel
      */
     public function addStat(Focus $focus, $type, $data = null, $lead = null)
     {
+        if (empty($lead)) {
+            return;
+        }
+
+        if ($lead instanceof Lead && !$lead->getId()) {
+            return;
+        }
+
+        if (is_array($lead)) {
+            if (empty($lead['id'])) {
+                return;
+            }
+
+            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+        }
+
         switch ($type) {
             case Stat::TYPE_FORM:
                 /** @var \Mautic\FormBundle\Entity\Submission $data */
