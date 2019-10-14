@@ -38,7 +38,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         $entityManager = $factory->getEntityManager();
 
         /** @var string $tablePrefix */
-        $tablePrefix = $factory->getParameter('mautic.db_table_prefix', '');
+        $tablePrefix = (string) $factory->getParameter('mautic.db_table_prefix');
 
         $migrationEngine = new Engine(
             $entityManager,
