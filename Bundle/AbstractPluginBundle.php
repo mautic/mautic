@@ -36,9 +36,7 @@ abstract class AbstractPluginBundle extends PluginBundleBase
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, ?Schema $installedSchema = null): void
     {
         $entityManager = $factory->getEntityManager();
-
-        /** @var string $tablePrefix */
-        $tablePrefix = (string) $factory->getParameter('mautic.db_table_prefix');
+        $tablePrefix   = (string) $factory->getParameter('mautic.db_table_prefix');
 
         $migrationEngine = new Engine(
             $entityManager,
