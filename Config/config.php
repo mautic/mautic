@@ -186,6 +186,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.integrations.sync.notification.helper.owner_provider' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.integrations.internal.object_provider',
+                ],
+            ],
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class,
             ],
@@ -453,6 +460,7 @@ return [
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.integrations.sync.notification.helper_user',
+                    'mautic.integrations.sync.notification.helper.owner_provider',
                     'mautic.integrations.sync.notification.helper_route',
                     'translator',
                 ],
@@ -462,6 +470,7 @@ return [
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.integrations.sync.notification.helper_user',
+                    'mautic.integrations.sync.notification.helper.owner_provider',
                     'mautic.integrations.sync.notification.helper_route',
                     'translator',
                 ],

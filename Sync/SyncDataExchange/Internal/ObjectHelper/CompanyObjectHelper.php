@@ -217,4 +217,25 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         return $q->execute()->fetchAll();
     }
+
+    /**
+     * @param array $objectIds
+     *
+     * @return array
+     */
+    public function findOwnerIds(array $objectIds): array
+    {
+        if (empty($objectIds)) {
+            return [];
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('c.owner_id, c.id');
+        $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
+        $qb->where('c.owner_id IS NOT NULL');
+        $qb->andWhere('c.id IN (:objectIds)');
+        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+
+        return $qb->execute()->fetchAll();
+    }
 }

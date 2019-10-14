@@ -30,6 +30,11 @@ class UserSummaryNotificationHelper
     private $userHelper;
 
     /**
+     * @var OwnerProvider
+     */
+    private $ownerProvider;
+
+    /**
      * @var RouteHelper
      */
     private $routeHelper;
@@ -67,19 +72,22 @@ class UserSummaryNotificationHelper
     /**
      * @param Writer              $writer
      * @param UserHelper          $userHelper
+     * @param OwnerProvider       $ownerProvider
      * @param RouteHelper         $routeHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
         Writer $writer,
         UserHelper $userHelper,
+        OwnerProvider $ownerProvider,
         RouteHelper $routeHelper,
         TranslatorInterface $translator
     ) {
-        $this->writer      = $writer;
-        $this->userHelper  = $userHelper;
-        $this->routeHelper = $routeHelper;
-        $this->translator  = $translator;
+        $this->writer        = $writer;
+        $this->userHelper    = $userHelper;
+        $this->ownerProvider = $ownerProvider;
+        $this->routeHelper   = $routeHelper;
+        $this->translator    = $translator;
     }
 
     /**
@@ -136,7 +144,18 @@ class UserSummaryNotificationHelper
      */
     private function findAndSendToUsers(array $ids): void
     {
-        $owners = $this->userHelper->getOwners($this->mauticObject, $ids);
+        $results = $this->ownerProvider->getOwnersForObjectIds($this->mauticObject, $ids);
+        $owners  = [];
+
+        // Group by owner ID.
+        foreach ($results as $result) {
+            $ownerId = $result['owner_id'];
+            if (!isset($owners[$ownerId])) {
+                $owners[$ownerId] = [];
+            }
+
+            $owners[$ownerId][] = (int) $result['id'];
+        }
 
         foreach ($owners as $userId => $ownedObjectIds) {
             // Keep track of who is left over to send to admins instead

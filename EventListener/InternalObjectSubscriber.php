@@ -16,6 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\EventListener;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
@@ -80,6 +81,10 @@ class InternalObjectSubscriber implements EventSubscriberInterface
                 ['findCompaniesByIds', 0],
                 ['findCompaniesByDateRange', 0],
                 ['findCompaniesByFieldValues', 0],
+            ],
+            IntegrationEvents::INTEGRATION_FIND_OWNER_IDS => [
+                ['findOwnerIdsForContacts', 0],
+                ['findOwnerIdsForCompanies', 0],
             ],
             IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE => [
                 ['buildContactRoute', 0],
@@ -254,6 +259,40 @@ class InternalObjectSubscriber implements EventSubscriberInterface
         $event->setFoundObjects(
             $this->companyObjectHelper->findObjectsByFieldValues(
                 $event->getFieldValues()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectOwnerEvent $event
+     */
+    public function findOwnerIdsForContacts(InternalObjectOwnerEvent $event): void
+    {
+        if (Contact::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setOwners(
+            $this->contactObjectHelper->findOwnerIds(
+                $event->getObjectIds()
+            )
+        );
+        $event->stopPropagation();
+    }
+
+    /**
+     * @param InternalObjectOwnerEvent $event
+     */
+    public function findOwnerIdsForCompanies(InternalObjectOwnerEvent $event): void
+    {
+        if (Company::NAME !== $event->getObject()->getName()) {
+            return;
+        }
+
+        $event->setOwners(
+            $this->companyObjectHelper->findOwnerIds(
+                $event->getObjectIds()
             )
         );
         $event->stopPropagation();

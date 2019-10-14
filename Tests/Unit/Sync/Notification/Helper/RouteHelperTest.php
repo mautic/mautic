@@ -35,6 +35,11 @@ class RouteHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $dispatcher;
 
+    /**
+     * @var RouteHelper
+     */
+    private $routeHelper;
+
     protected function setUp(): void
     {
         $this->objectProvider = $this->createMock(ObjectProvider::class);

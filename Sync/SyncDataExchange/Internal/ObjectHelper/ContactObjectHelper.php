@@ -344,6 +344,27 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
+     * @param array $objectIds
+     *
+     * @return array
+     */
+    public function findOwnerIds(array $objectIds): array
+    {
+        if (empty($objectIds)) {
+            return [];
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('c.owner_id, c.id');
+        $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'c');
+        $qb->where('c.owner_id IS NOT NULL');
+        $qb->andWhere('c.id IN (:objectIds)');
+        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+
+        return $qb->execute()->fetchAll();
+    }
+
+    /**
      * @param int $id
      *
      * @return string
