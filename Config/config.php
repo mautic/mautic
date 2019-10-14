@@ -65,10 +65,16 @@ return [
                     'mautic.integrations.helper.sync_integrations',
                 ],
             ],
-            'mautic.integrations.subscriber.internal_object' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\InternalObjectSubscriber::class,
+            'mautic.integrations.subscriber.contact_object' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\ContactObjectSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper.contact_object',
+                    'router',
+                ],
+            ],
+            'mautic.integrations.subscriber.company_object' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\CompanyObjectSubscriber::class,
+                'arguments' => [
                     'mautic.integrations.helper.company_object',
                     'router',
                 ],
