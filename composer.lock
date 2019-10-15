@@ -10318,6 +10318,12 @@
                 "reference": "494c9bbee9111e751b91833244cc3e9a06a27712",
                 "shasum": ""
             },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/intl/zipball/236c4eb3d12813f766d6b52d23b5677bf0a9840f",
+                "reference": "236c4eb3d12813f766d6b52d23b5677bf0a9840f",
+                "shasum": ""
+            },
             "require": {
                 "php": "^5.5.9|>=7.0.8",
                 "symfony/inflector": "~3.1|~4.0",
@@ -12126,6 +12132,12 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/c460a3cbaa58f983fe026cd52c45950bf61e9239",
                 "reference": "c460a3cbaa58f983fe026cd52c45950bf61e9239",
+                "shasum": ""
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/BazingaOAuthServerBundle/zipball/f7685479cdc35114cc4e6219313f57f5c72a5ee6",
+                "reference": "f7685479cdc35114cc4e6219313f57f5c72a5ee6",
                 "shasum": ""
             },
             "require": {
