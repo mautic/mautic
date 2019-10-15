@@ -24,8 +24,8 @@ class Version20191015135412 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $emailSatsTable = $schema->getTable("{$this->prefix}email_stats");
-        $pageHitsTable = $schema->getTable("{$this->prefix}page_hits");
+        $emailSatsTable            = $schema->getTable("{$this->prefix}email_stats");
+        $pageHitsTable             = $schema->getTable("{$this->prefix}page_hits");
         $campaignLeadEventLogTable = $schema->getTable("{$this->prefix}campaign_lead_event_log");
 
         if (!$emailSatsTable->hasIndex("{$this->prefix}is_failed_date_sent")) {
@@ -44,8 +44,8 @@ class Version20191015135412 extends AbstractMauticMigration
      */
     public function down(Schema $schema)
     {
-        $emailSatsTable = $schema->getTable("{$this->prefix}email_stats");
-        $pageHitsTable = $schema->getTable("{$this->prefix}page_hits");
+        $emailSatsTable            = $schema->getTable("{$this->prefix}email_stats");
+        $pageHitsTable             = $schema->getTable("{$this->prefix}page_hits");
         $campaignLeadEventLogTable = $schema->getTable("{$this->prefix}campaign_lead_event_log");
 
         if ($emailSatsTable->hasIndex("{$this->prefix}is_failed_date_sent")) {
