@@ -164,7 +164,8 @@ class Hit
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index');
+            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
+            ->addIndex(['lead_id', 'date_hit'], 'lead_id_date_hit');
         // There should be a 128 char prefix index but it cannot be created here
         // created in fixtures instead
         //->addIndex(['url'], 'page_hit_url');
