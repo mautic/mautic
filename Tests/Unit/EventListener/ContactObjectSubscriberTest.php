@@ -16,9 +16,12 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\EventListener;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectOwnerEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use MauticPlugin\IntegrationsBundle\EventListener\ContactObjectSubscriber;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use MauticPlugin\IntegrationsBundle\Sync\DAO\DateRange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
@@ -175,5 +178,155 @@ class ContactObjectSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->findContactsByIds($event);
 
         $this->assertSame([['object_1']], $event->getFoundObjects());
+    }
+
+    public function testFindContactsByDateRangeWithWrongObject(): void
+    {
+        $event = new InternalObjectFindEvent(new Company());
+
+        $this->contactObjectHelper->expects($this->never())
+            ->method('findObjectsBetweenDates');
+
+        $this->subscriber->findContactsByDateRange($event);
+
+        $this->assertSame([], $event->getFoundObjects());
+    }
+
+    public function testFindContactsByDateRangeWithNoDateRange(): void
+    {
+        $event = new InternalObjectFindEvent(new Contact());
+
+        $this->contactObjectHelper->expects($this->never())
+            ->method('findObjectsBetweenDates');
+
+        $this->subscriber->findContactsByDateRange($event);
+
+        $this->assertSame([], $event->getFoundObjects());
+    }
+
+    public function testFindContactsByDateRangeWithRightObject(): void
+    {
+        $event     = new InternalObjectFindEvent(new Contact());
+        $fromDate  = new \DateTimeImmutable();
+        $toDate    = new \DateTimeImmutable();
+        $dateRange = new DateRange($fromDate, $toDate);
+        $start     = 0;
+        $limit     = 10;
+
+        $event->setDateRange($dateRange);
+        $event->setStart($start);
+        $event->setLimit($limit);
+
+        $this->contactObjectHelper->expects($this->once())
+            ->method('findObjectsBetweenDates')
+            ->with(
+                $fromDate,
+                $toDate,
+                $start,
+                $limit
+            )
+            ->willReturn([['object_1']]);
+
+        $this->subscriber->findContactsByDateRange($event);
+
+        $this->assertSame([['object_1']], $event->getFoundObjects());
+    }
+
+    public function testFindContactsByFieldValuesWithWrongObject(): void
+    {
+        $event = new InternalObjectFindEvent(new Company());
+
+        $this->contactObjectHelper->expects($this->never())
+            ->method('findObjectsByFieldValues');
+
+        $this->subscriber->findContactsByFieldValues($event);
+
+        $this->assertSame([], $event->getFoundObjects());
+    }
+
+    public function testFindContactsByFieldValuesWithNoIds(): void
+    {
+        $event = new InternalObjectFindEvent(new Contact());
+
+        $this->contactObjectHelper->expects($this->never())
+            ->method('findObjectsByFieldValues');
+
+        $this->subscriber->findContactsByFieldValues($event);
+
+        $this->assertSame([], $event->getFoundObjects());
+    }
+
+    public function testFindContactsByFieldValuesWithRightObject(): void
+    {
+        $event = new InternalObjectFindEvent(new Contact());
+
+        $event->setFieldValues(['field_a' => 123]);
+
+        $this->contactObjectHelper->expects($this->once())
+            ->method('findObjectsByFieldValues')
+            ->with(['field_a' => 123])
+            ->willReturn([['object_1']]);
+
+        $this->subscriber->findContactsByFieldValues($event);
+
+        $this->assertSame([['object_1']], $event->getFoundObjects());
+    }
+
+    public function testFindOwnerIdsForContactsWithWrongObject(): void
+    {
+        $event = new InternalObjectOwnerEvent(new Company(), []);
+
+        $this->contactObjectHelper->expects($this->never())
+            ->method('findOwnerIds');
+
+        $this->subscriber->findOwnerIdsForContacts($event);
+
+        $this->assertSame([], $event->getOwners());
+    }
+
+    public function testFindOwnerIdsForContactsWithRightObject(): void
+    {
+        $event = new InternalObjectOwnerEvent(new Contact(), [567]);
+
+        $this->contactObjectHelper->expects($this->once())
+            ->method('findOwnerIds')
+            ->with([567])
+            ->willReturn([['object_1']]);
+
+        $this->subscriber->findOwnerIdsForContacts($event);
+
+        $this->assertSame([['object_1']], $event->getOwners());
+    }
+
+    public function testBuildContactRouteWithWrongObject(): void
+    {
+        $event = new InternalObjectRouteEvent(new Company(), 123);
+
+        $this->router->expects($this->never())
+            ->method('generate');
+
+        $this->subscriber->buildContactRoute($event);
+
+        $this->assertSame(null, $event->getRoute());
+    }
+
+    public function testBuildContactRouteWithRightObject(): void
+    {
+        $event = new InternalObjectRouteEvent(new Contact(), 123);
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'mautic_contact_action',
+                [
+                    'objectAction' => 'view',
+                    'objectId'     => 123,
+                ]
+            )
+            ->willReturn('some/route');
+
+        $this->subscriber->buildContactRoute($event);
+
+        $this->assertSame('some/route', $event->getRoute());
     }
 }
