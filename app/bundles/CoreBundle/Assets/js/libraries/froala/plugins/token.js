@@ -91,7 +91,7 @@
                                                                 str.replace(/_BADGE_/,'dwc') : '';
                     var title = tokens[val];
                     if (title.length>24) title = title.substr(0, 24) + '...';
-                    var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + val + '" title="' + title + '">' + title + badge + '</a></li>';
+                    var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + encodeURI(val) + '" title="' + title + '">' + title + badge + '</a></li>';
                     options.push(newOption);
                 }
 
