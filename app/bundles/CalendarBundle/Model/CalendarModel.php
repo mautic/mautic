@@ -42,7 +42,7 @@ class CalendarModel extends FormModel
      * @param string $bundle
      * @param int    $id
      *
-     * @return array
+     * @return EventGeneratorEvent
      */
     public function editCalendarEvent($bundle, $id)
     {

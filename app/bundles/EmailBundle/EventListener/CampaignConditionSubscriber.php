@@ -68,6 +68,8 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {

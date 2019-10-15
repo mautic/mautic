@@ -231,8 +231,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param Email $entity
      * @param       $unlock
-     *
-     * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -297,8 +295,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param  $entities
      * @param  $unlock
-     *
-     * @return array
      */
     public function saveEntities($entities, $unlock = true)
     {

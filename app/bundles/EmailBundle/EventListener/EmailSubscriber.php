@@ -144,7 +144,7 @@ class EmailSubscriber extends CommonSubscriber
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();
-                if (true || $retries > 3) {
+                if ($retries > 3) {
                     //tried too many times so just fail
                     $reason = $this->translator->trans('mautic.email.dnc.retries', [
                         '%subject%' => EmojiHelper::toShort($message->getSubject()),

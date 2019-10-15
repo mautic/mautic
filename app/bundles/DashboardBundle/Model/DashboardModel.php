@@ -54,12 +54,13 @@ class DashboardModel extends FormModel
      *
      * @param CoreParametersHelper $coreParametersHelper
      * @param PathsHelper          $pathsHelper
+     * @param Filesystem           $filesystem
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
         Filesystem $filesystem
-        ) {
+    ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
         $this->filesystem           = $filesystem;
@@ -285,7 +286,7 @@ class DashboardModel extends FormModel
      * @param string|null                         $action
      * @param array                               $options
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
