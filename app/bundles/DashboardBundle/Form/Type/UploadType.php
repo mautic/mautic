@@ -32,6 +32,11 @@ class UploadType extends AbstractType
                 'class'  => 'form-control',
             ],
         ]);
+        $constraints = [
+            new \Symfony\Component\Validator\Constraints\NotBlank(
+                ['message' => 'mautic.core.value.required']
+            ),
+        ];
         $builder->add('start', 'submit', [
             'attr' => [
                 'class'   => 'btn btn-primary',

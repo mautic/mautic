@@ -75,7 +75,7 @@ class EmailSendType extends AbstractType
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                     ],
-                    'data' => isset($options['data']['email_type']) ? $options['data']['email_type'] : 'transactional',
+                    'data' => (!isset($options['data']['email_type'])) ? 'transactional' : $options['data']['email_type'],
                 ]
             );
         }
