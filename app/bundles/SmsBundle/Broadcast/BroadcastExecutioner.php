@@ -70,7 +70,7 @@ class BroadcastExecutioner
             $this->contactLimiter = new ContactLimiter($event->getBatch(), null, $event->getMinContactIdFilter(), $event->getMaxContactIdFilter(), [], null, null, $event->getLimit());
             $this->result         = new BroadcastResult();
             try {
-                $this->send($sms, $this->contactLimiter);
+                $this->send($sms);
             } catch (\Exception $exception) {
             }
 

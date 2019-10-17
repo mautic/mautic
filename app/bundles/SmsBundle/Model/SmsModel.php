@@ -226,10 +226,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $sendTo = [$sendTo];
         }
 
-        $sentCount     = 0;
-        $results       = [];
-        $contacts      = [];
-        $fetchContacts = [];
+        $sentCount       = 0;
+        $failedCount     = 0;
+        $results         = [];
+        $contacts        = [];
+        $fetchContacts   = [];
         foreach ($sendTo as $lead) {
             if (!$lead instanceof Lead) {
                 $fetchContacts[] = $lead;
@@ -344,10 +345,12 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
                         $stat->setIsFailed(true);
+                        ++$failedCount;
                     } else {
                         $sendResult['sent'] = true;
                         ++$sentCount;
                     }
+
                     $stats[]            = $stat;
                     unset($stat);
                     //   unset($stat);
@@ -358,7 +361,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        if ($sentCount) {
+        if ($sentCount || $failedCount) {
             $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
             $this->getStatRepository()->saveEntities($stats);
 
@@ -486,14 +489,25 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$flag || $flag === 'total_and_unique') {
-            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
-
+            $filter['is_failed'] = 0;
+            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
 
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
+        }
+
+        if (!$flag || $flag === 'failed') {
+            $filter['is_failed'] = 1;
+            $q                   = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.sms.show.failed'), $data);
         }
 
         return $chart->render();
