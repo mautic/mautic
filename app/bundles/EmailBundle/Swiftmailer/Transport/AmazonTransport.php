@@ -112,76 +112,78 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      */
     public function processJsonPayload(array $payload)
     {
-        if (!isset($payload['Type'])) {
-            throw new HttpException(400, "Key 'Type' not found in payload ");
-        }
+        $this->logger->warn("PAYLOAD: '$payload[Type]'");
+        // if (!isset($payload['Type'])) {
+        //     throw new HttpException(400, "Key 'Type' not found in payload ");
+        // }
 
-        if ($payload['Type'] == 'SubscriptionConfirmation') {
-            // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
-            try {
-                $response = $this->httpClient->get($payload['SubscribeURL']);
-                if ($response->code == 200) {
-                    $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
+        // if ($payload['Type'] == 'SubscriptionConfirmation') {
+        //     // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
+        //     try {
+        //         $response = $this->httpClient->get($payload['SubscribeURL']);
+        //         if ($response->code == 200) {
+        //             $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
 
-                    return;
-                }
+        //             return;
+        //         }
 
-                $reason = 'HTTP Code '.$response->code.', '.$response->body;
-            } catch (UnexpectedResponseException $e) {
-                $reason = $e->getMessage();
+        //         $reason = 'HTTP Code '.$response->code.', '.$response->body;
+        //     } catch (UnexpectedResponseException $e) {
+        //         $reason = $e->getMessage();
+        //     }
+
+        //     $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
+
+        //     return;
+        // }
+
+        // if ($payload['Type'] == 'Notification') {
+        // $message = json_decode($payload, true);
+        $message = $payload;
+
+        // only deal with hard bounces
+        if ($message['notificationType'] == 'Bounce' && $message['bounce']['bounceType'] == 'Permanent') {
+            // Get bounced recipients in an array
+            $bouncedRecipients = $message['bounce']['bouncedRecipients'];
+            foreach ($bouncedRecipients as $bouncedRecipient) {
+                $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bouncedRecipient['diagnosticCode']);
+                $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bouncedRecipient['diagnosticCode']);
             }
-
-            $this->logger->error('Callback to SubscribeURL from Amazon SNS failed, reason: '.$reason);
 
             return;
         }
 
-        if ($payload['Type'] == 'Notification') {
-            $message = json_decode($payload['Message'], true);
-
-            // only deal with hard bounces
-            if ($message['notificationType'] == 'Bounce' && $message['bounce']['bounceType'] == 'Permanent') {
-                // Get bounced recipients in an array
-                $bouncedRecipients = $message['bounce']['bouncedRecipients'];
-                foreach ($bouncedRecipients as $bouncedRecipient) {
-                    $this->transportCallback->addFailureByAddress($bouncedRecipient['emailAddress'], $bouncedRecipient['diagnosticCode']);
-                    $this->logger->debug("Mark email '".$bouncedRecipient['emailAddress']."' as bounced, reason: ".$bouncedRecipient['diagnosticCode']);
+        // unsubscribe customer that complain about spam at their mail provider
+        if ($message['notificationType'] == 'Complaint') {
+            foreach ($message['complaint']['complainedRecipients'] as $complainedRecipient) {
+                $reason = null;
+                if (isset($message['complaint']['complaintFeedbackType'])) {
+                    // http://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html#complaint-object
+                    switch ($message['complaint']['complaintFeedbackType']) {
+                        case 'abuse':
+                            $reason = $this->translator->trans('mautic.email.complaint.reason.abuse');
+                            break;
+                        case 'fraud':
+                            $reason = $this->translator->trans('mautic.email.complaint.reason.fraud');
+                            break;
+                        case 'virus':
+                            $reason = $this->translator->trans('mautic.email.complaint.reason.virus');
+                            break;
+                    }
                 }
 
-                return;
-            }
-
-            // unsubscribe customer that complain about spam at their mail provider
-            if ($message['notificationType'] == 'Complaint') {
-                foreach ($message['complaint']['complainedRecipients'] as $complainedRecipient) {
-                    $reason = null;
-                    if (isset($message['complaint']['complaintFeedbackType'])) {
-                        // http://docs.aws.amazon.com/ses/latest/DeveloperGuide/notification-contents.html#complaint-object
-                        switch ($message['complaint']['complaintFeedbackType']) {
-                            case 'abuse':
-                                $reason = $this->translator->trans('mautic.email.complaint.reason.abuse');
-                                break;
-                            case 'fraud':
-                                $reason = $this->translator->trans('mautic.email.complaint.reason.fraud');
-                                break;
-                            case 'virus':
-                                $reason = $this->translator->trans('mautic.email.complaint.reason.virus');
-                                break;
-                        }
-                    }
-
-                    if ($reason == null) {
-                        $reason = $this->translator->trans('mautic.email.complaint.reason.unknown');
-                    }
-
-                    $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED);
-
-                    $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
+                if ($reason == null) {
+                    $reason = $this->translator->trans('mautic.email.complaint.reason.unknown');
                 }
 
-                return;
+                $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED);
+
+                $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
             }
+
+            return;
         }
+        // }
 
         $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
         $this->logger->debug('SES webhook payload: '.json_encode($payload));
