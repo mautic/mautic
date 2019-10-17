@@ -343,11 +343,12 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $stat);
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
+                        $stat->setIsFailed(true);
                     } else {
                         $sendResult['sent'] = true;
-                        $stats[]            = $stat;
                         ++$sentCount;
                     }
+                    $stats[]            = $stat;
                     unset($stat);
                     //   unset($stat);
                     $results[$leadId] = $sendResult;
@@ -362,7 +363,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $this->getStatRepository()->saveEntities($stats);
 
             foreach ($stats as $stat) {
-                $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+                if (!$stat->isFailed()) {
+                    $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
+                }
             }
 
             $this->em->clear(Stat::class);

@@ -74,6 +74,11 @@ class Stat
     private $tokens = [];
 
     /**
+     * @var bool
+     */
+    private $isFailed = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -84,7 +89,8 @@ class Stat
             ->setCustomRepositoryClass('Mautic\SmsBundle\Entity\StatRepository')
             ->addIndex(['sms_id', 'lead_id'], 'stat_sms_search')
             ->addIndex(['tracking_hash'], 'stat_sms_hash_search')
-            ->addIndex(['source', 'source_id'], 'stat_sms_source_search');
+            ->addIndex(['source', 'source_id'], 'stat_sms_source_search')
+            ->addIndex(['is_failed'], 'stat_sms_failed_search');
 
         $builder->addId();
 
@@ -103,6 +109,11 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('isFailed', 'boolean')
+            ->columnName('is_failed')
+            ->nullable()
             ->build();
 
         $builder->createField('trackingHash', 'string')
@@ -137,6 +148,7 @@ class Stat
                     'id',
                     'ipAddress',
                     'dateSent',
+                    'isFailed',
                     'source',
                     'sourceId',
                     'trackingHash',
@@ -333,5 +345,25 @@ class Stat
         $this->tokens = $tokens;
 
         return $this;
+    }
+
+    /**
+     * @param bool $isFailed
+     *
+     * @return Stat
+     */
+    public function setIsFailed($isFailed)
+    {
+        $this->isFailed = $isFailed;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->isFailed;
     }
 }
