@@ -178,8 +178,13 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
 
                     $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
                 }
+
+                return;
             }
         }
+
+        $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
+        $this->logger->debug('SES webhook payload: '.json_encode($payload));
     }
 
     /**
