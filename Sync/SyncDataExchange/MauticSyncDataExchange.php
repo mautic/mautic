@@ -157,7 +157,7 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
                 $object   = $this->fieldHelper->getFieldObjectName($changedObjectDAO->getMappedObject());
                 $objectId = $changedObjectDAO->getMappedObjectId();
 
-                $this->fieldChangeRepository->deleteEntitiesForObject($objectId, $object, $changedObjectDAO->getIntegration());
+                $this->fieldChangeRepository->deleteEntitiesForObject((int) $objectId, $object, $changedObjectDAO->getIntegration());
             } catch (ObjectNotSupportedException $exception) {
                 DebugLogger::log(
                     self::NAME,
