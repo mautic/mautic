@@ -9,9 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
+if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)):
+    $type = isset($event['extra']['type']) ? $event['extra']['type'] : null;
+    ?>
     <p>
-        <?php if (!empty($item['isFailed'])) :
+        <?php if (!empty($item['isFailed']) && $type == 'failed') :
             $details = json_decode($item['details'], true);
             $errors  = '';
             if (isset($details['failed'])) {
@@ -32,7 +34,7 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
         ?></span>
 
         <?php endif; ?>
-        <?php if (!empty($item['list_name'])) : ?>
+        <?php if (!empty($item['list_name']) && $type != 'failed') : ?>
             <br /><?php echo $view['translator']->trans('mautic.sms.timeline.event.list', ['%list%' => $item['list_name']]); ?>
         <?php endif; ?>
     </p>
