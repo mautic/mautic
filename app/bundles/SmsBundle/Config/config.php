@@ -12,6 +12,9 @@
 return [
     'services' => [
         'events' => [
+            'mautic.sms.lead.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\LeadSubscriber::class,
+            ],
             'mautic.sms.broadcast.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\BroadcastSubscriber::class,
                 'arguments' => [

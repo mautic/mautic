@@ -90,20 +90,27 @@ class BroadcastExecutioner
      */
     private function send(Sms $sms)
     {
-        $contactIds = $this->broadcastQuery->getPendingContactsIds($sms, $this->contactLimiter);
-        while (!empty($contactIds)) {
-            $results    = $this->smsModel->sendSms($sms, $contactIds, ['channel'=>['sms', $sms->getId()]]);
-            $this->result->process($results);
+        $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
+        while (!empty($contacts)) {
+            foreach ($contacts as $contact) {
+                $contactId  = $contact['id'];
+                $results    = $this->smsModel->sendSms($sms, $contactId, [
+                    'channel'=> [
+                        'sms', $sms->getId(),
+                    ],
+                    'listId'=> $contact['listId'],
+                ]);
+                $this->result->process($results);
+            }
 
-            $nextContactMinBatch = end($contactIds);
-            $this->contactLimiter->setBatchMinContactId($nextContactMinBatch + 1);
+            $this->contactLimiter->setBatchMinContactId($contactId + 1);
 
             if ($this->contactLimiter->hasCampaignLimit()) {
                 $this->contactLimiter->reduceCampaignLimitRemaining(count($results));
             }
 
             // Next batch
-            $contactIds = $this->broadcastQuery->getPendingContactsIds($sms, $this->contactLimiter);
+            $contacts = $this->broadcastQuery->getPendingContacts($sms, $this->contactLimiter);
         }
     }
 }

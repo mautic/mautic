@@ -55,14 +55,14 @@ class BroadcastQuery
      *
      * @return array
      */
-    public function getPendingContactsIds(Sms $sms, ContactLimiter $contactLimiter)
+    public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter)
     {
         $query = $this->getBasicQuery($sms);
-        $query->select('DISTINCT l.id');
+        $query->select('DISTINCT l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
         $contacts = $query->execute()->fetchAll();
 
-        return array_column($contacts, 'id');
+        return $contacts;
     }
 
     /**

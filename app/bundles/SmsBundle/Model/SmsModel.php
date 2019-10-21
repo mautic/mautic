@@ -219,6 +219,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     public function sendSms(Sms $sms, $sendTo, $options = [])
     {
         $channel = (isset($options['channel'])) ? $options['channel'] : null;
+        $listId  = (isset($options['listId'])) ? $options['listId'] : null;
 
         if ($sendTo instanceof Lead) {
             $sendTo = [$sendTo];
@@ -300,7 +301,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
                     $leadId          = $lead->getId();
-                    $stat            = $this->createStatEntry($sms, $lead, $channel, false);
+                    $stat            = $this->createStatEntry($sms, $lead, $channel, false, $listId);
+
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
@@ -385,15 +387,21 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @param Lead $lead
      * @param null $source
      * @param bool $persist
+     * @param null $listId
      *
      * @return Stat
+     *
+     * @throws \Exception
      */
-    public function createStatEntry(Sms $sms, Lead $lead, $source = null, $persist = true)
+    public function createStatEntry(Sms $sms, Lead $lead, $source = null, $persist = true, $listId = null)
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setSms($sms);
+        if (null !== $listId) {
+            $stat->setList($this->leadModel->getLeadListRepository()->getEntity($listId));
+        }
         if (is_array($source)) {
             $stat->setSourceId($source[1]);
             $source = $source[0];
