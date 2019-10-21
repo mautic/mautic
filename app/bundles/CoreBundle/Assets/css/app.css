@@ -4738,3 +4738,11 @@ figcaption {
 .imagecard .imagecard-caption {
   background-color: #bbb !important;
 }
+.ico-email:before {
+  font-family: "FontAwesome";
+  content: "\f1fa";
+}
+.ico-sms:before {
+  font-family: "FontAwesome";
+  content: "\f27b";
+}

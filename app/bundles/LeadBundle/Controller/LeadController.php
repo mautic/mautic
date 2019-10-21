@@ -18,6 +18,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
@@ -166,9 +167,8 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        // We need the EmailRepository to check if a lead is flagged as do not contact
-        /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
+        /** @var DoNotContactRepository $dncRepository */
+        $dncRepository = $this->getModel('lead.dnc')->getDncRepo();
 
         return $this->delegateView(
             [
@@ -185,7 +185,7 @@ class LeadController extends FormController
                     'currentList'      => $list,
                     'security'         => $this->get('mautic.security'),
                     'inSingleList'     => $inSingleList,
-                    'noContactList'    => $emailRepo->getDoNotEmailList(array_keys($leads)),
+                    'noContactList'    => $dncRepository->getChannelList(null, array_keys($leads)),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
