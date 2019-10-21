@@ -394,4 +394,17 @@ class Stat
 
         return $this;
     }
+
+    /**
+     * @param string $type
+     * @param string $detail
+     *
+     * @return Stat
+     */
+    public function addDetail($type, $detail)
+    {
+        $this->details[$type][] = $detail;
+
+        return $this;
+    }
 }

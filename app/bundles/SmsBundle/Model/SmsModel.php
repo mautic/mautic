@@ -345,6 +345,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
                         $stat->setIsFailed(true);
+                        if (is_string($metadata)) {
+                            $stat->addDetail('failed', $metadata);
+                        }
                         ++$failedCount;
                     } else {
                         $sendResult['sent'] = true;
