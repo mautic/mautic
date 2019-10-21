@@ -349,28 +349,32 @@ class LeadController extends FormController
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
         $dnc             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+
+        $dncSms             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'              => $lead,
-                    'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
-                    'fields'            => $fields,
-                    'companies'         => $companies,
-                    'socialProfiles'    => $socialProfiles,
-                    'socialProfileUrls' => $socialProfileUrls,
-                    'places'            => $this->getPlaces($lead),
-                    'permissions'       => $permissions,
-                    'events'            => $this->getEngagements($lead),
-                    'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
-                    'engagementData'    => $this->getEngagementData($lead),
-                    'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
-                    'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
-                    'devices'           => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
-                    'auditlog'          => $this->getAuditlogs($lead),
-                    'doNotContact'      => end($dnc),
-                    'leadNotes'         => $this->forward(
+                    'lead'                 => $lead,
+                    'avatarPanelState'     => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
+                    'fields'               => $fields,
+                    'companies'            => $companies,
+                    'socialProfiles'       => $socialProfiles,
+                    'socialProfileUrls'    => $socialProfileUrls,
+                    'places'               => $this->getPlaces($lead),
+                    'permissions'          => $permissions,
+                    'events'               => $this->getEngagements($lead),
+                    'upcomingEvents'       => $this->getScheduledCampaignEvents($lead),
+                    'engagementData'       => $this->getEngagementData($lead),
+                    'noteCount'            => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'integrations'         => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'devices'              => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
+                    'auditlog'             => $this->getAuditlogs($lead),
+                    'doNotContact'         => end($dnc),
+                    'doNotContactSms'      => end($dncSms),
+                    'leadNotes'            => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [
                             'leadId'     => $lead->getId(),
