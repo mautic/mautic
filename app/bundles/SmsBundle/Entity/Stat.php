@@ -74,6 +74,11 @@ class Stat
     private $tokens = [];
 
     /**
+     * @var array
+     */
+    private $details = [];
+
+    /**
      * @var bool
      */
     private $isFailed = false;
@@ -133,6 +138,8 @@ class Stat
         $builder->createField('tokens', 'array')
             ->nullable()
             ->build();
+
+        $builder->addField('details', 'json_array');
     }
 
     /**
@@ -154,6 +161,7 @@ class Stat
                     'trackingHash',
                     'lead',
                     'sms',
+                    'details',
                 ]
             )
             ->build();
@@ -365,5 +373,25 @@ class Stat
     public function isFailed()
     {
         return $this->isFailed;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    /**
+     * @param array $details
+     *
+     * @return Stat
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+
+        return $this;
     }
 }
