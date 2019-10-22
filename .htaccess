@@ -99,7 +99,7 @@
 
 # Apache 2.4+
 <IfModule authz_core_module>
-    # Denie access via HTTP requests to all PHP files.
+    # Deny access via HTTP requests to all PHP files.
     <FilesMatch "\.php$">
         Require all denied
     </FilesMatch>
@@ -112,7 +112,7 @@
 
 # Fallback for Apache < 2.4
 <IfModule !authz_core_module>
-    # Denie access via HTTP requests to all PHP files.
+    # Deny access via HTTP requests to all PHP files.
     <FilesMatch "\.php$">
         Order deny,allow
         Deny from all
