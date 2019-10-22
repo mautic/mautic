@@ -68,6 +68,16 @@ final class LeadEvents
     const LEAD_COMPANY_CHANGE = 'mautic.lead_company_change';
 
     /**
+     * The mautic.lead_primary_company_change event is dispatched if a lead's primary company changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadChangePrimaryCompanyEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_PRIMARY_COMPANY_CHANGE = 'mautic.lead_primary_company_change';
+
+    /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
      *
      * The event listener receives a

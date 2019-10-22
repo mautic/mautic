@@ -2417,6 +2417,10 @@ class LeadModel extends FormModel
         // Clear CompanyLead entities from Doctrine memory
         $this->em->clear(CompanyLead::class);
 
+        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRIMARY_COMPANY_CHANGE)) {
+            $this->dispatcher->dispatch(LeadEvents::LEAD_PRIMARY_COMPANY_CHANGE, new LeadChangePrimaryCompanyEvent($lead, $oldPrimaryCompany, $companyId));
+        }
+
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
 
