@@ -30,6 +30,8 @@ class Version20191022183652 extends AbstractMauticMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
 
+        return;
+
         /** @var QueryBuilder $query */
         $query                     = $this->container->get('doctrine')->getConnection()->createQueryBuilder();
         $hasContactsWithGooglePlus = (bool) $query->select('COUNT(googleplus) as count')
