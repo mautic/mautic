@@ -21,7 +21,7 @@ class GeneratedColumnSubscriber extends CommonSubscriber
         $emailDomain = new GeneratedColumn(
             'leads',
             'generated_email_domain',
-            'string',
+            'VARCHAR(255)',
             'SUBSTRING(email, LOCATE("@", email) + 1)'
         );
 
