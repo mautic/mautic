@@ -128,7 +128,7 @@ class FieldBuilder
 
     /**
      * @param string $field
-     * @param int $ownerId
+     * @param int    $ownerId
      *
      * @return ReportFieldDAO
      */
