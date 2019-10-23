@@ -56,6 +56,19 @@ class FieldBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $field->getValue()->getNormalizedValue());
     }
 
+    public function testOwnerIdFieldIsAdded(): void
+    {
+        $field = $this->getFieldBuilder()->buildObjectField(
+            'owner_id',
+            ['id' => 1, 'owner_id' => 123],
+            new ObjectDAO('Test'),
+            'Test'
+        );
+
+        $this->assertEquals('owner_id', $field->getName());
+        $this->assertEquals(123, $field->getValue()->getNormalizedValue());
+    }
+
     public function testDoNotContactFieldIsAdded(): void
     {
         $this->contactObjectHelper->expects($this->once())
