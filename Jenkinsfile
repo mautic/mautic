@@ -3,6 +3,7 @@ def REPO_NAME = env.JOB_NAME.split("/")[0]
 pipeline {
   options {
     skipDefaultCheckout()
+    disableConcurrentBuilds()
   }
   agent {
     kubernetes {
