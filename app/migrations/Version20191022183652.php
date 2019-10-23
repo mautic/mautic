@@ -36,7 +36,7 @@ class Version20191022183652 extends AbstractMauticMigration
             ->from("{$this->prefix}leads")
             ->where($query->expr()->andX(
                 $query->expr()->isNotNull('googleplus'),
-                $query->expr()->neq('googleplus', '')
+                $query->expr()->neq('googleplus', $query->expr()->literal(''))
             ))
             ->execute()
             ->fetchColumn();
