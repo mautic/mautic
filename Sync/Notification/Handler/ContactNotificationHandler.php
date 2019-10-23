@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactNotificationHandler implements HandlerInterface
@@ -85,7 +86,7 @@ class ContactNotificationHandler implements HandlerInterface
      */
     public function getSupportedObject(): string
     {
-        return MauticSyncDataExchange::OBJECT_CONTACT;
+        return Contact::NAME;
     }
 
     /**
@@ -121,7 +122,7 @@ class ContactNotificationHandler implements HandlerInterface
     public function finalize(): void
     {
         $this->userNotificationHelper->writeNotifications(
-            MauticSyncDataExchange::OBJECT_CONTACT,
+            Contact::NAME,
             'mautic.integration.sync.user_notification.contact_message'
         );
     }

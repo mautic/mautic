@@ -17,7 +17,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
 class InputOptionsDAO
 {
@@ -227,7 +227,7 @@ class InputOptionsDAO
         foreach ($input['mautic-object-id'] as $key => $mauticObjectId) {
             $input['mautic-object-id'][$key] = preg_replace(
                 '/^contact:/',
-                MauticSyncDataExchange::OBJECT_CONTACT.':',
+                Contact::NAME.':',
                 $mauticObjectId
             );
         }

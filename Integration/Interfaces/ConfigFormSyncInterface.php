@@ -27,7 +27,7 @@ interface ConfigFormSyncInterface extends IntegrationInterface
 
     /**
      * Return an array of Integration objects and what Mautic objects they are mapped to.
-     * i.e. ['Customer' => MauticSyncDataExchange::OBJECT_CONTACT, 'Account' =>  MauticSyncDataExchange::OBJECT_COMPANY];.
+     * i.e. ['Customer' => Contact::NAME, 'Account' =>  Company::NAME];.
      *
      * @return array
      */

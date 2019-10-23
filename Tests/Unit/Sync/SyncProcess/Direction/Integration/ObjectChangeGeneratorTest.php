@@ -19,6 +19,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportField
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
@@ -58,8 +59,8 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $objectChangeDAO       = $objectChangeGenerator->getSyncObjectChange(
             $syncReport,
             $mappingManual,
-            $mappingManual->getObjectMapping(MauticSyncDataExchange::OBJECT_CONTACT, $objectName),
-            $syncReport->getObject(MauticSyncDataExchange::OBJECT_CONTACT, 1),
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
+            $syncReport->getObject(Contact::NAME, 1),
             $integrationReportObject
         );
 
@@ -70,7 +71,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $objectChangeDAO->getObjectId());
 
         // mapped object and ID should be Mautic's
-        $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $objectChangeDAO->getMappedObject());
+        $this->assertEquals(Contact::NAME, $objectChangeDAO->getMappedObject());
         $this->assertEquals(1, $objectChangeDAO->getMappedObjectId());
 
         // Email should be a required field
@@ -109,8 +110,8 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $objectChangeDAO       = $objectChangeGenerator->getSyncObjectChange(
             $syncReport,
             $mappingManual,
-            $mappingManual->getObjectMapping(MauticSyncDataExchange::OBJECT_CONTACT, $objectName),
-            $syncReport->getObject(MauticSyncDataExchange::OBJECT_CONTACT, 1),
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
+            $syncReport->getObject(Contact::NAME, 1),
             $integrationReportObject
         );
 
@@ -121,7 +122,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $objectChangeDAO->getObjectId());
 
         // mapped object and ID should be Mautic's
-        $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $objectChangeDAO->getMappedObject());
+        $this->assertEquals(Contact::NAME, $objectChangeDAO->getMappedObject());
         $this->assertEquals(1, $objectChangeDAO->getMappedObjectId());
 
         // Email should be a required field
@@ -142,7 +143,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
     private function getMappingManual(string $integration, string $objectName)
     {
         $mappingManual = new MappingManualDAO($integration);
-        $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $objectName);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
         $mappingManual->addObjectMapping($objectMapping);
@@ -158,7 +159,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
     private function getInternalSyncReport($includeFirstNameField = true)
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
-        $internalReportObject = new ReportObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, 1);
+        $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
         $internalReportObject->addField(
             new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com'), ReportFieldDAO::FIELD_REQUIRED)
         );

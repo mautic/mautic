@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
+use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
@@ -32,6 +34,11 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
     private $userHelper;
 
     /**
+     * @var OwnerProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $ownerProvider;
+
+    /**
      * @var RouteHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $routeHelper;
@@ -41,26 +48,41 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $translator;
 
+    /**
+     * @var UserSummaryNotificationHelper
+     */
+    private $helper;
+
     protected function setUp(): void
     {
-        $this->writer      = $this->createMock(Writer::class);
-        $this->userHelper  = $this->createMock(UserHelper::class);
-        $this->routeHelper = $this->createMock(RouteHelper::class);
-        $this->translator  = $this->createMock(TranslatorInterface::class);
+        $this->writer        = $this->createMock(Writer::class);
+        $this->userHelper    = $this->createMock(UserHelper::class);
+        $this->ownerProvider = $this->createMock(OwnerProvider::class);
+        $this->routeHelper   = $this->createMock(RouteHelper::class);
+        $this->translator    = $this->createMock(TranslatorInterface::class);
+        $this->helper        = new UserSummaryNotificationHelper(
+            $this->writer,
+            $this->userHelper,
+            $this->ownerProvider,
+            $this->routeHelper,
+            $this->translator
+        );
     }
 
     public function testNotificationSentToOwner(): void
     {
-        $helper = $this->getHelper();
-        $helper->storeSummaryNotification('Foo', 'Bar', 1);
-        $helper->storeSummaryNotification('Bar', 'Foo', 2);
+        $this->helper->storeSummaryNotification('Foo', 'Bar', 1);
+        $this->helper->storeSummaryNotification('Bar', 'Foo', 2);
 
-        $this->userHelper->expects($this->exactly(2))
-            ->method('getOwners')
-            ->willReturnCallback(
-                function (string $object, array $ids) {
-                    return [1 => $ids];
-                }
+        $this->ownerProvider->expects($this->exactly(2))
+            ->method('getOwnersForObjectIds')
+            ->withConsecutive(
+                [Contact::NAME, [1 => 1]],
+                [Contact::NAME, [2 => 2]]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [['owner_id' => 1, 'id' => 1]],
+                [['owner_id' => 2, 'id' => 2]]
             );
 
         $this->userHelper->expects($this->never())
@@ -89,18 +111,24 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->routeHelper->expects($this->exactly(2))
             ->method('getLinkCsv');
 
-        $helper->writeNotifications('test', 'test');
+        $this->helper->writeNotifications(Contact::NAME, 'test');
     }
 
     public function testNotificationSentToAdmins(): void
     {
-        $helper = $this->getHelper();
-        $helper->storeSummaryNotification('Foo', 'Bar', 1);
-        $helper->storeSummaryNotification('Bar', 'Foo', 2);
+        $this->helper->storeSummaryNotification('Foo', 'Bar', 1);
+        $this->helper->storeSummaryNotification('Bar', 'Foo', 2);
 
-        $this->userHelper->expects($this->exactly(2))
-            ->method('getOwners')
-            ->willReturn([]);
+        $this->ownerProvider->expects($this->exactly(2))
+            ->method('getOwnersForObjectIds')
+            ->withConsecutive(
+                [Contact::NAME, [1 => 1]],
+                [Contact::NAME, [2 => 2]]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [],
+                []
+            );
 
         $this->userHelper->expects($this->exactly(2))
             ->method('getAdminUsers')
@@ -129,21 +157,22 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->routeHelper->expects($this->exactly(2))
             ->method('getLinkCsv');
 
-        $helper->writeNotifications('test', 'test');
+        $this->helper->writeNotifications(Contact::NAME, 'test');
     }
 
     public function testMoreThan25ObjectsResultInCountMessage(): void
     {
-        $helper = $this->getHelper();
-
         $counter = 1;
+        $withIds = [];
         do {
-            $helper->storeSummaryNotification('Foo', 'Bar', $counter);
+            $this->helper->storeSummaryNotification('Foo', 'Bar', $counter);
+            $withIds[$counter] = $counter;
             ++$counter;
         } while ($counter <= 26);
 
-        $this->userHelper->expects($this->once())
-            ->method('getOwners')
+        $this->ownerProvider->expects($this->once())
+            ->method('getOwnersForObjectIds')
+            ->with(Contact::NAME, $withIds)
             ->willReturn([]);
 
         $this->userHelper->expects($this->once())
@@ -173,19 +202,6 @@ class UserSummaryNotificationHelperTest extends \PHPUnit_Framework_TestCase
         $this->routeHelper->expects($this->never())
             ->method('getLinkCsv');
 
-        $helper->writeNotifications('test', 'test');
-    }
-
-    /**
-     * @return UserSummaryNotificationHelper
-     */
-    private function getHelper()
-    {
-        return new UserSummaryNotificationHelper(
-            $this->writer,
-            $this->userHelper,
-            $this->routeHelper,
-            $this->translator
-        );
+        $this->helper->writeNotifications(Contact::NAME, 'test');
     }
 }

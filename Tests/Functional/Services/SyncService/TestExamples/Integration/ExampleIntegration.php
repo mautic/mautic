@@ -18,7 +18,7 @@ use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 
@@ -91,7 +91,7 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
         // Each object like lead, contact, user, company, account, etc, will need it's own ObjectMappingDAO
         // In this example, Mautic's Contact object is mapped to the Example's Lead object
         $leadObjectMapping = new ObjectMappingDAO(
-            MauticSyncDataExchange::OBJECT_CONTACT,
+            Contact::NAME,
             ExampleSyncDataExchange::OBJECT_LEAD
         );
         $mappingManual->addObjectMapping($leadObjectMapping);

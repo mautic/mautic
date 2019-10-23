@@ -13,134 +13,222 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Executioner;
 
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
 {
+    private const INTEGRATION_NAME = 'Test';
+
     /**
      * @var MappingHelper|\PHPUnit_Framework_MockObject_MockObject
      */
     private $mappingHelper;
 
     /**
-     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $contactObjectHelper;
+    private $dispatcher;
 
     /**
-     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $companyObjectHelper;
+    private $objectProvider;
+
+    /**
+     * @var OrderExecutioner
+     */
+    private $orderExecutioner;
 
     protected function setup(): void
     {
-        $this->mappingHelper       = $this->createMock(MappingHelper::class);
-        $this->contactObjectHelper = $this->createMock(ContactObjectHelper::class);
-        $this->companyObjectHelper = $this->createMock(CompanyObjectHelper::class);
+        $this->mappingHelper    = $this->createMock(MappingHelper::class);
+        $this->dispatcher       = $this->createMock(EventDispatcherInterface::class);
+        $this->objectProvider   = $this->createMock(ObjectProvider::class);
+        $this->orderExecutioner = new OrderExecutioner(
+            $this->mappingHelper,
+            $this->dispatcher,
+            $this->objectProvider
+        );
     }
 
     public function testContactsAreUpdatedAndCreated(): void
     {
-        $this->contactObjectHelper->expects($this->exactly(1))
-            ->method('update');
+        $this->objectProvider->expects($this->exactly(2))
+            ->method('getObjectByName')
+            ->with(Contact::NAME)
+            ->willReturn(new Contact());
+
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectUpdateEvent $event) {
+                        $this->assertSame(Contact::NAME, $event->getObject()->getName());
+                        $this->assertSame([1, 2], $event->getIdentifiedObjectIds());
+                        $this->assertCount(2, $event->getUpdateObjects());
+
+                        return true;
+                    }),
+                ],
+                [
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectCreateEvent $event) {
+                        $this->assertSame(Contact::NAME, $event->getObject()->getName());
+                        $this->assertCount(1, $event->getCreateObjects());
+
+                        return true;
+                    }),
+                ]
+            );
+
         $this->mappingHelper->expects($this->exactly(1))
             ->method('updateObjectMappings');
 
-        $this->contactObjectHelper->expects($this->exactly(1))
-            ->method('create');
         $this->mappingHelper->expects($this->exactly(1))
             ->method('saveObjectMappings');
 
-        $this->companyObjectHelper->expects($this->never())
-            ->method('update');
-        $this->companyObjectHelper->expects($this->never())
-            ->method('create');
-
-        $syncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_CONTACT);
-        $this->getOrderExecutioner()->execute($syncOrder);
+        $this->orderExecutioner->execute($this->getSyncOrder(Contact::NAME));
     }
 
     public function testCompaniesAreUpdatedAndCreated(): void
     {
-        $this->companyObjectHelper->expects($this->exactly(1))
-            ->method('update');
+        $this->objectProvider->expects($this->exactly(2))
+            ->method('getObjectByName')
+            ->with(Company::NAME)
+            ->willReturn(new Company());
+
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectUpdateEvent $event) {
+                        $this->assertSame(Company::NAME, $event->getObject()->getName());
+                        $this->assertSame([1, 2], $event->getIdentifiedObjectIds());
+                        $this->assertCount(2, $event->getUpdateObjects());
+
+                        return true;
+                    }),
+                ],
+                [
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectCreateEvent $event) {
+                        $this->assertSame(Company::NAME, $event->getObject()->getName());
+                        $this->assertCount(1, $event->getCreateObjects());
+
+                        return true;
+                    }),
+                ]
+            );
+
         $this->mappingHelper->expects($this->exactly(1))
             ->method('updateObjectMappings');
 
-        $this->companyObjectHelper->expects($this->exactly(1))
-            ->method('create');
         $this->mappingHelper->expects($this->exactly(1))
             ->method('saveObjectMappings');
 
-        $this->contactObjectHelper->expects($this->never())
-            ->method('update');
-        $this->contactObjectHelper->expects($this->never())
-            ->method('create');
-
-        $syncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_COMPANY);
-        $this->getOrderExecutioner()->execute($syncOrder);
+        $syncOrder = $this->getSyncOrder(Company::NAME);
+        $this->orderExecutioner->execute($syncOrder);
     }
 
     public function testMixedObjectsAreUpdatedAndCreated(): void
     {
-        $this->companyObjectHelper->expects($this->exactly(1))
-            ->method('update');
+        $this->objectProvider->expects($this->exactly(4))
+            ->method('getObjectByName')
+            ->withConsecutive(
+                [Contact::NAME],
+                [Company::NAME],
+                [Contact::NAME],
+                [Company::NAME]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new Contact(),
+                new Company(),
+                new Contact(),
+                new Company()
+            );
+
+        $this->dispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectUpdateEvent $event) {
+                        $this->assertSame(Contact::NAME, $event->getObject()->getName());
+
+                        return true;
+                    }),
+                ],
+                [
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectUpdateEvent $event) {
+                        $this->assertSame(Company::NAME, $event->getObject()->getName());
+
+                        return true;
+                    }),
+                ],
+                [
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectCreateEvent $event) {
+                        $this->assertSame(Contact::NAME, $event->getObject()->getName());
+
+                        return true;
+                    }),
+                ],
+                [
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
+                    $this->callback(function (InternalObjectCreateEvent $event) {
+                        $this->assertSame(Company::NAME, $event->getObject()->getName());
+
+                        return true;
+                    }),
+                ]
+            );
+
         $this->mappingHelper->expects($this->exactly(2))
             ->method('updateObjectMappings');
 
-        $this->companyObjectHelper->expects($this->exactly(1))
-            ->method('create');
         $this->mappingHelper->expects($this->exactly(2))
             ->method('saveObjectMappings');
 
-        $this->contactObjectHelper->expects($this->exactly(1))
-            ->method('update');
-        $this->contactObjectHelper->expects($this->exactly(1))
-            ->method('create');
-
         // Merge companies and contacts for the test
-        $syncOrder        = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_CONTACT);
-        $companySyncOrder = $this->getSyncOrder(MauticSyncDataExchange::OBJECT_COMPANY);
-        foreach ($companySyncOrder->getChangedObjectsByObjectType(MauticSyncDataExchange::OBJECT_COMPANY) as $objectChange) {
+        $syncOrder        = $this->getSyncOrder(Contact::NAME);
+        $companySyncOrder = $this->getSyncOrder(Company::NAME);
+        foreach ($companySyncOrder->getChangedObjectsByObjectType(Company::NAME) as $objectChange) {
             $syncOrder->addObjectChange($objectChange);
         }
 
-        $this->getOrderExecutioner()->execute($syncOrder);
+        $this->orderExecutioner->execute($syncOrder);
     }
 
     /**
-     * @return OrderExecutioner
-     */
-    private function getOrderExecutioner()
-    {
-        return new OrderExecutioner($this->mappingHelper, $this->contactObjectHelper, $this->companyObjectHelper);
-    }
-
-    /**
-     * @param $objectName
+     * @param string $objectName
      *
      * @return OrderDAO
      *
      * @throws \Exception
      */
-    private function getSyncOrder($objectName)
+    private function getSyncOrder(string $objectName): OrderDAO
     {
-        $integration = 'Test';
-
-        $syncOrder = new OrderDAO(new \DateTimeImmutable(), false, $integration);
+        $syncOrder = new OrderDAO(new \DateTimeImmutable(), false, self::INTEGRATION_NAME);
 
         // Two updates
-        $syncOrder->addObjectChange(new ObjectChangeDAO($integration, $objectName, 1, $objectName, 1));
-        $syncOrder->addObjectChange(new ObjectChangeDAO($integration, $objectName, 2, $objectName, 2));
+        $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, $objectName, 1, $objectName, 1));
+        $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, $objectName, 2, $objectName, 2));
 
         // One create
-        $syncOrder->addObjectChange(new ObjectChangeDAO($integration, $objectName, null, $objectName, 3));
+        $syncOrder->addObjectChange(new ObjectChangeDAO(self::INTEGRATION_NAME, $objectName, null, $objectName, 3));
 
         return $syncOrder;
     }

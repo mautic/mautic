@@ -21,7 +21,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO as ReportObje
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
@@ -65,7 +65,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $mappingManual = $this->getMappingManual($integration, $objectName);
         $syncReport    = $this->getIntegrationSyncReport($integration, $objectName);
 
-        $internalReportObject = new ReportObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, 1);
+        $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
         $internalReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
         $internalReportObject->addField(new ReportFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
 
@@ -80,7 +80,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
             $syncReport,
             $mappingManual,
-            $mappingManual->getObjectMapping(MauticSyncDataExchange::OBJECT_CONTACT, $objectName),
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
             $internalReportObject,
             $syncReport->getObject($objectName, 2)
         );
@@ -88,7 +88,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be Mautic's (from the Mautic's POV)
-        $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $objectChangeDAO->getObject());
+        $this->assertEquals(Contact::NAME, $objectChangeDAO->getObject());
         $this->assertEquals(1, $objectChangeDAO->getObjectId());
 
         // mapped object and ID should be the integrations
@@ -126,7 +126,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $mappingManual = $this->getMappingManual($integration, $objectName);
         $syncReport    = $this->getIntegrationSyncReport($integration, $objectName);
 
-        $internalReportObject = new ReportObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, 1);
+        $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
         $internalReportObject->addField(new ReportFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
         $internalReportObject->addField(new ReportFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
 
@@ -141,7 +141,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $objectChangeDAO       = $this->getObjectGenerator()->getSyncObjectChange(
             $syncReport,
             $mappingManual,
-            $mappingManual->getObjectMapping(MauticSyncDataExchange::OBJECT_CONTACT, $objectName),
+            $mappingManual->getObjectMapping(Contact::NAME, $objectName),
             $internalReportObject,
             $syncReport->getObject($objectName, 2)
         );
@@ -149,7 +149,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($integration, $objectChangeDAO->getIntegration());
 
         // object and object ID should be Mautic's (from the Mautic's POV)
-        $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $objectChangeDAO->getObject());
+        $this->assertEquals(Contact::NAME, $objectChangeDAO->getObject());
         $this->assertEquals(1, $objectChangeDAO->getObjectId());
 
         // mapped object and ID should be the integrations
@@ -181,7 +181,7 @@ class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
     private function getMappingManual(string $integration, string $objectName)
     {
         $mappingManual = new MappingManualDAO($integration);
-        $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $objectName);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
         $mappingManual->addObjectMapping($objectMapping);

@@ -27,6 +27,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class ContactObjectHelper implements ObjectHelperInterface
@@ -123,7 +124,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setIntegration($object->getIntegration())
                 ->setIntegrationObjectName($object->getMappedObject())
                 ->setIntegrationObjectId($object->getMappedObjectId())
-                ->setInternalObjectName(MauticSyncDataExchange::OBJECT_CONTACT)
+                ->setInternalObjectName(Contact::NAME)
                 ->setInternalObjectId($contact->getId());
             $objectMappings[] = $objectMapping;
         }
@@ -340,6 +341,27 @@ class ContactObjectHelper implements ObjectHelperInterface
         }
 
         return (int) $status;
+    }
+
+    /**
+     * @param array $objectIds
+     *
+     * @return array
+     */
+    public function findOwnerIds(array $objectIds): array
+    {
+        if (empty($objectIds)) {
+            return [];
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb->select('c.owner_id, c.id');
+        $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'c');
+        $qb->where('c.owner_id IS NOT NULL');
+        $qb->andWhere('c.id IN (:objectIds)');
+        $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
+
+        return $qb->execute()->fetchAll();
     }
 
     /**
