@@ -13,47 +13,28 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Helper;
 
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ValueHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    protected function setUp(): void
+    public function testExceptionForMissingRequiredIntegrationValue(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->method('trans')
-            ->willReturnCallback(
-                function ($key) {
-                    return $key;
-                }
-            );
-    }
+        $this->expectException(InvalidValueException::class);
 
-    public function testUnkonwnReturnedForMissingRequiredIntegrationValue(): void
-    {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
-        $newValue = $this->getValueHelper()->getValueForIntegration(
+        $this->getValueHelper()->getValueForIntegration(
             $normalizedValueDAO,
             FieldDAO::FIELD_REQUIRED,
             ObjectMappingDAO::SYNC_TO_INTEGRATION
         );
-
-        $this->assertEquals(
-            'mautic.core.unknown',
-            $newValue->getNormalizedValue()
-        );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingNonRequiredIntegrationValue(): void
+    public function testNoExceptionForMissingNonRequiredIntegrationValue(): void
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -69,7 +50,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingOppositeSyncIntegrationValue(): void
+    public function testNoExceptionForMissingOppositeSyncIntegrationValue(): void
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -85,23 +66,20 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnReturnedForMissingRequiredMauticValue(): void
+    public function testExceptionForMissingRequiredMauticValue(): void
     {
+        $this->expectException(InvalidValueException::class);
+
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
-        $newValue = $this->getValueHelper()->getValueForMautic(
+        $this->getValueHelper()->getValueForMautic(
             $normalizedValueDAO,
             FieldDAO::FIELD_REQUIRED,
             ObjectMappingDAO::SYNC_TO_MAUTIC
         );
-
-        $this->assertEquals(
-            'mautic.core.unknown',
-            $newValue->getNormalizedValue()
-        );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingNonRequiredInternalValue(): void
+    public function testNoExceptionForMissingNonRequiredInternalValue(): void
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -117,7 +95,7 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testUnkonwnIsNotReturnedForMissingOppositeSyncInternalnValue(): void
+    public function testNoExceptionForMissingOppositeSyncInternalnValue(): void
     {
         $normalizedValueDAO = new NormalizedValueDAO(NormalizedValueDAO::STRING_TYPE, '');
 
@@ -138,6 +116,6 @@ class ValueHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getValueHelper()
     {
-        return new ValueHelper($this->translator);
+        return new ValueHelper();
     }
 }

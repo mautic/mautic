@@ -13,18 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper;
 
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ValueHelper
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     /**
      * @var NormalizedValueDAO
      */
@@ -41,19 +36,13 @@ class ValueHelper
     private $syncDirection;
 
     /**
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
-    /**
      * @param NormalizedValueDAO $normalizedValueDAO
      * @param string             $fieldState
      * @param string             $syncDirection
      *
      * @return NormalizedValueDAO
+     *
+     * @throws InvalidValueException
      */
     public function getValueForIntegration(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO
     {
@@ -72,6 +61,8 @@ class ValueHelper
      * @param string             $syncDirection
      *
      * @return NormalizedValueDAO
+     *
+     * @throws InvalidValueException
      */
     public function getValueForMautic(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO
     {
@@ -88,6 +79,8 @@ class ValueHelper
      * @param string $directionToIgnore
      *
      * @return float|int|mixed|string
+     *
+     * @throws InvalidValueException
      */
     private function getValue(string $directionToIgnore)
     {
@@ -121,7 +114,7 @@ class ValueHelper
             case NormalizedValueDAO::FLOAT_TYPE:
                 return 1.0;
             default:
-                return $this->translator->trans('mautic.core.unknown');
+                throw new InvalidValueException("Required field can't be empty");
         }
     }
 }

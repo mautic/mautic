@@ -15,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\DAO\Mapping;
 
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
 class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,14 +26,14 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [$this->integrationObjectName],
-            $this->getMappingManualDAO()->getIntegrationObjectNames(MauticSyncDataExchange::OBJECT_CONTACT)
+            $this->getMappingManualDAO()->getIntegrationObjectNames(Contact::NAME)
         );
     }
 
     public function testMappedInternalNamesAreReturnedBasedOnIntegrationObjectName(): void
     {
         $this->assertEquals(
-            [MauticSyncDataExchange::OBJECT_CONTACT],
+            [Contact::NAME],
             $this->getMappingManualDAO()->getInternalObjectNames($this->integrationObjectName)
         );
     }
@@ -46,7 +46,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
                 'country',  // bidirectional
                 'firstname', // sync from mautic to integration
             ],
-            $this->getMappingManualDAO()->getInternalObjectFieldsToSyncToIntegration(MauticSyncDataExchange::OBJECT_CONTACT)
+            $this->getMappingManualDAO()->getInternalObjectFieldsToSyncToIntegration(Contact::NAME)
         );
     }
 
@@ -54,7 +54,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             ['email'],
-            $this->getMappingManualDAO()->getInternalObjectRequiredFieldNames(MauticSyncDataExchange::OBJECT_CONTACT)
+            $this->getMappingManualDAO()->getInternalObjectRequiredFieldNames(Contact::NAME)
         );
     }
 
@@ -84,7 +84,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
             'last_name',
             $this->getMappingManualDAO()->getIntegrationMappedField(
                 $this->integrationObjectName,
-                MauticSyncDataExchange::OBJECT_CONTACT,
+                Contact::NAME,
                 'lastname'
             )
         );
@@ -95,7 +95,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'lastname',
             $this->getMappingManualDAO()->getInternalMappedField(
-                MauticSyncDataExchange::OBJECT_CONTACT,
+                Contact::NAME,
                 $this->integrationObjectName,
                 'last_name'
             )
@@ -105,7 +105,7 @@ class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
     private function getMappingManualDAO()
     {
         $mappingManual = new MappingManualDAO($this->integrationName);
-        $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $this->integrationObjectName);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $this->integrationObjectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('country', 'country', ObjectMappingDAO::SYNC_BIDIRECTIONALLY);
         $objectMapping->addFieldMapping('firstname', 'first_name', ObjectMappingDAO::SYNC_TO_INTEGRATION);

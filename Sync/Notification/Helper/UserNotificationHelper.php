@@ -29,6 +29,11 @@ class UserNotificationHelper
     private $userHelper;
 
     /**
+     * @var OwnerProvider
+     */
+    private $ownerProvider;
+
+    /**
      * @var RouteHelper
      */
     private $routeHelper;
@@ -51,19 +56,22 @@ class UserNotificationHelper
     /**
      * @param Writer              $writer
      * @param UserHelper          $userHelper
+     * @param OwnerProvider       $ownerProvider
      * @param RouteHelper         $routeHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
         Writer $writer,
         UserHelper $userHelper,
+        OwnerProvider $ownerProvider,
         RouteHelper $routeHelper,
         TranslatorInterface $translator
     ) {
-        $this->writer      = $writer;
-        $this->userHelper  = $userHelper;
-        $this->routeHelper = $routeHelper;
-        $this->translator  = $translator;
+        $this->writer        = $writer;
+        $this->userHelper    = $userHelper;
+        $this->ownerProvider = $ownerProvider;
+        $this->routeHelper   = $routeHelper;
+        $this->translator    = $translator;
     }
 
     /**
@@ -88,9 +96,10 @@ class UserNotificationHelper
         $this->integrationDisplayName = $integrationDisplayName;
         $this->objectDisplayName      = $objectDisplayName;
         $link                         = $this->routeHelper->getLink($mauticObject, $id, $linkText);
+        $owners                       = $this->ownerProvider->getOwnersForObjectIds($mauticObject, [$id]);
 
-        if ($owner = $this->userHelper->getOwner($mauticObject, $id)) {
-            $this->writeMessage($message, $link, $owner);
+        if (!empty($owners[0]['owner_id'])) {
+            $this->writeMessage($message, $link, $owners[0]['owner_id']);
 
             return;
         }

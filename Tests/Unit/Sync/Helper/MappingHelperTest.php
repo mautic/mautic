@@ -15,15 +15,18 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
 use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
+use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
+use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,26 +36,37 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
     private $fieldModel;
 
     /**
-     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $contactObjectHelper;
+    private $objectProvider;
 
     /**
-     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $companyObjectHelper;
+    private $dispatcher;
 
     /**
      * @var ObjectMappingRepository|\PHPUnit_Framework_MockObject_MockObject
      */
     private $objectMappingRepository;
 
+    /**
+     * @var MappingHelper
+     */
+    private $mappingHelper;
+
     protected function setUp(): void
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
-        $this->contactObjectHelper     = $this->createMock(ContactObjectHelper::class);
-        $this->companyObjectHelper     = $this->createMock(CompanyObjectHelper::class);
+        $this->objectProvider          = $this->createMock(ObjectProvider::class);
+        $this->dispatcher              = $this->createMock(EventDispatcherInterface::class);
         $this->objectMappingRepository = $this->createMock(ObjectMappingRepository::class);
+        $this->mappingHelper           = new MappingHelper(
+            $this->fieldModel,
+            $this->objectMappingRepository,
+            $this->objectProvider,
+            $this->dispatcher
+        );
     }
 
     public function testObjectReturnedIfKnwonMappingExists(): void
@@ -71,7 +85,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->willReturn($internalObjectDAO);
 
         $internalObjectName  = 'Contact';
-        $foundInternalObject = $this->getMappingHelper()->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
+        $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
         $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals($internalObjectDAO['internal_object_id'], $foundInternalObject->getObjectId());
@@ -88,7 +102,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
         $internalObjectName   = 'Contact';
         $integrationObjectDAO = new ObjectDAO('Object', 1);
 
-        $foundInternalObject = $this->getMappingHelper()->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
+        $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
         $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(null, $foundInternalObject->getObjectId());
@@ -104,7 +118,8 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $internalObjectName   = MauticSyncDataExchange::OBJECT_CONTACT;
+        $internalObject       = new Contact();
+        $internalObjectName   = Contact::NAME;
         $integrationObjectDAO = new ObjectDAO('Object', 1);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));
 
@@ -114,12 +129,24 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->with($integrationObjectDAO->getObject(), $internalObjectName, 'email')
             ->willReturn('integration_email');
 
-        $this->contactObjectHelper->expects($this->once())
-            ->method('findObjectsByFieldValues')
-            ->with(['email' => 'test@test.com'])
-            ->willReturn([]);
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with($internalObjectName)
+            ->willReturn($internalObject);
 
-        $foundInternalObject = $this->getMappingHelper()->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                    $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
+
+                    return true;
+                })
+            );
+
+        $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
         $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(null, $foundInternalObject->getObjectId());
@@ -135,7 +162,8 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $internalObjectName   = MauticSyncDataExchange::OBJECT_CONTACT;
+        $internalObject       = new Contact();
+        $internalObjectName   = Contact::NAME;
         $changeDateTime       = new \DateTime();
         $integrationObjectDAO = new ObjectDAO('Object', 1, $changeDateTime);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));
@@ -149,20 +177,31 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getIntegration')
             ->willReturn('Test');
 
-        $this->contactObjectHelper->expects($this->once())
-            ->method('findObjectsByFieldValues')
-            ->with(['email' => 'test@test.com'])
-            ->willReturn(
-                [
-                    [
-                        'id' => 3,
-                    ],
-                ]
-            );
-        $this->companyObjectHelper->expects($this->never())
-            ->method('findObjectsByFieldValues');
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with($internalObjectName)
+            ->willReturn($internalObject);
 
-        $foundInternalObject = $this->getMappingHelper()->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                    $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
+
+                    // Mock a subscriber.
+                    $event->setFoundObjects([
+                        [
+                            'id' => 3,
+                        ],
+                    ]);
+
+                    return true;
+                })
+            );
+
+        $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
 
         $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(3, $foundInternalObject->getObjectId());
@@ -178,7 +217,8 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $internalObjectName   = MauticSyncDataExchange::OBJECT_COMPANY;
+        $internalObject       = new Company();
+        $internalObjectName   = Company::NAME;
         $changeDateTime       = new \DateTime();
         $integrationObjectDAO = new ObjectDAO('Object', 1, $changeDateTime);
         $integrationObjectDAO->addField(new FieldDAO('integration_email', new NormalizedValueDAO('email', 'test@test.com')));
@@ -192,20 +232,35 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getIntegration')
             ->willReturn('Test');
 
-        $this->companyObjectHelper->expects($this->once())
-            ->method('findObjectsByFieldValues')
-            ->with(['email' => 'test@test.com'])
-            ->willReturn(
-                [
-                    [
-                        'id' => 3,
-                    ],
-                ]
-            );
-        $this->contactObjectHelper->expects($this->never())
-            ->method('findObjectsByFieldValues');
+        $this->objectProvider->expects($this->once())
+            ->method('getObjectByName')
+            ->with($internalObjectName)
+            ->willReturn($internalObject);
 
-        $foundInternalObject = $this->getMappingHelper()->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                    $this->assertSame($internalObject, $event->getObject());
+                    $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
+
+                    // Mock a subscriber.
+                    $event->setFoundObjects([
+                        [
+                            'id' => 3,
+                        ],
+                    ]);
+
+                    return true;
+                })
+            );
+
+        $foundInternalObject = $this->mappingHelper->findMauticObject(
+            $mappingManual,
+            $internalObjectName,
+            $integrationObjectDAO
+        );
 
         $this->assertEquals($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals(3, $foundInternalObject->getObjectId());
@@ -227,7 +282,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $foundIntegrationObject = $this->getMappingHelper()->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
+        $foundIntegrationObject = $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
 
         $this->assertEquals($objectName, $foundIntegrationObject->getObject());
         $this->assertEquals($objectId, $foundIntegrationObject->getObjectId());
@@ -241,7 +296,7 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getIntegrationObject')
             ->willReturn([]);
 
-        $foundIntegrationObject = $this->getMappingHelper()->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
+        $foundIntegrationObject = $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
 
         $this->assertEquals($objectName, $foundIntegrationObject->getObject());
         $this->assertEquals(null, $foundIntegrationObject->getObjectId());
@@ -266,14 +321,6 @@ class MappingHelperTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->getMappingHelper()->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
-    }
-
-    /**
-     * @return MappingHelper
-     */
-    public function getMappingHelper()
-    {
-        return new MappingHelper($this->fieldModel, $this->objectMappingRepository, $this->contactObjectHelper, $this->companyObjectHelper);
+        $this->mappingHelper->findIntegrationObject('Test', $objectName, new ObjectDAO('Contact', 1));
     }
 }

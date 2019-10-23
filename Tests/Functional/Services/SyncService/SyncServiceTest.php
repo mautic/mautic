@@ -16,7 +16,7 @@ namespace MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
@@ -45,7 +45,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         $exampleIntegration = new ExampleIntegration($dataExchange);
 
         $settings = new Integration();
-        $settings->setFeatureSettings(['sync' => ['objects' => [MauticSyncDataExchange::OBJECT_CONTACT]]]);
+        $settings->setFeatureSettings(['sync' => ['objects' => [Contact::NAME]]]);
         $settings->setIsPublished(true);
         $exampleIntegration->setIntegrationConfiguration($settings);
 
@@ -109,7 +109,7 @@ class SyncServiceTest extends MauticMysqlTestCase
 
         $this->assertCount(1, $results);
         $this->assertEquals(ExampleIntegration::NAME, $results[0]['integration']);
-        $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $results[0]['internal_object_name']);
+        $this->assertEquals(Contact::NAME, $results[0]['internal_object_name']);
 
         // There should be 50 entries
         $qb      = $connection->createQueryBuilder();

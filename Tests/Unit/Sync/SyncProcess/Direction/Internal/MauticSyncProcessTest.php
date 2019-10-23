@@ -25,6 +25,7 @@ use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO as RequestOb
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request\RequestDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
@@ -59,7 +60,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
     {
         $objectName    = 'Contact';
         $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
-        $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $objectName);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
         $mappingManual->addObjectMapping($objectMapping);
@@ -67,7 +68,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
         $fromSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
             ->method('getSyncFromDateTime')
-            ->with(MauticSyncDataExchange::NAME, MauticSyncDataExchange::OBJECT_CONTACT)
+            ->with(MauticSyncDataExchange::NAME, Contact::NAME)
             ->willReturn($fromSyncDateTime);
 
         $toSyncDateTime   = new \DateTimeImmutable();
@@ -87,7 +88,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
                     $requestObject = $requestObjects[0];
                     $this->assertEquals(['email'], $requestObject->getRequiredFields());
                     $this->assertEquals(['email', 'firstname'], $requestObject->getFields());
-                    $this->assertEquals(MauticSyncDataExchange::OBJECT_CONTACT, $requestObject->getObject());
+                    $this->assertEquals(Contact::NAME, $requestObject->getObject());
 
                     return new ReportDAO(self::INTEGRATION_NAME);
                 }
@@ -118,7 +119,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
     {
         $objectName    = 'Contact';
         $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
-        $objectMapping = new ObjectMappingDAO(MauticSyncDataExchange::OBJECT_CONTACT, $objectName);
+        $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
         $mappingManual->addObjectMapping($objectMapping);
@@ -137,12 +138,12 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
         // Search for an internal object
         $this->syncDataExchange->expects($this->once())
             ->method('getConflictedInternalObject')
-            ->with($mappingManual, MauticSyncDataExchange::OBJECT_CONTACT, $objectDAO)
+            ->with($mappingManual, Contact::NAME, $objectDAO)
             ->willReturn(
-                new ReportObjectDAO(MauticSyncDataExchange::OBJECT_CONTACT, 1)
+                new ReportObjectDAO(Contact::NAME, 1)
             );
 
-        $objectChangeDAO = new ObjectChangeDAO(MauticSyncDataExchange::NAME, MauticSyncDataExchange::OBJECT_CONTACT, 1, $objectName, 2);
+        $objectChangeDAO = new ObjectChangeDAO(MauticSyncDataExchange::NAME, Contact::NAME, 1, $objectName, 2);
         $objectChangeDAO->addField(new OrderFieldDAO('email', new NormalizedValueDAO(NormalizedValueDAO::EMAIL_TYPE, 'test@test.com')));
         $objectChangeDAO->addField(new OrderFieldDAO('firstname', new NormalizedValueDAO(NormalizedValueDAO::TEXT_TYPE, 'Bob')));
         $this->objectChangeGenerator->expects($this->once())
@@ -152,7 +153,7 @@ class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
         $syncOrder = $this->getSyncProcess($mappingManual)->getSyncOrder($syncReport);
 
         // The change should have been added to the order as an identified object
-        $this->assertEquals([MauticSyncDataExchange::OBJECT_CONTACT => [1 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
+        $this->assertEquals([Contact::NAME => [1 => $objectChangeDAO]], $syncOrder->getIdentifiedObjects());
     }
 
     /**
