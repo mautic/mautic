@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal;
 
+use MauticPlugin\IntegrationsBundle\Exception\InvalidValueException;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\FieldMappingDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
@@ -194,11 +195,15 @@ class ObjectChangeGenerator
             return;
         }
 
-        $newValue = $this->valueHelper->getValueForMautic(
-            $integrationInformationChangeRequest->getNewValue(),
-            $internalFieldState,
-            $fieldMappingDAO->getSyncDirection()
-        );
+        try {
+            $newValue = $this->valueHelper->getValueForMautic(
+                $integrationInformationChangeRequest->getNewValue(),
+                $internalFieldState,
+                $fieldMappingDAO->getSyncDirection()
+            );
+        } catch (InvalidValueException $e) {
+            return; // Field has to be skipped
+        }
 
         // Add the value to the field based on the field state
         $this->objectChange->addField(

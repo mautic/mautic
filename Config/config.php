@@ -267,9 +267,7 @@ return [
             ],
             'mautic.integrations.sync.sync_process.value_helper' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper::class,
-                'arguments' => [
-                    'translator',
-                ],
+                'arguments' => [],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_builder' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder::class,
