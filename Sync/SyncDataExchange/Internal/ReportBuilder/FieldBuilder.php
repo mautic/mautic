@@ -93,6 +93,11 @@ class FieldBuilder
             return $this->addContactIdField($field);
         }
 
+        // Special handling of the owner ID field
+        if ('owner_id' === $field) {
+            return $this->createOwnerIdReportFieldDAO($field, (int) $mauticObject['owner_id']);
+        }
+
         // Special handling of DNC fields
         if (0 === strpos($field, 'mautic_internal_dnc_')) {
             return $this->addDoNotContactField($field);
@@ -119,6 +124,23 @@ class FieldBuilder
         );
 
         return new ReportFieldDAO($field, $normalizedValue);
+    }
+
+    /**
+     * @param string $field
+     * @param int    $ownerId
+     *
+     * @return ReportFieldDAO
+     */
+    private function createOwnerIdReportFieldDAO(string $field, int $ownerId)
+    {
+        return new ReportFieldDAO(
+            $field,
+            new NormalizedValueDAO(
+                NormalizedValueDAO::INT_TYPE,
+                $ownerId
+            )
+        );
     }
 
     /**
