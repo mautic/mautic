@@ -143,18 +143,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function isAuthorized()
-    {
-        $keys = $this->getKeys();
-
-        return isset($keys[$this->getAuthTokenKey()]);
-    }
-
-    /**
      * @return string
      */
     public function getApiKey()
@@ -172,5 +160,29 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         $keys = $this->getKeys();
 
         return $keys['organizer_key'];
+    }
+
+    /**
+     * Get the keys for the refresh token and expiry.
+     *
+     * @return array
+     */
+    public function getRefreshTokenKeys()
+    {
+        return ['refresh_token', 'expires'];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $data
+     */
+    public function prepareResponseForExtraction($data)
+    {
+        if (is_array($data) && isset($data['expires_in'])) {
+            $data['expires'] = $data['expires_in'] + time();
+        }
+
+        return $data;
     }
 }
