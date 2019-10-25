@@ -38,6 +38,16 @@ final class LeadEvents
     const LEAD_POST_SAVE = 'mautic.lead_post_save';
 
     /**
+     * The mautic.on_lead_detach event is dispatched if a lead entity is detach.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadEvent instance.
+     *
+     * @var string
+     */
+    const ON_LEAD_DETACH = 'mautic.on_lead_detach';
+
+    /**
      * The mautic.lead_points_change event is dispatched if a lead's points changes.
      *
      * The event listener receives a
@@ -66,16 +76,6 @@ final class LeadEvents
      * @var string
      */
     const LEAD_COMPANY_CHANGE = 'mautic.lead_company_change';
-
-    /**
-     * The mautic.lead_primary_company_change event is dispatched if a lead's primary company changes.
-     *
-     * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadChangePrimaryCompanyEvent instance.
-     *
-     * @var string
-     */
-    const LEAD_PRIMARY_COMPANY_CHANGE = 'mautic.lead_primary_company_change';
 
     /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.

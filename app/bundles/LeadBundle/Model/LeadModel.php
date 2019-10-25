@@ -46,7 +46,6 @@ use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
-use Mautic\LeadBundle\Event\LeadChangePrimaryCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
@@ -557,6 +556,10 @@ class LeadModel extends FormModel
         }
 
         $this->em->clear(CompanyChangeLog::class);
+
+        if ($this->dispatcher->hasListeners(LeadEvents::ON_LEAD_DETACH)) {
+            $this->dispatcher->dispatch(LeadEvents::ON_LEAD_DETACH, new LeadEvent($entity));
+        }
     }
 
     /**
@@ -2417,10 +2420,6 @@ class LeadModel extends FormModel
 
         // Clear CompanyLead entities from Doctrine memory
         $this->em->clear(CompanyLead::class);
-
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRIMARY_COMPANY_CHANGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRIMARY_COMPANY_CHANGE, new LeadChangePrimaryCompanyEvent($lead, $oldPrimaryCompany, $companyId));
-        }
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
