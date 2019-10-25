@@ -13,7 +13,6 @@ namespace Mautic\SmsBundle\Broadcast;
 
 class BroadcastResult
 {
-
     /**
      * @var int
      */

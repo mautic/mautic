@@ -358,7 +358,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
                     $stats[]            = $stat;
                     unset($stat);
-                    //   unset($stat);
                     $results[$leadId] = $sendResult;
 
                     unset($smsEvent, $tokenEvent, $sendResult, $metadata);
