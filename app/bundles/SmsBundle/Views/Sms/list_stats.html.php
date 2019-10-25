@@ -15,7 +15,7 @@ $type = $item->getSmsType();
 <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
 
     <?php if ($type == 'list'): ?>
-        <span class="mt-xs label label-default has-click-event clickable-stat"
+        <span class="mt-xs label label-default has-click-event clickable-stat<?php echo $item->getPendingCount() > 0 && $item->getSmsType() === 'list' ? '' : ' hide'; ?>""
               id="pending-<?php echo $item->getId(); ?>"
               data-toggle="tooltip"
               title="<?php echo $view['translator']->trans('mautic.channel.stat.leadcount.tooltip'); ?>">
