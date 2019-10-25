@@ -19,21 +19,34 @@
 
 /app/cache/*
 !/app/cache/.gitkeep
+/var/cache/*
+!/var/cache/.gitkeep
+
+/app/logs/*
+!/app/logs/.gitkeep
+/var/logs/*
+!/var/logs/.gitkeep
+
+/app/spool/*
+!/app/spool/.gitkeep
+/var/spool/*
+!/var/spool/.gitkeep
+
+/var/tmp/*
+!/var/tmp/.gitkeep
+
+/app/Resources/SensioGeneratorBundle
 
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
 
-/app/logs/*
-!/app/logs/.gitkeep
-
-/app/Resources/SensioGeneratorBundle
-/app/spool/*
-
 /vendor/*
 !/vendor/.htaccess
 
 /bin/*
+!/bin/console
+
 /bundles
 /node_modules
 /build/coverage

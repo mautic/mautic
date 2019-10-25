@@ -44,14 +44,14 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $cache_path = '%kernel.root_dir%/cache';
+    public $cache_path = '%kernel.root_dir%/var/cache';
 
     /**
      * Absolute path to log directory.
      *
      * @var string
      */
-    public $log_path = '%kernel.root_dir%/logs';
+    public $log_path = '%kernel.root_dir%/var/logs';
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.

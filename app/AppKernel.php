@@ -27,14 +27,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MAJOR_VERSION = 2;
+    const MAJOR_VERSION = 3;
 
     /**
      * Minor version number.
      *
      * @const integer
      */
-    const MINOR_VERSION = 16;
+    const MINOR_VERSION = 0;
 
     /**
      * Patch version number.
@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-dev';
+    const EXTRA_VERSION = '-alpha';
 
     /**
      * @var array
@@ -158,7 +158,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle(),
             new Knp\Bundle\MenuBundle\KnpMenuBundle(),
             new FOS\OAuthServerBundle\FOSOAuthServerBundle(),
-            new Bazinga\OAuthServerBundle\BazingaOAuthServerBundle(),
+            //new Bazinga\OAuthServerBundle\BazingaOAuthServerBundle(),
             new FOS\RestBundle\FOSRestBundle(),
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new Oneup\UploaderBundle\OneupUploaderBundle(),
@@ -376,6 +376,14 @@ class AppKernel extends Kernel
     }
 
     /**
+     * @return string
+     */
+    public function getRootDir()
+    {
+        return __DIR__;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @api
@@ -388,7 +396,7 @@ class AppKernel extends Kernel
 
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
         } else {
-            return parent::getCacheDir();
+            return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
         }
     }
 
@@ -403,7 +411,7 @@ class AppKernel extends Kernel
         if (isset($parameters['log_path'])) {
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['log_path']);
         } else {
-            return parent::getLogDir();
+            return dirname(__DIR__).'/var/logs';
         }
     }
 

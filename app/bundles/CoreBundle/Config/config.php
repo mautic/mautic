@@ -1010,10 +1010,10 @@ return [
     'parameters' => [
         'site_url'                        => '',
         'webroot'                         => '',
-        'cache_path'                      => '%kernel.root_dir%/cache',
-        'log_path'                        => '%kernel.root_dir%/logs',
+        'cache_path'                      => '%kernel.root_dir%/var/cache',
+        'log_path'                        => '%kernel.root_dir%/var/logs',
         'image_path'                      => 'media/images',
-        'tmp_path'                        => '%kernel.root_dir%/cache',
+        'tmp_path'                        => '%kernel.root_dir%/var/tmp',
         'theme'                           => 'Mauve',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
