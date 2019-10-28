@@ -351,9 +351,12 @@ class LeadController extends FormController
         $dnc             = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
+        $fieldRepository = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:LeadField');
+
         return $this->delegateView(
             [
                 'viewParameters' => [
+                    'fieldRepository'   => $fieldRepository,
                     'lead'              => $lead,
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,

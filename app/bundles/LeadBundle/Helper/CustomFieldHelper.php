@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Doctrine\ORM\EntityRepository;
+
 /**
  * Helper class custom field operations.
  */
@@ -44,6 +46,49 @@ class CustomFieldHelper
             }
         }
 
+        return $value;
+    }
+
+    /**
+     * Return property label instead of value for select and selectmultiple fields.
+     *
+     * @param EntityRepository $repository
+     * @param string $alias
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    public static function fixSelectFieldValue(EntityRepository $repository, $alias, $value)
+    {
+        if (!is_null($value)) {
+            $customField = $repository->findOneByAlias($alias);
+            $customFieldProperties = $customField->getProperties()['list'];
+            if ( is_array($value) ) {
+                for( $i=0;$i<count($value);$i++ ) {
+                    $value[$i] = self::searchFieldValue($customFieldProperties,$alias,$value[$i]);
+                }
+            }else{
+                $value = self::searchFieldValue($customFieldProperties,$alias,$value);
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * Search for the Lead field value in LeadField properties.
+     *
+     * @param EntityRepository $fieldProperties
+     * @param string $alias
+     * @param mixed  $value
+     *
+     * @return string
+     */
+    public static function searchFieldValue($fieldProperties, $alias, $value)
+    {
+        $propertyIndex = array_search($value,array_column($fieldProperties, 'value'));
+        if ( $propertyIndex !== false ) {
+            $value = $fieldProperties[$propertyIndex]['label'];
+        }
         return $value;
     }
 }
