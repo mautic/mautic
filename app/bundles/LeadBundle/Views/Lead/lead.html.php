@@ -223,13 +223,14 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $view->escape($field['value']); ?>
                                                     <?php else: ?>
-                                                        <?php if (count(explode('|',$field['value']) > 0) && 'multiselect' === $field['type']): ?>
+                                                        <?php if (count(explode('|', $field['value']) > 0) && 'multiselect' === $field['type']): ?>
                                                             <?php 
-                                                                $valueArray = explode('|',$field['value']);
-                                                                echo implode(', ', \Mautic\LeadBundle\Helper\CustomFieldHelper::fixSelectFieldValue($fieldRepository,$field['alias'],$valueArray));
+                                                                $valueArray = explode('|', $field['value']);
+                                                                $valueArray = \Mautic\LeadBundle\Helper\CustomFieldHelper::fixSelectFieldValue($fieldRepository, $field['alias'], $valueArray);
+                                                                echo implode(', ', $valueArray);
                                                             ?>
                                                         <?php elseif (is_string($field['value']) && 'select' === $field['type']): ?>
-                                                            <?php echo \Mautic\LeadBundle\Helper\CustomFieldHelper::fixSelectFieldValue($fieldRepository,$field['alias'],$field['value']); ?>
+                                                            <?php echo \Mautic\LeadBundle\Helper\CustomFieldHelper::fixSelectFieldValue($fieldRepository, $field['alias'], $field['value']); ?>
                                                         <?php elseif (is_string($field['value']) && 'url' === $field['type']): ?>
                                                             <a href="<?php echo $view->escape($field['value']); ?>" target="_blank">
                                                                 <?php echo $field['value']; ?>

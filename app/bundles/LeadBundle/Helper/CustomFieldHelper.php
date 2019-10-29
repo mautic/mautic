@@ -53,24 +53,27 @@ class CustomFieldHelper
      * Return property label instead of value for select and selectmultiple fields.
      *
      * @param EntityRepository $repository
-     * @param string $alias
-     * @param mixed  $value
+     * @param string           $alias
+     * @param mixed            $value
      *
      * @return mixed
      */
     public static function fixSelectFieldValue(EntityRepository $repository, $alias, $value)
     {
         if (!is_null($value)) {
-            $customField = $repository->findOneByAlias($alias);
+            $customField           = $repository->findOneByAlias($alias);
             $customFieldProperties = $customField->getProperties()['list'];
-            if ( is_array($value) ) {
-                for( $i=0;$i<count($value);$i++ ) {
-                    $value[$i] = self::searchFieldValue($customFieldProperties,$alias,$value[$i]);
+
+            if (is_array($value)) {
+                $n = count($value);
+                for ($i=0; $i < $n; ++$i) {
+                    $value[$i] = self::searchFieldValue($customFieldProperties, $value[$i]);
                 }
-            }else{
-                $value = self::searchFieldValue($customFieldProperties,$alias,$value);
+            } else {
+                $value = self::searchFieldValue($customFieldProperties, $value);
             }
         }
+
         return $value;
     }
 
@@ -78,17 +81,18 @@ class CustomFieldHelper
      * Search for the Lead field value in LeadField properties.
      *
      * @param EntityRepository $fieldProperties
-     * @param string $alias
-     * @param mixed  $value
+     * @param string           $alias
+     * @param mixed            $value
      *
      * @return string
      */
-    public static function searchFieldValue($fieldProperties, $alias, $value)
+    public static function searchFieldValue($fieldProperties, $value)
     {
-        $propertyIndex = array_search($value,array_column($fieldProperties, 'value'));
-        if ( $propertyIndex !== false ) {
+        $propertyIndex = array_search($value, array_column($fieldProperties, 'value'));
+        if ($propertyIndex !== false) {
             $value = $fieldProperties[$propertyIndex]['label'];
         }
+
         return $value;
     }
 }
