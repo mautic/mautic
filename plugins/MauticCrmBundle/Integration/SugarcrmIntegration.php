@@ -938,9 +938,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                         $mauticObjectReference = 'lead';
                         $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
-                        if ($object == 'Leads') {
-                            $this->setTagsToContact($dataObject, $entity);
-                        }
+                        $this->setTagsToContact($dataObject, $entity);
                         $detachClass           = Lead::class;
                         $company               = null;
                         $this->fetchDncToMautic($entity, $data);
