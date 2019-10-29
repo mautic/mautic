@@ -4,43 +4,43 @@ Mautic Introduction
 
 ## Getting Started
 
-The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
+Versi GitHub direkomendasikan untuk pengembangan atau pengujian. Paket produksi siap dipasang dengan semua libraries di [https://www.mautic.org/download](https://www.mautic.org/download).
 
-Documentation on how to use Mautic is available at [https://www.mautic.org/docs](https://www.mautic.org/docs).
+Dokumentasi bagaimana cara menggunakan mautic dapat dilihat di [https://www.mautic.org/docs](https://www.mautic.org/docs).
 
-This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
+Ini adalaha 3 langkah simpel dalam proses instalasi. Anda harus sudah memiliki [Composer](http://getcomposer.org) tersedia di komputer Anda karena ini adalah rilis pengembangan dan Anda harus menggunakan Komposer untuk mengunduh paket vendor.
 
 <table width="100%" border="0">
 	<tr>
 		<td>
-			<center><b>Step 1</b></center>
+			<center><b>Langkah 1</b></center>
 		</td>
 		<td>
-			<center><b>Step 2</b></center>
+			<center><b>Langkah 2</b></center>
 		</td>
 		<td>
-			<center><b>Step 3</b></center>
+			<center><b>Langkah 3</b></center>
 		</td>
 	</tr>
 	<tr>
 		<td align="center" width="33.3%">
-			<a href="https://github.com/mautic/mautic/archive/master.zip">Download the repository zip</a><br />Extract this zip to your web root.
+			<a href="https://github.com/mautic/mautic/archive/master.zip">Download the repository zip</a><br />Extract file zip ini ke root web anda=.
 		</td>
 		<td align="center" width="33.3%">
-			Run the following command to install required packages.<br /> <code>composer install</code>
+			Jalankan perintah berikut untuk menginstal paket yang diperlukan.<br /> <code>composer install</code>
 		</td>
 		<td align="center" width="33.3%">
-			Open your browser and complete the installation through the web installer.
+			Buka browser Anda dan selesaikan penginstalan melalui penginstal web.
 		</td>
 	</tr>
 </table>
 
-**Get stuck?** *No problem. Check out [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
+**Get stuck?** *Tidak masalah. Cek di [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) dan jika itu tidak akan menyelesaikan masalah Anda, bergabunglah dengan kami di <a href="https://www.mautic.org/community">Mautic community</a> untuk bantuan dan jawaban.*
 
 ## Disclaimer
-Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production the pre-packaged Mautic available at [mautic.org/download](https://www.mautic.org/download) is recommended.
+Menginstal dari sumber hanya disarankan jika Anda merasa nyaman menggunakan baris perintah. Anda akan diminta untuk menggunakan berbagai perintah CLI untuk membuat Mautic berfungsi dan membuatnya berfungsi. Jika skema sumber dan / atau database tidak sinkron dengan rilis Mautic, pembaru rilis mungkin tidak berfungsi dan akan membutuhkan pembaruan manual. Untuk produksi, Mautic pra-paket tersedia di [mautic.org/download](https://www.mautic.org/download) is recommended.
 
-*Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
+*Perhatikan juga sumber di luar <a href="https://github.com/mautic/mautic/releases">a tagged release</a> harus dianggap "alfa" dan dapat mengandung bug, menyebabkan hasil yang tidak terduga, kerusakan atau kehilangan data, dan tidak direkomendasikan untuk digunakan dalam lingkungan produksi. Gunakan dengan risiko Anda sendiri.*
 
 ## Requirements
 
