@@ -187,24 +187,21 @@ class Sms extends FormEntity
                     $violations = $validator->validate(
                         $sms->getLists(),
                         [
-                            new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
-                            ),
                             new NotBlank(
                                 [
                                     'message' => 'mautic.lead.lists.required',
                                 ]
                             ),
+                            new LeadListAccess(),
                         ]
                     );
 
                     if (count($violations) > 0) {
-                        $string = (string) $violations;
-                        $context->buildViolation($string)
-                            ->atPath('lists')
-                            ->addViolation();
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                ->atPath('lists')
+                                ->addViolation();
+                        }
                     }
                 }
             },
