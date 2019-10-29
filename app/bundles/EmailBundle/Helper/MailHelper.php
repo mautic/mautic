@@ -957,9 +957,18 @@ class MailHelper
             $matches = [];
             if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
                 $replaces = [];
+                $tokens = $this->getGlobalTokens();
                 foreach ($matches[1] as $match) {
                     if (strpos($match, 'cid:') === false) {
-                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                        if (preg_match('/\{[^\}]+\}/i', $match)) {
+                            if (!count($tokens))
+                                continue;
+                            else 
+                                $matched = strtr($match, $tokens);
+                        } else {
+                            $matched = $match;
+                        }
+                        $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($matched));
                     }
                 }
                 $content = strtr($content, $replaces);
