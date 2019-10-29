@@ -28,6 +28,11 @@ class DateDecorator extends CustomMappedDecorator
     private $coreParametersHelper;
 
     /**
+     * @var string
+     */
+    private $timezone;
+
+    /**
      * CustomMappedDecorator constructor.
      *
      * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
@@ -41,6 +46,7 @@ class DateDecorator extends CustomMappedDecorator
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->timezone             = $this->coreParametersHelper->getParameter('default_timezone', 'local');
     }
 
     /**
@@ -62,13 +68,11 @@ class DateDecorator extends CustomMappedDecorator
      */
     public function getDefaultDate($relativeDate = null)
     {
-        $timezone = $this->coreParametersHelper->getParameter('default_timezone', 'local');
-
         if ($relativeDate) {
-            return new DateTimeHelper($relativeDate, null, $timezone);
+            return new DateTimeHelper($relativeDate, null, $this->timezone);
         }
 
-        return new DateTimeHelper('midnight today', null, $timezone);
+        return new DateTimeHelper('midnight today', null, $this->timezone);
     }
 
     /**
