@@ -15,12 +15,14 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\LockHandler;
 
 abstract class ModeratedCommand extends ContainerAwareCommand
 {
-    const MODE_LOCK = 'lock';
-    const MODE_PID  = 'pid';
+    const MODE_LOCK   = 'lock';
+    const MODE_PID    = 'pid';
+    const MODE_FLOCK  = 'flock';
 
     protected $checkFile;
     protected $moderationKey;
@@ -31,6 +33,8 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $lockHandler;
     protected $lockFile;
     private $bypassLocking;
+
+    private $flockHandle;
 
     /* @var OutputInterface $output */
     protected $output;
@@ -54,7 +58,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 '--lock_mode',
                 '-x',
                 InputOption::VALUE_REQUIRED,
-                'Force use of PID or FILE LOCK for semaphore. Allowed value are "pid" or "file_lock". By default, lock will try with pid, if not available will use file system',
+                'Allowed value are "pid" , "file_lock" or "flock". By default, lock will try with pid, if not available will use file system',
                 'pid'
             );
     }
@@ -72,7 +76,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $this->bypassLocking  = $input->getOption('bypass-locking');
         $lockMode             = $input->getOption('lock_mode');
 
-        if (!in_array($lockMode, ['pid', 'file_lock'])) {
+        if (!in_array($lockMode, ['pid', 'file_lock', 'flock'])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
             return false;
@@ -125,6 +129,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         if (self::MODE_LOCK == $this->moderationMode) {
             $this->lockHandler->release();
         }
+        if (self::MODE_FLOCK == $this->moderationMode) {
+            fclose($this->flockHandle);
+        }
 
         // Attempt to keep things tidy
         @unlink($this->lockFile);
@@ -176,6 +183,36 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
                 return true;
             }
+        } elseif ($lockMode === self::MODE_FLOCK && !$force) {
+            $this->moderationMode = self::MODE_FLOCK;
+            $error                = null;
+            // Silence error reporting
+            set_error_handler(function ($errno, $msg) use (&$error) {
+                $error = $msg;
+            });
+
+            if (!$this->flockHandle = fopen($this->lockFile, 'r+') ?: fopen($this->lockFile, 'r')) {
+                if ($this->flockHandle = fopen($this->lockFile, 'x')) {
+                    chmod($this->lockFile, 0666);
+                } elseif (!$this->flockHandle = fopen($this->lockFile, 'r+') ?: fopen($this->lockFile, 'r')) {
+                    usleep(100);
+                    $this->flockHandle = fopen($this->lockFile, 'r+') ?: fopen($this->lockFile, 'r');
+                }
+            }
+
+            restore_error_handler();
+
+            if (!$this->flockHandle) {
+                throw new IOException($error, 0, null, $this->lockFile);
+            }
+            if (!flock($this->flockHandle, LOCK_EX | LOCK_NB)) {
+                fclose($this->flockHandle);
+                $this->flockHandle = null;
+
+                return false;
+            }
+
+            return true;
         }
 
         // in anycase, fallback on file system

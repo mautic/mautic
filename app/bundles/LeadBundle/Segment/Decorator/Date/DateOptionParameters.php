@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 class DateOptionParameters
@@ -36,15 +37,26 @@ class DateOptionParameters
     private $shouldUseLastDayOfRange;
 
     /**
+     * @var DateTimeHelper
+     */
+    private $dateTimeHelper;
+
+    /**
      * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
      * @param array                     $relativeDateStrings
+     * @param TimezoneResolver          $timezoneResolver
      */
-    public function __construct(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)
-    {
+    public function __construct(
+        ContactSegmentFilterCrate $leadSegmentFilterCrate,
+        array $relativeDateStrings,
+        TimezoneResolver $timezoneResolver
+    ) {
         $this->hasTimePart             = $leadSegmentFilterCrate->hasTimeParts();
         $this->timeframe               = $this->parseTimeFrame($leadSegmentFilterCrate, $relativeDateStrings);
         $this->requiresBetween         = in_array($leadSegmentFilterCrate->getOperator(), ['=', '!='], true);
         $this->shouldUseLastDayOfRange = in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], true);
+
+        $this->setDateTimeHelper($timezoneResolver);
     }
 
     /**
@@ -84,6 +96,14 @@ class DateOptionParameters
     }
 
     /**
+     * @return DateTimeHelper
+     */
+    public function getDefaultDate()
+    {
+        return $this->dateTimeHelper;
+    }
+
+    /**
      * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
      * @param array                     $relativeDateStrings
      *
@@ -99,5 +119,10 @@ class DateOptionParameters
         }
 
         return str_replace('mautic.lead.list.', '', $key);
+    }
+
+    private function setDateTimeHelper(TimezoneResolver $timezoneResolver)
+    {
+        $this->dateTimeHelper = $timezoneResolver->getDefaultDate($this->hasTimePart());
     }
 }

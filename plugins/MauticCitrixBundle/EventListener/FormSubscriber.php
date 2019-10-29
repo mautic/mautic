@@ -131,11 +131,11 @@ class FormSubscriber extends CommonSubscriber
             }
 
             $productsToRegister = self::_getProductsFromPost($actions, $fields, $post, $product);
-            if ($product === 'assist' || (0 !== count($productsToRegister))) {
+            if ('assist' === $product || (0 !== count($productsToRegister))) {
                 $results = $submission->getResults();
 
                 // persist the new values
-                if ($product !== 'assist') {
+                if ('assist' !== $product) {
                     // replace the submitted value with something more legible
                     foreach ($productsToRegister as $productToRegister) {
                         $results[$productToRegister['fieldName']] = $productToRegister['productTitle'].' ('.$productToRegister['productId'].')';

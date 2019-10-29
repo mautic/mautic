@@ -44,6 +44,10 @@ Installing from source is only recommended if you are comfortable using the comm
 
 ## Requirements
 
+#### Contributor Agreement 
+
+By contributing to this project, you accept and agree to the [Contributor Agreement](https://www.mautic.org/contributor-agreement) in its entirety.
+
 #### Development / Build process requirements
 
 1. Mautic uses Git as a version control system. Download and install git for your OS from https://git-scm.com/.
@@ -60,7 +64,7 @@ Installing from source is only recommended if you are comfortable using the comm
 	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
-4. Disabling `ONLY_FULL_GROUP_BY` on the mySQL server.
+4. Recommended MySQL defaults can be set by running the queries `SET GLOBAL innodb_default_row_format=DYNAMIC; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
 
 ## Installation
 

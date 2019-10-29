@@ -51,7 +51,9 @@ trait RequestTrait
                                 break;
                             } catch (\InvalidArgumentException $exception) {
                             }
-                            $params[$name] = $data;
+
+                            // If not manually handled cast to int because Symfony form processing take false as empty
+                            $params[$name] = (int) $data;
                         }
                         break;
                     case 'choice':
@@ -82,7 +84,7 @@ trait RequestTrait
                             if ($timestamp) {
                                 switch ($type) {
                                     case 'datetime':
-                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                                         break;
                                     case 'date':
                                         $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');

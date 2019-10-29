@@ -13,7 +13,6 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
@@ -99,7 +98,7 @@ class LeadSubscriber extends CommonSubscriber
 
                     $removeLeads = [];
                     foreach ($leads as $l) {
-                        $lists = (isset($leadLists[$l])) ? $leadLists[$l] : [];
+                        $lists = (isset($leadLists[$l['id']])) ? $leadLists[$l['id']] : [];
                         if (array_intersect(array_keys($lists), $campaignLists[$c['id']])) {
                             continue;
                         } else {

@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
@@ -28,13 +29,23 @@ class DateRelativeInterval implements FilterDecoratorInterface
     private $originalValue;
 
     /**
-     * @param DateDecorator $dateDecorator
-     * @param string        $originalValue
+     * @var DateOptionParameters
      */
-    public function __construct(DateDecorator $dateDecorator, $originalValue)
-    {
-        $this->dateDecorator = $dateDecorator;
-        $this->originalValue = $originalValue;
+    private $dateOptionParameters;
+
+    /**
+     * @param DateDecorator        $dateDecorator
+     * @param string               $originalValue
+     * @param DateOptionParameters $dateOptionParameters
+     */
+    public function __construct(
+        DateDecorator $dateDecorator,
+        $originalValue,
+        DateOptionParameters $dateOptionParameters
+    ) {
+        $this->dateDecorator        = $dateDecorator;
+        $this->originalValue        = $originalValue;
+        $this->dateOptionParameters = $dateOptionParameters;
     }
 
     /**
@@ -92,7 +103,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $date = $this->dateDecorator->getDefaultDate();
+        $date = $this->dateOptionParameters->getDefaultDate();
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
@@ -102,14 +113,13 @@ class DateRelativeInterval implements FilterDecoratorInterface
             $date     = $this->dateDecorator->getDefaultDateTime();
             $format   = 'Y-m-d H:i:s';
         }
-
         $date->modify($this->originalValue);
 
         if ($operator === 'like' || $operator === 'notLike') {
             $format .= '%';
         }
 
-        return $date->getString($format);
+        return $date->toLocalString($format);
     }
 
     /**

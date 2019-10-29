@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -1480,7 +1481,7 @@ class LeadListRepository extends CommonRepository
                                 continue;
                             }
 
-                            $listFilters = unserialize($list['filters']);
+                            $listFilters = Serializer::decode($list['filters']);
                             if (empty($listFilters)) {
                                 // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
                                 $subQb = $this->createFilterExpressionSubQuery(
@@ -1539,6 +1540,7 @@ class LeadListRepository extends CommonRepository
                 case 'tags':
                 case 'globalcategory':
                 case 'campaign':
+                case 'lead_asset_download':
                 case 'lead_email_received':
                 case 'lead_email_sent':
                 case 'device_type':
@@ -1588,6 +1590,10 @@ class LeadListRepository extends CommonRepository
                             $table  = 'lead_devices';
                             $column = 'device_brand';
                             break;
+                        case 'lead_asset_download':
+                            $table  = 'asset_downloads';
+                            $column = 'asset_id';
+                            break;
                         case 'device_os':
                             $table  = 'lead_devices';
                             $column = 'device_os_name';
@@ -1603,7 +1609,6 @@ class LeadListRepository extends CommonRepository
                         $leadId,
                         $subQueryFilters
                     );
-
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subQb->getSQL())
                     );

@@ -367,6 +367,7 @@ class LeadController extends FormController
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'devices'           => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => end($dnc),
                     'leadNotes'         => $this->forward(

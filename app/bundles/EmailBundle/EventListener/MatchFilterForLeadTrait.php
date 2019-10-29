@@ -122,10 +122,18 @@ trait MatchFilterForLeadTrait
 
             switch ($data['operator']) {
                 case '=':
-                    $groups[$groupNum] = $leadVal == $filterVal;
+                    if ($data['type'] === 'boolean') {
+                        $groups[$groupNum] = $leadVal === $filterVal;
+                    } else {
+                        $groups[$groupNum] = $leadVal == $filterVal;
+                    }
                     break;
                 case '!=':
-                    $groups[$groupNum] = $leadVal != $filterVal;
+                    if ($data['type'] === 'boolean') {
+                        $groups[$groupNum] = $leadVal !== $filterVal;
+                    } else {
+                        $groups[$groupNum] = $leadVal != $filterVal;
+                    }
                     break;
                 case 'gt':
                     $groups[$groupNum] = $leadVal > $filterVal;

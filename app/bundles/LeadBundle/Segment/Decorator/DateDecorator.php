@@ -22,8 +22,10 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
  */
 class DateDecorator extends CustomMappedDecorator
 {
-    /** @var string */
-    private $timezone;
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
     /**
      * CustomMappedDecorator constructor.
@@ -38,7 +40,7 @@ class DateDecorator extends CustomMappedDecorator
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
-        $this->timezone = $coreParametersHelper->getParameter('default_timezone', 'local');
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -52,17 +54,21 @@ class DateDecorator extends CustomMappedDecorator
     }
 
     /**
+     * @deprecated Use DateOptionParameters->getDefaultDate() which takes timezone into account
+     *
      * @param null|string $relativeDate
      *
      * @return DateTimeHelper
      */
     public function getDefaultDate($relativeDate = null)
     {
+        $timezone = $this->coreParametersHelper->getParameter('default_timezone', 'local');
+
         if ($relativeDate) {
-            return new DateTimeHelper($relativeDate, null, $this->timezone);
-        } else {
-            return new DateTimeHelper('midnight today', null, $this->timezone);
+            return new DateTimeHelper($relativeDate, null, $timezone);
         }
+
+        return new DateTimeHelper('midnight today', null, $timezone);
     }
 
     /**
