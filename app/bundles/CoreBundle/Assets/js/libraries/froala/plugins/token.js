@@ -94,6 +94,7 @@
                     var normalizedValue = val.replace(new RegExp('"', 'g'), "'");
                     var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option"' +
                         ' data-cmd="token" data-param1="' + normalizedValue + '" title="' + title + '">' + title + badge + '</a></li>';
+                    options.push(newOption);
                 }
 
                 mQuery('button[data-cmd="token"]').next().find('ul').html(options.join(''));
