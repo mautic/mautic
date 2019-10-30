@@ -59,6 +59,7 @@ class DateTimeHelper
         if (empty($localTimezone) || null === $localTimezone) {
             $this->localTimezone = date_default_timezone_get();
         }
+        $this->localTimezone = ArrayHelper::getValue('default_timezone', (new ParamsLoaderHelper())->getParameters(), date_default_timezone_get());
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
