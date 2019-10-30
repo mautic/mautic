@@ -93,6 +93,8 @@ class DateRelativeInterval implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
         $date     = $this->dateOptionParameters->getDefaultDate();
+        $date->modify($this->originalValue);
+
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
 
@@ -100,7 +102,6 @@ class DateRelativeInterval implements FilterDecoratorInterface
         if ($contactSegmentFilterCrate->hasTimeParts() && in_array($contactSegmentFilterCrate->getOperator(), ['!gt', 'gt', 'gte', '!lt', 'lt', 'lte'])) {
             $format   = 'Y-m-d H:i:s';
         }
-        $date->modify($this->originalValue);
 
         if ($operator === 'like' || $operator === 'notLike') {
             $format .= '%';
