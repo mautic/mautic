@@ -33,7 +33,6 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -274,60 +273,13 @@ class ListModel extends FormModel
     {
         $choices = [];
 
-        //get list of custom fields
-        $fields = $this->em->getRepository(LeadField::class)->getEntities(
-            [
-                'filter' => [
-                    'where'         => [
-                        [
-                            'expr' => 'eq',
-                            'col'  => 'f.isListable',
-                            'val'  => true,
-                        ],
-                        [
-                            'expr' => 'eq',
-                            'col'  => 'f.isPublished',
-                            'val'  => true,
-                        ],
-                    ],
-                ],
-            ]
-        );
-        foreach ($fields as $field) {
-            $type               = $field->getType();
-            $properties         = $field->getProperties();
-            $properties['type'] = $type;
-            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
-                if ('boolean' == $type) {
-                    //create a lookup list with ID
-                    $properties['list'] = [
-                        0 => $properties['no'],
-                        1 => $properties['yes'],
-                    ];
-                } else {
-                    $properties['callback'] = 'activateLeadFieldTypeahead';
-                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_ARRAY,
-                        FormFieldHelper::parseList($properties['list'])
-                    ) : '';
-                }
-            }
-            $choices[$field->getObject()][$field->getAlias()] = [
-                'label'      => $field->getLabel(),
-                'properties' => $properties,
-                'object'     => $field->getObject(),
-            ];
-
-            $choices[$field->getObject()][$field->getAlias()]['operators'] = $this->getOperatorsForFieldType($type);
-        }
-
-        // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
-            $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest());
+            $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator);
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
             $choices = $event->getChoices();
         }
 
+        // Order choices by label.
         foreach ($choices as $key => $choice) {
             $cmp = function ($a, $b) {
                 return strcmp($a['label'], $b['label']);

@@ -13,26 +13,26 @@ namespace Mautic\LeadBundle\Segment;
 
 class OperatorOptions
 {
-    public const EQUAL_TO = '=';
-    public const NOT_EQUAL_TO = '!=';
-    public const GREATER_THAN = 'gt';
+    public const EQUAL_TO              = '=';
+    public const NOT_EQUAL_TO          = '!=';
+    public const GREATER_THAN          = 'gt';
     public const GREATER_THAN_OR_EQUAL = 'gte';
-    public const LESS_THAN = 'lt';
-    public const LESS_THAN_OR_EQUAL = 'lte';
-    public const EMPTY = 'empty';
-    public const NOT_EMPTY = '!empty';
-    public const LIKE = 'like';
-    public const NOT_LIKE = '!like';
-    public const BETWEEN = 'between';
-    public const NOT_BETWEEN = '!between';
-    public const IN = 'in';
-    public const NOT_IN = '!in';
-    public const REGEXP = 'regexp';
-    public const NOT_REGEXP = '!regexp';
-    public const DATE = 'date';
-    public const STARTS_WITH = 'startsWith';
-    public const ENDS_WITH = 'endsWith';
-    public const CONTAINS = 'contains';
+    public const LESS_THAN             = 'lt';
+    public const LESS_THAN_OR_EQUAL    = 'lte';
+    public const EMPTY                 = 'empty';
+    public const NOT_EMPTY             = '!empty';
+    public const LIKE                  = 'like';
+    public const NOT_LIKE              = '!like';
+    public const BETWEEN               = 'between';
+    public const NOT_BETWEEN           = '!between';
+    public const IN                    = 'in';
+    public const NOT_IN                = '!in';
+    public const REGEXP                = 'regexp';
+    public const NOT_REGEXP            = '!regexp';
+    public const DATE                  = 'date';
+    public const STARTS_WITH           = 'startsWith';
+    public const ENDS_WITH             = 'endsWith';
+    public const CONTAINS              = 'contains';
 
     private static $operatorOptions = [
         self::EQUAL_TO => [

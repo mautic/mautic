@@ -82,7 +82,7 @@ trait OperatorListTrait
 
     /**
      * @deprecated to be removed in Mautic 3. Use FilterOperatorProvider::getAllOperators() instead.
-     * 
+     *
      * @param null $operator
      *
      * @return array
@@ -165,6 +165,8 @@ trait OperatorListTrait
     }
 
     /**
+     * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
+     *
      * Normalize type operator.
      *
      * @param $type

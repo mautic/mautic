@@ -543,6 +543,17 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
+            'mautic.lead.subscriber.filterOperator' => [
+                'class'     => \Mautic\LeadBundle\EventListener\FilterOperatorSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.segment.operator_options',
+                    'mautic.lead.repository.field',
+                    'mautic.lead.provider.typeOperator',
+                ],
+            ],
+            'mautic.lead.subscriber.typeOperator' => [
+                'class'     => \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber::class,
+            ],
             'mautic.lead.subscriber.segment.filter' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber::class,
                 'arguments' => [
@@ -1105,9 +1116,7 @@ return [
             'mautic.lead.model.lead_segment_filter_operator' => [
                 'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterOperator::class,
                 'arguments' => [
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.lead.segment.operator_options',
+                    'mautic.lead.provider.fillterOperator',
                 ],
             ],
             'mautic.lead.model.lead_segment_decorator_factory' => [
