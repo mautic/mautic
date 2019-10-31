@@ -121,6 +121,32 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * @return todo
+     */
+    public function getListablePublishedFields()
+    {
+        return $this->getEntities(
+            [
+                'filter' => [
+                    'where' => [
+                        [
+                            'expr' => 'eq',
+                            'col'  => 'f.isListable',
+                            'val'  => true,
+                        ],
+                        [
+                            'expr' => 'eq',
+                            'col'  => 'f.isPublished',
+                            'val'  => true,
+                        ],
+                    ],
+                ],
+                'orderBy' => 'f.object',
+            ]
+        );
+    }
+
+    /**
      * Add company left join.
      *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
