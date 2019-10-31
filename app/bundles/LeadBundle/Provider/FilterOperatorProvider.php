@@ -55,9 +55,23 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
 
             $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
 
-            $this->cachedOperators = $event->getOperators();
+            $this->cachedOperators = $this->translateOperatorLabels($event->getOperators());
         }
 
         return $this->cachedOperators;
+    }
+
+    /**
+     * @param array $operators
+     * 
+     * @return array
+     */
+    private function translateOperatorLabels(array $operators)
+    {
+        foreach ($operators as $key => $operatorSettings) {
+            $operators[$key]['label'] = $this->translator->trans($operatorSettings['label']);
+        }
+
+        return $operators;
     }
 }
