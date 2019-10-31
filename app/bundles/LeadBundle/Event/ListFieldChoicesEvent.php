@@ -24,9 +24,8 @@ class ListFieldChoicesEvent extends Event
     private $choices = [];
 
     /**
-     *
      * @param string $fieldType
-     * @param array $choices
+     * @param array  $choices
      */
     public function setChoicesForFieldType($fieldType, array $choices)
     {

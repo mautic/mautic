@@ -24,9 +24,8 @@ class TypeOperatorsEvent extends Event
     private $operators = [];
 
     /**
-     *
      * @param string $fieldType
-     * @param array $operators
+     * @param array  $operators
      */
     public function setOperatorsForFieldType($fieldType, array $operators)
     {

@@ -561,7 +561,6 @@ final class LeadEvents
      */
     const LIST_FILTERS_OPERATORS_ON_GENERATE = 'mautic.list_filters_operators_on_generate';
 
-
     /**
      * The mautic.collect_filter_choices_for_list_field_type event is dispatched when some filter based on a list type needs to load its choices.
      *

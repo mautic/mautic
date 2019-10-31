@@ -11,13 +11,13 @@
 
 namespace Mautic\LeadBundle\Provider;
 
+use Mautic\LeadBundle\Entity\OperatorListTrait;
+use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
+use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\LeadBundle\Entity\OperatorListTrait;
-use Mautic\LeadBundle\Event\TypeOperatorsEvent;
-use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
-use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 
 final class TypeOperatorProvider implements TypeOperatorProviderInterface
 {
@@ -49,20 +49,19 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     private $cachedListChoices = [];
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param EventDispatcherInterface        $dispatcher
      * @param FilterOperatorProviderInterface $filterOperatorProvider
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         FilterOperatorProviderInterface $filterOperatorProvider
-    )
-    {
+    ) {
         $this->dispatcher             = $dispatcher;
         $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getOperatorsIncluding(array $operators)
     {
@@ -70,7 +69,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getOperatorsExcluding(array $operators)
     {
@@ -78,7 +77,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getChoicesForListFieldType($fieldType)
     {
@@ -98,7 +97,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getOperatorsForFieldType($fieldType)
     {
@@ -124,7 +123,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getAllTypeOperators()
     {
@@ -140,7 +139,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getAllChoicesForListFieldTypes()
     {
@@ -156,8 +155,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     }
 
     /**
-     * Overwriting deprecated method from OperatorListTrait
-     * 
+     * Overwriting deprecated method from OperatorListTrait.
+     *
      * @param string $operator
      *
      * @return array

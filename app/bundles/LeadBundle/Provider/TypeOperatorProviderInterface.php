@@ -18,32 +18,32 @@ interface TypeOperatorProviderInterface
 {
     /**
      * @param array $operators
-     * 
+     *
      * @return array
      */
     public function getOperatorsIncluding(array $operators);
 
     /**
      * @param array $operators
-     * 
+     *
      * @return array
      */
     public function getOperatorsExcluding(array $operators);
 
     /**
      * @param string $filedType
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ChoicesNotFoundException
      */
     public function getChoicesForListFieldType($fieldType);
 
     /**
      * @param string $filedType
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws OperatorsNotFoundException
      */
     public function getOperatorsForFieldType($fieldType);
