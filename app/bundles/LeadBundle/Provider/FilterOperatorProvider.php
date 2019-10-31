@@ -63,7 +63,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
 
     /**
      * @param array $operators
-     * 
+     *
      * @return array
      */
     private function translateOperatorLabels(array $operators)
