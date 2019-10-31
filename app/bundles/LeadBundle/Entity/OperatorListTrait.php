@@ -18,69 +18,71 @@ trait OperatorListTrait
     protected $typeOperators = [
         'text' => [
             'include' => [
-                '=',
-                '!=',
-                'empty',
-                '!empty',
-                'like',
-                '!like',
-                'regexp',
-                '!regexp',
-                'startsWith',
-                'endsWith',
-                'contains',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::LIKE,
+                OperatorOptions::NOT_LIKE,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::STARTS_WITH,
+                OperatorOptions::ENDS_WITH,
+                OperatorOptions::CONTAINS,
             ],
         ],
         'select' => [
             'include' => [
-                '=',
-                '!=',
-                'empty',
-                '!empty',
-                'regexp',
-                '!regexp',
-                'in',
-                '!in',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
+                OperatorOptions::REGEXP,
+                OperatorOptions::NOT_REGEXP,
+                OperatorOptions::IN,
+                OperatorOptions::NOT_IN,
             ],
         ],
         'bool' => [
             'include' => [
-                '=',
-                '!=',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
             ],
         ],
         'default' => [
             'exclude' => [
-                'in',
-                '!in',
-                'date',
+                OperatorOptions::IN,
+                OperatorOptions::NOT_IN,
+                OperatorOptions::DATE,
             ],
         ],
         'multiselect' => [
             'include' => [
-                'in',
-                '!in',
-                'empty',
-                '!empty',
+                OperatorOptions::IN,
+                OperatorOptions::NOT_IN,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
             ],
         ],
         'date' => [
             'exclude' => [
-                'in',
-                '!in',
+                OperatorOptions::IN,
+                OperatorOptions::NOT_IN,
             ],
         ],
         'lookup_id' => [
             'include' => [
-                '=',
-                '!=',
-                'empty',
-                '!empty',
+                OperatorOptions::EQUAL_TO,
+                OperatorOptions::NOT_EQUAL_TO,
+                OperatorOptions::EMPTY,
+                OperatorOptions::NOT_EMPTY,
             ],
         ],
     ];
 
     /**
+     * @deprecated to be removed in Mautic 3. Use FilterOperatorProvider::getAllOperators() instead.
+     * 
      * @param null $operator
      *
      * @return array
