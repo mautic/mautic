@@ -35,19 +35,18 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
 
     /**
      * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface      $translator
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getAllOperators()
     {

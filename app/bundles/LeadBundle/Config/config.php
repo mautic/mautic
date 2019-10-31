@@ -1162,6 +1162,20 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.lead.provider.fillterOperator' => [
+                'class'     => \Mautic\LeadBundle\Provider\FilterOperatorProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.provider.typeOperator' => [
+                'class'     => \Mautic\LeadBundle\Provider\TypeOperatorProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.lead.provider.fillterOperator',
+                ],
+            ],
             'mautic.lead.model.random_parameter_name' => [
                 'class'     => \Mautic\LeadBundle\Segment\RandomParameterName::class,
             ],
