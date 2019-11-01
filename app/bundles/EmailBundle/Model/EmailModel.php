@@ -1457,7 +1457,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $useSettings['slots'])
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
