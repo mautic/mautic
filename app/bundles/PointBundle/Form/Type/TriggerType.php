@@ -11,7 +11,6 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -84,7 +83,7 @@ class TriggerType extends AbstractType
         //add category
         $builder->add(
           'category',
-          'category', //@TODO M3 migration, somthing to change here when CategoryType done
+          'category',
           [
             'bundle' => 'point',
           ]
