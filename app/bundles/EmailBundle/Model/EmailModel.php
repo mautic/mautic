@@ -2188,18 +2188,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
-     *
-     * @param Email $entity
-     *
-     * @return array
-     */
-    public function getVariants(Email $entity)
-    {
-        return $entity->getVariants();
-    }
-
-    /**
      * @param        $type
      * @param string $filter
      * @param int    $limit
