@@ -285,10 +285,6 @@ class MessageQueueModel extends FormModel
                 $event  = new MessageQueueBatchProcessEvent($messages, $messageChannel, $messageChannelId);
                 $ignore = null;
                 $this->dispatchEvent('process_batch_message_queue', $ignore, false, $event);
-
-                // @deprecated support to be removed in 3.0
-                $event = new \Mautic\CoreBundle\Event\MessageQueueBatchProcessEvent($messages, $messageChannel, $messageChannelId);
-                $this->dispatchDeprecatedEvent('process_batch_message_queue', $event);
             }
         }
         unset($byChannel);
