@@ -121,12 +121,13 @@ return [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
                 'alias'     => 'notification_helper',
                 'arguments' => [
-                    'mautic.factory',
+                    'doctrine.orm.entity_manager',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                     'router',
                     'request_stack',
+                    'mautic.lead.model.dnc'
                 ],
             ],
         ],
@@ -134,7 +135,6 @@ return [
             'mautic.notification.api' => [
                 'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.http.connector',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
