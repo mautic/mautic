@@ -1429,66 +1429,6 @@ class EmailController extends FormController
     }
 
     /**
-     * Send example email to current user.
-     *
-     * @deprecated 2.5 to be removed in 3.0
-     *
-     * @param $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function exampleAction($objectId)
-    {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model  = $this->getModel('email');
-        $entity = $model->getEntity($objectId);
-
-        //not found or not allowed
-        if ($entity === null
-            || (!$this->get('mautic.security')->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
-                $entity->getCreatedBy()
-            ))
-        ) {
-            return $this->viewAction($objectId);
-        }
-
-        // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
-        array_walk(
-            $fields,
-            function (&$field) {
-                $field = "[$field]";
-            }
-        );
-        $fields['id'] = 0;
-
-        // Send to current user
-        $user  = $this->user;
-        $users = [
-            [
-                'id'        => $user->getId(),
-                'firstname' => $user->getFirstName(),
-                'lastname'  => $user->getLastName(),
-                'email'     => $user->getEmail(),
-            ],
-        ];
-
-        // Send to current user
-        $errors = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
-        if (count($errors)) {
-            $this->addFlash(implode('; ', $errors));
-        } else {
-            $this->addFlash('mautic.email.notice.test_sent.success');
-        }
-
-        return $this->viewAction($objectId);
-    }
-
-    /**
      * PreProcess page slots for public view.
      *
      * @param array $slots
