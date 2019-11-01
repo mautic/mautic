@@ -284,9 +284,13 @@ return [
         ],
         'forms' => [
             'mautic.form.type.email' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\EmailType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailform',
+                'class'     => \Mautic\EmailBundle\Form\Type\EmailType::class,
+                'arguments' => [
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'request_stack',
+                    'mautic.stage.model.stage',
+                ],
             ],
             'mautic.form.type.email.utm_tags' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailUtmTagsType',
