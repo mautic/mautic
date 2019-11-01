@@ -25,7 +25,7 @@ class YesNoButtonGroupType extends AbstractType
      */
     public function getParent()
     {
-        return 'button_group';
+        return ButtonGroupType::class;
     }
 
     /**
