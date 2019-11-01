@@ -32,6 +32,18 @@ class DateRangeType extends AbstractType
     private $coreParametersHelper;
 
     /**
+     * DateRangeType constructor.
+     *
+     * @param SessionInterface     $session
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(SessionInterface $session, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
