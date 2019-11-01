@@ -14,7 +14,12 @@ namespace Mautic\InstallBundle\Configurator\Form;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,7 +36,7 @@ class EmailStepType extends AbstractType
     {
         $builder->add(
             'mailer_from_name',
-            'text',
+            TextType::class,
             [
                 'label'      => false,
                 'label_attr' => ['class' => 'control-label'],
@@ -52,7 +57,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_from_email',
-            'email',
+            EmailType::class,
             [
                 'label'      => false,
                 'label_attr' => ['class' => 'control-label'],
@@ -79,7 +84,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_transport',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
@@ -104,7 +109,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.email.mailer_host',
                 'label_attr' => ['class' => 'control-label'],
@@ -116,7 +121,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.email.mailer_port',
                 'label_attr' => ['class' => 'control-label'],
@@ -128,7 +133,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_user',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.username',
                 'label_attr' => ['class' => 'control-label'],
@@ -140,7 +145,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.core.password',
                 'label_attr' => ['class' => 'control-label'],
@@ -155,9 +160,8 @@ class EmailStepType extends AbstractType
             'mailer_encryption',
             ButtonGroupType::class,
             [
-                'choice_list' => new ChoiceList(
-                    ['tls', 'ssl'],
-                    ['mautic.email.config.mailer_encryption.tls', 'mautic.email.config.mailer_encryption.ssl']
+                'choice_list' => new ArrayChoiceList(
+                    ['tls'=>'mautic.email.config.mailer_encryption.tls', 'ssl'=>'mautic.email.config.mailer_encryption.ssl']
                 ),
                 'label'       => 'mautic.install.form.email.encryption',
                 'expanded'    => true,
@@ -169,16 +173,11 @@ class EmailStepType extends AbstractType
             'mailer_auth_mode',
             'choice',
             [
-                'choice_list' => new ChoiceList(
+                'choice_list' => new ArrayChoiceList(
                     [
-                        'plain',
-                        'login',
-                        'cram-md5',
-                    ],
-                    [
-                        'mautic.email.config.mailer_auth_mode.plain',
-                        'mautic.email.config.mailer_auth_mode.login',
-                        'mautic.email.config.mailer_auth_mode.cram-md5',
+                        'plain'   => 'mautic.email.config.mailer_auth_mode.plain',
+                        'login'   => 'mautic.email.config.mailer_auth_mode.login',
+                        'cram-md5'=> 'mautic.email.config.mailer_auth_mode.cram-md5',
                     ]
                 ),
                 'label'       => 'mautic.install.form.email.auth_mode',
@@ -195,12 +194,9 @@ class EmailStepType extends AbstractType
             'mailer_spool_type',
             ButtonGroupType::class,
             [
-                'choice_list' => new ChoiceList(
-                    ['memory', 'file'],
-                    [
-                        'mautic.email.config.mailer_spool_type.memory',
-                        'mautic.email.config.mailer_spool_type.file',
-                    ]
+                'choice_list' => new ArrayChoiceList(
+                    ['memory'=> 'mautic.email.config.mailer_spool_type.memory',
+                      'file' => 'mautic.email.config.mailer_spool_type.file', ]
                 ),
                 'label'       => 'mautic.install.form.email.spool_type',
                 'expanded'    => true,
@@ -208,7 +204,7 @@ class EmailStepType extends AbstractType
             ]
         );
 
-        $builder->add('mailer_spool_path', 'hidden');
+        $builder->add('mailer_spool_path', HiddenType::class);
 
         $builder->add(
             'buttons',
@@ -240,7 +236,7 @@ class EmailStepType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'install_email_step';
     }
