@@ -59,8 +59,11 @@ return [
         ],
         'forms' => [
             'mautic.form.type.sms' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
+                'arguments' => [
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                ],
                 'alias'     => 'sms',
             ],
             'mautic.form.type.smsconfig' => [

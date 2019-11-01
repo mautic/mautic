@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,30 +11,38 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SmsType.
  */
 class SmsType extends AbstractType
 {
+    /**
+     * @var Translator
+     */
     private $translator;
-    private $em;
-    private $request;
 
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory)
+    private $em;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $entityManager
+     */
+    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->request    = $factory->getRequest();
+        $this->translator = $translator;
+        $this->em         = $entityManager;
     }
 
     /**
