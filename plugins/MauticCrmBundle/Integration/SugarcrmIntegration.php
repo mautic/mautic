@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -976,7 +977,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'keys') {
-            $builder->add('version', 'button_group', [
+            $builder->add('version', ButtonGroupType::class, [
                 'choices' => [
                     '6' => '6.x/community',
                     '7' => '7.x',
