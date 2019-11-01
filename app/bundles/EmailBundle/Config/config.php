@@ -46,13 +46,6 @@ return [
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST',
             ],
-
-            // @deprecated 2.6.0 to be removed in 3.0
-            'bc_mautic_api_sendcontactemail' => [
-                'path'       => '/emails/{id}/send/contact/{leadId}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
-                'method'     => 'POST',
-            ],
         ],
         'public' => [
             'mautic_plugin_tracker' => [
