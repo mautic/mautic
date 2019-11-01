@@ -112,7 +112,6 @@ return [
     ],
 
     'parameters' => [
-        'webhook_start'         => 0, // deprecated, should be 0 by default
         'webhook_limit'         => 10, // How many entities can be sent in one webhook
         'webhook_log_max'       => 1000, // How many recent logs to keep
         'webhook_disable_limit' => 100, // How many times the webhook response can fail until the webhook will be unpublished

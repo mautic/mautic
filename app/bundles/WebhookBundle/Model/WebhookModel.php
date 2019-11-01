@@ -53,13 +53,6 @@ class WebhookModel extends FormModel
     protected $queueMode;
 
     /**
-     * Deprecated property, should be 0 by default.
-     *
-     * @var int
-     */
-    protected $webhookStart;
-
-    /**
      * How many entities to add into one queued webhook.
      *
      * @var int
@@ -558,7 +551,7 @@ class WebhookModel extends FormModel
         return $queueRepo->getEntities(
             [
                 'iterator_mode' => true,
-                'start'         => $this->webhookStart,
+                'start'         => 0,
                 'limit'         => $this->webhookLimit,
                 'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
                 'orderByDir'    => $this->getEventsOrderbyDir($webhook),
@@ -684,7 +677,6 @@ class WebhookModel extends FormModel
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {
-        $this->webhookStart     = (int) $coreParametersHelper->getParameter('webhook_start', 0);
         $this->webhookLimit     = (int) $coreParametersHelper->getParameter('webhook_limit', 10);
         $this->disableLimit     = (int) $coreParametersHelper->getParameter('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);
