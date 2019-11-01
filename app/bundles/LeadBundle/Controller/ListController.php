@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -767,7 +768,7 @@ class ListController extends FormController
         $translator      = $this->get('translator');
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $stats           = $this->getModel('lead.list')->getSegmentContactsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),

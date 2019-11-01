@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -280,7 +281,7 @@ class PageController extends FormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_page_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());

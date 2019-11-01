@@ -12,6 +12,7 @@
 namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -394,7 +395,7 @@ class DynamicContentController extends FormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),

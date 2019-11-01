@@ -280,9 +280,11 @@ return [
                 'arguments' => ['mautic.helper.theme'],
             ],
             'mautic.form.type.daterange' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'daterange',
+                'class'     => \Mautic\CoreBundle\Form\Type\DateRangeType::class,
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'mautic.form.type.builder.section' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\BuilderSectionType',

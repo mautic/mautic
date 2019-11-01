@@ -13,6 +13,7 @@ namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -153,7 +154,7 @@ class AssetController extends FormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         if ($activeAsset === null) {
             //set the return URL
