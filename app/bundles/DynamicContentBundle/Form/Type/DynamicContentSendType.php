@@ -12,6 +12,7 @@
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
@@ -75,7 +76,7 @@ class DynamicContentSendType extends AbstractType
 
             $builder->add(
                 'newDynamicContentButton',
-                'button',
+                ButtonType::class,
                 [
                     'label' => 'mautic.dynamicContent.send.new.dynamicContent',
                     'attr'  => [
@@ -104,7 +105,7 @@ class DynamicContentSendType extends AbstractType
 
             $builder->add(
                 'editDynamicContentButton',
-                'button',
+                ButtonType::class,
                 [
                     'label' => 'mautic.dynamicContent.send.edit.dynamicContent',
                     'attr'  => [
