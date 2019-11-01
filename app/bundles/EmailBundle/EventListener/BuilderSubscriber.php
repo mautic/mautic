@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -165,7 +166,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
-                'slot_imagecaption',
+                SlotImageCaptionType::class,
                 850
             );
             $event->addSlotType(
