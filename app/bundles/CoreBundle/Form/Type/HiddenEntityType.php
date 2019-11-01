@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -63,7 +64,7 @@ class HiddenEntityType extends AbstractType
      */
     public function getParent()
     {
-        return 'hidden';
+        return HiddenType::class;
     }
 
     /**
