@@ -252,7 +252,7 @@ return [
                 'alias' => 'dynamiclist',
             ],
             'mautic.form.type.coreconfig' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\ConfigType',
+                'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.language',
@@ -261,7 +261,6 @@ return [
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
                 ],
-                'alias' => 'coreconfig',
             ],
             'mautic.form.type.themeconfig' => [
                 'class' => \Mautic\CoreBundle\Form\Type\ConfigThemeType::class,
