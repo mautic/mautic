@@ -23,6 +23,7 @@ use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
+use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -99,7 +100,7 @@ class PointModel extends CommonFormModel
             $options['pointActions'] = $this->getPointActions();
         }
 
-        return $formFactory->create('point', $entity, $options);
+        return $formFactory->create(PointType::class, $entity, $options);
     }
 
     /**

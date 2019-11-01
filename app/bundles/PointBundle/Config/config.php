@@ -130,7 +130,9 @@ return [
         'forms' => [
             'mautic.point.type.form' => [
                 'class'     => 'Mautic\PointBundle\Form\Type\PointType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                  'translator',
+                  'mautic.security', ],
                 'alias'     => 'point',
             ],
             'mautic.point.type.action' => [

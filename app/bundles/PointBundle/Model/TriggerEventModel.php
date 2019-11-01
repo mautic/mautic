@@ -12,6 +12,7 @@
 namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\LeadBundle\Form\Type\PointTriggerType;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -67,6 +68,6 @@ class TriggerEventModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('pointtriggerevent', $entity, $options);
+        return $formFactory->create(PointTriggerType::class, $entity, $options);
     }
 }
