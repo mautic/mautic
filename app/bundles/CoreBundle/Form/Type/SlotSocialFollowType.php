@@ -73,7 +73,7 @@ class SlotSocialFollowType extends SlotType
             ]
         );
 
-        $builder->add('align', 'button_group', [
+        $builder->add('align', ButtonGroupType::class, [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,

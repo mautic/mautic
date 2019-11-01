@@ -40,7 +40,7 @@ class SlotImageCaptionType extends SlotType
             ]
         );
 
-        $builder->add('align', 'button_group', [
+        $builder->add('align', ButtonGroupType::class, [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
@@ -54,7 +54,7 @@ class SlotImageCaptionType extends SlotType
             ),
         ]);
 
-        $builder->add('text-align', 'button_group', [
+        $builder->add('text-align', ButtonGroupType::class, [
             'label'      => 'mautic.core.caption.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,

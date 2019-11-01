@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -63,7 +64,7 @@ class EmailSendType extends AbstractType
         if (!empty($options['with_email_types'])) {
             $builder->add(
                 'email_type',
-                'button_group',
+                ButtonGroupType::class,
                 [
                     'choices' => [
                         'transactional' => 'mautic.email.send.emailtype.transactional',

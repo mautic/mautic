@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -81,7 +82,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'html_mode',
-            'button_group',
+            ButtonGroupType::class,
             [
                 'label'      => 'mautic.focus.form.html_mode',
                 'label_attr' => ['class' => 'control-label'],

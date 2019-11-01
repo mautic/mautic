@@ -25,7 +25,7 @@ class SlotImageType extends SlotType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('align', 'button_group', [
+        $builder->add('align', ButtonGroupType::class, [
             'label'      => 'mautic.core.image.position',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
