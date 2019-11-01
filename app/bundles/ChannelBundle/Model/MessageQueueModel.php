@@ -295,10 +295,6 @@ class MessageQueueModel extends FormModel
             if (!$message->isProcessed()) {
                 $event = new MessageQueueProcessEvent($message);
                 $this->dispatchEvent('process_message_queue', $message, false, $event);
-
-                // @deprecated support to be removed in 3.0
-                $event = new \Mautic\CoreBundle\Event\MessageQueueProcessEvent($message);
-                $this->dispatchDeprecatedEvent('process_message_queue', $event);
             }
 
             if ($message->isSuccess()) {
