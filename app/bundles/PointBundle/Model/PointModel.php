@@ -34,13 +34,6 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class PointModel extends CommonFormModel
 {
     /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
      * @var Session
      */
     protected $session;
@@ -254,7 +247,7 @@ class PointModel extends CommonFormModel
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->factory, // WHAT?
+                'factory'      => '', // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 

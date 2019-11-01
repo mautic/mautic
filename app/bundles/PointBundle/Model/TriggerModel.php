@@ -32,13 +32,6 @@ class TriggerModel extends CommonFormModel
     protected $triggers = [];
 
     /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
      * @var IpLookupHelper
      */
     protected $ipLookupHelper;
@@ -373,7 +366,7 @@ class TriggerModel extends CommonFormModel
         $args = [
           'event'   => $event,
           'lead'    => $lead,
-          'factory' => $this->factory, // WHAT??
+          'factory' => '',
           'config'  => $event['properties'],
         ];
 
