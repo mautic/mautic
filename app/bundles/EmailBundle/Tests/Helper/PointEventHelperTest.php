@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -12,7 +13,7 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testSendEmail()
     {
-        $helper = new self();
+        $helper = new PointEventHelper();
         $lead   = new Lead();
         $lead->setFields([
             'core' => [
