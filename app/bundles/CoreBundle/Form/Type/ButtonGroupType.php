@@ -54,4 +54,12 @@ class ButtonGroupType extends AbstractType
     {
         $view->vars['buttonBlockClass'] = $options['button_group_class'];
     }
+
+    /**
+     * @return string
+     */
+    public function getBlockPrefix()
+    {
+        return 'button_group';
+    }
 }
