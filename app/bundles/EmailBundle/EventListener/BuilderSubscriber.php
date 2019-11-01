@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -174,7 +175,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
-                'slot_button',
+                SlotButtonType::class,
                 800
             );
             $event->addSlotType(

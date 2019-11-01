@@ -306,7 +306,6 @@ return [
             ],
             'mautic.form.type.slot.button' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
-                'alias' => 'slot_button',
             ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
