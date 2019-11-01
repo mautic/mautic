@@ -105,7 +105,6 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.email.model.email',
-                    'mautic.helper.message',
                 ],
             ],
             'mautic.email.queue.subscriber' => [
@@ -613,14 +612,6 @@ return [
                     'mautic.lead.model.lead',
                     'event_dispatcher',
                     'monolog.logger.mautic',
-                ],
-            ],
-            'mautic.helper.message' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
-                'arguments' => [
-                    'mautic.message.processor.bounce',
-                    'mautic.message.processor.unsubscribe',
-                    'mautic.message.processor.feedbackloop',
                 ],
             ],
             'mautic.helper.mailer' => [
