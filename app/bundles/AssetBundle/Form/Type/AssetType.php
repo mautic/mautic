@@ -14,6 +14,7 @@ namespace Mautic\AssetBundle\Form\Type;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -63,7 +64,7 @@ class AssetType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
-        $builder->add('storageLocation', 'button_group', [
+        $builder->add('storageLocation', ButtonGroupType::class, [
             'label'   => 'mautic.asset.asset.form.storageLocation',
             'choices' => [
                 'mautic.asset.asset.form.storageLocation.local'  => 'local',
