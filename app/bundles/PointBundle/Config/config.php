@@ -133,11 +133,9 @@ return [
                 'arguments' => [
                   'translator',
                   'mautic.security', ],
-                'alias'     => 'point',
             ],
             'mautic.point.type.action' => [
                 'class' => 'Mautic\PointBundle\Form\Type\PointActionType',
-                'alias' => 'pointaction',
             ],
             'mautic.pointtrigger.type.form' => [
                 'class'     => 'Mautic\PointBundle\Form\Type\TriggerType',
@@ -148,11 +146,9 @@ return [
             ],
             'mautic.pointtrigger.type.action' => [
                 'class' => 'Mautic\PointBundle\Form\Type\TriggerEventType',
-                'alias' => 'pointtriggerevent',
             ],
             'mautic.point.type.genericpoint_settings' => [
                 'class' => 'Mautic\PointBundle\Form\Type\GenericPointSettingsType',
-                'alias' => 'genericpoint_settings',
             ],
         ],
         'models' => [
