@@ -676,7 +676,7 @@ class ConfigType extends AbstractType
             'email_frequency_number',
             'number',
             [
-                'precision'  => 0,
+                'scale'      => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
@@ -792,7 +792,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailconfig';
     }

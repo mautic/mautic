@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class FormSubmitActionUserEmailType.
@@ -46,7 +46,7 @@ class FormSubmitActionUserEmailType extends AbstractType
         ]);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'label' => false,
@@ -56,7 +56,7 @@ class FormSubmitActionUserEmailType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_submitaction_useremail';
     }

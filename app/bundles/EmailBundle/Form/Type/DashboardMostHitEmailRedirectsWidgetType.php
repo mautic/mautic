@@ -60,7 +60,7 @@ class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_dashboard_most_hit_email_redirects_widget';
     }

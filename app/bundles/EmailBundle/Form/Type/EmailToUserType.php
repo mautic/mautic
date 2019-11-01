@@ -76,7 +76,7 @@ class EmailToUserType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_to_user';
     }
