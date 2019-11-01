@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class HiddenEntityType.
+ *
+ * @deprecated to be removed in 3.0
  */
 class HiddenEntityType extends AbstractType
 {

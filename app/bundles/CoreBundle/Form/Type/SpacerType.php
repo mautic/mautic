@@ -19,6 +19,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class SpacerType.
+ *
+ * @deprecated to be removed in 3.0
  */
 class SpacerType extends AbstractType
 {
