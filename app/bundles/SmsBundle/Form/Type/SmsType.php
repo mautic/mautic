@@ -137,7 +137,7 @@ class SmsType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', FormButtonsType::class;
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['update_select'])) {
             $builder->add(

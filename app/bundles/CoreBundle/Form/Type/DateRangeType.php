@@ -11,24 +11,25 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Class FilterType.
  */
 class DateRangeType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var SessionInterface
+     */
+    private $session;
 
     /**
-     * @param MauticFactory $factory
+     * @var CoreParametersHelper
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
+    private $coreParametersHelper;
 
     /**
      * @param FormBuilderInterface $builder
@@ -37,14 +38,13 @@ class DateRangeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $humanFormat     = 'M j, Y';
-        $session         = $this->factory->get('session');
-        $sessionDateFrom = $session->get('mautic.daterange.form.from');
-        $sessionDateTo   = $session->get('mautic.daterange.form.to');
+        $sessionDateFrom = $this->session->get('mautic.daterange.form.from');
+        $sessionDateTo   = $this->session->get('mautic.daterange.form.to');
         if (!empty($sessionDateFrom) && !empty($sessionDateTo)) {
             $defaultFrom = new \DateTime($sessionDateFrom);
             $defaultTo   = new \DateTime($sessionDateTo);
         } else {
-            $dateRangeDefault = $this->factory->getParameter('default_daterange_filter', '-1 month');
+            $dateRangeDefault = $this->coreParametersHelper->getParameter('default_daterange_filter', '-1 month');
             $defaultFrom      = new \DateTime($dateRangeDefault);
             $defaultTo        = new \DateTime();
         }
@@ -98,14 +98,14 @@ class DateRangeType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $session->set('mautic.daterange.form.from', $dateFrom->format($humanFormat));
-        $session->set('mautic.daterange.form.to', $dateTo->format($humanFormat));
+        $this->session->set('mautic.daterange.form.from', $dateFrom->format($humanFormat));
+        $this->session->set('mautic.daterange.form.to', $dateTo->format($humanFormat));
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'daterange';
     }
