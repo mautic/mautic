@@ -12,26 +12,29 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class EmailSendType.
- */
 class EmailSendType extends AbstractType
 {
-    protected $factory;
+    /**
+     * @var RouterInterface
+     */
+    private $router;
 
     /**
-     * @param MauticFactory $factory
+     * @param RouterInterface $router
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(RouterInterface $router)
     {
-        $this->factory = $factory;
+        $this->router = $router;
     }
 
     /**
@@ -42,7 +45,7 @@ class EmailSendType extends AbstractType
     {
         $builder->add(
             'email',
-            'email_list',
+            EmailListType::class,
             [
                 'label'      => 'mautic.email.send.selectemails',
                 'label_attr' => ['class' => 'control-label'],
@@ -82,7 +85,7 @@ class EmailSendType extends AbstractType
         }
 
         if (!empty($options['update_select'])) {
-            $windowUrl = $this->factory->getRouter()->generate(
+            $windowUrl = $this->router->generate(
                 'mautic_email_action',
                 [
                     'objectAction' => 'new',
@@ -93,13 +96,13 @@ class EmailSendType extends AbstractType
 
             $builder->add(
                 'newEmailButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
                         'onclick' => 'Mautic.loadNewWindow({
-                        "windowUrl": "'.$windowUrl.'"
-                    })',
+                            "windowUrl": "'.$windowUrl.'"
+                        })',
                         'icon' => 'fa fa-plus',
                     ],
                     'label' => 'mautic.email.send.new.email',
@@ -107,7 +110,7 @@ class EmailSendType extends AbstractType
             );
 
             // create button edit email
-            $windowUrlEdit = $this->factory->getRouter()->generate(
+            $windowUrlEdit = $this->router->generate(
                 'mautic_email_action',
                 [
                     'objectAction' => 'edit',
@@ -119,7 +122,7 @@ class EmailSendType extends AbstractType
 
             $builder->add(
                 'editEmailButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
@@ -132,11 +135,11 @@ class EmailSendType extends AbstractType
             );
 
             // create button preview email
-            $windowUrlPreview = $this->factory->getRouter()->generate('mautic_email_preview', ['objectId' => 'emailId']);
+            $windowUrlPreview = $this->router->generate('mautic_email_preview', ['objectId' => 'emailId']);
 
             $builder->add(
                 'previewEmailButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
@@ -151,7 +154,7 @@ class EmailSendType extends AbstractType
                 $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
                 $builder->add(
                     'priority',
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices' => [
                             MessageQueue::PRIORITY_NORMAL => 'mautic.channel.message.send.priority.normal',
@@ -172,7 +175,7 @@ class EmailSendType extends AbstractType
                 $data = (!isset($options['data']['attempts'])) ? 3 : (int) $options['data']['attempts'];
                 $builder->add(
                     'attempts',
-                    'number',
+                    NumberType::class,
                     [
                         'label' => 'mautic.channel.message.send.attempts',
                         'attr'  => [
@@ -206,7 +209,7 @@ class EmailSendType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailsend_list';
     }

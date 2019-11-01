@@ -314,9 +314,8 @@ return [
                 'alias' => 'emailopen_list',
             ],
             'mautic.form.type.emailsend_list' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\EmailSendType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailsend_list',
+                'class'     => \Mautic\EmailBundle\Form\Type\EmailSendType::class,
+                'arguments' => ['router'],
             ],
             'mautic.form.type.formsubmit_sendemail_admin' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType',
