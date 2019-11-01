@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -70,7 +71,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],

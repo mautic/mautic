@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -1198,7 +1199,7 @@ class EmailController extends FormController
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);
         $pending  = $model->getPendingLeads($entity, null, true);
-        $form     = $this->get('form.factory')->create('batch_send', [], ['action' => $action]);
+        $form     = $this->get('form.factory')->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $this->request->request->get('complete', false);
 
         if ($this->request->getMethod() == 'POST' && ($complete || $this->isFormValid($form))) {

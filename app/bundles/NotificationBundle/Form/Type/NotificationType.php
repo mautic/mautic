@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -57,7 +58,7 @@ class NotificationType extends AbstractType
 
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
