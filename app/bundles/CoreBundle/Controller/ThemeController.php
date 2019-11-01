@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,7 +42,7 @@ class ThemeController extends FormController
         $themeHelper = $this->container->get('mautic.helper.theme');
         $dir         = $this->factory->getSystemPath('themes', true);
         $action      = $this->generateUrl('mautic_themes_index');
-        $form        = $this->get('form.factory')->create('theme_upload', [], ['action' => $action]);
+        $form        = $this->get('form.factory')->create(ThemeUploadType::class, [], ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
