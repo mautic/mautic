@@ -11,15 +11,10 @@
 
 namespace Mautic\AssetBundle\Controller;
 
-use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PublicController.
- */
 class PublicController extends CommonFormController
 {
     /**
@@ -63,6 +58,7 @@ class PublicController extends CommonFormController
                 $model->trackDownload($entity, $this->request, 301);
 
                 return $this->redirect($url, 301);
+            }
 
             if ($entity->isRemote()) {
                 $model->trackDownload($entity, $this->request, 200);
