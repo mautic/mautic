@@ -109,32 +109,28 @@ return [
         'forms' => [
             'mautic.stage.type.form' => [
                 'class'     => 'Mautic\StageBundle\Form\Type\StageType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stage',
+                'arguments' => [
+                    'translator',
+                    'mautic.security',
+                ],
             ],
             'mautic.stage.type.action' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageActionType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stageaction',
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
             ],
             'mautic.stage.type.action_list' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageActionListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stageaction_list',
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionListType',
             ],
             'mautic.stage.type.action_change' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stageaction_change',
+                'class' => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
             ],
             'mautic.stage.type.stage_list' => [
                 'class'     => 'Mautic\StageBundle\Form\Type\StageListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'stage_list',
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                ],
             ],
             'mautic.point.type.genericstage_settings' => [
                 'class' => 'Mautic\StageBundle\Form\Type\GenericStageSettingsType',
-                'alias' => 'genericstage_settings',
             ],
         ],
         'models' => [
@@ -143,6 +139,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'session',
+                    'mautic.helper.user',
         ],
     ],
 ],
