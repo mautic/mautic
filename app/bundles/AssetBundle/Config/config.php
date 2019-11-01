@@ -163,9 +163,12 @@ return [
                 'alias' => 'asset_submitaction_downloadfile',
             ],
             'mautic.form.type.assetlist' => [
-                'class'     => 'Mautic\AssetBundle\Form\Type\AssetListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'asset_list',
+                'class'     => \Mautic\AssetBundle\Form\Type\AssetListType::class,
+                'arguments' => [
+                    'mautic.security',
+                    'mautic.asset.model.asset',
+                    'mautic.helper.user',
+                ],
             ],
             'mautic.form.type.assetconfig' => [
                 'class'     => 'Mautic\AssetBundle\Form\Type\ConfigType',
