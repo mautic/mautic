@@ -377,7 +377,6 @@ return [
             ],
             'mautic.form.type.dynamic_content_filter' => [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
-                'alias' => 'dynamic_content_filter',
             ],
             'mautic.form.type.dynamic_content_filter_entry' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
