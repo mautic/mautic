@@ -226,9 +226,6 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.spacer' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SpacerType',
-            ],
             'mautic.form.type.tel' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\TelType',
                 'alias' => 'tel',
@@ -247,11 +244,6 @@ return [
             'mautic.form.type.form_buttons' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\FormButtonsType',
                 'alias' => 'form_buttons',
-            ],
-            'mautic.form.type.hidden_entity' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\HiddenEntityType',
-                'alias'     => 'hidden_entity',
-                'arguments' => 'doctrine.orm.entity_manager',
             ],
             'mautic.form.type.sortablelist' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
