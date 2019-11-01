@@ -11,10 +11,12 @@
 
 namespace Mautic\DashboardBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -25,14 +27,24 @@ use Symfony\Component\Form\FormEvents;
  */
 class WidgetType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var ContainerAwareEventDispatcher
+     */
+    protected $dispatcher;
 
     /**
-     * @param MauticFactory $factory
+     * @var CorePermissions
      */
-    public function __construct(MauticFactory $factory)
+    protected $security;
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     * @param CorePermissions          $security
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
     {
-        $this->factory = $factory;
+        $this->dispatcher = $dispatcher;
+        $this->security   = $security;
     }
 
     /**
@@ -48,10 +60,9 @@ class WidgetType extends AbstractType
             'required'   => false,
         ]);
 
-        $dispatcher = $this->factory->getDispatcher();
         $event      = new WidgetTypeListEvent();
-        $event->setSecurity($this->factory->getSecurity());
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $event->setSecurity($this->security);
+        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
         $builder->add('type', 'choice', [
             'label'       => 'mautic.dashboard.widget.form.type',
@@ -94,7 +105,7 @@ class WidgetType extends AbstractType
         ]);
 
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) use ($dispatcher) {
+        $func = function (FormEvent $e) {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();
@@ -115,7 +126,7 @@ class WidgetType extends AbstractType
             }
 
             $event->setType($type);
-            $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
+            $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
             $widgetForm = $event->getForm();
             $form->setData($params);
 
