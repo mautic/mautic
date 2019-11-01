@@ -15,6 +15,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -173,7 +174,7 @@ class AssetType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('buttons', 'form_buttons', []);
+        $builder->add('buttons', FormButtonsType::class, []);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

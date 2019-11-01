@@ -243,7 +243,6 @@ return [
             ],
             'mautic.form.type.form_buttons' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\FormButtonsType',
-                'alias' => 'form_buttons',
             ],
             'mautic.form.type.sortablelist' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',

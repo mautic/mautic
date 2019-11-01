@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
@@ -546,7 +547,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

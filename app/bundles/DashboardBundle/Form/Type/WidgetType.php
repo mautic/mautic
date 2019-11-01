@@ -12,6 +12,7 @@
 namespace Mautic\DashboardBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
@@ -130,7 +131,7 @@ class WidgetType extends AbstractType
             'mapped' => false,
         ]);
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'apply_text' => false,
             'save_text'  => 'mautic.core.form.save',
         ]);
