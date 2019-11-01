@@ -15,6 +15,7 @@ use DOMDocument;
 use DOMXPath;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
+use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -180,7 +181,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
-                'slot_imagecaption',
+                SlotImageCaptionType::class,
                 850
             );
             $event->addSlotType(
