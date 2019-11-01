@@ -83,7 +83,7 @@ class DynamicContentFilterType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dynamic_content_filter';
     }
