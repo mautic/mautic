@@ -142,25 +142,21 @@ return [
         ],
         'forms' => [
             'mautic.form.type.asset' => [
-                'class'     => 'Mautic\AssetBundle\Form\Type\AssetType',
+                'class'     => \Mautic\AssetBundle\Form\Type\AssetType::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.theme',
                     'mautic.asset.model.asset',
                 ],
-                'alias' => 'asset',
             ],
             'mautic.form.type.pointaction_assetdownload' => [
-                'class' => 'Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType',
-                'alias' => 'pointaction_assetdownload',
+                'class' => \Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType::class,
             ],
             'mautic.form.type.campaignevent_assetdownload' => [
-                'class' => 'Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType',
-                'alias' => 'campaignevent_assetdownload',
+                'class' => \Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType::class,
             ],
             'mautic.form.type.formsubmit_assetdownload' => [
-                'class' => 'Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType',
-                'alias' => 'asset_submitaction_downloadfile',
+                'class' => \Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType::class,
             ],
             'mautic.form.type.assetlist' => [
                 'class'     => \Mautic\AssetBundle\Form\Type\AssetListType::class,
@@ -171,13 +167,10 @@ return [
                 ],
             ],
             'mautic.form.type.assetconfig' => [
-                'class'     => 'Mautic\AssetBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'assetconfig',
+                'class' => \Mautic\AssetBundle\Form\Type\ConfigType::class,
             ],
             'mautic.form.type.asset_dashboard_downloads_in_time_widget' => [
-                'class' => 'Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType',
-                'alias' => 'asset_dashboard_downloads_in_time_widget',
+                'class' => \Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType::class,
             ],
         ],
         'others' => [
