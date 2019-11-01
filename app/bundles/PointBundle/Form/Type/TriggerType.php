@@ -11,12 +11,22 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class TriggerType.
@@ -36,10 +46,10 @@ class TriggerType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct($translator, CorePermissions $security)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
+        $this->translator = $translator;
+        $this->security   = $security;
     }
 
     /**
@@ -51,74 +61,74 @@ class TriggerType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add(
-            'name',
-            'text',
-            [
-                'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-            ]
+          'name',
+          TextType::class,
+          [
+            'label'      => 'mautic.core.name',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
+          ]
         );
 
         $builder->add(
-            'description',
-            'textarea',
-            [
-                'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control editor'],
-                'required'   => false,
-            ]
+          'description',
+          TextareaType::class,
+          [
+            'label'      => 'mautic.core.description',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control editor'],
+            'required'   => false,
+          ]
         );
 
         //add category
         $builder->add(
-            'category',
-            'category',
-            [
-                'bundle' => 'point',
-            ]
+          'category',
+          'category', //@TODO M3 migration, somthing to change here when CategoryType done
+          [
+            'bundle' => 'point',
+          ]
         );
 
         $builder->add(
-            'points',
-            'number',
-            [
-                'label'      => 'mautic.point.trigger.form.points',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.trigger.form.points_descr',
-                ],
-                'required' => false,
-            ]
+          'points',
+          NumberType::class,
+          [
+            'label'      => 'mautic.point.trigger.form.points',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+              'class'   => 'form-control',
+              'tooltip' => 'mautic.point.trigger.form.points_descr',
+            ],
+            'required' => false,
+          ]
         );
 
         $color = $options['data']->getColor();
 
         $builder->add(
-            'color',
-            'text',
-            [
-                'label'      => 'mautic.point.trigger.form.color',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'color',
-                    'tooltip'     => 'mautic.point.trigger.form.color_descr',
-                ],
-                'required'   => false,
-                'data'       => (!empty($color)) ? $color : 'a0acb8',
-                'empty_data' => 'a0acb8',
-            ]
+          'color',
+          TextType::class,
+          [
+            'label'      => 'mautic.point.trigger.form.color',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+              'class'       => 'form-control',
+              'data-toggle' => 'color',
+              'tooltip'     => 'mautic.point.trigger.form.color_descr',
+            ],
+            'required'   => false,
+            'data'       => (!empty($color)) ? $color : 'a0acb8',
+            'empty_data' => 'a0acb8',
+          ]
         );
 
         $builder->add(
-            'triggerExistingLeads',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.point.trigger.form.existingleads',
-            ]
+          'triggerExistingLeads',
+          YesNoButtonGroupType::class,
+          [
+            'label' => 'mautic.point.trigger.form.existingleads',
+          ]
         );
 
         if (!empty($options['data']) && $options['data']->getId()) {
@@ -133,55 +143,57 @@ class TriggerType extends AbstractType
         }
 
         $builder->add(
-            'isPublished',
-            'yesno_button_group',
-            [
-                'read_only' => $readonly,
-                'data'      => $data,
-            ]
+          'isPublished',
+          YesNoButtonGroupType::class,
+          [
+            'read_only' => $readonly,
+            'data'      => $data,
+          ]
         );
 
         $builder->add(
-            'publishUp',
-            'datetime',
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishup',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
+          'publishUp',
+          'datetime',
+          [
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishup',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+              'class'       => 'form-control',
+              'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+          ]
         );
 
         $builder->add(
-            'publishDown',
-            'datetime',
-            [
-                'widget'     => 'single_text',
-                'label'      => 'mautic.core.form.publishdown',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'data-toggle' => 'datetime',
-                ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
-            ]
+          'publishDown',
+          DateTimeType::class,
+          [
+            'widget'     => 'single_text',
+            'label'      => 'mautic.core.form.publishdown',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+              'class'       => 'form-control',
+              'data-toggle' => 'datetime',
+            ],
+            'format'   => 'yyyy-MM-dd HH:mm',
+            'required' => false,
+          ]
         );
 
         $builder->add(
-            'sessionId',
-            'hidden',
-            [
-                'mapped' => false,
-            ]
+          'sessionId',
+          HiddenType::class,
+          [
+            'mapped' => false,
+          ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons',
+          FormButtonsType::class
+        );
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -191,19 +203,19 @@ class TriggerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-            [
-                'data_class' => 'Mautic\PointBundle\Entity\Trigger',
-            ]
+          [
+            'data_class' => Trigger::class,
+          ]
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointtrigger';
     }

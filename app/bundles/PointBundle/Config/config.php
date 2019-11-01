@@ -139,8 +139,10 @@ return [
             ],
             'mautic.pointtrigger.type.form' => [
                 'class'     => 'Mautic\PointBundle\Form\Type\TriggerType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'pointtrigger',
+                'arguments' => [
+                  'translator',
+                  'mautic.security',
+                ],
             ],
             'mautic.pointtrigger.type.action' => [
                 'class' => 'Mautic\PointBundle\Form\Type\TriggerEventType',
