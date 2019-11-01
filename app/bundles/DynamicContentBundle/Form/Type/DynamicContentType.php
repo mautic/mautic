@@ -230,7 +230,7 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'translationParent',
-                'dwc_list',
+                DynamicContentListType::class,
                 [
                     'label'      => 'mautic.core.form.translation_parent',
                     'label_attr' => ['class' => 'control-label'],
@@ -360,7 +360,7 @@ class DynamicContentType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dwc';
     }

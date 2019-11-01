@@ -102,11 +102,9 @@ return [
                     'translator',
                     'mautic.lead.model.lead',
                 ],
-                'alias' => 'dwc',
             ],
             'mautic.form.type.dwc_entry_filters' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
-                'alias'     => 'dwc_entry_filters',
                 'arguments' => [
                     'translator',
                 ],
@@ -121,18 +119,15 @@ return [
                 'arguments' => [
                     'router',
                 ],
-                'alias' => 'dwcsend_list',
             ],
             'mautic.form.type.dwcdecision_list' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
                 'arguments' => [
                     'router',
                 ],
-                'alias' => 'dwcdecision_list',
             ],
             'mautic.form.type.dwc_list' => [
                 'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
-                'alias' => 'dwc_list',
             ],
         ],
         'models' => [
@@ -150,6 +145,7 @@ return [
                     'mautic.campaign.model.event',
                     'event_dispatcher',
                 ],
-            ], ],
+            ],
+        ],
     ],
 ];

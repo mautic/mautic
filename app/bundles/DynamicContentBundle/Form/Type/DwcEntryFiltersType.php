@@ -119,7 +119,7 @@ class DwcEntryFiltersType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dwc_entry_filters';
     }
