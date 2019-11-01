@@ -44,22 +44,23 @@ class ThemeListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'     => function (Options $options) {
+                'choices'           => function (Options $options) {
                     $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
                     $themes['mautic_code_mode'] = 'Code Mode';
 
-                    return $themes;
+                    return array_flip($themes);
                 },
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.core.form.theme',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.core.form.theme',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'required'          => false,
+                'attr'              => [
                     'class' => 'form-control',
                 ],
-                'feature'     => 'all',
+                'feature'           => 'all',
             ]
         );
     }
@@ -67,7 +68,7 @@ class ThemeListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'theme_list';
     }

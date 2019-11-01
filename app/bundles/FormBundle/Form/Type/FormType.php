@@ -15,6 +15,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -84,7 +85,7 @@ class FormType extends AbstractType
             ]
         );
 
-        $builder->add('template', 'theme_list', [
+        $builder->add('template', ThemeListType::class, [
             'feature'     => 'form',
             'empty_value' => ' ',
             'attr'        => [

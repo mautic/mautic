@@ -28,7 +28,7 @@ class ConfigThemeType extends AbstractType
     {
         $builder->add(
             'theme',
-            'theme_list',
+            ThemeListType::class,
             [
                 'label' => 'mautic.core.config.form.theme',
                 'attr'  => [

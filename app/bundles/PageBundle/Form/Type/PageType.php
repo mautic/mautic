@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\PageBundle\Entity\Page;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -33,11 +33,6 @@ class PageType extends AbstractType
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
     private $translator;
-
-    /**
-     * @var bool|mixed
-     */
-    private $defaultTheme;
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -103,16 +98,11 @@ class PageType extends AbstractType
             ]
         );
 
-        $template = $options['data']->getTemplate();
-        if (empty($template)) {
-            $template = $this->defaultTheme;
-        }
         $builder->add(
             'template',
-            'theme_list',
+            ThemeListType::class,
             [
                 'feature' => 'page',
-                'data'    => $template,
                 'attr'    => [
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.page.form.template.help',
