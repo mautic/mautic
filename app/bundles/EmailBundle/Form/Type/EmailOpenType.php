@@ -15,9 +15,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class EmailOpenType.
- */
 class EmailOpenType extends AbstractType
 {
     /**
@@ -45,7 +42,7 @@ class EmailOpenType extends AbstractType
             $defaultOptions = array_merge($defaultOptions, $options['list_options']);
         }
 
-        $builder->add('emails', 'email_list', $defaultOptions);
+        $builder->add('emails', EmailListType::class, $defaultOptions);
     }
 
     /**

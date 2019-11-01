@@ -12,11 +12,9 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class EmailUtmTagsType.
- */
 class EmailUtmTagsType extends AbstractType
 {
     /**
@@ -27,7 +25,7 @@ class EmailUtmTagsType extends AbstractType
     {
         $builder->add(
             'utmSource',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.campaign_source',
                 'label_attr' => ['class' => 'control-label'],
@@ -40,7 +38,7 @@ class EmailUtmTagsType extends AbstractType
 
         $builder->add(
             'utmMedium',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.campaign_medium',
                 'label_attr' => ['class' => 'control-label'],
@@ -53,7 +51,7 @@ class EmailUtmTagsType extends AbstractType
 
         $builder->add(
             'utmCampaign',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.email.campaign_name',
                 'label_attr' => ['class' => 'control-label'],
@@ -66,7 +64,7 @@ class EmailUtmTagsType extends AbstractType
 
         $builder->add(
             'utmContent',
-            'text',
+            TextType::class,
                 [
                 'label'      => 'mautic.email.campaign_content',
                 'label_attr' => ['class' => 'control-label'],

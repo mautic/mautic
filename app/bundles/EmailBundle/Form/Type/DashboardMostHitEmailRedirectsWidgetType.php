@@ -5,9 +5,6 @@ namespace Mautic\EmailBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardMostHitEmailRedirectsWidgetType.
- */
 class DashboardMostHitEmailRedirectsWidgetType extends AbstractType
 {
     /**

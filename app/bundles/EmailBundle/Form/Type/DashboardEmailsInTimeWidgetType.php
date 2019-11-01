@@ -12,11 +12,9 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardEmailsInTimeWidgetType.
- */
 class DashboardEmailsInTimeWidgetType extends AbstractType
 {
     /**
@@ -27,7 +25,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
     {
         $builder->add(
             'flag',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.email.flag.filter',
                 'choices'    => [

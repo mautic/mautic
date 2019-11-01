@@ -17,9 +17,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class EmailToUserType.
- */
 class EmailToUserType extends AbstractType
 {
     use ToBcBccFieldsTrait;
@@ -30,14 +27,16 @@ class EmailToUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('useremail', 'emailsend_list', [
-            'label' => 'mautic.email.emails',
-            'attr'  => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.email.choose.emails_descr',
-            ],
-            'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
-        ]);
+        $builder->add('useremail',
+            EmailSendType::class, [
+                'label' => 'mautic.email.emails',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.choose.emails_descr',
+                ],
+                'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
+            ]
+        );
 
         $builder->add('user_id', 'user_list', [
             'label'      => 'mautic.email.form.users',

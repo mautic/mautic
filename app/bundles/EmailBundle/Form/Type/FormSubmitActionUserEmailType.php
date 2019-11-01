@@ -15,9 +15,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FormSubmitActionUserEmailType.
- */
 class FormSubmitActionUserEmailType extends AbstractType
 {
     /**
@@ -26,14 +23,17 @@ class FormSubmitActionUserEmailType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('useremail', 'emailsend_list', [
-            'label' => 'mautic.email.emails',
-            'attr'  => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.email.choose.emails_descr',
-            ],
-            'update_select' => 'formaction_properties_useremail_email',
-        ]);
+        $builder->add('useremail',
+            EmailSendType::class,
+            [
+                'label' => 'mautic.email.emails',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.choose.emails_descr',
+                ],
+                'update_select' => 'formaction_properties_useremail_email',
+            ]
+        );
 
         $builder->add('user_id', 'user_list', [
             'label'      => 'mautic.email.form.users',

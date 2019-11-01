@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class EmailOpenType.
- */
 class EmailClickDecisionType extends AbstractType
 {
     /**

@@ -85,7 +85,7 @@ class VariantType extends AbstractType
                 ]
             );
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $criteria) {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
                 $form = $event->getForm();
                 $data = $event->getData();
 
