@@ -12,6 +12,7 @@
 namespace Mautic\PointBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
@@ -26,7 +27,7 @@ class GenericPointSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', 'number', [
+        $builder->add('delta', NumberType::class, [
             'label'      => 'mautic.point.action.delta',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -49,7 +50,7 @@ class GenericPointSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'genericpoint_settings';
     }
