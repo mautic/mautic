@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -111,7 +112,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'properties_select_template',
-            'sortablelist',
+            SortableListType::class,
             [
                 'mapped'          => false,
                 'label'           => 'mautic.lead.field.form.properties.select',
@@ -122,7 +123,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'properties_lookup_template',
-            'sortablelist',
+            SortableListType::class,
             [
                 'mapped'          => false,
                 'label'           => 'mautic.lead.field.form.properties.select',
@@ -236,7 +237,7 @@ class FieldType extends AbstractType
 
                     $form->add(
                         'properties',
-                        'sortablelist',
+                        SortableListType::class,
                         [
                             'required'          => false,
                             'label'             => 'mautic.lead.field.form.properties.select',
