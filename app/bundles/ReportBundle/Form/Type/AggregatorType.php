@@ -12,10 +12,11 @@
 namespace Mautic\ReportBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class AggregatorType.
@@ -35,7 +36,7 @@ class AggregatorType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // function
-        $builder->add('function', 'choice', [
+        $builder->add('function', ChoiceType::class, [
             'choices' => [
                 'COUNT' => $this->translator->trans('mautic.report.report.label.aggregators.count'),
                 'AVG'   => $this->translator->trans('mautic.report.report.label.aggregators.avg'),
@@ -55,7 +56,7 @@ class AggregatorType extends AbstractType
         ]);
 
         // Build a list of columns
-        $builder->add('column', 'choice', [
+        $builder->add('column', ChoiceType::class, [
             'choices'     => $options['columnList'],
             'expanded'    => false,
             'multiple'    => false,
@@ -82,7 +83,7 @@ class AggregatorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'aggregator';
     }
@@ -90,7 +91,7 @@ class AggregatorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'columnList' => [],

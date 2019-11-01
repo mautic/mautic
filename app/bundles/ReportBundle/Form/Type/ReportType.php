@@ -20,7 +20,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -219,7 +218,7 @@ class ReportType extends AbstractType
                     'filters',
                     ReportFiltersType::class,
                     [
-                        'type'    => 'filter_selector',
+                        'type'    => FilterSelectorType::class,
                         'label'   => false,
                         'options' => [
                             'filterList'   => $filters->choices,
@@ -244,7 +243,7 @@ class ReportType extends AbstractType
                     'aggregators',
                     CollectionType::class,
                     [
-                        'type'    => 'aggregator',
+                        'type'    => AggregatorType::class,
                         'label'   => false,
                         'options' => [
                             'columnList' => $groupByColumns->choices,
@@ -261,7 +260,7 @@ class ReportType extends AbstractType
                     'tableOrder',
                     CollectionType::class,
                     [
-                        'type'    => 'table_order',
+                        'type'    => TableOrderType::class,
                         'label'   => false,
                         'options' => [
                             'columnList' => $columns->choices,
@@ -284,11 +283,13 @@ class ReportType extends AbstractType
                         'attr'   => [
                             'class' => 'filter-value',
                         ],
-                        'data'        => 1,
-                        'choice_list' => new ChoiceList(
-                            [0, 1, 2],
-                            ['mautic.core.form.no', 'mautic.core.form.yes', 'mautic.core.filter.clear']
-                        ),
+                        'data'    => 1,
+                        'choices' => [
+                            'mautic.core.form.no'      => 0,
+                            'mautic.core.form.yes'     => 1,
+                            'mautic.core.filter.clear' => 2,
+                        ],
+                        'choices_as_values' => true,
                     ]
                 );
 
@@ -445,7 +446,7 @@ class ReportType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'report';
     }

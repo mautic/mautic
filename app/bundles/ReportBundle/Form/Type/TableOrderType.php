@@ -13,10 +13,11 @@ namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class FilterSelectorType.
@@ -39,7 +40,7 @@ class TableOrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Build a list of columns
-        $builder->add('column', 'choice', [
+        $builder->add('column', ChoiceType::class, [
             'choices'     => $options['columnList'],
             'expanded'    => false,
             'multiple'    => false,
@@ -53,7 +54,7 @@ class TableOrderType extends AbstractType
         ]);
 
         // Direction
-        $builder->add('direction', 'choice', [
+        $builder->add('direction', ChoiceType::class, [
             'choices' => [
                 'ASC'  => $this->translator->trans('mautic.report.report.label.tableorder_dir.asc'),
                 'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc'),
@@ -83,7 +84,7 @@ class TableOrderType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'table_order';
     }
@@ -91,7 +92,7 @@ class TableOrderType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'columnList' => [],

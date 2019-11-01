@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
 
@@ -645,7 +646,7 @@ class ReportController extends FormController
         }
 
         $dynamicFilterForm = $this->get('form.factory')->create(
-            'report_dynamicfilters',
+            DynamicFiltersType::class,
             $filterSettings,
             [
                 'action'            => $action,
