@@ -32,11 +32,7 @@ class ThemeUploadType extends AbstractType
                 'required' => true,
             ],
         ]);
-        $constraints = [
-            new \Symfony\Component\Validator\Constraints\NotBlank(
-                ['message' => 'mautic.core.value.required']
-            ),
-        ];
+
         $builder->add('start', 'submit', [
             'attr' => [
                 'class'   => 'btn btn-primary',
@@ -45,6 +41,7 @@ class ThemeUploadType extends AbstractType
             ],
             'label' => 'mautic.core.theme.install',
         ]);
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
@@ -53,7 +50,7 @@ class ThemeUploadType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'theme_upload';
     }

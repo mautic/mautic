@@ -370,8 +370,7 @@ return [
                 'alias' => 'slot_dwc',
             ],
             'mautic.form.type.theme.upload' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
-                'alias' => 'theme_upload',
+                'class' => \Mautic\CoreBundle\Form\Type\ThemeUploadType::class,
             ],
             'mautic.form.type.slot.dynamiccontent' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotDynamicContentType',
