@@ -16,13 +16,14 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AssetType.
- */
 class AssetType extends AbstractType
 {
     /**
@@ -41,8 +42,6 @@ class AssetType extends AbstractType
     private $assetModel;
 
     /**
-     * AssetType constructor.
-     *
      * @param TranslatorInterface $translator
      * @param ThemeHelper         $themeHelper
      * @param AssetModel          $assetModel
@@ -76,15 +75,23 @@ class AssetType extends AbstractType
         ]);
 
         $maxUploadSize = $this->assetModel->getMaxUploadSize('', true);
-        $builder->add('tempName', 'hidden', [
-            'label'      => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'tempName',
+            HiddenType::class,
+            [
+                'label'      => $this->translator->trans('mautic.asset.asset.form.file.upload', ['%max%' => $maxUploadSize]),
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('originalFileName', 'hidden', [
-            'required' => false,
-        ]);
+        $builder->add(
+            'originalFileName',
+            HiddenType::class,
+            [
+                'required' => false,
+            ]
+        );
         $builder->add(
             'disallow',
             'yesno_button_group',
@@ -98,35 +105,51 @@ class AssetType extends AbstractType
             ]
         );
 
-        $builder->add('remotePath', 'text', [
-            'label'      => 'mautic.asset.asset.form.remotePath',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'remotePath',
+            TextType::class,
+            [
+                'label'      => 'mautic.asset.asset.form.remotePath',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('title', 'text', [
-            'label'      => 'mautic.core.title',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'title',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.title',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
 
-        $builder->add('alias', 'text', [
-            'label'      => 'mautic.core.alias',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.asset.asset.help.alias',
-            ],
-            'required' => false,
-        ]);
+        $builder->add(
+            'alias',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.alias',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.asset.asset.help.alias',
+                ],
+                'required' => false,
+            ]
+        );
 
-        $builder->add('description', 'textarea', [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control editor'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
+                'required'   => false,
+            ]
+        );
 
         $builder->add('category', 'category', [
             'bundle' => 'asset',
@@ -156,21 +179,29 @@ class AssetType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('publishDown', 'datetime', [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-        ]);
+        $builder->add(
+            'publishDown',
+            DateTimeType::class,
+            [
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishdown',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'datetime',
+                ],
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
+            ]
+        );
 
-        $builder->add('tempId', 'hidden', [
-            'required' => false,
-        ]);
+        $builder->add(
+            'tempId',
+            HiddenType::class,
+            [
+                'required' => false,
+            ]
+        );
 
         $builder->add('buttons', 'form_buttons', []);
 
