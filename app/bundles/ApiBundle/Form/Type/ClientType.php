@@ -12,7 +12,6 @@
 namespace Mautic\ApiBundle\Form\Type;
 
 use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallback;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -22,7 +21,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 /**
  * Class ClientType.
@@ -45,19 +49,33 @@ class ClientType extends AbstractType
     private $apiMode;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
+     * @var \Symfony\Component\Routing\RouterInterface
      */
     private $router;
 
     /**
-     * @param MauticFactory $factory
+     * Constructor.
+     *
+     * @param TranslatorInterface $translator
+     * @param ValidatorInterface  $validator
+     * @param Request             $request
+     * @param Session             $session
+     * @param RouterInterface     $router
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->validator  = $factory->getValidator();
-        $this->apiMode    = $factory->getRequest()->get('api_mode', $factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
-        $this->router     = $factory->getRouter();
+    public function __construct(
+        TranslatorInterface $translator,
+        ValidatorInterface $validator,
+        Request $request,
+        Session $session,
+        RouterInterface $router
+    ) {
+        $this->translator = $translator;
+        $this->validator  = $validator;
+        $this->apiMode    = $request->get(
+            'api_mode',
+            $session->get('mautic.client.filter.api_mode', 'oauth1a')
+        );
+        $this->router     = $router;
     }
 
     /**

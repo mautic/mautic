@@ -125,7 +125,13 @@ return [
         'forms' => [
             'mautic.form.type.apiclients' => [
                 'class'     => 'Mautic\ApiBundle\Form\Type\ClientType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                    'validator',
+                    'request',
+                    'router',
+                    'session',
+                ],
                 'alias'     => 'client',
             ],
             'mautic.form.type.apiconfig' => [
