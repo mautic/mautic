@@ -326,8 +326,7 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCaptionType',
             ],
             'mautic.form.type.slot.socialshare' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialShareType',
-                'alias' => 'slot_socialshare',
+                'class' => \Mautic\CoreBundle\Form\Type\SlotSocialShareType::class,
             ],
             'mautic.form.type.slot.socialfollow' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
