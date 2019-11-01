@@ -228,7 +228,6 @@ return [
         'forms' => [
             'mautic.form.type.spacer' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SpacerType',
-                'alias' => 'spacer',
             ],
             'mautic.form.type.tel' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\TelType',
