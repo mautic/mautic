@@ -11,7 +11,9 @@
 
 namespace Mautic\InstallBundle\Configurator\Form;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -26,7 +28,7 @@ class CheckStepType extends AbstractType
     {
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'pre_extra_buttons' => [
                     [
@@ -46,9 +48,9 @@ class CheckStepType extends AbstractType
             ]
         );
 
-        $builder->add('site_url', 'hidden');
-        $builder->add('cache_path', 'hidden');
-        $builder->add('log_path', 'hidden');
+        $builder->add('site_url', HiddenType::class);
+        $builder->add('cache_path', HiddenType::class);
+        $builder->add('log_path', HiddenType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -58,7 +60,7 @@ class CheckStepType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'install_check_step';
     }

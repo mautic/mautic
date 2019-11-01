@@ -11,7 +11,11 @@
 
 namespace Mautic\InstallBundle\Configurator\Form;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,7 +47,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'firstname',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.core.firstname',
                 'label_attr'  => ['class' => 'control-label'],
@@ -62,7 +66,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'lastname',
-            'text',
+            TextType::class,
             [
                 'label'       => 'mautic.core.lastname',
                 'label_attr'  => ['class' => 'control-label'],
@@ -81,7 +85,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'email',
-            'email',
+            EmailType::class,
             [
                 'label'      => 'mautic.install.form.user.email',
                 'label_attr' => ['class' => 'control-label'],
@@ -108,7 +112,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'username',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.user.username',
                 'label_attr' => ['class' => 'control-label'],
@@ -129,7 +133,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.install.form.user.password',
                 'label_attr' => ['class' => 'control-label'],
@@ -157,7 +161,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'pre_extra_buttons' => [
                     [
@@ -185,7 +189,7 @@ class UserStepType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'install_user_step';
     }
