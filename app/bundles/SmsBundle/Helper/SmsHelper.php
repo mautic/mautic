@@ -47,11 +47,6 @@ class SmsHelper
     protected $integrationHelper;
 
     /**
-     * @var bool
-     */
-    private $disableTrackableUrls;
-
-    /**
      * SmsHelper constructor.
      *
      * @param EntityManager     $em
@@ -67,10 +62,6 @@ class SmsHelper
         $this->phoneNumberHelper    = $phoneNumberHelper;
         $this->smsModel             = $smsModel;
         $this->integrationHelper    = $integrationHelper;
-        $integration                = $integrationHelper->getIntegrationObject('Twilio');
-        $settings                   = $integration->getIntegrationSettings()->getFeatureSettings();
-        $this->smsFrequencyNumber   = $settings['frequency_number'];
-        $this->disableTrackableUrls = !empty($settings['disable_trackable_urls']) ? true : false;
     }
 
     public function unsubscribe($number)
@@ -117,6 +108,9 @@ class SmsHelper
      */
     public function getDisableTrackableUrls()
     {
-        return $this->disableTrackableUrls;
+        $integration                = $this->integrationHelper->getIntegrationObject('Twilio');
+        $settings                   = $integration->getIntegrationSettings()->getFeatureSettings();
+
+        return !empty($settings['disable_trackable_urls']) ? true : false;
     }
 }
