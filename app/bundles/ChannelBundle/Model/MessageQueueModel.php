@@ -384,9 +384,6 @@ class MessageQueueModel extends FormModel
                 break;
             case 'post_save':
                 $name = ChannelEvents::MESSAGE_QUEUED;
-
-                // @deprecated 2.4 to be removed in 3.0; BC support
-                $this->dispatchDeprecatedEvent($action, null, $entity, $isNew);
                 break;
             default:
                 return null;
@@ -397,48 +394,6 @@ class MessageQueueModel extends FormModel
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
-
-            return $event;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Process deprecated message events.
-     *
-     * @deprecated 2.4 to be removed in 3.0; BC for deprecated events
-     *
-     * @param $action
-     * @param $event
-     * @param $entity
-     * @param $isNew
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
-     *
-     * @return Event|null
-     */
-    protected function dispatchDeprecatedEvent($action, Event $event = null, $entity = null, $isNew = null)
-    {
-        switch ($action) {
-            case 'process_message_queue':
-                $name = \Mautic\CoreBundle\CoreEvents::PROCESS_MESSAGE_QUEUE;
-                break;
-            case 'process_batch_message_queue':
-                $name = \Mautic\CoreBundle\CoreEvents::PROCESS_MESSAGE_QUEUE_BATCH;
-                break;
-            case 'post_save':
-                $name = \Mautic\CoreBundle\CoreEvents::MESSAGE_QUEUED;
-
-                $event = new \Mautic\CoreBundle\Event\MessageQueueEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
