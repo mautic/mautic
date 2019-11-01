@@ -125,10 +125,10 @@ return [
                 ],
             ],
             'mautic.form.type.filter_selector' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\FilterSelectorType',
+                'class' => \Mautic\ReportBundle\Form\Type\FilterSelectorType::class,
             ],
             'mautic.form.type.table_order' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\TableOrderType',
+                'class'     => \Mautic\ReportBundle\Form\Type\TableOrderType::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -145,7 +145,7 @@ return [
                 'arguments' => 'mautic.report.model.report',
             ],
             'mautic.form.type.aggregator' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\AggregatorType',
+                'class'     => \Mautic\ReportBundle\Form\Type\AggregatorType::class,
                 'arguments' => 'translator',
             ],
             'mautic.form.type.report.settings' => [
