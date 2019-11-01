@@ -183,7 +183,7 @@ class SendEmailToContact
         // Enable the queue if applicable to the transport
         $this->mailer->enableQueue();
 
-        if ($this->mailer->setEmail($email, true, $slots, $assetAttachments)) {
+        if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
