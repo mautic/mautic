@@ -17,6 +17,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
+use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -256,7 +257,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.successmessage'),
                     'check',
                     'MauticCoreBundle:Slots:successmessage.html.php',
-                    'slot_successmessage',
+                    SlotSuccessMessageType::class,
                     540
                 );
             }
