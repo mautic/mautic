@@ -11,7 +11,7 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -29,9 +29,9 @@ class TableOrderType extends AbstractType
      */
     private $translator;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(Translator $translator)
     {
-        $this->translator = $factory->getTranslator();
+        $this->translator = $translator;
     }
 
     /**

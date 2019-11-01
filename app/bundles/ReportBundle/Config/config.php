@@ -129,7 +129,9 @@ return [
             ],
             'mautic.form.type.table_order' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\TableOrderType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.report_filters' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
