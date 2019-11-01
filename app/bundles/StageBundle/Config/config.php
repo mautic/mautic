@@ -118,7 +118,10 @@ return [
                 'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
             ],
             'mautic.stage.type.action_list' => [
-                'class' => 'Mautic\StageBundle\Form\Type\StageActionListType',
+                'class'     => 'Mautic\StageBundle\Form\Type\StageActionListType',
+                'arguments' => [
+                    'mautic.stage.model.stage',
+                ],
             ],
             'mautic.stage.type.action_change' => [
                 'class' => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
