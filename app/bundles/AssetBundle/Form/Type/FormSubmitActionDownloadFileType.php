@@ -61,7 +61,7 @@ class FormSubmitActionDownloadFileType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'asset_submitaction_downloadfile';
     }

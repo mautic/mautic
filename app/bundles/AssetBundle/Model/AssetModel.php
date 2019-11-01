@@ -17,6 +17,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Event\AssetEvent;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -384,7 +385,7 @@ class AssetModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('asset', $entity, $options);
+        return $formFactory->create(AssetType::class, $entity, $options);
     }
 
     /**
