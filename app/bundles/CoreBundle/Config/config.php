@@ -247,7 +247,6 @@ return [
             ],
             'mautic.form.type.sortablelist' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
-                'alias' => 'sortablelist',
             ],
             'mautic.form.type.dynamiclist' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\DynamicListType',
