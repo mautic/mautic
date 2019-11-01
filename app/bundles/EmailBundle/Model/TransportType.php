@@ -217,16 +217,6 @@ class TransportType
      *
      * @return string
      */
-    public function getServiceRequiresLogin()
-    {
-        return $this->getServiceRequiresUser();
-    }
-
-    /**
-     * @deprecated 2.14.0 to be removed in 3.0
-     *
-     * @return string
-     */
     public function getServiceDoNotNeedLogin()
     {
         return $this->getServiceDoNotNeedUser();
