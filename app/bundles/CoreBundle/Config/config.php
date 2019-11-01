@@ -854,10 +854,7 @@ return [
                 'arguments' => [
                     'event_dispatcher',
                 ],
-                'tag'          => 'form.type_extension',
-                'tagArguments' => [
-                    'alias' => 'form',
-                ],
+                'tag'       => 'form.type_extension',
             ],
 
             // Twig
