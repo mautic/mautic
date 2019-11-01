@@ -280,7 +280,6 @@ return [
             'mautic.form.type.theme_list' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\ThemeListType::class,
                 'arguments' => ['mautic.helper.theme'],
-                'alias'     => 'theme_list',
             ],
             'mautic.form.type.daterange' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\DateRangeType',
