@@ -33,7 +33,7 @@ class EventCanvasSettingsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_canvassettings';
     }

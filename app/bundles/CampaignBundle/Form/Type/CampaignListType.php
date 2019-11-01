@@ -85,7 +85,7 @@ class CampaignListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaign_list';
     }

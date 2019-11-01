@@ -123,7 +123,7 @@ class CampaignLeadSourceType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaign_leadsource';
     }

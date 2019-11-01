@@ -295,7 +295,7 @@ class EventType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent';
     }

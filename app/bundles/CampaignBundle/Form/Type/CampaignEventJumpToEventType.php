@@ -59,7 +59,7 @@ class CampaignEventJumpToEventType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_jump_to_event';
     }
