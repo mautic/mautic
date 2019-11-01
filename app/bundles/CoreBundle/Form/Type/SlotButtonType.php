@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -70,10 +69,12 @@ class SlotButtonType extends SlotType
                 'class'           => 'form-control',
                 'data-slot-param' => 'button-size',
             ],
-            'choice_list' => new ChoiceList(
-                ['s', 'm', 'l'],
-                ['S', 'M', 'L']
-            ),
+            'choices' => [
+                'S' => 's',
+                'M' => 'm',
+                'L' => 'l',
+            ],
+            'choices_as_values' => true,
         ]);
 
         $builder->add('float', ButtonGroupType::class, [
@@ -84,10 +85,12 @@ class SlotButtonType extends SlotType
                 'class'           => 'form-control',
                 'data-slot-param' => 'float',
             ],
-            'choice_list' => new ChoiceList(
-                ['left', 'center', 'right'],
-                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
-            ),
+            'choices' => [
+                'mautic.core.left'   => 'left',
+                'mautic.core.center' => 'center',
+                'mautic.core.right'  => 'right',
+            ],
+            'choices_as_values' => true,
         ]);
 
         $builder->add('background-color', 'text', [
