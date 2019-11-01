@@ -166,9 +166,9 @@ class RestrictionHelperTest extends TypeTestCase
     {
         $form = $this->factory->create(ConfigType::class, $this->forms);
 
-        $this->assertTrue($form->has('emailconfig'));
+        $this->assertTrue($form->has(EmailConfigType::class));
 
-        $emailConfig = $form->get('emailconfig');
+        $emailConfig = $form->get(EmailConfigType::class);
 
         // mailer_api_key is restricted and so should not be included
         $this->assertFalse($emailConfig->has('mailer_api_key'));
