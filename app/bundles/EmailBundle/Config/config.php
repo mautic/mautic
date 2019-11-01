@@ -297,9 +297,8 @@ return [
                 'alias' => 'utm_tags',
             ],
             'mautic.form.type.emailvariant' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\VariantType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'emailvariant',
+                'class'     => \Mautic\EmailBundle\Form\Type\VariantType::class,
+                'arguments' => ['mautic.email.model.email'],
             ],
             'mautic.form.type.email_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailListType',
@@ -685,7 +684,7 @@ return [
         ],
         'models' => [
             'mautic.email.model.email' => [
-                'class'     => 'Mautic\EmailBundle\Model\EmailModel',
+                'class'     => \Mautic\EmailBundle\Model\EmailModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.helper.theme',
