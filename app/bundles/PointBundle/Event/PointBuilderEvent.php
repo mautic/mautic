@@ -120,7 +120,7 @@ class PointBuilderEvent extends Event
         $choices = [];
         $actions = $this->getActions();
         foreach ($this->actions as $k => $c) {
-            $choices[$c['group']][$k] = $c['label'];
+            $choices[$c['group']][$c['label']] = $k;
         }
 
         return $choices;
