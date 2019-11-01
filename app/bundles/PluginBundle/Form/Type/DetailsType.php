@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -123,7 +124,7 @@ class DetailsType extends AbstractType
 
         $builder->add('in_auth', 'hidden', ['mapped' => false]);
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

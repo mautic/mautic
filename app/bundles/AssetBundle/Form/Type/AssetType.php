@@ -17,6 +17,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -202,7 +203,7 @@ class AssetType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons', []);
+        $builder->add('buttons', FormButtonsType::class, []);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

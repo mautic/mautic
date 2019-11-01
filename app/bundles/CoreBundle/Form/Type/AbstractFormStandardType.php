@@ -183,7 +183,7 @@ abstract class AbstractFormStandardType extends AbstractType
             if (!$builder->has('buttons')) {
                 $builder->add(
                     'buttons',
-                    'form_buttons',
+                    FormButtonsType::class,
                     array_merge(
                         ['apply_text' => false],
                         $buttonOptions
@@ -205,7 +205,7 @@ abstract class AbstractFormStandardType extends AbstractType
         } elseif (!$builder->has('buttons')) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 $buttonOptions
             );
         }
