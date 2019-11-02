@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
 use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
+use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
 use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
@@ -275,7 +276,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
                 'MauticCoreBundle:Slots:codemode.html.php',
-                'slot_codemode',
+                SlotCodeModeType::class,
                 500
             );
             $event->addSlotType(
