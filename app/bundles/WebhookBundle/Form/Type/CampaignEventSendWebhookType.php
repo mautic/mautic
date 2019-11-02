@@ -13,6 +13,8 @@ namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -70,7 +72,7 @@ class CampaignEventSendWebhookType extends AbstractType
 
         $builder->add(
             'method',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'get'    => 'GET',
@@ -114,7 +116,7 @@ class CampaignEventSendWebhookType extends AbstractType
 
         $builder->add(
             'timeout',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.webhook.event.sendwebhook.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -130,7 +132,7 @@ class CampaignEventSendWebhookType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_sendwebhook';
     }
