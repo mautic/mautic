@@ -37,7 +37,7 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $event->addForm(
             [
-                'formAlias'  => 'social_config',
+                'formAlias'  => ConfigType::class,
                 'formTheme'  => 'MauticSocialBundle:FormTheme\Config',
                 'formType'   => ConfigType::class,
                 'parameters' => $event->getParametersFromConfig('MauticSocialBundle'),

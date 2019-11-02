@@ -126,7 +126,6 @@ return [
             ],
             'mautic.social.config' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\ConfigType',
-                'alias'     => 'social_config',
                 'arguments' => 'mautic.lead.model.field',
             ],
             'mautic.social.tweet.list' => [
