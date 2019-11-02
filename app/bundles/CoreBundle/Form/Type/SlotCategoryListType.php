@@ -50,7 +50,7 @@ class SlotCategoryListType extends SlotType
     /**
      * @return mixed
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_categorylist';
     }
