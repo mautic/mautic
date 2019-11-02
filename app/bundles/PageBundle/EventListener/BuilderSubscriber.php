@@ -16,6 +16,7 @@ use DOMXPath;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
+use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
@@ -291,7 +292,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'sticky-note-o',
                 'MauticCoreBundle:Slots:dwc.html.php',
-                'slot_dwc',
+                SlotDwcType::class,
                 200
             );
         }

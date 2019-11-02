@@ -365,8 +365,7 @@ return [
                 'alias' => 'slot_codemode',
             ],
             'mautic.form.type.slot.dwc' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotDwcType',
-                'alias' => 'slot_dwc',
+                'class' => \Mautic\CoreBundle\Form\Type\SlotDwcType::class,
             ],
             'mautic.form.type.theme.upload' => [
                 'class' => \Mautic\CoreBundle\Form\Type\ThemeUploadType::class,
