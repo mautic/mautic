@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
+use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -186,7 +187,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot_socialfollow',
+                SlotSocialFollowType::class,
                 600
             );
             $event->addSlotType(

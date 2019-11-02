@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotImageType;
 use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
+use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
 use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
@@ -215,7 +216,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot_socialfollow',
+                SlotSocialFollowType::class,
                 600
             );
             if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
