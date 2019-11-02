@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -59,28 +60,36 @@ class LeadPermissions extends AbstractPermissions
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
 
-        $builder->add('lead:lists', 'permissionlist', [
-            'choices' => [
-                'viewother'   => 'mautic.core.permissions.viewother',
-                'editother'   => 'mautic.core.permissions.editother',
-                'deleteother' => 'mautic.core.permissions.deleteother',
-                'full'        => 'mautic.core.permissions.full',
-            ],
-            'label'  => 'mautic.lead.permissions.lists',
-            'data'   => (!empty($data['lists']) ? $data['lists'] : []),
-            'bundle' => 'lead',
-            'level'  => 'lists',
-        ]);
+        $builder->add(
+            'lead:lists',
+            PermissionListType::class,
+            [
+                'choices' => [
+                    'viewother'   => 'mautic.core.permissions.viewother',
+                    'editother'   => 'mautic.core.permissions.editother',
+                    'deleteother' => 'mautic.core.permissions.deleteother',
+                    'full'        => 'mautic.core.permissions.full',
+                ],
+                'label'  => 'mautic.lead.permissions.lists',
+                'data'   => (!empty($data['lists']) ? $data['lists'] : []),
+                'bundle' => 'lead',
+                'level'  => 'lists',
+            ]
+        );
 
-        $builder->add('lead:fields', 'permissionlist', [
-            'choices' => [
-                'full' => 'mautic.core.permissions.manage',
-            ],
-            'label'  => 'mautic.lead.permissions.fields',
-            'data'   => (!empty($data['fields']) ? $data['fields'] : []),
-            'bundle' => 'lead',
-            'level'  => 'fields',
-        ]);
+        $builder->add(
+            'lead:fields',
+            PermissionListType::class,
+            [
+                'choices' => [
+                    'full' => 'mautic.core.permissions.manage',
+                ],
+                'label'  => 'mautic.lead.permissions.fields',
+                'data'   => (!empty($data['fields']) ? $data['fields'] : []),
+                'bundle' => 'lead',
+                'level'  => 'fields',
+            ]
+        );
 
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }

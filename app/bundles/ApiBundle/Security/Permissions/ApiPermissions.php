@@ -12,6 +12,7 @@
 namespace Mautic\ApiBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -47,15 +48,19 @@ class ApiPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        $builder->add('api:access', 'permissionlist', [
-            'choices' => [
-                'full' => 'mautic.api.permissions.granted',
-            ],
-            'label'  => 'mautic.api.permissions.apiaccess',
-            'data'   => (!empty($data['access']) ? $data['access'] : []),
-            'bundle' => 'api',
-            'level'  => 'access',
-        ]);
+        $builder->add(
+            'api:access',
+            PermissionListType::class,
+            [
+                'choices' => [
+                    'full' => 'mautic.api.permissions.granted',
+                ],
+                'label'  => 'mautic.api.permissions.apiaccess',
+                'data'   => (!empty($data['access']) ? $data['access'] : []),
+                'bundle' => 'api',
+                'level'  => 'access',
+            ]
+        );
 
         $this->addStandardFormFields('api', 'clients', $builder, $data, false);
     }

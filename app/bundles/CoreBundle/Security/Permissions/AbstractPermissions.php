@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -379,13 +380,17 @@ abstract class AbstractPermissions
         $choices['full'] = 'mautic.core.permissions.full';
 
         $label = ($level == 'categories') ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
-        $builder->add("$bundle:$level", 'permissionlist', [
-            'choices' => $choices,
-            'label'   => $label,
-            'bundle'  => $bundle,
-            'level'   => $level,
-            'data'    => (!empty($data[$level]) ? $data[$level] : []),
-        ]);
+        $builder->add(
+            "$bundle:$level",
+            PermissionListType::class,
+            [
+                'choices' => $choices,
+                'label'   => $label,
+                'bundle'  => $bundle,
+                'level'   => $level,
+                'data'    => (!empty($data[$level]) ? $data[$level] : []),
+            ]
+        );
     }
 
     /**
@@ -420,13 +425,17 @@ abstract class AbstractPermissions
             'manage' => 'mautic.core.permissions.manage',
         ];
 
-        $builder->add("$bundle:$level", 'permissionlist', [
-            'choices' => $choices,
-            'label'   => "mautic.$bundle.permissions.$level",
-            'data'    => (!empty($data[$level]) ? $data[$level] : []),
-            'bundle'  => $bundle,
-            'level'   => $level,
-        ]);
+        $builder->add(
+            "$bundle:$level",
+            PermissionListType::class,
+            [
+                'choices' => $choices,
+                'label'   => "mautic.$bundle.permissions.$level",
+                'data'    => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'  => $bundle,
+                'level'   => $level,
+            ]
+        );
     }
 
     /**
@@ -496,7 +505,10 @@ abstract class AbstractPermissions
                 'full'        => 'mautic.core.permissions.full',
             ];
 
-        $builder->add("$bundle:$level", 'permissionlist', [
+        $builder->add(
+            "$bundle:$level",
+            PermissionListType::class,
+            [
                 'choices' => $choices,
                 'label'   => "mautic.$bundle.permissions.$level",
                 'data'    => (!empty($data[$level]) ? $data[$level] : []),

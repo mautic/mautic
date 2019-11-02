@@ -12,6 +12,7 @@
 namespace Mautic\UserBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -56,7 +57,7 @@ class UserPermissions extends AbstractPermissions
 
         $builder->add(
             'user:profile',
-            'permissionlist',
+            PermissionListType::class,
             [
                 'choices' => [
                     'editname'     => 'mautic.user.account.permissions.editname',

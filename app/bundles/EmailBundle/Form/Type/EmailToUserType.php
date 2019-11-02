@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -39,15 +40,19 @@ class EmailToUserType extends AbstractType
             'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
         ]);
 
-        $builder->add('user_id', 'user_list', [
-            'label'      => 'mautic.email.form.users',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.help.autocomplete',
-            ],
-            'required' => false,
-        ]);
+        $builder->add(
+            'user_id',
+            UserListType::class,
+            [
+                'label'      => 'mautic.email.form.users',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.help.autocomplete',
+                ],
+                'required' => false,
+            ]
+        );
 
         $builder->add(
             'to_owner',
