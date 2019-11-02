@@ -213,7 +213,10 @@ return [
             ],
             'mautic.form.type.pagelist' => [
                 'class'     => 'Mautic\PageBundle\Form\Type\PageListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'mautic.security',
+                ],
                 'alias'     => 'page_list',
             ],
             'mautic.form.type.preferencecenterlist' => [
