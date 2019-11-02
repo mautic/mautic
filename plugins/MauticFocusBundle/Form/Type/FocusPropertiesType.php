@@ -11,9 +11,11 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusPropertiesType extends AbstractType
 {
@@ -28,7 +30,7 @@ class FocusPropertiesType extends AbstractType
             case 'bar':
                 $builder->add(
                     'allow_hide',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.allow_hide',
                         'data'  => (isset($options['data']['allow_hide'])) ? $options['data']['allow_hide'] : true,
@@ -40,7 +42,7 @@ class FocusPropertiesType extends AbstractType
 
                 $builder->add(
                     'push_page',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.push_page',
                         'attr'  => [
@@ -53,7 +55,7 @@ class FocusPropertiesType extends AbstractType
 
                 $builder->add(
                     'sticky',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.sticky',
                         'attr'  => [
@@ -66,7 +68,7 @@ class FocusPropertiesType extends AbstractType
 
                 $builder->add(
                     'size',
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices' => [
                             'large'   => 'mautic.focus.form.bar.size.large',
@@ -110,7 +112,7 @@ class FocusPropertiesType extends AbstractType
         if (!empty($choices)) {
             $builder->add(
                 'placement',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'    => $choices,
                     'label'      => 'mautic.focus.form.placement',
@@ -126,7 +128,7 @@ class FocusPropertiesType extends AbstractType
         }
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus_properties';
     }
@@ -134,7 +136,7 @@ class FocusPropertiesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['focus_style']);
 

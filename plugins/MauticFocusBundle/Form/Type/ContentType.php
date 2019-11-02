@@ -11,9 +11,12 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContentType extends AbstractType
 {
@@ -25,7 +28,7 @@ class ContentType extends AbstractType
     {
         $builder->add(
             'headline',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.headline',
                 'label_attr' => ['class' => 'control-label'],
@@ -40,7 +43,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'tagline',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.tagline',
                 'label_attr' => ['class' => 'control-label'],
@@ -56,7 +59,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.link_text',
                 'label_attr' => ['class' => 'control-label'],
@@ -70,7 +73,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_url',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.focus.form.link_url',
                 'label_attr' => ['class' => 'control-label'],
@@ -84,7 +87,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_new_window',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.link_new_window',
                 'data'  => (isset($options['link_new_window'])) ? $options['link_new_window'] : true,
@@ -97,7 +100,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'font',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'Arial, Helvetica, sans-serif'                             => 'Arial',
@@ -132,7 +135,7 @@ class ContentType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus_content';
     }
@@ -140,7 +143,7 @@ class ContentType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
