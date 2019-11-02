@@ -293,10 +293,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.form.type.slot.image' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
-                'alias' => 'slot_image',
-            ],
             'mautic.form.type.slot.socialfollow' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
                 'alias' => 'slot_socialfollow',

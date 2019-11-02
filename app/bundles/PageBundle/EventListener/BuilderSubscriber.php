@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
 use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotImageType;
 use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
 use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
@@ -174,7 +175,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot_image',
+                SlotImageType::class,
                 900
             );
             $event->addSlotType(
