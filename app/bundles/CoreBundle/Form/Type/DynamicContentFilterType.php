@@ -12,6 +12,9 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,7 +31,7 @@ class DynamicContentFilterType extends AbstractType
     {
         $builder->add(
             'tokenName',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.core.dynamicContent.token_name',
                 'attr'  => [
@@ -39,7 +42,7 @@ class DynamicContentFilterType extends AbstractType
 
         $builder->add(
             'content',
-            'textarea',
+            TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.default_content',
                 'attr'  => [
@@ -51,7 +54,7 @@ class DynamicContentFilterType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                'collection',
+                CollectionType::class,
                 [
                     'type'           => 'dynamic_content_filter_entry',
                     'entity_options' => [

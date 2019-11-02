@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -53,7 +54,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
 
         $builder->add(
             'fetch_button',
-            'button',
+            ButtonType::class,
             [
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
                 'attr'  => [
