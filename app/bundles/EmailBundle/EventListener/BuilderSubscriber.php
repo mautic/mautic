@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
+use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
@@ -210,7 +211,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'tag',
                 'MauticCoreBundle:Slots:dynamiccontent.html.php',
-                'slot_dynamiccontent',
+                SlotDynamicContentType::class,
                 300
             );
         }
