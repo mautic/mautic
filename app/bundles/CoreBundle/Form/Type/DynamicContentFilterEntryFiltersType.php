@@ -16,7 +16,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -48,12 +48,13 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
             'glue',
             'choice',
             [
-                'label'   => false,
-                'choices' => [
-                    'and' => 'mautic.lead.list.form.glue.and',
-                    'or'  => 'mautic.lead.list.form.glue.or',
+                'label'             => false,
+                'choices'           => [
+                    'mautic.lead.list.form.glue.and' => 'and',
+                    'mautic.lead.list.form.glue.or'  => 'or',
                 ],
-                'attr' => [
+                'choices_as_values' => true,
+                'attr'              => [
                     'class'    => 'form-control not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
                 ],
@@ -86,7 +87,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             [
@@ -110,7 +111,7 @@ class DynamicContentFilterEntryFiltersType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dynamic_content_filter_entry_filters';
     }
