@@ -29,6 +29,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
+use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
@@ -146,7 +147,7 @@ class WebhookModel extends FormModel
 
         $params['events'] = $this->getEvents();
 
-        return $formFactory->create('webhook', $entity, $params);
+        return $formFactory->create(WebhookType::class, $entity, $params);
     }
 
     /**
