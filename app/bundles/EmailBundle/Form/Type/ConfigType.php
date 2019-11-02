@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -469,7 +470,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_test_connection_button',
-            'standalone_button',
+            StandAloneButtonType::class,
             [
                 'label'    => 'mautic.email.config.mailer.transport.test_connection',
                 'required' => false,
@@ -482,7 +483,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_test_send_button',
-            'standalone_button',
+            StandAloneButtonType::class,
             [
                 'label'    => 'mautic.email.config.mailer.transport.test_send',
                 'required' => false,

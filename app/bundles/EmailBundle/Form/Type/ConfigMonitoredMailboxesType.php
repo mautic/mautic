@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -221,7 +222,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
 
         $builder->add(
             'test_connection_button',
-            'standalone_button',
+            StandAloneButtonType::class,
             [
                 'label'    => 'mautic.email.config.monitored_email.test_connection',
                 'required' => false,

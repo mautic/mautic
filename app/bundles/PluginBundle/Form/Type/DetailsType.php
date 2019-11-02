@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -64,7 +65,7 @@ class DetailsType extends AbstractType
             $disabled = false;
             $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
-            $builder->add('authButton', 'standalone_button', [
+            $builder->add('authButton', StandAloneButtonType::class, [
                 'attr' => [
                     'class'   => 'btn btn-success btn-lg',
                     'onclick' => 'Mautic.initiateIntegrationAuthorization()',
