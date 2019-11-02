@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
@@ -40,7 +39,9 @@ class CampaignListType extends AbstractType
     private $canViewOther = false;
 
     /**
-     * @param MauticFactory $factory
+     * @param CampaignModel       $campaignModel
+     * @param TranslatorInterface $translator
+     * @param CorePermissions     $security
      */
     public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
     {

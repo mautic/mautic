@@ -228,7 +228,6 @@ return [
             ],
             'mautic.campaign.type.leadsource'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'campaign_leadsource',
             ],
             'mautic.form.type.campaignconfig'           => [
