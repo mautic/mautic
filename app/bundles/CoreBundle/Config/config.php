@@ -332,10 +332,6 @@ return [
             'mautic.form.type.theme.upload' => [
                 'class' => \Mautic\CoreBundle\Form\Type\ThemeUploadType::class,
             ],
-            'mautic.form.type.slot.dynamiccontent' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotDynamicContentType',
-                'alias' => 'slot_dynamiccontent',
-            ],
             'mautic.form.type.dynamic_content_filter' => [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
             ],
