@@ -261,10 +261,6 @@ return [
                     'mautic.ip_lookup',
                 ],
             ],
-            'mautic.form.type.themeconfig' => [
-                'class' => \Mautic\CoreBundle\Form\Type\ConfigThemeType::class,
-                'alias' => 'themeconfig',
-            ],
             'mautic.form.type.coreconfig.iplookup_download_data_store_button' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType',
                 'alias'     => 'iplookup_download_data_store_button',
