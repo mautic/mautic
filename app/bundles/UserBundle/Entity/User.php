@@ -23,9 +23,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class User.
- */
 class User extends FormEntity implements AdvancedUserInterface, \Serializable, EquatableInterface
 {
     /**
@@ -130,27 +127,11 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $guest = false;
 
     /**
-     * User constructor.
-     *
      * @param bool $isGuest
      */
     public function __construct($isGuest = false)
     {
         $this->guest = $isGuest;
-    }
-
-    /**
-     * @deprecated 2.9.0 to be removed in 3.0; support for $isGuest public property
-     *
-     * @param $name
-     */
-    public function __get($name)
-    {
-        if ('isGuest' === $name) {
-            @trigger_error('$isGuest is deprecated as of 2.9.0; use construct and isGuest() instead', E_USER_DEPRECATED);
-
-            return $this->guest;
-        }
     }
 
     /**
