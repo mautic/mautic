@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -89,7 +90,7 @@ class AssetType extends AbstractType
         ]);
         $builder->add(
             'disallow',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.asset.asset.form.disallow.crawlers',
                 'attr'  => [
@@ -144,7 +145,7 @@ class AssetType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',

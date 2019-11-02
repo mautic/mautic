@@ -617,7 +617,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'cors_restrict_domains',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.config.cors.restrict.domains',
                 'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),

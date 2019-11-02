@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -186,7 +187,7 @@ class FieldType extends AbstractType
             $default = (!isset($options['data']['showLabel'])) ? true : (bool) $options['data']['showLabel'];
             $builder->add(
                 'showLabel',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => (!empty($showLabelText)) ? $showLabelText : 'mautic.form.field.form.showlabel',
                     'data'  => $default,
@@ -227,7 +228,7 @@ class FieldType extends AbstractType
             $default = (!isset($options['data']['isRequired'])) ? false : (bool) $options['data']['isRequired'];
             $builder->add(
                 'isRequired',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.core.required',
                     'data'  => $default,
@@ -306,7 +307,7 @@ class FieldType extends AbstractType
                 : (bool) $options['data']['saveResult'];
             $builder->add(
                 'saveResult',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.saveresult',
                     'data'  => $default,
@@ -322,7 +323,7 @@ class FieldType extends AbstractType
                 : (bool) $options['data']['showWhenValueExists'];
             $builder->add(
                 'showWhenValueExists',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.show.when.value.exists',
                     'data'  => $default,
@@ -349,7 +350,7 @@ class FieldType extends AbstractType
             $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
             $builder->add(
                 'isAutoFill',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.form.field.form.auto_fill',
                     'data'  => $isAutoFillValue,

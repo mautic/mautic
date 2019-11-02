@@ -118,7 +118,7 @@ abstract class AbstractFormStandardType extends AbstractType
 
             $builder->add(
                 'isPublished',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'read_only' => $readonly,
                     'data'      => $data,

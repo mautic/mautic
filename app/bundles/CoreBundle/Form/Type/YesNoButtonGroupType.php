@@ -31,7 +31,7 @@ class YesNoButtonGroupType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'yesno_button_group';
     }

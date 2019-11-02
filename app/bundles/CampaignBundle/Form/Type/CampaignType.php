@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -61,7 +62,7 @@ class CampaignType extends AbstractType
         ]);
 
         $builder->add('allowRestart',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.campaign.allow_restart',
                 'attr'  => [
@@ -86,7 +87,7 @@ class CampaignType extends AbstractType
             $data     = false;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', [
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
             'read_only' => $readonly,
             'data'      => $data,
         ]);
