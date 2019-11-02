@@ -14,6 +14,7 @@ namespace Mautic\ConfigBundle\Controller;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\FormError;
@@ -50,7 +51,7 @@ class ConfigController extends FormController
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
         $form   = $this->get('form.factory')->create(
-            'config',
+            ConfigType::class,
             $formConfigs,
             [
                 'action'     => $action,
