@@ -28,22 +28,13 @@ class DecisionDispatcher
     private $dispatcher;
 
     /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
      * DecisionDispatcher constructor.
      *
      * @param EventDispatcherInterface $dispatcher
-     * @param LegacyEventDispatcher    $legacyDispatcher
      */
-    public function __construct(
-        EventDispatcherInterface $dispatcher,
-        LegacyEventDispatcher $legacyDispatcher
-    ) {
-        $this->dispatcher       = $dispatcher;
-        $this->legacyDispatcher = $legacyDispatcher;
+    public function __construct(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -72,7 +63,6 @@ class DecisionDispatcher
         $event = new DecisionEvent($config, $log);
 
         $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
-        $this->legacyDispatcher->dispatchDecisionEvent($event);
 
         return $event;
     }

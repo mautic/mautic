@@ -186,27 +186,4 @@ final class CampaignEvents
      * @var string
      */
     const ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP = 'mautic.lead.on_campaign_action_change_membership';
-
-    /**
-     * @deprecated 2.13.0; to be removed in 3.0. Listen to ON_EVENT_EXECUTED and ON_EVENT_FAILED
-     *
-     * The mautic.campaign_on_event_execution event is dispatched when a campaign event is executed.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\CampaignExecutionEvent instance.
-     *
-     * @var string
-     */
-    const ON_EVENT_EXECUTION = 'mautic.campaign_on_event_execution';
-
-    /**
-     * @deprecated 2.13.0; to be removed in 3.0; Listen to ON_EVENT_DECISION_EVALUATION instead
-     *
-     * The mautic.campaign_on_event_decision_trigger event is dispatched after a lead decision triggers a set of actions or if the decision is set
-     * as a root level event.
-     *
-     * The event listener receives a Mautic\CampaignBundle\Event\CampaignDecisionEvent instance.
-     *
-     * @var string
-     */
-    const ON_EVENT_DECISION_TRIGGER = 'mautic.campaign_on_event_decision_trigger';
 }

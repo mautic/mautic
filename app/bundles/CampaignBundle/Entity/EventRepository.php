@@ -11,10 +11,12 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CoreBundle\Entity\CommonRepository;
+
 /**
  * EventRepository.
  */
-class EventRepository extends LegacyEventRepository
+class EventRepository extends CommonRepository
 {
     /**
      * Get a list of entities.

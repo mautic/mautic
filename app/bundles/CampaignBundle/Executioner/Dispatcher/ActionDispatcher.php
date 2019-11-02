@@ -51,31 +51,23 @@ class ActionDispatcher
     private $notificationHelper;
 
     /**
-     * @var LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
      * EventDispatcher constructor.
      *
      * @param EventDispatcherInterface $dispatcher
      * @param LoggerInterface          $logger
      * @param EventScheduler           $scheduler
      * @param NotificationHelper       $notificationHelper
-     * @param LegacyEventDispatcher    $legacyDispatcher
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger,
         EventScheduler $scheduler,
-        NotificationHelper $notificationHelper,
-        LegacyEventDispatcher $legacyDispatcher
+        NotificationHelper $notificationHelper
     ) {
         $this->dispatcher         = $dispatcher;
         $this->logger             = $logger;
         $this->scheduler          = $scheduler;
         $this->notificationHelper = $notificationHelper;
-        $this->legacyDispatcher   = $legacyDispatcher;
     }
 
     /**
@@ -95,30 +87,20 @@ class ActionDispatcher
             $pendingEvent = new PendingEvent($config, $event, $logs);
         }
 
-        // this if statement can be removed when legacy dispatcher is removed
-        if ($customEvent = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($customEvent, $pendingEvent);
+        $this->dispatcher->dispatch($config->getBatchEventName(), $pendingEvent);
 
-            $success = $pendingEvent->getSuccessful();
-            $failed  = $pendingEvent->getFailures();
+        $success = $pendingEvent->getSuccessful();
+        $failed  = $pendingEvent->getFailures();
 
-            $this->validateProcessedLogs($logs, $success, $failed);
+        $this->validateProcessedLogs($logs, $success, $failed);
 
-            if ($success) {
-                $this->dispatchExecutedEvent($config, $event, $success);
-            }
-
-            if ($failed) {
-                $this->dispatchedFailedEvent($config, $failed);
-            }
-
-            // Dispatch legacy ON_EVENT_EXECUTION event for BC
-            $this->legacyDispatcher->dispatchExecutionEvents($config, $success, $failed);
+        if ($success) {
+            $this->dispatchExecutedEvent($config, $event, $success);
         }
 
-        // Execute BC eventName or callback. Or support case where the listener has been converted to batchEventName but still wants to execute
-        // eventName for BC support for plugins that could be listening to it's own custom event.
-        $this->legacyDispatcher->dispatchCustomEvent($config, $logs, ($customEvent), $pendingEvent);
+        if ($failed) {
+            $this->dispatchedFailedEvent($config, $failed);
+        }
 
         return $pendingEvent;
     }

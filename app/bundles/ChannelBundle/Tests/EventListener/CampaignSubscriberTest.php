@@ -20,7 +20,6 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
-use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\ChannelBundle\ChannelEvents;
@@ -67,11 +66,6 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
      */
     private $scheduler;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
 
     protected function setUp()
     {
@@ -141,21 +135,11 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->legacyDispatcher = new LegacyEventDispatcher(
-            $this->dispatcher,
-            $this->scheduler,
-            new NullLogger(),
-            $leadModel,
-            $notificationHelper,
-            $factory
-        );
-
         $this->eventDispatcher = new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
-            $notificationHelper,
-            $this->legacyDispatcher
+            $notificationHelper
         );
 
         $this->eventCollector = $this->getMockBuilder(EventCollector::class)

@@ -18,7 +18,6 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\DecisionResultsEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher;
-use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -29,18 +28,9 @@ class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     private $dispatcher;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
     protected function setUp()
     {
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->legacyDispatcher = $this->getMockBuilder(LegacyEventDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -54,9 +44,6 @@ class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
         $config->expects($this->once())
             ->method('getEventName')
             ->willReturn('something');
-
-        $this->legacyDispatcher->expects($this->never())
-            ->method('dispatchDecisionEvent');
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
@@ -73,9 +60,6 @@ class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
 
         $config->expects($this->never())
             ->method('getEventName');
-
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchDecisionEvent');
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
@@ -102,6 +86,6 @@ class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function getEventDispatcher()
     {
-        return new DecisionDispatcher($this->dispatcher, $this->legacyDispatcher);
+        return new DecisionDispatcher($this->dispatcher);
     }
 }

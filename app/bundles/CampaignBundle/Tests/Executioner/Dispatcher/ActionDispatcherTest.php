@@ -22,7 +22,6 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
-use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
@@ -42,11 +41,6 @@ class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
     private $scheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockBuilder|LegacyEventDispatcher
-     */
-    private $legacyDispatcher;
-
-    /**
      * @var \PHPUnit_Framework_MockObject_MockBuilder|NotificationHelper
      */
     private $notificationHelper;
@@ -62,10 +56,6 @@ class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->notificationHelper = $this->getMockBuilder(NotificationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->legacyDispatcher = $this->getMockBuilder(LegacyEventDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -157,9 +147,6 @@ class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->notificationHelper->expects($this->once())
             ->method('notifyOfFailure')
             ->with($lead2, $event);
-
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchExecutionEvents');
 
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
@@ -296,27 +283,6 @@ class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, $logs);
     }
 
-    public function testActionBatchEventIsIgnoredWithLegacy()
-    {
-        $event = new Event();
-
-        $config = $this->getMockBuilder(ActionAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $config->expects($this->once())
-            ->method('getBatchEventName')
-            ->willReturn(null);
-
-        $this->dispatcher->expects($this->never())
-            ->method('dispatch');
-
-        $this->legacyDispatcher->expects($this->once())
-            ->method('dispatchCustomEvent');
-
-        $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
-    }
-
     /**
      * @return ActionDispatcher
      */
@@ -326,8 +292,7 @@ class ActionDispatcherTest extends \PHPUnit_Framework_TestCase
             $this->dispatcher,
             new NullLogger(),
             $this->scheduler,
-            $this->notificationHelper,
-            $this->legacyDispatcher
+            $this->notificationHelper
         );
     }
 }

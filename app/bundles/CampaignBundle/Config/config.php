@@ -341,7 +341,6 @@ return [
                     'monolog.logger.mautic',
                     'mautic.campaign.scheduler',
                     'mautic.campaign.helper.notification',
-                    'mautic.campaign.legacy_event_dispatcher',
                 ],
             ],
             'mautic.campaign.dispatcher.condition'        => [
@@ -354,7 +353,6 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\DecisionDispatcher::class,
                 'arguments' => [
                     'event_dispatcher',
-                    'mautic.campaign.legacy_event_dispatcher',
                 ],
             ],
             'mautic.campaign.event_logger' => [
@@ -498,18 +496,6 @@ return [
                     'mautic.core.model.notification',
                     'translator',
                     'router',
-                ],
-            ],
-            // @deprecated 2.13.0 for BC support; to be removed in 3.0
-            'mautic.campaign.legacy_event_dispatcher' => [
-                'class'     => \Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.campaign.scheduler',
-                    'monolog.logger.mautic',
-                    'mautic.lead.model.lead',
-                    'mautic.campaign.helper.notification',
-                    'mautic.factory',
                 ],
             ],
         ],
