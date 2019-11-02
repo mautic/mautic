@@ -725,19 +725,19 @@ class PageModel extends FormModel
                 $utmTags->setRemoteHost($hit->getRemoteHost());
                 $utmTags->setLead($lead);
 
-                if (key_exists('utm_campaign', $query)) {
+                if (array_key_exists('utm_campaign', $query)) {
                     $utmTags->setUtmCampaign($query['utm_campaign']);
                 }
-                if (key_exists('utm_term', $query)) {
+                if (array_key_exists('utm_term', $query)) {
                     $utmTags->setUtmTerm($query['utm_term']);
                 }
-                if (key_exists('utm_content', $query)) {
+                if (array_key_exists('utm_content', $query)) {
                     $utmTags->setUtmContent($query['utm_content']);
                 }
-                if (key_exists('utm_medium', $query)) {
+                if (array_key_exists('utm_medium', $query)) {
                     $utmTags->setUtmMedium($query['utm_medium']);
                 }
-                if (key_exists('utm_source', $query)) {
+                if (array_key_exists('utm_source', $query)) {
                     $utmTags->setUtmSource($query['utm_source']);
                 }
 
