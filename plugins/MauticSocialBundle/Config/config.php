@@ -117,15 +117,12 @@ return [
             ],
             'mautic.social.form.type.network.twitter.hashtag' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType',
-                'alias' => 'twitter_hashtag',
             ],
             'mautic.social.form.type.network.twitter.mention' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType',
-                'alias' => 'twitter_handle',
             ],
             'mautic.social.form.type.network.twitter.custom' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterCustomType',
-                'alias' => 'twitter_custom',
             ],
             'mautic.social.config' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\ConfigType',
