@@ -1201,15 +1201,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * @deprecated 2.13.0; no longer used
-     *
-     * @param $trackByFingerprint
-     */
-    public function setTrackByFingerprint($trackByFingerprint)
-    {
-    }
-
-    /**
      * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
      *
      * @param Page $entity
