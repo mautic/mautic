@@ -154,7 +154,7 @@ return [
         ],
         'forms' => [
             'mautic.form.type.user' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\UserType',
+                'class'     => \Mautic\UserBundle\Form\Type\UserType::class,
                 'arguments' => [
                     'translator',
                     'doctrine.orm.entity_manager',
@@ -162,41 +162,32 @@ return [
                     'mautic.helper.language',
                     'mautic.helper.core_parameters',
                 ],
-                'alias' => 'user',
             ],
             'mautic.form.type.role' => [
-                'class' => 'Mautic\UserBundle\Form\Type\RoleType',
-                'alias' => 'role',
+                'class' => \Mautic\UserBundle\Form\Type\RoleType::class,
             ],
             'mautic.form.type.permissions' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PermissionsType',
-                'alias' => 'permissions',
+                'class' => \Mautic\UserBundle\Form\Type\PermissionsType::class,
             ],
             'mautic.form.type.permissionlist' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PermissionListType',
-                'alias' => 'permissionlist',
+                'class' => \Mautic\UserBundle\Form\Type\PermissionListType::class,
             ],
             'mautic.form.type.passwordreset' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PasswordResetType',
-                'alias' => 'passwordreset',
+                'class' => \Mautic\UserBundle\Form\Type\PasswordResetType::class,
             ],
             'mautic.form.type.passwordresetconfirm' => [
-                'class' => 'Mautic\UserBundle\Form\Type\PasswordResetConfirmType',
-                'alias' => 'passwordresetconfirm',
+                'class' => \Mautic\UserBundle\Form\Type\PasswordResetConfirmType::class,
             ],
             'mautic.form.type.user_list' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\UserListType',
+                'class'     => \Mautic\UserBundle\Form\Type\UserListType::class,
                 'arguments' => 'mautic.user.model.user',
-                'alias'     => 'user_list',
             ],
             'mautic.form.type.role_list' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
+                'class'     => \Mautic\UserBundle\Form\Type\RoleListType::class,
                 'arguments' => 'mautic.user.model.role',
-                'alias'     => 'role_list',
             ],
             'mautic.form.type.userconfig' => [
-                'class'     => 'Mautic\UserBundle\Form\Type\ConfigType',
-                'alias'     => 'userconfig',
+                'class'     => \Mautic\UserBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'translator',
