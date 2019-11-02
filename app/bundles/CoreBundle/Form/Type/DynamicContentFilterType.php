@@ -53,8 +53,8 @@ class DynamicContentFilterType extends AbstractType
                 'filters',
                 'collection',
                 [
-                    'type'    => 'dynamic_content_filter_entry',
-                    'options' => [
+                    'type'           => 'dynamic_content_filter_entry',
+                    'entity_options' => [
                         'label' => false,
                         'attr'  => [
                             'class' => 'form-control',
