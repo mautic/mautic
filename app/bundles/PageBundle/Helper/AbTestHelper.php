@@ -22,9 +22,9 @@ class AbTestHelper
     /**
      * Determines the winner of A/B test based on bounce rates.
      *
-     * @param $factory
-     * @param Page   $parent
-     * @param Page[] $children
+     * @param MauticFactory $factory
+     * @param Page          $parent
+     * @param Page[]        $children
      *
      * @return array
      */
@@ -112,7 +112,6 @@ class AbTestHelper
      *
      * @param MauticFactory $factory
      * @param Page          $parent
-     * @param               $children
      *
      * @return array
      */
