@@ -332,7 +332,6 @@ return [
             ],
             'mautic.form.type.slot.segmentlist' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
-                'alias'     => 'slot_segmentlist',
                 'arguments' => [
                     'translator',
                 ],

@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
 use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
@@ -219,7 +220,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.segmentlist'),
                     'list-alt',
                     'MauticCoreBundle:Slots:segmentlist.html.php',
-                    'slot_segmentlist',
+                    SlotSegmentListType::class,
                     590
                 );
                 $event->addSlotType(
