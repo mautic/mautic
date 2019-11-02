@@ -309,8 +309,7 @@ return [
                 ],
             ],
             'mautic.form.type.slot.categorylist' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotCategoryListType',
-                'alias'     => 'slot_categorylist',
+                'class'     => \Mautic\CoreBundle\Form\Type\SlotCategoryListType::class,
                 'arguments' => [
                     'translator',
                 ],
