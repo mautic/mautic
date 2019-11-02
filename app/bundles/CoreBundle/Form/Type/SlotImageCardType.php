@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -48,10 +47,12 @@ class SlotImageCardType extends SlotType
                 'class'           => 'form-control',
                 'data-slot-param' => 'align',
             ],
-            'choice_list' => new ChoiceList(
-                ['left', 'center', 'right'],
-                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
-            ),
+            'choices' => [
+                'mautic.core.left'   => 'left',
+                'mautic.core.center' => 'center',
+                'mautic.core.right'  => 'right',
+            ],
+            'choices_as_values' => true,
         ]);
 
         $builder->add('text-align', ButtonGroupType::class, [
@@ -62,10 +63,12 @@ class SlotImageCardType extends SlotType
                 'class'           => 'form-control',
                 'data-slot-param' => 'text-align',
             ],
-            'choice_list' => new ChoiceList(
-                ['left', 'center', 'right'],
-                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
-            ),
+            'choices' => [
+                'mautic.core.left'   => 'left',
+                'mautic.core.center' => 'center',
+                'mautic.core.right'  => 'right',
+            ],
+            'choices_as_values' => true,
         ]);
 
         $builder->add('background-color', 'text', [
@@ -107,7 +110,7 @@ class SlotImageCardType extends SlotType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_imagecard';
     }

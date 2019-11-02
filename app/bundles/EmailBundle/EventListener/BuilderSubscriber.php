@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
+use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -159,7 +160,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
                 'MauticCoreBundle:Slots:imagecard.html.php',
-                'slot_imagecard',
+                SlotImageCardType::class,
                 870
             );
             $event->addSlotType(
