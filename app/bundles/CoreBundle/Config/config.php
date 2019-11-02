@@ -319,11 +319,10 @@ return [
                 'alias' => 'slot_separator',
             ],
             'mautic.form.type.slot.imagecard' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
-                'alias' => 'slot_imagecard',
+                'class' => \Mautic\CoreBundle\Form\Type\SlotImageCardType::class,
             ],
             'mautic.form.type.slot.imagecaption' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCaptionType',
+                'class' => \Mautic\CoreBundle\Form\Type\SlotImageCaptionType::class,
             ],
             'mautic.form.type.slot.socialshare' => [
                 'class' => \Mautic\CoreBundle\Form\Type\SlotSocialShareType::class,
