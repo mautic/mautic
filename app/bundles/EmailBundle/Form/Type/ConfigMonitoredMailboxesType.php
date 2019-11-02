@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -164,7 +165,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
         if ($options['mailbox'] != 'general') {
             $builder->add(
                 'override_settings',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label'      => 'mautic.email.config.monitored_email_override_settings',
                     'label_attr' => ['class' => 'control-label'],

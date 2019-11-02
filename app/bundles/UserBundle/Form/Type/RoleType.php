@@ -14,6 +14,7 @@ namespace Mautic\UserBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -44,7 +45,7 @@ class RoleType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('isAdmin', 'yesno_button_group', [
+        $builder->add('isAdmin', YesNoButtonGroupType::class, [
             'label' => 'mautic.user.role.form.isadmin',
             'attr'  => [
                 'onchange' => 'Mautic.togglePermissionVisibility();',

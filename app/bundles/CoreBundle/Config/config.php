@@ -233,10 +233,6 @@ return [
             'mautic.form.type.button_group' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ButtonGroupType',
             ],
-            'mautic.form.type.yesno_button_group' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\YesNoButtonGroupType',
-                'alias' => 'yesno_button_group',
-            ],
             'mautic.form.type.standalone_button' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\StandAloneButtonType',
             ],

@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -84,7 +85,7 @@ class ContentType extends AbstractType
 
         $builder->add(
             'link_new_window',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.link_new_window',
                 'data'  => (isset($options['link_new_window'])) ? $options['link_new_window'] : true,

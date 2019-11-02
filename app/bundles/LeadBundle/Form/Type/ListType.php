@@ -19,6 +19,7 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -182,7 +183,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'isGlobal',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.list.form.isglobal',
                 'attr'       => [
@@ -193,7 +194,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'isPreferenceCenter',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.list.form.isPreferenceCenter',
                 'attr'       => [
@@ -202,7 +203,7 @@ class ListType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object'=>'lead']);
         $builder->add(

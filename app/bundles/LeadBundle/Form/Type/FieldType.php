@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -182,7 +183,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'default_template_boolean',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.core.defaultvalue',
                 'label_attr'  => ['class' => 'control-label'],
@@ -295,7 +296,7 @@ class FieldType extends AbstractType
 
                     $form->add(
                         'defaultValue',
-                        'yesno_button_group',
+                        YesNoButtonGroupType::class,
                         [
                             'label'       => 'mautic.core.defaultvalue',
                             'label_attr'  => ['class' => 'control-label'],
@@ -459,7 +460,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isPublished',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'disabled' => ($options['data']->getAlias() == 'email'),
                 'data'     => ($options['data']->getAlias() == 'email') ? true : $options['data']->getIsPublished(),
@@ -468,7 +469,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isRequired',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.required',
             ]
@@ -476,7 +477,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isVisible',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isvisible',
             ]
@@ -484,7 +485,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isShortVisible',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isshortvisible',
                 'attr'  => [
@@ -495,7 +496,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isListable',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.islistable',
             ]
@@ -504,7 +505,7 @@ class FieldType extends AbstractType
         $data = $options['data']->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.isuniqueidentifer',
                 'attr'  => [
@@ -517,7 +518,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isPubliclyUpdatable',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.field.form.ispubliclyupdatable',
                 'attr'  => [
