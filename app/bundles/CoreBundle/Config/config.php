@@ -764,9 +764,9 @@ return [
 
             // Twig
             'templating.twig.extension.slot' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension',
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension::class,
                 'arguments' => [
-                    'mautic.factory',
+                    'templating.helper.slots',
                 ],
                 'tag' => 'twig.extension',
             ],
