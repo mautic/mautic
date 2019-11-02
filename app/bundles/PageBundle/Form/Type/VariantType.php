@@ -11,7 +11,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -24,16 +24,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class VariantType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var PageModel
      */
-    private $factory;
+    private $pageModel;
 
     /**
-     * @param MauticFactory $factory
+     * @param PageModel $pageModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(PageModel $pageModel)
     {
-        $this->factory = $factory;
+        $this->pageModel = $pageModel;
     }
 
     /**
@@ -55,7 +55,7 @@ class VariantType extends AbstractType
             ],
         ]);
 
-        $abTestWinnerCriteria = $this->factory->getModel('page.page')->getBuilderComponents(null, 'abTestWinnerCriteria');
+        $abTestWinnerCriteria = $this->pageModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {
             $criteria = $abTestWinnerCriteria['criteria'];

@@ -195,8 +195,8 @@ return [
                 'alias'     => 'page',
             ],
             'mautic.form.type.pagevariant' => [
-                'class'     => 'Mautic\PageBundle\Form\Type\VariantType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\PageBundle\Form\Type\VariantType::class,
+                'arguments' => ['mautic.page.model.page'],
                 'alias'     => 'pagevariant',
             ],
             'mautic.form.type.pointaction_pointhit' => [
