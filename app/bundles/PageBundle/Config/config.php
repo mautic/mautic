@@ -257,9 +257,9 @@ return [
                 'alias' => 'slideshow_slide_config',
             ],
             'mautic.form.type.redirect_list' => [
-                'class'     => 'Mautic\PageBundle\Form\Type\RedirectListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'redirect_list',
+                'class'     => \Mautic\PageBundle\Form\Type\RedirectListType::class,
+                'arguments' => ['mautic.helper.core_parameters'],
+                'alias'     => 'redirect_list',\
             ],
             'mautic.form.type.page_dashboard_hits_in_time_widget' => [
                 'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',

@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -11,14 +11,17 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class RedirectListType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
     /**
-     * @param MauticFactory $factory
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory = $factory;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -26,9 +29,8 @@ class RedirectListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $factory = $this->factory;
         $resolver->setDefaults([
-            'choices'     => $factory->getParameter('redirect_list_types'),
+            'choices'     => $this->coreParametersHelper->getParameter('redirect_list_types'),
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.page.form.redirecttype',
