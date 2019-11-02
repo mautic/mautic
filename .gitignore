@@ -21,8 +21,7 @@
 !/app/cache/.gitkeep
 
 /app/config/local*.php
-/app/config/config_local.php
-/app/config/paths_local.php
+/app/config/*_local.php
 
 /app/logs/*
 !/app/logs/.gitkeep
