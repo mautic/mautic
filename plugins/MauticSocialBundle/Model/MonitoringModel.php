@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
+use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -46,7 +47,7 @@ class MonitoringModel extends FormModel
             $params['action'] = $action;
         }
 
-        return $formFactory->create('monitoring', $entity, $params);
+        return $formFactory->create(MonitoringType::class, $entity, $params);
     }
 
     /**

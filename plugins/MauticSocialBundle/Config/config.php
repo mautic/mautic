@@ -111,7 +111,6 @@ return [
             ],
             'mautic.social.form.type.monitoring' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType',
-                'alias' => 'monitoring',
             ],
             'mautic.social.form.type.network.twitter.abstract' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterAbstractType',
