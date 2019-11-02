@@ -4,7 +4,7 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class RedirectListType.
@@ -25,9 +25,9 @@ class RedirectListType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'choices'     => $this->coreParametersHelper->getParameter('redirect_list_types'),
@@ -43,7 +43,7 @@ class RedirectListType extends AbstractType
             'feature' => 'all',
         ]);
 
-        $resolver->setOptional(['feature']);
+        $resolver->setDefined(['feature']);
     }
 
     /**
