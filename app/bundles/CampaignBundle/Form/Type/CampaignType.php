@@ -11,9 +11,9 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,18 +23,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CampaignType extends AbstractType
 {
+    /**
+     * @var CorePermissions
+     */
     private $security;
-    private $translator;
-    private $em;
 
     /**
-     * @param MauticFactory $factory
+     * @param CorePermissions $security
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
-        $this->em         = $factory->getEntityManager();
+        $this->security   = $security;
     }
 
     /**

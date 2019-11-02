@@ -192,7 +192,9 @@ return [
         'forms'        => [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.security',
+                ],
                 'alias'     => 'campaign',
             ],
             'mautic.campaignrange.type.action'          => [
