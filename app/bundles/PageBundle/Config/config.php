@@ -212,7 +212,7 @@ return [
                 'alias' => 'campaignevent_pagehit',
             ],
             'mautic.form.type.pagelist' => [
-                'class'     => 'Mautic\PageBundle\Form\Type\PageListType',
+                'class'     => \Mautic\PageBundle\Form\Type\PageListType::class,
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.security',
@@ -220,8 +220,11 @@ return [
                 'alias'     => 'page_list',
             ],
             'mautic.form.type.preferencecenterlist' => [
-                'class'     => 'Mautic\PageBundle\Form\Type\PreferenceCenterListType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\PageBundle\Form\Type\PreferenceCenterListType::class,
+                'arguments' => [
+                    'mautic.page.model.page',
+                    'mautic.security',
+                ],
                 'alias'     => 'preference_center_list',
             ],
             'mautic.form.type.page_abtest_settings' => [
