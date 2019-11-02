@@ -43,7 +43,7 @@ class TweetSendType extends AbstractType
     {
         $builder->add(
             'channelId',
-            'tweet_list',
+            TweetListType::class,
             [
                 'label'      => 'mautic.integration.Twitter.send.selecttweet',
                 'label_attr' => ['class' => 'control-label'],

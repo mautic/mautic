@@ -96,7 +96,6 @@ return [
             ],
             'mautic.form.type.social.twitter' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
-                'alias' => 'socialmedia_twitter',
             ],
             'mautic.form.type.social.googleplus' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType',
@@ -136,7 +135,6 @@ return [
             ],
             'mautic.social.tweet.list' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetListType',
-                'alias' => 'tweet_list',
             ],
             'mautic.social.tweetsend_list' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType',
