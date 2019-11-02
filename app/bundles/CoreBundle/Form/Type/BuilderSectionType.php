@@ -95,7 +95,7 @@ class BuilderSectionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'builder_section';
     }
