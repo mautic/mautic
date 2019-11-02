@@ -271,10 +271,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.form.type.slot' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotType',
-                'alias' => 'slot',
-            ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'alias'     => 'slot_saveprefsbutton',
