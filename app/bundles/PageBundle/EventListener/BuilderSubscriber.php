@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotImageType;
+use Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType;
 use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
 use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
@@ -258,7 +259,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.saveprefsbutton'),
                     'floppy-o',
                     'MauticCoreBundle:Slots:saveprefsbutton.html.php',
-                    'slot_saveprefsbutton',
+                    SlotSavePrefsButtonType::class,
                     540
                 );
 
