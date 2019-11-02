@@ -50,7 +50,7 @@ class SlotSegmentListType extends SlotType
     /**
      * @return mixed
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_segmentlist';
     }
