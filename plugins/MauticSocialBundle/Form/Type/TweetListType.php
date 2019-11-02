@@ -52,7 +52,7 @@ class TweetListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'tweet_list';
     }
