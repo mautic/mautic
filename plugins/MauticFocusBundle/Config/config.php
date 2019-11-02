@@ -102,21 +102,9 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.focus.form.type.color' => [
-                'class' => \MauticPlugin\MauticFocusBundle\Form\Type\ColorType::class,
-            ],
-            'mautic.focus.form.type.content' => [
-                'class' => \MauticPlugin\MauticFocusBundle\Form\Type\ContentType::class,
-            ],
             'mautic.focus.form.type.focus' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusType::class,
                 'arguments' => 'mautic.security',
-            ],
-            'mautic.focus.form.type.entity_properties' => [
-                'class' => \MauticPlugin\MauticFocusBundle\Form\Type\PropertiesType::class,
-            ],
-            'mautic.focus.form.type.properties' => [
-                'class' => \MauticPlugin\MauticFocusBundle\Form\Type\FocusPropertiesType::class,
             ],
             'mautic.focus.form.type.focusshow_list' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType::class,
