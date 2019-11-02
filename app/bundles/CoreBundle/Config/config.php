@@ -242,10 +242,6 @@ return [
             'mautic.form.type.sortablelist' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
             ],
-            'mautic.form.type.dynamiclist' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\DynamicListType',
-                'alias' => 'dynamiclist',
-            ],
             'mautic.form.type.coreconfig' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
                 'arguments' => [
