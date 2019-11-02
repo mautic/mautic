@@ -12,35 +12,21 @@
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ReportType.
- */
 class WebhookType extends AbstractType
 {
-    /**
-     * Translator object.
-     *
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
-    /**
-     * WebhookType constructor.
-     *
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -50,7 +36,7 @@ class WebhookType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -61,7 +47,7 @@ class WebhookType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'    => 'mautic.webhook.form.description',
                 'required' => false,
@@ -73,7 +59,7 @@ class WebhookType extends AbstractType
 
         $builder->add(
             'webhookUrl',
-            'url',
+            UrlType::class,
             [
                 'label'      => 'mautic.webhook.form.webhook_url',
                 'label_attr' => ['class' => 'control-label'],
@@ -91,7 +77,7 @@ class WebhookType extends AbstractType
 
         $builder->add(
             'events',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'    => $choices,
                 'multiple'   => true,
@@ -108,7 +94,7 @@ class WebhookType extends AbstractType
 
         $builder->add(
             'sendTest',
-            'button',
+            ButtonType::class,
             [
                 'attr'  => ['class' => 'btn btn-success', 'onclick' => 'Mautic.sendHookTest(this)'],
                 'label' => 'mautic.webhook.send.test.payload',
@@ -118,7 +104,7 @@ class WebhookType extends AbstractType
         //add category
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             [
                 'bundle' => 'Webhook',
             ]
@@ -149,7 +135,7 @@ class WebhookType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\WebhookBundle\Entity\Webhook',
+                'data_class' => Webhook::class,
             ]
         );
 

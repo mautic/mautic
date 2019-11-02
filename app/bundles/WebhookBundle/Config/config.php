@@ -52,7 +52,6 @@ return [
         'forms' => [
             'mautic.form.type.webhook' => [
                 'class'     => \Mautic\WebhookBundle\Form\Type\WebhookType::class,
-                'arguments' => 'translator',
                 'alias'     => 'webhook',
             ],
             'mautic.form.type.webhookconfig' => [
