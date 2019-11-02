@@ -14,7 +14,6 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -46,7 +45,7 @@ class MonitoringType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add('publishUp', DateTimeType::class, [
             'widget'     => 'single_text',

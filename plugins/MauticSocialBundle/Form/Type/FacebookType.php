@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -55,12 +54,12 @@ class FacebookType extends AbstractType
             'attr'        => ['class' => 'form-control'],
         ]);
 
-        $builder->add('showFaces', YesNoButtonGroupType::class, [
+        $builder->add('showFaces', 'yesno_button_group', [
             'label' => 'mautic.integration.Facebook.share.showfaces',
             'data'  => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces'],
         ]);
 
-        $builder->add('showShare', YesNoButtonGroupType::class, [
+        $builder->add('showShare', 'yesno_button_group', [
             'label' => 'mautic.integration.Facebook.share.showshare',
             'data'  => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare'],
         ]);
