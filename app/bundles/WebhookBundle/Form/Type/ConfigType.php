@@ -13,6 +13,7 @@ namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -27,7 +28,7 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('queue_mode', 'choice', [
+        $builder->add('queue_mode', ChoiceType::class, [
             'choices' => [
                 'immediate_process' => 'mautic.webhook.config.immediate_process',
                 'command_process'   => 'mautic.webhook.config.cron_process',
@@ -47,7 +48,7 @@ class ConfigType extends AbstractType
             ],
         ]);
 
-        $builder->add('events_orderby_dir', 'choice', [
+        $builder->add('events_orderby_dir', ChoiceType::class, [
             'choices' => [
                 Criteria::ASC  => 'mautic.webhook.config.event.orderby.chronological',
                 Criteria::DESC => 'mautic.webhook.config.event.orderby.reverse.chronological',
@@ -64,7 +65,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'webhookconfig';
     }
