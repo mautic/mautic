@@ -13,26 +13,31 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class RoleListType.
- */
 class RoleListType extends AbstractType
 {
     /**
-     * @var array
+     * @var roleModel
      */
-    private $choices = [];
+    private $roleModel;
 
     /**
-     * RoleListType constructor.
-     *
-     * @param RoleModel $model
+     * @param RoleModel $roleModel
      */
-    public function __construct(RoleModel $model)
+    public function __construct(RoleModel $roleModel)
     {
-        $choices = $model->getRepository()->getEntities(
+        $this->roleModel = $roleModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $choices = [];
+        $roles   = $this->roleModel->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -46,22 +51,16 @@ class RoleListType extends AbstractType
             ]
         );
 
-        foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+        foreach ($roles as $role) {
+            $choices[$role->getId()] = $role->getName(true);
         }
 
-        //sort by language
-        ksort($this->choices);
-    }
+        //sort by name
+        ksort($choices);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
         $resolver->setDefaults(
             [
-                'choices'     => $this->choices,
+                'choices'     => $choices,
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
@@ -83,6 +82,6 @@ class RoleListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

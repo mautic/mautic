@@ -13,23 +13,31 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class UserListType.
- */
 class UserListType extends AbstractType
 {
-    private $choices = [];
+    /**
+     * @var UserModel
+     */
+    private $userModel;
 
     /**
-     * UserListType constructor.
-     *
-     * @param UserModel $model
+     * @param UserModel $userModel
      */
-    public function __construct(UserModel $model)
+    public function __construct(UserModel $userModel)
     {
-        $choices = $model->getRepository()->getEntities(
+        $this->userModel = $userModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $choices = [];
+        $users   = $this->userModel->getRepository()->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -43,22 +51,16 @@ class UserListType extends AbstractType
             ]
         );
 
-        foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+        foreach ($users as $user) {
+            $choices[$user->getId()] = $user->getName(true);
         }
 
         //sort by language
-        ksort($this->choices);
-    }
+        ksort($choices);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
         $resolver->setDefaults(
             [
-                'choices'     => $this->choices,
+                'choices'     => $choices,
                 'expanded'    => false,
                 'multiple'    => true,
                 'required'    => false,
@@ -80,6 +82,6 @@ class UserListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

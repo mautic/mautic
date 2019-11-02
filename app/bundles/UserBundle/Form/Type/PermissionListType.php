@@ -12,12 +12,10 @@
 namespace Mautic\UserBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class PermissionListType.
- */
 class PermissionListType extends AbstractType
 {
     /**
@@ -45,7 +43,7 @@ class PermissionListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
