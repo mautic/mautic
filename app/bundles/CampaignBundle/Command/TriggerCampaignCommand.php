@@ -226,7 +226,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set batch size of contacts to process per round. Defaults to 100.',
                 100
-            )
+            );
 
         parent::configure();
     }
