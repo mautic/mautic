@@ -312,7 +312,6 @@ return [
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
-                'alias'     => 'dynamic_content_filter_entry_filters',
                 'arguments' => [
                     'translator',
                 ],
