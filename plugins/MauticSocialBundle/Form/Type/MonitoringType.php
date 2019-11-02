@@ -11,17 +11,15 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
@@ -95,7 +93,7 @@ class MonitoringType extends AbstractType
             );
         }
 
-        $builder->add('lists', LeadListType::class, [
+        $builder->add('lists', 'leadlist_choices', [
             'label'      => 'mautic.lead.lead.events.addtolists',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -106,7 +104,7 @@ class MonitoringType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', CategoryListType::class, [
+        $builder->add('category', 'category', [
             'bundle' => 'plugin:mauticSocial',
         ]);
 
@@ -116,7 +114,7 @@ class MonitoringType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
                 'data_class' => 'MauticPlugin\MauticSocialBundle\Entity\Monitoring',
@@ -126,7 +124,7 @@ class MonitoringType extends AbstractType
         $resolver->setRequired(['networkTypes']);
 
         // allow the specific network type - single
-        $resolver->setOptional(['networkType']);
+        $resolver->setDefined(['networkType']);
     }
 
     public function getBlockPrefix()
