@@ -1200,18 +1200,6 @@ class PageModel extends FormModel
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
     }
 
-    /**
-     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
-     *
-     * @param Page $entity
-     *
-     * @return array
-     */
-    public function getVariants(Page $entity)
-    {
-        return $entity->getVariants();
-    }
-
     /*
      * Cleans query params saving url values.
      *
