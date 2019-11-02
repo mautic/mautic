@@ -292,8 +292,7 @@ return [
                 ],
             ],
             'mautic.form.type.slot.preferredchannel' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotPreferredChannelType',
-                'alias'     => 'slot_preferredchannel',
+                'class'     => \Mautic\CoreBundle\Form\Type\SlotPreferredChannelType::class,
                 'arguments' => [
                     'translator',
                 ],
