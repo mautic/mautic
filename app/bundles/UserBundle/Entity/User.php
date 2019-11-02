@@ -142,7 +142,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('users')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\UserRepository');
+            ->setCustomRepositoryClass(UserRepository::class);
 
         $builder->addId();
 
