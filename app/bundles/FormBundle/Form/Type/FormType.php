@@ -11,12 +11,22 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class FormType.
@@ -34,12 +44,13 @@ class FormType extends AbstractType
     private $security;
 
     /**
-     * @param MauticFactory $factory
+     * @param TranslatorInterface $translator
+     * @param CorePermissions     $security
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
+        $this->translator = $translator;
+        $this->security   = $security;
     }
 
     /**
@@ -51,13 +62,13 @@ class FormType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
         //details
-        $builder->add('name', 'text', [
+        $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
-        $builder->add('formAttributes', 'text', [
+        $builder->add('formAttributes', TextType::class, [
             'label'      => 'mautic.form.field.form.form_attr',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -67,7 +78,7 @@ class FormType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('description', 'textarea', [
+        $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
@@ -79,7 +90,7 @@ class FormType extends AbstractType
             'bundle' => 'form',
         ]);
 
-        $builder->add('template', 'theme_list', [
+        $builder->add('template', ThemeListType::class, [
             'feature'     => 'form',
             'empty_value' => ' ',
             'attr'        => [
@@ -104,12 +115,12 @@ class FormType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', [
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
             'read_only' => $readonly,
             'data'      => $data,
         ]);
 
-        $builder->add('inKioskMode', 'yesno_button_group', [
+        $builder->add('inKioskMode', YesNoButtonGroupType::class, [
             'label' => 'mautic.form.form.kioskmode',
             'attr'  => [
                 'tooltip' => 'mautic.form.form.kioskmode.tooltip',
@@ -118,7 +129,7 @@ class FormType extends AbstractType
 
         $builder->add(
             'noIndex',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
                 'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
@@ -130,7 +141,7 @@ class FormType extends AbstractType
             $options['data']->setRenderStyle(true);
         }
 
-        $builder->add('renderStyle', 'yesno_button_group', [
+        $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
             'data'       => ($options['data']->getRenderStyle() === null) ? true : $options['data']->getRenderStyle(),
             'empty_data' => true,
@@ -139,7 +150,7 @@ class FormType extends AbstractType
             ],
         ]);
 
-        $builder->add('publishUp', 'datetime', [
+        $builder->add('publishUp', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => ['class' => 'control-label'],
@@ -151,7 +162,7 @@ class FormType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('publishDown', 'datetime', [
+        $builder->add('publishDown', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => ['class' => 'control-label'],
@@ -163,15 +174,16 @@ class FormType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('postAction', 'choice', [
+        $builder->add('postAction', ChoiceType::class, [
             'choices' => [
-                'return'   => 'mautic.form.form.postaction.return',
-                'redirect' => 'mautic.form.form.postaction.redirect',
-                'message'  => 'mautic.form.form.postaction.message',
+                'mautic.form.form.postaction.return'   => 'return',
+                'mautic.form.form.postaction.redirect' => 'redirect',
+                'mautic.form.form.postaction.message'  => 'message',
             ],
-            'label'      => 'mautic.form.form.postaction',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
+            'choices_as_values' => true,
+            'label'             => 'mautic.form.form.postaction',
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
             ],
@@ -181,19 +193,19 @@ class FormType extends AbstractType
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
         $required   = (in_array($postAction, ['redirect', 'message'])) ? true : false;
-        $builder->add('postActionProperty', 'text', [
+        $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'required'   => $required,
         ]);
 
-        $builder->add('sessionId', 'hidden', [
+        $builder->add('sessionId', HiddenType::class, [
             'mapped' => false,
         ]);
 
-        $builder->add('buttons', 'form_buttons');
-        $builder->add('formType', 'hidden', ['empty_data' => 'standalone']);
+        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('formType', HiddenType::class, ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -203,12 +215,12 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'        => 'Mautic\FormBundle\Entity\Form',
+            'data_class'        => Form::class,
             'validation_groups' => [
-                'Mautic\FormBundle\Entity\Form',
+                Form::class,
                 'determineValidationGroups',
             ],
         ]);
@@ -217,7 +229,7 @@ class FormType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mauticform';
     }

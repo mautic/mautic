@@ -17,6 +17,8 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
+use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
@@ -78,7 +80,7 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = [
             'label'       => 'mautic.form.campaign.event.submit',
             'description' => 'mautic.form.campaign.event.submit_descr',
-            'formType'    => 'campaignevent_formsubmit',
+            'formType'    => CampaignEventFormSubmitType::class,
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         ];
         $event->addDecision('form.submit', $trigger);
@@ -86,7 +88,7 @@ class CampaignSubscriber extends CommonSubscriber
         $trigger = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
-            'formType'    => 'campaignevent_form_field_value',
+            'formType'    => CampaignEventFormFieldValueType::class,
             'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];

@@ -41,7 +41,7 @@ abstract class AbstractFormFieldHelper
     protected $translationKeyPrefix;
 
     /**
-     * @var
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -90,6 +90,7 @@ abstract class AbstractFormFieldHelper
             $choices[$v] = $this->translator->trans($f['label']);
         }
 
+        array_flip($choices);
         natcasesort($choices);
 
         return $choices;

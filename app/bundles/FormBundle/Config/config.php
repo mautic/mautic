@@ -9,33 +9,29 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\EventListener\CalendarSubscriber;
 use Mautic\FormBundle\EventListener\CampaignSubscriber;
 use Mautic\FormBundle\EventListener\DashboardSubscriber;
 use Mautic\FormBundle\EventListener\EmailSubscriber;
 use Mautic\FormBundle\EventListener\FormSubscriber;
+use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use Mautic\FormBundle\EventListener\LeadSubscriber;
 use Mautic\FormBundle\EventListener\PageSubscriber;
 use Mautic\FormBundle\EventListener\PointSubscriber;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\FormBundle\EventListener\SearchSubscriber;
+use Mautic\FormBundle\EventListener\StatsSubscriber;
 use Mautic\FormBundle\EventListener\WebhookSubscriber;
-use Mautic\FormBundle\Form\Type\ActionType;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
-use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\Form\Type\FieldType;
-use Mautic\FormBundle\Form\Type\FormFieldCaptchaType;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
-use Mautic\FormBundle\Form\Type\FormFieldGroupType;
-use Mautic\FormBundle\Form\Type\FormFieldHTMLType;
 use Mautic\FormBundle\Form\Type\FormFieldPageBreakType;
-use Mautic\FormBundle\Form\Type\FormFieldPlaceholderType;
-use Mautic\FormBundle\Form\Type\FormFieldSelectType;
-use Mautic\FormBundle\Form\Type\FormFieldTextType;
+use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\FormBundle\Form\Type\FormType;
-use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
+use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Helper\TokenHelper;
@@ -179,7 +175,7 @@ return [
                 ],
             ],
             'mautic.form.validation.subscriber' => [
-                'class'     => \Mautic\FormBundle\EventListener\FormValidationSubscriber::class,
+                'class'     => FormValidationSubscriber::class,
             ],
             'mautic.form.pagebundle.subscriber' => [
                 'class'     => PageSubscriber::class,
@@ -241,7 +237,7 @@ return [
                 ],
             ],
             'mautic.form.stats.subscriber' => [
-                'class'     => \Mautic\FormBundle\EventListener\StatsSubscriber::class,
+                'class'     => StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
@@ -250,12 +246,13 @@ return [
         'forms' => [
             'mautic.form.type.form' => [
                 'class'     => FormType::class,
-                'arguments' => 'mautic.factory',
-                'alias'     => 'mauticform',
+                'arguments' => [
+                    'translator',
+                    'mautic.security',
+                ],
             ],
             'mautic.form.type.field' => [
                 'class'       => FieldType::class,
-                'alias'       => 'formfield',
                 'arguments'   => [
                     'translator',
                 ],
@@ -264,30 +261,6 @@ return [
                     'setFormModel'  => ['mautic.form.model.form'],
                 ],
             ],
-            'mautic.form.type.action' => [
-                'class' => ActionType::class,
-                'alias' => 'formaction',
-            ],
-            'mautic.form.type.field_propertytext' => [
-                'class' => FormFieldTextType::class,
-                'alias' => 'formfield_text',
-            ],
-            'mautic.form.type.field_propertyhtml' => [
-                'class' => FormFieldHTMLType::class,
-                'alias' => 'formfield_html',
-            ],
-            'mautic.form.type.field_propertyplaceholder' => [
-                'class' => FormFieldPlaceholderType::class,
-                'alias' => 'formfield_placeholder',
-            ],
-            'mautic.form.type.field_propertyselect' => [
-                'class' => FormFieldSelectType::class,
-                'alias' => 'formfield_select',
-            ],
-            'mautic.form.type.field_propertycaptcha' => [
-                'class' => FormFieldCaptchaType::class,
-                'alias' => 'formfield_captcha',
-            ],
             'mautic.form.type.field_propertypagebreak' => [
                 'class'     => FormFieldPageBreakType::class,
                 'arguments' => [
@@ -295,7 +268,7 @@ return [
                 ],
             ],
             'mautic.form.type.field_propertytel' => [
-                'class'     => \Mautic\FormBundle\Form\Type\FormFieldTelType::class,
+                'class'     => FormFieldTelType::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -307,27 +280,19 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.form.type.field_propertygroup' => [
-                'class' => FormFieldGroupType::class,
-                'alias' => 'formfield_group',
-            ],
-            'mautic.form.type.pointaction_formsubmit' => [
-                'class' => PointActionFormSubmitType::class,
-                'alias' => 'pointaction_formsubmit',
-            ],
             'mautic.form.type.form_list' => [
                 'class'     => FormListType::class,
-                'arguments' => 'mautic.factory',
-                'alias'     => 'form_list',
-            ],
-            'mautic.form.type.campaignevent_formsubmit' => [
-                'class' => CampaignEventFormSubmitType::class,
-                'alias' => 'campaignevent_formsubmit',
+                'arguments' => [
+                    'mautic.security',
+                    'mautic.form.model.form',
+                    'mautic.helper.user',
+                ],
             ],
             'mautic.form.type.campaignevent_form_field_value' => [
                 'class'     => CampaignEventFormFieldValueType::class,
-                'arguments' => 'mautic.factory',
-                'alias'     => 'campaignevent_form_field_value',
+                'arguments' => [
+                    'mautic.form.model.form',
+                ],
             ],
             'mautic.form.type.form_submitaction_sendemail' => [
                 'class'       => SubmitActionEmailType::class,
@@ -335,14 +300,13 @@ return [
                     'translator',
                     'mautic.helper.core_parameters',
                 ],
-                'alias'       => 'form_submitaction_sendemail',
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
                 ],
             ],
             'mautic.form.type.form_submitaction_repost' => [
-                'class'       => \Mautic\FormBundle\Form\Type\SubmitActionRepostType::class,
+                'class'       => SubmitActionRepostType::class,
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
@@ -424,7 +388,7 @@ return [
                 ],
             ],
             'mautic.form.service.field.value.transformer' => [
-                'class'     => \Mautic\FormBundle\Event\Service\FieldValueTransformer::class,
+                'class'     => FieldValueTransformer::class,
                 'arguments' => [
                     'router',
                 ],
