@@ -17,6 +17,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
+use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
 use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
@@ -246,7 +247,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.channelfrequency'),
                     'calendar',
                     'MauticCoreBundle:Slots:channelfrequency.html.php',
-                    'slot_channelfrequency',
+                    SlotChannelFrequencyType::class,
                     560
                 );
                 $event->addSlotType(
