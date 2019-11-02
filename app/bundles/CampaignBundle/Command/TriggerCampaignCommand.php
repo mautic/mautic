@@ -227,13 +227,6 @@ class TriggerCampaignCommand extends ModeratedCommand
                 'Set batch size of contacts to process per round. Defaults to 100.',
                 100
             )
-            // @deprecated 2.13.0 to be removed in 3.0; use inactive-only instead
-            ->addOption(
-                '--negative-only',
-                null,
-                InputOption::VALUE_NONE,
-                'Just execute the inactive events'
-            );
 
         parent::configure();
     }

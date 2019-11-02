@@ -13,8 +13,9 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Symfony\Component\EventDispatcher\Event;
 
-class ConditionEvent extends CampaignExecutionEvent
+class ConditionEvent extends Event
 {
     use ContextTrait;
 
@@ -43,19 +44,6 @@ class ConditionEvent extends CampaignExecutionEvent
     {
         $this->eventConfig = $config;
         $this->eventLog    = $log;
-
-        // @deprecated support for pre 2.13.0; to be removed in 3.0
-        parent::__construct(
-            [
-                'eventSettings'   => $config->getConfig(),
-                'eventDetails'    => null,
-                'event'           => $log->getEvent(),
-                'lead'            => $log->getLead(),
-                'systemTriggered' => $log->getSystemTriggered(),
-            ],
-            null,
-            $log
-        );
     }
 
     /**
@@ -96,39 +84,5 @@ class ConditionEvent extends CampaignExecutionEvent
     public function wasConditionSatisfied()
     {
         return $this->passed;
-    }
-
-    /**
-     * @param string   $channel
-     * @param null|int $channelId
-     */
-    public function setChannel($channel, $channelId = null)
-    {
-        $this->log->setChannel($this->channel)
-            ->setChannelId($this->channelId);
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return bool
-     */
-    public function getResult()
-    {
-        return $this->passed;
-    }
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @param $result
-     *
-     * @return $this
-     */
-    public function setResult($result)
-    {
-        $this->passed = (bool) $result;
-
-        return $this;
     }
 }

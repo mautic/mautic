@@ -15,11 +15,12 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 
 /**
  * Class EventModel.
  */
-class EventModel extends LegacyEventModel
+class EventModel extends CommonFormModel
 {
     /**
      * {@inheritdoc}
