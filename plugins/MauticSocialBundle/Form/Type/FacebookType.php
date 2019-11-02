@@ -68,7 +68,7 @@ class FacebookType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'socialmedia_facebook';
     }
