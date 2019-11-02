@@ -11,13 +11,18 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use DateTime;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class FocusController.
  */
-class FocusController extends FormController
+class FocusController extends AbstractFormController
 {
     public function __construct()
     {
@@ -36,7 +41,7 @@ class FocusController extends FormController
     /**
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -46,7 +51,7 @@ class FocusController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return JsonResponse|Response
      */
     public function newAction()
     {
@@ -59,7 +64,7 @@ class FocusController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return JsonResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -71,7 +76,7 @@ class FocusController extends FormController
      *
      * @param $objectId
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function viewAction($objectId)
     {
@@ -83,7 +88,7 @@ class FocusController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -95,7 +100,7 @@ class FocusController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -105,7 +110,7 @@ class FocusController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -119,7 +124,7 @@ class FocusController extends FormController
     public function customizeViewArguments($args, $view)
     {
         if ($view == 'view') {
-            /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $item */
+            /** @var Focus $item */
             $item = $args['viewParameters']['item'];
 
             // For line graphs in the view
@@ -138,13 +143,13 @@ class FocusController extends FormController
                 ]
             );
 
-            /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
+            /** @var FocusModel $model */
             $model = $this->getModel('focus');
             $stats = $model->getStats(
                 $item,
                 null,
-                new \DateTime($dateRangeForm->get('date_from')->getData()),
-                new \DateTime($dateRangeForm->get('date_to')->getData())
+                new DateTime($dateRangeForm->get('date_from')->getData()),
+                new DateTime($dateRangeForm->get('date_to')->getData())
             );
 
             $args['viewParameters']['stats']         = $stats;
