@@ -11,10 +11,13 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -27,11 +30,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class PageType extends AbstractType
 {
-    /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
-     */
-    private $translator;
-
     /**
      * @var bool|mixed
      */
@@ -58,15 +56,21 @@ class PageType extends AbstractType
     private $canViewOther = false;
 
     /**
-     * @param MauticFactory $factory
+     * @param EntityManager   $entityManager
+     * @param PageModel       $pageModel
+     * @param CorePermissions $corePermissions
+     * @param UserHelper      $userHelper
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator   = $factory->getTranslator();
-        $this->em           = $factory->getEntityManager();
-        $this->model        = $factory->getModel('page');
-        $this->canViewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
-        $this->user         = $factory->getUser();
+    public function __construct(
+        EntityManager $entityManager,
+        PageModel $pageModel,
+        CorePermissions $corePermissions,
+        UserHelper $userHelper
+    ) {
+        $this->em           = $entityManager;
+        $this->model        = $pageModel;
+        $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
+        $this->user         = $userHelper->getUser();
     }
 
     /**

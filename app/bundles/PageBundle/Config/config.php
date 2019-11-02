@@ -190,8 +190,13 @@ return [
         ],
         'forms' => [
             'mautic.form.type.page' => [
-                'class'     => 'Mautic\PageBundle\Form\Type\PageType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\PageBundle\Form\Type\PageType::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.page.model.page',
+                    'mautic.security',
+                    'mautic.helper.user',
+                ],
                 'alias'     => 'page',
             ],
             'mautic.form.type.pagevariant' => [
