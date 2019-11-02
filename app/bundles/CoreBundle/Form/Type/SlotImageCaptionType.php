@@ -39,31 +39,18 @@ class SlotImageCaptionType extends SlotType
             ]
         );
 
-        $builder->add('align', ButtonGroupType::class, [
-            'label'      => 'mautic.core.image.position',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'align',
-            ],
-            'choices' => [
-                'mautic.core.left'   => 'left',
-                'mautic.core.center' => 'center',
-                'mautic.core.right'  => 'right',
-            ],
-            'choices_as_values' => true,
-        ]);
-
-        $builder->add('text-align', ButtonGroupType::class, [
-                'label'      => 'mautic.core.caption.position',
-                'label_attr' => ['class' => 'control-label'],
-                'required'   => false,
-                'attr'       => [
+        $builder->add(
+            'align',
+            ButtonGroupType::class,
+            [
+                'label'             => 'mautic.core.image.position',
+                'label_attr'        => ['class' => 'control-label'],
+                'required'          => false,
+                'attr'              => [
                     'class'           => 'form-control',
-                    'data-slot-param' => 'text-align',
+                    'data-slot-param' => 'align',
                 ],
-                'choices' => [
+                'choices'           => [
                     'mautic.core.left'   => 'left',
                     'mautic.core.center' => 'center',
                     'mautic.core.right'  => 'right',
@@ -72,16 +59,40 @@ class SlotImageCaptionType extends SlotType
             ]
         );
 
-        $builder->add('color', 'text', [
-            'label'      => 'mautic.core.text.color',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'color',
-                'data-toggle'     => 'color',
-            ],
-        ]);
+        $builder->add(
+            'text-align',
+            ButtonGroupType::class,
+            [
+                'label'             => 'mautic.core.caption.position',
+                'label_attr'        => ['class' => 'control-label'],
+                'required'          => false,
+                'attr'              => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'text-align',
+                ],
+                'choices'           => [
+                    'mautic.core.left'   => 'left',
+                    'mautic.core.center' => 'center',
+                    'mautic.core.right'  => 'right',
+                ],
+                'choices_as_values' => true,
+            ]
+        );
+
+        $builder->add(
+            'color',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.text.color',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'color',
+                    'data-toggle'     => 'color',
+                ],
+            ]
+        );
 
         parent::buildForm($builder, $options);
     }

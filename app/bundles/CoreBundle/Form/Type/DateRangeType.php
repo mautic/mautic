@@ -13,6 +13,8 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -69,7 +71,7 @@ class DateRangeType extends AbstractType
 
         $builder->add(
             'date_from',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.date.from',
                 'label_attr' => ['class' => 'control-label'],
@@ -87,7 +89,7 @@ class DateRangeType extends AbstractType
 
         $builder->add(
             'date_to',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.date.to',
                 'label_attr' => ['class' => 'control-label'],
@@ -99,7 +101,7 @@ class DateRangeType extends AbstractType
 
         $builder->add(
             'apply',
-            'submit',
+            SubmitType::class,
             [
                 'label' => 'mautic.core.form.apply',
                 'attr'  => ['class' => 'btn btn-default'],

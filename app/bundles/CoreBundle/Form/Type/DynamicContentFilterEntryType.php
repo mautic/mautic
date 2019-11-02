@@ -15,6 +15,8 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -64,7 +66,7 @@ class DynamicContentFilterEntryType extends AbstractType
     {
         $builder->add(
             'content',
-            'textarea',
+            TextareaType::class,
             [
                 'label' => 'mautic.core.dynamicContent.alt_content',
                 'attr'  => [
@@ -76,7 +78,7 @@ class DynamicContentFilterEntryType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                'collection',
+                CollectionType::class,
                 [
                     'type'          => DynamicContentFilterEntryFiltersType::class,
                     'entry_options' => [

@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -42,7 +44,7 @@ class SlotSavePrefsButtonType extends SlotType
     {
         $builder->add(
             'link-text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.lead.field.label',
                 'label_attr' => ['class' => 'control-label'],
@@ -59,7 +61,7 @@ class SlotSavePrefsButtonType extends SlotType
 
         $builder->add(
             'border-radius',
-            'number',
+            NumberType::class,
             [
                 'label'      => 'mautic.core.button.border.radius',
                 'label_attr' => ['class' => 'control-label'],
@@ -114,7 +116,7 @@ class SlotSavePrefsButtonType extends SlotType
 
         $builder->add(
             'background-color',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.background.color',
                 'label_attr' => ['class' => 'control-label'],
@@ -129,7 +131,7 @@ class SlotSavePrefsButtonType extends SlotType
 
         $builder->add(
             'color',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.text.color',
                 'label_attr' => ['class' => 'control-label'],
