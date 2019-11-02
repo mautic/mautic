@@ -14,7 +14,7 @@ namespace Mautic\UserBundle\Form\Type;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserListType extends AbstractType
 {
@@ -34,7 +34,7 @@ class UserListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choices = [];
         $users   = $this->userModel->getRepository()->getEntities(
@@ -72,7 +72,7 @@ class UserListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'user_list';
     }

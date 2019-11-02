@@ -13,11 +13,8 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\UserBundle\Form\Type as FormType;
+use Mautic\UserBundle\Form\Type\ContactType;
 
-/**
- * Class UserController.
- */
 class UserController extends FormController
 {
     /**
@@ -444,7 +441,7 @@ class UserController extends FormController
         }
 
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'contact', 'objectId' => $objectId]);
-        $form   = $this->createForm(new FormType\ContactType(), [], ['action' => $action]);
+        $form   = $this->createForm(ContactType::class, [], ['action' => $action]);
 
         $currentUser = $this->user;
 

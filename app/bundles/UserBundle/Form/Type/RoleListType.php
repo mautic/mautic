@@ -14,7 +14,7 @@ namespace Mautic\UserBundle\Form\Type;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RoleListType extends AbstractType
 {
@@ -34,7 +34,7 @@ class RoleListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $choices = [];
         $roles   = $this->roleModel->getRepository()->getEntities(
@@ -72,7 +72,7 @@ class RoleListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'role_list';
     }
