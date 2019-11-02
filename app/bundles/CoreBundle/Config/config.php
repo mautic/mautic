@@ -321,8 +321,7 @@ return [
                 ],
             ],
             'mautic.form.type.slot.channelfrequency' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType',
-                'alias'     => 'slot_channelfrequency',
+                'class'     => \Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType::class,
                 'arguments' => [
                     'translator',
                 ],
