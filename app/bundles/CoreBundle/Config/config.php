@@ -269,7 +269,6 @@ return [
             ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
-                'alias'     => 'slot_saveprefsbutton',
                 'arguments' => [
                     'translator',
                 ],
