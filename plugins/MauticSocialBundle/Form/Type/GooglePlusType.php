@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,7 +26,7 @@ class GooglePlusType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('annotation', 'choice', [
+        $builder->add('annotation', ChoiceType::class, [
             'choices' => [
                 'inline'          => 'mautic.integration.GooglePlus.share.annotation.inline',
                 'bubble'          => 'mautic.integration.GooglePlus.share.annotation.bubble',
@@ -39,7 +40,7 @@ class GooglePlusType extends AbstractType
             'attr'        => ['class' => 'form-control'],
         ]);
 
-        $builder->add('height', 'choice', [
+        $builder->add('height', ChoiceType::class, [
             'choices' => [
                 ''   => 'mautic.integration.GooglePlus.share.height.standard',
                 '15' => 'mautic.integration.GooglePlus.share.height.small',
@@ -56,7 +57,7 @@ class GooglePlusType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'socialmedia_googleplus';
     }
