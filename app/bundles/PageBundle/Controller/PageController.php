@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
@@ -434,7 +435,7 @@ class PageController extends FormController
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->get('form.factory')->create('builder_section');
+        $sectionForm = $this->get('form.factory')->create(BuilderSectionType::class);
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -593,7 +594,7 @@ class PageController extends FormController
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->get('form.factory')->create('builder_section');
+        $sectionForm = $this->get('form.factory')->create(BuilderSectionType::class);
 
         return $this->delegateView([
             'viewParameters' => [

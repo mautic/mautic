@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -552,7 +553,7 @@ class EmailController extends FormController
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->get('form.factory')->create('builder_section');
+        $sectionForm = $this->get('form.factory')->create(BuilderSectionType::class);
         $routeParams = [
             'objectAction' => 'new',
         ];
@@ -767,7 +768,7 @@ class EmailController extends FormController
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->get('form.factory')->create('builder_section');
+        $sectionForm = $this->get('form.factory')->create(BuilderSectionType::class);
         $routeParams = [
             'objectAction' => 'edit',
             'objectId'     => $entity->getId(),
