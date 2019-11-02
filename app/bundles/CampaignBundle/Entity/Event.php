@@ -17,6 +17,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as Contact;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class Event.
@@ -197,28 +200,28 @@ class Event implements ChannelInterface
             ->length(50)
             ->build();
 
-        $builder->createField('eventType', 'string')
+        $builder->createField('eventType', TextType::class)
             ->columnName('event_type')
             ->length(50)
             ->build();
 
-        $builder->createField('order', 'integer')
+        $builder->createField('order', IntegerType::class)
             ->columnName('event_order')
             ->build();
 
         $builder->addField('properties', 'array');
 
-        $builder->createField('triggerDate', 'datetime')
+        $builder->createField('triggerDate', DateTimeType::class)
             ->columnName('trigger_date')
             ->nullable()
             ->build();
 
-        $builder->createField('triggerInterval', 'integer')
+        $builder->createField('triggerInterval', IntegerType::class)
             ->columnName('trigger_interval')
             ->nullable()
             ->build();
 
-        $builder->createField('triggerIntervalUnit', 'string')
+        $builder->createField('triggerIntervalUnit', TextType::class)
             ->columnName('trigger_interval_unit')
             ->length(1)
             ->nullable()
@@ -284,11 +287,11 @@ class Event implements ChannelInterface
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('channel', 'string')
+        $builder->createField('channel', TextType::class)
             ->nullable()
             ->build();
 
-        $builder->createField('channelId', 'integer')
+        $builder->createField('channelId', IntegerType::class)
             ->columnName('channel_id')
             ->nullable()
             ->build();
