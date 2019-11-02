@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Form\Type\SlotDwcType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotImageType;
+use Mautic\CoreBundle\Form\Type\SlotPreferredChannelType;
 use Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType;
 use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
@@ -243,7 +244,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.preferredchannel'),
                     'envelope-o',
                     'MauticCoreBundle:Slots:preferredchannel.html.php',
-                    'slot_preferredchannel',
+                    SlotPreferredChannelType::class,
                     570
                 );
                 $event->addSlotType(
