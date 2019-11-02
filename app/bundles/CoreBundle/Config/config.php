@@ -254,8 +254,7 @@ return [
                 ],
             ],
             'mautic.form.type.coreconfig.iplookup_download_data_store_button' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType',
-                'alias'     => 'iplookup_download_data_store_button',
+                'class'     => \Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType::class,
                 'arguments' => [
                     'mautic.helper.template.date',
                     'translator',
