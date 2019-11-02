@@ -11,10 +11,16 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -27,13 +33,13 @@ class MonitoringType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
-        $builder->add('title', 'text', [
+        $builder->add('title', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
-        $builder->add('description', 'textarea', [
+        $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
@@ -42,7 +48,7 @@ class MonitoringType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $builder->add('publishUp', 'datetime', [
+        $builder->add('publishUp', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => ['class' => 'control-label'],
@@ -54,7 +60,7 @@ class MonitoringType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('publishDown', 'datetime', [
+        $builder->add('publishDown', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => ['class' => 'control-label'],
@@ -66,7 +72,7 @@ class MonitoringType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('networkType', 'choice', [
+        $builder->add('networkType', ChoiceType::class, [
             'label'      => 'mautic.social.monitoring.type.list',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -90,7 +96,7 @@ class MonitoringType extends AbstractType
             );
         }
 
-        $builder->add('lists', 'leadlist_choices', [
+        $builder->add('lists', LeadListType::class, [
             'label'      => 'mautic.lead.lead.events.addtolists',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -101,7 +107,7 @@ class MonitoringType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
+        $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);
 
@@ -124,7 +130,7 @@ class MonitoringType extends AbstractType
         $resolver->setOptional(['networkType']);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'monitoring';
     }
