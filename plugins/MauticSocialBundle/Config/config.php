@@ -90,11 +90,9 @@ return [
                     'mautic.form.model.form',
                     'mautic.helper.core_parameters',
                     ],
-                'alias' => 'sociallogin',
             ],
             'mautic.form.type.social.facebook' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookType',
-                'alias' => 'socialmedia_facebook',
             ],
             'mautic.form.type.social.twitter' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
@@ -102,15 +100,12 @@ return [
             ],
             'mautic.form.type.social.googleplus' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType',
-                'alias' => 'socialmedia_googleplus',
             ],
             'mautic.form.type.social.linkedin' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
-                'alias' => 'socialmedia_linkedin',
             ],
             'mautic.social.form.type.twitter.tweet' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetType',
-                'alias'     => 'twitter_tweet',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
@@ -121,7 +116,6 @@ return [
             ],
             'mautic.social.form.type.network.twitter.abstract' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterAbstractType',
-                'alias' => 'twitter_abstract',
             ],
             'mautic.social.form.type.network.twitter.hashtag' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType',
