@@ -226,10 +226,6 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.tel' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\TelType',
-                'alias' => 'tel',
-            ],
             'mautic.form.type.button_group' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ButtonGroupType',
             ],
