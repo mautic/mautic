@@ -63,16 +63,16 @@ return [
                 'alias'     => 'sms',
             ],
             'mautic.form.type.smsconfig' => [
-                'class' => 'Mautic\SmsBundle\Form\Type\ConfigType',
+                'class' => \Mautic\SmsBundle\Form\Type\ConfigType::class,
                 'alias' => 'smsconfig',
             ],
             'mautic.form.type.smssend_list' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsSendType',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsSendType::class,
                 'arguments' => 'router',
                 'alias'     => 'smssend_list',
             ],
             'mautic.form.type.sms_list' => [
-                'class' => 'Mautic\SmsBundle\Form\Type\SmsListType',
+                'class' => \Mautic\SmsBundle\Form\Type\SmsListType::class,
                 'alias' => 'sms_list',
             ],
             'mautic.form.type.sms.config.form' => [
