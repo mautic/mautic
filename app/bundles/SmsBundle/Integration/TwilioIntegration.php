@@ -112,7 +112,7 @@ class TwilioIntegration extends AbstractIntegration
             );
             $builder->add('frequency_number', 'number',
                 [
-                    'precision'  => 0,
+                    'scale'      => 0,
                     'label'      => 'mautic.sms.list.frequency.number',
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
