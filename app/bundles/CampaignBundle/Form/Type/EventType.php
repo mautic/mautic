@@ -12,14 +12,9 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\Type\ButtonGroupType;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -42,7 +37,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'name',
-            TextType::class,
+            'text',
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -53,7 +48,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'anchor',
-            HiddenType::class,
+            'hidden',
             [
                 'label' => false,
             ]
@@ -84,7 +79,7 @@ class EventType extends AbstractType
             $triggerMode = (empty($options['data']['triggerMode'])) ? $default : $options['data']['triggerMode'];
             $builder->add(
                 'triggerMode',
-                ButtonGroupType::class,
+                'button_group',
                 [
                     'choices'     => $choices,
                     'expanded'    => true,
@@ -103,7 +98,7 @@ class EventType extends AbstractType
 
             $builder->add(
                 'triggerDate',
-                DateTimeType::class,
+                'datetime',
                 [
                     'label'  => false,
                     'attr'   => [
@@ -120,7 +115,7 @@ class EventType extends AbstractType
                 || null === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
             $builder->add(
                 'triggerInterval',
-                NumberType::class,
+                'number',
                 [
                     'label' => false,
                     'attr'  => [
@@ -134,7 +129,7 @@ class EventType extends AbstractType
             $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
             $builder->add(
                 'triggerIntervalUnit',
-                ChoiceType::class,
+                'choice',
                 [
                     'choices'     => [
                         'i' => 'mautic.campaign.event.intervalunit.choice.i',
@@ -234,11 +229,11 @@ class EventType extends AbstractType
             $this->addPropertiesType($builder, $options, $masks);
         }
 
-        $builder->add('type', HiddenType::class);
-        $builder->add('eventType', HiddenType::class);
+        $builder->add('type', 'hidden');
+        $builder->add('eventType', 'hidden');
         $builder->add(
             'anchorEventType',
-            HiddenType::class,
+            'hidden',
             [
                 'mapped' => false,
                 'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
@@ -247,7 +242,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'canvasSettings',
-            EventCanvasSettingsType::class,
+            'campaignevent_canvassettings',
             [
                 'label' => false,
             ]
@@ -264,7 +259,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'buttons',
-            FormButtonsType::class,
+            'form_buttons',
             [
                 'save_text'       => $btnValue,
                 'save_icon'       => $btnIcon,
@@ -276,7 +271,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'campaignId',
-            HiddenType::class,
+            'hidden',
             [
                 'mapped' => false,
             ]

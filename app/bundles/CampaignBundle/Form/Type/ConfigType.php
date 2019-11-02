@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -28,7 +27,7 @@ class ConfigType extends AbstractType
     {
         $builder->add(
             'campaign_time_wait_on_event_false',
-            ChoiceType::class,
+            'choice',
             [
                 'label'      => 'mautic.campaignconfig.campaign_time_wait_on_event_false',
                 'label_attr' => ['class' => 'control-label'],

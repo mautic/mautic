@@ -16,8 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 /**
  * Class LeadEventLog.
@@ -131,7 +129,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->addLead(false, 'CASCADE');
 
-        $builder->addField('rotation', IntegerType::class);
+        $builder->addField('rotation', 'integer');
 
         $builder->createManyToOne('campaign', 'Campaign')
             ->addJoinColumn('campaign_id', 'id')
@@ -139,7 +137,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateTriggered', DateTimeType::class)
+        $builder->createField('dateTriggered', 'datetime')
             ->columnName('date_triggered')
             ->nullable()
             ->build();
@@ -148,7 +146,7 @@ class LeadEventLog implements ChannelInterface
             ->columnName('is_scheduled')
             ->build();
 
-        $builder->createField('triggerDate', DateTimeType::class)
+        $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
             ->nullable()
             ->build();
@@ -165,7 +163,7 @@ class LeadEventLog implements ChannelInterface
                 ->nullable()
                 ->build();
 
-        $builder->addNamedField('channelId', IntegerType::class, 'channel_id', true);
+        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
 

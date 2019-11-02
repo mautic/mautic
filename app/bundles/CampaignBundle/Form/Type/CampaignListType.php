@@ -14,7 +14,6 @@ namespace Mautic\CampaignBundle\Form\Type;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -94,6 +93,6 @@ class CampaignListType extends AbstractType
 
     public function getParent()
     {
-        return ChoiceType::class;
+        return 'choice';
     }
 }

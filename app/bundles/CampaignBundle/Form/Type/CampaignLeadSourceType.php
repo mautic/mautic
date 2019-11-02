@@ -11,10 +11,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -32,7 +29,7 @@ class CampaignLeadSourceType extends AbstractType
             case 'lists':
                 $builder->add(
                     'lists',
-                    ChoiceType::class,
+                    'choice',
                     [
                         'choices'    => $options['source_choices'],
                         'multiple'   => true,
@@ -54,7 +51,7 @@ class CampaignLeadSourceType extends AbstractType
             case 'forms':
                 $builder->add(
                     'forms',
-                    ChoiceType::class,
+                    'choice',
                     [
                         'choices'    => $options['source_choices'],
                         'multiple'   => true,
@@ -77,11 +74,11 @@ class CampaignLeadSourceType extends AbstractType
                 break;
         }
 
-        $builder->add('sourceType', HiddenType::class);
+        $builder->add('sourceType', 'hidden');
 
-        $builder->add('droppedX', HiddenType::class);
+        $builder->add('droppedX', 'hidden');
 
-        $builder->add('droppedY', HiddenType::class);
+        $builder->add('droppedY', 'hidden');
 
         $update = !empty($options['data'][$sourceType]);
         if (!empty($update)) {
@@ -92,7 +89,7 @@ class CampaignLeadSourceType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', FormButtonsType::class, [
+        $builder->add('buttons', 'form_buttons', [
             'save_text'       => $btnValue,
             'save_icon'       => $btnIcon,
             'save_onclick'    => 'Mautic.submitCampaignSource(event)',

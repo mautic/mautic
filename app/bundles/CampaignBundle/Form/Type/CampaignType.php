@@ -11,17 +11,10 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -52,13 +45,13 @@ class CampaignType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('campaign', $options));
 
-        $builder->add('name', TextType::class, [
+        $builder->add('name', 'text', [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
-        $builder->add('description', TextareaType::class, [
+        $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
@@ -66,7 +59,7 @@ class CampaignType extends AbstractType
         ]);
 
         $builder->add('allowRestart',
-            YesNoButtonGroupType::class,
+            'yesno_button_group',
             [
                 'label' => 'mautic.campaign.allow_restart',
                 'attr'  => [
@@ -76,7 +69,7 @@ class CampaignType extends AbstractType
         );
 
         //add category
-        $builder->add('category', CategoryType::class, [
+        $builder->add('category', 'category', [
             'bundle' => 'campaign',
         ]);
 
@@ -91,12 +84,12 @@ class CampaignType extends AbstractType
             $data     = false;
         }
 
-        $builder->add('isPublished', YesNoButtonGroupType::class, [
+        $builder->add('isPublished', 'yesno_button_group', [
             'read_only' => $readonly,
             'data'      => $data,
         ]);
 
-        $builder->add('publishUp', DateTimeType::class, [
+        $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => ['class' => 'control-label'],
@@ -108,7 +101,7 @@ class CampaignType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('publishDown', DateTimeType::class, [
+        $builder->add('publishDown', 'datetime', [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => ['class' => 'control-label'],
@@ -120,7 +113,7 @@ class CampaignType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('sessionId', HiddenType::class, [
+        $builder->add('sessionId', 'hidden', [
             'mapped' => false,
         ]);
 
@@ -128,7 +121,7 @@ class CampaignType extends AbstractType
             $builder->setAction($options['action']);
         }
 
-        $builder->add('buttons', FormButtonsType::class, [
+        $builder->add('buttons', 'form_buttons', [
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',

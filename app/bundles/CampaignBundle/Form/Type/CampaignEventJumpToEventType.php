@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -32,7 +31,7 @@ class CampaignEventJumpToEventType extends AbstractType
 
         $builder->add(
             'jumpToEvent',
-            ChoiceType::class,
+            'choice',
             [
                 'choices'    => [],
                 'multiple'   => false,
