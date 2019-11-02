@@ -11,40 +11,18 @@
 
 namespace Mautic\SmsBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Translation\Translator;
+use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SmsType.
  */
 class SmsType extends AbstractType
 {
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     */
-    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
-    {
-        $this->translator = $translator;
-        $this->em         = $entityManager;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -181,7 +159,7 @@ class SmsType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\SmsBundle\Entity\Sms',
+                'data_class' => Sms::class,
             ]
         );
 

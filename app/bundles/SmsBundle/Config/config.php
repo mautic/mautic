@@ -60,10 +60,6 @@ return [
         'forms' => [
             'mautic.form.type.sms' => [
                 'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
-                'arguments' => [
-                    'translator',
-                    'doctrine.orm.entity_manager',
-                ],
                 'alias'     => 'sms',
             ],
             'mautic.form.type.smsconfig' => [
@@ -87,13 +83,14 @@ return [
         ],
         'helpers' => [
             'mautic.helper.sms' => [
-                'class'     => 'Mautic\SmsBundle\Helper\SmsHelper',
+                'class'     => \Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
                     'mautic.sms.model.sms',
                     'mautic.helper.integration',
+                    'mautic.lead.model.dnc',
                 ],
                 'alias' => 'sms_helper',
             ],
