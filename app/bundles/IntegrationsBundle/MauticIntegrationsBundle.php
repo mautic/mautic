@@ -20,7 +20,7 @@ use Mautic\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
 use Mautic\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class IntegrationsBundle extends AbstractPluginBundle
+class MauticIntegrationsBundle extends AbstractPluginBundle
 {
     /**
      * @param ContainerBuilder $container
