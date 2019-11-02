@@ -1,0 +1,58 @@
+{
+  "name": "mautic/integrations-bundle",
+  "description": "This plugin enables tools required to integration with 3rd party integrations.",
+  "type": "mautic-plugin",
+  "version": "2.0.0",
+  "keywords": ["mautic","plugin","integration"],
+  "config": {
+    "process-timeout": 2000,
+    "platform": {
+      "php": "7.1.28"
+    }
+  },
+  "authors": [
+    {
+      "name": "Jan Kozak",
+      "email": "galvani78@gmail.com",
+      "homepage": "https://github.com/galvani",
+      "role": "Engineer"
+    },
+    {
+      "name": "Don Gilbert",
+      "email": "don.gilbert@mautic.com",
+      "homepage": "https://github.com/dongilbert",
+      "role": "Engineer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "MauticPlugin\\IntegrationsBundle\\": "./"
+    }
+  },
+  "require": {
+    "mautic/composer-plugin": "^1.0",
+    "php": "^7.1 || ^7.2",
+    "guzzlehttp/oauth-subscriber": "^0.3"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^0.11.12",
+    "symplify/easy-coding-standard": "^6.0"
+  },
+  "scripts": {
+    "test": [
+      "@phpunit",
+      "@fixcs",
+      "@phpstan"
+    ],
+    "quicktest": [
+      "@unit"
+    ],
+    "phpunit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
+    "unit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
+    "coverage": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
+    "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=max Auth Bundle Command Config Configuration Controller DependencyInjection Entity Event EventListener Exception Facade Form Helper Integration Mapping Migration Migrations Sync Tests",
+    "csfixer": "vendor/bin/ecs check .",
+    "fixcs": "vendor/bin/ecs check . --fix"
+  },
+  "minimum-stability": "dev"
+}
