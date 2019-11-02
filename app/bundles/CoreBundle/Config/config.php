@@ -239,7 +239,6 @@ return [
             ],
             'mautic.form.type.standalone_button' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\StandAloneButtonType',
-                'alias' => 'standalone_button',
             ],
             'mautic.form.type.form_buttons' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\FormButtonsType',
