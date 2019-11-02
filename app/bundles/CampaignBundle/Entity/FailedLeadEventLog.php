@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class LeadEventLog.
@@ -54,7 +55,7 @@ class FailedLeadEventLog
 
         $builder->addDateAdded();
 
-        $builder->addNullableField('reason', 'text');
+        $builder->addNullableField('reason', TextType::class);
     }
 
     /**

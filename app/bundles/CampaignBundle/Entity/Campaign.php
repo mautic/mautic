@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -159,7 +160,7 @@ class Campaign extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
+        $builder->addNamedField('allowRestart', IntegerType::class, 'allow_restart');
     }
 
     /**

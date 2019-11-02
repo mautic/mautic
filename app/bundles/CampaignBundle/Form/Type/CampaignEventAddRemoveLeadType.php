@@ -26,7 +26,7 @@ class CampaignEventAddRemoveLeadType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('addTo', 'campaign_list', [
+        $builder->add('addTo', CampaignListType::class, [
             'label'      => 'mautic.campaign.form.addtocampaigns',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -37,7 +37,7 @@ class CampaignEventAddRemoveLeadType extends AbstractType
             'this_translation' => 'mautic.campaign.form.thiscampaign_restart',
         ]);
 
-        $builder->add('removeFrom', 'campaign_list', [
+        $builder->add('removeFrom', CampaignListType::class, [
             'label'      => 'mautic.campaign.form.removefromcampaigns',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
