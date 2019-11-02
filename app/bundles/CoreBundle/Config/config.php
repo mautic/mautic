@@ -293,10 +293,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.form.type.slot.socialfollow' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
-                'alias' => 'slot_socialfollow',
-            ],
             'mautic.form.type.slot.segmentlist' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
                 'arguments' => [
