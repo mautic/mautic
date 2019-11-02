@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -200,7 +201,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot_separator',
+                SlotSeparatorType::class,
                 400
             );
 

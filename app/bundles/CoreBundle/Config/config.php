@@ -293,9 +293,6 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotType',
                 'alias' => 'slot',
             ],
-            'mautic.form.type.slot.button' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
-            ],
             'mautic.form.type.slot.saveprefsbutton' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
                 'alias'     => 'slot_saveprefsbutton',
@@ -312,19 +309,6 @@ return [
             'mautic.form.type.slot.image' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
                 'alias' => 'slot_image',
-            ],
-            'mautic.form.type.slot.separator' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
-                'alias' => 'slot_separator',
-            ],
-            'mautic.form.type.slot.imagecard' => [
-                'class' => \Mautic\CoreBundle\Form\Type\SlotImageCardType::class,
-            ],
-            'mautic.form.type.slot.imagecaption' => [
-                'class' => \Mautic\CoreBundle\Form\Type\SlotImageCaptionType::class,
-            ],
-            'mautic.form.type.slot.socialshare' => [
-                'class' => \Mautic\CoreBundle\Form\Type\SlotSocialShareType::class,
             ],
             'mautic.form.type.slot.socialfollow' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',

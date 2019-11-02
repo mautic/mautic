@@ -49,7 +49,7 @@ class SlotSeparatorType extends SlotType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_separator';
     }
