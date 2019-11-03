@@ -24,7 +24,7 @@ class PointActionPageHitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('pages', 'page_list', [
+        $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.point.action.form.pages',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [

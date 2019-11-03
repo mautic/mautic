@@ -12,6 +12,9 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -24,7 +27,7 @@ class SlideshowSlideConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('slides:'.$options['data']['key'].':remove', 'checkbox', [
+        $builder->add('slides:'.$options['data']['key'].':remove', CheckboxType::class, [
             'label' => 'mautic.page.slideshow.remove',
             'attr'  => [
                 'data-slot-config'  => $options['data']['slot'],
@@ -33,7 +36,7 @@ class SlideshowSlideConfigType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('slides:'.$options['data']['key'].':captionheader', 'text', [
+        $builder->add('slides:'.$options['data']['key'].':captionheader', TextType::class, [
             'label'      => 'mautic.page.slideshow.caption.header',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -45,7 +48,7 @@ class SlideshowSlideConfigType extends AbstractType
             'data'     => isset($options['data']['captionheader']) ? $options['data']['captionheader'] : '',
         ]);
 
-        $builder->add('slides:'.$options['data']['key'].':captionbody', 'text', [
+        $builder->add('slides:'.$options['data']['key'].':captionbody', TextType::class, [
             'label'      => 'mautic.page.slideshow.caption.body',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -57,7 +60,7 @@ class SlideshowSlideConfigType extends AbstractType
             'data'     => isset($options['data']['captionbody']) ? $options['data']['captionbody'] : '',
         ]);
 
-        $builder->add('slides:'.$options['data']['key'].':background-image', 'text', [
+        $builder->add('slides:'.$options['data']['key'].':background-image', TextType::class, [
             'label'      => 'mautic.page.slideshow.background',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -69,7 +72,7 @@ class SlideshowSlideConfigType extends AbstractType
             'data'     => isset($options['data']['background-image']) ? $options['data']['background-image'] : '',
         ]);
 
-        $builder->add('slides:'.$options['data']['key'].':order', 'hidden', [
+        $builder->add('slides:'.$options['data']['key'].':order', HiddenType::class, [
             'attr' => [
                 'class'            => 'slide-order',
                 'data-slot-config' => $options['data']['slot'],

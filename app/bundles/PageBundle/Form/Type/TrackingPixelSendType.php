@@ -13,6 +13,8 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -44,7 +46,7 @@ class TrackingPixelSendType extends AbstractType
     {
         $trackingServices = $this->trackingHelper->getEnabledServices();
 
-        $builder->add('services', 'choice', [
+        $builder->add('services', ChoiceType::class, [
             'label'      => 'mautic.page.tracking.form.services',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -63,7 +65,7 @@ class TrackingPixelSendType extends AbstractType
 
         $builder->add(
             'category',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.page.tracking.form.category',
                 'label_attr' => ['class' => 'control-label'],
@@ -80,7 +82,7 @@ class TrackingPixelSendType extends AbstractType
 
         $builder->add(
             'action',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.page.tracking.form.action',
                 'label_attr' => ['class' => 'control-label'],
@@ -96,7 +98,7 @@ class TrackingPixelSendType extends AbstractType
 
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.page.tracking.form.label',
                 'label_attr' => ['class' => 'control-label'],

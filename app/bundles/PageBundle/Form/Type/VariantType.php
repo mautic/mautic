@@ -13,6 +13,8 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -41,7 +43,7 @@ class VariantType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('weight', 'integer', [
+        $builder->add('weight', IntegerType::class, [
             'label'      => 'mautic.core.ab_test.form.traffic_weight',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -61,7 +63,7 @@ class VariantType extends AbstractType
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 
-            $builder->add('winnerCriteria', 'choice', [
+            $builder->add('winnerCriteria', ChoiceType::class, [
                 'label'      => 'mautic.core.ab_test.form.winner',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [

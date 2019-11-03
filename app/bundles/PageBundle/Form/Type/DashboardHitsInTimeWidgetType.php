@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,7 +26,7 @@ class DashboardHitsInTimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('flag', 'choice', [
+        $builder->add('flag', ChoiceType::class, [
                 'label'   => 'mautic.page.visit.flag.filter',
                 'choices' => [
                     ''                 => 'mautic.page.show.total.visits',

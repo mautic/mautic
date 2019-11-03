@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -51,7 +52,7 @@ class SlideshowGlobalConfigType extends AbstractType
             ],
         ]);
 
-        $builder->add('height', 'text', [
+        $builder->add('height', TextType::class, [
             'label'      => 'mautic.page.slideshow.height',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -63,7 +64,7 @@ class SlideshowGlobalConfigType extends AbstractType
             'data'     => isset($options['data']['height']) ? $options['data']['height'] : '',
         ]);
 
-        $builder->add('width', 'text', [
+        $builder->add('width', TextType::class, [
             'label'      => 'mautic.page.slideshow.width',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -75,7 +76,7 @@ class SlideshowGlobalConfigType extends AbstractType
             'data'     => isset($options['data']['width']) ? $options['data']['width'] : '',
         ]);
 
-        $builder->add('background_color', 'text', [
+        $builder->add('background_color', TextType::class, [
             'label'      => 'mautic.page.slideshow.background.color',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [

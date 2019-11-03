@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -20,6 +21,11 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -84,7 +90,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'title',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.title',
                 'label_attr' => ['class' => 'control-label'],
@@ -94,7 +100,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'customHtml',
-            'textarea',
+            TextareaType::class,
             [
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
@@ -147,7 +153,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'publishUp',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishup',
@@ -163,7 +169,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'publishDown',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -177,7 +183,7 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('sessionId', 'hidden');
+        $builder->add('sessionId', HiddenType::class);
 
         //Custom field for redirect URL
         $this->model->getRepository()->setCurrentUser($this->user);
@@ -192,14 +198,14 @@ class PageType extends AbstractType
         $builder->add(
             $builder->create(
                 'variantParent',
-                'hidden'
+                HiddenType::class
             )->addModelTransformer($transformer)
         );
 
         $builder->add(
             $builder->create(
                 'translationParent',
-                'page_list',
+                PageListType::class,
                 [
                     'label'      => 'mautic.core.form.translation_parent',
                     'label_attr' => ['class' => 'control-label'],
@@ -220,7 +226,7 @@ class PageType extends AbstractType
             if ($isVariant) {
                 $form->add(
                     'variantSettings',
-                    'pagevariant',
+                    VariantType::class,
                     [
                         'label' => false,
                     ]
@@ -255,7 +261,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'metaDescription',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.page.form.metadescription',
                 'label_attr' => ['class' => 'control-label'],
@@ -279,7 +285,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'redirectUrl',
-            'url',
+            UrlType::class,
             [
                 'required'   => true,
                 'label'      => 'mautic.page.form.redirecturl',
@@ -300,7 +306,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -315,7 +321,7 @@ class PageType extends AbstractType
         //add category
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             [
                 'bundle' => 'page',
             ]
