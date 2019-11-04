@@ -34,7 +34,7 @@ class SmsListType extends AbstractType
                 'model_lookup_method' => 'getLookupResults',
                 'lookup_arguments'    => function (Options $options) {
                     return [
-                        'type'    => 'sms',
+                        'type'    => SmsType::class,
                         'filter'  => '$data',
                         'limit'   => 0,
                         'start'   => 0,
@@ -62,7 +62,7 @@ class SmsListType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'sms_list';
+        return self::class;
     }
 
     /**

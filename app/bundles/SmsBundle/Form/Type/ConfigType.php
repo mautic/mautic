@@ -72,6 +72,6 @@ class ConfigType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'smsconfig';
+        return self::class;
     }
 }

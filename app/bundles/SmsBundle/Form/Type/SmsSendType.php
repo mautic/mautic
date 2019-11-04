@@ -14,7 +14,7 @@ namespace Mautic\SmsBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -118,11 +118,11 @@ class SmsSendType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * @param OptionsResolverInterface $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefined(['update_select']);
+        $resolver->setOptional(['update_select']);
     }
 
     /**
@@ -130,6 +130,6 @@ class SmsSendType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'smssend_list';
+        return self::class;
     }
 }

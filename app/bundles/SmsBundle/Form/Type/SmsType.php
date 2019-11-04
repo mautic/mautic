@@ -178,6 +178,6 @@ class SmsType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'sms';
+        return self::class;
     }
 }

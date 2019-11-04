@@ -17,6 +17,7 @@ use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
 
 /**
@@ -65,7 +66,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'sms_list',
+                        'lookupFormType' => SmsListType::class,
                         'repository'     => 'MauticSmsBundle:Sms',
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],
