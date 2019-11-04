@@ -55,24 +55,13 @@ class AssetListType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $viewOther = $this->corePermissions->isGranted('asset:assets:viewother');
-        $repo      = $this->assetModel->getRepository();
-        $repo->setCurrentUser($this->userHelper->getUser());
-        $choices = $repo->getAssetList('', 0, 0, $viewOther);
-
-        foreach ($choices as $asset) {
-            $choices[$asset['language']][$asset['id']] = $asset['title'];
-        }
-
-        //sort by language
-        ksort($choices);
-
         $resolver->setDefaults([
-            'choices'     => $choices,
-            'empty_value' => false,
-            'expanded'    => false,
-            'multiple'    => true,
-            'required'    => false,
+            'choices'           => $this->getAssetChoices(),
+            'choices_as_values' => true,
+            'empty_value'       => false,
+            'expanded'          => false,
+            'multiple'          => true,
+            'required'          => false,
         ]);
     }
 
@@ -90,5 +79,26 @@ class AssetListType extends AbstractType
     public function getParent()
     {
         return ChoiceType::class;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAssetChoices()
+    {
+        $choices   = [];
+        $viewOther = $this->corePermissions->isGranted('asset:assets:viewother');
+        $repo      = $this->assetModel->getRepository();
+        $repo->setCurrentUser($this->userHelper->getUser());
+        $assets = $repo->getAssetList('', 0, 0, $viewOther);
+
+        foreach ($assets as $asset) {
+            $choices[$asset['language']][$asset['title']] = $asset['id'];
+        }
+
+        //sort by language
+        ksort($choices);
+
+        return $choices;
     }
 }
