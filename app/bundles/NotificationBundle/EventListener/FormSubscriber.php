@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -89,7 +90,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.notification.actions',
             'description' => 'mautic.notification.actions.mobile_tooltip',
             'label'       => 'mautic.notification.actions.send_mobile_notification',
-            'formType'    => 'notification_list',
+            'formType'    => NotificationListType::class,
             'formTheme'   => 'MauticNotificationBundle:FormTheme\NotificationSendList',
             'eventName'   => NotificationEvents::NOTIFICATION_ON_FORM_ACTION_SEND,
         ];
