@@ -130,6 +130,6 @@ class SmsSendType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return self::class;
+        return 'smssend_list';
     }
 }
