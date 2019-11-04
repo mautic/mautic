@@ -12,7 +12,6 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -23,6 +22,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
@@ -321,7 +321,7 @@ class PageType extends AbstractType
         //add category
         $builder->add(
             'category',
-            CategoryListType::class,
+            'category',
             [
                 'bundle' => 'page',
             ]
@@ -329,7 +329,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'language',
-            'locale',
+            LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
