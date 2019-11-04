@@ -133,6 +133,6 @@ class CampaignEventSendWebhookType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return self::class;
+        return 'campaignevent_sendwebhook';
     }
 }

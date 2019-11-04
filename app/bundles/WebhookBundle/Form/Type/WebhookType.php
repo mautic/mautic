@@ -147,6 +147,6 @@ class WebhookType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return self::class;
+        return 'webhook';
     }
 }
