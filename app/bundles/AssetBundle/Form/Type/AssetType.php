@@ -15,7 +15,6 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -33,24 +32,17 @@ class AssetType extends AbstractType
     private $translator;
 
     /**
-     * @var array
-     */
-    private $themes;
-
-    /**
      * @var AssetModel
      */
     private $assetModel;
 
     /**
      * @param TranslatorInterface $translator
-     * @param ThemeHelper         $themeHelper
      * @param AssetModel          $assetModel
      */
-    public function __construct(TranslatorInterface $translator, ThemeHelper $themeHelper, AssetModel $assetModel)
+    public function __construct(TranslatorInterface $translator, AssetModel $assetModel)
     {
         $this->translator = $translator;
-        $this->themes     = $themeHelper->getInstalledThemes('asset');
         $this->assetModel = $assetModel;
     }
 

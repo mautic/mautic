@@ -145,7 +145,6 @@ return [
                 'class'     => \Mautic\AssetBundle\Form\Type\AssetType::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.theme',
                     'mautic.asset.model.asset',
                 ],
             ],
