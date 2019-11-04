@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -20,22 +19,32 @@ use Symfony\Component\Finder\Finder;
 class AssetGenerationHelper
 {
     /**
-     * @var MauticFactory
+     * @var CoreParametersHelper
      */
-    private $factory;
+    private $coreParametersHelper;
 
     /**
-     * @var
+     * @var PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
+     * @var string
      */
     private $version;
 
     /**
-     * @param MauticFactory $factory
+     * AssetGenerationHelper constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param PathsHelper          $pathsHelper
+     * @param AppVersion           $version
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper, AppVersion $version)
     {
-        $this->factory = $factory;
-        $this->version = substr(hash('sha1', $this->factory->getParameter('secret_key').$this->factory->getVersion()), 0, 8);
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->pathsHelper          = $pathsHelper;
+        $this->version              = substr(hash('sha1', $coreParametersHelper->getParameter('secret_key').$version->getVersion()), 0, 8);
     }
 
     /**
@@ -51,9 +60,9 @@ class AssetGenerationHelper
 
         if (empty($assets)) {
             $loadAll    = true;
-            $env        = ($forceRegeneration) ? 'prod' : $this->factory->getEnvironment();
-            $rootPath   = $this->factory->getSystemPath('assets_root');
-            $assetsPath = $this->factory->getSystemPath('assets');
+            $env        = ($forceRegeneration) ? 'prod' : MAUTIC_ENV;
+            $rootPath   = $this->pathsHelper->getSystemPath('assets_root');
+            $assetsPath = $this->pathsHelper->getSystemPath('assets');
 
             $assetsFullPath = "$rootPath/$assetsPath";
             if ($env == 'prod') {
@@ -92,7 +101,7 @@ class AssetGenerationHelper
                 $modifiedLast = [];
 
                 //get a list of all core asset files
-                $bundles = $this->factory->getParameter('bundles');
+                $bundles = $this->coreParametersHelper->getParameter('bundles');
 
                 $fileTypes = ['css', 'js'];
                 foreach ($bundles as $bundle) {
@@ -210,7 +219,7 @@ class AssetGenerationHelper
      */
     protected function findAssets($dir, $ext, $env, &$assets)
     {
-        $rootPath    = str_replace('\\', '/', $this->factory->getSystemPath('assets_root').'/');
+        $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
         $directories->directories()->exclude('*less')->depth('0')->ignoreDotFiles(true)->in($dir);
 
@@ -303,8 +312,8 @@ class AssetGenerationHelper
      */
     protected function findOverrides($env, &$assets)
     {
-        $rootPath      = $this->factory->getSystemPath('assets_root');
-        $currentTheme  = $this->factory->getSystemPath('current_theme');
+        $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
+        $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');
         $modifiedLast  = [];
         $types         = ['css', 'js'];
         $overrideFiles = [
