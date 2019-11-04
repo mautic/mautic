@@ -583,8 +583,11 @@ return [
                 ],
             ],
             'mautic.translation.loader' => [
-                'class'     => 'Mautic\CoreBundle\Loader\TranslationLoader',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\CoreBundle\Loader\TranslationLoader::class,
+                'arguments' => [
+                    'mautic.helper.bundle',
+                    'mautic.helper.paths',
+                ],
                 'tag'       => 'translation.loader',
                 'alias'     => 'mautic',
             ],
