@@ -36,35 +36,14 @@ class UserListType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = [];
-        $users   = $this->userModel->getRepository()->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'u.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                    ],
-                ],
-            ]
-        );
-
-        foreach ($users as $user) {
-            $choices[$user->getId()] = $user->getName(true);
-        }
-
-        //sort by language
-        ksort($choices);
-
         $resolver->setDefaults(
             [
-                'choices'     => $choices,
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'empty_value' => 'mautic.core.form.chooseone',
+                'choices'           => $this->getUserChoices(),
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'empty_value'       => 'mautic.core.form.chooseone',
             ]
         );
     }
@@ -83,5 +62,35 @@ class UserListType extends AbstractType
     public function getParent()
     {
         return ChoiceType::class;
+    }
+
+    /**
+     * @return array
+     */
+    private function getUserChoices()
+    {
+        $choices = [];
+        $users   = $this->userModel->getRepository()->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'u.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        foreach ($users as $user) {
+            $choices[$user->getName(true)] = $user->getId();
+        }
+
+        //sort by user name
+        ksort($choices);
+
+        return $choices;
     }
 }

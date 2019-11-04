@@ -213,10 +213,11 @@ class UserType extends AbstractType
             'locale',
             ChoiceType::class,
             [
-                'choices'    => $this->getSupportedLanguageChoices(),
-                'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'choices'           => $this->getSupportedLanguageChoices(),
+                'choices_as_values' => true,
+                'label'             => 'mautic.core.language',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => [
                     'class' => 'form-control',
                 ],
                 'multiple'    => false,
@@ -322,13 +323,13 @@ class UserType extends AbstractType
         $choices   = [];
 
         foreach ($languages as $code => $langData) {
-            $choices[$code] = $langData['name'];
+            $choices[$langData['name']] = $code;
         }
 
-        $choices = array_merge($choices, $this->parametersHelper->getParameter('supported_languages'));
+        $choices = array_merge($choices, array_flip($this->parametersHelper->getParameter('supported_languages')));
 
         // Alpha sort the languages by name
-        asort($choices);
+        ksort($choices);
 
         return $choices;
     }

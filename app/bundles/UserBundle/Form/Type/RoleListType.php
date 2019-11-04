@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class RoleListType extends AbstractType
 {
     /**
-     * @var roleModel
+     * @var RoleModel
      */
     private $roleModel;
 
@@ -36,35 +36,14 @@ class RoleListType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $choices = [];
-        $roles   = $this->roleModel->getRepository()->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'r.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                    ],
-                ],
-            ]
-        );
-
-        foreach ($roles as $role) {
-            $choices[$role->getId()] = $role->getName(true);
-        }
-
-        //sort by name
-        ksort($choices);
-
         $resolver->setDefaults(
             [
-                'choices'     => $choices,
-                'expanded'    => false,
-                'multiple'    => false,
-                'required'    => false,
-                'empty_value' => 'mautic.core.form.chooseone',
+                'choices'           => $this->getRoleChoices(),
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'required'          => false,
+                'empty_value'       => 'mautic.core.form.chooseone',
             ]
         );
     }
@@ -83,5 +62,35 @@ class RoleListType extends AbstractType
     public function getParent()
     {
         return ChoiceType::class;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRoleChoices()
+    {
+        $choices = [];
+        $roles   = $this->roleModel->getRepository()->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'r.isPublished',
+                            'expr'   => 'eq',
+                            'value'  => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        foreach ($roles as $role) {
+            $choices[$role->getName(true)] = $role->getId();
+        }
+
+        //sort by name
+        ksort($choices);
+
+        return $choices;
     }
 }
