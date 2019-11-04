@@ -14,7 +14,6 @@ namespace Mautic\SmsBundle\Form\Type;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -134,7 +133,7 @@ class SmsType extends AbstractType
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                FormButtonsType::class,
+                'form_buttons',
                 [
                     'apply_text' => false,
                 ]
@@ -150,7 +149,7 @@ class SmsType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                FormButtonsType::class
+                'form_buttons'
             );
         }
 
