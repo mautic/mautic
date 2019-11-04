@@ -12,7 +12,6 @@
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
-use ReflectionClass;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -47,8 +46,8 @@ class ConfigType extends AbstractType
                     unset($config['parameters'][$checkMe]);
                 }
                 $builder->add(
-                    $this->generateFormName($config),
                     $config['formAlias'],
+                    $config['formType'] ?? $config['formAlias'], // this condition should not be needed after Symfony 3 refactoring.
                     [
                         'data' => $config['parameters'],
                     ]
@@ -101,24 +100,5 @@ class ConfigType extends AbstractType
                 'fileFields' => [],
             ]
         );
-    }
-
-    /**
-     * Builds form name out of provided bundle and form class name (formAlias).
-     *
-     * @param array $config
-     *
-     * @return string
-     */
-    private function generateFormName(array $config)
-    {
-        // @deprecated This condition can be deleted once Mautic uses Symfony 3 and all formAliases are class names.
-        if (!class_exists($config['formAlias'])) {
-            return $config['formAlias'];
-        }
-
-        $reflection = new ReflectionClass($config['formAlias']);
-
-        return "{$config['bundle']}_{$reflection->getShortName()}";
     }
 }

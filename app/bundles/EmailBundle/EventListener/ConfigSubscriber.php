@@ -55,6 +55,7 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $event->addForm([
             'bundle'     => 'EmailBundle',
+            'formType'   => ConfigType::class,
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticEmailBundle'),
