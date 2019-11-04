@@ -67,6 +67,6 @@ class ConfigType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'webhookconfig';
+        return self::class;
     }
 }

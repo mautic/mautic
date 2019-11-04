@@ -112,7 +112,7 @@ class WebhookType extends AbstractType
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $builder->add('eventsOrderbyDir', 'choice', [
+        $builder->add('eventsOrderbyDir', ChoiceType::class, [
             'choices' => [
                 ''             => 'mautic.core.form.default',
                 Criteria::ASC  => 'mautic.webhook.config.event.orderby.chronological',
@@ -147,6 +147,6 @@ class WebhookType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'webhook';
+        return self::class;
     }
 }

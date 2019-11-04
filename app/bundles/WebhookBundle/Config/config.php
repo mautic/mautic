@@ -52,18 +52,15 @@ return [
         'forms' => [
             'mautic.form.type.webhook' => [
                 'class'     => \Mautic\WebhookBundle\Form\Type\WebhookType::class,
-                'alias'     => 'webhook',
             ],
             'mautic.form.type.webhookconfig' => [
                 'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
-                'alias' => 'webhookconfig',
             ],
             'mautic.campaign.type.action.sendwebhook' => [
                 'class'     => \Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType::class,
                 'arguments' => [
                     'arguments' => 'translator',
                 ],
-                'alias' => 'campaignevent_sendwebhook',
             ],
         ],
         'events' => [
