@@ -714,10 +714,10 @@ return [
                 'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
             ],
             'mautic.menu_renderer' => [
-                'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
+                'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 'arguments' => [
                     'knp_menu.matcher',
-                    'mautic.factory',
+                    'mautic.helper.templating',
                     '%kernel.charset%',
                 ],
                 'tag'   => 'knp_menu.renderer',
