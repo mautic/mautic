@@ -19,7 +19,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -42,11 +41,6 @@ class CommonRepository extends EntityRepository
      * @var User
      */
     protected $currentUser;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
 
     /**
      * @var TranslatorInterface
@@ -814,14 +808,6 @@ class CommonRepository extends EntityRepository
             $user = new User();
         }
         $this->currentUser = $user;
-    }
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
     }
 
     /**
