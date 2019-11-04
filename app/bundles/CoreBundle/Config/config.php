@@ -357,8 +357,14 @@ return [
                 'alias'     => 'exception',
             ],
             'mautic.helper.template.gravatar' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\GravatarHelper',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'templating.helper.assets',
+                    'mautic.helper.template.avatar',
+                    'mautic.helper.core_parameters',
+                    'request_stack',
+                ],
                 'alias'     => 'gravatar',
             ],
             'mautic.helper.template.analytics' => [
