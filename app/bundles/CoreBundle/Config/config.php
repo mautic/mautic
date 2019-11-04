@@ -618,8 +618,12 @@ return [
             ],
             // Helpers
             'mautic.helper.assetgeneration' => [
-                'class'     => 'Mautic\CoreBundle\Helper\AssetGenerationHelper',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                    'mautic.helper.app_version',
+                ],
             ],
             'mautic.helper.cookie' => [
                 'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
