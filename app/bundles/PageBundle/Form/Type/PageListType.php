@@ -84,7 +84,7 @@ class PageListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'page_list';
     }

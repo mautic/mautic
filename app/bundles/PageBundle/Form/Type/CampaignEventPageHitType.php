@@ -58,7 +58,7 @@ class CampaignEventPageHitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_pagehit';
     }

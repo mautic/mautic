@@ -85,7 +85,7 @@ class PagePublishDatesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'page_publish_dates';
     }

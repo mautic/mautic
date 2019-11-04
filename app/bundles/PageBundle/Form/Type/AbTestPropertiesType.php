@@ -46,7 +46,7 @@ class AbTestPropertiesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'page_abtest_settings';
     }

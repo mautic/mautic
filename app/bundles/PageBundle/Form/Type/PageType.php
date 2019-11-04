@@ -374,7 +374,7 @@ class PageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'page';
     }

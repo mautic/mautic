@@ -135,7 +135,7 @@ class PointActionUrlHitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointaction_urlhit';
     }

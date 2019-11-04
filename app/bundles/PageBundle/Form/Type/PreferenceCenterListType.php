@@ -86,7 +86,7 @@ class PreferenceCenterListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'preference_center_list';
     }

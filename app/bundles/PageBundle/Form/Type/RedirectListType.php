@@ -50,7 +50,7 @@ class RedirectListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'redirect_list';
     }
