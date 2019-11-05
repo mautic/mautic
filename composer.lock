@@ -10223,7 +10223,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "1219418720cac8fa09ce3c76480185fc41f9bce3"
+                "reference": "35979d2d341e4b10d40777328723511c71213a73"
             },
             "require": {
                 "php": ">=7.1",
@@ -10255,7 +10255,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2019-11-05T15:48:49+00:00"
+            "time": "2019-11-05T16:24:30+00:00"
         },
         {
             "name": "zendframework/zend-code",
