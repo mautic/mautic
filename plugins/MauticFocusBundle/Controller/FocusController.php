@@ -12,7 +12,7 @@
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use DateTime;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,20 +22,22 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class FocusController.
  */
-class FocusController extends AbstractFormController
+class FocusController extends AbstractStandardFormController
 {
-    public function __construct()
+    /**
+     * @return string
+     */
+    protected function getControllerBase()
     {
-        $this->setStandardParameters(
-            'focus',
-            'plugin:focus:items',
-            'mautic_focus',
-            'mautic_focus',
-            'mautic.focus',
-            'MauticFocusBundle:Focus',
-            null,
-            'focus'
-        );
+        return 'MauticFocusBundle:Focus';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getModelName()
+    {
+        return 'focus';
     }
 
     /**
@@ -118,12 +120,16 @@ class FocusController extends AbstractFormController
     }
 
     /**
-     * @param $args
-     * @param $view
+     * @param array $args
+     * @param       $action
+     *
+     * @return array
+     *
+     * @throws \Exception
      */
-    public function customizeViewArguments($args, $view)
+    public function getViewArguments(array $args, $action)
     {
-        if ($view == 'view') {
+        if ($action == 'view') {
             /** @var Focus $item */
             $item = $args['viewParameters']['item'];
 
