@@ -648,7 +648,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'monitored_email',
-            'monitored_email',
+            ConfigMonitoredEmailType::class,
             [
                 'label'    => false,
                 'data'     => (array_key_exists('monitored_email', $options['data'])) ? $options['data']['monitored_email'] : [],

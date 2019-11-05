@@ -15,10 +15,9 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
+use Mautic\PageBundle\Form\Type\ConfigType;
 
-/**
- * Class ConfigSubscriber.
- */
 class ConfigSubscriber extends CommonSubscriber
 {
     /**
@@ -40,6 +39,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             // parameters must be defined directly in case there are 2 config forms per bundle.
             // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
@@ -56,6 +56,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'trackingconfig',
+            'formType'   => ConfigTrackingPageType::class,
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             // parameters defined this way because of the reason as above.
             'parameters' => [
