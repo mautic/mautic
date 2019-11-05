@@ -764,11 +764,14 @@ return [
 
             // Form extensions
             'mautic.form.extension.custom' => [
-                'class'     => 'Mautic\CoreBundle\Form\Extension\CustomFormExtension',
-                'arguments' => [
+                'class'        => \Mautic\CoreBundle\Form\Extension\CustomFormExtension::class,
+                'arguments'    => [
                     'event_dispatcher',
                 ],
-                'tag'       => 'form.type_extension',
+                'tag'          => 'form.type_extension',
+                'tagArguments' => [
+                    'extended_type' => Symfony\Component\Form\Extension\Core\Type\FormType::class,
+                ],
             ],
 
             // Twig
