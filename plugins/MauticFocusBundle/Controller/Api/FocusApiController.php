@@ -29,7 +29,7 @@ class FocusApiController extends CommonApiController
         $this->entityClass     = 'MauticPlugin\MauticFocusBundle\Entity\Focus';
         $this->entityNameOne   = 'focus';
         $this->entityNameMulti = 'focus';
-        $this->permissionBase  = 'plugin:focus:items';
+        $this->permissionBase  = 'focus:items';
         $this->dataInputMasks  = [
             'html'   => 'html',
             'editor' => 'html',

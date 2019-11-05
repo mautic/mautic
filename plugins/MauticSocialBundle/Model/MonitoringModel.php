@@ -142,7 +142,7 @@ class MonitoringModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:mauticSocial:monitoring';
+        return 'mauticSocial:monitoring';
     }
 
     /**
