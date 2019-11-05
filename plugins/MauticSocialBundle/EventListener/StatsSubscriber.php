@@ -30,7 +30,7 @@ class StatsSubscriber extends CommonStatsSubscriber
         $this->repositories[]      = $repo;
         $table                     = $repo->getTableName();
         $this->permissions[$table] = [
-            'tweet' => 'plugin:mauticSocial:tweets',
+            'tweet' => 'mauticSocial:tweets',
         ];
     }
 }

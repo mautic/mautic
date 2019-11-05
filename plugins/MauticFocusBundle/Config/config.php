@@ -162,7 +162,7 @@ return [
         'main' => [
             'mautic.focus' => [
                 'route'    => 'mautic_focus_index',
-                'access'   => 'plugin:focus:items:view',
+                'access'   => 'focus:items:view',
                 'parent'   => 'mautic.core.channels',
                 'priority' => 10,
             ],
