@@ -10,6 +10,8 @@
 /app/tests.bootstrap*
 /app/phpunit.xml
 
+/var/bootstrap*
+
 /app/bundles/CoreBundle/Assets/css/app/less/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/**/*.css
 /app/bundles/CoreBundle/Assets/css/libraries/Froala/plugins/*.css
