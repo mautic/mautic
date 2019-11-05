@@ -47,7 +47,7 @@ class ConfigType extends AbstractType
                 }
                 $builder->add(
                     $config['formAlias'],
-                    $config['formType'] ?? $config['formAlias'], // this condition should not be needed after Symfony 3 refactoring.
+                    $config['formType'],
                     [
                         'data' => $config['parameters'],
                     ]
