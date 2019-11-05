@@ -85,6 +85,14 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
+    }
+
+    /**
      * Register a plugin in the Transport.
      *
      * @param \Swift_Events_EventListener $plugin
@@ -107,14 +115,14 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param null                $failedRecipients
      *
      * @return int
      *
      * @throws \Exception
      */
-    abstract public function send(\Swift_Mime_Message $message, &$failedRecipients = null);
+    abstract public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null);
 
     /**
      * Get the metadata from a MauticMessage.
