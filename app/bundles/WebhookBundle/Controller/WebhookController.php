@@ -11,7 +11,7 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Mautic\FormBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\FormController;
 
 /**
  * Class WebhookController.
