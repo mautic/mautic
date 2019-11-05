@@ -65,7 +65,7 @@ class DynamicListType extends AbstractType
                 'remove_icon'     => 'fa fa-times',
                 'sortable'        => 'fa fa-ellipsis-v handle',
                 'label'           => false,
-                'entity_options'  => [
+                'entry_options'   => [
                     'label'    => false,
                     'required' => false,
                     'attr'     => [
