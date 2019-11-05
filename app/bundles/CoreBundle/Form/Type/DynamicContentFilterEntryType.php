@@ -132,7 +132,7 @@ class DynamicContentFilterEntryType extends AbstractType
         return 'dynamic_content_filter_entry';
     }
 
-    private function filterFieldChoices(): array
+    private function filterFieldChoices()
     {
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],
