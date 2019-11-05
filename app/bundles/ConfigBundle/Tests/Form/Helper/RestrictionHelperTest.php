@@ -44,9 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class RestrictionHelperTest.
- *
- * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper
+ * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 class RestrictionHelperTest extends TypeTestCase
 {
@@ -166,9 +164,9 @@ class RestrictionHelperTest extends TypeTestCase
     {
         $form = $this->factory->create(ConfigType::class, $this->forms);
 
-        $this->assertTrue($form->has('EmailBundle_ConfigType'));
+        $this->assertTrue($form->has('emailconfig'));
 
-        $emailConfig = $form->get('EmailBundle_ConfigType');
+        $emailConfig = $form->get('emailconfig');
 
         // mailer_api_key is restricted and so should not be included
         $this->assertFalse($emailConfig->has('mailer_api_key'));
@@ -210,7 +208,7 @@ class RestrictionHelperTest extends TypeTestCase
 
         $form = $this->factory->create(ConfigType::class, $this->forms);
         /** @var FormInterface $address */
-        $address = $form['EmailBundle_ConfigType']['monitored_email']['EmailBundle_unsubscribes']['address'];
+        $address = $form['emailconfig']['monitored_email']['EmailBundle_unsubscribes']['address'];
 
         $this->assertTrue($address->getConfig()->getOption('read_only'));
         $this->assertTrue($address->getConfig()->getOption('disabled'));
