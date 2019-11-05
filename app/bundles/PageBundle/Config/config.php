@@ -197,24 +197,19 @@ return [
                     'mautic.security',
                     'mautic.helper.user',
                 ],
-                'alias'     => 'page',
             ],
             'mautic.form.type.pagevariant' => [
                 'class'     => \Mautic\PageBundle\Form\Type\VariantType::class,
                 'arguments' => ['mautic.page.model.page'],
-                'alias'     => 'pagevariant',
             ],
             'mautic.form.type.pointaction_pointhit' => [
                 'class' => 'Mautic\PageBundle\Form\Type\PointActionPageHitType',
-                'alias' => 'pointaction_pagehit',
             ],
             'mautic.form.type.pointaction_urlhit' => [
                 'class' => 'Mautic\PageBundle\Form\Type\PointActionUrlHitType',
-                'alias' => 'pointaction_urlhit',
             ],
             'mautic.form.type.pagehit.campaign_trigger' => [
                 'class' => 'Mautic\PageBundle\Form\Type\CampaignEventPageHitType',
-                'alias' => 'campaignevent_pagehit',
             ],
             'mautic.form.type.pagelist' => [
                 'class'     => \Mautic\PageBundle\Form\Type\PageListType::class,
@@ -222,7 +217,6 @@ return [
                     'mautic.page.model.page',
                     'mautic.security',
                 ],
-                'alias'     => 'page_list',
             ],
             'mautic.form.type.preferencecenterlist' => [
                 'class'     => \Mautic\PageBundle\Form\Type\PreferenceCenterListType::class,
@@ -230,44 +224,34 @@ return [
                     'mautic.page.model.page',
                     'mautic.security',
                 ],
-                'alias'     => 'preference_center_list',
             ],
             'mautic.form.type.page_abtest_settings' => [
                 'class' => 'Mautic\PageBundle\Form\Type\AbTestPropertiesType',
-                'alias' => 'page_abtest_settings',
             ],
             'mautic.form.type.page_publish_dates' => [
                 'class' => 'Mautic\PageBundle\Form\Type\PagePublishDatesType',
-                'alias' => 'page_publish_dates',
             ],
             'mautic.form.type.pageconfig' => [
                 'class' => 'Mautic\PageBundle\Form\Type\ConfigType',
-                'alias' => 'pageconfig',
             ],
             'mautic.form.type.trackingconfig' => [
                 'class' => 'Mautic\PageBundle\Form\Type\ConfigTrackingPageType',
-                'alias' => 'trackingconfig',
             ],
             'mautic.form.type.slideshow_config' => [
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType',
-                'alias' => 'slideshow_config',
             ],
             'mautic.form.type.slideshow_slide_config' => [
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowSlideConfigType',
-                'alias' => 'slideshow_slide_config',
             ],
             'mautic.form.type.redirect_list' => [
                 'class'     => \Mautic\PageBundle\Form\Type\RedirectListType::class,
                 'arguments' => ['mautic.helper.core_parameters'],
-                'alias'     => 'redirect_list',
             ],
             'mautic.form.type.page_dashboard_hits_in_time_widget' => [
                 'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
-                'alias' => 'page_dashboard_hits_in_time_widget',
             ],
             'mautic.page.tracking.pixel.send' => [
                 'class'     => 'Mautic\PageBundle\Form\Type\TrackingPixelSendType',
-                'alias'     => 'tracking_pixel_send_action',
                 'arguments' => [
                     'mautic.page.helper.tracking',
                 ],
