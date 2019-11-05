@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -44,7 +43,7 @@ class ListApiController extends CommonApiController
     public function getListsAction()
     {
         $lists   = $this->getModel('lead.list')->getUserLists();
-        $view    = $this->view($lists, Codes::HTTP_OK);
+        $view    = $this->view($lists, Response::HTTP_OK);
         $context = SerializationContext::create()->setGroups(['leadListList']);
         $view->setSerializationContext($context);
 
@@ -82,7 +81,7 @@ class ListApiController extends CommonApiController
 
         $this->getModel('lead')->addToLists($leadId, $entity);
 
-        $view = $this->view(['success' => 1], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -100,7 +99,7 @@ class ListApiController extends CommonApiController
     {
         $contactIds = $this->request->request->get('ids');
         if (null === $contactIds) {
-            return $this->returnError('mautic.core.error.badrequest', Codes::HTTP_BAD_REQUEST);
+            return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
         }
 
         $entity = $this->model->getEntity($id);
@@ -127,7 +126,7 @@ class ListApiController extends CommonApiController
             }
         }
 
-        $view = $this->view(['success' => 1, 'details' => $responseDetail], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1, 'details' => $responseDetail], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -163,7 +162,7 @@ class ListApiController extends CommonApiController
 
         $this->getModel('lead')->removeFromLists($leadId, $entity);
 
-        $view = $this->view(['success' => 1], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1], Response::HTTP_OK);
 
         return $this->handleView($view);
     }

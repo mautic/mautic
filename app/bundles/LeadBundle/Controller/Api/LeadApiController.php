@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -89,7 +89,7 @@ class LeadApiController extends CommonApiController
         $limit   = $this->request->query->get('limit', null);
         $start   = $this->request->query->get('start', null);
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
-        $view    = $this->view($users, Codes::HTTP_OK);
+        $view    = $this->view($users, Response::HTTP_OK);
         $context = SerializationContext::create()->setGroups(['userList']);
         $view->setSerializationContext($context);
 
@@ -122,7 +122,7 @@ class LeadApiController extends CommonApiController
             ]
         );
 
-        $view    = $this->view($fields, Codes::HTTP_OK);
+        $view    = $this->view($fields, Response::HTTP_OK);
         $context = SerializationContext::create()->setGroups(['leadFieldList']);
         $view->setSerializationContext($context);
 
@@ -174,7 +174,7 @@ class LeadApiController extends CommonApiController
                 'total' => $count,
                 'notes' => $notes,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
         $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
@@ -228,7 +228,7 @@ class LeadApiController extends CommonApiController
                 'total'   => $count,
                 'devices' => $devices,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
         $context = SerializationContext::create()->setGroups(['leadDeviceDetails']);
@@ -268,7 +268,7 @@ class LeadApiController extends CommonApiController
                     'total' => count($lists),
                     'lists' => $lists,
                 ],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
 
             return $this->handleView($view);
@@ -303,7 +303,7 @@ class LeadApiController extends CommonApiController
                 'total'     => count($companies),
                 'companies' => $companies,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
         return $this->handleView($view);
@@ -347,7 +347,7 @@ class LeadApiController extends CommonApiController
                     'total'     => count($campaigns),
                     'campaigns' => $campaigns,
                 ],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             );
 
             return $this->handleView($view);
@@ -683,7 +683,7 @@ class LeadApiController extends CommonApiController
                     $msg = $this->translator->trans('mautic.core.error.badrequest', [], 'flashes');
                 }
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST, $formErrors);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST, $formErrors);
             }
 
             unset($parameters['frequencyRules']);

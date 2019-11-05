@@ -75,7 +75,7 @@ class TriggerApiController extends CommonApiController
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError('Trigger events: '.$msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError('Trigger events: '.$msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 

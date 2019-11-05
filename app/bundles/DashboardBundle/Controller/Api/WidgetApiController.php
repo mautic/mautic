@@ -11,7 +11,7 @@
 
 namespace Mautic\DashboardBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -47,7 +47,7 @@ class WidgetApiController extends CommonApiController
         $event      = new WidgetTypeListEvent();
         $event->setTranslator($this->get('translator'));
         $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
-        $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Codes::HTTP_OK);
+        $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -73,7 +73,7 @@ class WidgetApiController extends CommonApiController
         try {
             DateTimeHelper::validateMysqlDateTimeUnit($unit);
         } catch (\InvalidArgumentException $e) {
-            return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
         if ($timezone) {
@@ -140,7 +140,7 @@ class WidgetApiController extends CommonApiController
         $response['success']        = 1;
         $response['data']           = $data;
 
-        $view = $this->view($response, Codes::HTTP_OK);
+        $view = $this->view($response, Response::HTTP_OK);
 
         return $this->handleView($view);
     }

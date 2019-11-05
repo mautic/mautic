@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -62,7 +61,7 @@ class CampaignApiController extends CommonApiController
 
             $this->model->addLead($entity, $leadId);
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -91,7 +90,7 @@ class CampaignApiController extends CommonApiController
 
             $this->model->removeLead($entity, $leadId);
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -115,11 +114,11 @@ class CampaignApiController extends CommonApiController
             if (empty($parameters['events'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -138,7 +137,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($parameters['events'] as $key => $requestEvent) {
                 if (!isset($requestEvent['id'])) {
-                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                 }
                 $requestEventIds[] = $requestEvent['id'];
             }
@@ -152,7 +151,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['lists'])) {
                 foreach ($parameters['lists'] as $requestSegment) {
                     if (!isset($requestSegment['id'])) {
-                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                     }
                     $requestSegmentIds[] = $requestSegment['id'];
                 }
@@ -167,7 +166,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['forms'])) {
                 foreach ($parameters['forms'] as $requestForm) {
                     if (!isset($requestForm['id'])) {
-                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                     }
                     $requestFormIds[] = $requestForm['id'];
                 }
@@ -300,7 +299,7 @@ class CampaignApiController extends CommonApiController
             true
         );
 
-        $view = $this->view([$this->entityNameOne => $entity], Codes::HTTP_OK, $headers);
+        $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
 
         $this->setSerializationContext($view);
 

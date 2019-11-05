@@ -11,7 +11,7 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -46,7 +46,7 @@ class UserApiController extends CommonApiController
     public function getSelfAction()
     {
         $currentUser = $this->get('security.context')->getToken()->getUser();
-        $view        = $this->view($currentUser, Codes::HTTP_OK);
+        $view        = $this->view($currentUser, Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -178,7 +178,7 @@ class UserApiController extends CommonApiController
         }
 
         $return = $this->get('mautic.security')->isGranted($permissions, 'RETURN_ARRAY', $entity);
-        $view   = $this->view($return, Codes::HTTP_OK);
+        $view   = $this->view($return, Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -202,7 +202,7 @@ class UserApiController extends CommonApiController
         $limit  = $this->request->query->get('limit', null);
         $roles  = $this->getModel('user')->getLookupResults('role', $filter, $limit);
 
-        $view    = $this->view($roles, Codes::HTTP_OK);
+        $view    = $this->view($roles, Response::HTTP_OK);
         $context = SerializationContext::create()->setGroups(['roleList']);
         $view->setSerializationContext($context);
 
