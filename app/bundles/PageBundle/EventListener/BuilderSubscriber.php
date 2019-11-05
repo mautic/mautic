@@ -132,7 +132,7 @@ class BuilderSubscriber extends CommonSubscriber
         }
 
         if ($event->tokensRequested([$this->pageTokenRegex, $this->dwcTokenRegex])) {
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
 
             // add only filter based dwc tokens
             $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
@@ -701,7 +701,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
             $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
         }
     }
 

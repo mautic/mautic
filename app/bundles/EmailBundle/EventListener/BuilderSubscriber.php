@@ -126,8 +126,7 @@ class BuilderSubscriber extends CommonSubscriber
 
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
-                $event->filterTokens($tokens),
-                true
+                $event->filterTokens($tokens)
             );
         }
 

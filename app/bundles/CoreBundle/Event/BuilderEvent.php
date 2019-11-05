@@ -200,10 +200,9 @@ class BuilderEvent extends Event
 
     /**
      * @param array $tokens
-     * @param bool  $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
      * @param bool  $convertToLinks
      */
-    public function addTokens(array $tokens, $allowVisualPlaceholder = false, $convertToLinks = false)
+    public function addTokens(array $tokens, $convertToLinks = false)
     {
         if ($convertToLinks) {
             array_walk($tokens, function (&$val, $key) {
@@ -334,15 +333,13 @@ class BuilderEvent extends Event
      * @param                    $tokens
      * @param string             $labelColumn
      * @param string             $valueColumn
-     * @param bool               $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
-     * @param bool               $convertToLinks         If true, the tokens will be converted to links
+     * @param bool               $convertToLinks If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(
         BuilderTokenHelper $tokenHelper,
         $tokens,
         $labelColumn = 'name',
         $valueColumn = 'id',
-        $allowVisualPlaceholder = false,
         $convertToLinks = false
     ) {
         $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
@@ -352,7 +349,6 @@ class BuilderEvent extends Event
 
         $this->addTokens(
             $tokens,
-            $allowVisualPlaceholder,
             $convertToLinks
         );
     }

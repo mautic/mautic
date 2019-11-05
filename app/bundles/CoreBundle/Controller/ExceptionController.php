@@ -55,11 +55,6 @@ class ExceptionController extends CommonController
                             'type'    => null,
                         ],
                     ],
-                    // @deprecated 2.6.0 to be removed in 3.0
-                    'error' => [
-                        'message' => $message.' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                        'code'    => $code,
-                    ],
                 ];
                 if ($env == 'dev') {
                     $dataArray['trace'] = $exception->getTrace();
