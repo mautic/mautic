@@ -351,7 +351,7 @@ $container->loadFromExtension('jms_serializer', [
         'directories'    => $serializerMappings,
     ],
     'visitors' => [
-        'json' => [
+        'json_deserialization' => [
             'options' => JSON_PRETTY_PRINT,
         ],
     ],
