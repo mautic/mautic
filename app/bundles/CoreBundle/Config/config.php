@@ -158,7 +158,7 @@ return [
                     'mautic.helper.user',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
-                    'security.context',
+                    'security.authorization_checker',
                     'mautic.user.model.user',
                 ],
             ],

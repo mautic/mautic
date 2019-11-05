@@ -60,9 +60,9 @@ class CoreSubscriber extends CommonSubscriber
     protected $assetsHelper;
 
     /**
-     * @var SecurityContext
+     * @var AuthorizationCheckerInterface
      */
-    protected $securityContext;
+    protected $authorizer;
 
     /**
      * @var UserModel
@@ -74,20 +74,32 @@ class CoreSubscriber extends CommonSubscriber
      */
     protected $coreParametersHelper;
 
+    /**
+     * CoreSubscriber constructor.
+     *
+     * @param BundleHelper                  $bundleHelper
+     * @param MenuHelper                    $menuHelper
+     * @param UserHelper                    $userHelper
+     * @param AssetsHelper                  $assetsHelper
+     * @param CoreParametersHelper          $coreParametersHelper
+     * @param AuthorizationCheckerInterface $authorizer
+     * @param UserModel                     $userModel
+     */
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
         UserHelper $userHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
-        AuthorizationCheckerInterface $securityContext,
+        AuthorizationCheckerInterface $authorizer,
         UserModel $userModel
-    ) {
+    )
+    {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
         $this->userHelper           = $userHelper;
         $this->assetsHelper         = $assetsHelper;
-        $this->securityContext      = $securityContext;
+        $this->authorizer           = $authorizer;
         $this->userModel            = $userModel;
         $this->coreParametersHelper = $coreParametersHelper;
     }
@@ -139,7 +151,7 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         $session = $event->getRequest()->getSession();
-        if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+        if ($this->authorizer->isGranted('IS_AUTHENTICATED_FULLY') || $this->authorizer->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in
