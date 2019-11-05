@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -45,9 +46,9 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected $platform;
 
     /**
-     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     * @var EntityManagerInterface
      */
-    protected $factory;
+    protected $entityManager;
 
     /**
      * @param Schema $schema
@@ -83,10 +84,10 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        $this->container = $container;
-        $this->prefix    = $container->getParameter('mautic.db_table_prefix');
-        $this->platform  = $this->connection->getDatabasePlatform()->getName();
-        $this->factory   = $container->get('mautic.factory');
+        $this->container     = $container;
+        $this->prefix        = $container->getParameter('mautic.db_table_prefix');
+        $this->platform      = $this->connection->getDatabasePlatform()->getName();
+        $this->entityManager = $this->container->get('doctrine')->getManager();
     }
 
     /**
