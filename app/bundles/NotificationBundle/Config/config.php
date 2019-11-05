@@ -119,7 +119,7 @@ return [
                     'mautic.helper.integration',
                     'router',
                     'request_stack',
-                    'mautic.lead.model.dnc'
+                    'mautic.lead.model.dnc',
                 ],
             ],
         ],
