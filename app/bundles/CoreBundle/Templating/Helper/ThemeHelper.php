@@ -13,7 +13,6 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
 /**
@@ -21,11 +20,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
  */
 class ThemeHelper
 {
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var string
      */

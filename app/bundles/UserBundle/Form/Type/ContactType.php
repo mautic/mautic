@@ -11,6 +11,7 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
@@ -63,7 +64,7 @@ class ContactType extends AbstractType
                     'autocomplete' => 'off',
                 ],
             ])
-            ->add('buttons', 'form_buttons', [
+            ->add('buttons', FormButtonsType::class, [
                 'save_text'  => 'mautic.user.user.contact.send',
                 'save_icon'  => 'fa fa-send',
                 'apply_text' => false,

@@ -11,7 +11,12 @@
 
 namespace Mautic\CoreBundle\Form;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Form;
 
 trait RequestTrait
@@ -29,7 +34,7 @@ trait RequestTrait
             if (isset($params[$name])) {
                 $type = $child->getConfig()->getType()->getName();
                 switch ($type) {
-                    case 'yesno_button_group':
+                    case YesNoButtonGroupType::class:
                         if (is_object($entity)) {
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
@@ -56,7 +61,7 @@ trait RequestTrait
                             $params[$name] = (int) $data;
                         }
                         break;
-                    case 'choice':
+                    case ChoiceType::class:
                         if ($child->getConfig()->getOption('multiple')) {
                             // Ensure the value is an array
                             if (!is_array($params[$name])) {
@@ -68,9 +73,9 @@ trait RequestTrait
                             }
                         }
                         break;
-                    case 'datetime':
-                    case 'date':
-                    case 'time':
+                    case DateTimeType::class:
+                    case DateType::class:
+                    case TimeType::class:
                         // Prevent zero based date placeholders
                         $dateTest = (int) str_replace(['/', '-', ' '], '', $params[$name]);
 
@@ -83,13 +88,13 @@ trait RequestTrait
                             }
                             if ($timestamp) {
                                 switch ($type) {
-                                    case 'datetime':
+                                    case DateTimeType::class:
                                         $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
                                         break;
-                                    case 'date':
+                                    case DateType::class:
                                         $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
                                         break;
-                                    case 'time':
+                                    case TimeType::class:
                                         $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
                                         break;
                                 }

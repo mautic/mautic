@@ -12,6 +12,7 @@
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
@@ -201,7 +202,7 @@ class NotificationController extends FormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),

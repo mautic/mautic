@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 
@@ -62,7 +63,7 @@ class ConfigSubscriber extends CommonSubscriber
         unset($coreParams['theme_import_allowed_extensions']);
         $event->addForm([
             'bundle'     => 'CoreBundle',
-            'formAlias'  => 'coreconfig',
+            'formAlias'  => ConfigType::class,
             'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
             'parameters' => $coreParams,
         ]);

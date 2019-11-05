@@ -243,6 +243,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getPermissionBase()
     {
-        return 'plugin:mauticSocial:tweets';
+        return 'mauticSocial:tweets';
     }
 }

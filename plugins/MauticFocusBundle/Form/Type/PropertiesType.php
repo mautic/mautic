@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -61,7 +62,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'animate',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.animate',
                 'data'  => (isset($options['data']['animate'])) ? $options['data']['animate'] : true,
@@ -73,7 +74,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'link_activation',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.activate_for_links',
                 'data'  => (isset($options['data']['link_activation'])) ? $options['data']['link_activation'] : true,
@@ -158,7 +159,7 @@ class PropertiesType extends AbstractType
 
         $builder->add(
             'stop_after_conversion',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.focus.form.engage_after_conversion',
                 'data'  => (isset($options['data']['stop_after_conversion'])) ? $options['data']['stop_after_conversion'] : true,

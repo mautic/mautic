@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -93,7 +94,7 @@ class ConstantContactType extends AbstractType
             ],
         ]);
 
-        $builder->add('sendWelcome', 'yesno_button_group', [
+        $builder->add('sendWelcome', YesNoButtonGroupType::class, [
             'label' => 'mautic.emailmarketing.send_welcome',
             'data'  => (!isset($options['data']['sendWelcome'])) ? true : $options['data']['sendWelcome'],
         ]);

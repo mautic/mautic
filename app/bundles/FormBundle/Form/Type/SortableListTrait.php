@@ -11,6 +11,8 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -45,10 +47,10 @@ trait SortableListTrait
             $listOptions['data'] = $listData;
         }
 
-        $builder->add($listName, 'sortablelist', $listOptions);
+        $builder->add($listName, SortableListType::class, $listOptions);
         $builder->add(
             'syncList',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'attr' => [
                     'data-show-on' => '{"'.$formName.'_leadField:data-list-type": "1"}',

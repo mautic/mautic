@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
@@ -201,7 +202,7 @@ class FormController extends CommonFormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Submission stats per time period
         $timeStats = $this->getModel('form.submission')->getSubmissionsLineChartData(

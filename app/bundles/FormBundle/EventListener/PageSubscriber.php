@@ -70,7 +70,7 @@ class PageSubscriber extends CommonSubscriber
 
         if ($event->tokensRequested($this->formRegex)) {
             $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id');
         }
     }
 
