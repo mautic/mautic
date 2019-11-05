@@ -642,7 +642,7 @@ return [
                 ],
             ],
             'mautic.helper.cache_storage' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CacheStorageHelper',
+                'class'     => Mautic\CoreBundle\Helper\CacheStorageHelper::class,
                 'arguments' => [
                     '"db"',
                     '%mautic.db_table_prefix%',
