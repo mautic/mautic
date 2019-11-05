@@ -201,16 +201,4 @@ abstract class AbstractFormFieldHelper
                 return $array;
         }
     }
-
-    /**
-     * @deprecated  to be removed in 3.0; use parseList instead
-     *
-     * @param $list
-     *
-     * @return array|string
-     */
-    public static function parseListStringIntoArray($list)
-    {
-        return self::parseList($list);
-    }
 }
