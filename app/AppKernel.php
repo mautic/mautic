@@ -513,6 +513,9 @@ class AppKernel extends Kernel
      */
     protected function initializeContainer()
     {
+        return parent::initializeContainer();
+
+        // @todo - figure out what is needed from 2.x to 3.x (custom container location?)
         $class = $this->getContainerClass();
 
         $cache = new \Symfony\Component\Config\ConfigCache($this->getContainerFile(true), $this->debug);
