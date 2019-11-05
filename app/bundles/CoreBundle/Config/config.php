@@ -551,9 +551,6 @@ return [
             'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
             // System uses
-            'mautic.cipher.mcrypt' => [
-                'class' => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher::class,
-            ],
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
@@ -688,7 +685,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
-                    'mautic.cipher.mcrypt',
                 ],
             ],
             'mautic.helper.language' => [
