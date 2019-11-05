@@ -540,9 +540,6 @@ return [
                 ],
             ],
 
-            // Translator overrides
-            'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
-            'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
             // System uses
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,

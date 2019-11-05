@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Templating\Helper\FormHelper;
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
+use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -89,6 +90,11 @@ class TemplatingPass implements CompilerPassInterface
         if ($container->hasDefinition('templating.helper.form')) {
             $container->getDefinition('templating.helper.form')
                 ->setClass(FormHelper::class);
+        }
+
+        if ($container->hasDefinition('templating.helper.translator')) {
+            $container->getDefinition('templating.helper.translator')
+                ->setClass(TranslatorHelper::class);
         }
     }
 }

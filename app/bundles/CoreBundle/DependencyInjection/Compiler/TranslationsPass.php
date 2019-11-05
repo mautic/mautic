@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -24,7 +25,12 @@ class TranslationsPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->has('translator.default')) {
+            return;
+        }
+
         $translator = $container->findDefinition('translator.default');
+        $translator->setClass(Translator::class);
 
         if ($translator === null || MAUTIC_ENV === 'prod') {
             return;

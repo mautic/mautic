@@ -11,12 +11,12 @@
 
 namespace Mautic\CoreBundle\Templating\Engine;
 
+use Psr\Container\ContainerInterface;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine as BasePhpEngine;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
