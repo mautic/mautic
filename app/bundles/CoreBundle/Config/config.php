@@ -540,13 +540,6 @@ return [
                 ],
             ],
 
-            // Template helper overrides
-            'templating.helper.assets.class'    => 'Mautic\CoreBundle\Templating\Helper\AssetsHelper',
-            'templating.helper.slots.class'     => 'Mautic\CoreBundle\Templating\Helper\SlotsHelper',
-            'templating.name_parser.class'      => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-            'templating.helper.form.class'      => 'Mautic\CoreBundle\Templating\Helper\FormHelper',
-            'templating.engine.php.class'       => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
-            'debug.templating.engine.php.class' => 'Mautic\CoreBundle\Templating\Engine\PhpEngine',
             // Translator overrides
             'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
