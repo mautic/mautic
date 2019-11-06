@@ -30,6 +30,7 @@ class CompanyListType extends AbstractType
                 'modal_header'        => 'mautic.company.new.company',
                 'model'               => 'lead.company',
                 'ajax_lookup_action'  => 'lead:getLookupChoiceList',
+                'repo_lookup_method'  => 'getAjaxSimpleList',
                 'multiple'            => true,
                 'main_entity'         => null,
             ]

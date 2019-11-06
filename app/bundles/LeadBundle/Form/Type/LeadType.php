@@ -143,7 +143,6 @@ class LeadType extends AbstractType
             [
                 'label'              => 'mautic.company.selectcompany',
                 'label_attr'         => ['class' => 'control-label'],
-                'repo_lookup_method' => 'getAjaxSimpleList',
                 'multiple'           => true,
                 'required'           => false,
                 'mapped'             => false,
