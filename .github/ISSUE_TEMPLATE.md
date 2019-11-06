@@ -14,6 +14,7 @@ Detail your bug report:
 
 [//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
 [//]: # (Enhancement? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
+[//]: # (Need support, have questions? ---> Go to forum please ---> https://forum.mautic.org/c/support)
 
 ## Description:
 The more details the better...
