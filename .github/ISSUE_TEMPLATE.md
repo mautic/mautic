@@ -1,22 +1,23 @@
-**Please DO NOT report security vulnerabilities here. Send them to security@mautic.com instead.**
+[//]: # (READ THIS BEFORE PUBLISHING YOUR ISSUE)
 
-What type of report is this:
+[//]: # (Please post questions, support requests and feature requests/ideas at https://forum.mautic.org.)
+[//]: # (Strictly follow the instruction hereunder, otherwise your issue will be close for lack of information.)
+[//]: # (DO NOT report security vulnerabilities here. Send them to security@mautic.com.)
+
+Detail your bug report:
 
 | Q  | A
 | ---| ---
-| Bug report? | 
-| Feature request? | 
-| Enhancement? | 
+| Confirm it is a Bug report |
+| Mautic version | 
+| PHP version | 
+
+[//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org.)
+[//]: # (Enhancement? ---> Go to forum please ---> https://forum.mautic.org.)
 
 ## Description:
 The more details the better...
 
-## If a bug:
-
-| Q   | A
-| --- | ---
-| Mautic version | 
-| PHP version | 
 
 ### Steps to reproduce:
 1. 
@@ -25,4 +26,3 @@ The more details the better...
 ### Log errors: 
 
 _Please check for related errors in the latest log file in [mautic root]/app/log/ and/or the web server's logs and post them here. Be sure to remove sensitive information if applicable._ 
-
