@@ -1,4 +1,4 @@
-**Please be sure you are submitting this against the _staging_ branch.**
+[//]: # ( Please be sure you are submitting this against the _staging_ branch.)
 
 [//]: # ( Please answer the following questions: )
 
@@ -24,7 +24,7 @@
 2. 
 
 #### Steps to test this PR:
-1. Load up [this PR](https://mautibox.com)
+1. [Click here](https://mautibox.com), it will load the PR on Mautibox, an environnement automatically created to test PRs. No developer skill is needed.
 2. 
 
 #### List deprecations along with the new alternative:
