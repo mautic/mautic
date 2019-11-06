@@ -12,8 +12,8 @@ Detail your bug report:
 | Mautic version | 
 | PHP version | 
 
-[//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org.)
-[//]: # (Enhancement? ---> Go to forum please ---> https://forum.mautic.org.)
+[//]: # (Feature request? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
+[//]: # (Enhancement? ---> Go to forum please ---> https://forum.mautic.org/c/ideas)
 
 ## Description:
 The more details the better...
