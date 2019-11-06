@@ -394,15 +394,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             if ($reflection->hasMethod('getTitle')) {
                 $labelColumn = 'title';
             } else {
-                $labelColumn = 'name';
+                $labelColumn = 'companyname';
             }
         }
 
         $q->select($prefix.$valueColumn.' as value,
         case
-        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
-        when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
-        when (comp.companycity is not null) then concat(comp.companyname, " <small>", comp.companycity, "</small>")
+        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, "  - ", companycity,", ", companycountry)
+        when (comp.companycountry is not null) then concat(comp.companyname, " - ", comp.companycountry)
+        when (comp.companycity is not null) then concat(comp.companyname, " - ", comp.companycity)
         else comp.companyname
         end
         as label')

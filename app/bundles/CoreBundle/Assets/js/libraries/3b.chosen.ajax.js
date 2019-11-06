@@ -58,6 +58,7 @@
                     options.data = options.dataCallback(options.data);
                 }
                 success = options.success;
+                var already_loaded_values = [];
                 options.success = function (data) {
                     var items, nbItems, selected_values;
                     if (data == null) {
@@ -65,9 +66,8 @@
                     }
                     selected_values = [];
                     select.find('option').each(function () {
-                        if (!$(this).is(":selected")) {
-                            return $(this).remove();
-                        } else {
+                        already_loaded_values.push($(this).val() + "-" + $(this).text());
+                        if ($(this).is(":selected")) {
                             return selected_values.push($(this).val() + "-" + $(this).text());
                         }
                     });
@@ -76,6 +76,15 @@
                     });
                     items = callback != null ? callback(data, field) : data;
                     nbItems = 0;
+
+                    var hasNewOptionsFromRequest = false;
+                    var appendNewOptionsFromRequest = function (value, text, select) {
+                        if ($.inArray(value + "-" + text, selected_values) === -1 && $.inArray(value + "-" + text, already_loaded_values) === -1) {
+                            hasNewOptionsFromRequest = true;
+                            already_loaded_values.push(value + "-" + text);
+                            return $("<option />").attr('value', value).html(text).appendTo(select);
+                        }
+                    }
 
                     $.each(items, function (i, element) {
                         var group, text, value;
@@ -95,9 +104,7 @@
                                     value = element.value;
                                     text = element.text;
                                 }
-                                if ($.inArray(value + "-" + text, selected_values) === -1) {
-                                    return $("<option />").attr('value', value).html(text).appendTo(group);
-                                }
+                                appendNewOptionsFromRequest(value, text, select);
                             });
                         } else {
                             if (typeof element === "string") {
@@ -107,24 +114,25 @@
                                 value = element.value;
                                 text = element.text;
                             }
-                            if ($.inArray(value + "-" + text, selected_values) === -1) {
-                                return $("<option />").attr('value', value).html(text).appendTo(select);
-                            }
+                            appendNewOptionsFromRequest(value, text, select);
                         }
                     });
                     if (nbItems) {
-                        // Re-append new back to the top
-                        if (hasNew) {
-                            hasNew.prependTo(select);
-                        }
-                        select.trigger("chosen:updated");
+                        if (hasNewOptionsFromRequest) {
+                            // Re-append new back to the top
+                            if (hasNew) {
+                                hasNew.prependTo(select);
+                            }
+                            select.trigger("chosen:updated");
 
-                        setTimeout( function() {
-                            // Hack to force chosen to hide already selected values from the list
-                            var e = $.Event("keyup.chosen");
-                            e.which = 93; // Windows/Command
-                            field.trigger(e);
-                        }, 5);
+                            setTimeout(function () {
+                                // Hack to force chosen to hide already
+                                // selected values from the list
+                                var e = $.Event("keyup.chosen");
+                                e.which = 93; // Windows/Command
+                                field.trigger(e);
+                            }, 5);
+                        }
                     } else {
                         select.data().chosen.no_results_clear();
                         select.data().chosen.no_results(field.val());
@@ -132,7 +140,7 @@
                     if (settings.success != null) {
                         settings.success(data);
                     }
-                    var returnVar = field.val(untrimmed_val);
+                    var returnVar = field.val(unthis.chosen(chosenOptions ? chosenOptions : {}));
 
                     // Force width
                     div = $('<div />');
