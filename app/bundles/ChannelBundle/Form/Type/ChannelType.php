@@ -12,7 +12,6 @@
 namespace Mautic\ChannelBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\Channel;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -59,7 +58,7 @@ class ChannelType extends AbstractType
 
             $form->add(
                 'isEnabled',
-                YesNoButtonGroupType::class,
+                'yesno_button_group',
                 [
                     'label' => 'mautic.channel.message.form.enabled',
                     'attr'  => [
