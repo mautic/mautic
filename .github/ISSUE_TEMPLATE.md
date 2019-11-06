@@ -1,7 +1,7 @@
 [//]: # (READ THIS BEFORE PUBLISHING YOUR ISSUE)
 
 [//]: # (Please post questions, support requests and feature requests/ideas at https://forum.mautic.org.)
-[//]: # (Strictly follow the instruction hereunder, otherwise your issue will be close for lack of information.)
+[//]: # (Strictly follow the instructions hereunder, otherwise your issue will be closed for lack of information.)
 [//]: # (DO NOT report security vulnerabilities here. Send them to security@mautic.com.)
 
 Detail your bug report:
