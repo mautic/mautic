@@ -24,7 +24,7 @@
 2. 
 
 #### Steps to test this PR:
-1. [Click here](https://mautibox.com), it will load the PR on Mautibox, an environnement automatically created to test PRs. No developer skill is needed.
+1. [Click here](https://mautibox.com) and choose the PR from the dropdown list to launch a test environment, it will load the PR on Mautibox environnement automatically created to test PRs. No developer skill is needed.
 2. 
 
 #### List deprecations along with the new alternative:
