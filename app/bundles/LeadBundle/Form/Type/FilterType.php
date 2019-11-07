@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -61,13 +62,61 @@ class FilterType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event, $eventName) {
-            $this->buildFiltersForm(
-                $eventName,
-                $event,
-                $this->translator,
-                $this->requestStack->getCurrentRequest()->attributes->get('objectId', false)
+        $formModifier = function (FormEvent $event) {
+            $segmentId = $this->requestStack->getCurrentRequest()->attributes->get('objectId', false);
+            $data      = $event->getData();
+            $form      = $event->getForm();
+            $options   = $form->getConfig()->getOptions();
+            $fieldName = $data['field'];
+            if (isset($options['fields']['behaviors'][$fieldName])) {
+                $field = $options['fields']['behaviors'][$fieldName];
+            } elseif (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
+                $field = $options['fields'][$data['object']][$fieldName];
+            }
+            $form->add(
+                'operator',
+                ChoiceType::class,
+                [
+                    'label'   => false,
+                    'choices' => isset($field['operators']) ? $field['operators'] : [],
+                    'attr'    => [
+                        'class'    => 'form-control not-chosen',
+                        'onchange' => 'Mautic.convertLeadFilterInput(this)',
+                    ],
+                ]
             );
+
+            $form->add(
+                'filter',
+                TextType::class,
+                [
+                    'label' => false,
+                    'data'  => isset($data['filter']) ? $data['filter'] : '',
+                    'attr'  => ['class' => 'form-control'],
+                ]
+            );
+
+            $form->add(
+                'filter:default',
+                TextType::class,
+                [
+                    'label' => false,
+                    'data'  => isset($data['filter']) ? $data['filter'] : '',
+                    'attr'  => ['class' => 'form-control', 'disabled' => true],
+                ]
+            );
+
+            $form->add(
+                'display',
+                HiddenType::class,
+                [
+                    'label' => false,
+                    'attr'  => [],
+                    'data'  => (isset($data['display'])) ? $data['display'] : '',
+                ]
+            );
+
+            $this->typeOperatorProvider->adjustFilterFormType($event);
         };
 
         $builder->addEventListener(

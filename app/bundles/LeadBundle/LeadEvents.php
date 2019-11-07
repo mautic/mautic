@@ -565,7 +565,7 @@ final class LeadEvents
      * The mautic.collect_filter_choices_for_list_field_type event is dispatched when some filter based on a list type needs to load its choices.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\TypeOperatorsEvent
+     * Mautic\LeadBundle\Event\ListFieldChoicesEvent
      *
      * @var string
      */
@@ -580,6 +580,24 @@ final class LeadEvents
      * @var string
      */
     const COLLECT_OPERATORS_FOR_FIELD_TYPE = 'mautic.collect_operators_for_field_type';
+
+    /**
+     * The mautic.adjust_filter_form_type_for_field event is dispatched when the segment filter form is built so events can add new or modify existing fields.
+     *
+     * The event listener receives a
+     * Symfony\Component\Form\FormEvent
+     *
+     * @var string
+     */
+    const ADJUST_FILTER_FORM_TYPE_FOR_FIELD = 'mautic.adjust_filter_form_type_for_field';
+
+    /**
+     * The mautic.list_filters_delegate_decorator event id dispatched when decorator is delegated for segment filter.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent instance.
+     */
+    const SEGMENT_ON_DECORATOR_DELEGATE = 'mautic.list_filters_delegate_decorator';
 
     /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.

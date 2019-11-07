@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormEvent;
 
 final class TypeOperatorProvider implements TypeOperatorProviderInterface
 {
@@ -48,10 +49,6 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     private $cachedListChoices = [];
 
-    /**
-     * @param EventDispatcherInterface        $dispatcher
-     * @param FilterOperatorProviderInterface $filterOperatorProvider
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         FilterOperatorProviderInterface $filterOperatorProvider
@@ -152,6 +149,14 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         }
 
         return $this->cachedListChoices;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustFilterFormType(FormEvent $event)
+    {
+        $this->dispatcher->dispatch(LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD, $event);
     }
 
     /**

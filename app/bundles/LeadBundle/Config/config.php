@@ -592,7 +592,11 @@ return [
             ],
             'mautic.form.type.leadlist_filter' => [
                 'class'       => \Mautic\LeadBundle\Form\Type\FilterType::class,
-                'arguments'   => ['translator', 'request_stack'],
+                'arguments'   => [
+                    'translator',
+                    'request_stack',
+                    'mautic.lead.provider.typeOperator',
+                ],
                 'methodCalls' => [
                     'setConnection' => [
                         'database_connection',
