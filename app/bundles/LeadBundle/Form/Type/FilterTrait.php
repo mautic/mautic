@@ -54,8 +54,7 @@ trait FilterTrait
         $displayType = HiddenType::class;
         $displayAttr = [];
         $operator    = isset($data['operator']) ? $data['operator'] : '';
-
-        $field = [];
+        $field       = [];
 
         if (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
             $field = $options['fields'][$data['object']][$fieldName];

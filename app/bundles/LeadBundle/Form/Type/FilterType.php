@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -38,10 +39,19 @@ class FilterType extends AbstractType
      */
     private $requestStack;
 
-    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
-    {
-        $this->translator   = $translator;
-        $this->requestStack = $requestStack;
+    /**
+     * @var TypeOperatorProviderInterface
+     */
+    private $typeOperatorProvider;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        RequestStack $requestStack,
+        TypeOperatorProviderInterface $typeOperatorProvider
+    ) {
+        $this->translator           = $translator;
+        $this->requestStack         = $requestStack;
+        $this->typeOperatorProvider = $typeOperatorProvider;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
