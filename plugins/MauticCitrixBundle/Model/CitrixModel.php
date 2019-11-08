@@ -327,7 +327,7 @@ class CitrixModel extends FormModel
 
         // Add events
         if (0 !== count($contactsToAdd)) {
-            $searchEmails = array_keys($contactsToAdd);
+            $searchEmails = array_keys(array_change_key_case($contactsToAdd, CASE_LOWER));
             $leads        = $this->leadModel->getRepository()->getLeadsByFieldValue('email', $searchEmails, null, true);
             foreach ($contactsToAdd as $email => $info) {
                 if (!isset($leads[strtolower($email)])) {
