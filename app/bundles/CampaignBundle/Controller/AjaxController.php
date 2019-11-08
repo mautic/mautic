@@ -90,7 +90,7 @@ class AjaxController extends CommonAjaxController
 
                 /** @var EventLogModel $logModel */
                 $logModel = $this->getModel('campaign.event_log');
-                $logModel->saveEntity($log);
+                $logModel->getRepository()->saveEntity($log);
 
                 $dataArray = ['success' => 1];
             }
