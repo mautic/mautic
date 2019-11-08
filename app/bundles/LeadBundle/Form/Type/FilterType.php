@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -73,16 +74,14 @@ class FilterType extends AbstractType
         );
 
         $formModifier = function (FormEvent $event) {
-            $segmentId = $this->requestStack->getCurrentRequest()->attributes->get('objectId', false);
-            $data      = $event->getData();
-            $form      = $event->getForm();
-            $options   = $form->getConfig()->getOptions();
-            $fieldName = $data['field'];
-            if (isset($options['fields']['behaviors'][$fieldName])) {
-                $field = $options['fields']['behaviors'][$fieldName];
-            } elseif (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
-                $field = $options['fields'][$data['object']][$fieldName];
-            }
+            // $segmentId = $this->requestStack->getCurrentRequest()->attributes->get('objectId', false);
+            $data        = $event->getData();
+            $form        = $event->getForm();
+            $options     = $form->getConfig()->getOptions();
+            $fieldName   = $data['field'];
+            $fieldObject = $data['object'] ?? 'behaviors';
+            $field       = $options['fields'][$fieldObject][$fieldName] ?? [];
+
             $form->add(
                 'operator',
                 ChoiceType::class,
@@ -107,12 +106,11 @@ class FilterType extends AbstractType
             );
 
             $form->add(
-                'filter:default',
-                TextType::class,
+                'properties',
+                FilterPropertiesType::class,
                 [
                     'label' => false,
-                    'data'  => isset($data['filter']) ? $data['filter'] : '',
-                    'attr'  => ['class' => 'form-control', 'disabled' => true],
+                    'attr'  => ['class' => 'form-control'],
                 ]
             );
 
@@ -126,7 +124,13 @@ class FilterType extends AbstractType
                 ]
             );
 
-            $this->typeOperatorProvider->adjustFilterFormType($event);
+            if ($fieldName) {
+                $this->typeOperatorProvider->adjustFilterPropertiesType(
+                    $form->get('properties'),
+                    $fieldName,
+                    $fieldObject
+                );
+            }
         };
 
         $builder->addEventListener(

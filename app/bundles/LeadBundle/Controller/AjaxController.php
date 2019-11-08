@@ -19,11 +19,15 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -92,7 +96,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function fieldListAction(Request $request)
     {
@@ -149,6 +153,37 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    protected function loadNewSegmentFilterFormAction(Request $request)
+    {
+        $fieldName = InputHelper::clean($request->request->get('fieldName'));
+        $object    = InputHelper::clean($request->request->get('object'));
+
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory = $this->get('form.factory');
+        $form        = $formFactory->create(FilterPropertiesType::class);
+
+        /** @var TypeOperatorProvider $typeOperatorProvider */
+        $typeOperatorProvider = $this->get('mautic.lead.provider.typeOperator');
+        if ($fieldName) {
+            $typeOperatorProvider->adjustFilterPropertiesType(
+                $form,
+                $fieldName,
+                $object
+            );
+        }
+
+        $this->sendJsonResponse(
+            [
+                'viewParameters' => [
+                    'form' => $form->createView(),
+                ],
+            ]
+        );
     }
 
     /**

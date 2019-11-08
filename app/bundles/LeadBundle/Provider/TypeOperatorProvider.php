@@ -12,13 +12,14 @@
 namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Entity\OperatorListTrait;
+use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
 
 final class TypeOperatorProvider implements TypeOperatorProviderInterface
 {
@@ -154,9 +155,12 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function adjustFilterFormType(FormEvent $event)
+    public function adjustFilterPropertiesType(FormInterface $form, string $fieldName, string $fieldObject): FormInterface
     {
+        $event = new FilterPropertiesTypeEvent($form, $fieldName, $fieldObject);
         $this->dispatcher->dispatch(LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD, $event);
+
+        return $event->getFilterPropertiesForm();
     }
 
     /**

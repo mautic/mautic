@@ -489,6 +489,28 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
 };
 
 Mautic.addLeadListFilter = function (elId, elObj) {
+
+    mQuery.ajax({
+        showLoadingBar: true,
+        url: mauticAjaxUrl,
+        type: 'POST',
+        data: {
+            action: 'lead:loadNewSegmentFilterForm',
+            field: elId,
+            object: elObj,
+        },
+        dataType: 'json',
+        success: function (response) {
+            console.log(response);
+            Mautic.stopPageLoadingBar();
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    });
+
+    // @todo implement the properties form into the template bellow.
+    return;
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
     var label = filterOption.text();
