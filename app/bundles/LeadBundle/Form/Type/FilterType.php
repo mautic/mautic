@@ -79,8 +79,8 @@ class FilterType extends AbstractType
             $form        = $event->getForm();
             $options     = $form->getConfig()->getOptions();
             $fieldName   = $data['field'];
-            $fieldObject = $data['object'] ?? 'behaviors';
-            $field       = $options['fields'][$fieldObject][$fieldName] ?? [];
+            $fieldObject = isset($data['object']) ? $data['object'] : 'behaviors';
+            $field       = isset($options['fields'][$fieldObject][$fieldName]) ? $options['fields'][$fieldObject][$fieldName] : [];
 
             $form->add(
                 'operator',
@@ -110,7 +110,6 @@ class FilterType extends AbstractType
                 FilterPropertiesType::class,
                 [
                     'label' => false,
-                    'attr'  => ['class' => 'form-control'],
                 ]
             );
 
