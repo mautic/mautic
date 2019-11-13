@@ -103,6 +103,11 @@ class LeadSubscriber extends CommonSubscriber
             $changes['fields']['owner_id'] = $changes['owner'];
         }
 
+        if (!empty($changes['points'])) {
+            // Add ability to update points custom field in target
+            $changes['fields']['points'] = $changes['points'];
+        }
+
         if (isset($changes['fields'])) {
             $this->recordFieldChanges($changes['fields'], $lead->getId(), Lead::class);
         }
