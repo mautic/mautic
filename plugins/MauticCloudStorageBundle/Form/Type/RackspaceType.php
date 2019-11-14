@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCloudStorageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -24,7 +25,7 @@ class RackspaceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('serverLocation', 'choice', [
+        $builder->add('serverLocation', ChoiceType::class, [
             'label'   => 'mautic.integration.Rackspace.server.location',
             'choices' => [
                 'us' => 'mautic.integration.Rackspace.server.location.us',
@@ -41,7 +42,7 @@ class RackspaceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'cloudstorage_rackspace';
     }

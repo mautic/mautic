@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCloudStorageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -24,7 +25,7 @@ class OpenStackType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('serviceUrl', 'url', [
+        $builder->add('serviceUrl', UrlType::class, [
             'label'      => 'mautic.integration.OpenStack.service.url',
             'required'   => true,
             'label_attr' => ['class' => 'control-label'],
@@ -38,7 +39,7 @@ class OpenStackType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'cloudstorage_openstack';
     }
