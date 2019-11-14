@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
-use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
