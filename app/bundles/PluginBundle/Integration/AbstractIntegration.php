@@ -234,17 +234,6 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param MauticFactory $factory
-     *
-     * @deprecated 2.8.2 To be removed in 3.0. Use constructor arguments
-     *             to set dependencies instead
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    /**
      * @param FieldModel $fieldModel
      */
     public function setFieldModel(FieldModel $fieldModel)
