@@ -38,6 +38,7 @@ use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
@@ -47,6 +48,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -203,34 +205,54 @@ abstract class AbstractIntegration
     protected $commandParameters = [];
 
     /**
-     * AbstractIntegration constructor.
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param CacheStorageHelper       $cacheStorageHelper
+     * @param EntityManager            $entityManager
+     * @param Session                  $session
+     * @param RequestStack             $requestStack
+     * @param Router                   $router
+     * @param DataCollectorTranslator  $translator
+     * @param Logger                   $logger
+     * @param EncryptionHelper         $encryptionHelper
+     * @param LeadModel                $leadModel
+     * @param CompanyModel             $companyModel
+     * @param PathsHelper              $pathsHelper
+     * @param NotificationModel        $notificationModel
+     * @param FieldModel               $fieldModel
+     * @param IntegrationEntityModel   $integrationEntityModel
      */
-    public function __construct(MauticFactory $factory = null)
-    {
-        /*
-         * @deprecated: 2.8.2 To be removed in 3.0
-         *            This keeps BC with 3rd party plugins that
-         *            don't use the container for the
-         *            integration pass to set all of these properties
-         */
-        if ($factory) {
-            $this->factory                = $factory;
-            $this->dispatcher             = $factory->getDispatcher();
-            $this->cache                  = $factory->getHelper('cache_storage')->getCache($this->getName());
-            $this->em                     = $factory->getEntityManager();
-            $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-            $this->request                = $factory->getRequest();
-            $this->router                 = $factory->getRouter();
-            $this->translator             = $factory->getTranslator();
-            $this->logger                 = $factory->getLogger();
-            $this->encryptionHelper       = $factory->getHelper('encryption');
-            $this->leadModel              = $factory->getModel('lead');
-            $this->companyModel           = $factory->getModel('lead.company');
-            $this->pathsHelper            = $factory->getHelper('paths');
-            $this->notificationModel      = $factory->getModel('core.notification');
-            $this->fieldModel             = $factory->getModel('lead.field');
-            $this->integrationEntityModel = $factory->getModel('plugin.integration_entity');
-        }
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        CacheStorageHelper $cacheStorageHelper,
+        EntityManager $entityManager,
+        Session $session,
+        RequestStack $requestStack,
+        Router $router,
+        DataCollectorTranslator $translator,
+        Logger $logger,
+        EncryptionHelper $encryptionHelper,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        PathsHelper $pathsHelper,
+        NotificationModel $notificationModel,
+        FieldModel $fieldModel,
+        IntegrationEntityModel $integrationEntityModel
+    ) {
+        $this->dispatcher             = $eventDispatcher;
+        $this->cache                  = $cacheStorageHelper->getCache($this->getName());
+        $this->em                     = $entityManager;
+        $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $session : null;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->router                 = $router;
+        $this->translator             = $translator;
+        $this->logger                 = $logger;
+        $this->encryptionHelper       = $encryptionHelper;
+        $this->leadModel              = $leadModel;
+        $this->companyModel           = $companyModel;
+        $this->pathsHelper            = $pathsHelper;
+        $this->notificationModel      = $notificationModel;
+        $this->fieldModel             = $fieldModel;
+        $this->integrationEntityModel = $integrationEntityModel;
     }
 
     /**
