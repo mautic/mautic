@@ -131,36 +131,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Get the HTML for list of fields.
-     *
-     * @deprecated 2.8.0 to be removed in 3.0
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getIntegrationLeadFieldsAction(Request $request)
-    {
-        $request->attributes->set('object', 'lead');
-
-        return $this->getIntegrationFieldsAction($request);
-    }
-
-    /**
-     * Get the HTML for list of fields.
-     *
-     * @deprecated 2.8.0 to be removed in 3.0
-     *
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getIntegrationCompanyFieldsAction(Request $request)
-    {
-        $request->attributes->set('object', 'company');
-
-        return $this->getIntegrationFieldsAction($request);
-    }
-
-    /**
      * Get the HTML for integration properties.
      *
      * @param Request $request

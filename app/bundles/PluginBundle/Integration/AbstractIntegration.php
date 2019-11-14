@@ -231,8 +231,6 @@ abstract class AbstractIntegration
             $this->fieldModel             = $factory->getModel('lead.field');
             $this->integrationEntityModel = $factory->getModel('plugin.integration_entity');
         }
-
-        $this->init();
     }
 
     /**
@@ -385,16 +383,6 @@ abstract class AbstractIntegration
     public function getTranslator()
     {
         return $this->translator;
-    }
-
-    /**
-     * Called on construct.
-     *
-     * @deprecated 2.8.2 To be removed in 3.0
-     *             Setup your integration in the class constructor instead
-     */
-    public function init()
-    {
     }
 
     /**
@@ -1598,25 +1586,6 @@ abstract class AbstractIntegration
     public function getBearerToken($inAuthorization = false)
     {
         return '';
-    }
-
-    /**
-     * Gets the ID of the user for the integration.
-     *
-     * @param       $identifier
-     * @param array $socialCache
-     *
-     * @deprecated  To be removed 2.0
-     *
-     * @return mixed
-     */
-    public function getUserId($identifier, &$socialCache)
-    {
-        if (!empty($socialCache['id'])) {
-            return $socialCache['id'];
-        }
-
-        return false;
     }
 
     /**
