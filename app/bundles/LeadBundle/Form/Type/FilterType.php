@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -45,18 +46,27 @@ class FilterType extends AbstractType
      */
     private $typeOperatorProvider;
 
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
     public function __construct(
         TranslatorInterface $translator,
         RequestStack $requestStack,
-        TypeOperatorProviderInterface $typeOperatorProvider
+        TypeOperatorProviderInterface $typeOperatorProvider,
+        ListModel $listModel
     ) {
         $this->translator           = $translator;
         $this->requestStack         = $requestStack;
         $this->typeOperatorProvider = $typeOperatorProvider;
+        $this->listModel            = $listModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $fieldChoices = $this->listModel->getChoiceFields();
+
         $builder->add(
             'glue',
             ChoiceType::class,
@@ -73,14 +83,14 @@ class FilterType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormEvent $event) {
+        $formModifier = function (FormEvent $event) use ($fieldChoices) {
             // $segmentId = $this->requestStack->getCurrentRequest()->attributes->get('objectId', false);
             $data        = $event->getData();
             $form        = $event->getForm();
-            $options     = $form->getConfig()->getOptions();
-            $fieldName   = $data['field'];
+            $fieldAlias  = $data['field'];
             $fieldObject = isset($data['object']) ? $data['object'] : 'behaviors';
-            $field       = isset($options['fields'][$fieldObject][$fieldName]) ? $options['fields'][$fieldObject][$fieldName] : [];
+            $operator    = isset($data['operator']) ? $data['operator'] : null;
+            $field       = isset($fieldChoices[$fieldObject][$fieldAlias]) ? $fieldChoices[$fieldObject][$fieldAlias] : [];
 
             $form->add(
                 'operator',
@@ -123,11 +133,13 @@ class FilterType extends AbstractType
                 ]
             );
 
-            if ($fieldName) {
+            if ($fieldAlias && $operator) {
                 $this->typeOperatorProvider->adjustFilterPropertiesType(
                     $form->get('properties'),
-                    $fieldName,
-                    $fieldObject
+                    $fieldAlias,
+                    $fieldObject,
+                    $operator,
+                    $field
                 );
             }
         };
@@ -158,7 +170,6 @@ class FilterType extends AbstractType
                 'timezones',
                 'countries',
                 'regions',
-                'fields',
                 'lists',
                 'campaign',
                 'emails',
@@ -186,7 +197,7 @@ class FilterType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields'] = $options['fields'];
+        $view->vars['fields'] = $this->listModel->getChoiceFields();
     }
 
     /**

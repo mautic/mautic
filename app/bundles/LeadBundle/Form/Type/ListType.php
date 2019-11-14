@@ -44,7 +44,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $fieldChoices        = [];
     private $timezoneChoices     = [];
     private $countryChoices      = [];
     private $regionChoices       = [];
@@ -63,8 +62,7 @@ class ListType extends AbstractType
     public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
     {
         $this->translator = $translator;
-
-        $this->fieldChoices = $listModel->getChoiceFields();
+        $this->listModel  = $listModel;
 
         // Locales
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -223,7 +221,6 @@ class ListType extends AbstractType
                         'timezones'      => $this->timezoneChoices,
                         'countries'      => $this->countryChoices,
                         'regions'        => $this->regionChoices,
-                        'fields'         => $this->fieldChoices,
                         'lists'          => $this->listChoices,
                         'campaign'       => $this->campaignChoices,
                         'emails'         => $this->emailChoices,
@@ -271,7 +268,7 @@ class ListType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields']         = $this->fieldChoices;
+        $view->vars['fields']         = $this->listModel->getChoiceFields();
         $view->vars['countries']      = $this->countryChoices;
         $view->vars['regions']        = $this->regionChoices;
         $view->vars['timezones']      = $this->timezoneChoices;

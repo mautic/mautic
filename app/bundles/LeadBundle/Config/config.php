@@ -596,6 +596,7 @@ return [
                     'translator',
                     'request_stack',
                     'mautic.lead.provider.typeOperator',
+                    'mautic.lead.model.list',
                 ],
                 'methodCalls' => [
                     'setConnection' => [

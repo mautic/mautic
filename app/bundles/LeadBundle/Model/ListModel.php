@@ -65,6 +65,11 @@ class ListModel extends FormModel
     private $leadSegmentService;
 
     /**
+     * @var array
+     */
+    private $choiceFieldsCache = [];
+
+    /**
      * @var SegmentChartQueryFactory
      */
     private $segmentChartQueryFactory;
@@ -271,6 +276,10 @@ class ListModel extends FormModel
      */
     public function getChoiceFields()
     {
+        if ($this->choiceFieldsCache) {
+            return $this->choiceFieldsCache;
+        }
+
         $choices = [];
 
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
@@ -287,6 +296,8 @@ class ListModel extends FormModel
             uasort($choice, $cmp);
             $choices[$key] = $choice;
         }
+
+        $this->choiceFieldsCache = $choices;
 
         return $choices;
     }

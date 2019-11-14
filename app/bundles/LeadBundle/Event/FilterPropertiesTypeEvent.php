@@ -24,18 +24,30 @@ class FilterPropertiesTypeEvent extends Event
     /**
      * @var string
      */
-    private $fieldName;
+    private $fieldAlias;
 
     /**
      * @var string
      */
     private $fieldObject;
 
-    public function __construct(FormInterface $form, string $fieldName, string $fieldObject)
+    /**
+     * @var string
+     */
+    private $operator;
+
+    /**
+     * @var array
+     */
+    private $fieldDetails;
+
+    public function __construct(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails)
     {
-        $this->form        = $form;
-        $this->fieldName   = $fieldName;
-        $this->fieldObject = $fieldObject;
+        $this->form          = $form;
+        $this->fieldAlias    = $fieldAlias;
+        $this->fieldObject   = $fieldObject;
+        $this->operator      = $operator;
+        $this->fieldDetails  = $fieldDetails;
     }
 
     public function getFilterPropertiesForm(): FormInterface
@@ -43,13 +55,49 @@ class FilterPropertiesTypeEvent extends Event
         return $this->form;
     }
 
-    public function getFieldName(): string
+    public function getFieldAlias(): string
     {
-        return $this->fieldName;
+        return $this->fieldAlias;
     }
 
     public function getFieldObject(): string
     {
         return $this->fieldObject;
+    }
+
+    public function getOperator(): string
+    {
+        return $this->operator;
+    }
+
+    /**
+     * @param string ...$operators
+     */
+    public function operatorIsOneOf(string ...$operators): bool
+    {
+        return in_array($this->getOperator(), $operators);
+    }
+
+    /**
+     * @param string ...$fieldTypes
+     */
+    public function fieldTypeIsOneOf(string ...$fieldTypes): bool
+    {
+        return in_array($this->getFieldType(), $fieldTypes);
+    }
+
+    public function getFieldType(): string
+    {
+        return $this->fieldDetails['properties']['type'];
+    }
+
+    public function getFieldDetails(): array
+    {
+        return $this->fieldDetails;
+    }
+
+    public function getFieldChoices(): array
+    {
+        return $this->fieldDetails['properties']['list'] ? $this->fieldDetails['properties']['list'] : [];
     }
 }

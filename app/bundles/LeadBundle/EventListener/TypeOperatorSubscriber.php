@@ -16,7 +16,9 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
@@ -69,43 +71,59 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
     {
-        // if ('campaign' !== $event->getFieldName()) {
-        //     return;
-        // }
-
         $form = $event->getFilterPropertiesForm();
+        $data = $form->getData();
 
-        // Add new default select input.
+        if ($event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY, OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP)) {
+            $form->add(
+                'filter',
+                TextType::class,
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class'    => 'form-control',
+                        'disabled' => $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY),
+                    ],
+                ]
+            );
+
+            return;
+        }
+
+        if ($event->fieldTypeIsOneOf('select', 'multiselect', 'boolean')) {
+            $multiple = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN);
+
+            // Conversion between select and multiselect values.
+            if ($multiple) {
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+            }
+
+            $form->add(
+                'filter',
+                ChoiceType::class,
+                [
+                    'label'                     => false,
+                    'attr'                      => ['class' => 'form-control'],
+                    'data'                      => $data['filter'],
+                    'choices'                   => FormFieldHelper::parseList($event->getFieldChoices(), true, ('boolean' === $event->getFieldType())),
+                    'multiple'                  => $multiple,
+                    'choice_translation_domain' => false,
+                ]
+            );
+
+            return;
+        }
+
         $form->add(
             'filter',
-            ChoiceType::class,
-            [
-                'label'                     => false,
-                'attr'                      => ['class' => 'form-control'],
-                'choices'                   => ['a' => ['b' => 'c']],
-                'multiple'                  => true,
-                'choice_translation_domain' => false,
-            ]
-        );
-
-        $form->add(
-            'filter:default',
-            ChoiceType::class,
-            [
-                'label'                     => false,
-                'attr'                      => ['class' => 'form-control'],
-                'choices'                   => ['a', 'b'],
-                'multiple'                  => true,
-                'choice_translation_domain' => false,
-            ]
-        );
-
-        $form->add(
-            'filter:empty',
             TextType::class,
             [
                 'label' => false,
-                'attr'  => ['class' => 'form-control', 'disabled' => true],
+                'attr'  => ['class' => 'form-control'],
             ]
         );
     }

@@ -113,11 +113,11 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
 
         if (array_key_exists($fieldType, $typeOperators)) {
             $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators[$fieldType]);
-
-            return $this->cachedTypeOperatorsChoices[$fieldType];
+        } else {
+            $this->cachedTypeOperatorsChoices[$fieldType] = $this->getOperatorChoiceList($typeOperators['default']);
         }
 
-        throw new OperatorsNotFoundException("No filer operators for field type {$fieldType} were found");
+        return $this->cachedTypeOperatorsChoices[$fieldType];
     }
 
     /**
@@ -155,9 +155,9 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function adjustFilterPropertiesType(FormInterface $form, string $fieldName, string $fieldObject): FormInterface
+    public function adjustFilterPropertiesType(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails): FormInterface
     {
-        $event = new FilterPropertiesTypeEvent($form, $fieldName, $fieldObject);
+        $event = new FilterPropertiesTypeEvent($form, $fieldAlias, $fieldObject, $operator, $fieldDetails);
         $this->dispatcher->dispatch(LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD, $event);
 
         return $event->getFilterPropertiesForm();
