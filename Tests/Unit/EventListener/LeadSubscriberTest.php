@@ -209,6 +209,46 @@ class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
+    public function testOnLeadPostSaveRecordChangesWithPointChange(): void
+    {
+        $newPointCount   = 5;
+        $fieldChanges    = [
+            'points' => [
+                2,
+                $newPointCount,
+            ],
+        ];
+        $objectId   = 1;
+        $objectType = Lead::class;
+
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->at(0))
+            ->method('isAnonymous')
+            ->willReturn(false);
+        $lead->expects($this->once())
+            ->method('getChanges')
+            ->willReturn($fieldChanges);
+        $lead->expects($this->once())
+            ->method('getId')
+            ->willReturn($objectId);
+
+        $event = $this->createMock(LeadEvent::class);
+        $event->expects($this->once())
+            ->method('getLead')
+            ->willReturn($lead);
+
+        $this->syncIntegrationsHelper->expects($this->once())
+            ->method('hasObjectSyncEnabled')
+            ->with(Contact::NAME)
+            ->willReturn(true);
+
+        $fieldChanges['fields']['points'] = $fieldChanges['points'];
+
+        $this->handleRecordFieldChanges($fieldChanges['fields'], $objectId, $objectType);
+
+        $this->subscriber->onLeadPostSave($event);
+    }
+
     public function testOnLeadPostDelete(): void
     {
         $deletedId = '5';
