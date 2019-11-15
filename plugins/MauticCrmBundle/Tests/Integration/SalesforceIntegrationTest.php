@@ -11,19 +11,9 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\CacheStorageHelper;
-use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -32,9 +22,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
-use Monolog\Logger;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Routing\Router;
 
 /**
  * Class SalesforceIntegrationTest.
@@ -749,18 +736,8 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         return 1;
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function getMockFactory()
+    protected function setMocks()
     {
-        $mauticFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $integrationEntityRepository = $this->getMockBuilder(IntegrationEntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -820,17 +797,15 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ]
             );
 
-        $entityManager->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['MauticPluginBundle:IntegrationEntity', $integrationEntityRepository],
-                        ['MauticCoreBundle:AuditLog', $auditLogRepo],
-                    ]
-                )
+        $this->em->method('getRepository')
+            ->willReturnMap(
+                [
+                    ['MauticPluginBundle:IntegrationEntity', $integrationEntityRepository],
+                    ['MauticCoreBundle:AuditLog', $auditLogRepo],
+                ]
             );
 
-        $entityManager->method('getReference')
+        $this->em->method('getReference')
             ->willReturnCallback(
                 function () {
                     switch (func_get_arg(0)) {
@@ -840,74 +815,16 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 }
             );
 
-        $mauticFactory->method('getEntityManager')
-            ->willReturn($entityManager);
-
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mauticFactory->method('getTranslator')
-            ->willReturn($translator);
-
-        $router = $this->getMockBuilder(Router::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['generate'])
-            ->getMock();
-
-        $router->method('generate')
+        $this->router->method('generate')
             ->willReturnArgument(0);
 
-        $mauticFactory->method('getRouter')
-            ->willReturn($router);
-
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $leadModel->method('getEntity')
+        $this->leadModel->method('getEntity')
             ->willReturn(new Lead());
-        $companyModel = $this->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $companyModel->method('getEntity')
+
+        $this->companyModel->method('getEntity')
             ->willReturn(new Company());
-        $companyModel->method('getEntities')
+        $this->companyModel->method('getEntities')
             ->willReturn([]);
-        $fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $notificationModel = $this->getMockBuilder(NotificationModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mauticFactory->method('getModel')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['lead', $leadModel],
-                        ['lead.company', $companyModel],
-                        ['lead.field', $fieldModel],
-                        ['core.notification', $notificationModel],
-                    ]
-                )
-            );
-
-        $logger = $this->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mauticFactory->method('getLogger')
-            ->willReturn($logger);
-
-        $eventDispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mauticFactory->method('getDispatcher')
-            ->willReturn($eventDispatcher);
-
-        $cacheHelper = $this->getMockBuilder(CacheStorageHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $cacheHelper->method('getCache')
-            ->willReturn($cacheHelper);
 
         $leadFields = [
             'Id__Lead' => [
@@ -977,34 +894,17 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ],
         ];
 
-        $cacheHelper->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['leadFields.Lead', null, $leadFields],
-                        ['leadFields.Contact', null, $contactFields],
-                    ]
-                )
+        $this->cache
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['leadFields.Lead', null, $leadFields],
+                    ['leadFields.Contact', null, $contactFields],
+                ]
             );
 
-        $encryptionHelper = $this->getMockBuilder(EncryptionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockPathsHelper = $this->getMockBuilder(PathsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mauticFactory->method('getHelper')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['cache_storage', $cacheHelper],
-                        ['encryption', $encryptionHelper],
-                        ['paths', $mockPathsHelper],
-                    ]
-                )
-            );
-
-        return $mauticFactory;
+        $this->cache->method('getCache')
+            ->willReturn($this->cache);
     }
 
     /**
@@ -1018,7 +918,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     protected function getSalesforceIntegration($maxUpdate = 100, $maxCreate = 200, $maxSfLeads = 25, $maxSfContacts = 25, $updateObject = null)
     {
-        $mockFactory = $this->getMockFactory();
+        $this->setMocks();
 
         $featureSettings = [
             'sandbox' => [
@@ -1073,7 +973,23 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             );
 
         $sf = $this->getMockBuilder(SalesforceIntegration::class)
-            ->setConstructorArgs([$mockFactory])
+            ->setConstructorArgs([
+                $this->dispatcher,
+                $this->cache,
+                $this->em,
+                $this->session,
+                $this->request,
+                $this->router,
+                $this->translator,
+                $this->logger,
+                $this->encryptionHelper,
+                $this->leadModel,
+                $this->companyModel,
+                $this->pathsHelper,
+                $this->notificationModel,
+                $this->fieldModel,
+                $this->integrationEntityModel,
+            ])
             ->setMethods($this->sfMockMethods)
             ->getMock();
 
@@ -1132,9 +1048,8 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 )
             );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject $mockDispatcher */
-        $mockDispatcher = $mockFactory->getDispatcher();
-        $mockDispatcher->method('dispatch')
+        /* @var \PHPUnit_Framework_MockObject_MockObject $this->>dispatcher */
+        $this->dispatcher->method('dispatch')
             ->will(
                 $this->returnCallback(
                     function () use ($sf, $integration) {
