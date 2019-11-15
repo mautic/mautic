@@ -171,7 +171,6 @@ class FilterType extends AbstractType
                 'countries',
                 'regions',
                 'lists',
-                'campaign',
                 'emails',
                 'deviceTypes',
                 'deviceBrands',

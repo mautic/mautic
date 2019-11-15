@@ -553,6 +553,10 @@ return [
             ],
             'mautic.lead.subscriber.typeOperator' => [
                 'class'     => \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.campaign.model.campaign',
+                ],
             ],
             'mautic.lead.subscriber.segment.filter' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SegmentFiltersSubscriber::class,

@@ -48,7 +48,6 @@ class ListType extends AbstractType
     private $countryChoices      = [];
     private $regionChoices       = [];
     private $listChoices         = [];
-    private $campaignChoices     = [];
     private $emailChoices        = [];
     private $deviceTypesChoices  = [];
     private $deviceBrandsChoices = [];
@@ -222,7 +221,6 @@ class ListType extends AbstractType
                         'countries'      => $this->countryChoices,
                         'regions'        => $this->regionChoices,
                         'lists'          => $this->listChoices,
-                        'campaign'       => $this->campaignChoices,
                         'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
@@ -273,7 +271,6 @@ class ListType extends AbstractType
         $view->vars['regions']        = $this->regionChoices;
         $view->vars['timezones']      = $this->timezoneChoices;
         $view->vars['lists']          = $this->listChoices;
-        $view->vars['campaign']       = $this->campaignChoices;
         $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['deviceBrands']   = $this->deviceBrandsChoices;

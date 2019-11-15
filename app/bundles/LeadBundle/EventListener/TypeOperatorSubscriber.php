@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
@@ -18,6 +19,7 @@ use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -25,6 +27,24 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 class TypeOperatorSubscriber extends CommonSubscriber
 {
     use OperatorListTrait;
+
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
+     * @var CampaignModel
+     */
+    private $campaignModel;
+
+    public function __construct(
+        ListModel $listModel,
+        CampaignModel $campaignModel
+    ) {
+        $this->listModel     = $listModel; // @todo implement segment membership choices.
+        $this->campaignModel = $campaignModel;
+    }
 
     /**
      * @return array
@@ -67,6 +87,8 @@ class TypeOperatorSubscriber extends CommonSubscriber
                 1 => $this->translator->trans('mautic.core.form.yes'),
             ]
         );
+
+        $event->setChoicesForFieldType('campaign', $this->getCampaignChoices());
     }
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
@@ -126,5 +148,17 @@ class TypeOperatorSubscriber extends CommonSubscriber
                 'attr'  => ['class' => 'form-control'],
             ]
         );
+    }
+
+    private function getCampaignChoices(): array
+    {
+        $campaigns = $this->campaignModel->getPublishedCampaigns(true);
+        $choices   = [];
+
+        foreach ($campaigns as $campaign) {
+            $choices[$campaign['id']] = $campaign['name'];
+        }
+
+        return $choices;
     }
 }
