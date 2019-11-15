@@ -44,8 +44,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $timezoneChoices     = [];
-    private $regionChoices       = [];
     private $emailChoices        = [];
     private $deviceTypesChoices  = [];
     private $deviceBrandsChoices = [];
@@ -53,18 +51,12 @@ class ListType extends AbstractType
     private $tagChoices          = [];
     private $stageChoices        = [];
     private $assetChoices        = [];
-    private $localeChoices       = [];
     private $categoriesChoices   = [];
 
     public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;
-
-        // Locales
-        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
-        $this->regionChoices   = FormFieldHelper::getRegionChoices();
-        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
 
         $viewOther   = $security->isGranted('email:emails:viewother');
         $currentUser = $userHelper->getUser();
@@ -202,8 +194,6 @@ class ListType extends AbstractType
                     'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
-                        'timezones'      => $this->timezoneChoices,
-                        'regions'        => $this->regionChoices,
                         'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
@@ -211,7 +201,6 @@ class ListType extends AbstractType
                         'assets'         => $this->assetChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
-                        'locales'        => $this->localeChoices,
                         'globalcategory' => $this->categoriesChoices,
                     ],
                     'error_bubbling' => false,
@@ -250,8 +239,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['regions']        = $this->regionChoices;
-        $view->vars['timezones']      = $this->timezoneChoices;
         $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
@@ -259,7 +246,6 @@ class ListType extends AbstractType
         $view->vars['assets']         = $this->assetChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
-        $view->vars['locales']        = $this->localeChoices;
         $view->vars['globalcategory'] = $this->categoriesChoices;
     }
 

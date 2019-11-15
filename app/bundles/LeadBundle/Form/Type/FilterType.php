@@ -167,8 +167,6 @@ class FilterType extends AbstractType
     {
         $resolver->setRequired(
             [
-                'timezones',
-                'regions',
                 'emails',
                 'deviceTypes',
                 'deviceBrands',
@@ -176,7 +174,6 @@ class FilterType extends AbstractType
                 'assets',
                 'tags',
                 'stage',
-                'locales',
                 'globalcategory',
             ]
         );

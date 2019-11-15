@@ -91,6 +91,9 @@ class TypeOperatorSubscriber extends CommonSubscriber
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
         $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
+        $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
+        $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
+        $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
     }
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
