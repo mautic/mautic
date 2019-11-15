@@ -150,7 +150,7 @@ class DetailsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_details';
     }

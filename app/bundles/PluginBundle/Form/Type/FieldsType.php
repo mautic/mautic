@@ -55,7 +55,7 @@ class FieldsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_fields';
     }

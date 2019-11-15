@@ -55,7 +55,7 @@ class CompanyFieldsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_company_fields';
     }

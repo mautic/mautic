@@ -52,7 +52,7 @@ class IntegrationCampaignsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_campaign_status';
     }
