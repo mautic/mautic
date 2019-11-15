@@ -21,15 +21,29 @@ class ListFieldChoicesEvent extends Event
     /**
      * @var array
      */
-    private $choices = [];
+    private $choicesForTypes = [];
+
+    /**
+     * @var array
+     */
+    private $choicesForAliases = [];
 
     /**
      * @param string $fieldType
      * @param array  $choices
      */
-    public function setChoicesForFieldType($fieldType, array $choices)
+    public function setChoicesForFieldType(string $fieldType, array $choices)
     {
-        $this->choices[$fieldType] = $choices;
+        $this->choicesForTypes[$fieldType] = $choices;
+    }
+
+    /**
+     * @param string $fieldType
+     * @param array  $choices
+     */
+    public function setChoicesForFieldAlias(string $fieldAlias, array $choices)
+    {
+        $this->choicesForAliases[$fieldAlias] = $choices;
     }
 
     /**
@@ -37,6 +51,14 @@ class ListFieldChoicesEvent extends Event
      */
     public function getChoicesForAllListFieldTypes()
     {
-        return $this->choices;
+        return $this->choicesForTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChoicesForAllListFieldAliases()
+    {
+        return $this->choicesForAliases;
     }
 }

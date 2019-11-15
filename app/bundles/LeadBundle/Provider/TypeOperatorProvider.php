@@ -47,7 +47,12 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * @var array
      */
-    private $cachedListChoices = [];
+    private $cachedTypeChoices = [];
+
+    /**
+     * @var array
+     */
+    private $cachedAliasChoices = [];
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -76,21 +81,20 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getChoicesForListFieldType($fieldType)
+    public function getChoicesForField(string $fieldType, string $fieldAlias)
     {
-        // This condition can be removed after strict types will be implemented.
-        if (!is_string($fieldType)) {
-            throw new \InvalidArgumentException('getOperatorsForFieldType param must be string. '.print_r($fieldType, true).' provided');
+        $aliasChoices = $this->getAllChoicesForListFieldAliases();
+        $typeChoices  = $this->getAllChoicesForListFieldTypes();
+
+        if (isset($aliasChoices[$fieldAlias])) {
+            return $aliasChoices[$fieldAlias];
         }
 
-        $typeChoices = $this->getAllChoicesForListFieldTypes();
-
-        // If we already processed this
         if (isset($typeChoices[$fieldType])) {
             return $typeChoices[$fieldType];
         }
 
-        throw new ChoicesNotFoundException("No choices for field type {$fieldType} were found");
+        throw new ChoicesNotFoundException("No choices for field type {$fieldType} nor alias {$fieldAlias} were found");
     }
 
     /**
@@ -140,15 +144,19 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     public function getAllChoicesForListFieldTypes()
     {
-        if (empty($this->cachedListChoices)) {
-            $event = new ListFieldChoicesEvent();
+        $this->lookForFieldChoices();
 
-            $this->dispatcher->dispatch(LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE, $event);
+        return $this->cachedTypeChoices;
+    }
 
-            $this->cachedListChoices = $event->getChoicesForAllListFieldTypes();
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllChoicesForListFieldAliases()
+    {
+        $this->lookForFieldChoices();
 
-        return $this->cachedListChoices;
+        return $this->cachedAliasChoices;
     }
 
     /**
@@ -174,5 +182,17 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         $operatorOption = $this->filterOperatorProvider->getAllOperators();
 
         return (null === $operator) ? $operatorOption : $operatorOption[$operator];
+    }
+
+    private function lookForFieldChoices(): void
+    {
+        if (empty($this->cachedTypeChoices)) {
+            $event = new ListFieldChoicesEvent();
+
+            $this->dispatcher->dispatch(LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE, $event);
+
+            $this->cachedTypeChoices  = $event->getChoicesForAllListFieldTypes();
+            $this->cachedAliasChoices = $event->getChoicesForAllListFieldAliases();
+        }
     }
 }

@@ -32,12 +32,13 @@ interface TypeOperatorProviderInterface
 
     /**
      * @param string $filedType
+     * @param string $fieldAlias
      *
      * @return array
      *
      * @throws ChoicesNotFoundException
      */
-    public function getChoicesForListFieldType($fieldType);
+    public function getChoicesForField(string $fieldType, string $fieldAlias);
 
     /**
      * @param string $filedType

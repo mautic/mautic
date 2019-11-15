@@ -148,7 +148,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'multiselect',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('leadlist'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('multiselect', 'leadlist'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -157,7 +157,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
                 'properties' => [
                     'type' => 'select',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('campaign'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'campaign'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -200,7 +200,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_bounced'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -209,7 +209,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -218,7 +218,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_manually'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed_manually'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'     => 'lead',
@@ -227,7 +227,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_bounced_sms'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -236,7 +236,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -245,7 +245,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms_manually'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms_manually'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'     => 'lead',
@@ -409,7 +409,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.email_id'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'email_id'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -433,7 +433,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'sms_clicked_link'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -522,7 +522,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'notification'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -531,7 +531,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.page_id'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'page_id'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -540,7 +540,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
                 'label'      => $this->translator->trans('mautic.lead.list.filter.redirect_id'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('boolean'),
+                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'redirect_id'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',

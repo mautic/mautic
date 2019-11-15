@@ -88,8 +88,8 @@ class TypeOperatorSubscriber extends CommonSubscriber
             ]
         );
 
-        $event->setChoicesForFieldType('campaign', $this->getCampaignChoices());
-        $event->setChoicesForFieldType('leadlist', $this->getSegmentChoices());
+        $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
+        $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
     }
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
