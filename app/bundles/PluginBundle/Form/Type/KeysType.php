@@ -13,7 +13,7 @@ namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -75,12 +75,12 @@ class KeysType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['integration_object', 'integration_keys']);
-        $resolver->setOptional(['secret_keys']);
+        $resolver->setDefined(['secret_keys']);
         $resolver->setDefaults(['secret_keys' => [], 'is_published' => true]);
     }
 
