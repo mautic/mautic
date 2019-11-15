@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
+class AbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testPopulatedLeadDataReturnsIntAndNotDncEntityForMauticContactIsContactableByEmail()
     {
