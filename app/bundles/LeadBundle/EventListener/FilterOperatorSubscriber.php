@@ -146,7 +146,10 @@ class FilterOperatorSubscriber extends CommonSubscriber
             ],
             'leadlist' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
-                'properties' => ['type' => 'leadlist'],
+                'properties' => [
+                    'type' => 'multiselect',
+                    'list' => $this->typeOperatorProvider->getChoicesForListFieldType('leadlist'),
+                ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
             ],

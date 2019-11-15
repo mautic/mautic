@@ -47,7 +47,6 @@ class ListType extends AbstractType
     private $timezoneChoices     = [];
     private $countryChoices      = [];
     private $regionChoices       = [];
-    private $listChoices         = [];
     private $emailChoices        = [];
     private $deviceTypesChoices  = [];
     private $deviceBrandsChoices = [];
@@ -68,18 +67,6 @@ class ListType extends AbstractType
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
-
-        // Segments
-        $lists = $listModel->getUserLists();
-        foreach ($lists as $list) {
-            $this->listChoices[$list['name']] = $list['id'];
-        }
-
-        // Campaigns
-        $campaigns = $campaignModel->getPublishedCampaigns(true);
-        foreach ($campaigns as $campaign) {
-            $this->campaignChoices[$campaign['name']] = $campaign['id'];
-        }
 
         $viewOther   = $security->isGranted('email:emails:viewother');
         $currentUser = $userHelper->getUser();
@@ -220,7 +207,6 @@ class ListType extends AbstractType
                         'timezones'      => $this->timezoneChoices,
                         'countries'      => $this->countryChoices,
                         'regions'        => $this->regionChoices,
-                        'lists'          => $this->listChoices,
                         'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
@@ -270,7 +256,6 @@ class ListType extends AbstractType
         $view->vars['countries']      = $this->countryChoices;
         $view->vars['regions']        = $this->regionChoices;
         $view->vars['timezones']      = $this->timezoneChoices;
-        $view->vars['lists']          = $this->listChoices;
         $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['deviceBrands']   = $this->deviceBrandsChoices;

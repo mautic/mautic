@@ -89,22 +89,24 @@ class TypeOperatorSubscriber extends CommonSubscriber
         );
 
         $event->setChoicesForFieldType('campaign', $this->getCampaignChoices());
+        $event->setChoicesForFieldType('leadlist', $this->getSegmentChoices());
     }
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
     {
-        $form = $event->getFilterPropertiesForm();
-        $data = $form->getData();
+        $form     = $event->getFilterPropertiesForm();
+        $data     = $form->getData();
+        $disabled = $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
+        $multiple = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
 
-        if ($event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY, OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP)) {
+        if ($event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP)) {
             $form->add(
                 'filter',
                 TextType::class,
                 [
                     'label' => false,
                     'attr'  => [
-                        'class'    => 'form-control',
-                        'disabled' => $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY),
+                        'class' => 'form-control',
                     ],
                 ]
             );
@@ -113,8 +115,6 @@ class TypeOperatorSubscriber extends CommonSubscriber
         }
 
         if ($event->fieldTypeIsOneOf('select', 'multiselect', 'boolean')) {
-            $multiple = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN);
-
             // Conversion between select and multiselect values.
             if ($multiple) {
                 if (!isset($data['filter'])) {
@@ -134,6 +134,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
                     'choices'                   => FormFieldHelper::parseList($event->getFieldChoices(), true, ('boolean' === $event->getFieldType())),
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
+                    'disabled'                  => $disabled,
                 ]
             );
 
@@ -144,8 +145,9 @@ class TypeOperatorSubscriber extends CommonSubscriber
             'filter',
             TextType::class,
             [
-                'label' => false,
-                'attr'  => ['class' => 'form-control'],
+                'label'    => false,
+                'attr'     => ['class' => 'form-control'],
+                'disabled' => $disabled,
             ]
         );
     }
@@ -157,6 +159,18 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
         foreach ($campaigns as $campaign) {
             $choices[$campaign['id']] = $campaign['name'];
+        }
+
+        return $choices;
+    }
+
+    private function getSegmentChoices(): array
+    {
+        $segments = $this->listModel->getUserLists();
+        $choices  = [];
+
+        foreach ($segments as $segegment) {
+            $choices[$segegment['id']] = $segegment['name'];
         }
 
         return $choices;

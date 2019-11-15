@@ -11,6 +11,7 @@
 namespace Mautic\CoreBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -79,8 +80,9 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     private function reduceToSegmentIds(array $filters)
     {
-        $segmentFilters = array_filter($filters, function ($v) {
-            return 'leadlist' == $v['type'];
+        $segmentFilters = array_filter($filters, function ($filter) {
+            return 'leadlist' === $filter['type']
+                && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]);
         });
 
         $segentIdsInFilter = array_column($segmentFilters, 'filter');

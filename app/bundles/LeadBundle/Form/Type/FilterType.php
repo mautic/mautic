@@ -170,7 +170,6 @@ class FilterType extends AbstractType
                 'timezones',
                 'countries',
                 'regions',
-                'lists',
                 'emails',
                 'deviceTypes',
                 'deviceBrands',
