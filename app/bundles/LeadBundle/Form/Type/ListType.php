@@ -45,7 +45,6 @@ class ListType extends AbstractType
 {
     private $translator;
     private $timezoneChoices     = [];
-    private $countryChoices      = [];
     private $regionChoices       = [];
     private $emailChoices        = [];
     private $deviceTypesChoices  = [];
@@ -64,7 +63,6 @@ class ListType extends AbstractType
 
         // Locales
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
-        $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
 
@@ -205,7 +203,6 @@ class ListType extends AbstractType
                     'entry_options' => [
                         'label'          => false,
                         'timezones'      => $this->timezoneChoices,
-                        'countries'      => $this->countryChoices,
                         'regions'        => $this->regionChoices,
                         'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
@@ -253,7 +250,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['countries']      = $this->countryChoices;
         $view->vars['regions']        = $this->regionChoices;
         $view->vars['timezones']      = $this->timezoneChoices;
         $view->vars['emails']         = $this->emailChoices;

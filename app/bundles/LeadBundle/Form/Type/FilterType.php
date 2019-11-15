@@ -168,7 +168,6 @@ class FilterType extends AbstractType
         $resolver->setRequired(
             [
                 'timezones',
-                'countries',
                 'regions',
                 'emails',
                 'deviceTypes',

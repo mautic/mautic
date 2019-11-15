@@ -98,6 +98,6 @@ class FilterPropertiesTypeEvent extends Event
 
     public function getFieldChoices(): array
     {
-        return $this->fieldDetails['properties']['list'] ? $this->fieldDetails['properties']['list'] : [];
+        return $this->fieldDetails['properties']['list'] ?? [];
     }
 }

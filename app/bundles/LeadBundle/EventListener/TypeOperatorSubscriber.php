@@ -90,14 +90,16 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
+        $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
     }
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
     {
         $form     = $event->getFilterPropertiesForm();
-        $data     = $form->getData();
+        $choices  = $event->getFieldChoices();
         $disabled = $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
         $multiple = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
+        $data     = $form->getData();
 
         if ($event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP)) {
             $form->add(
@@ -114,7 +116,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
             return;
         }
 
-        if ($event->fieldTypeIsOneOf('select', 'multiselect', 'boolean')) {
+        if ($event->fieldTypeIsOneOf('select', 'multiselect', 'boolean') || $choices) {
             // Conversion between select and multiselect values.
             if ($multiple) {
                 if (!isset($data['filter'])) {
@@ -131,7 +133,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
                     'label'                     => false,
                     'attr'                      => ['class' => 'form-control'],
                     'data'                      => $data['filter'],
-                    'choices'                   => FormFieldHelper::parseList($event->getFieldChoices(), true, ('boolean' === $event->getFieldType())),
+                    'choices'                   => FormFieldHelper::parseList($choices, true, ('boolean' === $event->getFieldType())),
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
                     'disabled'                  => $disabled,

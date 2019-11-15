@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
@@ -91,6 +92,12 @@ class FilterOperatorSubscriber extends CommonSubscriber
                         FormFieldHelper::parseList($properties['list'])
                     ) : '';
                 }
+            }
+
+            try {
+                $properties['list'] = $this->typeOperatorProvider->getChoicesForField($type, $field->getAlias());
+            } catch (ChoicesNotFoundException $e) {
+                // That's fine. Not all fields should have choices.
             }
 
             $event->addChoice($field->getObject(), $field->getAlias(), [
