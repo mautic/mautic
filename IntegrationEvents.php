@@ -122,4 +122,13 @@ final class IntegrationEvents
      * @var string
      */
     public const INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE = 'mautic.integration.INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE';
+
+    /**
+     * This event is dispatched when a tokens are being built to represent links to mapped integration objects
+     *
+     * The event listener receives a MauticPlugin\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent instance.
+     *
+     * @var string
+     */
+    public const INTEGRATION_OBJECT_TOKEN_EVENT = 'mautic.integration.INTEGRATION_OBJECT_TOKEN_EVENT';
 }
