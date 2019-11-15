@@ -11,7 +11,10 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -39,7 +42,7 @@ class DetailsType extends AbstractType
             }
         }
 
-        $builder->add('apiKeys', 'integration_keys', [
+        $builder->add('apiKeys', KeysType::class, [
             'label'              => false,
             'integration_keys'   => $keys,
             'data'               => $decryptedKeys,
@@ -50,7 +53,7 @@ class DetailsType extends AbstractType
             $data = $event->getData();
             $form = $event->getForm();
 
-            $form->add('apiKeys', 'integration_keys', [
+            $form->add('apiKeys', KeysType::class, [
                 'label'              => false,
                 'integration_keys'   => $keys,
                 'data'               => $decryptedKeys,
@@ -87,7 +90,7 @@ class DetailsType extends AbstractType
                 $choices[$f] = 'mautic.integration.form.feature.'.$f;
             }
 
-            $builder->add('supportedFeatures', 'choice', [
+            $builder->add('supportedFeatures', ChoiceType::class, [
                 'choices'     => $choices,
                 'expanded'    => true,
                 'label_attr'  => ['class' => 'control-label'],
@@ -108,7 +111,7 @@ class DetailsType extends AbstractType
             ]);
         }
 
-        $builder->add('featureSettings', 'integration_featuresettings', [
+        $builder->add('featureSettings', FeatureSettingsType::class, [
             'label'              => 'mautic.integration.form.feature.settings',
             'required'           => true,
             'data'               => $options['data']->getFeatureSettings(),
@@ -119,9 +122,9 @@ class DetailsType extends AbstractType
             'company_fields'     => $options['company_fields'],
         ]);
 
-        $builder->add('name', 'hidden', ['data' => $options['integration']]);
+        $builder->add('name', HiddenType::class, ['data' => $options['integration']]);
 
-        $builder->add('in_auth', 'hidden', ['mapped' => false]);
+        $builder->add('in_auth', HiddenType::class, ['mapped' => false]);
 
         $builder->add('buttons', 'form_buttons');
 
@@ -138,7 +141,7 @@ class DetailsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\PluginBundle\Entity\Integration',
+            'data_class' => Integration::class,
         ]);
 
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);

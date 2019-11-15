@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -58,7 +59,7 @@ class IntegrationsListType extends AbstractType
 
         $builder->add(
             'integration',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'    => $integrations,
                 'expanded'   => false,
@@ -107,7 +108,7 @@ class IntegrationsListType extends AbstractType
             }
             $form->add(
                 'config',
-                'integration_config',
+                IntegrationConfigType::class,
                 [
                     'label' => false,
                     'attr'  => [
@@ -122,7 +123,7 @@ class IntegrationsListType extends AbstractType
             $hideClass = (isset($data['campaign_member_status']) && !empty($data['campaign_member_status']['campaign_member_status'])) ? '' : ' hide';
             $form->add(
                 'campaign_member_status',
-                'integration_campaign_status',
+                IntegrationCampaignsType::class,
                 [
                     'label' => false,
                     'attr'  => [
