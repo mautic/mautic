@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -35,8 +34,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $stageChoices        = [];
-    private $assetChoices        = [];
     private $categoriesChoices   = [];
 
     /**
@@ -44,17 +41,12 @@ class ListType extends AbstractType
      */
     private $listModel;
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, StageModel $stageModel, CategoryModel $categoryModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, CategoryModel $categoryModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;
 
-        $stages = $stageModel->getRepository()->getSimpleList();
-        foreach ($stages as $stage) {
-            $this->stageChoices[$stage['label']] = $stage['value'];
-        }
-
-        $categories = $categoryModel->getLookupResults('global', null, 0);
+        $categories = $categoryModel->getLookupResults('global');
 
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['title']] = $category['id'];
@@ -157,7 +149,6 @@ class ListType extends AbstractType
                     'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
-                        'stage'          => $this->stageChoices,
                         'globalcategory' => $this->categoriesChoices,
                     ],
                     'error_bubbling' => false,
@@ -196,7 +187,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['stage']          = $this->stageChoices;
         $view->vars['globalcategory'] = $this->categoriesChoices;
     }
 

@@ -271,14 +271,17 @@ class FilterOperatorSubscriber extends CommonSubscriber
             ],
             'stage' => [
                 'label'      => $this->translator->trans('mautic.lead.lead.field.stage'),
-                'properties' => ['type' => 'stage'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'select',
+                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'stage'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::EQUAL_TO,
                     OperatorOptions::NOT_EQUAL_TO,
                     OperatorOptions::EMPTY,
                     OperatorOptions::NOT_EMPTY,
                 ]),
-                'object' => 'lead',
             ],
             'globalcategory' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.categories'),
