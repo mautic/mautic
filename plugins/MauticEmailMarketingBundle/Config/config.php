@@ -19,7 +19,7 @@ return [
         'forms' => [
             'mautic.form.type.emailmarketing.mailchimp' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType',
-                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters'],
+                'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'mautic.helper.core_parameters'],
                 'alias'     => 'emailmarketing_mailchimp',
             ],
             'mautic.form.type.emailmarketing.constantcontact' => [
