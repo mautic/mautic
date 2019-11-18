@@ -196,7 +196,7 @@ class MailchimpType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailmarketing_mailchimp';
     }
