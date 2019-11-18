@@ -176,8 +176,7 @@ class BuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyCriteria(
-            ['group', 'label', 'callback'],
-            ['callback'],
+            ['group', 'label', 'event'],
             $criteria
         );
 
@@ -188,22 +187,13 @@ class BuilderEvent extends Event
 
     /**
      * @param array $keys
-     * @param array $methods
      * @param array $criteria
      */
-    private function verifyCriteria(array $keys, array $methods, array $criteria)
+    private function verifyCriteria(array $keys, array $criteria)
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {
                 throw new InvalidArgumentException("The key, '$k' is missing.");
-            }
-        }
-
-        foreach ($methods as $m) {
-            if (isset($criteria[$m]) && !is_callable($criteria[$m], true)) {
-                throw new InvalidArgumentException(
-                    $criteria[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.'
-                );
             }
         }
     }

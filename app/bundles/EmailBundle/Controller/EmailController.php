@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -338,34 +339,21 @@ class EmailController extends FormController
                 $testSettings = $criteria['criteria'][$lastCriteria];
 
                 $args = [
-                    'factory'    => $this->factory,
                     'email'      => $email,
                     'parent'     => $parent,
                     'children'   => $children,
                     'properties' => $properties,
                 ];
 
-                //execute the callback
-                if (is_callable($testSettings['callback'])) {
-                    if (is_array($testSettings['callback'])) {
-                        $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
-                    } elseif (strpos($testSettings['callback'], '::') !== false) {
-                        $parts      = explode('::', $testSettings['callback']);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $testSettings['callback']);
-                    }
+                //if (array_key_exists('event', $testSettings)) {
+                $event = new DetermineWinnerEvent($args);
+                $this->container->get('event_dispatcher')->dispatch(
+                        $testSettings['event'],
+                        $event
+                    );
 
-                    $pass = [];
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    $abTestResults = $reflection->invokeArgs($this, $pass);
-                }
+                $abTestResults = $event->getAbTestResults();
+                //}
             }
         }
 
