@@ -24,7 +24,7 @@ use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use MauticPlugin\IntegrationsBundle\Helper\TokenParser;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -41,7 +41,7 @@ class EmailSubscriber extends CommonSubscriber
     protected $translator;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -61,15 +61,15 @@ class EmailSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
-     * @param TranslatorInterface     $translator
-     * @param EventDispatcher         $eventDispatcher
-     * @param TokenParser             $tokenParser
-     * @param ObjectMappingRepository $objectMappingRepository
-     * @param IntegrationHelper       $integrationHelper
+     * @param TranslatorInterface      $translator
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param TokenParser              $tokenParser
+     * @param ObjectMappingRepository  $objectMappingRepository
+     * @param IntegrationHelper        $integrationHelper
      */
     public function __construct(
         TranslatorInterface $translator,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         TokenParser $tokenParser,
         ObjectMappingRepository $objectMappingRepository,
         IntegrationHelper $integrationHelper
