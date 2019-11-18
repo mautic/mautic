@@ -11,8 +11,9 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -28,9 +29,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class MailchimpType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var IntegrationHelper
      */
-    private $factory;
+    private $integrationHelper;
+
+    /** @var PluginModel */
+    private $pluginModel;
+
     /**
      * @var Session
      */
@@ -41,9 +46,10 @@ class MailchimpType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory              = $factory;
+        $this->integrationHelper    = $integrationHelper;
+        $this->pluginModel          = $pluginModel;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
     }
@@ -54,11 +60,8 @@ class MailchimpType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-        $helper = $this->factory->getHelper('integration');
-
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration $mailchimp */
-        $mailchimp = $helper->getIntegrationObject('Mailchimp');
+        $mailchimp = $this->integrationHelper->getIntegrationObject('Mailchimp');
 
         $api = $mailchimp->getApiHelper();
         try {
@@ -109,7 +112,7 @@ class MailchimpType extends AbstractType
         }
 
         if (isset($options['form_area']) && $options['form_area'] == 'integration') {
-            $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+            $leadFields = $this->pluginModel->getLeadFields();
 
             $formModifier = function (FormInterface $form, $data) use ($mailchimp, $leadFields) {
                 $integrationName = $mailchimp->getName();
