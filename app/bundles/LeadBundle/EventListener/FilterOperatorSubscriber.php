@@ -177,9 +177,12 @@ class FilterOperatorSubscriber extends CommonSubscriber
             ],
             'device_type' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.device_type'),
-                'properties' => ['type' => 'device_type'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
+                'properties' => [
+                    'type' => 'select',
+                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'device_type'),
+                ],
             ],
             'device_brand' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.device_brand'),
