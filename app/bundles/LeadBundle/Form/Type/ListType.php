@@ -38,7 +38,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $deviceBrandsChoices = [];
     private $deviceOsChoices     = [];
     private $tagChoices          = [];
     private $stageChoices        = [];
@@ -70,7 +69,6 @@ class ListType extends AbstractType
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['title']] = $category['id'];
         }
-        $this->deviceBrandsChoices = array_flip(DeviceParser::$deviceBrands);
         $this->deviceOsChoices     = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 
@@ -170,7 +168,6 @@ class ListType extends AbstractType
                     'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
-                        'deviceBrands'   => $this->deviceBrandsChoices,
                         'deviceOs'       => $this->deviceOsChoices,
                         'assets'         => $this->assetChoices,
                         'tags'           => $this->tagChoices,
@@ -213,7 +210,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
         $view->vars['deviceOs']       = $this->deviceOsChoices;
         $view->vars['assets']         = $this->assetChoices;
         $view->vars['tags']           = $this->tagChoices;
