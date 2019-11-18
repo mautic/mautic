@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter\LazyOpenCloud;
 use Gaufrette\Adapter\OpenStackCloudFiles\ObjectStoreFactory;
+use MauticPlugin\MauticCloudStorageBundle\Form\Type\OpenStackType;
 use OpenCloud\OpenStack;
 
 /**
@@ -107,5 +108,21 @@ class OpenStackIntegration extends CloudStorageIntegration
         $keys = $this->getDecryptedApiKeys();
 
         return $this->storeFactory->getObjectStore()->getContainer($keys['containerName'])->getObject($key)->getPublicUrl();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ('features' !== $formArea) {
+            return;
+        }
+
+        $builder->add('provider', OpenStackType::class, [
+            'label'    => 'mautic.integration.form.provider.settings',
+            'required' => false,
+            'data'     => (isset($data['provider'])) ? $data['provider'] : [],
+        ]);
     }
 }

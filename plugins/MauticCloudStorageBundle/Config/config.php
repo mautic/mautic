@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2019 Mautic Contributors. All rights reserved
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -32,21 +32,12 @@ return [
         'integrations' => [
             'mautic.integration.amazons3' => [
                 'class'       => \MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,
-                'methodCalls' => [
-                    'setContainer' => ['@service_container'],
-                ],
             ],
             'mautic.integration.openstack' => [
                 'class'       => \MauticPlugin\MauticCloudStorageBundle\Integration\OpenStackIntegration::class,
-                'methodCalls' => [
-                    'setContainer' => ['@service_container'],
-                ],
             ],
             'mautic.integration.rackspace' => [
                 'class'       => \MauticPlugin\MauticCloudStorageBundle\Integration\RackspaceIntegration::class,
-                'methodCalls' => [
-                    'setContainer' => ['@service_container'],
-                ],
             ],
         ],
     ],

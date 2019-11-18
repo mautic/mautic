@@ -88,7 +88,6 @@ class AmazonS3Integration extends CloudStorageIntegration
                         'class'   => 'form-control',
                     ],
                     'data'        => empty($data['region']) ? 'us-east-1' : $data['region'],
-                    'required'    => false,
                 ]
             );
         }

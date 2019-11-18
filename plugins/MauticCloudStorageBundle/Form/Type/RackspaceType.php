@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2019 Mautic Contributors. All rights reserved
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -36,6 +36,7 @@ class RackspaceType extends AbstractType
             'attr'       => [
                 'class' => 'form-control',
             ],
+            'choices_as_values' => true,
         ]);
     }
 

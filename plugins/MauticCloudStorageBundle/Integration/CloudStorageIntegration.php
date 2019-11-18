@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2019 Mautic Contributors. All rights reserved
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,7 +13,6 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\DependencyInjection\Container;
 
 /**
  * Class CloudStorageIntegration.
@@ -24,36 +23,6 @@ abstract class CloudStorageIntegration extends AbstractIntegration
      * @var Adapter
      */
     protected $adapter;
-
-    /**
-     * @var Container
-     */
-    protected $container;
-
-    /**
-     * @param Container $container
-     */
-    public function setContainer(Container $container)
-    {
-        $this->container = $container;
-    }
-
-    /**
-     * @param \Symfony\Component\Form\FormBuilder| \Symfony\Component\Form\Form $builder
-     */
-    public function appendToForm(&$builder, $data, $formArea)
-    {
-        if ($formArea == 'features') {
-            $name = strtolower($this->getName());
-            if ($this->container->has('mautic.form.type.cloudstorage.'.$name)) {
-                $builder->add('provider', $name, [
-                    'label'    => 'mautic.integration.form.provider.settings',
-                    'required' => false,
-                    'data'     => (isset($data['provider'])) ? $data['provider'] : [],
-                ]);
-            }
-        }
-    }
 
     /**
      * {@inheritdoc}
