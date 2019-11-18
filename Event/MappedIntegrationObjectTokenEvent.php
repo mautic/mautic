@@ -50,7 +50,7 @@ class MappedIntegrationObjectTokenEvent extends CommonEvent
             'base_url'    => $objectLink,
             'token_title' => $title,
             'link_text'   => $linkText,
-            'default'     => $default
+            'default'     => $default,
         ];
     }
 

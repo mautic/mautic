@@ -61,18 +61,18 @@ class EmailSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
-     * @param TranslatorInterface $translator
-     * @param EventDispatcher $eventDispatcher
-     * @param TokenParser $tokenParser
+     * @param TranslatorInterface     $translator
+     * @param EventDispatcher         $eventDispatcher
+     * @param TokenParser             $tokenParser
      * @param ObjectMappingRepository $objectMappingRepository
-     * @param IntegrationHelper $integrationHelper
+     * @param IntegrationHelper       $integrationHelper
      */
     public function __construct(
-        TranslatorInterface     $translator,
-        EventDispatcher         $eventDispatcher,
-        TokenParser             $tokenParser,
+        TranslatorInterface $translator,
+        EventDispatcher $eventDispatcher,
+        TokenParser $tokenParser,
         ObjectMappingRepository $objectMappingRepository,
-        IntegrationHelper       $integrationHelper
+        IntegrationHelper $integrationHelper
     ) {
         $this->translator              = $translator;
         $this->eventDispatcher         = $eventDispatcher;
