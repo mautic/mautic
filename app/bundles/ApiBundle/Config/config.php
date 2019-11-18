@@ -126,7 +126,7 @@ return [
             'mautic.form.type.apiclients' => [
                 'class'     => 'Mautic\ApiBundle\Form\Type\ClientType',
                 'arguments' => [
-                    'service_container',
+                    'request_stack',
                     'translator',
                     'validator',
                     'router',

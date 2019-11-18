@@ -16,12 +16,12 @@ use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
@@ -56,14 +56,14 @@ class ClientType extends AbstractType
     /**
      * Constructor.
      *
-     * @param ContainerInterface $container
-     * @param TranslatorInterface       $translator
-     * @param ValidatorInterface        $validator
-     * @param Session                   $session
-     * @param RouterInterface           $router
+     * @param RequestStack        $requestStack
+     * @param TranslatorInterface $translator
+     * @param ValidatorInterface  $validator
+     * @param Session             $session
+     * @param RouterInterface     $router
      */
     public function __construct(
-        ContainerInterface $container,
+        RequestStack $requestStack,
         TranslatorInterface $translator,
         ValidatorInterface $validator,
         Session $session,
@@ -71,7 +71,7 @@ class ClientType extends AbstractType
     ) {
         $this->translator = $translator;
         $this->validator  = $validator;
-        $this->apiMode    = $container->get('request')->get(
+        $this->apiMode    = $requestStack->getCurrentRequest()->get(
             'api_mode',
             $session->get('mautic.client.filter.api_mode', 'oauth1a')
         );
