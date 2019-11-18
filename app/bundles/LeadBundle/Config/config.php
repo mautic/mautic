@@ -559,6 +559,7 @@ return [
                     'mautic.campaign.model.campaign',
                     'mautic.email.model.email',
                     'mautic.stage.model.stage',
+                    'mautic.category.model.category',
                 ],
             ],
             'mautic.lead.subscriber.segment.filter' => [
@@ -583,7 +584,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
-                    'mautic.category.model.category',
                 ],
             ],
             'mautic.form.type.leadlist_choices' => [

@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\EventListener;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -58,18 +59,25 @@ class TypeOperatorSubscriber extends CommonSubscriber
      */
     private $stageModel;
 
+    /**
+     * @var CategoryModel
+     */
+    private $categoryModel;
+
     public function __construct(
         LeadModel $leadModel,
         ListModel $listModel,
         CampaignModel $campaignModel,
         EmailModel $emailModel,
-        StageModel $stageModel
+        StageModel $stageModel,
+        CategoryModel $categoryModel
     ) {
         $this->leadModel     = $leadModel;
         $this->listModel     = $listModel;
         $this->campaignModel = $campaignModel;
         $this->emailModel    = $emailModel;
         $this->stageModel    = $stageModel;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -118,6 +126,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
         $event->setChoicesForFieldAlias('tags', $this->getTagChoices());
         $event->setChoicesForFieldAlias('stage', $this->getStageChoices());
+        $event->setChoicesForFieldAlias('globalcategory', $this->getCategoryChoices());
         $event->setChoicesForFieldAlias('lead_email_received', $this->emailModel->getLookupResults('email', '', 0, 0));
         $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
         $event->setChoicesForFieldAlias('device_brand', DeviceParser::$deviceBrands);
@@ -232,6 +241,18 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
         foreach ($stages as $stage) {
             $choices[$stage['value']] = $stage['label'];
+        }
+
+        return $choices;
+    }
+
+    private function getCategoryChoices(): array
+    {
+        $categories = $this->categoryModel->getLookupResults('global');
+        $choices    = [];
+
+        foreach ($categories as $category) {
+            $choices[$category['id']] = $category['title'];
         }
 
         return $choices;

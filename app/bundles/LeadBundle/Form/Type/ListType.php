@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -34,23 +33,16 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $categoriesChoices   = [];
 
     /**
      * @var ListModel
      */
     private $listModel;
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, CategoryModel $categoryModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;
-
-        $categories = $categoryModel->getLookupResults('global');
-
-        foreach ($categories as $category) {
-            $this->categoriesChoices[$category['title']] = $category['id'];
-        }
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -146,11 +138,7 @@ class ListType extends AbstractType
                 'filters',
                 CollectionType::class,
                 [
-                    'entry_type'    => FilterType::class,
-                    'entry_options' => [
-                        'label'          => false,
-                        'globalcategory' => $this->categoriesChoices,
-                    ],
+                    'entry_type'     => FilterType::class,
                     'error_bubbling' => false,
                     'mapped'         => true,
                     'allow_add'      => true,
@@ -186,8 +174,7 @@ class ListType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['globalcategory'] = $this->categoriesChoices;
+        $view->vars['fields'] = $this->listModel->getChoiceFields();
     }
 
     /**

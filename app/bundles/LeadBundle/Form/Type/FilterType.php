@@ -170,12 +170,6 @@ class FilterType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'globalcategory',
-            ]
-        );
-
         $resolver->setDefaults(
             [
                 'label'          => false,

@@ -285,9 +285,12 @@ class FilterOperatorSubscriber extends CommonSubscriber
             ],
             'globalcategory' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.categories'),
-                'properties' => ['type' => 'globalcategory'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
+                'properties' => [
+                    'type' => 'select',
+                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'globalcategory'),
+                ],
             ],
             'utm_campaign' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.utmcampaign'),
