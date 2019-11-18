@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -87,7 +88,7 @@ class IcontactType extends AbstractType
             $page    = 1;
         }
 
-        $builder->add('list', 'choice', [
+        $builder->add('list', ChoiceType::class, [
             'choices'  => $choices,
             'label'    => 'mautic.emailmarketing.list',
             'required' => false,
