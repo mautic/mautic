@@ -29,7 +29,7 @@ return [
             ],
             'mautic.form.type.emailmarketing.icontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType',
-                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters'],
+                'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
                 'alias'     => 'emailmarketing_icontact',
             ],
         ],

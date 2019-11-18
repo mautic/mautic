@@ -11,8 +11,9 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -27,9 +28,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class IcontactType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var IntegrationHelper
      */
-    private $factory;
+    private $integrationHelper;
+
+    /** @var PluginModel */
+    private $pluginModel;
 
     /**
      * @var Session
@@ -41,9 +45,10 @@ class IcontactType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory              = $factory;
+        $this->integrationHelper    = $integrationHelper;
+        $this->pluginModel          = $pluginModel;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
     }
@@ -54,11 +59,8 @@ class IcontactType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-        $helper = $this->factory->getHelper('integration');
-
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration $object */
-        $object          = $helper->getIntegrationObject('Icontact');
+        $object          = $this->integrationHelper->getIntegrationObject('Icontact');
         $integrationName = $object->getName();
         $session         = $this->session;
         $limit           = $session->get(
@@ -105,7 +107,7 @@ class IcontactType extends AbstractType
         }
 
         if (isset($options['form_area']) && $options['form_area'] == 'integration') {
-            $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+            $leadFields = $this->pluginModel->getLeadFields();
 
             $fields = $object->getFormLeadFields();
 
