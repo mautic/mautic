@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
+
 /**
  * Class IcontactIntegration.
  */
@@ -260,5 +262,10 @@ class IcontactIntegration extends EmailAbstractIntegration
         }
 
         return false;
+    }
+
+    public function getFormType()
+    {
+        return IcontactType::class;
     }
 }

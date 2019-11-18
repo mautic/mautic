@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
+
 /**
  * Class MailchimpIntegration.
  */
@@ -197,5 +199,10 @@ class MailchimpIntegration extends EmailAbstractIntegration
         $settings['dynamic_contact_fields'] = true;
 
         return $settings;
+    }
+
+    public function getFormType()
+    {
+        return MailchimpType::class;
     }
 }

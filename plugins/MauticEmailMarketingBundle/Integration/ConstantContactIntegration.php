@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType;
+
 /**
  * Class ConstantContactIntegration.
  */
@@ -188,5 +190,10 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         }
 
         return false;
+    }
+
+    public function getFormType()
+    {
+        return ConstantContactType::class;
     }
 }
