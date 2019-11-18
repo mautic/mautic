@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
+use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
@@ -45,6 +46,7 @@ class WebhookSubscriber implements EventSubscriberInterface
             LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
             LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
             LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
+            LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
         ];
     }
 
@@ -104,6 +106,15 @@ class WebhookSubscriber implements EventSubscriberInterface
             [
                 'label'       => 'mautic.lead.webhook.event.lead.company.change',
                 'description' => 'mautic.lead.webhook.event.lead.company.change.desc',
+            ]
+        );
+
+        // add checkbox to the webhook form for new/updated companies
+        $event->addEvent(
+            LeadEvents::COMPANY_POST_SAVE,
+            [
+                'label'       => 'mautic.lead.webhook.event.company.new_or_update',
+                'description' => 'mautic.lead.webhook.event.company.new_or_update_desc',
             ]
         );
     }
@@ -214,5 +225,18 @@ class WebhookSubscriber implements EventSubscriberInterface
                 ]
             );
         }
+    }
+
+    /**
+     * @param CompanyEvent $event
+     */
+    public function onCompanySave(CompanyEvent $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::COMPANY_POST_SAVE,
+            [
+                'company'    => $event->getCompany(),
+            ]
+        );
     }
 }
