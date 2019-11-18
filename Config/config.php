@@ -16,7 +16,7 @@ return [
     'description' => 'Adds support for plugin integrations',
     'version'     => '0.0.1',
     'author'      => 'Mautic, Inc.',
-    'routes' => [
+    'routes'      => [
         'main' => [
             'mautic_integration_config' => [
                 'path'       => '/integration/{integration}/config',
@@ -233,7 +233,7 @@ return [
             ],
             'mautic.integrations.token.parser' => [
                 'class' => \MauticPlugin\IntegrationsBundle\Helper\TokenParser::class,
-            ]
+            ],
         ],
         'repositories' => [
             'mautic.integrations.repository.field_change' => [

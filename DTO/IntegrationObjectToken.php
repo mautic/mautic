@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,7 +15,7 @@ namespace MauticPlugin\IntegrationsBundle\DTO;
 
 /**
  * This class represents tokens which provide links to objects which have been
- * synced from integrations into Mautic
+ * synced from integrations into Mautic.
  */
 class IntegrationObjectToken
 {
@@ -68,7 +70,7 @@ class IntegrationObjectToken
     /**
      * @param string $objectName
      */
-    public function setObjectName($objectName)
+    public function setObjectName($objectName): void
     {
         $this->objectName = $objectName;
     }
@@ -84,7 +86,7 @@ class IntegrationObjectToken
     /**
      * @param string $integration
      */
-    public function setIntegration($integration)
+    public function setIntegration($integration): void
     {
         $this->integration = $integration;
     }
@@ -100,7 +102,7 @@ class IntegrationObjectToken
     /**
      * @param string $defaultValue
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
     }
@@ -116,7 +118,7 @@ class IntegrationObjectToken
     /**
      * @param string $linkText
      */
-    public function setLinkText($linkText)
+    public function setLinkText($linkText): void
     {
         $this->linkText = $linkText;
     }
@@ -132,7 +134,7 @@ class IntegrationObjectToken
     /**
      * @param string $baseURL
      */
-    public function setBaseURL($baseURL)
+    public function setBaseURL($baseURL): void
     {
         $this->baseURL = $baseURL;
     }

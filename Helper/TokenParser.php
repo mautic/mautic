@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -87,7 +89,7 @@ class TokenParser
     public function buildTokenWithDefaultOptions($integrationObjectName, $integration, $default, $linkText, $baseURL): string
     {
         return sprintf(
-            "{mapped-integration-object=%s | integration=%s | default=%s | link-text=%s | base-url=%s}",
+            '{mapped-integration-object=%s | integration=%s | default=%s | link-text=%s | base-url=%s}',
             $integrationObjectName,
             $integration,
             $default,

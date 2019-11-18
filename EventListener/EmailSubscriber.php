@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -17,45 +19,44 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
 use MauticPlugin\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use MauticPlugin\IntegrationsBundle\Helper\TokenParser;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 
 /**
  * This class subscribes to events related to building and providing
- * tokens for emails, particularly the IntegrationObjectToken
+ * tokens for emails, particularly the IntegrationObjectToken.
  *
  * Class EmailSubscriber
- * @package MauticPlugin\IntegrationsBundle\EventListener
  */
 class EmailSubscriber extends CommonSubscriber
 {
     /**
-     * @var TranslatorInterface $translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @var EventDispatcher $eventDispatcher
+     * @var EventDispatcher
      */
     protected $eventDispatcher;
 
     /**
-     * @var TokenParser $tokenParser
+     * @var TokenParser
      */
     protected $tokenParser;
 
     /**
-     * @var ObjectMappingRepository $objectMappingRepository
+     * @var ObjectMappingRepository
      */
     protected $objectMappingRepository;
 
     /**
-     * @var IntegrationHelper $integrationHelper
+     * @var IntegrationHelper
      */
     protected $integrationHelper;
 
@@ -67,17 +68,17 @@ class EmailSubscriber extends CommonSubscriber
      * @param IntegrationHelper $integrationHelper
      */
     public function __construct(
-        TranslatorInterface $translator,
-        EventDispatcher $eventDispatcher,
-        TokenParser $tokenParser,
+        TranslatorInterface     $translator,
+        EventDispatcher         $eventDispatcher,
+        TokenParser             $tokenParser,
         ObjectMappingRepository $objectMappingRepository,
-        IntegrationHelper $integrationHelper
+        IntegrationHelper       $integrationHelper
     ) {
-        $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->tokenParser = $tokenParser;
+        $this->translator              = $translator;
+        $this->eventDispatcher         = $eventDispatcher;
+        $this->tokenParser             = $tokenParser;
         $this->objectMappingRepository = $objectMappingRepository;
-        $this->integrationHelper = $integrationHelper;
+        $this->integrationHelper       = $integrationHelper;
     }
 
     /**
@@ -95,7 +96,7 @@ class EmailSubscriber extends CommonSubscriber
     /**
      * @param EmailBuilderEvent $event
      */
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         $tokens = [];
 
@@ -129,7 +130,7 @@ class EmailSubscriber extends CommonSubscriber
     /**
      * @param EmailSendEvent $event
      */
-    public function decodeTokens(EmailSendEvent $event)
+    public function decodeTokens(EmailSendEvent $event): void
     {
         $tokens = $this->tokenParser->findTokens($event->getContent());
 
@@ -137,17 +138,17 @@ class EmailSubscriber extends CommonSubscriber
             return;
         }
 
-        $tokens->map(function (Token $token) use ($event) {
+        $tokens->map(function (Token $token) use ($event): void {
             try {
                 $integrationObject = $this->objectMappingRepository->getIntegrationObject(
                     $token->getIntegration(),
                     'lead',
-                    ($event->getLead())['id'],
+                    $event->getLead()['id'],
                     $token->getObjectName()
                 );
 
-                $url = $token->getBaseURL() . "/" . $integrationObject['integration_object_id'];
-                $link = "<a href=\"{$url}\" >" . $token->getLinkText() . "</a>";
+                $url = $token->getBaseURL().'/'.$integrationObject['integration_object_id'];
+                $link = "<a href=\"{$url}\" >".$token->getLinkText().'</a>';
                 $event->addToken($token->getToken(), $link);
             } catch (EntityNotFoundException $e) {
                 return;
