@@ -172,8 +172,6 @@ class FilterType extends AbstractType
     {
         $resolver->setRequired(
             [
-                'deviceOs',
-                'assets',
                 'tags',
                 'stage',
                 'globalcategory',

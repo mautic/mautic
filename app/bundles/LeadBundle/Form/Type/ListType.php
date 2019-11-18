@@ -11,8 +11,6 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
-use DeviceDetector\Parser\OperatingSystem;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -38,7 +36,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $deviceOsChoices     = [];
     private $tagChoices          = [];
     private $stageChoices        = [];
     private $assetChoices        = [];
@@ -69,7 +66,6 @@ class ListType extends AbstractType
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['title']] = $category['id'];
         }
-        $this->deviceOsChoices     = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -168,8 +164,6 @@ class ListType extends AbstractType
                     'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
-                        'deviceOs'       => $this->deviceOsChoices,
-                        'assets'         => $this->assetChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'globalcategory' => $this->categoriesChoices,
@@ -210,8 +204,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['deviceOs']       = $this->deviceOsChoices;
-        $view->vars['assets']         = $this->assetChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['globalcategory'] = $this->categoriesChoices;

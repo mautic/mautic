@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
+use DeviceDetector\Parser\OperatingSystem;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -102,6 +103,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
         $event->setChoicesForFieldAlias('lead_email_received', $this->emailModel->getLookupResults('email', '', 0, 0));
         $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
         $event->setChoicesForFieldAlias('device_brand', DeviceParser::$deviceBrands);
+        $event->setChoicesForFieldAlias('device_os', array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())));
         $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
         $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
