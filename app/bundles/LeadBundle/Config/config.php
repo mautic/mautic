@@ -556,6 +556,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.campaign.model.campaign',
+                    'mautic.email.model.email',
                 ],
             ],
             'mautic.lead.subscriber.segment.filter' => [
@@ -580,14 +581,9 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
-                    'mautic.email.model.email',
-                    'mautic.security',
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
-                    'mautic.helper.user',
-                    'mautic.campaign.model.campaign',
-                    'mautic.asset.model.asset',
                 ],
             ],
             'mautic.form.type.leadlist_choices' => [

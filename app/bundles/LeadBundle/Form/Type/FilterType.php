@@ -89,15 +89,20 @@ class FilterType extends AbstractType
             $form        = $event->getForm();
             $fieldAlias  = $data['field'];
             $fieldObject = isset($data['object']) ? $data['object'] : 'behaviors';
-            $operator    = isset($data['operator']) ? $data['operator'] : null;
             $field       = isset($fieldChoices[$fieldObject][$fieldAlias]) ? $fieldChoices[$fieldObject][$fieldAlias] : [];
+            $operators   = $field['operators'] ?? [];
+            $operator    = isset($data['operator']) ? $data['operator'] : null;
+
+            if ($operators && !$operator) {
+                $operator = $this->getFirstOperatorKey($operators);
+            }
 
             $form->add(
                 'operator',
                 ChoiceType::class,
                 [
                     'label'   => false,
-                    'choices' => isset($field['operators']) ? $field['operators'] : [],
+                    'choices' => $operators,
                     'attr'    => [
                         'class'    => 'form-control not-chosen',
                         'onchange' => 'Mautic.convertLeadFilterInput(this)',
@@ -167,7 +172,6 @@ class FilterType extends AbstractType
     {
         $resolver->setRequired(
             [
-                'emails',
                 'deviceTypes',
                 'deviceBrands',
                 'deviceOs',
@@ -200,5 +204,15 @@ class FilterType extends AbstractType
     public function getBlockPrefix()
     {
         return 'leadlist_filter';
+    }
+
+    /**
+     * @deprecated replace with native array_key_first() once supported
+     */
+    private function getFirstOperatorKey(array $operators): string
+    {
+        foreach ($operators as $key => $value) {
+            return $key;
+        }
     }
 }

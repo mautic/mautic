@@ -13,8 +13,6 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
-use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -22,12 +20,8 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
@@ -44,7 +38,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $emailChoices        = [];
     private $deviceTypesChoices  = [];
     private $deviceBrandsChoices = [];
     private $deviceOsChoices     = [];
@@ -53,30 +46,15 @@ class ListType extends AbstractType
     private $assetChoices        = [];
     private $categoriesChoices   = [];
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;
-
-        $viewOther   = $security->isGranted('email:emails:viewother');
-        $currentUser = $userHelper->getUser();
-        $emailRepo   = $emailModel->getRepository();
-
-        $emailRepo->setCurrentUser($currentUser);
-
-        $emails = $emailRepo->getEmailList('', 0, 0, $viewOther, true);
-
-        foreach ($emails as $email) {
-            $this->emailChoices[$email['language']][$email['name']] = $email['id'];
-        }
-        ksort($this->emailChoices);
-
-        // Get assets without 'filter' or 'limit'
-        $assets = $assetModel->getLookupResults('asset', null, 0);
-        foreach ($assets as $asset) {
-            $this->assetChoices[$asset['language']][$asset['title']] = $asset['id'];
-        }
-        ksort($this->assetChoices);
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
@@ -194,7 +172,6 @@ class ListType extends AbstractType
                     'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
-                        'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
                         'deviceOs'       => $this->deviceOsChoices,
@@ -239,7 +216,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
         $view->vars['deviceOs']       = $this->deviceOsChoices;

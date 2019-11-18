@@ -316,24 +316,28 @@ class FilterOperatorSubscriber extends CommonSubscriber
         $choices = [
             'lead_email_received' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_received'),
-                'properties' => ['type' => 'lead_email_received'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'select',
+                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'lead_email_received'),
+                ],
+                'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::IN,
                     OperatorOptions::NOT_IN,
                 ]),
-                'object' => 'lead',
             ],
             'lead_email_sent' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent'),
+                'object'     => 'lead',
                 'properties' => ['type' => 'lead_email_received'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::IN,
                     OperatorOptions::NOT_IN,
                 ]),
-                'object' => 'lead',
             ],
             'lead_email_sent_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
+                'object'     => 'lead',
                 'properties' => ['type' => 'datetime'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::EQUAL_TO,
@@ -343,7 +347,6 @@ class FilterOperatorSubscriber extends CommonSubscriber
                     OperatorOptions::GREATER_THAN_OR_EQUAL,
                     OperatorOptions::LESS_THAN_OR_EQUAL,
                 ]),
-                'object' => 'lead',
             ],
             'lead_email_read_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_date'),
@@ -360,6 +363,7 @@ class FilterOperatorSubscriber extends CommonSubscriber
             ],
             'lead_email_read_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_count'),
+                'object'     => 'lead',
                 'properties' => ['type' => 'number'],
                 'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::EQUAL_TO,
@@ -368,7 +372,6 @@ class FilterOperatorSubscriber extends CommonSubscriber
                     OperatorOptions::GREATER_THAN_OR_EQUAL,
                     OperatorOptions::LESS_THAN_OR_EQUAL,
                 ]),
-                'object' => 'lead',
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),

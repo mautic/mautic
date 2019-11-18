@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
@@ -38,12 +39,19 @@ class TypeOperatorSubscriber extends CommonSubscriber
      */
     private $campaignModel;
 
+    /**
+     * @var EmailModel
+     */
+    private $emailModel;
+
     public function __construct(
         ListModel $listModel,
-        CampaignModel $campaignModel
+        CampaignModel $campaignModel,
+        EmailModel $emailModel
     ) {
-        $this->listModel     = $listModel; // @todo implement segment membership choices.
+        $this->listModel     = $listModel;
         $this->campaignModel = $campaignModel;
+        $this->emailModel    = $emailModel;
     }
 
     /**
@@ -90,6 +98,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
+        $event->setChoicesForFieldAlias('lead_email_received', $this->emailModel->getLookupResults('email', '', 0, 0));
         $event->setChoicesForFieldType('country', FormFieldHelper::getCountryChoices());
         $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
