@@ -172,7 +172,6 @@ class FilterType extends AbstractType
     {
         $resolver->setRequired(
             [
-                'tags',
                 'stage',
                 'globalcategory',
             ]

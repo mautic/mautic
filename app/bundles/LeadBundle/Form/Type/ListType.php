@@ -20,7 +20,6 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
@@ -36,7 +35,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $tagChoices          = [];
     private $stageChoices        = [];
     private $assetChoices        = [];
     private $categoriesChoices   = [];
@@ -46,15 +44,10 @@ class ListType extends AbstractType
      */
     private $listModel;
 
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, StageModel $stageModel, CategoryModel $categoryModel)
     {
         $this->translator = $translator;
         $this->listModel  = $listModel;
-
-        $tags = $leadModel->getTagList();
-        foreach ($tags as $tag) {
-            $this->tagChoices[$tag['label']] = $tag['value'];
-        }
 
         $stages = $stageModel->getRepository()->getSimpleList();
         foreach ($stages as $stage) {
@@ -164,7 +157,6 @@ class ListType extends AbstractType
                     'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
-                        'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'globalcategory' => $this->categoriesChoices,
                     ],
@@ -204,7 +196,6 @@ class ListType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['fields']         = $this->listModel->getChoiceFields();
-        $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['globalcategory'] = $this->categoriesChoices;
     }

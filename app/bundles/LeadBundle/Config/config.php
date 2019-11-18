@@ -554,6 +554,7 @@ return [
             'mautic.lead.subscriber.typeOperator' => [
                 'class'     => \Mautic\LeadBundle\EventListener\TypeOperatorSubscriber::class,
                 'arguments' => [
+                    'mautic.lead.model.lead',
                     'mautic.lead.model.list',
                     'mautic.campaign.model.campaign',
                     'mautic.email.model.email',
@@ -581,7 +582,6 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
-                    'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
                     'mautic.category.model.category',
                 ],

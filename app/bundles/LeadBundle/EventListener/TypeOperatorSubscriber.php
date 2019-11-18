@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -30,6 +31,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 class TypeOperatorSubscriber extends CommonSubscriber
 {
     use OperatorListTrait;
+
+    /**
+     * @var LeadModel
+     */
+    private $leadModel;
 
     /**
      * @var ListModel
@@ -47,10 +53,12 @@ class TypeOperatorSubscriber extends CommonSubscriber
     private $emailModel;
 
     public function __construct(
+        LeadModel $leadModel,
         ListModel $listModel,
         CampaignModel $campaignModel,
         EmailModel $emailModel
     ) {
+        $this->leadModel     = $leadModel;
         $this->listModel     = $listModel;
         $this->campaignModel = $campaignModel;
         $this->emailModel    = $emailModel;
@@ -100,6 +108,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
         $event->setChoicesForFieldAlias('campaign', $this->getCampaignChoices());
         $event->setChoicesForFieldAlias('leadlist', $this->getSegmentChoices());
+        $event->setChoicesForFieldAlias('tags', $this->getTagChoices());
         $event->setChoicesForFieldAlias('lead_email_received', $this->emailModel->getLookupResults('email', '', 0, 0));
         $event->setChoicesForFieldAlias('device_type', array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())));
         $event->setChoicesForFieldAlias('device_brand', DeviceParser::$deviceBrands);
@@ -190,6 +199,18 @@ class TypeOperatorSubscriber extends CommonSubscriber
 
         foreach ($segments as $segegment) {
             $choices[$segegment['id']] = $segegment['name'];
+        }
+
+        return $choices;
+    }
+
+    private function getTagChoices(): array
+    {
+        $segments = $this->leadModel->getTagList();
+        $choices  = [];
+
+        foreach ($segments as $segegment) {
+            $choices[$segegment['value']] = $segegment['label'];
         }
 
         return $choices;
