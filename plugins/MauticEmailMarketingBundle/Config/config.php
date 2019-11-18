@@ -24,7 +24,7 @@ return [
             ],
             'mautic.form.type.emailmarketing.constantcontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType',
-                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters'],
+                'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
                 'alias'     => 'emailmarketing_constantcontact',
             ],
             'mautic.form.type.emailmarketing.icontact' => [
