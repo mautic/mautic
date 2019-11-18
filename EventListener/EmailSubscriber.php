@@ -72,8 +72,7 @@ class EmailSubscriber extends CommonSubscriber
         TokenParser $tokenParser,
         ObjectMappingRepository $objectMappingRepository,
         IntegrationHelper $integrationHelper
-    )
-    {
+    ) {
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
         $this->tokenParser = $tokenParser;

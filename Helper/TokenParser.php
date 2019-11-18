@@ -86,7 +86,8 @@ class TokenParser
      */
     public function buildTokenWithDefaultOptions($integrationObjectName, $integration, $default, $linkText, $baseURL): string
     {
-        return sprintf("{mapped-integration-object=%s | integration=%s | default=%s | link-text=%s | base-url=%s}",
+        return sprintf(
+            "{mapped-integration-object=%s | integration=%s | default=%s | link-text=%s | base-url=%s}",
             $integrationObjectName,
             $integration,
             $default,
