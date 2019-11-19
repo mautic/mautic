@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -459,6 +458,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     unset($dataObject['AccountId__'.$object]); //no company was found in Salesforce
                                 }
                             }
+                            // no break
                         case 'Lead':
                             // Set owner so that it maps if configured to do so
                             if (!empty($dataObject['Owner__Lead']['Email'])) {
