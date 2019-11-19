@@ -1710,7 +1710,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
-                    $error = 'Uknown status code '.$item['httpStatusCode'];
+                    $error = 'Unknown status code '.$item['httpStatusCode'];
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));
                 }
             }
