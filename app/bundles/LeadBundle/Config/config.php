@@ -638,8 +638,8 @@ return [
                 'alias' => 'lead_import',
             ],
             'mautic.form.type.lead_field_import' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\LeadImportFieldType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\LeadImportFieldType::class,
+                'arguments' => ['translator', 'doctrine.orm.entity_manager'],
                 'alias'     => 'lead_field_import',
             ],
             'mautic.form.type.lead_quickemail' => [

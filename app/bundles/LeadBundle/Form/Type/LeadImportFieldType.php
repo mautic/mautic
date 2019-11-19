@@ -11,26 +11,36 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\UserBundle\Form\Type\UserListType;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadImportFieldType.
- */
 class LeadImportFieldType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory)
+    private $entityManager;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $entityManager
+     */
+    public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
     {
-        $this->factory = $factory;
+        $this->translator    = $translator;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -78,10 +88,7 @@ class LeadImportFieldType extends AbstractType
             );
         }
 
-        $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticUserBundle:User'
-        );
+        $transformer = new IdToEntityModelTransformer($this->entityManager, User::class);
 
         $builder->add(
             $builder->create(
@@ -126,8 +133,8 @@ class LeadImportFieldType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'                => 'form-control',
-                        'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                        'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                        'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                        'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                         'data-allow-add'       => 'true',
                         'onchange'             => 'Mautic.createLeadTag(this)',
                     ],
