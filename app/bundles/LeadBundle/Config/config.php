@@ -742,8 +742,8 @@ return [
                 'alias' => 'lead_dashboard_leads_in_time_widget',
             ],
             'mautic.form.type.lead_dashboard_leads_lifetime_widget' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType::class,
+                'arguments' => ['mautic.lead.model.list', 'translator'],
                 'alias'     => 'lead_dashboard_leads_lifetime_widget',
             ],
             'mautic.company.type.form' => [

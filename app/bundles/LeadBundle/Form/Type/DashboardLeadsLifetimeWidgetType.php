@@ -11,23 +11,31 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
+use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardLeadsInTimeWidgetType.
- */
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var ListModel
      */
-    private $factory;
+    private $segmentModel;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param ListModel           $segmentModel
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
     {
-        $this->factory = $factory;
+        $this->segmentModel = $segmentModel;
+        $this->translator   = $translator;
     }
 
     /**
@@ -36,11 +44,9 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $model = $this->factory->getModel('lead.list');
-
-        $lists       = $model->getUserLists();
+        $lists       = $this->segmentModel->getUserLists();
         $segments    = [];
-        $segments[0] = $this->factory->getTranslator()->trans('mautic.lead.all.leads');
+        $segments[0] = $this->translator->trans('mautic.lead.all.leads');
         foreach ($lists as $list) {
             $segments[$list['id']] = $list['name'];
         }
