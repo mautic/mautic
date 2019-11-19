@@ -823,8 +823,8 @@ return [
                 ],
             ],
             'mautic.lead.constraint.alias' => [
-                'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAliasValidator::class,
+                'arguments' => ['mautic.lead.repository.lead_list', 'mautic.helper.user'],
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
