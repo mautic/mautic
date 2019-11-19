@@ -988,7 +988,11 @@ return [
         'helpers' => [
             'mautic.helper.template.avatar' => [
                 'class'     => Mautic\LeadBundle\Templating\Helper\AvatarHelper::class,
-                'arguments' => ['mautic.factory'],
+                'arguments' => [
+                    'templating.helper.assets',
+                    'mautic.helper.template.gravatar',
+                    'mautic.helper.paths',
+                ],
                 'alias'     => 'lead_avatar',
             ],
             'mautic.helper.field.alias' => [
