@@ -566,9 +566,9 @@ return [
                 'alias'     => 'leadlist_choices',
             ],
             'mautic.form.type.leadlist_filter' => [
-                'class'       => 'Mautic\LeadBundle\Form\Type\FilterType',
+                'class'       => \Mautic\LeadBundle\Form\Type\FilterType::class,
                 'alias'       => 'leadlist_filter',
-                'arguments'   => ['mautic.factory'],
+                'arguments'   => ['translator', 'request_stack'],
                 'methodCalls' => [
                     'setConnection' => [
                         'database_connection',

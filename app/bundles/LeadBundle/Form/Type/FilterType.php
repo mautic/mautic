@@ -11,32 +11,38 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class FilterType.
- */
 class FilterType extends AbstractType
 {
     use FilterTrait;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
-    private $currentListId;
 
     /**
-     * @param MauticFactory $factory
+     * @var RequestStack
      */
-    public function __construct(MauticFactory $factory)
+    private $requestStack;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param RequestStack        $requestStack
+     */
+    public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
     {
-        $this->translator    = $factory->getTranslator();
-        $this->currentListId = $factory->getRequest()->attributes->get('objectId', false);
+        $this->translator   = $translator;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -62,7 +68,12 @@ class FilterType extends AbstractType
         );
 
         $formModifier = function (FormEvent $event, $eventName) {
-            $this->buildFiltersForm($eventName, $event, $this->translator, $this->currentListId);
+            $this->buildFiltersForm(
+                $eventName,
+                $event,
+                $this->translator,
+                $this->requestStack->getCurrentRequest()->attributes->get('objectId', false)
+            );
         };
 
         $builder->addEventListener(
