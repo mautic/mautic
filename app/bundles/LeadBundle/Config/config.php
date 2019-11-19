@@ -576,8 +576,8 @@ return [
                 ],
             ],
             'mautic.form.type.leadfield' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\FieldType::class,
+                'arguments' => ['translator', 'mautic.lead.repository.field'],
                 'alias'     => 'leadfield',
             ],
             'mautic.form.type.lead.submitaction.pointschange' => [

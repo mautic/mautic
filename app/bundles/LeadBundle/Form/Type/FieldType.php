@@ -12,12 +12,13 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
@@ -25,24 +26,30 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * Class FieldType.
- */
 class FieldType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
-    private $em;
 
     /**
-     * @param MauticFactory $factory
+     * @var LeadFieldRepository
      */
-    public function __construct(MauticFactory $factory)
+    private $leadFieldRepository;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param LeadFieldRepository $leadFieldRepository
+     */
+    public function __construct(TranslatorInterface $translator, LeadFieldRepository $leadFieldRepository)
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
+        $this->translator          = $translator;
+        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     /**
@@ -422,7 +429,7 @@ class FieldType extends AbstractType
         );
 
         //get order list
-        $transformer = new FieldToOrderTransformer($this->em);
+        $transformer = new FieldToOrderTransformer($this->leadFieldRepository);
         $builder->add(
             $builder->create(
                 'order',
@@ -562,7 +569,7 @@ class FieldType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadField',
+                'data_class' => LeadField::class,
             ]
         );
     }
