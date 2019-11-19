@@ -201,6 +201,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
         return $settings;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return string|null
+     */
     public function getFormType()
     {
         return MailchimpType::class;

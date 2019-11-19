@@ -65,7 +65,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     /**
      * Returns form type.
      *
-     * @return mixed
+     * @return string|null
      */
     abstract public function getFormType();
 
