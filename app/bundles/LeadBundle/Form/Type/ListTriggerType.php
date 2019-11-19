@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ListTriggerType.
- */
 class ListTriggerType extends AbstractType
 {
     /**
@@ -49,7 +46,7 @@ class ListTriggerType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist_trigger';
     }

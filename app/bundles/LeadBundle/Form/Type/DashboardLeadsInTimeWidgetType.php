@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardLeadsInTimeWidgetType.
- */
 class DashboardLeadsInTimeWidgetType extends AbstractType
 {
     /**
@@ -46,7 +43,7 @@ class DashboardLeadsInTimeWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_dashboard_leads_in_time_widget';
     }

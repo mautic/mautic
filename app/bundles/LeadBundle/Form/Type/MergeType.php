@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class MergeType.
- */
 class MergeType extends AbstractType
 {
     /**
@@ -77,7 +74,7 @@ class MergeType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_merge';
     }

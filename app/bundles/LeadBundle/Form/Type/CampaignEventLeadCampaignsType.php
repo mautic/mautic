@@ -17,9 +17,6 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignEventLeadCampaignsType.
- */
 class CampaignEventLeadCampaignsType extends AbstractType
 {
     /**
@@ -28,8 +25,6 @@ class CampaignEventLeadCampaignsType extends AbstractType
     protected $listModel;
 
     /**
-     * CampaignEventLeadCampaignsType constructor.
-     *
      * @param ListModel $listModel
      */
     public function __construct(ListModel $listModel)
@@ -98,7 +93,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_campaigns';
     }

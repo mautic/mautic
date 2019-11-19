@@ -16,9 +16,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\File;
 
-/**
- * Class LeadImportType.
- */
 class LeadImportType extends AbstractType
 {
     /**
@@ -138,7 +135,7 @@ class LeadImportType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_import';
     }

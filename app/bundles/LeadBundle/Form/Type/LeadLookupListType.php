@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class CompanyListType.
- */
 class LeadLookupListType extends AbstractType
 {
     /**
@@ -49,7 +46,7 @@ class LeadLookupListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'company_list';
     }

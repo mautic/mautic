@@ -70,7 +70,7 @@ class TagListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_tags';
     }

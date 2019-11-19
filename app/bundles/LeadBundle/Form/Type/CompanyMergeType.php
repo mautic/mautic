@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class CompanyMergeType.
- */
 class CompanyMergeType extends AbstractType
 {
     /**
@@ -69,7 +66,7 @@ class CompanyMergeType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'company_merge';
     }

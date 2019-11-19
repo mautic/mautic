@@ -16,9 +16,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class FormSubmitActionAddUtmTagType.
- */
 class AddToCompanyActionType extends AbstractType
 {
     /**
@@ -81,7 +78,7 @@ class AddToCompanyActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'addtocompany_action';
     }

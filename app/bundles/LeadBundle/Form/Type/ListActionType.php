@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ListActionType.
- */
 class ListActionType extends AbstractType
 {
     /**
@@ -49,7 +46,7 @@ class ListActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist_action';
     }

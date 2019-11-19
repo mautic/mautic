@@ -72,7 +72,7 @@ class ModifyLeadTagsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'modify_lead_tags';
     }

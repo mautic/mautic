@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class PointsTriggerType.
- */
 class PointTriggerType extends AbstractType
 {
     /**
@@ -37,7 +34,7 @@ class PointTriggerType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadpoints_trigger';
     }

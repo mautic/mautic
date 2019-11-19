@@ -17,9 +17,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class MergeType.
- */
 class ContactFrequencyType extends AbstractType
 {
     /**
@@ -28,8 +25,6 @@ class ContactFrequencyType extends AbstractType
     protected $coreParametersHelper;
 
     /**
-     * ContactFrequencyType constructor.
-     *
      * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
@@ -135,7 +130,7 @@ class ContactFrequencyType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_contact_frequency_rules';
     }

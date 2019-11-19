@@ -12,13 +12,11 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class DeviceType.
- */
 class DeviceType extends AbstractType
 {
     /**
@@ -51,14 +49,14 @@ class DeviceType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Mautic\LeadBundle\Entity\LeadDevice',
+            'data_class' => LeadDevice::class,
         ]);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leaddevice';
     }

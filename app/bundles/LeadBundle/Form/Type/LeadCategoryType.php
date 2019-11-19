@@ -16,9 +16,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class LeadCategoryType.
- */
 class LeadCategoryType extends AbstractType
 {
     private $categoryModel;
@@ -64,7 +61,7 @@ class LeadCategoryType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadcategory_choices';
     }

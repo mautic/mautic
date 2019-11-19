@@ -65,7 +65,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_dashboard_leads_lifetime_widget';
     }

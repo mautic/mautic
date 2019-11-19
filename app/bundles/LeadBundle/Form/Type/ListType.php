@@ -36,9 +36,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ListType.
- */
 class ListType extends AbstractType
 {
     private $translator;
@@ -59,8 +56,6 @@ class ListType extends AbstractType
     private $categoriesChoices   = [];
 
     /**
-     * ListType constructor.
-     *
      * @param TranslatorInterface $translator
      * @param ListModel           $listModel
      * @param EmailModel          $emailModel
@@ -288,7 +283,7 @@ class ListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist';
     }

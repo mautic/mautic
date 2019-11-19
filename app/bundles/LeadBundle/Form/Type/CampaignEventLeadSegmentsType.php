@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignEventLeadSegmentsType.
- */
 class CampaignEventLeadSegmentsType extends AbstractType
 {
     /**
@@ -40,7 +37,7 @@ class CampaignEventLeadSegmentsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_segments';
     }

@@ -15,9 +15,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
-/**
- * Class CompanyChangeScoreActionType.
- */
 class CompanyChangeScoreActionType extends AbstractType
 {
     /**
@@ -50,7 +47,7 @@ class CompanyChangeScoreActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'scorecontactscompanies_action';
     }

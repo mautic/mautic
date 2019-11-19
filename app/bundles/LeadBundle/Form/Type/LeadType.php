@@ -235,7 +235,7 @@ orm(FormBuilderInterface $builder, array $options)
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead';
     }

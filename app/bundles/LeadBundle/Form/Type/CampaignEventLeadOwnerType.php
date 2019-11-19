@@ -15,9 +15,6 @@ use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignEventLeadOwnerType.
- */
 class CampaignEventLeadOwnerType extends AbstractType
 {
     /**
@@ -43,7 +40,7 @@ class CampaignEventLeadOwnerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_owner';
     }

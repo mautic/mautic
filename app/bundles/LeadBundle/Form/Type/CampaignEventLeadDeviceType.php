@@ -16,9 +16,6 @@ use DeviceDetector\Parser\OperatingSystem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class CampaignEventLeadDeviceType.
- */
 class CampaignEventLeadDeviceType extends AbstractType
 {
     /**
@@ -75,7 +72,7 @@ class CampaignEventLeadDeviceType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_device';
     }

@@ -16,23 +16,25 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Form\Type\UserListType;
+use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CompanyType.
- */
 class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
+
     /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @var CorePermissions
      */
     private $security;
 
+    /**
+     * @var EntityManager
+     */
     private $em;
 
     /**
@@ -46,10 +48,10 @@ class CompanyType extends AbstractType
     protected $translator;
 
     /**
-     * CompanyType constructor.
-     *
-     * @param EntityManager   $entityManager
-     * @param CorePermissions $security
+     * @param EntityManager       $entityManager
+     * @param CorePermissions     $security
+     * @param RouterInterface     $router
+     * @param TranslatorInterface $translator
      */
     public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator)
     {
@@ -153,7 +155,7 @@ class CompanyType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'    => 'Mautic\LeadBundle\Entity\Company',
+                'data_class'    => Company::class,
                 'isShortForm'   => false,
                 'update_select' => false,
             ]
@@ -165,7 +167,7 @@ class CompanyType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'company';
     }

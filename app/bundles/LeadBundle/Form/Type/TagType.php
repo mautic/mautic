@@ -72,7 +72,7 @@ class TagType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_tag';
     }

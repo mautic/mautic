@@ -21,9 +21,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class CampaignEventLeadFieldValueType.
- */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
     /**
@@ -42,8 +39,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
     protected $fieldModel;
 
     /**
-     * CampaignEventLeadFieldValueType constructor.
-     *
      * @param TranslatorInterface $translator
      * @param LeadModel           $leadModel
      * @param FieldModel          $fieldModel
@@ -237,7 +232,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_field_value';
     }

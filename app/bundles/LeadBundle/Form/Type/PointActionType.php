@@ -15,9 +15,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
-/**
- * Class PointsActionType.
- */
 class PointActionType extends AbstractType
 {
     /**
@@ -50,7 +47,7 @@ class PointActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadpoints_action';
     }

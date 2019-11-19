@@ -16,9 +16,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class LeadFieldsType.
- */
 class LeadFieldsType extends AbstractType
 {
     /**
@@ -79,7 +76,7 @@ class LeadFieldsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadfields_choices';
     }
