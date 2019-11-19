@@ -107,22 +107,6 @@ return [
                     'contactId' => '\d+',
                 ],
             ],
-            // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
-            'mautic_contact_import_index' => [
-                'path'       => '/{object}/import/{page}',
-                'controller' => 'MauticLeadBundle:Import:index',
-                'defaults'   => [
-                    'object' => 'contacts',
-                ],
-            ],
-            // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_action instead.
-            'mautic_contact_import_action' => [
-                'path'       => '/{object}/import/{objectAction}/{objectId}',
-                'controller' => 'MauticLeadBundle:Import:execute',
-                'defaults'   => [
-                    'object' => 'contacts',
-                ],
-            ],
             'mautic_import_index' => [
                 'path'       => '/{object}/import/{page}',
                 'controller' => 'MauticLeadBundle:Import:index',
@@ -281,46 +265,6 @@ return [
                 'name'            => 'tags',
                 'path'            => '/tags',
                 'controller'      => 'MauticLeadBundle:Api\TagApi',
-            ],
-
-            // @deprecated 2.6.0 to be removed in 3.0
-            'bc_mautic_api_segmentaddcontact' => [
-                'path'       => '/segments/{id}/contact/add/{leadId}',
-                'controller' => 'MauticLeadBundle:Api\ListApi:addLead',
-                'method'     => 'POST',
-            ],
-            'bc_mautic_api_segmentremovecontact' => [
-                'path'       => '/segments/{id}/contact/remove/{leadId}',
-                'controller' => 'MauticLeadBundle:Api\ListApi:removeLead',
-                'method'     => 'POST',
-            ],
-            'bc_mautic_api_companyaddcontact' => [
-                'path'       => '/companies/{companyId}/contact/add/{contactId}',
-                'controller' => 'MauticLeadBundle:Api\CompanyApi:addContact',
-                'method'     => 'POST',
-            ],
-            'bc_mautic_api_companyremovecontact' => [
-                'path'       => '/companies/{companyId}/contact/remove/{contactId}',
-                'controller' => 'MauticLeadBundle:Api\CompanyApi:removeContact',
-                'method'     => 'POST',
-            ],
-            'bc_mautic_api_dncaddcontact' => [
-                'path'       => '/contacts/{id}/dnc/add/{channel}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:addDnc',
-                'method'     => 'POST',
-                'defaults'   => [
-                    'channel' => 'email',
-                ],
-            ],
-            'bc_mautic_api_dncremovecontact' => [
-                'path'       => '/contacts/{id}/dnc/remove/{channel}',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
-                'method'     => 'POST',
-            ],
-            // @deprecated 2.10.0 to be removed in 3.0
-            'bc_mautic_api_getcontactevents' => [
-                'path'       => '/contacts/{id}/events',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',
             ],
         ],
     ],
