@@ -769,7 +769,7 @@ class CommonApiController extends FOSRestController implements MauticController
     protected function createEntityForm($entity)
     {
         return $this->model->createForm(
-            get_class($entity),
+            $entity,
             $this->get('form.factory'),
             null,
             array_merge(
