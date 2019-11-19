@@ -620,8 +620,8 @@ return [
                 'alias' => 'leadlist_action',
             ],
             'mautic.form.type.updatelead_action' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\UpdateLeadActionType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\UpdateLeadActionType::class,
+                'arguments' => ['mautic.lead.model.field'],
                 'alias'     => 'updatelead_action',
             ],
             'mautic.form.type.updatecompany_action' => [
