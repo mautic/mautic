@@ -963,18 +963,6 @@ class FieldModel extends FormModel
     /**
      * Retrieves a list of published fields that are unique identifers.
      *
-     * @deprecated to be removed in 3.0
-     *
-     * @return array
-     */
-    public function getUniqueIdentiferFields($filters = [])
-    {
-        return $this->getUniqueIdentifierFields($filters);
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
      * @param array $filters
      *
      * @return mixed

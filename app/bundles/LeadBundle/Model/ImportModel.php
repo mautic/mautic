@@ -190,29 +190,6 @@ class ImportModel extends FormModel
      * Start import. This is meant for the CLI command since it will import
      * the whole file at once.
      *
-     * @deprecated in 2.13.0. To be removed in 3.0.0. Use beginImport instead
-     *
-     * @param Import   $import
-     * @param Progress $progress
-     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
-     *
-     * @return bool
-     */
-    public function startImport(Import $import, Progress $progress, $limit = 0)
-    {
-        try {
-            return $this->beginImport($import, $progress, $limit);
-        } catch (\Exception $e) {
-            $this->logDebug($e->getMessage());
-
-            return false;
-        }
-    }
-
-    /**
-     * Start import. This is meant for the CLI command since it will import
-     * the whole file at once.
-     *
      * @param Import   $import
      * @param Progress $progress
      * @param int      $limit    Number of records to import before delaying the import. 0 will import all

@@ -276,19 +276,23 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $items['link'][]       = $listUrl;
                     $items['chartItems'][] = $column;
 
-                    $stages[] = $this->leadListModel->getStagesBarChartData($params['timeUnit'],
+                    $stages[] = $this->leadListModel->getStagesBarChartData(
+                        $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOthers);
+                        $canViewOthers
+                    );
 
-                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData($params['timeUnit'],
+                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData(
+                        $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOthers);
+                        $canViewOthers
+                    );
                 }
                 $width = 100 / count($lists);
 

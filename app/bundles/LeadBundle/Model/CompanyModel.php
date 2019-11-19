@@ -362,20 +362,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
 
             if ($companyLead != null) {
-                // @deprecated support to be removed in 3.0
-                if ($companyLead->wasManuallyRemoved()) {
-                    $companyLead->setManuallyRemoved(false);
-                    $companyLead->setManuallyAdded(false);
-                    $contactAdded     = true;
-                    $persistCompany[] = $companyLead;
-                    $dispatchEvents[] = $companyId;
-                    $companyName      = $companyLeadAdd[$companyId]->getName();
-                } else {
-                    // Detach from Doctrine
-                    $this->em->detach($companyLead);
+                // Detach from Doctrine
+                $this->em->detach($companyLead);
 
-                    continue;
-                }
+                continue;
             } else {
                 $companyLead = new CompanyLead();
                 $companyLead->setCompany($companyLeadAdd[$companyId]);

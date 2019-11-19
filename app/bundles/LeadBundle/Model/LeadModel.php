@@ -924,20 +924,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the lead from request (ct/clickthrough) and handles auto merging of lead data from request parameters.
-     *
-     * @deprecated - here till all lead methods are converted to contact methods; preferably use getContactFromRequest instead
-     *
-     * @param array $queryFields
-     *
-     * @return array|Lead|null
-     */
-    public function getLeadFromRequest(array $queryFields = [])
-    {
-        return $this->getContactFromRequest($queryFields);
-    }
-
-    /**
      * Get the contat from request (ct/clickthrough) and handles auto merging of contact data from request parameters.
      *
      * @param array $queryFields
@@ -1326,26 +1312,6 @@ class LeadModel extends FormModel
         }
 
         return $leadCategoryList;
-    }
-
-    /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     *
-     * @return bool|null
-     *
-     * @throws \Exception
-     *
-     * @deprecated 2.10.0 To be removed in 3.0. Use `import` instead
-     */
-    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
-    {
-        return $this->import($fields, $data, $owner, $list, $tags, $persist, $eventLog);
     }
 
     /**
@@ -2668,28 +2634,6 @@ class LeadModel extends FormModel
         }
 
         return false;
-    }
-
-    /**
-     * @param bool $forceRegeneration
-     *
-     * @deprecated 2.13.0 to be removed in 3.0; use the DeviceTrackingService
-     */
-    public function getTrackingCookie($forceRegeneration = false)
-    {
-        @trigger_error('getTrackingCookie is deprecated and will be removed in 3.0; Use the ContactTracker::getTrackingId instead', E_USER_DEPRECATED);
-
-        return [$this->contactTracker->getTrackingId(), false];
-    }
-
-    /**
-     * @param $leadId
-     *
-     * @deprecated 2.13.0 to be removed in 3.0
-     */
-    public function setLeadCookie($leadId)
-    {
-        // No longer used
     }
 
     /**
