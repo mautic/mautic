@@ -24,12 +24,12 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\LeadBundle\Model\ListModel;
 
 class AjaxController extends CommonAjaxController
 {
