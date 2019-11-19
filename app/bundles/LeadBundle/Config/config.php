@@ -561,8 +561,8 @@ return [
                 'alias' => 'leadlist',
             ],
             'mautic.form.type.leadlist_choices' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\LeadListType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\LeadListType::class,
+                'arguments' => ['mautic.lead.model.list'],
                 'alias'     => 'leadlist_choices',
             ],
             'mautic.form.type.leadlist_filter' => [

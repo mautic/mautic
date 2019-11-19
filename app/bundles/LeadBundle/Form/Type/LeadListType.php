@@ -11,24 +11,25 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class LeadListType.
- */
 class LeadListType extends AbstractType
 {
-    private $model;
+    /**
+     * @var ListModel
+     */
+    private $segmentModel;
 
     /**
-     * @param MauticFactory $factory
+     * @param ListModel $segmentModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(ListModel $segmentModel)
     {
-        $this->model = $factory->getModel('lead.list');
+        $this->segmentModel = $segmentModel;
     }
 
     /**
@@ -36,12 +37,10 @@ class LeadListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
-        $model = $this->model;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
-                $lists = (empty($options['preference_center_only'])) ? $lists : $model->getPreferenceCenterLists();
+            'choices' => function (Options $options) {
+                $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
+                $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
 
                 $choices = [];
                 foreach ($lists as $l) {
@@ -57,7 +56,7 @@ class LeadListType extends AbstractType
     }
 
     /**
-     * @return null|string|\Symfony\Component\Form\FormTypeInterface
+     * @return null|string|FormTypeInterface
      */
     public function getParent()
     {
