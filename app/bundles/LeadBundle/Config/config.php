@@ -586,8 +586,7 @@ return [
                 'alias'     => 'lead_submitaction_pointschange',
             ],
             'mautic.form.type.lead.submitaction.addutmtags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType::class,
                 'alias'     => 'lead_action_addutmtags',
             ],
             'mautic.form.type.lead.submitaction.removedonotcontact' => [
