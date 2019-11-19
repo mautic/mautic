@@ -540,8 +540,12 @@ return [
         ],
         'forms' => [
             'mautic.form.type.lead' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\LeadType',
-                'arguments' => ['mautic.factory', 'mautic.lead.model.company'],
+                'class'     => \Mautic\LeadBundle\Form\Type\LeadType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.company',
+                    'doctrine.orm.entity_manager',
+                ],
                 'alias'     => 'lead',
             ],
             'mautic.form.type.leadlist' => [
