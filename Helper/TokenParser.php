@@ -115,8 +115,6 @@ class TokenParser
      */
     private function trimArrayElements(array $array): array
     {
-        return array_map(function ($part) {
-            return trim($part);
-        }, $array);
+        return array_map('trim', $array);
     }
 }
