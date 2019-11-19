@@ -52,8 +52,8 @@ class TokenPersistence implements TokenPersistenceInterface
         $apiKeys['expires_at'] = $apiKeys['expires_at'] ?? null;
 
         return new IntegrationToken(
-            $apiKeys['access_token'] ?? null,
-            $apiKeys['refresh_token'] ?? null,
+            empty($apiKeys['access_token']) ? null : $apiKeys['access_token'],
+            empty($apiKeys['refresh_token']) ? null : $apiKeys['refresh_token'],
             $apiKeys['expires_at'] ? $apiKeys['expires_at'] - time() : -1
         );
     }
