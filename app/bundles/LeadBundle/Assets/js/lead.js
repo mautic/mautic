@@ -389,6 +389,21 @@ Mautic.reorderSegmentFilters = function() {
 };
 
 Mautic.convertLeadFilterInput = function(el) {
+    var operatorSelect = mQuery(el);
+    
+    // Extract the filter number
+    var regExp    = /_filters_(\d+)_operator/;
+    var matches   = regExp.exec(operatorSelect.attr('id'));
+    var filterNum = matches[1];
+
+    var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
+    var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
+
+    Mautic.loadFilterForm(fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
+        mQuery('#leadlist_filters_'+filterNum+'_properties').html(propertiesFields);
+        Mautic.activateChosenSelect('#leadlist_filters_'+filterNum+'_properties select');
+    });
+    return; // @todo make this method backward compatible for DEC and DWC.
     var prefix = 'leadlist';
 
     var parent = mQuery(el).parents('.dynamic-content-filter, .dwc-filter');
@@ -488,29 +503,33 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
     mQuery = mQueryBackup;
 };
 
-Mautic.addLeadListFilter = function (elId, elObj) {
-
+Mautic.loadFilterForm = function(fieldObject, fieldAlias, operator, resultHtml) {
     mQuery.ajax({
         showLoadingBar: true,
         url: mauticAjaxUrl,
         type: 'POST',
         data: {
-            action: 'lead:loadNewSegmentFilterForm',
-            field: elId,
-            object: elObj,
+            action: 'lead:loadSegmentFilterForm',
+            fieldAlias: fieldAlias,
+            fieldObject: fieldObject,
+            operator: operator,
         },
         dataType: 'json',
         success: function (response) {
-            console.log(response);
             Mautic.stopPageLoadingBar();
+            resultHtml(response.viewParameters.form);
         },
         error: function (request, textStatus, errorThrown) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
         }
     });
+}
+
+Mautic.addLeadListFilter = function (elId, elObj) {
+
+    
 
     // @todo implement the properties form into the template bellow.
-    return;
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
     var label = filterOption.text();

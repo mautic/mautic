@@ -29,6 +29,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\LeadBundle\Model\ListModel;
 
 class AjaxController extends CommonAjaxController
 {
@@ -157,29 +158,38 @@ class AjaxController extends CommonAjaxController
     /**
      * @return JsonResponse
      */
-    protected function loadNewSegmentFilterFormAction(Request $request)
+    protected function loadSegmentFilterFormAction(Request $request)
     {
-        $fieldName = InputHelper::clean($request->request->get('fieldName'));
-        $object    = InputHelper::clean($request->request->get('object'));
-
-        /** @var FormFactoryInterface $formFactory */
-        $formFactory = $this->get('form.factory');
-        $form        = $formFactory->create(FilterPropertiesType::class);
-
+        /** @var ListModel $listModel */
         /** @var TypeOperatorProvider $typeOperatorProvider */
-        $typeOperatorProvider = $this->get('mautic.lead.provider.typeOperator');
-        if ($fieldName) {
-            $typeOperatorProvider->adjustFilterPropertiesType(
+        /** @var FormFactoryInterface $formFactory */
+        $fieldAlias    = InputHelper::clean($request->request->get('fieldAlias'));
+        $fieldObject   = InputHelper::clean($request->request->get('fieldObject'));
+        $operator      = InputHelper::clean($request->request->get('operator'));
+        $formFactory   = $this->get('form.factory');
+        $typeOperators = $this->get('mautic.lead.provider.typeOperator');
+        $listModel     = $this->get('mautic.lead.model.list');
+        $form          = $formFactory->create(FilterPropertiesType::class);
+
+        if ($fieldAlias && $operator) {
+            $typeOperators->adjustFilterPropertiesType(
                 $form,
-                $fieldName,
-                $object
+                $fieldAlias,
+                $fieldObject,
+                $operator,
+                $listModel->getChoiceFields()[$fieldObject][$fieldAlias]
             );
         }
 
-        $this->sendJsonResponse(
+        return $this->sendJsonResponse(
             [
                 'viewParameters' => [
-                    'form' => $form->createView(),
+                    'form' => $this->renderView(
+                        'MauticLeadBundle:List:filterpropform.html.php',
+                        [
+                            'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.php', []),
+                        ]
+                    ),
                 ],
             ]
         );
