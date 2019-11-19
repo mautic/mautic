@@ -139,7 +139,7 @@ return [
                     'mautic.asset.model.asset',
                 ],
             ],
-            'mautic.assets.subscriber.determine_winner' => [
+            'mautic.asset.subscriber.determine_winner' => [
                 'class'     => \Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',

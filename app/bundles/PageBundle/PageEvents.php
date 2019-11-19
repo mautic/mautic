@@ -139,7 +139,7 @@ final class PageEvents
     const ON_DETERMINE_BOUNCE_RATE_WINNER = 'mautic.page.on_bounce_rate_winner';
 
     /**
-     * The mautic.page.on_dwell_time_winner event is fired when there is a need to determine dwell time winner.
+     * The mautic.page.on_dwell_time_winner event is fired when there is a need to determine a winner based on dwell time.
      *
      * The event listener receives a
      * Mautic\CoreBundles\Event\DetermineWinnerEvent

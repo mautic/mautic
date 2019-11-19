@@ -18,9 +18,6 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class WinnerDeterminerSubscriber.
- */
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**

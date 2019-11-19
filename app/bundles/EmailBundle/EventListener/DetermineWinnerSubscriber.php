@@ -18,9 +18,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class WinnerDeterminerSubscriber.
- */
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**
@@ -49,7 +46,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER         => ['onDermineOpenRateWinner', 0],
+            EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER         => ['onDetermineOpenRateWinner', 0],
             EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER => ['onDetermineClickthroughRateWinner', 0],
         ];
     }
@@ -59,10 +56,11 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      *
      * @param DetermineWinnerEvent $event
      */
-    public function onDermineOpenRateWinner(DetermineWinnerEvent $event)
+    public function onDetermineOpenRateWinner(DetermineWinnerEvent $event)
     {
-        $parent   = $event->getParameters()['parent'];
-        $children = $event->getParameters()['children'];
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $repo */
         $repo = $this->em->getRepository('MauticEmailBundle:Stat');
@@ -162,7 +160,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
         $pageRepo = $this->em->getRepository('MauticPageBundle:Hit');
         /** @var \Mautic\EmailBundle\Entity\StatRepository $emailRepo */
-        $emailRepo = $this->em->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        $emailRepo = $this->em->getRepository('MauticEmailBundle:Stat');
         /** @var Email $parent */
         $ids = $parent->getRelatedEntityIds();
 

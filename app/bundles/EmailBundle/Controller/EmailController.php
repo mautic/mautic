@@ -345,7 +345,6 @@ class EmailController extends FormController
                     'properties' => $properties,
                 ];
 
-                //if (array_key_exists('event', $testSettings)) {
                 $event = new DetermineWinnerEvent($args);
                 $this->container->get('event_dispatcher')->dispatch(
                         $testSettings['event'],
@@ -353,7 +352,6 @@ class EmailController extends FormController
                     );
 
                 $abTestResults = $event->getAbTestResults();
-                //}
             }
         }
 

@@ -17,9 +17,6 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class WinnerDeterminerSubscriber.
- */
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**
@@ -82,8 +79,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     foreach ($translations as $translation) {
                         $combined[$parent->getId()]['bounces'] += $counts[$translation]['bounces'];
                         $combined[$parent->getId()]['totalHits'] += $counts[$translation]['totalHits'];
-                        $combined[$parent->getId()]['rate'] = ($counts[$parent->getId()]['totalHits']) ? round(
-                            ($counts[$parent->getId()]['bounces'] / $counts[$parent->getId()]['totalHits']) * 100,
+                        $combined[$parent->getId()]['rate'] = ($combined[$parent->getId()]['totalHits']) ? round(
+                            ($combined[$parent->getId()]['bounces'] / $combined[$parent->getId()]['totalHits']) * 100,
                             2
                         ) : 0;
                     }
@@ -96,8 +93,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         foreach ($translations as $translation) {
                             $combined[$child->getId()]['bounces'] += $counts[$translation]['bounces'];
                             $combined[$child->getId()]['totalHits'] += $counts[$translation]['totalHits'];
-                            $combined[$child->getId()]['rate'] = ($counts[$child->getId()]['totalHits']) ? round(
-                                ($counts[$child->getId()]['bounces'] / $counts[$child->getId()]['totalHits']) * 100,
+                            $combined[$child->getId()]['rate'] = ($combined[$child->getId()]['totalHits']) ? round(
+                                ($combined[$child->getId()]['bounces'] / $combined[$child->getId()]['totalHits']) * 100,
                                 2
                             ) : 0;
                         }
@@ -109,7 +106,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $rates             = [];
                 $support['data']   = [];
                 $support['labels'] = [];
-                $bounceLabel       = $factory->getTranslator()->trans('mautic.page.abtest.label.bounces');
+                $bounceLabel       = $this->translator->trans('mautic.page.abtest.label.bounces');
 
                 foreach ($combined as $pid => $stats) {
                     $rates[$pid]                     = $stats['rate'];
@@ -149,7 +146,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
     {
         //find the hits that did not go any further
-        $repo      = $this->em->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $repo      = $this->em->getRepository('MauticPageBundle:Hit');
         $parent    = $event->getParameters()['parent'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
@@ -157,7 +154,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
             $counts     = $repo->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
-            $translator = $factory->getTranslator();
+            $translator = $this->translator;
             $support    = [];
 
             if ($counts) {
@@ -185,6 +182,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     'basedOn'         => 'page.dwelltime',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
                 ]);
+
+                return;
             }
         }
 
