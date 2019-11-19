@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadImportFieldType extends AbstractType
@@ -172,9 +172,9 @@ class LeadImportFieldType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['lead_fields', 'import_fields', 'company_fields', 'object']);
         $resolver->setDefaults(['line_count_limit' => 0]);

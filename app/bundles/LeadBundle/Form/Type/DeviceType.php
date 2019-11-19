@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DeviceType extends AbstractType
 {
@@ -44,9 +44,9 @@ class DeviceType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => LeadDevice::class,

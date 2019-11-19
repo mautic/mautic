@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadFieldsType extends AbstractType
 {
@@ -32,9 +32,9 @@ class LeadFieldsType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         /** @var \Mautic\LeadBundle\Model\FieldModel $model */
         $model = $this->fieldModel;

@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeadCategoryType extends AbstractType
 {
@@ -29,9 +29,9 @@ class LeadCategoryType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $model = $this->categoryModel;
         $resolver->setDefaults([
