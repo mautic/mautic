@@ -16,8 +16,7 @@ return [
     'description' => 'Adds support for plugin integrations',
     'version'     => '0.0.1',
     'author'      => 'Mautic, Inc.',
-
-    'routes' => [
+    'routes'      => [
         'main' => [
             'mautic_integration_config' => [
                 'path'       => '/integration/{integration}/config',
@@ -52,6 +51,7 @@ return [
                 'class'     => \MauticPlugin\IntegrationsBundle\Command\SyncCommand::class,
                 'arguments' => [
                     'mautic.integrations.sync.service',
+                    'mautic.helper.core_parameters',
                 ],
                 'tag' => 'console.command',
             ],
@@ -97,6 +97,16 @@ return [
                 'arguments' => [
                     'mautic.lead.repository.lead_event_log',
                     'translator',
+                ],
+            ],
+            'mautic.integrations.subscriber.email_subscriber' => [
+                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\EmailSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.integrations.token.parser',
+                    'mautic.integrations.repository.object_mapping',
+                    'mautic.helper.integration',
                 ],
             ],
         ],
@@ -220,6 +230,9 @@ return [
             'mautic.integrations.auth_provider.token_persistence_factory' => [
                 'class'     => \MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory::class,
                 'arguments' => ['mautic.integrations.helper'],
+            ],
+            'mautic.integrations.token.parser' => [
+                'class' => \MauticPlugin\IntegrationsBundle\Helper\TokenParser::class,
             ],
         ],
         'repositories' => [
