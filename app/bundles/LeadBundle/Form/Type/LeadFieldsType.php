@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -36,16 +37,14 @@ class LeadFieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $model */
-        $model = $this->fieldModel;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $fieldList = $model->getFieldList();
+            'choices' => function (Options $options) {
+                $fieldList = $this->fieldModel->getFieldList();
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
                 if ($options['with_company_fields']) {
-                    $fieldList['Company'] = $model->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
+                    $fieldList['Company'] = $this->fieldModel->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
                 }
                 if ($options['with_utm']) {
                     $fieldList['UTM']['utm_campaign'] = 'mautic.lead.field.utmcampaign';
@@ -70,7 +69,7 @@ class LeadFieldsType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

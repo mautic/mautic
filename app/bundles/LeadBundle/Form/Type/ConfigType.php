@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
@@ -22,14 +23,18 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('background_import_if_more_rows_than', 'number', [
-            'label'      => 'mautic.lead.background.import.if.more.rows.than',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.lead.background.import.if.more.rows.than.tooltip',
-            ],
-        ]);
+        $builder->add(
+            'background_import_if_more_rows_than',
+            NumberType::class,
+            [
+                'label'      => 'mautic.lead.background.import.if.more.rows.than',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.background.import.if.more.rows.than.tooltip',
+                ],
+            ]
+        );
     }
 
     /**

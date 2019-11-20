@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -174,7 +175,7 @@ class ListModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadlist', $entity, $options);
+        return $formFactory->create(ListType::class, $entity, $options);
     }
 
     /**

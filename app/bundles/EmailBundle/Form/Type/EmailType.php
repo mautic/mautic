@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
@@ -448,7 +449,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'lists',
-                'leadlist_choices',
+                LeadListType::class,
                 [
                     'label'      => 'mautic.email.form.list',
                     'label_attr' => ['class' => 'control-label'],

@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,7 +28,7 @@ class BatchType extends AbstractType
     {
         $builder->add(
             'add',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.lead.batch.add_to',
                 'multiple'   => true,
@@ -39,7 +41,7 @@ class BatchType extends AbstractType
 
         $builder->add(
             'remove',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.lead.batch.remove_from',
                 'multiple'   => true,
@@ -52,7 +54,7 @@ class BatchType extends AbstractType
 
         $builder->add(
             'ids',
-            'hidden'
+            HiddenType::class
         );
 
         $builder->add(

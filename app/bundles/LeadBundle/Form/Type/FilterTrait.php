@@ -14,6 +14,9 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -51,11 +54,11 @@ trait FilterTrait
         $fieldType = $data['type'];
         $fieldName = $data['field'];
 
-        $type = 'text';
+        $type = TextType::class;
         $attr = [
             'class' => 'form-control',
         ];
-        $displayType = 'hidden';
+        $displayType = HiddenType::class;
         $displayAttr = [];
 
         $field = [];
@@ -76,7 +79,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['assets'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
-                $type                                       = 'choice';
+                $type                                       = ChoiceType::class;
                 break;
             case 'leadlist':
                 if (!isset($data['filter'])) {
@@ -93,7 +96,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['lists'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
-                $type                                       = 'choice';
+                $type                                       = ChoiceType::class;
                 break;
             case 'campaign':
                 if (!isset($data['filter'])) {
@@ -105,7 +108,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['campaign'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
-                $type                                       = 'choice';
+                $type                                       = ChoiceType::class;
                 break;
             case 'lead_email_received':
                 if (!isset($data['filter'])) {
@@ -117,7 +120,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['emails'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
-                $type                                       = 'choice';
+                $type                                       = ChoiceType::class;
                 break;
             case 'device_type':
                 if (!isset($data['filter'])) {
@@ -128,7 +131,7 @@ trait FilterTrait
 
                 $customOptions['choices']  = $options['deviceTypes'];
                 $customOptions['multiple'] = true;
-                $type                      = 'choice';
+                $type                      = ChoiceType::class;
                 break;
             case 'device_brand':
                 if (!isset($data['filter'])) {
@@ -139,7 +142,7 @@ trait FilterTrait
 
                 $customOptions['choices']  = $options['deviceBrands'];
                 $customOptions['multiple'] = true;
-                $type                      = 'choice';
+                $type                      = ChoiceType::class;
                 break;
             case 'device_os':
                 if (!isset($data['filter'])) {
@@ -150,7 +153,7 @@ trait FilterTrait
 
                 $customOptions['choices']  = $options['deviceOs'];
                 $customOptions['multiple'] = true;
-                $type                      = 'choice';
+                $type                      = ChoiceType::class;
                 break;
             case 'tags':
                 if (!isset($data['filter'])) {
@@ -170,12 +173,12 @@ trait FilterTrait
                         'onchange'             => 'Mautic.createLeadTag(this)',
                     ]
                 );
-                $type = 'choice';
+                $type = ChoiceType::class;
                 break;
             case 'stage':
                 $customOptions['choices']                   = $options['stage'];
                 $customOptions['choice_translation_domain'] = false;
-                $type                                       = 'choice';
+                $type                                       = ChoiceType::class;
                 break;
             case 'globalcategory':
                 if (!isset($data['filter'])) {
@@ -185,7 +188,7 @@ trait FilterTrait
                 }
                 $customOptions['choices']  = $options['globalcategory'];
                 $customOptions['multiple'] = true;
-                $type                      = 'choice';
+                $type                      = ChoiceType::class;
                 break;
             case 'timezone':
             case 'country':
@@ -206,7 +209,7 @@ trait FilterTrait
                         break;
                 }
 
-                $type                                       = 'choice';
+                $type                                       = ChoiceType::class;
                 $customOptions['choices']                   = $options[$choiceKey];
                 $customOptions['choice_translation_domain'] = false;
                 $customOptions['multiple']                  = (in_array($data['operator'], ['in', '!in']));
@@ -226,8 +229,8 @@ trait FilterTrait
                 $attr['data-toggle'] = $fieldType;
                 break;
             case 'lookup_id':
-                $type        = 'hidden';
-                $displayType = 'text';
+                $type        = HiddenType::class;
+                $displayType = TextType::class;
                 $displayAttr = array_merge(
                     $displayAttr,
                     [
@@ -250,7 +253,7 @@ trait FilterTrait
             case 'select':
             case 'multiselect':
             case 'boolean':
-                $type = 'choice';
+                $type = ChoiceType::class;
                 $attr = array_merge(
                     $attr,
                     [
@@ -386,7 +389,7 @@ trait FilterTrait
 
         $form->add(
             'operator',
-            'choice',
+            ChoiceType::class,
             [
                 'label'   => false,
                 'choices' => isset($field['operators']) ? $field['operators'] : [],

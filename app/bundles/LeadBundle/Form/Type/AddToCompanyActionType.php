@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -39,7 +40,7 @@ class AddToCompanyActionType extends AbstractType
     {
         $builder->add(
             'company',
-            'company_list',
+            CompanyListType::class,
             [
                 'multiple'    => false,
                 'required'    => true,
@@ -63,7 +64,7 @@ class AddToCompanyActionType extends AbstractType
 
         $builder->add(
             'newCompanyButton',
-            'button',
+            ButtonType::class,
             [
                 'attr' => [
                     'class'   => 'btn btn-primary btn-nospin',

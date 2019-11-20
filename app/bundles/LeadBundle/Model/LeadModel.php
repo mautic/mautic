@@ -48,6 +48,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -414,7 +415,7 @@ class LeadModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('lead', $entity, $options);
+        return $formFactory->create(LeadType::class, $entity, $options);
     }
 
     /**

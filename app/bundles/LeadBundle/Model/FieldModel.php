@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -707,7 +708,7 @@ class FieldModel extends FormModel
      *
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
@@ -719,7 +720,7 @@ class FieldModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadfield', $entity, $options);
+        return $formFactory->create(FieldType::class, $entity, $options);
     }
 
     /**

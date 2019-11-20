@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,7 +28,7 @@ class OwnerType extends AbstractType
     {
         $builder->add(
             'addowner',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.lead.batch.add_to',
                 'multiple'   => false,
@@ -37,10 +39,7 @@ class OwnerType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'ids',
-            'hidden'
-        );
+        $builder->add('ids', HiddenType::class);
 
         $builder->add(
             'buttons',

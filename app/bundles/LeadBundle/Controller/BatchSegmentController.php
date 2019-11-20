@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -92,7 +93,7 @@ class BatchSegmentController extends AbstractFormController
             [
                 'viewParameters' => [
                     'form' => $this->createForm(
-                        'lead_batch',
+                        BatchType::class,
                         [],
                         [
                             'items'  => $items,

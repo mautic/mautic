@@ -19,9 +19,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChangeOwnerType extends AbstractType
 {
-    /** @var UserModel */
+    /**
+     * @var UserModel
+     */
     private $userModel;
 
+    /**
+     * @param UserModel $userModel
+     */
     public function __construct(UserModel $userModel)
     {
         $this->userModel = $userModel;

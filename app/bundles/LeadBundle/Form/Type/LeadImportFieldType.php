@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -76,7 +77,7 @@ class LeadImportFieldType extends AbstractType
         foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
                 $field,
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'    => $importChoiceFields,
                     'label'      => $label,
@@ -111,7 +112,7 @@ class LeadImportFieldType extends AbstractType
             $builder->add(
                 $builder->create(
                     'list',
-                    'leadlist_choices',
+                    LeadListType::class,
                     [
                         'label'      => 'mautic.lead.lead.field.list',
                         'label_attr' => ['class' => 'control-label'],
@@ -126,7 +127,7 @@ class LeadImportFieldType extends AbstractType
 
             $builder->add(
                 'tags',
-                'lead_tag',
+                TagType::class,
                 [
                     'label'      => 'mautic.lead.tags',
                     'required'   => false,

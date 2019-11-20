@@ -11,8 +11,9 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -20,6 +21,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FilterType extends AbstractType
 {
@@ -53,7 +55,7 @@ class FilterType extends AbstractType
     {
         $builder->add(
             'glue',
-            'choice',
+            ChoiceType::class,
             [
                 'label'   => false,
                 'choices' => [
@@ -90,9 +92,9 @@ class FilterType extends AbstractType
             }
         );
 
-        $builder->add('field', 'hidden');
-        $builder->add('object', 'hidden');
-        $builder->add('type', 'hidden');
+        $builder->add('field', HiddenType::class);
+        $builder->add('object', HiddenType::class);
+        $builder->add('type', HiddenType::class);
     }
 
     /**

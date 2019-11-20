@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventLeadDeviceType extends AbstractType
@@ -25,7 +26,7 @@ class CampaignEventLeadDeviceType extends AbstractType
     {
         $builder->add(
             'device_type',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.lead.campaign.event.device_type',
                 'label_attr' => ['class' => 'control-label'],
@@ -40,7 +41,7 @@ class CampaignEventLeadDeviceType extends AbstractType
 
         $builder->add(
             'device_brand',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.lead.campaign.event.device_brand',
                 'label_attr' => ['class' => 'control-label'],
@@ -55,7 +56,7 @@ class CampaignEventLeadDeviceType extends AbstractType
 
         $builder->add(
             'device_os',
-            'choice',
+            ChoiceType::class,
             [
                 'label'      => 'mautic.lead.campaign.event.device_os',
                 'label_attr' => ['class' => 'control-label'],

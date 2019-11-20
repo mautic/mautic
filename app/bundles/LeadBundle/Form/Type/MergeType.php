@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -27,7 +28,7 @@ class MergeType extends AbstractType
     {
         $builder->add(
             'lead_to_merge',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'     => $options['leads'],
                 'label'       => 'mautic.lead.merge.select',

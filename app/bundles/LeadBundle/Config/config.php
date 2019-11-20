@@ -490,7 +490,6 @@ return [
                     'mautic.lead.model.company',
                     'doctrine.orm.entity_manager',
                 ],
-                'alias'     => 'lead',
             ],
             'mautic.form.type.leadlist' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\ListType::class,
@@ -533,11 +532,6 @@ return [
             'mautic.form.type.lead.submitaction.removedonotcontact' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact::class,
             ],
-            'mautic.form.type.lead.submitaction.changelist' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\EventListType',
-                'arguments' => ['mautic.factory'],
-                'alias'     => 'leadlist_action_type',
-            ],
             'mautic.form.type.leadpoints_action' => [
                 'class' => \Mautic\LeadBundle\Form\Type\PointActionType::class,
             ],
@@ -547,12 +541,10 @@ return [
             'mautic.form.type.updatelead_action' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\UpdateLeadActionType::class,
                 'arguments' => ['mautic.lead.model.field'],
-                'alias'     => 'updatelead_action',
             ],
             'mautic.form.type.updatecompany_action' => [
                 'class'     => Mautic\LeadBundle\Form\Type\UpdateCompanyActionType::class,
                 'arguments' => ['mautic.lead.model.field'],
-                'alias'     => 'updatecompany_action',
             ],
             'mautic.form.type.leadnote' => [
                 'class' => Mautic\LeadBundle\Form\Type\NoteType::class,
@@ -573,7 +565,6 @@ return [
             ],
             'mautic.form.type.lead_tag' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\TagType::class,
-                'alias'     => 'lead_tag',
                 'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.form.type.modify_lead_tags' => [
@@ -669,9 +660,8 @@ return [
                 ],
             ],
             'mautic.form.type.lead_categories' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\LeadCategoryType',
+                'class'     => \Mautic\LeadBundle\Form\Type\LeadCategoryType::class,
                 'arguments' => ['mautic.category.model.category'],
-                'alias'     => 'leadcategory_choices',
             ],
             'mautic.company.merge.type.form' => [
                 'class' => \Mautic\LeadBundle\Form\Type\CompanyMergeType::class,

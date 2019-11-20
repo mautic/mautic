@@ -23,7 +23,7 @@ class CampaignEventLeadSegmentsType extends AbstractType
     {
         $builder->add(
             'segments',
-            'leadlist_choices',
+            LeadListType::class,
             [
                 'global_only' => true,
                 'label'       => 'mautic.lead.lead.lists',

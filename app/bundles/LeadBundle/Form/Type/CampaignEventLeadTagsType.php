@@ -37,7 +37,7 @@ class CampaignEventLeadTagsType extends AbstractType
     {
         $builder->add(
             'tags',
-            'lead_tag',
+            TagType::class,
             [
                 'add_transformer' => true,
                 'by_reference'    => false,

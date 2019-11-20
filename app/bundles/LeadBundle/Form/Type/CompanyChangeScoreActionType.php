@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
@@ -25,7 +26,7 @@ class CompanyChangeScoreActionType extends AbstractType
     {
         $builder->add(
             'score',
-            'number',
+            NumberType::class,
             [
                 'label'       => 'mautic.lead.lead.events.changecompanyscore',
                 'attr'        => ['class' => 'form-control'],

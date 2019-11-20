@@ -14,6 +14,7 @@ namespace Mautic\CategoryBundle\Controller;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\LeadBundle\Form\Type\BatchType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -92,7 +93,7 @@ class BatchContactController extends AbstractFormController
             [
                 'viewParameters' => [
                     'form' => $this->createForm(
-                        'lead_batch',
+                        BatchType::class,
                         [],
                         [
                             'items'  => $items,

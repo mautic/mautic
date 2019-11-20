@@ -23,6 +23,8 @@ use Mautic\UserBundle\Form\Type\UserListType;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -82,7 +84,7 @@ orm(FormBuilderInterface $builder, array $options)
 
             $builder->add(
                 'preferred_profile_image',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'    => $imageChoices,
                     'label'      => 'mautic.lead.lead.field.preferred_profile',
@@ -97,7 +99,7 @@ orm(FormBuilderInterface $builder, array $options)
 
             $builder->add(
                 'custom_avatar',
-                'file',
+                FileType::class,
                 [
                     'label'      => false,
                     'label_attr' => ['class' => 'control-label'],
@@ -127,12 +129,12 @@ orm(FormBuilderInterface $builder, array $options)
 
         $builder->add(
             'tags',
-            'lead_tag',
+            TagType::class,
             [
                 'by_reference' => false,
                 'attr'         => [
                     'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->translator->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
@@ -147,8 +149,8 @@ orm(FormBuilderInterface $builder, array $options)
         }
 
         $builder->add(
-        'companies',
-            'company_list',
+            'companies',
+            CompanyListType::class,
             [
                 'label'      => 'mautic.company.selectcompany',
                 'label_attr' => ['class' => 'control-label'],

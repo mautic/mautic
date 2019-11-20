@@ -30,6 +30,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -142,7 +145,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -152,7 +155,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -167,7 +170,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -204,9 +207,9 @@ class ListType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'    => 'leadlist_filter',
+                    'type'    => FilterType::class,
                     'options' => [
                         'label'          => false,
                         'timezones'      => $this->timezoneChoices,
@@ -253,7 +256,7 @@ class ListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadList',
+                'data_class' => LeadList::class,
             ]
         );
     }

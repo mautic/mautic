@@ -15,6 +15,8 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -57,7 +59,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
     {
         $builder->add(
             'field',
-            'leadfields_choices',
+            LeadFieldsType::class,
             [
                 'label'                 => 'mautic.lead.campaign.event.field',
                 'label_attr'            => ['class' => 'control-label'],
@@ -163,7 +165,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
             if (!empty($fieldValues) && $supportsChoices) {
                 $form->add(
                     'value',
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices'    => $fieldValues,
                         'label'      => 'mautic.form.field.form.value',
@@ -196,7 +198,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
                 $form->add(
                     'value',
-                    'text',
+                    TextType::class,
                     [
                         'label'       => 'mautic.form.field.form.value',
                         'label_attr'  => ['class' => 'control-label'],
@@ -212,7 +214,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
 
             $form->add(
                 'operator',
-                'choice',
+                ChoiceType::class,
                 [
                     'label'      => 'mautic.lead.lead.submitaction.operator',
                     'label_attr' => ['class' => 'control-label'],

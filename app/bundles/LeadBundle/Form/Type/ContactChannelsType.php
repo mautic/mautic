@@ -6,7 +6,10 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,7 +29,6 @@ class ContactChannelsType extends AbstractType
     }
 
     /**
-     * @see AbstractType::buildForm()
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -37,7 +39,7 @@ class ContactChannelsType extends AbstractType
 
         $builder->add(
             'subscribed_channels',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'           => $options['channels'],
                 'choices_as_values' => true,
@@ -53,7 +55,7 @@ class ContactChannelsType extends AbstractType
         if (!$options['public_view'] || $showContactPreferredChannels) {
             $builder->add(
                 'preferred_channel',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'           => $options['channels'],
                     'choices_as_values' => true,
@@ -78,7 +80,7 @@ class ContactChannelsType extends AbstractType
 
                 $builder->add(
                     'frequency_number_'.$channel,
-                    'integer',
+                    IntegerType::class,
                     [
                         'precision'  => 0,
                         'label'      => 'mautic.lead.list.frequency.number',
@@ -95,7 +97,7 @@ class ContactChannelsType extends AbstractType
 
                 $builder->add(
                     'frequency_time_'.$channel,
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices' => [
                             FrequencyRule::TIME_DAY   => 'mautic.core.time.days',
@@ -166,7 +168,7 @@ class ContactChannelsType extends AbstractType
         if (isset($options['save_button']) && $options['save_button'] === true) {
             $builder->add(
                 'ids',
-                'hidden'
+                HiddenType::class
             );
 
             $builder->add(
@@ -189,7 +191,6 @@ class ContactChannelsType extends AbstractType
     }
 
     /**
-     * @see AbstractType::configureOptions()
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)

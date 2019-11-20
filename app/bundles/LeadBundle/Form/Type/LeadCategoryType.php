@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -33,12 +34,11 @@ class LeadCategoryType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $model = $this->categoryModel;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $categories = $model->getLookupResults('global');
+            'choices' => function (Options $options) {
+                $categories = $this->categoryModel->getLookupResults('global');
+                $choices    = [];
 
-                $choices = [];
                 foreach ($categories as $cat) {
                     $choices[$cat['id']] = $cat['title'];
                 }
@@ -55,7 +55,7 @@ class LeadCategoryType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**

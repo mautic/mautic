@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Form\Type\ListActionType;
+use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -36,7 +38,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'    => 'mautic.lead.point.trigger',
             'label'    => 'mautic.lead.point.trigger.changelists',
             'callback' => ['\\Mautic\\LeadBundle\\Helper\\PointEventHelper', 'changeLists'],
-            'formType' => 'leadlist_action',
+            'formType' => ListActionType::class,
         ];
 
         $event->addEvent('lead.changelists', $changeLists);
@@ -45,7 +47,7 @@ class PointSubscriber implements EventSubscriberInterface
         $action = [
             'group'    => 'mautic.lead.point.trigger',
             'label'    => 'mautic.lead.lead.events.changetags',
-            'formType' => 'modify_lead_tags',
+            'formType' => ModifyLeadTagsType::class,
             'callback' => '\Mautic\LeadBundle\Helper\EventHelper::updateTags',
         ];
         $event->addEvent('lead.changetags', $action);

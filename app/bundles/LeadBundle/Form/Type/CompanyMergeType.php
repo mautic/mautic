@@ -27,7 +27,7 @@ class CompanyMergeType extends AbstractType
     {
         $builder->add(
             'company_to_merge',
-            'company_list',
+            CompanyListType::class,
             [
                 'multiple'    => false,
                 'label'       => 'mautic.company.to.merge.into',

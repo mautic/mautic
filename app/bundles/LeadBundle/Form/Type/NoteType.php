@@ -17,6 +17,9 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,39 +44,51 @@ class NoteType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['text' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.note', $options));
 
-        $builder->add('text', 'textarea', [
-            'label'      => 'mautic.lead.note.form.text',
-            'label_attr' => ['class' => 'control-label sr-only'],
-            'attr'       => ['class' => 'mousetrap form-control editor', 'rows' => 10, 'autofocus' => 'autofocus'],
-        ]);
+        $builder->add(
+            'text',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.lead.note.form.text',
+                'label_attr' => ['class' => 'control-label sr-only'],
+                'attr'       => ['class' => 'mousetrap form-control editor', 'rows' => 10, 'autofocus' => 'autofocus'],
+            ]
+        );
 
-        $builder->add('type', 'choice', [
-            'label'   => 'mautic.lead.note.form.type',
-            'choices' => [
-                'general' => 'mautic.lead.note.type.general',
-                'email'   => 'mautic.lead.note.type.email',
-                'call'    => 'mautic.lead.note.type.call',
-                'meeting' => 'mautic.lead.note.type.meeting',
-            ],
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'type',
+            ChoiceType::class,
+            [
+                'label'   => 'mautic.lead.note.form.type',
+                'choices' => [
+                    'general' => 'mautic.lead.note.type.general',
+                    'email'   => 'mautic.lead.note.type.email',
+                    'call'    => 'mautic.lead.note.type.call',
+                    'meeting' => 'mautic.lead.note.type.meeting',
+                ],
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
 
         $dt   = $options['data']->getDatetime();
         $data = ($dt == null) ? $this->dateHelper->getDateTime() : $dt;
 
-        $builder->add('dateTime', 'datetime', [
-            'label'      => 'mautic.core.date.added',
-            'label_attr' => ['class' => 'control-label'],
-            'widget'     => 'single_text',
-            'attr'       => [
-                'class'       => 'form-control',
-                'data-toggle' => 'datetime',
-                'preaddon'    => 'fa fa-calendar',
-            ],
-            'format' => 'yyyy-MM-dd HH:mm',
-            'data'   => $data,
-        ]);
+        $builder->add(
+            'dateTime',
+            DateTimeType::class,
+            [
+                'label'      => 'mautic.core.date.added',
+                'label_attr' => ['class' => 'control-label'],
+                'widget'     => 'single_text',
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'datetime',
+                    'preaddon'    => 'fa fa-calendar',
+                ],
+                'format' => 'yyyy-MM-dd HH:mm',
+                'data'   => $data,
+            ]
+        );
 
         $builder->add('buttons', FormButtonsType::class, [
             'apply_text' => false,
