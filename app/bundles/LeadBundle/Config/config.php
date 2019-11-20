@@ -493,7 +493,7 @@ return [
                 'alias'     => 'lead',
             ],
             'mautic.form.type.leadlist' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\ListType',
+                'class'     => \Mautic\LeadBundle\Form\Type\ListType::class,
                 'arguments' => [
                     'translator',
                     'mautic.lead.model.list',
@@ -506,7 +506,6 @@ return [
                     'mautic.campaign.model.campaign',
                     'mautic.asset.model.asset',
                 ],
-                'alias' => 'leadlist',
             ],
             'mautic.form.type.leadlist_choices' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\LeadListType::class,
@@ -539,13 +538,8 @@ return [
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'leadlist_action_type',
             ],
-            'mautic.form.type.leadpoints_trigger' => [
-                'class' => 'Mautic\LeadBundle\Form\Type\PointTriggerType',
-                'alias' => 'leadpoints_trigger',
-            ],
             'mautic.form.type.leadpoints_action' => [
-                'class' => 'Mautic\LeadBundle\Form\Type\PointActionType',
-                'alias' => 'leadpoints_action',
+                'class' => \Mautic\LeadBundle\Form\Type\PointActionType::class,
             ],
             'mautic.form.type.leadlist_action' => [
                 'class' => \Mautic\LeadBundle\Form\Type\ListActionType::class,
@@ -562,7 +556,6 @@ return [
             ],
             'mautic.form.type.leadnote' => [
                 'class' => Mautic\LeadBundle\Form\Type\NoteType::class,
-                'alias' => 'leadnote',
             ],
             'mautic.form.type.leaddevice' => [
                 'class' => Mautic\LeadBundle\Form\Type\DeviceType::class,
@@ -590,7 +583,6 @@ return [
             ],
             'mautic.form.type.modify_lead_tags' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\ModifyLeadTagsType::class,
-                'alias'     => 'modify_lead_tags',
                 'arguments' => ['translator'],
             ],
             'mautic.form.type.lead_entity_tag' => [
@@ -608,12 +600,10 @@ return [
                 'alias' => 'lead_batch_stage',
             ],
             'mautic.form.type.lead_batch_owner' => [
-                'class' => 'Mautic\LeadBundle\Form\Type\OwnerType',
-                'alias' => 'lead_batch_owner',
+                'class' => \Mautic\LeadBundle\Form\Type\OwnerType::class,
             ],
             'mautic.form.type.lead_merge' => [
-                'class' => 'Mautic\LeadBundle\Form\Type\MergeType',
-                'alias' => 'lead_merge',
+                'class' => \Mautic\LeadBundle\Form\Type\MergeType::class,
             ],
             'mautic.form.type.lead_contact_frequency_rules' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\ContactFrequencyType::class,
