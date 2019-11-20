@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
@@ -220,7 +221,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => [
                         'company'  => 'mautic.pipedrive.object.organization',
@@ -236,7 +237,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'import',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => [
                         'enabled' => 'mautic.pipedrive.add.edit.contact.import.enabled',

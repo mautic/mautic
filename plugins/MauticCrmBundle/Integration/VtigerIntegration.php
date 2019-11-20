@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 /**
  * Class VtigerIntegration.
  */
@@ -277,7 +279,7 @@ class VtigerIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'contacts' => 'mautic.vtiger.object.contact',
