@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
@@ -343,14 +344,14 @@ trait FilterTrait
         if (in_array($data['operator'], ['between', '!between'])) {
             $form->add(
                 'filter',
-                'collection',
+                CollectionType::class,
                 [
-                    'type'    => $type,
-                    'options' => [
+                    'label'         => false,
+                    'type'          => $type,
+                    'entry_options' => [
                         'label' => false,
                         'attr'  => $attr,
                     ],
-                    'label' => false,
                 ]
             );
         } else {
