@@ -25,6 +25,7 @@ use MauticPlugin\MauticCrmBundle\Api\ZohoApi;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -612,7 +613,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateBlanks' => 'mautic.integrations.blanks',
@@ -629,7 +630,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if ($formArea === 'keys') {
             $builder->add(
                 'datacenter',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'zoho.com'    => 'mautic.plugin.zoho.zone_us',
@@ -648,7 +649,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         } elseif ('features' === $formArea) {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'Leads'    => 'mautic.zoho.object.lead',

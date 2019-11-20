@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
@@ -77,7 +78,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     {
         $builder->add(
             'updateBlanks',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
                     'updateBlanks' => 'mautic.integrations.blanks',
@@ -93,7 +94,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         if ($formArea === 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'contacts' => 'mautic.dynamics.object.contact',
