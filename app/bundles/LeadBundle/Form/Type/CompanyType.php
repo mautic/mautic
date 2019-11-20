@@ -97,7 +97,7 @@ class CompanyType extends AbstractType
                 'label'      => 'mautic.company.score',
                 'attr'       => ['class' => 'form-control'],
                 'label_attr' => ['class' => 'control-label'],
-                'precision'  => 0,
+                'scale'      => 0,
                 'required'   => false,
             ]
         );

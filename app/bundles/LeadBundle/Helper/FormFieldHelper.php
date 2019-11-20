@@ -81,7 +81,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'number' => [
             'properties' => [
                 'roundmode' => [],
-                'precision' => [],
+                'scale'     => [],
             ],
         ],
         'tel' => [

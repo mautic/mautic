@@ -69,11 +69,11 @@ trait EntityFieldsBuildFormTrait
 
             switch ($type) {
                 case 'number':
-                    if (empty($properties['precision'])) {
-                        $properties['precision'] = null;
+                    if (empty($properties['scale'])) {
+                        $properties['scale'] = null;
                     } //ensure default locale is used
                     else {
-                        $properties['precision'] = (int) $properties['precision'];
+                        $properties['scale'] = (int) $properties['scale'];
                     }
 
                     if ('' === $value) {
@@ -92,7 +92,7 @@ trait EntityFieldsBuildFormTrait
                             'data'          => (null !== $value) ? (float) $value : $value,
                             'mapped'        => $mapped,
                             'constraints'   => $constraints,
-                            'precision'     => $properties['precision'],
+                            'scale'         => $properties['scale'],
                             'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0,
                         ]
                     );

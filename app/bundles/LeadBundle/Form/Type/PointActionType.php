@@ -31,7 +31,7 @@ class PointActionType extends AbstractType
                 'label'       => 'mautic.lead.lead.event.points',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
-                'precision'   => 0,
+                'scale'       => 0,
                 'data'        => (isset($options['data']['points'])) ? $options['data']['points'] : 0,
                 'constraints' => [
                     new NotEqualTo(

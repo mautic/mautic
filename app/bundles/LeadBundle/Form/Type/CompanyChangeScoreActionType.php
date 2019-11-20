@@ -31,7 +31,7 @@ class CompanyChangeScoreActionType extends AbstractType
                 'label'       => 'mautic.lead.lead.events.changecompanyscore',
                 'attr'        => ['class' => 'form-control'],
                 'label_attr'  => ['class' => 'control-label'],
-                'precision'   => 0,
+                'scale'       => 0,
                 'data'        => (isset($options['data']['score'])) ? $options['data']['score'] : 0,
                 'constraints' => [
                     new NotEqualTo(

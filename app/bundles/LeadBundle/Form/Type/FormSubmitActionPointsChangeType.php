@@ -48,7 +48,7 @@ class FormSubmitActionPointsChangeType extends AbstractType
                 'label'      => 'mautic.lead.lead.submitaction.points',
                 'attr'       => ['class' => 'form-control'],
                 'label_attr' => ['class' => 'control-label'],
-                'precision'  => 0,
+                'scale'      => 0,
                 'data'       => $default,
             ]
         );
