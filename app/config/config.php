@@ -227,8 +227,6 @@ $dbalSettings = [
     'types'    => [
         'array'    => 'Mautic\CoreBundle\Doctrine\Type\ArrayType',
         'datetime' => 'Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType',
-        'integer'  => 'Symfony\Component\Form\Extension\Core\Type\IntegerType',
-        'text'     => 'Symfony\Component\Form\Extension\Core\Type\TextType',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [

@@ -18,8 +18,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class Event.
@@ -200,12 +198,12 @@ class Event implements ChannelInterface
             ->length(50)
             ->build();
 
-        $builder->createField('eventType', TextType::class)
+        $builder->createField('eventType', 'string')
             ->columnName('event_type')
             ->length(50)
             ->build();
 
-        $builder->createField('order', IntegerType::class)
+        $builder->createField('order', 'integer')
             ->columnName('event_order')
             ->build();
 
@@ -216,12 +214,12 @@ class Event implements ChannelInterface
             ->nullable()
             ->build();
 
-        $builder->createField('triggerInterval', IntegerType::class)
+        $builder->createField('triggerInterval', 'integer')
             ->columnName('trigger_interval')
             ->nullable()
             ->build();
 
-        $builder->createField('triggerIntervalUnit', TextType::class)
+        $builder->createField('triggerIntervalUnit', 'string')
             ->columnName('trigger_interval_unit')
             ->length(1)
             ->nullable()
@@ -287,11 +285,11 @@ class Event implements ChannelInterface
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('channel', TextType::class)
+        $builder->createField('channel', 'string')
             ->nullable()
             ->build();
 
-        $builder->createField('channelId', IntegerType::class)
+        $builder->createField('channelId', 'integer')
             ->columnName('channel_id')
             ->nullable()
             ->build();

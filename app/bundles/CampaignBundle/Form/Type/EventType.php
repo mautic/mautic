@@ -42,7 +42,7 @@ class EventType extends AbstractType
 
         $builder->add(
             'name',
-            TextType::class,
+            'string',
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],

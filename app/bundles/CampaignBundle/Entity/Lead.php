@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
 /**
  * Class Lead.
@@ -90,7 +89,7 @@ class Lead
 
         $builder->addNamedField('dateLastExited', DateTimeType::class, 'date_last_exited', true);
 
-        $builder->addField('rotation', IntegerType::class);
+        $builder->addField('rotation', 'integer');
     }
 
     /**
