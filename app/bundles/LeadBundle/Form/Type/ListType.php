@@ -209,7 +209,7 @@ class ListType extends AbstractType
                 'filters',
                 CollectionType::class,
                 [
-                    'type'          => FilterType::class,
+                    'entry_type'    => FilterType::class,
                     'entry_options' => [
                         'label'          => false,
                         'timezones'      => $this->timezoneChoices,

@@ -347,7 +347,7 @@ trait FilterTrait
                 CollectionType::class,
                 [
                     'label'         => false,
-                    'type'          => $type,
+                    'entry_type'    => $type,
                     'entry_options' => [
                         'label' => false,
                         'attr'  => $attr,
