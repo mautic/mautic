@@ -571,10 +571,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Form\Type\EmailType::class,
                 'arguments' => ['mautic.helper.user'],
             ],
-            'mautic.form.type.lead_tags' => [
-                'class'     => \Mautic\LeadBundle\Form\Type\TagListType::class,
-                'arguments' => ['translator'],
-            ],
             'mautic.form.type.lead_tag' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\TagType::class,
                 'alias'     => 'lead_tag',
