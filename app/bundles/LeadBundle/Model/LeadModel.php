@@ -1697,7 +1697,7 @@ class LeadModel extends FormModel
 
         // Fix up known synonym/mismatch field names
         foreach ($synonyms as $expected => $replace) {
-            if (key_exists($expected, $params) && !isset($params[$replace])) {
+            if (array_key_exists($expected, $params) && !isset($params[$replace])) {
                 // add expected key name
                 $params[$replace] = $params[$expected];
             }
