@@ -30,12 +30,13 @@ class BatchType extends AbstractType
             'add',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.add_to',
-                'multiple'   => true,
-                'choices'    => $options['items'],
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.batch.add_to',
+                'multiple'          => true,
+                'choices'           => $options['items'],
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 
@@ -43,19 +44,17 @@ class BatchType extends AbstractType
             'remove',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.remove_from',
-                'multiple'   => true,
-                'choices'    => $options['items'],
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.batch.remove_from',
+                'multiple'          => true,
+                'choices'           => $options['items'],
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 
-        $builder->add(
-            'ids',
-            HiddenType::class
-        );
+        $builder->add('ids', HiddenType::class);
 
         $builder->add(
             'buttons',

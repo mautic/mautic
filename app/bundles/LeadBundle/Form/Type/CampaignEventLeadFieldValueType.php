@@ -167,10 +167,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'value',
                     ChoiceType::class,
                     [
-                        'choices'    => $fieldValues,
-                        'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
+                        'choices_as_values' => true,
+                        'choices'           => array_flip($fieldValues),
+                        'label'             => 'mautic.form.field.form.value',
+                        'label_attr'        => ['class' => 'control-label'],
+                        'attr'              => [
                             'class'                => 'form-control',
                             'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
                             'data-toggle'          => $fieldType,
@@ -216,12 +217,13 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'operator',
                 ChoiceType::class,
                 [
-                    'label'      => 'mautic.lead.lead.submitaction.operator',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
+                    'choices_as_values' => true,
+                    'choices'           => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
+                    'label'             => 'mautic.lead.lead.submitaction.operator',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => [
                         'onchange' => 'Mautic.updateLeadFieldValues(this)',
                     ],
-                    'choices' => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
                 ]
             );
         };

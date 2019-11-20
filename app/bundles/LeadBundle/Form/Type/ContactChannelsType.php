@@ -99,10 +99,11 @@ class ContactChannelsType extends AbstractType
                     'frequency_time_'.$channel,
                     ChoiceType::class,
                     [
-                        'choices' => [
-                            FrequencyRule::TIME_DAY   => 'mautic.core.time.days',
-                            FrequencyRule::TIME_WEEK  => 'mautic.core.time.weeks',
-                            FrequencyRule::TIME_MONTH => 'mautic.core.time.months',
+                        'choices_as_values' => true,
+                        'choices'           => [
+                            'mautic.core.time.days'   => FrequencyRule::TIME_DAY,
+                            'mautic.core.time.weeks'  => FrequencyRule::TIME_WEEK,
+                            'mautic.core.time.months' => FrequencyRule::TIME_MONTH,
                         ],
                         'label'      => 'mautic.lead.list.frequency.times',
                         'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],

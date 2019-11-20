@@ -32,10 +32,8 @@ class CampaignEventLeadDeviceType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'multiple'   => true,
                 'choices'    => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-                'required' => false,
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 
@@ -43,14 +41,13 @@ class CampaignEventLeadDeviceType extends AbstractType
             'device_brand',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.campaign.event.device_brand',
-                'label_attr' => ['class' => 'control-label'],
-                'multiple'   => true,
-                'choices'    => DeviceParser::$deviceBrands,
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-                'required' => false,
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.campaign.event.device_brand',
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => true,
+                'choices'           => array_flip(DeviceParser::$deviceBrands),
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
             ]
         );
 
@@ -62,10 +59,8 @@ class CampaignEventLeadDeviceType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'multiple'   => true,
                 'choices'    => array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())),
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-                'required' => false,
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
     }

@@ -55,17 +55,12 @@ abstract class AbstractFormFieldHelper
      */
     abstract public function getTypes();
 
-    /**
-     * AbstractFormFieldHelper constructor.
-     */
     public function __construct()
     {
         $this->setTranslationKeyPrefix();
     }
 
     /**
-     * Set translator.
-     *
      * @param TranslatorInterface $translator
      */
     public function setTranslator(TranslatorInterface $translator)
@@ -83,14 +78,14 @@ abstract class AbstractFormFieldHelper
         $choices = [];
 
         foreach ($this->getTypes() as $v => $type) {
-            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "{$this->translationKeyPrefix}{$v}");
+            $choices[$this->translator->transConditional("mautic.core.type.{$v}", "{$this->translationKeyPrefix}{$v}")] = $v;
         }
 
         foreach ($customFields as $v => $f) {
-            $choices[$v] = $this->translator->trans($f['label']);
+            $choices[$this->translator->trans($f['label'])] = $v;
         }
 
-        natcasesort($choices);
+        ksort($choices);
 
         return $choices;
     }

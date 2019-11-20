@@ -392,9 +392,10 @@ trait FilterTrait
             'operator',
             ChoiceType::class,
             [
-                'label'   => false,
-                'choices' => isset($field['operators']) ? $field['operators'] : [],
-                'attr'    => [
+                'choices_as_values' => true,
+                'label'             => false,
+                'choices'           => isset($field['operators']) ? $field['operators'] : [],
+                'attr'              => [
                     'class'    => 'form-control not-chosen',
                     'onchange' => 'Mautic.convertLeadFilterInput(this)',
                 ],
