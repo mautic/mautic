@@ -14,7 +14,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 /**
  * Class Lead.
@@ -87,7 +86,7 @@ class Lead
             ->columnName('manually_added')
             ->build();
 
-        $builder->addNamedField('dateLastExited', DateTimeType::class, 'date_last_exited', true);
+        $builder->addNamedField('dateLastExited', 'datetime', 'date_last_exited', true);
 
         $builder->addField('rotation', 'integer');
     }

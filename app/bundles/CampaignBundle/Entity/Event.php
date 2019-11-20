@@ -17,7 +17,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as Contact;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 /**
  * Class Event.
@@ -209,7 +208,7 @@ class Event implements ChannelInterface
 
         $builder->addField('properties', 'array');
 
-        $builder->createField('triggerDate', DateTimeType::class)
+        $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
             ->nullable()
             ->build();

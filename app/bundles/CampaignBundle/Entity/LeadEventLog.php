@@ -16,7 +16,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 /**
  * Class LeadEventLog.
@@ -138,7 +137,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateTriggered', DateTimeType::class)
+        $builder->createField('dateTriggered', 'datetime')
             ->columnName('date_triggered')
             ->nullable()
             ->build();
@@ -147,7 +146,7 @@ class LeadEventLog implements ChannelInterface
             ->columnName('is_scheduled')
             ->build();
 
-        $builder->createField('triggerDate', DateTimeType::class)
+        $builder->createField('triggerDate', 'datetime')
             ->columnName('trigger_date')
             ->nullable()
             ->build();
