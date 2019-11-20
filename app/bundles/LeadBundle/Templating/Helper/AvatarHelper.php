@@ -14,7 +14,6 @@ namespace Mautic\LeadBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Templating\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -26,28 +25,20 @@ class AvatarHelper extends Helper
     private $assetsHelper;
 
     /**
-     * @var GravatarHelper
-     */
-    private $gravatarHelper;
-
-    /**
      * @var PathsHelper
      */
     private $pathsHelper;
 
     /**
-     * @param AssetsHelper   $assetsHelper
-     * @param GravatarHelper $gravatarHelper
-     * @param PathsHelper    $pathsHelper
+     * @param AssetsHelper $assetsHelper
+     * @param PathsHelper  $pathsHelper
      */
     public function __construct(
         AssetsHelper $assetsHelper,
-        GravatarHelper $gravatarHelper,
         PathsHelper $pathsHelper
     ) {
-        $this->assetsHelper   = $assetsHelper;
-        $this->gravatarHelper = $gravatarHelper;
-        $this->pathsHelper    = $pathsHelper;
+        $this->assetsHelper = $assetsHelper;
+        $this->pathsHelper  = $pathsHelper;
     }
 
     /**
@@ -59,7 +50,6 @@ class AvatarHelper extends Helper
     {
         $preferred  = $lead->getPreferredProfileImage();
         $socialData = $lead->getSocialCache();
-        $leadEmail  = $lead->getEmail();
 
         if ($preferred == 'custom') {
             $avatarPath = $this->getAvatarPath(true).'/avatar'.$lead->getId();
@@ -78,12 +68,7 @@ class AvatarHelper extends Helper
         }
 
         if (empty($img)) {
-            // Default to gravatar if others failed
-            if (!empty($leadEmail)) {
-                $img = $this->gravatarHelper->getImage($leadEmail);
-            } else {
-                $img = $this->getDefaultAvatar();
-            }
+            $img = $this->getDefaultAvatar();
         }
 
         return $img;

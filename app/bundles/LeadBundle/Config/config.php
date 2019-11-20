@@ -573,7 +573,6 @@ return [
             ],
             'mautic.form.type.lead_tags' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\TagListType::class,
-                'alias'     => 'lead_tags',
                 'arguments' => ['translator'],
             ],
             'mautic.form.type.lead_tag' => [
@@ -587,7 +586,6 @@ return [
             ],
             'mautic.form.type.lead_entity_tag' => [
                 'class' => \Mautic\LeadBundle\Form\Type\TagEntityType::class,
-                'alias' => \Mautic\LeadBundle\Form\Type\TagEntityType::class,
             ],
             'mautic.form.type.lead_batch' => [
                 'class' => \Mautic\LeadBundle\Form\Type\BatchType::class,
@@ -596,8 +594,7 @@ return [
                 'class' => \Mautic\LeadBundle\Form\Type\DncType::class,
             ],
             'mautic.form.type.lead_batch_stage' => [
-                'class' => 'Mautic\LeadBundle\Form\Type\StageType',
-                'alias' => 'lead_batch_stage',
+                'class' => \Mautic\LeadBundle\Form\Type\StageType::class,
             ],
             'mautic.form.type.lead_batch_owner' => [
                 'class' => \Mautic\LeadBundle\Form\Type\OwnerType::class,
@@ -887,7 +884,6 @@ return [
                 'class'     => Mautic\LeadBundle\Templating\Helper\AvatarHelper::class,
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.template.gravatar',
                     'mautic.helper.paths',
                 ],
                 'alias'     => 'lead_avatar',
