@@ -21,7 +21,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -159,7 +158,7 @@ class EventType extends AbstractType
             $data = $this->getTimeValue($options['data'], 'triggerHour');
             $builder->add(
                 'triggerHour',
-                TextType::class,
+                'string',
                 [
                     'label' => false,
                     'attr'  => [
