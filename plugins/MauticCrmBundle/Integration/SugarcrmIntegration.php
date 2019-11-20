@@ -993,7 +993,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'updateOwner',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateOwner' => 'mautic.sugarcrm.updateOwner',
@@ -1012,7 +1012,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateDnc',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateDnc' => 'mautic.sugarcrm.updateDnc',
@@ -1031,7 +1031,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateBlanks' => 'mautic.integrations.blanks',
@@ -1047,7 +1047,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'Leads'    => 'mautic.sugarcrm.object.lead',

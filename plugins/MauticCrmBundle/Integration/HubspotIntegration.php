@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 /**
  * Class HubspotIntegration.
@@ -272,7 +273,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'contacts' => 'mautic.hubspot.object.contact',

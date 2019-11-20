@@ -17,6 +17,8 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Integration\IntegrationObject;
+use MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -287,7 +289,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateBlanks' => 'mautic.integrations.blanks',
@@ -302,7 +304,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             );
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'Contact' => 'mautic.connectwise.object.contact',
@@ -336,7 +338,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $builder->add(
                         'campaign_task',
-                        'integration_campaign_task',
+                        IntegrationCampaignsTaskType::class,
                         [
                             'label'  => false,
                             'helper' => $this->factory->getHelper('integration'),

@@ -29,6 +29,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\ResultsPaginator;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -547,7 +548,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'sandbox',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'sandbox' => 'mautic.salesforce.sandbox',
@@ -566,7 +567,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateOwner',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateOwner' => 'mautic.salesforce.updateOwner',
@@ -584,7 +585,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             );
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateBlanks' => 'mautic.integrations.blanks',
@@ -599,7 +600,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             );
             $builder->add(
                 'updateDncByDate',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'updateDncByDate' => 'mautic.integrations.update.dnc.by.date',
@@ -615,7 +616,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
                         'Lead'     => 'mautic.salesforce.object.lead',
@@ -651,7 +652,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'namespace',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.salesforce.form.namespace_prefix',
                     'label_attr' => ['class' => 'control-label'],
