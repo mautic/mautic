@@ -74,14 +74,11 @@ class ListModel extends FormModel
      * {@inheritdoc}
      *
      * @return LeadListRepository
-     *
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      */
     public function getRepository()
     {
         /** @var LeadListRepository $repo */
-        $repo = $this->em->getRepository(ListLead::class);
+        $repo = $this->em->getRepository(LeadList::class);
 
         $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
