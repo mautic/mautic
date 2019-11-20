@@ -236,10 +236,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         $q->where(
-            $q->expr()->in('cl.company_id', $companyIds),
-            $q->expr()->eq('cl.manually_removed', ':false')
+            $q->expr()->in('cl.company_id', $companyIds)
         )
-            ->setParameter('false', false, 'boolean')
             ->groupBy('cl.company_id');
 
         $result = $q->execute()->fetchAll();
