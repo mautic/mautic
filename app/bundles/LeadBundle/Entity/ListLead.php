@@ -49,7 +49,7 @@ class ListLead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_lists_leads')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\ListLeadRepository');
+            ->setCustomRepositoryClass(ListLeadRepository::class);
 
         $builder->createManyToOne('list', 'LeadList')
             ->isPrimaryKey()

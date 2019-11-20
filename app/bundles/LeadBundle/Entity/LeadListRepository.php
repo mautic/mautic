@@ -27,9 +27,6 @@ use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * LeadListRepository.
- */
 class LeadListRepository extends CommonRepository
 {
     use OperatorListTrait;
@@ -109,7 +106,7 @@ class LeadListRepository extends CommonRepository
         }
 
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+            ->from(LeadList::class, 'l', 'l.id');
 
         $q->select('partial l.{id, name, alias}')
             ->andWhere($q->expr()->eq('l.isPublished', ':true'))
@@ -155,7 +152,7 @@ class LeadListRepository extends CommonRepository
     {
         if (is_array($lead)) {
             $q = $this->getEntityManager()->createQueryBuilder()
-                ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+                ->from(LeadList::class, 'l', 'l.id');
 
             if ($forList) {
                 $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
@@ -194,7 +191,7 @@ class LeadListRepository extends CommonRepository
             return $return;
         } else {
             $q = $this->getEntityManager()->createQueryBuilder()
-                ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+                ->from(LeadList::class, 'l', 'l.id');
 
             if ($forList) {
                 $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
@@ -263,7 +260,7 @@ class LeadListRepository extends CommonRepository
     public function getGlobalLists()
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+            ->from(LeadList::class, 'l', 'l.id');
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))
@@ -284,7 +281,7 @@ class LeadListRepository extends CommonRepository
     public function getPreferenceCenterList()
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticLeadBundle:LeadList', 'l', 'l.id');
+            ->from(LeadList::class, 'l', 'l.id');
 
         $q->select('partial l.{id, name, alias}')
             ->where($q->expr()->eq('l.isPublished', 'true'))

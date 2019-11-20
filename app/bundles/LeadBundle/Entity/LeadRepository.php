@@ -22,9 +22,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * LeadRepository.
- */
 class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait {
@@ -807,7 +804,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $imploder = [];
 
                 foreach ($prateek as $key => $value) {
-                    $list       = $this->getEntityManager()->getRepository('MauticLeadBundle:LeadList')->findOneByAlias($value);
+                    $list       = $this->getEntityManager()->getRepository(LeadList::class)->findOneByAlias($value);
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }
 
