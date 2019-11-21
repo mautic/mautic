@@ -832,9 +832,9 @@ class FieldModel extends FormModel
         foreach ($fields as $f) {
             if ($byGroup) {
                 $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
-                $leadFields[$fieldName][$f->getLabel()] = $f->getAlias();
+                $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
             } else {
-                $leadFields[$f->getLabel()] = $f->getAlias();
+                $leadFields[$f->getAlias()] = $f->getLabel();
             }
         }
 
@@ -845,7 +845,7 @@ class FieldModel extends FormModel
             if ($byGroup) {
                 // Sort each group by translation
                 foreach ($leadFields as $group => &$fieldGroup) {
-                    uksort($fieldGroup, 'strnatcmp');
+                    uasort($fieldGroup, 'strnatcmp');
                 }
             }
         }
