@@ -13,6 +13,7 @@ namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -58,9 +59,9 @@ class AjaxController extends CommonAjaxController
         }
 
         $widget   = new Widget();
-        $form     = $this->get('form.factory')->create('widget', $widget);
+        $form     = $this->get('form.factory')->create(WidgetType::class, $widget);
         $formHtml = $this->render('MauticDashboardBundle::Widget\\form.html.php',
-            ['form' => $form->bind($data)->createView()]
+            ['form' => $form->submit($data)->createView()]
         )->getContent();
 
         $dataArray['formHtml'] = $formHtml;
