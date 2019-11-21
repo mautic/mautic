@@ -58,12 +58,13 @@ class NoteType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'label'   => 'mautic.lead.note.form.type',
-                'choices' => [
-                    'general' => 'mautic.lead.note.type.general',
-                    'email'   => 'mautic.lead.note.type.email',
-                    'call'    => 'mautic.lead.note.type.call',
-                    'meeting' => 'mautic.lead.note.type.meeting',
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.note.form.type',
+                'choices'           => [
+                    'mautic.lead.note.type.general' => 'general',
+                    'mautic.lead.note.type.email'   => 'email',
+                    'mautic.lead.note.type.call'    => 'call',
+                    'mautic.lead.note.type.meeting' => 'meeting',
                 ],
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],

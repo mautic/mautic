@@ -95,10 +95,12 @@ abstract class AbstractFormFieldHelper
      *
      * @param      $list
      * @param bool $removeEmpty
+     * @param bool $ignoreNumerical
+     * @param bool $flipArray
      *
      * @return array
      */
-    public static function parseList($list, $removeEmpty = true, $ignoreNumerical = false)
+    public static function parseList($list, $removeEmpty = true, $ignoreNumerical = false, $flipArray = false)
     {
         // Note if this was an array to start and if we need to determine if the keys are sequentially numerical
         // for BC purposes
@@ -131,12 +133,17 @@ abstract class AbstractFormFieldHelper
             $list = array_combine($list, $list);
         }
 
-        $valueFormatting = function ($list) use ($removeEmpty) {
+        $valueFormatting = function ($list) use ($removeEmpty, $flipArray) {
             $choices = [];
             foreach ($list as $val => $label) {
                 if (is_array($label) && isset($label['value'])) {
-                    $val   = $label['value'];
-                    $label = $label['label'];
+                    if ($flipArray) {
+                        $val   = $label['label'];
+                        $label = $label['value'];
+                    } else {
+                        $val   = $label['value'];
+                        $label = $label['label'];
+                    }
                 }
                 if ($removeEmpty && empty($val) && empty($label)) {
                     continue;

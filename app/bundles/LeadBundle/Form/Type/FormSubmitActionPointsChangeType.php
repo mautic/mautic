@@ -28,14 +28,15 @@ class FormSubmitActionPointsChangeType extends AbstractType
             'operator',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.lead.submitaction.operator',
-                'attr'       => ['class' => 'form-control'],
-                'label_attr' => ['class' => 'control-label'],
-                'choices'    => [
-                    'plus'   => 'mautic.lead.lead.submitaction.operator_plus',
-                    'minus'  => 'mautic.lead.lead.submitaction.operator_minus',
-                    'times'  => 'mautic.lead.lead.submitaction.operator_times',
-                    'divide' => 'mautic.lead.lead.submitaction.operator_divide',
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.lead.submitaction.operator',
+                'attr'              => ['class' => 'form-control'],
+                'label_attr'        => ['class' => 'control-label'],
+                'choices'           => [
+                    'mautic.lead.lead.submitaction.operator_plus'   => 'plus',
+                    'mautic.lead.lead.submitaction.operator_minus'  => 'minus',
+                    'mautic.lead.lead.submitaction.operator_times'  => 'times',
+                    'mautic.lead.lead.submitaction.operator_divide' => 'divide',
                 ],
             ]
         );

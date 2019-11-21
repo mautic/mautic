@@ -828,7 +828,7 @@ class LeadController extends FormController
 
         $leadChoices = [];
         foreach ($leads as $l) {
-            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+            $leadChoices[$l->getPrimaryIdentifier()] = $l->getId();
         }
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'merge', 'objectId' => $mainLead->getId()]);
@@ -1742,7 +1742,7 @@ class LeadController extends FormController
             $stages = $model->getUserStages();
             $items  = [];
             foreach ($stages as $stage) {
-                $items[$stage['id']] = $stage['name'];
+                $items[$stage['name']] = $stage['id'];
             }
 
             $route = $this->generateUrl(
@@ -1839,7 +1839,7 @@ class LeadController extends FormController
             $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
             $items = [];
             foreach ($users as $user) {
-                $items[$user['id']] = $user['firstName'].' '.$user['lastName'];
+                $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
             }
 
             $route = $this->generateUrl(

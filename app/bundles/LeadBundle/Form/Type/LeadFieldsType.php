@@ -38,20 +38,21 @@ class LeadFieldsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices' => function (Options $options) {
+            'choices_as_values' => true,
+            'choices'           => function (Options $options) {
                 $fieldList = $this->fieldModel->getFieldList();
                 if ($options['with_tags']) {
-                    $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
+                    $fieldList['Core']['mautic.lead.field.tags'] = 'tags';
                 }
                 if ($options['with_company_fields']) {
                     $fieldList['Company'] = $this->fieldModel->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
                 }
                 if ($options['with_utm']) {
-                    $fieldList['UTM']['utm_campaign'] = 'mautic.lead.field.utmcampaign';
-                    $fieldList['UTM']['utm_content']  = 'mautic.lead.field.utmcontent';
-                    $fieldList['UTM']['utm_medium']   = 'mautic.lead.field.utmmedium';
-                    $fieldList['UTM']['utm_source']   = 'mautic.lead.field.umtsource';
-                    $fieldList['UTM']['utm_term']     = 'mautic.lead.field.utmterm';
+                    $fieldList['UTM']['mautic.lead.field.utmcampaign'] = 'utm_campaign';
+                    $fieldList['UTM']['mautic.lead.field.utmcontent']  = 'utm_content';
+                    $fieldList['UTM']['mautic.lead.field.utmmedium']   = 'utm_medium';
+                    $fieldList['UTM']['mautic.lead.field.umtsource']   = 'utm_source';
+                    $fieldList['UTM']['mautic.lead.field.utmterm']     = 'utm_term';
                 }
 
                 return $fieldList;

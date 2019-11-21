@@ -86,13 +86,13 @@ class ListType extends AbstractType
         // Segments
         $lists = $listModel->getUserLists();
         foreach ($lists as $list) {
-            $this->listChoices[$list['id']] = $list['name'];
+            $this->listChoices[$list['name']] = $list['id'];
         }
 
         // Campaigns
         $campaigns = $campaignModel->getPublishedCampaigns(true);
         foreach ($campaigns as $campaign) {
-            $this->campaignChoices[$campaign['id']] = $campaign['name'];
+            $this->campaignChoices[$campaign['name']] = $campaign['id'];
         }
 
         $viewOther   = $security->isGranted('email:emails:viewother');
@@ -104,34 +104,34 @@ class ListType extends AbstractType
         $emails = $emailRepo->getEmailList('', 0, 0, $viewOther, true);
 
         foreach ($emails as $email) {
-            $this->emailChoices[$email['language']][$email['id']] = $email['name'];
+            $this->emailChoices[$email['language']][$email['name']] = $email['id'];
         }
         ksort($this->emailChoices);
 
         // Get assets without 'filter' or 'limit'
         $assets = $assetModel->getLookupResults('asset', null, 0);
         foreach ($assets as $asset) {
-            $this->assetChoices[$asset['language']][$asset['id']] = $asset['title'];
+            $this->assetChoices[$asset['language']][$asset['title']] = $asset['id'];
         }
         ksort($this->assetChoices);
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
-            $this->tagChoices[$tag['value']] = $tag['label'];
+            $this->tagChoices[$tag['label']] = $tag['value'];
         }
 
         $stages = $stageModel->getRepository()->getSimpleList();
         foreach ($stages as $stage) {
-            $this->stageChoices[$stage['value']] = $stage['label'];
+            $this->stageChoices[$stage['label']] = $stage['value'];
         }
 
         $categories = $categoryModel->getLookupResults('global');
 
         foreach ($categories as $category) {
-            $this->categoriesChoices[$category['id']] = $category['title'];
+            $this->categoriesChoices[$category['title']] = $category['id'];
         }
         $this->deviceTypesChoices  = array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames()));
-        $this->deviceBrandsChoices = DeviceParser::$deviceBrands;
+        $this->deviceBrandsChoices = array_flip(DeviceParser::$deviceBrands);
         $this->deviceOsChoices     = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 

@@ -264,7 +264,7 @@ class FieldType extends AbstractType
                         ]
                     );
 
-                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list']) : [];
+                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list'], true, false, true) : [];
                     $form->add(
                         'defaultValue',
                         ChoiceType::class,
