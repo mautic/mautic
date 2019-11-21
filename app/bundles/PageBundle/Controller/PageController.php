@@ -268,7 +268,7 @@ class PageController extends FormController
                 ];
 
                 $event = new DetermineWinnerEvent($args);
-                $this->container->get('event_dispatcher')->dispatch(
+                $this->dispatcher->dispatch(
                     $testSettings['event'],
                     $event
                 );
