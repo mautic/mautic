@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -89,7 +91,7 @@ class ClientType extends AbstractType
         if (!$options['data']->getId()) {
             $builder->add(
                 'api_mode',
-                'choice',
+                ChoiceType::class,
                 [
                     'mapped'     => false,
                     'label'      => 'mautic.api.client.form.auth_protocol',
@@ -111,7 +113,7 @@ class ClientType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -124,7 +126,7 @@ class ClientType extends AbstractType
             $builder->add(
                 $builder->create(
                     'redirectUris',
-                    'text',
+                    TextType::class,
                     [
                         'label'      => 'mautic.api.client.redirecturis',
                         'label_attr' => ['class' => 'control-label'],
@@ -139,7 +141,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'publicId',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.clientid',
                     'label_attr' => ['class' => 'control-label'],
@@ -153,7 +155,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'secret',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.clientsecret',
                     'label_attr' => ['class' => 'control-label'],
@@ -199,7 +201,7 @@ class ClientType extends AbstractType
             $builder->add(
                 $builder->create(
                     'callback',
-                    'text',
+                    TextType::class,
                     [
                         'label'      => 'mautic.api.client.form.callback',
                         'label_attr' => ['class' => 'control-label'],
@@ -214,7 +216,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'consumerKey',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.consumerkey',
                     'label_attr' => ['class' => 'control-label'],
@@ -231,7 +233,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'consumerSecret',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.consumersecret',
                     'label_attr' => ['class' => 'control-label'],
