@@ -14,10 +14,8 @@ namespace Mautic\SmsBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\SmsBundle\Form\Type\ConfigType;
 
-/**
- * Class ConfigSubscriber.
- */
 class ConfigSubscriber extends CommonSubscriber
 {
     /**
@@ -35,6 +33,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'SmsBundle',
             'formAlias'  => 'smsconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticSmsBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticSmsBundle'),
         ]);
