@@ -101,7 +101,6 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionChangeOwner', 7],
                 ['onCampaignTriggerActionUpdateCompany', 8],
             ],
-            LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
     }
 
