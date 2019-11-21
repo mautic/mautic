@@ -11,7 +11,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CategoryBundle\Form\Type\CategoryType;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -75,9 +75,13 @@ class CampaignType extends AbstractType
         );
 
         //add category
-        $builder->add('category', CategoryType::class, [
-            'bundle' => 'campaign',
-        ]);
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'campaign',
+            ]
+        );
 
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('campaign:campaigns:publish');

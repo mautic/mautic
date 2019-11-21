@@ -14,8 +14,6 @@ namespace Mautic\ChannelBundle\Command;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\ChannelBroadcastEvent as BcChannelBroadcastEvent;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -106,16 +104,6 @@ EOT
         $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
 
         $results = $event->getResults();
-
-        // @deprecated 2.4 to be removed in 3.0; BC support
-        if ($dispatcher->hasListeners(CoreEvents::CHANNEL_BROADCAST)) {
-            /** @var BcChannelBroadcastEvent $bcEvent */
-            $bcEvent = $dispatcher->dispatch(
-                CoreEvents::CHANNEL_BROADCAST,
-                new BcChannelBroadcastEvent($channel, $channelId, $output)
-            );
-            $results = array_merge($results, $bcEvent->getResults());
-        }
 
         $rows = [];
         foreach ($results as $channel => $counts) {

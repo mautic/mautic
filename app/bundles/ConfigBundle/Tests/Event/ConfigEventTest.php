@@ -41,18 +41,6 @@ class ConfigEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($config, $event->getConfig());
     }
 
-    /**
-     * @deprecated 2.14.1; to be removed in 3.0 as unused
-     */
-    public function testGetPost()
-    {
-        $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
-        $event    = new ConfigEvent($config, $paramBag);
-
-        $this->assertEquals($paramBag, $event->getPost());
-    }
-
     public function testGetSetPreserved()
     {
         $config   = [];

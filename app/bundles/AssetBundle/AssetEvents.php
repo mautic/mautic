@@ -12,23 +12,10 @@
 namespace Mautic\AssetBundle;
 
 /**
- * Class AssetEvents
  * Events available for AssetBundle.
  */
 final class AssetEvents
 {
-    /**
-     * The mautic.asset_on_download event is dispatched when a public asset is being downloaded and a download tracked.
-     *
-     * The event listener receives a
-     * Mautic\AssetBundle\Event\AssetEvent instance.
-     *
-     * @var string
-     *
-     * @deprecated 2.0 - to be removed in 3.0
-     */
-    const ASSET_ON_DOWNLOAD = 'mautic.asset_on_download';
-
     /**
      * The mautic.asset_on_load event is dispatched when a public asset is downloaded, publicly viewed, or redirected to (remote).
      *
