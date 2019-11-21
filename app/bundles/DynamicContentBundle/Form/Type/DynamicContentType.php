@@ -14,6 +14,7 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -249,7 +250,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             ['bundle' => 'dynamicContent']
         );
 

@@ -11,6 +11,7 @@
 
 namespace Mautic\StageBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -26,9 +27,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class StageType.
- */
 class StageType extends AbstractType
 {
     /**
@@ -129,9 +127,13 @@ class StageType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
-            'bundle' => 'stage',
-        ]);
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'stage',
+            ]
+        );
 
         $builder->add('buttons', FormButtonsType::class);
 
