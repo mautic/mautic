@@ -12,6 +12,7 @@
 namespace Mautic\AssetBundle\Form\Type;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -128,9 +129,13 @@ class AssetType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('category', 'category', [
-            'bundle' => 'asset',
-        ]);
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'asset',
+            ]
+        );
 
         $builder->add('language', 'locale', [
             'label'      => 'mautic.core.language',
