@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
@@ -472,7 +473,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'assetAttachments',
-                'asset_list',
+                AssetListType::class,
                 [
                     'label'      => 'mautic.email.attachments',
                     'label_attr' => ['class' => 'control-label'],

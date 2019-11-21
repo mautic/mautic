@@ -14,9 +14,6 @@ namespace Mautic\AssetBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class PointActionFormSubmitType.
- */
 class PointActionAssetDownloadType extends AbstractType
 {
     /**
@@ -25,24 +22,28 @@ class PointActionAssetDownloadType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('assets', 'asset_list', [
-            'expanded'    => false,
-            'multiple'    => true,
-            'label'       => 'mautic.asset.point.action.assets',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.asset.point.action.assets.descr',
-            ],
-        ]);
+        $builder->add(
+            'assets',
+            AssetListType::class,
+            [
+                'expanded'    => false,
+                'multiple'    => true,
+                'label'       => 'mautic.asset.point.action.assets',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.asset.point.action.assets.descr',
+                ],
+            ]
+        );
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pointaction_assetdownload';
     }

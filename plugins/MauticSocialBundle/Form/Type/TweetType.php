@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -99,7 +100,7 @@ class TweetType extends AbstractType
         $builder->add(
                 $builder->create(
                 'asset',
-                'asset_list',
+                AssetListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
                     'empty_value' => 'mautic.social.monitoring.list.choose',
