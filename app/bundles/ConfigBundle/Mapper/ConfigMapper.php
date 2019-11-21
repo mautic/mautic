@@ -29,8 +29,6 @@ class ConfigMapper
     private $restrictedParameters;
 
     /**
-     * ConfigHelper constructor.
-     *
      * @param CoreParametersHelper $parametersHelper
      */
     public function __construct(CoreParametersHelper $parametersHelper, array $restrictedParameters = [])
