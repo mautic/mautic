@@ -87,8 +87,9 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 }
 
                 foreach ($children as $child) {
+                    $combined[$child->getId()] = $counts[$child->getId()];
+
                     if ($child->hasTranslations()) {
-                        $combined[$child->getId()] = $counts[$child->getId()];
                         $translations              = $child->getTranslationChildren()->getKeys();
                         foreach ($translations as $translation) {
                             $combined[$child->getId()]['bounces'] += $counts[$translation]['bounces'];
@@ -114,10 +115,10 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     $support['labels'][]             = $pid.':'.$stats['title'];
                 }
 
+                // investigate the rate calculation, seems that lowest value should be the winner
                 $max                   = max($rates);
                 $support['step_width'] = (ceil($max / 10) * 10);
 
-                //get the page ids with the greatest average dwell time
                 $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
                 $event->setAbTestResults([

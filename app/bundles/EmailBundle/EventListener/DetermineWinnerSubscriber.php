@@ -154,8 +154,9 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event)
     {
-        $parent   = $event->getParameters()['parent'];
-        $children = $event->getParameters()['children'];
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
 
         /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
         $pageRepo = $this->em->getRepository('MauticPageBundle:Hit');

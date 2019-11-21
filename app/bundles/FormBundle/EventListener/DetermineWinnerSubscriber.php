@@ -57,9 +57,10 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
     {
-        $repo     = $this->em->getRepository('MauticFormBundle:Submission');
-        $parent   = $event->getParameters()['parent'];
-        $children = $event->getParameters()['children'];
+        $repo       = $this->em->getRepository('MauticFormBundle:Submission');
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
 
         //if this is an email A/B test, then link email to page to form submission
         //if it is a page A/B test, then link form submission to page

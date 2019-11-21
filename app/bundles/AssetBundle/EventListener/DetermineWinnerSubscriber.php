@@ -57,9 +57,10 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event)
     {
-        $repo     = $this->em->getRepository('MauticAssetBundle:Download');
-        $parent   = $event->getParameters()['parent'];
-        $children = $event->getParameters()['children'];
+        $repo       = $this->em->getRepository('MauticAssetBundle:Download');
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
 
         //if this is an email A/B test, then link email to page to form submission
         //if it is a page A/B test, then link form submission to page

@@ -174,7 +174,7 @@ class BuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        //check for required keys
         $this->verifyCriteria(
             ['group', 'label', 'event'],
             $criteria
