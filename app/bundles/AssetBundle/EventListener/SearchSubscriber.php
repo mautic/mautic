@@ -14,12 +14,12 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetModel
@@ -27,13 +27,32 @@ class SearchSubscriber extends CommonSubscriber
     protected $assetModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var CorePermissions
      */
-    public function __construct(AssetModel $assetModel)
+    protected $security;
+
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var DelegatingEngine
+     */
+    protected $templating;
+
+    /**
+     * @param AssetModel       $assetModel
+     * @param CorePermissions  $security
+     * @param UserHelper       $userHelper
+     * @param DelegatingEngine $templating
+     */
+    public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, DelegatingEngine $templating)
     {
         $this->assetModel = $assetModel;
+        $this->security   = $security;
+        $this->userHelper = $userHelper;
+        $this->templating = $templating;
     }
 
     /**
@@ -68,7 +87,7 @@ class SearchSubscriber extends CommonSubscriber
                 $filter['force'][] = [
                     'column' => 'IDENTITY(a.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId(),
+                    'value'  => $this->userHelper->getUser()->getId(),
                 ];
             }
 

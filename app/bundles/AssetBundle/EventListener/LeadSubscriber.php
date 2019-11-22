@@ -11,17 +11,17 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AssetBundle.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetModel
@@ -29,13 +29,36 @@ class LeadSubscriber extends CommonSubscriber
     protected $assetModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var TranslatorInterface
      */
-    public function __construct(AssetModel $assetModel)
-    {
-        $this->assetModel = $assetModel;
+    protected $translator;
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var DownloadRepository
+     */
+    protected $downloadRepository;
+
+    /**
+     * @param AssetModel          $assetModel
+     * @param TranslatorInterface $translator
+     * @param Router              $router
+     * @param DownloadRepository  $downloadRepository
+     */
+    public function __construct(
+        AssetModel $assetModel,
+        TranslatorInterface $translator,
+        Router $router,
+        DownloadRepository $downloadRepository
+    ) {
+        $this->assetModel         = $assetModel;
+        $this->translator         = $translator;
+        $this->router             = $router;
+        $this->downloadRepository = $downloadRepository;
     }
 
     /**
@@ -68,9 +91,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
-        $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
-        $downloads          = $downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
+        $downloads = $this->downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $downloads);
