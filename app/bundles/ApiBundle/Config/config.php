@@ -132,11 +132,9 @@ return [
                     'router',
                     'session',
                 ],
-                'alias'     => 'client',
             ],
             'mautic.form.type.apiconfig' => [
                 'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
-                'alias' => 'apiconfig',
             ],
         ],
         'other' => [
@@ -176,7 +174,6 @@ return [
             'mautic.validator.oauthcallback' => [
                 'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
                 'tag'   => 'validator.constraint_validator',
-                'alias' => 'oauth_callback',
             ],
         ],
         'models' => [
