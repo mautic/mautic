@@ -13,6 +13,7 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\AssetEvents;
+use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -57,7 +58,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event)
     {
-        $repo       = $this->em->getRepository('MauticAssetBundle:Download');
+        $repo       = $this->em->getRepository(Download::class);
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
