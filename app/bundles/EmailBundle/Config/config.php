@@ -215,7 +215,7 @@ return [
                 'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.email.configbundle.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],

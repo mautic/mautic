@@ -67,7 +67,7 @@ return [
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber',
+                'class' => \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.social.subscriber.channel' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\EventListener\ChannelSubscriber::class,

@@ -147,7 +147,7 @@ return [
                 ],
             ],
             'mautic.page.configbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.page.search.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\SearchSubscriber',

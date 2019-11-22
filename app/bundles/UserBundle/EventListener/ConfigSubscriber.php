@@ -13,11 +13,11 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\UserBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     private $fileFields = ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key'];
 

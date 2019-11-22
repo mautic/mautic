@@ -111,7 +111,7 @@ return [
                 'class' => 'Mautic\AssetBundle\EventListener\EmailSubscriber',
             ],
             'mautic.asset.configbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.asset.search.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\SearchSubscriber',

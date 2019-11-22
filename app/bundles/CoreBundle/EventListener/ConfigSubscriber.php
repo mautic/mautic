@@ -17,8 +17,9 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LanguageHelper

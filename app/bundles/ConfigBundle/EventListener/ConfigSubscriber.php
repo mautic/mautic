@@ -14,10 +14,10 @@ namespace Mautic\ConfigBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper

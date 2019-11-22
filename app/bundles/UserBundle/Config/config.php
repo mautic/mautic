@@ -139,7 +139,7 @@ return [
                 ],
             ],
             'mautic.user.config.subscriber' => [
-                'class' => 'Mautic\UserBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.user.route.subscriber' => [
                 'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',

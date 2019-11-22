@@ -169,7 +169,7 @@ return [
                 ],
             ],
             'mautic.core.configbundle.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.language',
                     'mautic.helper.core_parameters',

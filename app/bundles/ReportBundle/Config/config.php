@@ -77,7 +77,7 @@ return [
     'services' => [
         'events' => [
             'mautic.report.configbundle.subscriber' => [
-                'class' => 'Mautic\ReportBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.report.search.subscriber' => [
                 'class'     => 'Mautic\ReportBundle\EventListener\SearchSubscriber',

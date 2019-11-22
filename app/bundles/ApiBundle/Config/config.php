@@ -108,7 +108,7 @@ return [
                 ],
             ],
             'mautic.api.configbundle.subscriber' => [
-                'class' => 'Mautic\ApiBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.api.search.subscriber' => [
                 'class'     => 'Mautic\ApiBundle\EventListener\SearchSubscriber',

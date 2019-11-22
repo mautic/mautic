@@ -159,7 +159,7 @@ return [
                 ],
             ],
             'mautic.campaignconfigbundle.subscriber'    => [
-                'class' => 'Mautic\CampaignBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.campaign.stats.subscriber'          => [
                 'class'     => \Mautic\CampaignBundle\EventListener\StatsSubscriber::class,
