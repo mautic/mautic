@@ -99,11 +99,12 @@ return [
     'services' => [
         'events' => [
             'mautic.api.subscriber' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\ApiSubscriber',
+                'class'     => \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
                     'mautic.core.model.auditlog',
+                    'translator',
                 ],
             ],
             'mautic.api.configbundle.subscriber' => [
