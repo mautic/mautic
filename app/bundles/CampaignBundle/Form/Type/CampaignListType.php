@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -70,14 +71,15 @@ class CampaignListType extends AbstractType
                         $choices = ['this' => $options['this_translation']] + $choices;
                     }
 
-                    return $choices;
+                    return array_flip($choices);
                 },
-                'empty_value'      => false,
-                'expanded'         => false,
-                'multiple'         => true,
-                'required'         => false,
-                'include_this'     => false,
-                'this_translation' => 'mautic.campaign.form.thiscampaign',
+                'choices_as_values' => true,
+                'empty_value'       => false,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'include_this'      => false,
+                'this_translation'  => 'mautic.campaign.form.thiscampaign',
             ]
         );
     }
@@ -85,13 +87,13 @@ class CampaignListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaign_list';
     }
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

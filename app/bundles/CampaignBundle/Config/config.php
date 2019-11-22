@@ -193,11 +193,9 @@ return [
             'mautic.campaign.type.form'                 => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaign',
             ],
             'mautic.campaignrange.type.action'          => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
-                'alias' => 'campaignevent',
             ],
             'mautic.campaign.type.campaignlist'         => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
@@ -206,33 +204,26 @@ return [
                     'translator',
                     'mautic.security',
                 ],
-                'alias'     => 'campaign_list',
             ],
             'mautic.campaign.type.trigger.leadchange'   => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventLeadChangeType',
-                'alias' => 'campaignevent_leadchange',
             ],
             'mautic.campaign.type.action.addremovelead' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
-                'alias' => 'campaignevent_addremovelead',
             ],
             'mautic.campaign.type.action.jump_to_event' => [
                 'class' => \Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
-                'alias' => 'campaignevent_jump_to_event',
             ],
             'mautic.campaign.type.canvassettings'       => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
-                'alias' => 'campaignevent_canvassettings',
             ],
             'mautic.campaign.type.leadsource'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'campaign_leadsource',
             ],
             'mautic.form.type.campaignconfig'           => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
                 'arguments' => 'translator',
-                'alias'     => 'campaignconfig',
             ],
         ],
         'models'       => [

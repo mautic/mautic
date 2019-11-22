@@ -41,7 +41,7 @@ class CampaignEventLeadChangeType extends AbstractType
             'data'        => $data,
         ]);
 
-        $builder->add('campaigns', 'campaign_list', [
+        $builder->add('campaigns', CampaignListType::class, [
             'label'      => 'mautic.campaign.form.limittocampaigns',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -55,7 +55,7 @@ class CampaignEventLeadChangeType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_leadchange';
     }
