@@ -832,7 +832,7 @@ class ListModel extends FormModel
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : false;
 
-        return  $this->em->getRepository(LeadList::class)->getLists($user, $alias);
+        return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
     }
 
     /**
