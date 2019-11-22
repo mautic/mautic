@@ -20,17 +20,14 @@ return [
             'mautic.form.type.emailmarketing.mailchimp' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType',
                 'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'mautic.helper.core_parameters'],
-                'alias'     => 'emailmarketing_mailchimp',
             ],
             'mautic.form.type.emailmarketing.constantcontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType',
                 'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
-                'alias'     => 'emailmarketing_constantcontact',
             ],
             'mautic.form.type.emailmarketing.icontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType',
                 'arguments' => ['mautic.helper.integration', 'mautic.plugin.model.plugin', 'session', 'mautic.helper.core_parameters'],
-                'alias'     => 'emailmarketing_icontact',
             ],
         ],
         'integrations' => [
