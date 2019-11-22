@@ -12,11 +12,11 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -30,18 +30,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CampaignType extends AbstractType
 {
-    private $security;
-    private $translator;
-    private $em;
-
     /**
-     * @param MauticFactory $factory
+     * @var CorePermissions
      */
-    public function __construct(MauticFactory $factory)
+    private $security;
+
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
-        $this->em         = $factory->getEntityManager();
+        $this->security   = $security;
     }
 
     /**

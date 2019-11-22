@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -25,19 +24,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CampaignLeadSourceType extends AbstractType
 {
-    /**
-     * @var
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __constuct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $sourceType = $options['data']['sourceType'];
