@@ -978,8 +978,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ($formArea == 'keys') {
             $builder->add('version', 'button_group', [
                 'choices' => [
-                    '6' => '6.x/community',
-                    '7' => '7.x',
+                    '6.x/community' => '6',
+                    '7.x'           => '7',
                 ],
                 'label'       => 'mautic.sugarcrm.form.version',
                 'constraints' => [
@@ -996,7 +996,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateOwner' => 'mautic.sugarcrm.updateOwner',
+                        'mautic.sugarcrm.updateOwner' => 'updateOwner',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -1015,7 +1015,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateDnc' => 'mautic.sugarcrm.updateDnc',
+                        'mautic.sugarcrm.updateDnc' => 'updateDnc',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -1034,7 +1034,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -1050,9 +1050,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'Leads'    => 'mautic.sugarcrm.object.lead',
-                        'Contacts' => 'mautic.sugarcrm.object.contact',
-                        'company'  => 'mautic.sugarcrm.object.company',
+                        'mautic.sugarcrm.object.lead'    => 'Leads',
+                        'mautic.sugarcrm.object.contact' => 'Contacts',
+                        'mautic.sugarcrm.object.company' => 'company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -1067,7 +1067,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'    => $this->leadModel->getEngagementTypes(),
+                    'choices'    => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
                     'label'      => 'mautic.salesforce.form.activity_included_events',
                     'label_attr' => [
                         'class'       => 'control-label',

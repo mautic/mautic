@@ -81,7 +81,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             ChoiceType::class,
             [
                 'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
+                    'mautic.integrations.blanks' => 'updateBlanks',
                 ],
                 'expanded'    => true,
                 'multiple'    => true,
@@ -97,8 +97,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
+                        'mautic.dynamics.object.contact'  => 'contacts',
+                        'mautic.dynamics.object.company'  => 'company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,

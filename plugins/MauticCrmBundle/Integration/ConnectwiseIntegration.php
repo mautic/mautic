@@ -292,7 +292,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -307,8 +307,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'Contact' => 'mautic.connectwise.object.contact',
-                        'company' => 'mautic.connectwise.object.company',
+                        'mautic.connectwise.object.contact' => 'Contact',
+                        'mautic.connectwise.object.company' => 'company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,

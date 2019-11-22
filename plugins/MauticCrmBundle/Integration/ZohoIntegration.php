@@ -616,7 +616,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -633,10 +633,10 @@ class ZohoIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'zoho.com'    => 'mautic.plugin.zoho.zone_us',
-                        'zoho.eu'     => 'mautic.plugin.zoho.zone_europe',
-                        'zoho.co.jp'  => 'mautic.plugin.zoho.zone_japan',
-                        'zoho.com.cn' => 'mautic.plugin.zoho.zone_china',
+                        'mautic.plugin.zoho.zone_us'     => 'zoho.com',
+                        'mautic.plugin.zoho.zone_europe' => 'zoho.eu',
+                        'mautic.plugin.zoho.zone_japan'  => 'zoho.co.jp',
+                        'mautic.plugin.zoho.zone_china'  => 'zoho.com.cn',
                     ],
                     'label'       => 'mautic.plugin.zoho.zone_select',
                     'empty_value' => false,
@@ -652,9 +652,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'Leads'    => 'mautic.zoho.object.lead',
-                        'Contacts' => 'mautic.zoho.object.contact',
-                        'company'  => 'mautic.zoho.object.account',
+                        'mautic.zoho.object.lead'    => 'Leads',
+                        'mautic.zoho.object.contact' => 'Contacts',
+                        'mautic.zoho.object.account' => 'company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,

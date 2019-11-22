@@ -282,8 +282,8 @@ class VtigerIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.vtiger.object.contact',
-                        'company'  => 'mautic.vtiger.object.company',
+                        'mautic.vtiger.object.contact' => 'contacts',
+                        'mautic.vtiger.object.company' => 'company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,

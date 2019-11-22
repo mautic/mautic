@@ -551,7 +551,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'sandbox' => 'mautic.salesforce.sandbox',
+                        'mautic.salesforce.sandbox' => 'sandbox',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -570,7 +570,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateOwner' => 'mautic.salesforce.updateOwner',
+                        'mautic.salesforce.updateOwner' => 'updateOwner',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -588,7 +588,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -603,7 +603,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'updateDncByDate' => 'mautic.integrations.update.dnc.by.date',
+                        'mautic.integrations.update.dnc.by.date' => 'updateDncByDate',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -619,10 +619,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices' => [
-                        'Lead'     => 'mautic.salesforce.object.lead',
-                        'Contact'  => 'mautic.salesforce.object.contact',
-                        'company'  => 'mautic.salesforce.object.company',
-                        'Activity' => 'mautic.salesforce.object.activity',
+                        'mautic.salesforce.object.lead'     => 'Lead',
+                        'mautic.salesforce.object.contact'  => 'Contact',
+                        'mautic.salesforce.object.company'  => 'company',
+                        'mautic.salesforce.object.activity' => 'Activity',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -637,7 +637,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'    => $this->leadModel->getEngagementTypes(),
+                    'choices'    => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
                     'label'      => 'mautic.salesforce.form.activity_included_events',
                     'label_attr' => [
                         'class'       => 'control-label',

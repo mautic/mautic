@@ -224,7 +224,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices'     => [
-                        'company'  => 'mautic.pipedrive.object.organization',
+                        'mautic.pipedrive.object.organization'  => 'company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -240,7 +240,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices'     => [
-                        'enabled' => 'mautic.pipedrive.add.edit.contact.import.enabled',
+                        'mautic.pipedrive.add.edit.contact.import.enabled' => 'enabled',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
