@@ -14,12 +14,11 @@ namespace Mautic\ApiBundle\EventListener;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var ClientModel
@@ -27,13 +26,25 @@ class SearchSubscriber extends CommonSubscriber
     protected $apiClientModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param ClientModel $apiClientModel
+     * @var CorePermissions
      */
-    public function __construct(ClientModel $apiClientModel)
+    protected $security;
+
+    /**
+     * @var DelegatingEngine
+     */
+    protected $templating;
+
+    /**
+     * @param ClientModel      $apiClientModel
+     * @param CorePermissions  $security
+     * @param DelegatingEngine $templating
+     */
+    public function __construct(ClientModel $apiClientModel, CorePermissions $security, DelegatingEngine $templating)
     {
         $this->apiClientModel = $apiClientModel;
+        $this->security       = $security;
+        $this->templating     = $templating;
     }
 
     /**
@@ -97,8 +108,7 @@ class SearchSubscriber extends CommonSubscriber
      */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
-        $security = $this->security;
-        if ($security->isGranted('api:clients:view')) {
+        if ($this->security->isGranted('api:clients:view')) {
             $event->addCommands(
                 'mautic.api.client.header.index',
                 $this->apiClientModel->getCommandList()

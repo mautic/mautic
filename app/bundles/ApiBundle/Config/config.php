@@ -111,9 +111,11 @@ return [
                 'class' => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.api.search.subscriber' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\ApiBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.api.model.client',
+                    'mautic.helper.templating',
+                    'mautic.security',
                 ],
             ],
             'mautic.api.rate_limit_generate_key.subscriber' => [
