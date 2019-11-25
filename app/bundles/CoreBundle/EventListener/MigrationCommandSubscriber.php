@@ -8,8 +8,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -29,7 +28,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function addGeneratedColumns(ConsoleCommandEvent $event): void
+    public function addGeneratedColumns(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();
         $output  = $event->getOutput();

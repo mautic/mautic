@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -34,7 +34,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $connection;
 
-    private \Symfony\Component\Console\Event\ConsoleCommandEvent $event;
+    private ConsoleTerminateEvent $event;
 
     /**
      * @var MockObject|Command
@@ -77,7 +77,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $input = $this->createMock(InputInterface::class);
 
-        $this->event = new ConsoleCommandEvent($this->command, $input, $this->output);
+        $this->event = new ConsoleTerminateEvent($this->command, $input, $this->output, 0);
 
         $this->connection->method('createSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
