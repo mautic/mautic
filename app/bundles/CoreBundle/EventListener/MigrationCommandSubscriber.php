@@ -25,7 +25,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConsoleEvents::COMMAND => ['addGeneratedColumns'],
+            ConsoleEvents::TERMINATE => ['addGeneratedColumns'],
         ];
     }
 
