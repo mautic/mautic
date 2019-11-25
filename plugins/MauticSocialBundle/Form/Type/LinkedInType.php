@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,7 +26,7 @@ class LinkedInType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('counter', 'choice', [
+        $builder->add('counter', ChoiceType::class, [
             'choices' => [
                 'right' => 'mautic.integration.LinkedIn.share.counter.right',
                 'top'   => 'mautic.integration.LinkedIn.share.counter.top',

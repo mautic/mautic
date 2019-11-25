@@ -12,7 +12,6 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -109,7 +108,7 @@ class MonitoringType extends AbstractType
             'bundle' => 'plugin:mauticSocial',
         ]);
 
-        $builder->add('buttons', FormButtonsType::class);
+        $builder->add('buttons', 'form_buttons');
     }
 
     /**

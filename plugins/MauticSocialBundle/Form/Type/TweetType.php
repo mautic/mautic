@@ -16,6 +16,10 @@ use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -43,7 +47,7 @@ class TweetType extends AbstractType
     {
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.name',
                 'required'   => true,
@@ -64,7 +68,7 @@ class TweetType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.description',
                 'required'   => false,
@@ -78,7 +82,7 @@ class TweetType extends AbstractType
 
         $builder->add(
             'text',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.text',
                 'required'   => true,
@@ -135,7 +139,7 @@ class TweetType extends AbstractType
 
         $builder->add(
             'handle',
-            'button',
+            ButtonType::class,
             [
                 'label' => 'mautic.social.twitter.handle',
                 'attr'  => [
@@ -159,7 +163,7 @@ class TweetType extends AbstractType
             );
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,

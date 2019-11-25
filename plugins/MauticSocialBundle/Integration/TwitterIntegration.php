@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterType;
 
 /**
  * Class TwitterIntegration.
@@ -313,5 +314,13 @@ class TwitterIntegration extends SocialIntegration
         }
 
         return json_decode($data, true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return TwitterType::class;
     }
 }

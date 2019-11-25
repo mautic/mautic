@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -59,7 +60,7 @@ class SocialLoginType extends AbstractType
 
                 $builder->add(
                     'authUrl_'.$integrationObject->getName(),
-                    'hidden',
+                    HiddenType::class,
                     [
                         'data' => $model->buildUrl('mautic_integration_auth_user', $integration, true, []),
                     ]
@@ -67,7 +68,7 @@ class SocialLoginType extends AbstractType
 
                 $builder->add(
                     'buttonImageUrl',
-                    'hidden',
+                    HiddenType::class,
                     [
                         'data' => $this->coreParametersHelper->getParameter('site_url').'/'.$this->coreParametersHelper->getParameter('image_path').'/',
                     ]
@@ -77,7 +78,7 @@ class SocialLoginType extends AbstractType
 
         $builder->add(
             'integrations',
-            'hidden',
+            HiddenType::class,
             [
                 'data' => $integrations,
             ]
