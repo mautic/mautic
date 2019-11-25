@@ -96,7 +96,7 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
-            'mautic.dynamicContent.stats.subscriber' => [
+            'mautic.dynamicContent.lead.subscriber' => [
                 'class'     => \Mautic\DynamicContentBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'translator',
