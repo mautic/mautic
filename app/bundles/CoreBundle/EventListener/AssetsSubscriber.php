@@ -14,13 +14,12 @@ namespace Mautic\CoreBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
- * Class AssetsSubscriber.
- */
-class AssetsSubscriber extends CommonSubscriber
+class AssetsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetsHelper
@@ -28,13 +27,18 @@ class AssetsSubscriber extends CommonSubscriber
     protected $assetsHelper;
 
     /**
-     * AssetsSubscriber constructor.
-     *
-     * @param AssetsHelper $assetsHelper
+     * @var ContainerAwareEventDispatcher
      */
-    public function __construct(AssetsHelper $assetsHelper)
+    protected $dispatcher;
+
+    /**
+     * @param AssetsHelper                  $assetsHelper
+     * @param ContainerAwareEventDispatcher $dispatcher
+     */
+    public function __construct(AssetsHelper $assetsHelper, ContainerAwareEventDispatcher $dispatcher)
     {
         $this->assetsHelper = $assetsHelper;
+        $this->dispatcher   = $dispatcher;
     }
 
     /**

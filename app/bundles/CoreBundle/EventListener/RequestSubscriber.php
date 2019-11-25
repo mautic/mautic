@@ -11,14 +11,17 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class RequestSubscriber extends CommonSubscriber
+class RequestSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CsrfTokenManagerInterface
@@ -26,11 +29,28 @@ class RequestSubscriber extends CommonSubscriber
     private $tokenManager;
 
     /**
-     * @param CsrfTokenManagerInterface $tokenManager
+     * @var TranslatorInterface
      */
-    public function __construct(CsrfTokenManagerInterface $tokenManager)
-    {
+    private $translator;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @param CsrfTokenManagerInterface $tokenManager
+     * @param TranslatorInterface       $translator
+     * @param TemplatingHelper          $templating
+     */
+    public function __construct(
+        CsrfTokenManagerInterface $tokenManager,
+        TranslatorInterface $translator,
+        TemplatingHelper $templating
+    ) {
         $this->tokenManager = $tokenManager;
+        $this->translator   = $translator;
+        $this->templating   = $templating;
     }
 
     /**
@@ -62,6 +82,8 @@ class RequestSubscriber extends CommonSubscriber
 
     /**
      * @param Request $request
+     *
+     * @return bool
      */
     private function isAjaxPost(Request $request)
     {
@@ -70,6 +92,8 @@ class RequestSubscriber extends CommonSubscriber
 
     /**
      * @param Request $request
+     *
+     * @return bool
      */
     private function isSecurePath(Request $request)
     {
@@ -78,6 +102,8 @@ class RequestSubscriber extends CommonSubscriber
 
     /**
      * @param Request $request
+     *
+     * @return bool
      */
     private function isCsrfTokenFromRequestHeaderValid(Request $request)
     {

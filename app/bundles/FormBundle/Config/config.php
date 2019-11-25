@@ -407,6 +407,13 @@ return [
                 ],
             ],
         ],
+        'repositories' => [
+            'mautic.form.repository.form' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\FormBundle\Entity\Form::class,
+            ],
+        ],
         'other' => [
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,
