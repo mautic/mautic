@@ -14,13 +14,10 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CalendarSubscriber.
- */
-class MessageQueueSubscriber extends CommonSubscriber
+class MessageQueueSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
@@ -28,8 +25,6 @@ class MessageQueueSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
-     * MessageQueueSubscriber constructor.
-     *
      * @param EmailModel $emailModel
      */
     public function __construct(EmailModel $emailModel)

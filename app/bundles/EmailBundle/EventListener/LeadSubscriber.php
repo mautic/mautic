@@ -11,28 +11,53 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Entity\EmailReplyRepositoryInterface;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
-    /** @var EmailReplyRepositoryInterface */
+    /**
+     * @var EmailReplyRepositoryInterface
+     */
     private $emailReplyRepository;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param EmailReplyRepositoryInterface $emailReplyRepository
+     * @var StatRepository
      */
-    public function __construct(EmailReplyRepositoryInterface $emailReplyRepository)
-    {
+    private $statRepository;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @param EmailReplyRepositoryInterface $emailReplyRepository
+     * @param StatRepository                $statRepository
+     * @param TranslatorInterface           $translator
+     * @param Router                        $router
+     */
+    public function __construct(
+        EmailReplyRepositoryInterface $emailReplyRepository,
+        StatRepository $statRepository,
+        TranslatorInterface $translator,
+        Router $router
+    ) {
         $this->emailReplyRepository = $emailReplyRepository;
+        $this->statRepository       = $statRepository;
+        $this->translator           = $translator;
+        $this->router               = $router;
     }
 
     /**
@@ -64,7 +89,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticEmailBundle:Stat')->updateLead(
+        $this->statRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
@@ -87,11 +112,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
-        $statRepository        = $this->em->getRepository('MauticEmailBundle:Stat');
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-        $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
+        $stats                 = $this->statRepository->getLeadStats($event->getLeadId(), $queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);

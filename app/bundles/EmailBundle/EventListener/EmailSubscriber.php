@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -19,11 +19,10 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AuditLogModel
@@ -41,17 +40,34 @@ class EmailSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
-     * EmailSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param EmailModel     $emailModel
+     * @var TranslatorInterface
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel)
-    {
+    protected $translator;
+
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @param IpLookupHelper      $ipLookupHelper
+     * @param AuditLogModel       $auditLogModel
+     * @param EmailModel          $emailModel
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $entityManager
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        EmailModel $emailModel,
+        TranslatorInterface $translator,
+        EntityManager $entityManager
+    ) {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
         $this->emailModel     = $emailModel;
+        $this->translator     = $translator;
+        $this->entityManager  = $entityManager;
     }
 
     /**
@@ -155,8 +171,8 @@ class EmailSubscriber extends CommonSubscriber
                     $event->tryAgain();
                 }
 
-                $this->em->persist($stat);
-                $this->em->flush();
+                $this->entityManager->persist($stat);
+                $this->entityManager->flush();
             }
         }
     }

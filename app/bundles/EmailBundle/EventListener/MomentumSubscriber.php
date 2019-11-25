@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\RequestStorageHelper;
@@ -23,12 +22,8 @@ use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
 use Mautic\QueueBundle\QueueEvents;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Listeners specific for Momentum transport.
- */
-class MomentumSubscriber extends CommonSubscriber
+class MomentumSubscriber implements EventSubscriberInterface
 {
     /**
      * @var MomentumCallbackInterface

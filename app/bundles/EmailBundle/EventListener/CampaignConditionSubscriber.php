@@ -20,9 +20,6 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignConditionSubscriber.
- */
 class CampaignConditionSubscriber implements EventSubscriberInterface
 {
     /**
@@ -31,8 +28,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     protected $validator;
 
     /**
-     * CampaignCondition constructor.
-     *
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(EmailValidator $validator)

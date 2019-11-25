@@ -100,11 +100,13 @@ return [
     'services' => [
         'events' => [
             'mautic.email.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\EmailSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.email.model.email',
+                    'translator',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.email.queue.subscriber' => [
@@ -143,16 +145,18 @@ return [
                 ],
             ],
             'mautic.emailbuilder.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\BuilderSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.email.model.email',
                     'mautic.page.model.trackable',
                     'mautic.page.model.redirect',
+                    'translator',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.emailtoken.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\TokenSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\TokenSubscriber::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.lead.helper.primary_company',
@@ -170,31 +174,36 @@ return [
                 ],
             ],
             'mautic.email.campaignbundle.condition_subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\CampaignConditionSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\CampaignConditionSubscriber::class,
                 'arguments' => [
                     'mautic.validator.email',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber',
+                'class' => \Mautic\EmailBundle\EventListener\FormSubscriber::class,
             ],
             'mautic.email.reportbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'mautic.lead.model.company_report_data',
+                    'mautic.email.repository.stat',
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.email.repository.emailReply',
+                    'mautic.email.repository.stat',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.email.pointbundle.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\PointSubscriber::class,
                 'arguments' => [
                     'mautic.point.model.point',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.email.touser.subscriber' => [
@@ -204,15 +213,19 @@ return [
                 ],
             ],
             'mautic.email.search.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.email.model.email',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.email.webhook.subscriber' => [
-                'class'       => \Mautic\EmailBundle\EventListener\WebhookSubscriber::class,
-                'arguments'   => ['mautic.webhook.model.webhook'],
+                'class'     => \Mautic\EmailBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
             ],
             'mautic.email.configbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\ConfigSubscriber::class,
@@ -221,10 +234,11 @@ return [
                 ],
             ],
             'mautic.email.pagebundle.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\PageSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
+                    'request_stack',
                 ],
             ],
             'mautic.email.dashboard.subscriber' => [
@@ -235,7 +249,7 @@ return [
                 ],
             ],
             'mautic.email.broadcast.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\BroadcastSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\BroadcastSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
                     'doctrine.orm.entity_manager',

@@ -11,22 +11,21 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Form\Type\EmailOpenType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
@@ -34,13 +33,18 @@ class PointSubscriber extends CommonSubscriber
     protected $pointModel;
 
     /**
-     * PointSubscriber constructor.
-     *
-     * @param PointModel $pointModel
+     * @var EntityManager
      */
-    public function __construct(PointModel $pointModel)
+    protected $entityManager;
+
+    /**
+     * @param PointModel    $pointModel
+     * @param EntityManager $entityManager
+     */
+    public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
-        $this->pointModel = $pointModel;
+        $this->pointModel    = $pointModel;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -126,7 +130,7 @@ class PointSubscriber extends CommonSubscriber
     public function onEmailSend(EmailSendEvent $event)
     {
         if ($leadArray = $event->getLead()) {
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $leadArray['id']);
+            $lead = $this->entityManager->getReference(Lead::class, $leadArray['id']);
         } else {
             return;
         }

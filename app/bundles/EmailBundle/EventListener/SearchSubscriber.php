@@ -13,14 +13,13 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
@@ -33,15 +32,25 @@ class SearchSubscriber extends CommonSubscriber
     protected $userHelper;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserHelper $userHelper
-     * @param EmailModel $emailModel
+     * @var CorePermissions
      */
-    public function __construct(UserHelper $userHelper, EmailModel $emailModel)
-    {
+    protected $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    public function __construct(
+        UserHelper $userHelper,
+        EmailModel $emailModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userHelper = $userHelper;
         $this->emailModel = $emailModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**

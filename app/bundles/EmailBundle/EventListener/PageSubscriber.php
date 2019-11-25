@@ -12,15 +12,13 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
@@ -33,15 +31,20 @@ class PageSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
-     * PageSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
-     * @param EventModel $campaignEventModel
+     * @var RequestStack
      */
-    public function __construct(EmailModel $emailModel, EventModel $campaignEventModel)
+    protected $requestStack;
+
+    /**
+     * @param EmailModel   $emailModel
+     * @param EventModel   $campaignEventModel
+     * @param RequestStack $requestStack
+     */
+    public function __construct(EmailModel $emailModel, EventModel $campaignEventModel, RequestStack $requestStack)
     {
         $this->emailModel         = $emailModel;
         $this->campaignEventModel = $campaignEventModel;
+        $this->requestStack       = $requestStack;
     }
 
     /**
@@ -88,7 +91,7 @@ class PageSubscriber extends CommonSubscriber
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
                     // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->request ?: $event->getRequest());
+                    $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
                 }
             }
         }
