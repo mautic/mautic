@@ -11,19 +11,27 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CampaignModel
@@ -36,15 +44,71 @@ class LeadSubscriber extends CommonSubscriber
     protected $leadModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param CampaignModel $campaignModel
-     * @param LeadModel     $leadModel
+     * @var TranslatorInterface
      */
-    public function __construct(CampaignModel $campaignModel, LeadModel $leadModel)
-    {
-        $this->campaignModel = $campaignModel;
-        $this->leadModel     = $leadModel;
+    protected $translator;
+
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var CampaignRepository
+     */
+    protected $campaignRepository;
+
+    /**
+     * @var LeadListRepository
+     */
+    protected $segmentRepository;
+
+    /**
+     * @var LeadEventLogRepository
+     */
+    protected $contactEventLogRepository;
+
+    /**
+     * @var LeadRepository
+     */
+    protected $contactRepository;
+
+    /**
+     * @param CampaignModel       $campaignModel
+     * @param LeadModel           $leadModel
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $entityManager
+     * @param Router              $router
+     * @param CorePermissions     $security
+     */
+    public function __construct(
+        CampaignModel $campaignModel,
+        LeadModel $leadModel,
+        TranslatorInterface $translator,
+        EntityManager $entityManager,
+        Router $router,
+        CorePermissions $security
+    ) {
+        $this->campaignModel             = $campaignModel;
+        $this->leadModel                 = $leadModel;
+        $this->translator                = $translator;
+        $this->entityManager             = $entityManager;
+        $this->router                    = $router;
+        $this->security                  = $security;
+        $this->campaignRepository        = $entityManager->getRepository(Campaign::class);
+        $this->segmentRepository         = $entityManager->getRepository(LeadList::class);
+        $this->contactEventLogRepository = $entityManager->getRepository(LeadEventLog::class);
+        $this->contactRepository         = $entityManager->getRepository(Lead::class);
     }
 
     /**
@@ -72,19 +136,18 @@ class LeadSubscriber extends CommonSubscriber
         $leads  = $event->getLeads();
         $list   = $event->getList();
         $action = $event->wasAdded() ? 'added' : 'removed';
-        $em     = $this->em;
 
         //get campaigns for the list
         if (!isset($listCampaigns[$list->getId()])) {
-            $listCampaigns[$list->getId()] = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists($list->getId(), $this->security->isGranted('campaign:campaigns:viewother'));
+            $listCampaigns[$list->getId()] = $this->campaignRepository->getPublishedCampaignsByLeadLists($list->getId(), $this->security->isGranted('campaign:campaigns:viewother'));
         }
 
-        $leadLists = $em->getRepository('MauticLeadBundle:LeadList')->getLeadLists($leads, true, true);
+        $leadLists = $this->segmentRepository->getLeadLists($leads, true, true);
 
         if (!empty($listCampaigns[$list->getId()])) {
             foreach ($listCampaigns[$list->getId()] as $c) {
                 if (!isset($campaignReferences[$c['id']])) {
-                    $campaignReferences[$c['id']] = $em->getReference('MauticCampaignBundle:Campaign', $c['id']);
+                    $campaignReferences[$c['id']] = $this->entityManager->getReference(Campaign::class, $c['id']);
                 }
 
                 if ($action == 'added') {
@@ -113,7 +176,7 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         // Save memory with batch processing
-        unset($event, $em, $model, $leads, $list, $listCampaigns, $leadLists);
+        unset($event, $model, $leads, $list, $listCampaigns, $leadLists);
     }
 
     /**
@@ -126,13 +189,13 @@ class LeadSubscriber extends CommonSubscriber
         $lead   = $event->getLead();
         $list   = $event->getList();
         $action = $event->wasAdded() ? 'added' : 'removed';
-        $repo   = $this->campaignModel->getRepository();
 
         //get campaigns for the list
-        $listCampaigns = $repo->getPublishedCampaignsByLeadLists($list->getId(), $this->security->isGranted('campaign:campaigns:viewother'));
+        $listCampaigns = $this->campaignRepository->getPublishedCampaignsByLeadLists($list->getId(), $this->security->isGranted('campaign:campaigns:viewother'));
 
-        $leadLists   = $this->leadModel->getLists($lead, true);
-        $leadListIds = array_keys($leadLists);
+        $leadLists     = $this->leadModel->getLists($lead, true);
+        $leadListIds   = array_keys($leadLists);
+        $campaignLists = [];
 
         // If the lead was removed then don't count it
         if ($action == 'removed') {
@@ -142,7 +205,7 @@ class LeadSubscriber extends CommonSubscriber
 
         if (!empty($listCampaigns)) {
             foreach ($listCampaigns as $c) {
-                $campaign = $this->em->getReference('MauticCampaignBundle:Campaign', $c['id']);
+                $campaign = $this->entityManager->getReference(Campaign::class, $c['id']);
 
                 if (!isset($campaignLists[$c['id']])) {
                     $campaignLists[$c['id']] = array_keys($c['lists']);
@@ -181,9 +244,8 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
-
-        $this->em->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->contactEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->contactRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 
     /**
@@ -201,11 +263,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
-        $logRepository             = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
-        $logs                      = $logRepository->getLeadLogs($event->getLeadId(), $options);
+        $logs                      = $this->LeadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->campaignModel->getEvents();
 
         // Add total number to counter

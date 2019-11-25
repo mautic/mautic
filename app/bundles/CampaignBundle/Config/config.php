@@ -123,8 +123,8 @@ return [
         'campaign' => null,
     ],
 
-    'services'   => [
-        'events'       => [
+    'services' => [
+        'events' => [
             'mautic.campaign.subscriber'                => [
                 'class'     => \Mautic\CampaignBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
@@ -133,26 +133,37 @@ return [
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber'     => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.lead',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'router',
+                    'mautic.security',
                 ],
             ],
             'mautic.campaign.calendarbundle.subscriber' => [
-                'class' => 'Mautic\CampaignBundle\EventListener\CalendarSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                    'translator',
+                    'router',
+                ],
             ],
             'mautic.campaign.pointbundle.subscriber'    => [
-                'class' => 'Mautic\CampaignBundle\EventListener\PointSubscriber',
+                'class' => \Mautic\CampaignBundle\EventListener\PointSubscriber::class,
             ],
             'mautic.campaign.search.subscriber'         => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.campaign',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.campaign.dashboard.subscriber'      => [
-                'class'     => 'Mautic\CampaignBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\CampaignBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.campaign',
                     'mautic.campaign.model.event',
