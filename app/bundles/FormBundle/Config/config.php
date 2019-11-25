@@ -236,6 +236,7 @@ return [
                 'arguments' => [
                     'mautic.form.model.submission',
                     'mautic.form.model.form',
+                    'router',
                 ],
             ],
             'mautic.form.stats.subscriber' => [

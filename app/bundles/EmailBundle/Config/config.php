@@ -228,9 +228,10 @@ return [
                 ],
             ],
             'mautic.email.dashboard.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'router',
                 ],
             ],
             'mautic.email.broadcast.subscriber' => [

@@ -13,13 +13,13 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -44,13 +44,36 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $auditLogModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param AuditLogModel $auditLogModel
+     * @var TranslatorInterface
      */
-    public function __construct(AuditLogModel $auditLogModel)
-    {
+    protected $translator;
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var ModelFactory
+     */
+    protected $modelFactory;
+
+    /**
+     * @param AuditLogModel       $auditLogModel
+     * @param TranslatorInterface $translator
+     * @param AuditLogModel       $router
+     * @param ModelFactory        $modelFactory
+     */
+    public function __construct(
+        AuditLogModel $auditLogModel,
+        TranslatorInterface $translator,
+        Router $router,
+        ModelFactory $modelFactory
+    ) {
         $this->auditLogModel = $auditLogModel;
+        $this->translator    = $translator;
+        $this->router        = $router;
+        $this->modelFactory  = $modelFactory;
     }
 
     /**
@@ -70,7 +93,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 foreach ($logs as $key => &$log) {
                     if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                         try {
-                            $model = $this->factory->getModel($log['bundle'].'.'.$log['object']);
+                            $model = $this->modelFactory->getModel($log['bundle'].'.'.$log['object']);
                             $item  = $model->getEntity($log['objectId']);
                             if (method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();

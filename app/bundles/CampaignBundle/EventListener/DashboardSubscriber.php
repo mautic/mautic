@@ -16,9 +16,6 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -59,8 +56,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $campaignModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
      * @param CampaignModel $campaignModel
      * @param EventModel    $campaignEventModel
      */

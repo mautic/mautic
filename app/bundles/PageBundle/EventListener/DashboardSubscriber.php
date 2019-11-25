@@ -14,10 +14,8 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\Routing\Router;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -59,13 +57,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $pageModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param PageModel $pageModel
+     * @var Router
      */
-    public function __construct(PageModel $pageModel)
+    protected $router;
+
+    /**
+     * @param PageModel $pageModel
+     * @param Router    $router
+     */
+    public function __construct(PageModel $pageModel, Router $router)
     {
         $this->pageModel = $pageModel;
+        $this->router    = $router;
     }
 
     /**

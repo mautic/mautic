@@ -147,6 +147,7 @@ return [
                 'class'     => \Mautic\AssetBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.asset.model.asset',
+                    'router',
                 ],
             ],
             'mautic.asset.subscriber.determine_winner' => [

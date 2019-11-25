@@ -19,6 +19,7 @@ use Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType;
 use Mautic\EmailBundle\Form\Type\DashboardMostHitEmailRedirectsWidgetType;
 use Mautic\EmailBundle\Form\Type\DashboardSentEmailToContactsWidgetType;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\Routing\Router;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -68,13 +69,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $emailModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
+     * @var Router
      */
-    public function __construct(EmailModel $emailModel)
+    private $router;
+
+    /**
+     * @param EmailModel $emailModel
+     * @param Router     $router
+     */
+    public function __construct(EmailModel $emailModel, Router $router)
     {
         $this->emailModel = $emailModel;
+        $this->router     = $router;
     }
 
     /**

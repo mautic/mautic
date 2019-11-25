@@ -449,10 +449,12 @@ return [
                 'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.lead.dashboard.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.list',
+                    'router',
+                    'translator',
                 ],
             ],
             'mautic.lead.maintenance.subscriber' => [

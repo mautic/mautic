@@ -189,9 +189,12 @@ return [
                 'class' => \Mautic\CoreBundle\EventListener\BuildJsSubscriber::class,
             ],
             'mautic.core.dashboard.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
+                    'translator',
+                    'router',
+                    'mautic.model.factory',
                 ],
             ],
 

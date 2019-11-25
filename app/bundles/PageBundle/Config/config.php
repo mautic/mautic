@@ -161,9 +161,10 @@ return [
                 'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.page.dashboard.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.page.model.page',
+                    'router',
                 ],
             ],
             'mautic.page.js.subscriber' => [
