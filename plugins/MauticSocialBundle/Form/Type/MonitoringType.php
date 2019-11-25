@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -22,6 +23,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
+    /** @var MonitoringModel */
+    private $monitoringModel;
+
+    public function __construct(MonitoringModel $monitoringModel)
+    {
+        $this->monitoringModel = $monitoringModel;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -85,7 +94,9 @@ class MonitoringType extends AbstractType
             // get the values from the entity function
             $properties = $options['data']->getProperties();
 
-            $builder->add('properties', $options['networkType'],
+            $formType = $this->monitoringModel->getFormByType($options['networkType']);
+
+            $builder->add('properties', $formType,
                 [
                     'label' => false,
                     'data'  => $properties,
