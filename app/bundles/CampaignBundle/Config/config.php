@@ -175,6 +175,7 @@ return [
             'mautic.campaign.stats.subscriber'          => [
                 'class'     => \Mautic\CampaignBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

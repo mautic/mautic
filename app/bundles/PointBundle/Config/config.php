@@ -123,6 +123,7 @@ return [
             'mautic.point.stats.subscriber' => [
                 'class'     => \Mautic\PointBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

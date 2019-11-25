@@ -131,6 +131,7 @@ return [
             'mautic.asset.stats.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

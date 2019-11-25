@@ -63,6 +63,7 @@ return [
             'mautic.citrix.stats.subscriber' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

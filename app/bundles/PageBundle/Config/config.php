@@ -182,6 +182,7 @@ return [
             'mautic.page.stats.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

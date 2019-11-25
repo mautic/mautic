@@ -241,6 +241,7 @@ return [
             'mautic.form.stats.subscriber' => [
                 'class'     => \Mautic\FormBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

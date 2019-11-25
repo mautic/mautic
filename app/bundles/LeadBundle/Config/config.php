@@ -464,6 +464,7 @@ return [
             'mautic.lead.stats.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

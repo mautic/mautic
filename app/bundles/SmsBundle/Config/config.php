@@ -44,6 +44,7 @@ return [
             'mautic.sms.stats.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

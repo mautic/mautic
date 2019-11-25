@@ -90,6 +90,7 @@ return [
             'mautic.stage.stats.subscriber' => [
                 'class'     => \Mautic\StageBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

@@ -89,6 +89,7 @@ return [
             'mautic.dynamicContent.stats.subscriber' => [
                 'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

@@ -66,6 +66,7 @@ return [
             'mautic.notification.stats.subscriber' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
