@@ -148,7 +148,6 @@ return [
         'forms' => [
             'mautic.form.type.connectwise.campaignaction' => [
                 'class' => MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType::class,
-                'alias' => 'integration_campaign_task',
             ],
         ],
     ],
