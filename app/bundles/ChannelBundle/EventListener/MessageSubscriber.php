@@ -13,13 +13,10 @@ namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\MessageEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class MessageSubscriber.
- */
-class MessageSubscriber extends CommonSubscriber
+class MessageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AuditLogModel
@@ -27,8 +24,6 @@ class MessageSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * DynamicContentSubscriber constructor.
-     *
      * @param AuditLogModel $auditLogModel
      */
     public function __construct(

@@ -11,15 +11,45 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @var MessageQueueRepository
+     */
+    private $messageQueueRepository;
+
+    /**
+     * @param TranslatorInterface    $translator
+     * @param Router                 $router
+     * @param MessageQueueRepository $messageQueueRepository
+     */
+    public function __construct(
+        TranslatorInterface $translator,
+        Router $router,
+        MessageQueueRepository $messageQueueRepository
+    ) {
+        $this->translator             = $translator;
+        $this->router                 = $router;
+        $this->messageQueueRepository = $messageQueueRepository;
+    }
+
     /**
      * @return array
      */
@@ -59,9 +89,7 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
-        $messageQueueRepository = $this->em->getRepository('MauticChannelBundle:MessageQueue');
-        $logs                   = $messageQueueRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
+        $logs = $this->messageQueueRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);
