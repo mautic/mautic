@@ -13,14 +13,13 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserHelper
@@ -33,15 +32,25 @@ class SearchSubscriber extends CommonSubscriber
     protected $formModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserHelper $userHelper
-     * @param FormModel  $formModel
+     * @var CorePermissions
      */
-    public function __construct(UserHelper $userHelper, FormModel $formModel)
-    {
+    protected $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    public function __construct(
+        UserHelper $userHelper,
+        FormModel $formModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userHelper = $userHelper;
         $this->formModel  = $formModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**
@@ -65,10 +74,9 @@ class SearchSubscriber extends CommonSubscriber
             return;
         }
 
-        $security = $this->security;
-        $filter   = ['string' => $str, 'force' => ''];
+        $filter = ['string' => $str, 'force' => ''];
 
-        $permissions = $security->isGranted(['form:forms:viewown', 'form:forms:viewother'], 'RETURN_ARRAY');
+        $permissions = $this->security->isGranted(['form:forms:viewown', 'form:forms:viewother'], 'RETURN_ARRAY');
         if ($permissions['form:forms:viewown'] || $permissions['form:forms:viewother']) {
             //only show own forms if the user does not have permission to view others
             if (!$permissions['form:forms:viewother']) {

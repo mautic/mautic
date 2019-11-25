@@ -11,17 +11,14 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
@@ -29,8 +26,6 @@ class PointSubscriber extends CommonSubscriber
     protected $pointModel;
 
     /**
-     * PointSubscriber constructor.
-     *
      * @param PointModel $pointModel
      */
     public function __construct(PointModel $pointModel)

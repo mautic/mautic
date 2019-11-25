@@ -15,16 +15,13 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FormModel
@@ -42,8 +39,6 @@ class CampaignSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
      * @param FormModel       $formModel
      * @param SubmissionModel $formSubmissionModel
      * @param EventModel      $campaignEventModel
