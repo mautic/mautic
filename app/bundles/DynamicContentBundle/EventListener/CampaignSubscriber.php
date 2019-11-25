@@ -15,17 +15,14 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
@@ -43,16 +40,22 @@ class CampaignSubscriber extends CommonSubscriber
     protected $session;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param LeadModel           $leadModel
-     * @param DynamicContentModel $dynamicContentModel
+     * @var ContainerAwareEventDispatcher
      */
-    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
+    protected $dispatcher;
+
+    /**
+     * @param LeadModel                     $leadModel
+     * @param DynamicContentModel           $dynamicContentModel
+     * @param Session                       $session
+     * @param ContainerAwareEventDispatcher $dispatcher
+     */
+    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, ContainerAwareEventDispatcher $dispatcher)
     {
         $this->leadModel           = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;
         $this->session             = $session;
+        $this->dispatcher          = $dispatcher;
     }
 
     /**
