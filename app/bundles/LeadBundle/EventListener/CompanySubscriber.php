@@ -11,16 +11,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CompanySubscriber.
- */
-class CompanySubscriber extends CommonSubscriber
+class CompanySubscriber implements EventSubscriberInterface
 {
     /**
      * @var AuditLogModel
@@ -33,8 +30,6 @@ class CompanySubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
-     * LeadSubscriber constructor.
-     *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      */

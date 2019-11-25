@@ -11,21 +11,26 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
@@ -50,21 +55,45 @@ class LeadSubscriber extends CommonSubscriber
     private $dncReasonHelper;
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
      * @param IpLookupHelper            $ipLookupHelper
      * @param AuditLogModel             $auditLogModel
      * @param LeadChangeEventDispatcher $eventDispatcher
      * @param DncReasonHelper           $dncReasonHelper
+     * @param EntityManager             $entityManager
+     * @param TranslatorInterface       $translator
+     * @param Router                    $router
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         LeadChangeEventDispatcher $eventDispatcher,
-        DncReasonHelper $dncReasonHelper
+        DncReasonHelper $dncReasonHelper,
+        EntityManager $entityManager,
+        TranslatorInterface $translator,
+        Router $router
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
         $this->auditLogModel       = $auditLogModel;
         $this->leadEventDispatcher = $eventDispatcher;
         $this->dncReasonHelper     = $dncReasonHelper;
+        $this->entityManager       = $entityManager;
+        $this->translator          = $translator;
+        $this->router              = $router;
     }
 
     /**
@@ -256,7 +285,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function preLeadMerge(Events\LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticLeadBundle:LeadEventLog')->updateLead(
+        $this->entityManager->getRepository(LeadEventLog::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
@@ -267,17 +296,17 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadMerge(Events\LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticLeadBundle:PointsChangeLog')->updateLead(
+        $this->entityManager->getRepository(PointsChangeLog::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->em->getRepository('MauticLeadBundle:ListLead')->updateLead(
+        $this->entityManager->getRepository(ListLead::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
 
-        $this->em->getRepository('MauticLeadBundle:LeadNote')->updateLead(
+        $this->entityManager->getRepository(LeadNote::class)->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );
@@ -472,7 +501,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $utmRepo = $this->em->getRepository('MauticLeadBundle:UtmTag');
+        $utmRepo = $this->entityManager->getRepository(UtmTag::class);
         $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
         // Add to counter
         $event->addToCounter($eventTypeKey, $utmTags);
@@ -535,7 +564,7 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
         $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
@@ -619,7 +648,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $eventLogRepo = $this->em->getRepository('MauticLeadBundle:LeadEventLog');
+        $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
         $imports      = $eventLogRepo->getEvents(
             $event->getLead(),
             'lead',

@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -26,11 +25,10 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_LEADS                     = 'leads';
     const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
@@ -94,12 +92,18 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * @param LeadModel         $leadModel
-     * @param StageModel        $stageModel
-     * @param CampaignModel     $campaignModel
-     * @param CompanyModel      $companyModel
-     * @param CompanyReportData $companyReportData
-     * @param FieldsBuilder     $fieldsBuilder
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param LeadModel           $leadModel
+     * @param StageModel          $stageModel
+     * @param CampaignModel       $campaignModel
+     * @param CompanyModel        $companyModel
+     * @param CompanyReportData   $companyReportData
+     * @param FieldsBuilder       $fieldsBuilder
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         LeadModel $leadModel,
@@ -107,7 +111,8 @@ class ReportSubscriber extends CommonSubscriber
         CampaignModel $campaignModel,
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
-        FieldsBuilder $fieldsBuilder
+        FieldsBuilder $fieldsBuilder,
+        TranslatorInterface $translator
     ) {
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
@@ -115,6 +120,7 @@ class ReportSubscriber extends CommonSubscriber
         $this->companyModel      = $companyModel;
         $this->companyReportData = $companyReportData;
         $this->fieldsBuilder     = $fieldsBuilder;
+        $this->translator        = $translator;
     }
 
     /**

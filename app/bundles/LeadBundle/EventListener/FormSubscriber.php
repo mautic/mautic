@@ -11,17 +11,14 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
@@ -29,8 +26,6 @@ class FormSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
-     * FormSubscriber constructor.
-     *
      * @param EmailModel $emailModel
      */
     public function __construct(EmailModel $emailModel)
