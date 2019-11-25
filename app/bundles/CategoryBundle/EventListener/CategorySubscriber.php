@@ -14,15 +14,12 @@ namespace Mautic\CategoryBundle\EventListener;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event as Events;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CategorySubscriber.
- */
-class CategorySubscriber extends CommonSubscriber
+class CategorySubscriber implements EventSubscriberInterface
 {
     /**
      * @var BundleHelper
@@ -40,8 +37,6 @@ class CategorySubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * CategorySubscriber constructor.
-     *
      * @param BundleHelper   $bundleHelper
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
