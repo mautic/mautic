@@ -11,6 +11,7 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -29,7 +30,7 @@ class ConfigType extends AbstractType
     {
         $builder->add(
             'api_enabled',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.enabled',
                 'data'  => (bool) $options['data']['api_enabled'],
@@ -41,7 +42,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'api_enable_basic_auth',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.basic_auth_enabled',
                 'data'  => (bool) $options['data']['api_enable_basic_auth'],
