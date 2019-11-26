@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -26,7 +27,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\DataCollectorTranslator;
 
-class AbstractIntegrationTestCase extends \PHPUnit_Framework_TestCase
+class AbstractIntegrationTestCase extends MauticMysqlTestCase
 {
     /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -103,7 +104,7 @@ class AbstractIntegrationTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $integrationEntityModel;
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 
