@@ -95,4 +95,14 @@ final class AssetEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.asset.on_campaign_trigger_decision';
+
+    /**
+     * The mautic.asset.on_download_rate_winner event is fired when there is a need to determine download rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_DOWNLOAD_RATE_WINNER = 'mautic.asset.on_download_rate_winner';
 }
