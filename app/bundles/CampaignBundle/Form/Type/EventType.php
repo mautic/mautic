@@ -305,7 +305,7 @@ class EventType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaignevent';
+        return self::class;
     }
 
     /**

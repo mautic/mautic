@@ -62,17 +62,17 @@ class CampaignListType extends AbstractType
                     $choices   = [];
                     $campaigns = $this->model->getRepository()->getPublishedCampaigns(null, null, true, $this->canViewOther);
                     foreach ($campaigns as $campaign) {
-                        $choices[$campaign['id']] = $campaign['name'];
+                        $choices[$campaign['name']] = $campaign['id'];
                     }
 
                     //sort by language
-                    asort($choices);
+                    ksort($choices);
 
                     if ($options['include_this']) {
                         $choices = ['this' => $options['this_translation']] + $choices;
                     }
 
-                    return array_flip($choices);
+                    return $choices;
                 },
                 'choices_as_values' => true,
                 'empty_value'       => false,
@@ -90,7 +90,7 @@ class CampaignListType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaign_list';
+        return self::class;
     }
 
     public function getParent()

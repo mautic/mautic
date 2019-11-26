@@ -155,6 +155,6 @@ class CampaignType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaign';
+        return self::class;
     }
 }

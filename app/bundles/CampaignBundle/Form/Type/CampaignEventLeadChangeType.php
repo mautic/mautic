@@ -57,6 +57,6 @@ class CampaignEventLeadChangeType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaignevent_leadchange';
+        return self::class;
     }
 }

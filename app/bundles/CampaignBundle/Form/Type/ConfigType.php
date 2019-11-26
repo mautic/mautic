@@ -64,6 +64,6 @@ class ConfigType extends AbstractType
      */
     public function getName()
     {
-        return 'campaignconfig';
+        return self::class;
     }
 }

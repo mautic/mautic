@@ -36,6 +36,6 @@ class EventCanvasSettingsType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaignevent_canvassettings';
+        return self::class;
     }
 }

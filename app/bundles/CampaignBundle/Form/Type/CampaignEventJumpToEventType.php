@@ -62,6 +62,6 @@ class CampaignEventJumpToEventType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaignevent_jump_to_event';
+        return self::class;
     }
 }

@@ -116,6 +116,6 @@ class CampaignLeadSourceType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaign_leadsource';
+        return self::class;
     }
 }

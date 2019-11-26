@@ -53,7 +53,7 @@ class CampaignEventAddRemoveLeadType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'campaignevent_addremovelead';
+        return self::class;
     }
 
     /**
