@@ -79,12 +79,13 @@ class WebhookType extends AbstractType
             'events',
             ChoiceType::class,
             [
-                'choices'    => $choices,
-                'multiple'   => true,
-                'expanded'   => true,
-                'label'      => 'mautic.webhook.form.webhook.events',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => ''],
+                'choices'           => array_flip($choices),
+                'multiple'          => true,
+                'expanded'          => true,
+                'label'             => 'mautic.webhook.form.webhook.events',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => ''],
+                'choices_as_values' => true,
             ]
         );
 
@@ -114,17 +115,18 @@ class WebhookType extends AbstractType
 
         $builder->add('eventsOrderbyDir', ChoiceType::class, [
             'choices' => [
-                ''             => 'mautic.core.form.default',
-                Criteria::ASC  => 'mautic.webhook.config.event.orderby.chronological',
-                Criteria::DESC => 'mautic.webhook.config.event.orderby.reverse.chronological',
+                'mautic.core.form.default'                                  => '',
+                'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
+                'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
             ],
             'label' => 'mautic.webhook.config.event.orderby',
             'attr'  => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
-            'empty_value' => '',
-            'required'    => false,
+            'empty_value'       => '',
+            'required'          => false,
+            'choices_as_values' => true,
         ]);
     }
 

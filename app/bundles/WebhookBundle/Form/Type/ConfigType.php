@@ -30,8 +30,8 @@ class ConfigType extends AbstractType
     {
         $builder->add('queue_mode', ChoiceType::class, [
             'choices' => [
-                'immediate_process' => 'mautic.webhook.config.immediate_process',
-                'command_process'   => 'mautic.webhook.config.cron_process',
+                'mautic.webhook.config.immediate_process' => 'immediate_process',
+                'mautic.webhook.config.cron_process'      => 'command_process',
             ],
             'label' => 'mautic.webhook.config.form.queue.mode',
             'attr'  => [
@@ -46,19 +46,21 @@ class ConfigType extends AbstractType
                     ]
                 ),
             ],
+            'choices_as_values' => true,
         ]);
 
         $builder->add('events_orderby_dir', ChoiceType::class, [
             'choices' => [
-                Criteria::ASC  => 'mautic.webhook.config.event.orderby.chronological',
-                Criteria::DESC => 'mautic.webhook.config.event.orderby.reverse.chronological',
+                'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
+                'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
             ],
             'label' => 'mautic.webhook.config.event.orderby',
             'attr'  => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
-            'required' => false,
+            'required'          => false,
+            'choices_as_values' => true,
         ]);
     }
 

@@ -74,11 +74,11 @@ class CampaignEventSendWebhookType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'get'    => 'GET',
-                    'post'   => 'POST',
-                    'put'    => 'PUT',
-                    'patch'  => 'PATCH',
-                    'delete' => 'DELETE',
+                    'GET'    => 'get',
+                    'POST'   => 'post',
+                    'PUT'    => 'put',
+                    'PATCH'  => 'patch',
+                    'DELETE' => 'delete',
                 ],
                 'multiple'   => false,
                 'label_attr' => ['class' => 'control-label'],
@@ -86,8 +86,9 @@ class CampaignEventSendWebhookType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'empty_value' => false,
-                'required'    => false,
+                'empty_value'       => false,
+                'required'          => false,
+                'choices_as_values' => true,
             ]
         );
 
