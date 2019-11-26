@@ -11,7 +11,10 @@
 
 namespace MauticPlugin\MauticClearbitBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class BatchLookupType extends AbstractType
@@ -22,11 +25,11 @@ class BatchLookupType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('ids', 'hidden');
+        $builder->add('ids', HiddenType::class);
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text'     => false,
                 'save_text'      => 'mautic.core.form.submit',
@@ -39,7 +42,7 @@ class BatchLookupType extends AbstractType
 
         $builder->add(
             'notify',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.plugin.clearbit.notify',
                 'label_attr' => ['class' => 'control-label'],
@@ -59,7 +62,7 @@ class BatchLookupType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'clearbit_batch_lookup';
     }

@@ -28,9 +28,9 @@ $configKeys = array_keys($form->children);
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
             <?php foreach ($configKeys as $i => $key) : ?>
-                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) {
-    continue;
-} ?>
+                <?php if (!isset($formConfigs[$key]) || !count($form[$key]->children)) : ?>
+                <?php continue; ?>
+                <?php endif; ?>
                 <li role="presentation" class="list-group-item <?php echo $i === 0 ? 'in active' : ''; ?>">
                     <?php $containsErrors = ($view['form']->containsErrors($form[$key])) ? ' text-danger' : ''; ?>
                     <a href="#<?php echo $key; ?>" aria-controls="<?php echo $key; ?>" role="tab" data-toggle="tab" class="steps<?php echo $containsErrors; ?>">

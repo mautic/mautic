@@ -109,15 +109,4 @@ final class ChannelEvents
      * @var string
      */
     const MESSAGE_POST_DELETE = 'mautic.message_post_delete';
-
-    /**
-     * @deprecated 2.13.0 to be removed in 3.0; Listen to ON_CAMPAIGN_BATCH_ACTION instead.
-     * The mautic.channel.on_campaign_trigger_action event is fired when the campaign action triggers.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
-     *
-     * @var string
-     */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.channel.on_campaign_trigger_action';
 }

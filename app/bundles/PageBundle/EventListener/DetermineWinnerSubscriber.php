@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,29 +9,58 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\PageBundle\Helper;
+namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\PageBundle\Entity\Page;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AbTestHelper.
- */
-class AbTestHelper
+class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param EntityManager       $em
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    {
+        $this->em         = $em;
+        $this->translator = $translator;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER => ['onDetermineBounceRateWinner', 0],
+            PageEvents::ON_DETERMINE_DWELL_TIME_WINNER  => ['onDetermineDwellTimeWinner', 0],
+        ];
+    }
+
     /**
      * Determines the winner of A/B test based on bounce rates.
      *
-     * @param MauticFactory $factory
-     * @param Page          $parent
-     * @param Page[]        $children
-     *
-     * @return array
+     * @param DetermineWinnerEvent $event
      */
-    public static function determineBounceTestWinner($factory, $parent, $children)
+    public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
     {
         //find the hits that did not go any further
-        $repo      = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $repo      = $this->em->getRepository('MauticPageBundle:Hit');
+        $parent    = $event->getParameters()['parent'];
+        $children  = $event->getParameters()['children'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
@@ -50,22 +79,23 @@ class AbTestHelper
                     foreach ($translations as $translation) {
                         $combined[$parent->getId()]['bounces'] += $counts[$translation]['bounces'];
                         $combined[$parent->getId()]['totalHits'] += $counts[$translation]['totalHits'];
-                        $combined[$parent->getId()]['rate'] = ($counts[$parent->getId()]['totalHits']) ? round(
-                            ($counts[$parent->getId()]['bounces'] / $counts[$parent->getId()]['totalHits']) * 100,
+                        $combined[$parent->getId()]['rate'] = ($combined[$parent->getId()]['totalHits']) ? round(
+                            ($combined[$parent->getId()]['bounces'] / $combined[$parent->getId()]['totalHits']) * 100,
                             2
                         ) : 0;
                     }
                 }
 
                 foreach ($children as $child) {
+                    $combined[$child->getId()] = $counts[$child->getId()];
+
                     if ($child->hasTranslations()) {
-                        $combined[$child->getId()] = $counts[$child->getId()];
                         $translations              = $child->getTranslationChildren()->getKeys();
                         foreach ($translations as $translation) {
                             $combined[$child->getId()]['bounces'] += $counts[$translation]['bounces'];
                             $combined[$child->getId()]['totalHits'] += $counts[$translation]['totalHits'];
-                            $combined[$child->getId()]['rate'] = ($counts[$child->getId()]['totalHits']) ? round(
-                                ($counts[$child->getId()]['bounces'] / $counts[$child->getId()]['totalHits']) * 100,
+                            $combined[$child->getId()]['rate'] = ($combined[$child->getId()]['totalHits']) ? round(
+                                ($combined[$child->getId()]['bounces'] / $combined[$child->getId()]['totalHits']) * 100,
                                 2
                             ) : 0;
                         }
@@ -77,7 +107,7 @@ class AbTestHelper
                 $rates             = [];
                 $support['data']   = [];
                 $support['labels'] = [];
-                $bounceLabel       = $factory->getTranslator()->trans('mautic.page.abtest.label.bounces');
+                $bounceLabel       = $this->translator->trans('mautic.page.abtest.label.bounces');
 
                 foreach ($combined as $pid => $stats) {
                     $rates[$pid]                     = $stats['rate'];
@@ -85,47 +115,47 @@ class AbTestHelper
                     $support['labels'][]             = $pid.':'.$stats['title'];
                 }
 
+                // investigate the rate calculation, seems that lowest value should be the winner
                 $max                   = max($rates);
                 $support['step_width'] = (ceil($max / 10) * 10);
 
-                //get the page ids with the greatest average dwell time
                 $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
-                return [
+                $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.bouncerate',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
-                ];
+                ]);
+
+                return;
             }
         }
 
-        return [
+        $event->setAbTestResults([
             'winners' => [],
             'support' => [],
             'basedOn' => 'page.bouncerate',
-        ];
+        ]);
     }
 
     /**
      * Determines the winner of A/B test based on dwell time rates.
      *
-     * @param MauticFactory $factory
-     * @param Page          $parent
-     *
-     * @return array
+     * @param DetermineWinnerEvent $event
      */
-    public static function determineDwellTimeTestWinner($factory, $parent)
+    public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
     {
         //find the hits that did not go any further
-        $repo      = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $repo      = $this->em->getRepository('MauticPageBundle:Hit');
+        $parent    = $event->getParameters()['parent'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
 
         if ($startDate != null && !empty($pageIds)) {
             //get their bounce rates
             $counts     = $repo->getDwellTimesForPages($pageIds, ['fromDate' => $startDate]);
-            $translator = $factory->getTranslator();
+            $translator = $this->translator;
             $support    = [];
 
             if ($counts) {
@@ -147,19 +177,21 @@ class AbTestHelper
                 //get the page ids with the greatest average dwell time
                 $winners = ($max > 0) ? array_keys($avgs, $max) : [];
 
-                return [
+                $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.dwelltime',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
-                ];
+                ]);
+
+                return;
             }
         }
 
-        return [
+        $event->setAbTestResults([
             'winners' => [],
             'support' => [],
             'basedOn' => 'page.dwelltime',
-        ];
+        ]);
     }
 }

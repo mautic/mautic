@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,29 +9,58 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Helper;
+namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\PageBundle\Entity\Page;
+use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AbTestHelper.
- */
-class AbTestHelper
+class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param EntityManager       $em
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    {
+        $this->em         = $em;
+        $this->translator = $translator;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER => ['onDetermineSubmissionWinner', 0],
+        ];
+    }
+
     /**
      * Determines the winner of A/B test based on number of form submissions.
      *
-     * @param MauticFactory $factory
-     * @param Page          $parent
-     * @param               $children
-     *
-     * @return array
+     * @param DetermineWinnerEvent $event
      */
-    public static function determineSubmissionWinner($factory, $parent, $children)
+    public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
     {
-        $repo = $factory->getEntityManager()->getRepository('MauticFormBundle:Submission');
+        $repo       = $this->em->getRepository('MauticFormBundle:Submission');
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
 
         //if this is an email A/B test, then link email to page to form submission
         //if it is a page A/B test, then link form submission to page
@@ -50,7 +79,7 @@ class AbTestHelper
         if ($startDate != null && !empty($ids)) {
             $counts = ($type == 'page') ? $repo->getSubmissionCountsByPage($ids, $startDate) : $repo->getSubmissionCountsByEmail($ids, $startDate);
 
-            $translator = $factory->getTranslator();
+            $translator = $this->translator;
             if ($counts) {
                 $submissions = $support = $data = [];
                 $hasResults  = [];
@@ -102,19 +131,21 @@ class AbTestHelper
                 //get the page ids with the most number of submissions
                 $winners = array_keys($submissions, $max);
 
-                return [
+                $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'form.submissions',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
-                ];
+                ]);
+
+                return;
             }
         }
 
-        return [
+        $event->setAbTestResults([
             'winners' => [],
             'support' => [],
             'basedOn' => 'form.submissions',
-        ];
+        ]);
     }
 }

@@ -18,9 +18,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -29,8 +26,6 @@ class ConfigType extends AbstractType
     private $restrictionHelper;
 
     /**
-     * ConfigType constructor.
-     *
      * @param RestrictionHelper $restrictionHelper
      */
     public function __construct(RestrictionHelper $restrictionHelper)
@@ -52,7 +47,7 @@ class ConfigType extends AbstractType
                 }
                 $builder->add(
                     $config['formAlias'],
-                    $config['formAlias'],
+                    $config['formType'],
                     [
                         'data' => $config['parameters'],
                     ]
@@ -90,7 +85,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'config';
     }
