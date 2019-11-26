@@ -34,7 +34,6 @@ return [
             'mautic.form.type.queueconfig' => [
                 'class'     => 'Mautic\QueueBundle\Form\Type\ConfigType',
                 'arguments' => 'event_dispatcher',
-                'alias'     => 'queueconfig',
             ],
         ],
         'other' => [
