@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 class DynamicsIntegration extends CrmAbstractIntegration
@@ -77,34 +78,36 @@ class DynamicsIntegration extends CrmAbstractIntegration
     {
         $builder->add(
             'updateBlanks',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
+                    'mautic.integrations.blanks' => 'updateBlanks',
                 ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
+                'choices_as_values' => true,
+                'expanded'          => true,
+                'multiple'          => true,
+                'label'             => 'mautic.integrations.form.blanks',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'required'          => false,
             ]
         );
         if ($formArea === 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
+                        'mautic.dynamics.object.contact'  => 'contacts',
+                        'mautic.dynamics.object.company'  => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.dynamics.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.dynamics.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }

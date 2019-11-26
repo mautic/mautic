@@ -272,6 +272,13 @@ return [
                     'mautic.email.repository.stat',
                 ],
             ],
+            'mautic.email.subscriber.determine_winner' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.email' => [

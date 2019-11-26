@@ -95,7 +95,7 @@ class ConfigChangeLogger
             return;
         }
 
-        $log     = [
+        $log = [
             'bundle'    => 'config',
             'object'    => 'config',
             'objectId'  => 0,

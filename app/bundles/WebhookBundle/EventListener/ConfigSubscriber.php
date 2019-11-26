@@ -16,9 +16,6 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\WebhookBundle\Form\Type\ConfigType;
 
-/**
- * Class ConfigSubscriber.
- */
 class ConfigSubscriber extends CommonSubscriber
 {
     /**
@@ -36,6 +33,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'WebhookBundle',
             'formAlias'  => ConfigType::class,
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticWebhookBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticWebhookBundle'),
         ]);

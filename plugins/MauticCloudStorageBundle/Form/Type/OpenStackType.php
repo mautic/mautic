@@ -12,11 +12,9 @@
 namespace MauticPlugin\MauticCloudStorageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class OpenStackType.
- */
 class OpenStackType extends AbstractType
 {
     /**
@@ -24,21 +22,25 @@ class OpenStackType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('serviceUrl', 'url', [
-            'label'      => 'mautic.integration.OpenStack.service.url',
-            'required'   => true,
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'tooltip' => 'mautic.integration.OpenStack.service.url.tooltip',
-                'class'   => 'form-control',
-            ],
-        ]);
+        $builder->add(
+            'serviceUrl',
+            UrlType::class,
+            [
+                'label'      => 'mautic.integration.OpenStack.service.url',
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'tooltip' => 'mautic.integration.OpenStack.service.url.tooltip',
+                    'class'   => 'form-control',
+                ],
+            ]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'cloudstorage_openstack';
     }

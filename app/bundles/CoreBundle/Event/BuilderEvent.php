@@ -174,10 +174,9 @@ class BuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        //check for required keys
         $this->verifyCriteria(
-            ['group', 'label', 'callback'],
-            ['callback'],
+            ['group', 'label', 'event'],
             $criteria
         );
 
@@ -188,22 +187,13 @@ class BuilderEvent extends Event
 
     /**
      * @param array $keys
-     * @param array $methods
      * @param array $criteria
      */
-    private function verifyCriteria(array $keys, array $methods, array $criteria)
+    private function verifyCriteria(array $keys, array $criteria)
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {
                 throw new InvalidArgumentException("The key, '$k' is missing.");
-            }
-        }
-
-        foreach ($methods as $m) {
-            if (isset($criteria[$m]) && !is_callable($criteria[$m], true)) {
-                throw new InvalidArgumentException(
-                    $criteria[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.'
-                );
             }
         }
     }
