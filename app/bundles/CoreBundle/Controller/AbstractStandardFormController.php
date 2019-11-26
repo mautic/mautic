@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\Form\Form;
@@ -829,7 +830,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $dateRangeValues = $this->request->$method->get('daterange', $this->get('session')->get($name, []));
         $this->get('session')->set($name, $dateRangeValues);
 
-        $dateRangeForm = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $returnUrl]);
+        $dateRangeForm = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);
         $dateFrom      = new \DateTime($dateRangeForm['date_from']->getData());
         $dateFrom->setTime(0, 0, 0);
         $dateTo = new \DateTime($dateRangeForm['date_to']->getData());

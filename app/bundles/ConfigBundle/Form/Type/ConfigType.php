@@ -12,6 +12,7 @@
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -70,7 +71,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_onclick' => 'Mautic.activateBackdrop()',
                 'save_onclick'  => 'Mautic.activateBackdrop()',

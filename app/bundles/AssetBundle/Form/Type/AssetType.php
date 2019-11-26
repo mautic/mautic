@@ -16,6 +16,9 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -56,7 +59,7 @@ class AssetType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
-        $builder->add('storageLocation', 'button_group', [
+        $builder->add('storageLocation', ButtonGroupType::class, [
             'label'   => 'mautic.asset.asset.form.storageLocation',
             'choices' => [
                 'mautic.asset.asset.form.storageLocation.local'  => 'local',
@@ -88,7 +91,7 @@ class AssetType extends AbstractType
         );
         $builder->add(
             'disallow',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.asset.asset.form.disallow.crawlers',
                 'attr'  => [
@@ -163,7 +166,7 @@ class AssetType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add('publishUp', 'datetime', [
             'widget'     => 'single_text',
@@ -201,7 +204,7 @@ class AssetType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons', []);
+        $builder->add('buttons', FormButtonsType::class, []);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

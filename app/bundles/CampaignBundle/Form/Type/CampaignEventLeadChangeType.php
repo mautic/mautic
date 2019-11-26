@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -26,7 +27,7 @@ class CampaignEventLeadChangeType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $data = (isset($options['data']['action'])) ? $options['data']['action'] : 'added';
-        $builder->add('action', 'button_group', [
+        $builder->add('action', ButtonGroupType::class, [
             'choices' => [
                 'added'   => 'mautic.campaign.form.trigger_leadchanged_added',
                 'removed' => 'mautic.campaign.form.trigger_leadchanged_removed',

@@ -247,12 +247,6 @@ class CorePermissions
             }
 
             $parts = explode(':', $permission);
-
-            if ($parts[0] == 'plugin' && count($parts) == 4) {
-                // @deprecated - no longer used; to be removed in 3.0
-                array_shift($parts);
-            }
-
             if (count($parts) != 3) {
                 throw new PermissionBadFormatException(
                     $this->getTranslator()->trans(
@@ -334,12 +328,6 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-
-            if ($parts[0] == 'plugin' && count($parts) == 4) {
-                // @deprecated - no longer used; to be removed in 3.0
-                array_shift($parts);
-            }
-
             if (count($parts) != 3) {
                 $result[$p] = false;
             } else {

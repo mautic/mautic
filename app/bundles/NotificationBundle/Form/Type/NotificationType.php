@@ -14,6 +14,8 @@ namespace Mautic\NotificationBundle\Form\Type;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -120,7 +122,7 @@ class NotificationType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'publishUp',
@@ -176,12 +178,12 @@ class NotificationType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                 ]
@@ -197,7 +199,7 @@ class NotificationType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 
