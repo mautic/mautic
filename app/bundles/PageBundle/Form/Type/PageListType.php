@@ -60,10 +60,13 @@ class PageListType extends AbstractType
                         $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
                     }
 
+                    $choices = array_flip($choices);
+
                     //sort by language
                     ksort($choices);
 
                     foreach ($choices as $lang => &$pages) {
+                        $pages = array_flip($pages);
                         ksort($pages);
                     }
 

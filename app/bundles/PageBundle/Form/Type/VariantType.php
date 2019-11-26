@@ -72,7 +72,7 @@ class VariantType extends AbstractType
                 ],
                 'expanded'    => false,
                 'multiple'    => false,
-                'choices'     => $choices,
+                'choices'     => array_flip($choices),
                 'empty_value' => 'mautic.core.form.chooseone',
                 'constraints' => [
                     new NotBlank(
