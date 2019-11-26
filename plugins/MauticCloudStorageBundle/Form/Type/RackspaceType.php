@@ -12,11 +12,9 @@
 namespace MauticPlugin\MauticCloudStorageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class RackspaceType.
- */
 class RackspaceType extends AbstractType
 {
     /**
@@ -24,24 +22,26 @@ class RackspaceType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('serverLocation', 'choice', [
-            'label'   => 'mautic.integration.Rackspace.server.location',
-            'choices' => [
-                'us' => 'mautic.integration.Rackspace.server.location.us',
-                'uk' => 'mautic.integration.Rackspace.server.location.uk',
-            ],
-            'required'   => true,
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class' => 'form-control',
-            ],
-        ]);
+        $builder->add(
+            'serverLocation',
+            ChoiceType::class, [
+                'choices_as_values' => true,
+                'label'             => 'mautic.integration.Rackspace.server.location',
+                'choices'           => [
+                    'mautic.integration.Rackspace.server.location.us' => 'us',
+                    'mautic.integration.Rackspace.server.location.uk' => 'uk',
+                ],
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'cloudstorage_rackspace';
     }
