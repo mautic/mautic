@@ -11,7 +11,7 @@
 
 namespace Mautic\DynamicContentBundle\Form\Type;
 
-use Doctrine\DBAL\Types\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
