@@ -71,12 +71,13 @@ class PreferenceCenterListType extends AbstractType
 
                     return $choices;
                 },
-                'empty_value' => false,
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'top_level'   => 'variant',
-                'ignore_ids'  => [],
+                'empty_value'       => false,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'top_level'         => 'variant',
+                'ignore_ids'        => [],
+                'choices_as_values' => true,
             ]
         );
 
