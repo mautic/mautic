@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -43,14 +44,14 @@ class ThemeApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
         if (!$this->security->isGranted('core:themes:create')) {
             return $this->accessDenied();
         }
 
         $response  = ['success' => false];
-        $themeZip  = $this->getRequest()->files->get('file');
+        $themeZip  = $request->files->get('file');
         $extension = $themeZip->getClientOriginalExtension();
 
         if (!$themeZip) {

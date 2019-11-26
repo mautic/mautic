@@ -20,6 +20,9 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -38,11 +41,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PageType extends AbstractType
 {
-    /**
-     * @var bool|mixed
-     */
-    private $defaultTheme;
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -113,16 +111,11 @@ class PageType extends AbstractType
             ]
         );
 
-        $template = $options['data']->getTemplate();
-        if (empty($template)) {
-            $template = $this->defaultTheme;
-        }
         $builder->add(
             'template',
-            'theme_list',
+            ThemeListType::class,
             [
                 'feature' => 'page',
-                'data'    => $template,
                 'attr'    => [
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.page.form.template.help',
@@ -132,11 +125,11 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'isPreferenceCenter',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.preference_center',
                 'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
@@ -145,7 +138,7 @@ class PageType extends AbstractType
 
         $builder->add(
             'noIndex',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.no_index',
                 'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
@@ -343,7 +336,7 @@ class PageType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'pre_extra_buttons' => [
                 [
                     'name'  => 'builder',

@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,7 +29,7 @@ class ConfigType extends AbstractType
     {
         $builder->add(
             'cat_in_page_url',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.cat.in.url',
                 'data'  => (bool) $options['data']['cat_in_page_url'],

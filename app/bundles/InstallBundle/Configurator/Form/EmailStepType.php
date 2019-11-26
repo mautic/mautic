@@ -11,6 +11,8 @@
 
 namespace Mautic\InstallBundle\Configurator\Form;
 
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -152,7 +154,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_encryption',
-            'button_group',
+            ButtonGroupType::class,
             [
                 'choice_list' => new ChoiceList(
                     ['tls', 'ssl'],
@@ -192,7 +194,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_spool_type',
-            'button_group',
+            ButtonGroupType::class,
             [
                 'choice_list' => new ChoiceList(
                     ['memory', 'file'],
@@ -211,7 +213,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'pre_extra_buttons' => [
                     [

@@ -29,15 +29,17 @@ class ConfigThemeSubscriber extends CommonSubscriber
 
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
-        $event->addForm([
-            'bundle'     => 'CoreBundle',
-            'formAlias'  => 'themeconfig',
-            'formType'   => ConfigThemeType::class,
-            'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
-            'parameters' => [
+        $event->addForm(
+            [
+                'bundle'     => 'CoreBundle',
+                'formAlias'  => 'themeconfig',
+                'formType'   => ConfigThemeType::class,
+                'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
+                'parameters' => [
                     'theme'                           => $event->getParametersFromConfig('MauticCoreBundle')['theme'],
                     'theme_import_allowed_extensions' => $event->getParametersFromConfig('MauticCoreBundle')['theme_import_allowed_extensions'],
                 ],
-        ]);
+            ]
+        );
     }
 }

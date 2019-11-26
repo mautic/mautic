@@ -26,7 +26,7 @@ if ($tmpl == 'index') {
                         'langVar'         => 'mautic.social.monitoring',
                         'routeBase'       => 'social',
                         'templateButtons' => [
-                            'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+                            'delete' => $view['security']->isGranted('mauticSocial:monitoring:delete'),
                         ],
                     ]
                 );
@@ -64,8 +64,8 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-                                    'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+                                    'edit'   => $view['security']->isGranted('mauticSocial:monitoring:edit'),
+                                    'delete' => $view['security']->isGranted('mauticSocial:monitoring:delete'),
                                 ],
                                 'routeBase'  => 'social',
                                 'langVar'    => 'mautic.social.monitoring',

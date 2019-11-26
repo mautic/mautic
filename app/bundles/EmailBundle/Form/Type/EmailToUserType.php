@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -50,7 +51,7 @@ class EmailToUserType extends AbstractType
 
         $builder->add(
             'to_owner',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.send.email.to.owner',
                 'data'  => isset($options['data']['to_owner']) ? $options['data']['to_owner'] : false,

@@ -36,7 +36,7 @@ class ChannelBroadcastEvent extends Event
     /**
      * Number of contacts successfully processed and/or failed per channel.
      *
-     * @var int
+     * @var array
      */
     protected $results = [];
 
@@ -118,7 +118,7 @@ class ChannelBroadcastEvent extends Event
     }
 
     /**
-     * @return int
+     * @return array
      */
     public function getResults()
     {

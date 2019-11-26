@@ -488,11 +488,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         'type'    => null,
                     ],
                 ];
-                // @deprecated 2.6.0 to be removed in 3.0
-                $dataArray['error'] = [
-                    'message' => $error['message'].' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                    'code'    => 500,
-                ];
 
                 if (self::$environment == 'dev') {
                     $dataArray['trace'] = $error['trace'];

@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -25,7 +26,7 @@ class SlideshowGlobalConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('slideshow_enabled', 'yesno_button_group', [
+        $builder->add('slideshow_enabled', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.slideshow.enabled',
             'data'  => (bool) isset($options['data']['slideshow_enabled']) ? $options['data']['slideshow_enabled'] : true,
             'attr'  => [
@@ -34,7 +35,7 @@ class SlideshowGlobalConfigType extends AbstractType
             ],
         ]);
 
-        $builder->add('dot_navigation', 'yesno_button_group', [
+        $builder->add('dot_navigation', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.slideshow.dot.navigation',
             'data'  => (bool) isset($options['data']['dot_navigation']) ? $options['data']['dot_navigation'] : true,
             'attr'  => [
@@ -43,7 +44,7 @@ class SlideshowGlobalConfigType extends AbstractType
             ],
         ]);
 
-        $builder->add('arrow_navigation', 'yesno_button_group', [
+        $builder->add('arrow_navigation', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.slideshow.arrow.navigation',
             'data'  => (bool) isset($options['data']['arrow_navigation']) ? $options['data']['arrow_navigation'] : true,
             'attr'  => [

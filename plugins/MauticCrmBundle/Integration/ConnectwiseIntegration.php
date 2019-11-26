@@ -12,6 +12,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -326,7 +327,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $builder->add(
                     'push_activities',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label'      => 'mautic.plugin.config.push.activities',
                         'label_attr' => ['class' => 'control-label'],

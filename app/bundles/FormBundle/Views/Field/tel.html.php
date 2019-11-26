@@ -8,12 +8,15 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Form\Type\TelType;
+
 echo $view->render(
     'MauticFormBundle:Field:text.html.php',
     [
         'field'    => $field,
         'inForm'   => (isset($inForm)) ? $inForm : false,
-        'type'     => 'tel',
+        'type'     => TelType::class,
         'id'       => $id,
         'formId'   => (isset($formId)) ? $formId : 0,
         'formName' => (isset($formName)) ? $formName : '',

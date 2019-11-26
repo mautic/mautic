@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraint;
@@ -94,7 +95,7 @@ class FormFieldFileType extends AbstractType
 
         $builder->add(
             'public',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.form.field.file.public',
             ]

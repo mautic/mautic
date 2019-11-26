@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -151,7 +152,7 @@ class TweetType extends AbstractType
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                 ]
@@ -167,7 +168,7 @@ class TweetType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 
