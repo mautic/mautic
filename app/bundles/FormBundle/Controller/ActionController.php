@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Form\Type\ActionType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -55,7 +56,7 @@ class ActionController extends CommonFormController
 
         //fire the form builder event
         $customComponents = $this->getModel('form.form')->getCustomComponents();
-        $form             = $this->get('form.factory')->create('formaction', $formAction, [
+        $form             = $this->get('form.factory')->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
             'formId'   => $formId,
