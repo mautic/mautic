@@ -34,12 +34,4 @@ class SlotTextType extends SlotType
 
         parent::buildForm($builder, $options);
     }
-
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return self::class;
-    }
 }

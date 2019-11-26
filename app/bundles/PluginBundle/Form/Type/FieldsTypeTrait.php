@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -166,7 +167,7 @@ trait FieldsTypeTrait
 
                         $form->add(
                             $updateName.$index,
-                            'button_group',
+                            ButtonGroupType::class,
                             [
                                 'choices' => [
                                     '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>',

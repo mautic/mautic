@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -81,7 +82,7 @@ class TwitterType extends AbstractType
             ],
         ]);
 
-        $builder->add('size', 'yesno_button_group', [
+        $builder->add('size', YesNoButtonGroupType::class, [
             'no_value'  => 'medium',
             'yes_value' => 'large',
             'label'     => 'mautic.integration.Twitter.share.largesize',

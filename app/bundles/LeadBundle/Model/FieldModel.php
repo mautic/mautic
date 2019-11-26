@@ -15,9 +15,9 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
+use Mautic\CoreBundle\Form\Type\TelType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
@@ -71,13 +71,13 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'mobile' => [
-            'type'     => 'tel',
+            'type'     => TelType::class,
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
         ],
         'phone' => [
-            'type'     => 'tel',
+            'type'     => TelType::class,
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
@@ -90,7 +90,7 @@ class FieldModel extends FormModel
             'default'  => 0,
         ],
         'fax' => [
-            'type'     => 'tel',
+            'type'     => TelType::class,
             'listable' => true,
             'object'   => 'lead',
         ],
@@ -219,7 +219,7 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companyphone' => [
-            'type'     => 'tel',
+            'type'     => TelType::class,
             'fixed'    => true,
             'listable' => true,
             'object'   => 'company',
@@ -266,7 +266,7 @@ class FieldModel extends FormModel
             'object'     => 'company',
         ],
         'companyfax' => [
-            'type'     => 'tel',
+            'type'     => TelType::class,
             'listable' => true,
             'group'    => 'professional',
             'object'   => 'company',

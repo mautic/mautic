@@ -274,7 +274,8 @@ class DashboardModel extends FormModel
     public function clearDashboardCache()
     {
         $cacheDir     = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-        $cacheStorage = new CacheStorageHelper($cacheDir, $this->userHelper->getUser()->getId());
+        $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
+
         $cacheStorage->clear();
     }
 

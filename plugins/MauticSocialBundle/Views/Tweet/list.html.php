@@ -26,7 +26,7 @@ if ($tmpl == 'index') {
                         'langVar'         => 'mautic.social.tweets',
                         'routeBase'       => 'mautic_tweet',
                         'templateButtons' => [
-                            'delete' => $view['security']->isGranted('plugin:mauticSocial:tweet:delete'),
+                            'delete' => $view['security']->isGranted('mauticSocial:tweet:delete'),
                         ],
                     ]
                 );
@@ -64,8 +64,8 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->isGranted('plugin:mauticSocial:tweet:edit'),
-                                    'delete' => $view['security']->isGranted('plugin:mauticSocial:tweet:delete'),
+                                    'edit'   => $view['security']->isGranted('mauticSocial:tweet:edit'),
+                                    'delete' => $view['security']->isGranted('mauticSocial:tweet:delete'),
                                 ],
                                 'routeBase'  => 'mautic_tweet',
                                 'langVar'    => 'mautic.integration.Twitter',

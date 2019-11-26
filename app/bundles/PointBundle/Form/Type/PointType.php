@@ -15,6 +15,8 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -113,14 +115,14 @@ class PointType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', [
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
             'read_only' => $readonly,
             'data'      => $data,
         ]);
 
         $builder->add(
             'repeatable',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.point.form.repeat',
                 'data'  => $options['data']->getRepeatable() ?: false,
@@ -160,7 +162,7 @@ class PointType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
