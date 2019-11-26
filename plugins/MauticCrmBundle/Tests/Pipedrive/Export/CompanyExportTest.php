@@ -42,11 +42,15 @@ class CompanyExportTest extends PipedriveTest
             ]
         );
 
+        /** @var Company $company */
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
-        $company             = $this->em->getRepository(Company::class)->findOneById(1);
+
+        /** @var Company $company */
+        $company = $this->em->getRepository(Company::class)->findOneById(1);
 
         $requests = $GLOBALS['requests'];
 
+        $this->assertNotNull($company, 'Company failed to be created');
         $this->assertSame(count($requests), 0);
         $this->assertSame(count($integrationEntities), 0);
         $this->assertEquals($company->getName(), 'Test Name');
