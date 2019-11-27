@@ -32,7 +32,7 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $event->addForm([
             'bundle'     => 'WebhookBundle',
-            'formAlias'  => ConfigType::class,
+            'formAlias'  => 'webhookconfig',
             'formType'   => ConfigType::class,
             'formTheme'  => 'MauticWebhookBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticWebhookBundle'),
