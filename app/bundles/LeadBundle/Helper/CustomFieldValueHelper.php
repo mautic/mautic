@@ -31,7 +31,7 @@ class CustomFieldValueHelper
     public static function normalizeValue(array $field)
     {
         $value      = ArrayHelper::getValue('value', $field);
-        $type       =  ArrayHelper::getValue('type', $field);
+        $type       = ArrayHelper::getValue('type', $field);
         $properties = ArrayHelper::getValue('properties', $field);
 
         if ($value !== '' && $type && $properties) {
