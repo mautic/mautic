@@ -11,7 +11,10 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -51,7 +54,7 @@ class MonitoringType extends AbstractType
             'required'   => false,
         ]);
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add('publishUp', DateTimeType::class, [
             'widget'     => 'single_text',
@@ -115,11 +118,11 @@ class MonitoringType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
+        $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
     }
 
     /**

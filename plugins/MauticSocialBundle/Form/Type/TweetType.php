@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Form\Type\AssetListType;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
@@ -149,7 +150,7 @@ class TweetType extends AbstractType
         );
 
         //add category
-        $builder->add('category', 'category', [
+        $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);
 
