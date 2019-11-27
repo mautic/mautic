@@ -14,6 +14,8 @@ namespace Mautic\SmsBundle\Form\Type;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -72,7 +74,7 @@ class SmsType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'publishUp',
@@ -109,7 +111,7 @@ class SmsType extends AbstractType
         //add category
         $builder->add(
              'category',
-            CategoryListType::class,
+             CategoryListType::class,
              [
                  'bundle' => 'sms',
              ]
@@ -128,12 +130,12 @@ class SmsType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                 ]
@@ -149,7 +151,7 @@ class SmsType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 

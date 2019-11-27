@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -26,8 +27,25 @@ class SortableValueLabelListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('label', 'text', ['label' => 'mautic.core.label', 'error_bubbling' => true, 'attr' => ['class' => 'form-control']]);
-        $builder->add('value', 'text', ['label' => 'mautic.core.value', 'error_bubbling' => true, 'attr' => ['class' => 'form-control']]);
+        $builder->add(
+            'label',
+            TextType::class,
+            [
+                'label'          => 'mautic.core.label',
+                'error_bubbling' => true,
+                'attr'           => ['class' => 'form-control'],
+            ]
+        );
+
+        $builder->add(
+            'value',
+            TextType::class,
+            [
+                'label'          => 'mautic.core.value',
+                'error_bubbling' => true,
+                'attr'           => ['class' => 'form-control'],
+            ]
+        );
     }
 
     public function buildView(FormView $view, FormInterface $form, array $options)

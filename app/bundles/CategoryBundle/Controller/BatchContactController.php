@@ -11,7 +11,6 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;

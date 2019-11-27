@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -27,7 +28,7 @@ class EmailClickDecisionType extends AbstractType
     {
         $builder->add(
             'urls',
-            'sortablelist',
+            SortableListType::class,
             [
                 'label'           => 'mautic.email.click.urls.contains',
                 'option_required' => false,

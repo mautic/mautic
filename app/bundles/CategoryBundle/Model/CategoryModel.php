@@ -14,6 +14,7 @@ namespace Mautic\CategoryBundle\Model;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Event\CategoryEvent;
+use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -120,7 +121,7 @@ class CategoryModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('category_form', $entity, $options);
+        return $formFactory->create(CategoryType::class, $entity, $options);
     }
 
     /**

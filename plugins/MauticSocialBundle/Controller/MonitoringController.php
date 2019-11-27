@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
@@ -116,7 +117,7 @@ class MonitoringController extends FormController
      */
     public function newAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:create')) {
+        if (!$this->container->get('mautic.security')->isGranted('mauticSocial:monitoring:create')) {
             return $this->accessDenied();
         }
 
@@ -238,7 +239,7 @@ class MonitoringController extends FormController
      */
     public function editAction($objectId)
     {
-        if (!$this->container->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:edit')) {
+        if (!$this->container->get('mautic.security')->isGranted('mauticSocial:monitoring:edit')) {
             return $this->accessDenied();
         }
 
@@ -389,7 +390,7 @@ class MonitoringController extends FormController
      */
     public function viewAction($objectId)
     {
-        if (!$this->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:view')) {
+        if (!$this->get('mautic.security')->isGranted('mauticSocial:monitoring:view')) {
             return $this->accessDenied();
         }
 
@@ -446,7 +447,7 @@ class MonitoringController extends FormController
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $returnUrl]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);
         $dateFrom        = new \DateTime($dateRangeForm['date_from']->getData());
         $dateTo          = new \DateTime($dateRangeForm['date_to']->getData());
 
@@ -496,7 +497,7 @@ class MonitoringController extends FormController
      */
     public function deleteAction($objectId)
     {
-        if (!$this->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:delete')) {
+        if (!$this->get('mautic.security')->isGranted('mauticSocial:monitoring:delete')) {
             return $this->accessDenied();
         }
 
@@ -563,7 +564,7 @@ class MonitoringController extends FormController
      */
     public function batchDeleteAction()
     {
-        if (!$this->container->get('mautic.security')->isGranted('plugin:mauticSocial:monitoring:delete')) {
+        if (!$this->container->get('mautic.security')->isGranted('mauticSocial:monitoring:delete')) {
             return $this->accessDenied();
         }
 
@@ -641,7 +642,7 @@ class MonitoringController extends FormController
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'plugin:mauticSocial:monitoring:view',
+            'mauticSocial:monitoring:view',
             'social',
             'monitoring_leads',
             null, // @todo - implement when individual social channels are supported by the plugin

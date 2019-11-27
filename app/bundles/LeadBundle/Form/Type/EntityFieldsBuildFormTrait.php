@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\TelType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
@@ -192,7 +194,7 @@ trait EntityFieldsBuildFormTrait
                         $cleaningRules[$field['alias']] = 'raw';
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                        $choiceType                  = 'yesno_button_group';
+                        $choiceType                  = YesNoButtonGroupType::class;
                         $typeProperties['expanded']  = true;
                         $typeProperties['yes_label'] = $properties['yes'];
                         $typeProperties['no_label']  = $properties['no'];
@@ -279,6 +281,10 @@ trait EntityFieldsBuildFormTrait
                             if ($type == 'multiselect') {
                                 $constraints[] = new Length(['max' => 255]);
                             }
+                            break;
+                        case 'tel':
+                            $type = TelType::class;
+                        break;
                     }
 
                     $builder->add(

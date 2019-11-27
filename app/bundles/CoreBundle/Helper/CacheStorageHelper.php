@@ -60,15 +60,6 @@ class CacheStorageHelper
     protected $defaultExpiration;
 
     /**
-     * Semi BC support for pre 2.6.0.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @var array
-     */
-    protected $expirations = [];
-
-    /**
      * CacheStorageHelper constructor.
      *
      * @param                 $adaptor
@@ -84,19 +75,6 @@ class CacheStorageHelper
         $this->namespace         = $namespace;
         $this->connection        = $connection;
         $this->defaultExpiration = $defaultExpiration;
-
-        // @deprecated BC support for pre 2.6.0 to be removed in 3.0
-        if (!in_array($adaptor, [self::ADAPTOR_DATABASE, self::ADAPTOR_FILESYSTEM])) {
-            if (file_exists($adaptor)) {
-                $this->cacheDir = $adaptor.'/data';
-            } else {
-                throw new \InvalidArgumentException(
-                    'cache directory either not set or does not exist; use the container\'s mautic.helper.cache_storage service.'
-                );
-            }
-
-            $this->adaptor = self::ADAPTOR_FILESYSTEM;
-        }
 
         $this->setCacheAdaptor();
     }
@@ -121,9 +99,6 @@ class CacheStorageHelper
 
         if (null !== $expiration) {
             $cacheItem->expiresAfter((int) $expiration);
-        } elseif (isset($this->expirations[$name])) {
-            // @deprecated BC support to be removed in 3.0
-            $cacheItem->expiresAfter($this->expirations[$name]);
         } elseif ($data === $cacheItem->get()) {
             // Exact same data so don't update the cache unless expiration is set
 

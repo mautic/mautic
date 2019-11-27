@@ -13,8 +13,8 @@ namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
 /**
@@ -38,7 +38,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->mainCipherMock           = $this->createMock(OpenSSLCipher::class);
-        $this->secondaryCipherMock      = $this->createMock(McryptCipher::class);
+        $this->secondaryCipherMock      = $this->createMock(SymmetricCipherInterface::class);
     }
 
     public function testEncryptMainSupported()

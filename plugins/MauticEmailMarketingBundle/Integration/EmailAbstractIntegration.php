@@ -37,12 +37,14 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     {
         if ($formArea == 'features' || $formArea == 'integration') {
             if ($this->isAuthorized()) {
-                $name = strtolower($this->getName());
-                if ($this->factory->serviceExists('mautic.form.type.emailmarketing.'.$name)) {
+                $formType = $this->getFormType();
+
+                if ($formType) {
                     if ($formArea == 'integration' && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
                         $data['list_settings']['leadFields'] = $data['leadFields'];
                     }
-                    $builder->add('list_settings', 'emailmarketing_'.$name, [
+
+                    $builder->add('list_settings', $formType, [
                         'label'     => false,
                         'form_area' => $formArea,
                         'data'      => (isset($data['list_settings'])) ? $data['list_settings'] : [],
@@ -59,6 +61,13 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     {
         return 'MauticEmailMarketingBundle:FormTheme\EmailMarketing';
     }
+
+    /**
+     * Returns form type.
+     *
+     * @return string|null
+     */
+    abstract public function getFormType();
 
     /**
      * Get the API helper.

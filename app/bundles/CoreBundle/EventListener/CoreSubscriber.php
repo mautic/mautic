@@ -30,7 +30,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
@@ -80,7 +80,7 @@ class CoreSubscriber extends CommonSubscriber
         UserHelper $userHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
-        SecurityContext $securityContext,
+        AuthorizationCheckerInterface $securityContext,
         UserModel $userModel
     ) {
         $this->bundleHelper         = $bundleHelper;
@@ -139,7 +139,6 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         $session = $event->getRequest()->getSession();
-
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $event->getAuthenticationToken()->getUser();
 

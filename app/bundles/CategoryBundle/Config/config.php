@@ -83,11 +83,9 @@ return [
                     'mautic.category.model.category',
                     'router',
                 ],
-                'alias' => 'category',
             ],
             'mautic.form.type.category_form' => [
                 'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
-                'alias'     => 'category_form',
                 'arguments' => [
                     'translator',
                     'session',
@@ -98,7 +96,6 @@ return [
                 'arguments' => [
                     'event_dispatcher',
                 ],
-                'alias' => 'category_bundles_form',
             ],
         ],
         'models' => [

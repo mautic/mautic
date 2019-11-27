@@ -14,10 +14,13 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -136,11 +139,11 @@ class DynamicContentType extends AbstractType
             )->addModelTransformer($emojiTransformer)
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'isCampaignBased',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.dwc.form.is_campaign_based',
                 'data'  => (bool) $options['data']->isCampaignBased(),
@@ -249,14 +252,14 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             ['bundle' => 'dynamicContent']
         );
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 ['apply_text' => false]
             );
 
@@ -271,7 +274,7 @@ class DynamicContentType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons'
+                FormButtonsType::class
             );
         }
 

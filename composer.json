@@ -157,6 +157,7 @@
     },
     "config": {
         "bin-dir": "bin",
+        "process-timeout": 0,
         "platform": {
             "php": "5.6.19"
         }

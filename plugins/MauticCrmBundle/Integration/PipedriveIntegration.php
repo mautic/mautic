@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
@@ -220,33 +221,35 @@ class PipedriveIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => [
-                        'company'  => 'mautic.pipedrive.object.organization',
+                        'mautic.pipedrive.object.organization'  => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.pipedrive.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
             $builder->add(
                 'import',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => [
-                        'enabled' => 'mautic.pipedrive.add.edit.contact.import.enabled',
+                        'mautic.pipedrive.add.edit.contact.import.enabled' => 'enabled',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.pipedrive.add.edit.contact.import',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.add.edit.contact.import',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }
