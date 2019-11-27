@@ -34,14 +34,15 @@ class TwitterHashtagType extends TwitterAbstractType
 
         $builder->add('checknames', ChoiceType::class, [
             'choices' => [
-                '0' => 'mautic.social.monitoring.twitter.no',
-                '1' => 'mautic.social.monitoring.twitter.yes',
+                'mautic.social.monitoring.twitter.no'  => '0',
+                'mautic.social.monitoring.twitter.yes' => '1',
             ],
-            'label'       => 'mautic.social.monitoring.twitter.namematching',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => [
+            'choices_as_values' => true,
+            'label'             => 'mautic.social.monitoring.twitter.namematching',
+            'required'          => false,
+            'empty_value'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.social.monitoring.twitter.namematching.tooltip',
             ],
@@ -51,7 +52,7 @@ class TwitterHashtagType extends TwitterAbstractType
         parent::buildForm($builder, $options);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'twitter_hashtag';
     }

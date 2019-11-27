@@ -12,8 +12,9 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -43,7 +44,7 @@ class TweetSendType extends AbstractType
     {
         $builder->add(
             'channelId',
-            'tweet_list',
+            TweetListType::class,
             [
                 'label'      => 'mautic.integration.Twitter.send.selecttweet',
                 'label_attr' => ['class' => 'control-label'],
@@ -74,7 +75,7 @@ class TweetSendType extends AbstractType
 
             $builder->add(
                 'newTweetButton',
-                'button',
+                ButtonType::class,
                 [
                     'attr' => [
                         'class'   => 'btn btn-primary btn-nospin',
@@ -118,17 +119,17 @@ class TweetSendType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['update_select']);
+        $resolver->setDefined(['update_select']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'tweetsend_list';
     }

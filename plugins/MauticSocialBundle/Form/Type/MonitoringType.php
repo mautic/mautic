@@ -11,15 +11,29 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
+    /** @var MonitoringModel */
+    private $monitoringModel;
+
+    public function __construct(MonitoringModel $monitoringModel)
+    {
+        $this->monitoringModel = $monitoringModel;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -27,13 +41,13 @@ class MonitoringType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
 
-        $builder->add('title', 'text', [
+        $builder->add('title', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
-        $builder->add('description', 'textarea', [
+        $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
@@ -42,7 +56,7 @@ class MonitoringType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $builder->add('publishUp', 'datetime', [
+        $builder->add('publishUp', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishup',
             'label_attr' => ['class' => 'control-label'],
@@ -54,7 +68,7 @@ class MonitoringType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('publishDown', 'datetime', [
+        $builder->add('publishDown', DateTimeType::class, [
             'widget'     => 'single_text',
             'label'      => 'mautic.core.form.publishdown',
             'label_attr' => ['class' => 'control-label'],
@@ -66,15 +80,16 @@ class MonitoringType extends AbstractType
             'required' => false,
         ]);
 
-        $builder->add('networkType', 'choice', [
+        $builder->add('networkType', ChoiceType::class, [
             'label'      => 'mautic.social.monitoring.type.list',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.getNetworkFormAction(this)',
             ],
-            'choices'     => $options['networkTypes'], // passed from the controller
-            'empty_value' => 'mautic.core.form.chooseone',
+            'choices'           => array_flip((array) $options['networkTypes']), // passed from the controller
+            'choices_as_values' => true,
+            'empty_value'       => 'mautic.core.form.chooseone',
         ]);
 
         // if we have a network type value add in the form
@@ -82,7 +97,9 @@ class MonitoringType extends AbstractType
             // get the values from the entity function
             $properties = $options['data']->getProperties();
 
-            $builder->add('properties', $options['networkType'],
+            $formType = $this->monitoringModel->getFormByType($options['networkType']);
+
+            $builder->add('properties', $formType,
                 [
                     'label' => false,
                     'data'  => $properties,
@@ -101,7 +118,7 @@ class MonitoringType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
+        $builder->add('category', CategoryListType::class, [
             'bundle' => 'plugin:mauticSocial',
         ]);
 
@@ -111,7 +128,7 @@ class MonitoringType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
                 'data_class' => 'MauticPlugin\MauticSocialBundle\Entity\Monitoring',
@@ -121,10 +138,10 @@ class MonitoringType extends AbstractType
         $resolver->setRequired(['networkTypes']);
 
         // allow the specific network type - single
-        $resolver->setOptional(['networkType']);
+        $resolver->setDefined(['networkType']);
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'monitoring';
     }
