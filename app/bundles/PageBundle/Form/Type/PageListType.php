@@ -57,14 +57,13 @@ class PageListType extends AbstractType
                     $choices = [];
                     $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids']);
                     foreach ($pages as $page) {
-                        $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
+                        $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                     }
 
                     //sort by language
                     ksort($choices);
 
                     foreach ($choices as $lang => &$pages) {
-                        $pages = array_flip($pages);
                         ksort($pages);
                     }
 

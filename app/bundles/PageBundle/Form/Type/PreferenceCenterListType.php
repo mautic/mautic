@@ -58,7 +58,7 @@ class PreferenceCenterListType extends AbstractType
                     $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
                     foreach ($pages as $page) {
                         if ($page['isPreferenceCenter']) {
-                            $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
+                            $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                         }
                     }
 
@@ -66,7 +66,6 @@ class PreferenceCenterListType extends AbstractType
                     ksort($choices);
 
                     foreach ($choices as $lang => &$pages) {
-                        $pages = array_flip($pages);
                         ksort($pages);
                     }
 
