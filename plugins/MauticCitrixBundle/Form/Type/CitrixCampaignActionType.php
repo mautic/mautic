@@ -122,7 +122,7 @@ class CitrixCampaignActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'citrix_campaign_action';
     }

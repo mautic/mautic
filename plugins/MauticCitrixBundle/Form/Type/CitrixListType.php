@@ -71,7 +71,7 @@ class CitrixListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'citrix_list';
     }

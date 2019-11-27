@@ -15,6 +15,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -92,9 +93,10 @@ class CitrixActionType extends AbstractType
 
             $builder->add(
                 'product',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'    => $products,
+                    'choices'    => array_flip($products),
+                    'choices_as_values' => true,
                     'expanded'   => false,
                     'label_attr' => ['class' => 'control-label'],
                     'multiple'   => false,
@@ -215,7 +217,7 @@ class CitrixActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'citrix_submit_action';
     }
