@@ -125,12 +125,16 @@ return [
         'forms' => [
             'mautic.form.type.apiclients' => [
                 'class'     => 'Mautic\ApiBundle\Form\Type\ClientType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'client',
+                'arguments' => [
+                    'request_stack',
+                    'translator',
+                    'validator',
+                    'router',
+                    'session',
+                ],
             ],
             'mautic.form.type.apiconfig' => [
                 'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
-                'alias' => 'apiconfig',
             ],
         ],
         'other' => [
@@ -170,7 +174,6 @@ return [
             'mautic.validator.oauthcallback' => [
                 'class' => 'Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator',
                 'tag'   => 'validator.constraint_validator',
-                'alias' => 'oauth_callback',
             ],
         ],
         'models' => [

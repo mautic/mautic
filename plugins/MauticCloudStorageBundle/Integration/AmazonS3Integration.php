@@ -13,13 +13,11 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Aws\S3\S3Client;
 use Gaufrette\Adapter\AwsS3;
+use MauticPlugin\MauticFullContactBundle\Exception\NoFormNeededException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-/**
- * Class AmazonS3Integration.
- */
 class AmazonS3Integration extends CloudStorageIntegration
 {
     /**
@@ -119,6 +117,14 @@ class AmazonS3Integration extends CloudStorageIntegration
         }
 
         return $this->adapter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        throw new NoFormNeededException();
     }
 
     /**

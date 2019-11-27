@@ -92,32 +92,6 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * Remove email from DNE list.
-     *
-     * @param $email
-     */
-    public function removeFromDoNotEmailList($email)
-    {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-
-        /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
-        $leadRepo = $this->getEntityManager()->getRepository('MauticLeadBundle:Lead');
-        $leadId   = (array) $leadRepo->getLeadByEmail($email, true);
-
-        /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = [];
-
-        foreach ($leadId as $lead) {
-            $leads[] = $leadRepo->getEntity($lead['id']);
-        }
-
-        foreach ($leads as $lead) {
-            $leadModel->removeDncForLead($lead, 'email');
-        }
-    }
-
-    /**
      * Delete DNC row.
      *
      * @param $id

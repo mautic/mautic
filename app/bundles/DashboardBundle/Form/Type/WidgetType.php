@@ -11,11 +11,17 @@
 
 namespace Mautic\DashboardBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -25,14 +31,24 @@ use Symfony\Component\Form\FormEvents;
  */
 class WidgetType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var ContainerAwareEventDispatcher
+     */
+    protected $dispatcher;
 
     /**
-     * @param MauticFactory $factory
+     * @var CorePermissions
      */
-    public function __construct(MauticFactory $factory)
+    protected $security;
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     * @param CorePermissions          $security
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
     {
-        $this->factory = $factory;
+        $this->dispatcher = $dispatcher;
+        $this->security   = $security;
     }
 
     /**
@@ -41,60 +57,75 @@ class WidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name', 'text', [
-            'label'      => 'mautic.dashboard.widget.form.name',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'name',
+            TextType::class,
+            [
+                'label'      => 'mautic.dashboard.widget.form.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
 
-        $dispatcher = $this->factory->getDispatcher();
-        $event      = new WidgetTypeListEvent();
-        $event->setSecurity($this->factory->getSecurity());
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $event = new WidgetTypeListEvent();
+        $event->setSecurity($this->security);
+        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
-        $builder->add('type', 'choice', [
-            'label'       => 'mautic.dashboard.widget.form.type',
-            'choices'     => $event->getTypes(),
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => 'mautic.core.select',
-            'attr'        => [
-                'class'    => 'form-control',
-                'onchange' => 'Mautic.updateWidgetForm(this)',
-            ],
-        ]);
+        $builder->add(
+            'type',
+            ChoiceType::class,
+            [
+                'label'       => 'mautic.dashboard.widget.form.type',
+                'choices'     => $event->getTypes(),
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => 'mautic.core.select',
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.updateWidgetForm(this)',
+                ],
+            ]
+        );
 
-        $builder->add('width', 'choice', [
-            'label'   => 'mautic.dashboard.widget.form.width',
-            'choices' => [
-                '25'  => '25%',
-                '50'  => '50%',
-                '75'  => '75%',
-                '100' => '100%',
-            ],
-            'empty_data' => '100',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'width',
+            ChoiceType::class,
+            [
+                'label'   => 'mautic.dashboard.widget.form.width',
+                'choices' => [
+                    '25'  => '25%',
+                    '50'  => '50%',
+                    '75'  => '75%',
+                    '100' => '100%',
+                ],
+                'empty_data'        => '100',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
+            ]
+        );
 
-        $builder->add('height', 'choice', [
-            'label'   => 'mautic.dashboard.widget.form.height',
-            'choices' => [
-                '215' => '215px',
-                '330' => '330px',
-                '445' => '445px',
-                '560' => '560px',
-                '675' => '675px',
-            ],
-            'empty_data' => '330',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'height',
+            ChoiceType::class,
+            [
+                'label'   => 'mautic.dashboard.widget.form.height',
+                'choices' => [
+                    '215' => '215px',
+                    '330' => '330px',
+                    '445' => '445px',
+                    '560' => '560px',
+                    '675' => '675px',
+                ],
+                'empty_data'        => '330',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
+            ]
+        );
 
         // function to add a form for specific widget type dynamically
-        $func = function (FormEvent $e) use ($dispatcher) {
+        $func = function (FormEvent $e) {
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();
@@ -115,7 +146,7 @@ class WidgetType extends AbstractType
             }
 
             $event->setType($type);
-            $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
+            $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_FORM_GENERATE, $event);
             $widgetForm = $event->getForm();
             $form->setData($params);
 
@@ -126,14 +157,22 @@ class WidgetType extends AbstractType
             }
         };
 
-        $builder->add('id', 'hidden', [
-            'mapped' => false,
-        ]);
+        $builder->add(
+            'id',
+            HiddenType::class,
+            [
+                'mapped' => false,
+            ]
+        );
 
-        $builder->add('buttons', 'form_buttons', [
-            'apply_text' => false,
-            'save_text'  => 'mautic.core.form.save',
-        ]);
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'apply_text' => false,
+                'save_text'  => 'mautic.core.form.save',
+            ]
+        );
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -141,13 +180,13 @@ class WidgetType extends AbstractType
 
         // Register the function above as EventListener on PreSet and PreBind
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
-        $builder->addEventListener(FormEvents::PRE_BIND, $func);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'widget';
     }

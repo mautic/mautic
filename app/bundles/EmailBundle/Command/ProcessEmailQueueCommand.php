@@ -57,11 +57,10 @@ EOT
         $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
         $container  = $this->getContainer();
         $dispatcher = $container->get('event_dispatcher');
-
-        $skipClear = $input->getOption('do-not-clear');
-        $quiet     = $input->getOption('quiet');
-        $timeout   = $input->getOption('clear-timeout');
-        $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
+        $skipClear  = $input->getOption('do-not-clear');
+        $quiet      = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $timeout    = $input->getOption('clear-timeout');
+        $queueMode  = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');

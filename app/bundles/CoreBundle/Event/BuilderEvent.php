@@ -174,10 +174,9 @@ class BuilderEvent extends Event
             throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
         }
 
-        //check for required keys and that given functions are callable
+        //check for required keys
         $this->verifyCriteria(
-            ['group', 'label', 'callback'],
-            ['callback'],
+            ['group', 'label', 'event'],
             $criteria
         );
 
@@ -188,32 +187,22 @@ class BuilderEvent extends Event
 
     /**
      * @param array $keys
-     * @param array $methods
      * @param array $criteria
      */
-    private function verifyCriteria(array $keys, array $methods, array $criteria)
+    private function verifyCriteria(array $keys, array $criteria)
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {
                 throw new InvalidArgumentException("The key, '$k' is missing.");
             }
         }
-
-        foreach ($methods as $m) {
-            if (isset($criteria[$m]) && !is_callable($criteria[$m], true)) {
-                throw new InvalidArgumentException(
-                    $criteria[$m].' is not callable.  Please ensure that it exists and that it is a fully qualified namespace.'
-                );
-            }
-        }
     }
 
     /**
      * @param array $tokens
-     * @param bool  $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
      * @param bool  $convertToLinks
      */
-    public function addTokens(array $tokens, $allowVisualPlaceholder = false, $convertToLinks = false)
+    public function addTokens(array $tokens, $convertToLinks = false)
     {
         if ($convertToLinks) {
             array_walk($tokens, function (&$val, $key) {
@@ -344,15 +333,13 @@ class BuilderEvent extends Event
      * @param                    $tokens
      * @param string             $labelColumn
      * @param string             $valueColumn
-     * @param bool               $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
-     * @param bool               $convertToLinks         If true, the tokens will be converted to links
+     * @param bool               $convertToLinks If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(
         BuilderTokenHelper $tokenHelper,
         $tokens,
         $labelColumn = 'name',
         $valueColumn = 'id',
-        $allowVisualPlaceholder = false,
         $convertToLinks = false
     ) {
         $tokens = $this->getTokensFromHelper($tokenHelper, $tokens, $labelColumn, $valueColumn);
@@ -362,7 +349,6 @@ class BuilderEvent extends Event
 
         $this->addTokens(
             $tokens,
-            $allowVisualPlaceholder,
             $convertToLinks
         );
     }
@@ -429,51 +415,5 @@ class BuilderEvent extends Event
         }
 
         return $this->requested == $type || $this->requested == 'all';
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @param $key
-     * @param $header
-     * @param $content
-     * @param $priority
-     */
-    public function addTokenSection($key, $header, $content, $priority = 0)
-    {
-    }
-
-    /**
-     * Get tokenSections.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @return array
-     */
-    public function getTokenSections()
-    {
-        return [];
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @return array
-     */
-    public function getVisualTokens()
-    {
-        return [];
-    }
-
-    /**
-     * Check if token sections have been requested.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @return bool
-     */
-    public function tokenSectionsRequested()
-    {
-        return [];
     }
 }

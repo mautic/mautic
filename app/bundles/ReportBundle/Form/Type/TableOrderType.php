@@ -48,7 +48,7 @@ class TableOrderType extends AbstractType
             'empty_value' => false,
             'required'    => false,
             'attr'        => [
-                'class' => 'form-control filter-columns',
+                'class' => 'form-control',
             ],
         ]);
 

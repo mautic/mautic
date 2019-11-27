@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use Joomla\Http\HttpFactory;
+use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 
 /**
  * Class AbstractLocalDataLookup.
@@ -37,7 +38,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      */
     public function getConfigFormService()
     {
-        return 'iplookup_download_data_store_button';
+        return IpLookupDownloadDataStoreButtonType::class;
     }
 
     /**

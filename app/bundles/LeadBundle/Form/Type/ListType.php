@@ -13,10 +13,13 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -51,6 +54,7 @@ class ListType extends AbstractType
     private $deviceOsChoices     = [];
     private $tagChoices          = [];
     private $stageChoices        = [];
+    private $assetChoices        = [];
     private $localeChoices       = [];
     private $categoriesChoices   = [];
 
@@ -66,8 +70,9 @@ class ListType extends AbstractType
      * @param CategoryModel       $categoryModel
      * @param UserHelper          $userHelper
      * @param CampaignModel       $campaignModel
+     * @param AssetModel          $assetModel
      */
-    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel)
+    public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
     {
         $this->translator = $translator;
 
@@ -103,6 +108,13 @@ class ListType extends AbstractType
             $this->emailChoices[$email['language']][$email['id']] = $email['name'];
         }
         ksort($this->emailChoices);
+
+        // Get assets without 'filter' or 'limit'
+        $assets = $assetModel->getLookupResults('asset', null, 0);
+        foreach ($assets as $asset) {
+            $this->assetChoices[$asset['language']][$asset['id']] = $asset['title'];
+        }
+        ksort($this->assetChoices);
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
@@ -171,7 +183,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'isGlobal',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.list.form.isglobal',
                 'attr'       => [
@@ -182,7 +194,7 @@ class ListType extends AbstractType
 
         $builder->add(
             'isPreferenceCenter',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.list.form.isPreferenceCenter',
                 'attr'       => [
@@ -191,9 +203,9 @@ class ListType extends AbstractType
             ]
         );
 
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object'=>'lead']);
         $builder->add(
             $builder->create(
                 'filters',
@@ -212,6 +224,7 @@ class ListType extends AbstractType
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
                         'deviceOs'       => $this->deviceOsChoices,
+                        'assets'         => $this->assetChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'locales'        => $this->localeChoices,
@@ -231,7 +244,7 @@ class ListType extends AbstractType
             )->addModelTransformer($filterModalTransformer)
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -265,6 +278,7 @@ class ListType extends AbstractType
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
         $view->vars['deviceOs']       = $this->deviceOsChoices;
+        $view->vars['assets']         = $this->assetChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['locales']        = $this->localeChoices;

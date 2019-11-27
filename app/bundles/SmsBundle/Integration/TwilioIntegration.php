@@ -12,6 +12,7 @@
 
 namespace Mautic\SmsBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
@@ -101,7 +102,7 @@ class TwilioIntegration extends AbstractIntegration
             );
             $builder->add(
                 'disable_trackable_urls',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
                     'attr'  => [

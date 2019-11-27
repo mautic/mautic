@@ -82,7 +82,7 @@ class TweetController extends FormController
      */
     protected function getPermissionBase()
     {
-        return 'plugin:mauticSocial:tweets';
+        return 'mauticSocial:tweets';
     }
 
     /**

@@ -10,7 +10,7 @@
  */
 $header = $view['translator']->trans(
     'mautic.report.report.header.view',
-    ['%name%' => $view['translator']->trans($report->getName())]
+    ['%name%' => $view->escape($view['translator']->trans($report->getName()))]
 );
 
 if ($tmpl == 'index') {
@@ -109,7 +109,7 @@ if ($tmpl == 'index') {
 <!-- report detail header -->
 <?php if ($report->getDescription()): ?>
 <div class="pr-md pl-md pt-lg pb-lg">
-    <div class="text-white dark-sm mb-0"><?php echo $report->getDescription(); ?></div>
+    <div class="text-white dark-sm mb-0"><?php echo $view->escape($report->getDescription()); ?></div>
 </div>
 <?php endif; ?>
 <!--/ report detail header -->

@@ -15,6 +15,21 @@ use DOMDocument;
 use DOMXPath;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
+use Mautic\CoreBundle\Form\Type\SlotButtonType;
+use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
+use Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType;
+use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
+use Mautic\CoreBundle\Form\Type\SlotDwcType;
+use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
+use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotImageType;
+use Mautic\CoreBundle\Form\Type\SlotPreferredChannelType;
+use Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType;
+use Mautic\CoreBundle\Form\Type\SlotSegmentListType;
+use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
+use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
+use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
+use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -104,20 +119,20 @@ class BuilderSubscriber extends CommonSubscriber
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner',
+                'event'    => PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
             $dwellTime = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.dwelltime',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner',
+                'event'    => PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
         if ($event->tokensRequested([$this->pageTokenRegex, $this->dwcTokenRegex])) {
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
 
             // add only filter based dwc tokens
             $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
@@ -164,7 +179,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot_image',
+                SlotImageType::class,
                 900
             );
             $event->addSlotType(
@@ -172,7 +187,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
                 'MauticCoreBundle:Slots:imagecard.html.php',
-                'slot_imagecard',
+                SlotImageCardType::class,
                 870
             );
             $event->addSlotType(
@@ -180,7 +195,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
-                'slot_imagecaption',
+                SlotImageCaptionType::class,
                 850
             );
             $event->addSlotType(
@@ -188,7 +203,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
-                'slot_button',
+                SlotButtonType::class,
                 800
             );
             $event->addSlotType(
@@ -196,7 +211,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialshare'),
                 'share-alt',
                 'MauticCoreBundle:Slots:socialshare.html.php',
-                'slot_socialshare',
+                SlotSocialShareType::class,
                 700
             );
             $event->addSlotType(
@@ -204,7 +219,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot_socialfollow',
+                SlotSocialFollowType::class,
                 600
             );
             if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
@@ -213,7 +228,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.segmentlist'),
                     'list-alt',
                     'MauticCoreBundle:Slots:segmentlist.html.php',
-                    'slot_segmentlist',
+                    SlotSegmentListType::class,
                     590
                 );
                 $event->addSlotType(
@@ -221,7 +236,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.categorylist'),
                     'bookmark-o',
                     'MauticCoreBundle:Slots:categorylist.html.php',
-                    'slot_categorylist',
+                    SlotCategoryListType::class,
                     580
                 );
                 $event->addSlotType(
@@ -229,7 +244,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.preferredchannel'),
                     'envelope-o',
                     'MauticCoreBundle:Slots:preferredchannel.html.php',
-                    'slot_preferredchannel',
+                    SlotPreferredChannelType::class,
                     570
                 );
                 $event->addSlotType(
@@ -237,7 +252,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.channelfrequency'),
                     'calendar',
                     'MauticCoreBundle:Slots:channelfrequency.html.php',
-                    'slot_channelfrequency',
+                    SlotChannelFrequencyType::class,
                     560
                 );
                 $event->addSlotType(
@@ -245,7 +260,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.saveprefsbutton'),
                     'floppy-o',
                     'MauticCoreBundle:Slots:saveprefsbutton.html.php',
-                    'slot_saveprefsbutton',
+                    SlotSavePrefsButtonType::class,
                     540
                 );
 
@@ -254,7 +269,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.core.slot.label.successmessage'),
                     'check',
                     'MauticCoreBundle:Slots:successmessage.html.php',
-                    'slot_successmessage',
+                    SlotSuccessMessageType::class,
                     540
                 );
             }
@@ -263,7 +278,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
                 'MauticCoreBundle:Slots:codemode.html.php',
-                'slot_codemode',
+                SlotCodeModeType::class,
                 500
             );
             $event->addSlotType(
@@ -271,7 +286,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot_separator',
+                SlotSeparatorType::class,
                 400
             );
             $event->addSlotType(
@@ -287,7 +302,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'sticky-note-o',
                 'MauticCoreBundle:Slots:dwc.html.php',
-                'slot_dwc',
+                SlotDwcType::class,
                 200
             );
         }
@@ -358,6 +373,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::segmentListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -365,6 +381,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::categoryListRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -372,6 +389,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::preferredchannel;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -379,6 +397,7 @@ class BuilderSubscriber extends CommonSubscriber
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
                     $slot->nodeValue = self::channelfrequency;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
                 }
 
@@ -387,6 +406,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $slot            = $divContent->item($i);
                     $saveButton      = $xpath->query('//*[@data-slot="saveprefsbutton"]//a')->item(0);
                     $slot->nodeValue = self::saveprefsRegex;
+                    $slot->setAttribute('data-prefs-center', '1');
                     $content         = $dom->saveHTML();
 
                     $params['saveprefsbutton'] = [
@@ -421,6 +441,26 @@ class BuilderSubscriber extends CommonSubscriber
             if (false !== strpos($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
+            }
+            // add form before first block of prefs center
+            if (isset($params['startform']) && strpos($content, 'data-prefs-center') !== false) {
+                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+                $xpath      = new DOMXPath($dom);
+                // If use slots
+                $divContent = $xpath->query('//*[@data-prefs-center="1"]');
+                if (!$divContent->length) {
+                    // If use tokens
+                    $divContent = $xpath->query('//*[@data-prefs-center-first="1"]');
+                }
+
+                if ($divContent->length) {
+                    $slot    = $divContent->item(0);
+                    $newnode = $dom->createElement('startform');
+                    $slot->parentNode->insertBefore($newnode, $slot);
+                    $content = $dom->saveHTML();
+                    $content = str_replace('<startform></startform>', $params['startform'], $content);
+                }
             }
 
             if (false !== strpos($content, self::successmessage)) {
@@ -465,6 +505,14 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
+     * @return string
+     */
+    private function getAttributeForFirtSlot()
+    {
+        return 'data-prefs-center-first="1"';
+    }
+
+    /**
      * Renders the HTML for the segment list.
      *
      * @param array $params
@@ -476,7 +524,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-segmentlist'>\n";
+            $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -494,7 +542,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-categorylist'>\n";
+            $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
@@ -548,7 +596,7 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-saveprefs'>\n";
+            $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
@@ -612,7 +660,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $related[$parent->getId()] = [
                     'lang' => $trans,
                     // Add ntrd to not auto redirect to another language
-                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
+                    'url'  => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -623,7 +671,7 @@ class BuilderSubscriber extends CommonSubscriber
                     $related[$c->getId()] = [
                         'lang' => $trans,
                         // Add ntrd to not auto redirect to another language
-                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
+                        'url'  => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }
@@ -653,7 +701,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
             $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
         }
     }
 

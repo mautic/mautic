@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -976,10 +977,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'keys') {
-            $builder->add('version', 'button_group', [
+            $builder->add('version', ButtonGroupType::class, [
                 'choices' => [
-                    '6' => '6.x/community',
-                    '7' => '7.x',
+                    '6.x/community' => '6',
+                    '7.x'           => '7',
                 ],
                 'label'       => 'mautic.sugarcrm.form.version',
                 'constraints' => [
@@ -993,18 +994,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'updateOwner',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateOwner' => 'mautic.sugarcrm.updateOwner',
+                        'mautic.sugarcrm.updateOwner' => 'updateOwner',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.sugarcrm.form.updateOwner',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.sugarcrm.form.updateOwner',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -1012,18 +1014,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateDnc',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateDnc' => 'mautic.sugarcrm.updateDnc',
+                        'mautic.sugarcrm.updateDnc' => 'updateDnc',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.sugarcrm.form.updateDnc',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.sugarcrm.form.updateDnc',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -1031,35 +1034,37 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integrations.form.blanks',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.integrations.form.blanks',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'Leads'    => 'mautic.sugarcrm.object.lead',
-                        'Contacts' => 'mautic.sugarcrm.object.contact',
-                        'company'  => 'mautic.sugarcrm.object.company',
+                        'mautic.sugarcrm.object.lead'    => 'Leads',
+                        'mautic.sugarcrm.object.contact' => 'Contacts',
+                        'mautic.sugarcrm.object.company' => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.sugarcrm.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.sugarcrm.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
@@ -1067,9 +1072,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'    => $this->leadModel->getEngagementTypes(),
-                    'label'      => 'mautic.salesforce.form.activity_included_events',
-                    'label_attr' => [
+                    'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
+                    'choices_as_values' => true,
+                    'label'             => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr'        => [
                         'class'       => 'control-label',
                         'data-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
@@ -1142,9 +1148,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 return false;
             } //Do not push lead if it was already synched
         }
-        $fields = array_keys($config['leadFields']);
 
-        $leadFields = $this->cleanSugarData($config, $fields, $object);
+        $fieldsToUpdateInSugar      = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $leadSugarFieldsToCreate    = $this->cleanSugarData($config, array_keys($config['leadFields']), $object);
+        $fieldsToUpdateInLeadsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, $object);
+        $leadFields                 = array_intersect_key($leadSugarFieldsToCreate, $fieldsToUpdateInLeadsSugar);
 
         $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
 
@@ -1254,7 +1262,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $config                  = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo   = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData              = $leadsToUpdate              = $fields              = [];
-        $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields              = $config['leadFields'];
         if (!empty($leadFields)) {
             if ($keys = array_keys($leadFields, 'mauticContactTimelineLink')) {
@@ -1276,12 +1284,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             //Leads fields
             $leadSugarFieldsToCreate    = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Leads');
             $fieldsToUpdateInLeadsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, 'Leads');
-            $leadSugarFields            = array_diff_key($leadSugarFieldsToCreate, $fieldsToUpdateInLeadsSugar);
+            $leadSugarFields            = array_intersect_key($leadSugarFieldsToCreate, $fieldsToUpdateInLeadsSugar);
 
             //Contacts fields
             $contactSugarFields            = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Contacts');
             $fieldsToUpdateInContactsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, 'Contacts');
-            $contactSugarFields            = array_diff_key($contactSugarFields, $fieldsToUpdateInContactsSugar);
+            $contactSugarFields            = array_intersect_key($contactSugarFields, $fieldsToUpdateInContactsSugar);
 
             $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
 
@@ -1334,7 +1342,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         // Create any left over
-        if ($checkEmailsInSugar) {
+        if ($checkEmailsInSugar && isset($checkEmailsInSugar['Leads'])) {
             list($checkEmailsInSugar, $deletedSugarLeads) = $this->getObjectDataToUpdate($checkEmailsInSugar['Leads'], $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, 'Leads');
             $ownerAssignedUserIdByEmail                   = null;
             foreach ($checkEmailsInSugar as $lead) {
@@ -1449,7 +1457,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param $leadSugarFields
      * @param string $object
      *
-     * @return mixed
+     * @return array The first element is made up of records that exist in Mautic, but which no longer have a match in CRM.
+     *               We therefore assume that they've been deleted in CRM and will mark them as deleted in the pushLeads function (~line 1320).
+     *               The second element contains Ids of records that were explicitly marked as deleted in CRM. ATM, nothing is done with this data.
      */
     public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads')
     {
@@ -1496,44 +1506,46 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 $email           = $sugarLeadRecord['email1'];
                 $key             = mb_strtolower($email);
                 $leadOwnerEmails = [];
-                foreach ($checkEmailsInSugar as $emailKey => $mauticRecord) {
-                    if ($email == $emailKey) {
-                        $isConverted = (isset($sugarLeadRecord['contact_id'])
-                            && $sugarLeadRecord['contact_id'] != null
-                            && $sugarLeadRecord['contact_id'] != '');
+                if (!empty($checkEmailsInSugar)) {
+                    foreach ($checkEmailsInSugar as $emailKey => $mauticRecord) {
+                        if ($key == $emailKey) {
+                            $isConverted = (isset($sugarLeadRecord['contact_id'])
+                                && $sugarLeadRecord['contact_id'] != null
+                                && $sugarLeadRecord['contact_id'] != '');
 
-                        $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id'];
-                        $lead['owner_email']                                             = $this->getOwnerEmail($mauticRecord);
-                        if ($lead['owner_email']) {
-                            $leadOwnerEmails[] = $lead['owner_email'];
-                        }
-                        $ownerAssignedUserIdByEmail = $this->getApiHelper()->getIdBySugarEmail(['emails' => array_unique($leadOwnerEmails)]);
-                        if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
-                            $sugarFieldMappings = $this->prepareFieldsForPush($availableFields);
+                            $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id'];
+                            $lead['owner_email']                                             = $this->getOwnerEmail($mauticRecord);
+                            if ($lead['owner_email']) {
+                                $leadOwnerEmails[] = $lead['owner_email'];
+                            }
+                            $ownerAssignedUserIdByEmail = $this->getApiHelper()->getIdBySugarEmail(['emails' => array_unique($leadOwnerEmails)]);
+                            if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
+                                $sugarFieldMappings = $this->prepareFieldsForPush($availableFields);
 
-                            if (isset($sugarFieldMappings['Contacts']) && !empty($sugarFieldMappings['Contacts'])) {
-                                $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
+                                if (isset($sugarFieldMappings['Contacts']) && !empty($sugarFieldMappings['Contacts'])) {
+                                    $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
+                                }
+                                if (isset($sugarFieldMappings['Leads']) && !empty($sugarFieldMappings['Leads'])) {
+                                    $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord, $sugarFieldMappings['Leads'], $config);
+                                }
+                                $this->buildCompositeBody(
+                                    $mauticData,
+                                    $availableFields,
+                                    $isConverted || ($object == 'Contacts') ? $contactSugarFields : $leadSugarFields,
+                                    $isConverted || ($object == 'Contacts') ? 'Contacts' : 'Leads',
+                                    $checkEmailsInSugar[$key],
+                                    $ownerAssignedUserIdByEmail,
+                                    $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']
+                                );
+                            } else {
+                                // @todo - Should return also deleted contacts from Sugar
+                                $deletedSugarLeads[] = $sugarLeadRecord['id'];
+                                if (!empty($sugarLeadRecord['contact_id']) || $sugarLeadRecord['contact_id'] != '') {
+                                    $deletedSugarLeads[] = $sugarLeadRecord['contact_id'];
+                                }
                             }
-                            if (isset($sugarFieldMappings['Leads']) && !empty($sugarFieldMappings['Leads'])) {
-                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord, $sugarFieldMappings['Leads'], $config);
-                            }
-                            $this->buildCompositeBody(
-                                $mauticData,
-                                $availableFields,
-                                $isConverted || ($object == 'Contacts') ? $contactSugarFields : $leadSugarFields,
-                                $isConverted || ($object == 'Contacts') ? 'Contacts' : 'Leads',
-                                $checkEmailsInSugar[$key],
-                                $ownerAssignedUserIdByEmail,
-                                $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']
-                            );
-                        } else {
-                            // @todo - Should return also deleted contacts from Sugar
-                            $deletedSugarLeads[] = $sugarLeadRecord['id'];
-                            if (!empty($sugarLeadRecord['contact_id']) || $sugarLeadRecord['contact_id'] != '') {
-                                $deletedSugarLeads[] = $sugarLeadRecord['contact_id'];
-                            }
+                            unset($checkEmailsInSugar[$key]);
                         }
-                        unset($checkEmailsInSugar[$key]);
                     }
                 }
             }
@@ -1555,17 +1567,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $result = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
 
         return $result;
-    }
-
-    /**
-     * @param array $fields
-     *
-     * @return array
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public function amendToSfFields($fields)
-    {
     }
 
     /**
@@ -1715,7 +1716,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
-                    $error = 'Uknown status code '.$item['httpStatusCode'];
+                    $error = 'Unknown status code '.$item['httpStatusCode'];
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));
                 }
             }

@@ -128,7 +128,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $action = [
             'label'                  => 'mautic.channel.message.send.marketing.message',
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
-            'eventName'              => ChannelEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => 'message_send',
             'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend',

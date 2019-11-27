@@ -12,16 +12,23 @@
 namespace Mautic\ApiBundle\Form\Type;
 
 use Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallback;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer as Transformers;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ValidatorInterface;
 
 /**
  * Class ClientType.
@@ -44,19 +51,33 @@ class ClientType extends AbstractType
     private $apiMode;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
+     * @var \Symfony\Component\Routing\RouterInterface
      */
     private $router;
 
     /**
-     * @param MauticFactory $factory
+     * Constructor.
+     *
+     * @param RequestStack        $requestStack
+     * @param TranslatorInterface $translator
+     * @param ValidatorInterface  $validator
+     * @param Session             $session
+     * @param RouterInterface     $router
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->validator  = $factory->getValidator();
-        $this->apiMode    = $factory->getRequest()->get('api_mode', $factory->getSession()->get('mautic.client.filter.api_mode', 'oauth1a'));
-        $this->router     = $factory->getRouter();
+    public function __construct(
+        RequestStack $requestStack,
+        TranslatorInterface $translator,
+        ValidatorInterface $validator,
+        Session $session,
+        RouterInterface $router
+    ) {
+        $this->translator = $translator;
+        $this->validator  = $validator;
+        $this->apiMode    = $requestStack->getCurrentRequest()->get(
+            'api_mode',
+            $session->get('mautic.client.filter.api_mode', 'oauth1a')
+        );
+        $this->router     = $router;
     }
 
     /**
@@ -70,7 +91,7 @@ class ClientType extends AbstractType
         if (!$options['data']->getId()) {
             $builder->add(
                 'api_mode',
-                'choice',
+                ChoiceType::class,
                 [
                     'mapped'     => false,
                     'label'      => 'mautic.api.client.form.auth_protocol',
@@ -80,19 +101,20 @@ class ClientType extends AbstractType
                         'onchange' => 'Mautic.refreshApiClientForm(\''.$this->router->generate('mautic_client_action', ['objectAction' => 'new']).'\', this)',
                     ],
                     'choices' => [
-                        'oauth1a' => 'OAuth 1.0a',
-                        'oauth2'  => 'OAuth 2',
+                        'OAuth 1.0a' => 'oauth1a',
+                        'OAuth 2'    => 'oauth2',
                     ],
-                    'required'    => false,
-                    'empty_value' => false,
-                    'data'        => $this->apiMode,
+                    'choices_as_values' => true,
+                    'required'          => false,
+                    'empty_value'       => false,
+                    'data'              => $this->apiMode,
                 ]
             );
         }
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -105,7 +127,7 @@ class ClientType extends AbstractType
             $builder->add(
                 $builder->create(
                     'redirectUris',
-                    'text',
+                    TextType::class,
                     [
                         'label'      => 'mautic.api.client.redirecturis',
                         'label_attr' => ['class' => 'control-label'],
@@ -120,7 +142,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'publicId',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.clientid',
                     'label_attr' => ['class' => 'control-label'],
@@ -134,7 +156,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'secret',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.clientsecret',
                     'label_attr' => ['class' => 'control-label'],
@@ -180,7 +202,7 @@ class ClientType extends AbstractType
             $builder->add(
                 $builder->create(
                     'callback',
-                    'text',
+                    TextType::class,
                     [
                         'label'      => 'mautic.api.client.form.callback',
                         'label_attr' => ['class' => 'control-label'],
@@ -195,7 +217,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'consumerKey',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.consumerkey',
                     'label_attr' => ['class' => 'control-label'],
@@ -212,7 +234,7 @@ class ClientType extends AbstractType
 
             $builder->add(
                 'consumerSecret',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.api.client.form.consumersecret',
                     'label_attr' => ['class' => 'control-label'],
@@ -254,7 +276,7 @@ class ClientType extends AbstractType
             );
         }
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -264,7 +286,7 @@ class ClientType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $dataClass = ($this->apiMode == 'oauth2') ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
         $resolver->setDefaults(
@@ -277,7 +299,7 @@ class ClientType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'client';
     }

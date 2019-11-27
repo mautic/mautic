@@ -14,11 +14,9 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\UserBundle\Form\Type\ConfigType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/**
- * Class ConfigSubscriber.
- */
 class ConfigSubscriber extends CommonSubscriber
 {
     private $fileFields = ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key'];
@@ -40,14 +38,15 @@ class ConfigSubscriber extends CommonSubscriber
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addFileFields($this->fileFields)
-              ->addForm(
-                  [
-                      'bundle'     => 'UserBundle',
-                      'formAlias'  => 'userconfig',
-                      'formTheme'  => 'MauticUserBundle:FormTheme\Config',
-                      'parameters' => $event->getParametersFromConfig('MauticUserBundle'),
-                  ]
-              );
+            ->addForm(
+            [
+                'bundle'     => 'UserBundle',
+                'formAlias'  => 'userconfig',
+                'formType'   => ConfigType::class,
+                'formTheme'  => 'MauticUserBundle:FormTheme\Config',
+                'parameters' => $event->getParametersFromConfig('MauticUserBundle'),
+            ]
+        );
     }
 
     /**

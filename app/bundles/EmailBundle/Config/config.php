@@ -127,6 +127,7 @@ return [
                     'mautic.transport.momentum.callback',
                     'mautic.queue.service',
                     'mautic.email.helper.request.storage',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.email.monitored.bounce.subscriber' => [
@@ -272,6 +273,13 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\TrackingSubscriber::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
+                ],
+            ],
+            'mautic.email.subscriber.determine_winner' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
                 ],
             ],
         ],
@@ -555,6 +563,8 @@ return [
                     '%mautic.mailer_api_key%',
                     'translator',
                     'mautic.email.model.transport_callback',
+                    'mautic.sparkpost.factory',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.sparkpost.factory' => [

@@ -12,7 +12,6 @@
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class TwitterAbstractType extends AbstractType
@@ -22,29 +21,9 @@ class TwitterAbstractType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // Disabled due to Twitter restrictions
-        /*
-        $builder->add('tweet_action', 'choice', array(
-            'empty_value' => 'mautic.social.monitoring.list.choose',
-            'choice_list' => new ChoiceList(
-                array('retweet','favorite'),
-                array(
-                    'mautic.social.monitoring.list.action.retweet',
-                    'mautic.social.monitoring.list.action.favorite')
-            ),
-            'label'      => 'mautic.social.monitoring.twitter.interact.label',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       => array(
-                'tooltip' => 'mautic.social.monitoring.twitter.interact.tooltip',
-                'class' => 'form-control',
-
-            ),
-            'required' => false
-        ));
-        */
     }
 
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'twitter_abstract';
     }

@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -34,7 +35,7 @@ class DeviceType extends AbstractType
         $builder->add('deviceModel', 'text');
         $builder->add('deviceBrand', 'text');
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'apply_text' => false,
             'save_text'  => 'mautic.core.form.save',
         ]);

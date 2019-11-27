@@ -15,6 +15,7 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -54,7 +55,7 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, 
                 if ($val != 'NULL') {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['content', 'variantSettings'])) {
-                        $val = unserialize(stripslashes($val));
+                        $val = Serializer::decode(stripslashes($val));
                     }
                     $email->$setter($val);
                 }

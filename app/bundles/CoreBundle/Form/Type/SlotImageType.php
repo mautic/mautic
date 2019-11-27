@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -25,19 +24,25 @@ class SlotImageType extends SlotType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('align', 'button_group', [
-            'label'      => 'mautic.core.image.position',
-            'label_attr' => ['class' => 'control-label'],
-            'required'   => false,
-            'attr'       => [
-                'class'           => 'form-control',
-                'data-slot-param' => 'align',
-            ],
-            'choice_list' => new ChoiceList(
-                ['left', 'center', 'right'],
-                ['mautic.core.left', 'mautic.core.center', 'mautic.core.right']
-            ),
-        ]);
+        $builder->add(
+            'align',
+            ButtonGroupType::class,
+            [
+                'label'             => 'mautic.core.image.position',
+                'label_attr'        => ['class' => 'control-label'],
+                'required'          => false,
+                'attr'              => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'align',
+                ],
+                'choices'           => [
+                    'mautic.core.left'   => 'left',
+                    'mautic.core.center' => 'center',
+                    'mautic.core.right'  => 'right',
+                ],
+                'choices_as_values' => true,
+            ]
+        );
 
         parent::buildForm($builder, $options);
     }
@@ -45,7 +50,7 @@ class SlotImageType extends SlotType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'slot_image';
     }

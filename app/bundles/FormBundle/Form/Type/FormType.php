@@ -11,9 +11,13 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\ThemeListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -57,6 +61,16 @@ class FormType extends AbstractType
             'attr'       => ['class' => 'form-control'],
         ]);
 
+        $builder->add('formAttributes', 'text', [
+            'label'      => 'mautic.form.field.form.form_attr',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
+            ],
+            'required'   => false,
+        ]);
+
         $builder->add('description', 'textarea', [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
@@ -65,11 +79,15 @@ class FormType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
-            'bundle' => 'form',
-        ]);
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'form',
+            ]
+        );
 
-        $builder->add('template', 'theme_list', [
+        $builder->add('template', ThemeListType::class, [
             'feature'     => 'form',
             'empty_value' => ' ',
             'attr'        => [
@@ -94,12 +112,12 @@ class FormType extends AbstractType
             $data     = true;
         }
 
-        $builder->add('isPublished', 'yesno_button_group', [
+        $builder->add('isPublished', YesNoButtonGroupType::class, [
             'read_only' => $readonly,
             'data'      => $data,
         ]);
 
-        $builder->add('inKioskMode', 'yesno_button_group', [
+        $builder->add('inKioskMode', YesNoButtonGroupType::class, [
             'label' => 'mautic.form.form.kioskmode',
             'attr'  => [
                 'tooltip' => 'mautic.form.form.kioskmode.tooltip',
@@ -108,7 +126,7 @@ class FormType extends AbstractType
 
         $builder->add(
             'noIndex',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
                 'data'  => $options['data']->getNoIndex() ? $options['data']->getNoIndex() : false,
@@ -120,7 +138,7 @@ class FormType extends AbstractType
             $options['data']->setRenderStyle(true);
         }
 
-        $builder->add('renderStyle', 'yesno_button_group', [
+        $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
             'data'       => ($options['data']->getRenderStyle() === null) ? true : $options['data']->getRenderStyle(),
             'empty_data' => true,
@@ -182,7 +200,7 @@ class FormType extends AbstractType
             'mapped' => false,
         ]);
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
         $builder->add('formType', 'hidden', ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {

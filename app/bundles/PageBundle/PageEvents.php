@@ -127,4 +127,24 @@ final class PageEvents
      * Mautic\PageBundle\Event\RedirectGenerationEvent
      */
     const ON_REDIRECT_GENERATE = 'mautic.page.on_redirect_generate';
+
+    /**
+     * The mautic.page.on_bounce_rate_winner event is fired when there is a need to determine bounce rate winner.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_BOUNCE_RATE_WINNER = 'mautic.page.on_bounce_rate_winner';
+
+    /**
+     * The mautic.page.on_dwell_time_winner event is fired when there is a need to determine a winner based on dwell time.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundles\Event\DetermineWinnerEvent
+     *
+     * @var string
+     */
+    const ON_DETERMINE_DWELL_TIME_WINNER = 'mautic.page.on_dwell_time_winner';
 }
