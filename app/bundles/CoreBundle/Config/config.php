@@ -581,6 +581,16 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.helper.token_builder' => [
+                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelper::class,
+                'arguments' => [
+                    'mautic.security',
+                    'doctrine.orm.entity_manager',
+                    'database_connection',
+                    'mautic.helper.user',
+                    'kernel',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
