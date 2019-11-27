@@ -121,9 +121,10 @@ class CitrixActionType extends AbstractType
         ) {
             $builder->add(
                 'firstname',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'    => $choices,
+                    'choices'    => array_flip($choices),
+                    'choices_as_values' => true,
                     'expanded'   => false,
                     'label_attr' => ['class' => 'control-label'],
                     'multiple'   => false,
@@ -143,9 +144,10 @@ class CitrixActionType extends AbstractType
 
             $builder->add(
                 'lastname',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'    => $choices,
+                    'choices'    => array_flip($choices),
+                    'choices_as_values' => true,
                     'expanded'   => false,
                     'label_attr' => ['class' => 'control-label'],
                     'multiple'   => false,
@@ -166,9 +168,10 @@ class CitrixActionType extends AbstractType
 
         $builder->add(
             'email',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'    => $choices,
+                'choices'    => array_flip($choices),
+                'choices_as_values' => true,
                 'expanded'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'multiple'   => false,

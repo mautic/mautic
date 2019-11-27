@@ -15,6 +15,7 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -75,10 +76,11 @@ class CitrixCampaignEventType extends AbstractType
 
         $builder->add(
             'event-criteria-'.$product,
-            'choice',
+            ChoiceType::class,
             [
                 'label'   => $this->translator->trans('plugin.citrix.decision.criteria'),
-                'choices' => $choices,
+                'choices' => array_flip($choices),
+                'choices_as_values' => true,
             ]
         );
 
@@ -89,10 +91,11 @@ class CitrixCampaignEventType extends AbstractType
 
         $builder->add(
             $product.'-list',
-            'choice',
+            ChoiceType::class,
             [
                 'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                'choices'  => $choices,
+                'choices'  => array_flip($choices),
+                'choices_as_values' => true,
                 'multiple' => true,
             ]
         );
