@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -94,7 +95,7 @@ class CampaignEventSendWebhookType extends AbstractType
 
         $builder->add(
             'headers',
-            'sortablelist',
+            SortableListType::class,
             [
                 'required'        => false,
                 'label'           => 'mautic.webhook.event.sendwebhook.headers',
@@ -105,7 +106,7 @@ class CampaignEventSendWebhookType extends AbstractType
 
         $builder->add(
             'additional_data',
-            'sortablelist',
+            SortableListType::class,
             [
                 'required'        => false,
                 'label'           => 'mautic.webhook.event.sendwebhook.data',
