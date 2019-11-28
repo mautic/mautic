@@ -27,6 +27,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
@@ -533,7 +535,7 @@ class FormSubscriber extends CommonSubscriber
             // Select field
             $field = [
                 'label'    => 'plugin.citrix.'.$product.'.listfield',
-                'formType' => 'citrix_list',
+                'formType' => CitrixListType::class,
                 'template' => 'MauticCitrixBundle:Field:citrixlist.html.php',
                 'listType' => $product,
             ];
@@ -552,7 +554,7 @@ class FormSubscriber extends CommonSubscriber
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.webinar',
                         'label'           => 'plugin.citrix.action.register.webinar',
-                        'formType'        => 'citrix_submit_action',
+                        'formType'        => CitrixActionType::class,
                         'formTypeOptions' => [
                             'attr' => [
                                 'data-product'        => $product,
@@ -570,7 +572,7 @@ class FormSubscriber extends CommonSubscriber
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.meeting',
                         'label'           => 'plugin.citrix.action.start.meeting',
-                        'formType'        => 'citrix_submit_action',
+                        'formType'        => CitrixActionType::class,
                         'template'        => 'MauticFormBundle:Action:generic.html.php',
                         'eventName'       => CitrixEvents::ON_MEETING_START_ACTION,
                         'formTypeOptions' => [
@@ -588,7 +590,7 @@ class FormSubscriber extends CommonSubscriber
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.training',
                         'label'           => 'plugin.citrix.action.register.training',
-                        'formType'        => 'citrix_submit_action',
+                        'formType'        => CitrixActionType::class,
                         'template'        => 'MauticFormBundle:Action:generic.html.php',
                         'eventName'       => CitrixEvents::ON_TRAINING_REGISTER_ACTION,
                         'formTypeOptions' => [
@@ -604,7 +606,7 @@ class FormSubscriber extends CommonSubscriber
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.start.training',
                         'label'           => 'plugin.citrix.action.start.training',
-                        'formType'        => 'citrix_submit_action',
+                        'formType'        => CitrixActionType::class,
                         'template'        => 'MauticFormBundle:Action:generic.html.php',
                         'eventName'       => CitrixEvents::ON_TRAINING_START_ACTION,
                         'formTypeOptions' => [
@@ -622,7 +624,7 @@ class FormSubscriber extends CommonSubscriber
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.assist',
                         'label'           => 'plugin.citrix.action.screensharing.assist',
-                        'formType'        => 'citrix_submit_action',
+                        'formType'        => CitrixActionType::class,
                         'template'        => 'MauticFormBundle:Action:generic.html.php',
                         'eventName'       => CitrixEvents::ON_ASSIST_REMOTE_ACTION,
                         'formTypeOptions' => [

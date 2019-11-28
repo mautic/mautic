@@ -74,18 +74,15 @@ return [
         'forms' => [
             'mautic.form.type.fieldslist.citrixlist' => [
                 'class' => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType',
-                'alias' => 'citrix_list',
             ],
             'mautic.form.type.citrix.submitaction' => [
                 'class'     => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType',
-                'alias'     => 'citrix_submit_action',
                 'arguments' => [
                     'mautic.form.model.field',
                 ],
             ],
             'mautic.form.type.citrix.campaignevent' => [
                 'class'     => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType',
-                'alias'     => 'citrix_campaign_event',
                 'arguments' => [
                     'mautic.citrix.model.citrix',
                     'translator',
@@ -93,7 +90,6 @@ return [
             ],
             'mautic.form.type.citrix.campaignaction' => [
                 'class'     => 'MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType',
-                'alias'     => 'citrix_campaign_action',
                 'arguments' => [
                     'translator',
                 ],
