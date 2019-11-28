@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType;
+use Mautic\PageBundle\Form\Type\SlideshowSlideConfigType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -1050,7 +1052,7 @@ class PageController extends FormController
                 // create config form
                 $options['configForm'] = $formFactory->createNamedBuilder(
                     null,
-                    'slideshow_config',
+                    SlideshowGlobalConfigType::class,
                     [],
                     ['data' => $options]
                 )->getForm()->createView();
@@ -1061,7 +1063,7 @@ class PageController extends FormController
                     $slide['slot'] = $slot;
                     $slide['form'] = $formFactory->createNamedBuilder(
                         null,
-                        'slideshow_slide_config',
+                        SlideshowSlideConfigType::class,
                         [],
                         ['data' => $slide]
                     )->getForm()->createView();
