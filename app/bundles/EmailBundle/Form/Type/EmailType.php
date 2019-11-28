@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -301,7 +302,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'preferenceCenter',
-                'preference_center_list',
+                PreferenceCenterListType::class,
                 [
                     'label'      => 'mautic.email.form.preference_center',
                     'label_attr' => ['class' => 'control-label'],
