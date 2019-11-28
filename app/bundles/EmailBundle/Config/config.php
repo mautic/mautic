@@ -219,10 +219,8 @@ return [
                 ],
             ],
             'mautic.email.webhook.subscriber' => [
-                'class'       => 'Mautic\EmailBundle\EventListener\WebhookSubscriber',
-                'methodCalls' => [
-                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
-                ],
+                'class'       => \Mautic\EmailBundle\EventListener\WebhookSubscriber::class,
+                'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.email.configbundle.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\ConfigSubscriber',

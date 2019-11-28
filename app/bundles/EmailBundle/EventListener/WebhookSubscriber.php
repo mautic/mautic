@@ -15,7 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
-use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 
 /**
@@ -23,7 +23,18 @@ use Mautic\WebhookBundle\WebhookEvents;
  */
 class WebhookSubscriber extends CommonSubscriber
 {
-    use WebhookModelTrait;
+    /**
+     * @var WebhookModel
+     */
+    private $webhookModel;
+
+    /**
+     * @param WebhookModel $webhookModel
+     */
+    public function __construct(WebhookModel $webhookModel)
+    {
+        $this->webhookModel = $webhookModel;
+    }
 
     /**
      * @return array

@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
 
@@ -71,7 +72,7 @@ class CampaignSubscriber extends CommonSubscriber
         $sendWebhookAction = [
             'label'       => 'mautic.webhook.event.sendwebhook',
             'description' => 'mautic.webhook.event.sendwebhook_desc',
-            'formType'    => 'campaignevent_sendwebhook',
+            'formType'    => CampaignEventSendWebhookType::class,
             'eventName'   => WebhookEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('campaign.sendwebhook', $sendWebhookAction);
