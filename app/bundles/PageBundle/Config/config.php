@@ -122,12 +122,13 @@ return [
                 ],
             ],
             'mautic.page.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
                     'mautic.lead.model.lead',
                     'mautic.page.helper.tracking',
+                    'mautic.campaign.executioner.realtime',
                 ],
             ],
             'mautic.page.leadbundle.subscriber' => [
