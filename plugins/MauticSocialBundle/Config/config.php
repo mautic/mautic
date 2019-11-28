@@ -90,64 +90,53 @@ return [
                     'mautic.form.model.form',
                     'mautic.helper.core_parameters',
                     ],
-                'alias' => 'sociallogin',
             ],
             'mautic.form.type.social.facebook' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookType',
-                'alias' => 'socialmedia_facebook',
             ],
             'mautic.form.type.social.twitter' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
-                'alias' => 'socialmedia_twitter',
             ],
             'mautic.form.type.social.googleplus' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType',
-                'alias' => 'socialmedia_googleplus',
             ],
             'mautic.form.type.social.linkedin' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
-                'alias' => 'socialmedia_linkedin',
             ],
             'mautic.social.form.type.twitter.tweet' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetType',
-                'alias'     => 'twitter_tweet',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.social.form.type.monitoring' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType',
-                'alias' => 'monitoring',
+                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType',
+                'arguments' => [
+                    'mautic.social.model.monitoring',
+                ],
             ],
             'mautic.social.form.type.network.twitter.abstract' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterAbstractType',
-                'alias' => 'twitter_abstract',
             ],
             'mautic.social.form.type.network.twitter.hashtag' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType',
-                'alias' => 'twitter_hashtag',
             ],
             'mautic.social.form.type.network.twitter.mention' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType',
-                'alias' => 'twitter_handle',
             ],
             'mautic.social.form.type.network.twitter.custom' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterCustomType',
-                'alias' => 'twitter_custom',
             ],
             'mautic.social.config' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\ConfigType',
-                'alias'     => 'social_config',
                 'arguments' => 'mautic.lead.model.field',
             ],
             'mautic.social.tweet.list' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetListType',
-                'alias' => 'tweet_list',
             ],
             'mautic.social.tweetsend_list' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType',
                 'arguments' => 'router',
-                'alias'     => 'tweetsend_list',
             ],
         ],
         'models' => [

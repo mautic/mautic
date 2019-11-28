@@ -16,6 +16,7 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TweetListType;
 
 /**
  * Class ChannelSubscriber.
@@ -64,7 +65,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'tweet_list',
+                        'lookupFormType' => TweetListType::class,
                         'repository'     => 'MauticSocialBundle:Tweet',
                     ],
                 ]

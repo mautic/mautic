@@ -229,9 +229,7 @@ return [
             ],
             'mautic.form.webhook.subscriber' => [
                 'class'       => WebhookSubscriber::class,
-                'methodCalls' => [
-                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
-                ],
+                'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.form.dashboard.subscriber' => [
                 'class'     => DashboardSubscriber::class,
