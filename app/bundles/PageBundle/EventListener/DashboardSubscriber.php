@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType;
 use Mautic\PageBundle\Model\PageModel;
 
 /**
@@ -34,7 +35,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'page.hits.in.time' => [
-            'formAlias' => 'page_dashboard_hits_in_time_widget',
+            'formType' => DashboardHitsInTimeWidgetType::class,
         ],
         'unique.vs.returning.leads' => [],
         'dwell.times'               => [],
