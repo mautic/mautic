@@ -11,14 +11,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
-/**
- * Class TokenSubscriber.
- */
-class TokenSubscriber extends CommonSubscriber
+class TokenSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}

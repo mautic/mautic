@@ -11,17 +11,18 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CalendarBundle\CalendarEvents;
 use Mautic\CalendarBundle\Event\CalendarGeneratorEvent;
 use Mautic\CalendarBundle\Event\EventGeneratorEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CalendarSubscriber.
- */
-class CalendarSubscriber extends CommonSubscriber
+class CalendarSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PageModel
@@ -29,13 +30,44 @@ class CalendarSubscriber extends CommonSubscriber
     protected $pageModel;
 
     /**
-     * CalendarSubscriber constructor.
-     *
-     * @param PageModel $pageModel
+     * @var Connection
      */
-    public function __construct(PageModel $pageModel)
-    {
-        $this->pageModel = $pageModel;
+    protected $connection;
+
+    /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @param PageModel           $pageModel
+     * @param Connection          $connection
+     * @param CorePermissions     $security
+     * @param TranslatorInterface $translator
+     * @param Router              $router
+     */
+    public function __construct(
+        PageModel $pageModel,
+        Connection $connection,
+        CorePermissions $security,
+        TranslatorInterface $translator,
+        Router $router
+    ) {
+        $this->pageModel  = $pageModel;
+        $this->connection = $connection;
+        $this->security   = $security;
+        $this->translator = $translator;
+        $this->router     = $router;
     }
 
     /**
@@ -66,7 +98,7 @@ class CalendarSubscriber extends CommonSubscriber
             'publish.down' => ['dateName' => 'publish_down', 'setter' => 'PublishDown'],
         ];
 
-        $query = $this->em->getConnection()->createQueryBuilder();
+        $query = $this->connection->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->leftJoin('p', MAUTIC_TABLE_PREFIX.'categories', 'c', 'c.id = p.category_id AND c.bundle=:bundle')
             ->setParameter('bundle', 'page')

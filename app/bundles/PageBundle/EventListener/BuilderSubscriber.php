@@ -11,9 +11,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use DOMDocument;
 use DOMXPath;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -32,6 +33,8 @@ use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -40,11 +43,10 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TokenHelper
@@ -55,6 +57,31 @@ class BuilderSubscriber extends CommonSubscriber
      * @var IntegrationHelper
      */
     protected $integrationHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
 
     /**
      * @var PageModel
@@ -78,17 +105,33 @@ class BuilderSubscriber extends CommonSubscriber
     const identifierToken   = '{leadidentifier}';
 
     /**
-     * BuilderSubscriber constructor.
-     *
-     * @param TokenHelper       $tokenHelper
-     * @param IntegrationHelper $integrationHelper
-     * @param PageModel         $pageModel
+     * @param TokenHelper         $tokenHelper
+     * @param IntegrationHelper   $integrationHelper
+     * @param PageModel           $pageModel
+     * @param TranslatorInterface $translator
+     * @param Connection          $connection
+     * @param CorePermissions     $security
+     * @param TemplatingHelper    $templating
+     * @param MauticFactory       $factory
      */
-    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
-    {
+    public function __construct(
+        TokenHelper $tokenHelper,
+        IntegrationHelper $integrationHelper,
+        PageModel $pageModel,
+        TranslatorInterface $translator,
+        Connection $connection,
+        CorePermissions $security,
+        TemplatingHelper $templating,
+        MauticFactory $factory // To be removed once BuilderTokenHelper is refactored out of MauticFactory.
+    ) {
         $this->tokenHelper       = $tokenHelper;
         $this->integrationHelper = $integrationHelper;
         $this->pageModel         = $pageModel;
+        $this->translator        = $translator;
+        $this->connection        = $connection;
+        $this->security          = $security;
+        $this->templating        = $templating;
+        $this->factory           = $factory;
     }
 
     /**
@@ -136,7 +179,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             // add only filter based dwc tokens
             $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -492,7 +535,7 @@ class BuilderSubscriber extends CommonSubscriber
             $shareButtons = $this->integrationHelper->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
-            foreach ($shareButtons as $network => $button) {
+            foreach ($shareButtons as $button) {
                 $content .= $button;
             }
             $content .= "</div>\n";

@@ -13,14 +13,13 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserHelper
@@ -33,15 +32,31 @@ class SearchSubscriber extends CommonSubscriber
     protected $pageModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserHelper $userHelper
-     * @param PageModel  $pageModel
+     * @var CorePermissions
      */
-    public function __construct(UserHelper $userHelper, PageModel $pageModel)
-    {
+    protected $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    /**
+     * @param UserHelper       $userHelper
+     * @param PageModel        $pageModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
+    public function __construct(
+        UserHelper $userHelper,
+        PageModel $pageModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userHelper = $userHelper;
         $this->pageModel  = $pageModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**

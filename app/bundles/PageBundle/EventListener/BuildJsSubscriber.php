@@ -13,15 +13,12 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Helper\TrackingHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetsHelper
@@ -34,15 +31,20 @@ class BuildJsSubscriber extends CommonSubscriber
     protected $trackingHelper;
 
     /**
-     * BuildJsSubscriber constructor.
-     *
+     * @var Router
+     */
+    protected $router;
+
+    /**
      * @param AssetsHelper   $assetsHelper
      * @param TrackingHelper $trackingHelper
+     * @param Router         $router
      */
-    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper)
+    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, Router $router)
     {
         $this->assetsHelper   = $assetsHelper;
         $this->trackingHelper = $trackingHelper;
+        $this->router         = $router;
     }
 
     /**

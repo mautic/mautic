@@ -90,27 +90,36 @@ return [
     'services' => [
         'events' => [
             'mautic.page.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\PageSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.page.model.page',
+                    'mautic.page.repository.hit',
+                    'mautic.page.repository.page',
+                    'mautic.page.repository.redirect',
+                    'mautic.lead.repository.lead',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\BuilderSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
+                    'translator',
+                    'doctrine.dbal.default_connection',
+                    'mautic.security',
+                    'mautic.helper.templating',
+                    'mautic.factory',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\TokenSubscriber',
+                'class' => \Mautic\PageBundle\EventListener\TokenSubscriber::class,
             ],
             'mautic.page.pointbundle.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\PointSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\PointSubscriber::class,
                 'arguments' => [
                     'mautic.point.model.point',
                 ],
@@ -119,10 +128,12 @@ return [
                 'class'     => \Mautic\PageBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'mautic.page.repository.hit',
+                    'translator',
                 ],
             ],
             'mautic.page.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
@@ -131,34 +142,44 @@ return [
                 ],
             ],
             'mautic.page.leadbundle.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.page.model.video',
+                    'translator',
+                    'router',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
                 ],
             ],
             'mautic.page.calendarbundle.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\CalendarSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\CalendarSubscriber::class,
                 'arguments' => [
                     'mautic.page.model.page',
+                    'doctrine.dbal.default_connection',
+                    'mautic.security',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.page.configbundle.subscriber' => [
                 'class' => \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.page.search.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.page.model.page',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.page.webhook.subscriber' => [
-                'class'       => \Mautic\PageBundle\EventListener\WebhookSubscriber::class,
-                'arguments'   => ['mautic.webhook.model.webhook'],
+                'class'     => \Mautic\PageBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
             ],
             'mautic.page.dashboard.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\DashboardSubscriber::class,
@@ -168,16 +189,18 @@ return [
                 ],
             ],
             'mautic.page.js.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\BuildJsSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\BuildJsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.page.helper.tracking',
+                    'router',
                 ],
             ],
             'mautic.page.maintenance.subscriber' => [
-                'class'     => 'Mautic\PageBundle\EventListener\MaintenanceSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\MaintenanceSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'translator',
                 ],
             ],
             'mautic.page.stats.subscriber' => [
@@ -311,6 +334,20 @@ return [
             ],
         ],
         'repositories' => [
+            'mautic.page.repository.hit' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PageBundle\Entity\Hit::class,
+                ],
+            ],
+            'mautic.page.repository.page' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PageBundle\Entity\Page::class,
+                ],
+            ],
             'mautic.page.repository.redirect' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],

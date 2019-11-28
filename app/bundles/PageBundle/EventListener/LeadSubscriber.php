@@ -12,7 +12,6 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -20,11 +19,9 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
@@ -39,15 +36,31 @@ class LeadSubscriber extends CommonSubscriber
     protected $pageVideoModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param PageModel  $pageModel
-     * @param VideoModel $pageVideoModel
+     * @var TranslatorInterface
      */
-    public function __construct(PageModel $pageModel, VideoModel $pageVideoModel)
-    {
+    private $translator;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @param PageModel           $pageModel
+     * @param VideoModel          $pageVideoModel
+     * @param TranslatorInterface $translator
+     * @param Router              $router
+     */
+    public function __construct(
+        PageModel $pageModel,
+        VideoModel $pageVideoModel,
+        TranslatorInterface $translator,
+        Router $router
+    ) {
         $this->pageModel      = $pageModel;
         $this->pageVideoModel = $pageVideoModel;
+        $this->translator     = $translator;
+        $this->router         = $router;
     }
 
     /**
@@ -82,9 +95,10 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
-        $hitRepository = $this->em->getRepository('MauticPageBundle:Hit');
-        $hits          = $hitRepository->getLeadHits($event->getLeadId(), $event->getQueryOptions());
+        $hits = $this->pageModel->getHitRepository()->getLeadHits(
+            $event->getLeadId(),
+            $event->getQueryOptions()
+        );
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $hits);
@@ -186,10 +200,10 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        /** @var \Mautic\PageBundle\Entity\VideoHitRepository $hitRepository */
-        $hitRepository = $this->em->getRepository('MauticPageBundle:VideoHit');
-
-        $hits = $hitRepository->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
+        $hits = $this->pageVideoModel->getHitRepository()->getTimelineStats(
+            $event->getLeadId(),
+            $event->getQueryOptions()
+        );
 
         $event->addToCounter($eventTypeKey, $hits);
 
