@@ -13,7 +13,6 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
@@ -23,10 +22,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 
-/**
- * Class NotificationSubscriber.
- */
-class NotificationSubscriber extends CommonSubscriber
+class NotificationSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TrackableModel
@@ -49,8 +45,6 @@ class NotificationSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * NotificationSubscriber constructor.
-     *
      * @param AuditLogModel    $auditLogModel
      * @param TrackableModel   $trackableModel
      * @param PageTokenHelper  $pageTokenHelper

@@ -11,16 +11,13 @@
 
 namespace Mautic\NotificationBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetsHelper
@@ -33,8 +30,6 @@ class PageSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
-     * PageSubscriber constructor.
-     *
      * @param AssetsHelper      $assetsHelper
      * @param IntegrationHelper $integrationHelper
      */
