@@ -123,7 +123,12 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                     $expressions[] = $queryBuilder->expr()->$operator('l.'.$filter->getField(), $parameter);
                 }
 
-                $expression = $queryBuilder->expr()->andX($expressions);
+                if ($filter->contactSegmentFilterCrate->getSourceOperator() == 'contains') {
+                    $expression = $queryBuilder->expr()->orX($expressions);
+                } else {
+                    $expression = $queryBuilder->expr()->andX($expressions);
+                }
+
                 break;
             default:
                 throw new \Exception('Dunno how to handle operator "'.$filterOperator.'"');

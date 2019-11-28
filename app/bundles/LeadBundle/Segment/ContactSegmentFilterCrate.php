@@ -166,7 +166,7 @@ class ContactSegmentFilterCrate
     /**
      * @return string|null
      */
-    private function getType()
+    public function getType()
     {
         return $this->type;
     }
@@ -183,8 +183,8 @@ class ContactSegmentFilterCrate
     {
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 
-        if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = false === strpos($operator, '!') ? '' : '!';
+        if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in', 'contains'])) {
+            $neg            = strpos($operator, '!') === false ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;
@@ -206,5 +206,13 @@ class ContactSegmentFilterCrate
     public function getNullValue()
     {
         return $this->nullValue;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSourceOperator()
+    {
+        return isset($this->sourceArray['operator']) ? $this->sourceArray['operator'] : null;
     }
 }
