@@ -1006,6 +1006,7 @@ class PageController extends FormController
             $value = isset($content[$slot]) ? $content[$slot] : '';
 
             if ($slotConfig['type'] == 'slideshow') {
+                // @deprecated and should be removed
                 if (isset($content[$slot])) {
                     $options = json_decode($content[$slot], true);
                 } else {
