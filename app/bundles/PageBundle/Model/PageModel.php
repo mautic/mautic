@@ -923,8 +923,7 @@ class PageModel extends FormModel
             $this->limitQueryToCreator($returnQ);
         }
 
-        $all = $query->fetchCount($allQ);
-//        $unique    = $query->fetchCount($uniqueQ);
+        $all       = $query->fetchCount($allQ);
         $returning = $query->fetchCount($returnQ);
         $unique    = $all - $returning;
         $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
@@ -1005,7 +1004,6 @@ class PageModel extends FormModel
         foreach ($results as $result) {
             $label = empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'];
 
-            // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
             $chart->setDataset($label, $result['count']);
         }
 
