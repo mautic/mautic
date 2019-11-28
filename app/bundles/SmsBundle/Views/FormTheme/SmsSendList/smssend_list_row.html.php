@@ -9,13 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\SmsBundle\Form\Type\SmsType;
-
 ?>
 
 <div class="row">
     <div class="col-xs-8">
-        <?php echo $view['form']->row($form[SmsType::class]); ?>
+        <?php echo $view['form']->row($form['sms']); ?>
     </div>
     <div class="col-xs-4 mt-lg">
         <div class="mt-3">
