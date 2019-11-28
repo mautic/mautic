@@ -13,6 +13,8 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
+use Mautic\PageBundle\Form\Type\PointActionPageHitType;
+use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
@@ -60,7 +62,8 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.page.point.action.pagehit',
             'description' => 'mautic.page.point.action.pagehit_descr',
             'callback'    => [PointActionHelper::class, 'validatePageHit'],
-            'formType'    => 'pointaction_pagehit',
+            'formAlias'   => 'pointaction_pagehit',
+            'formType'    => PointActionPageHitType::class,
         ];
 
         $event->addAction('page.hit', $action);
@@ -70,7 +73,8 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.page.point.action.urlhit',
             'description' => 'mautic.page.point.action.urlhit_descr',
             'callback'    => [PointActionHelper::class, 'validateUrlHit'],
-            'formType'    => 'pointaction_urlhit',
+            'formAlias'   => 'pointaction_urlhit',
+            'formType'    => PointActionUrlHitType::class,
             'formTheme'   => 'MauticPageBundle:FormTheme\Point',
         ];
 
