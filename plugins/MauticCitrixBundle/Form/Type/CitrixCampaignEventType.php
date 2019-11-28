@@ -78,8 +78,8 @@ class CitrixCampaignEventType extends AbstractType
             'event-criteria-'.$product,
             ChoiceType::class,
             [
-                'label'   => $this->translator->trans('plugin.citrix.decision.criteria'),
-                'choices' => array_flip($choices),
+                'label'             => $this->translator->trans('plugin.citrix.decision.criteria'),
+                'choices'           => array_flip($choices),
                 'choices_as_values' => true,
             ]
         );
@@ -93,10 +93,10 @@ class CitrixCampaignEventType extends AbstractType
             $product.'-list',
             ChoiceType::class,
             [
-                'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                'choices'  => array_flip($choices),
+                'label'             => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                'choices'           => array_flip($choices),
                 'choices_as_values' => true,
-                'multiple' => true,
+                'multiple'          => true,
             ]
         );
     }

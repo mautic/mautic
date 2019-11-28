@@ -95,13 +95,13 @@ class CitrixActionType extends AbstractType
                 'product',
                 ChoiceType::class,
                 [
-                    'choices'    => array_flip($products),
+                    'choices'           => array_flip($products),
                     'choices_as_values' => true,
-                    'expanded'   => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'multiple'   => false,
-                    'label'      => 'plugin.citrix.'.$product.'.listfield',
-                    'attr'       => [
+                    'expanded'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'multiple'          => false,
+                    'label'             => 'plugin.citrix.'.$product.'.listfield',
+                    'attr'              => [
                         'class'   => 'form-control',
                         'tooltip' => 'plugin.citrix.selectproduct.tooltip',
                     ],
@@ -123,13 +123,13 @@ class CitrixActionType extends AbstractType
                 'firstname',
                 ChoiceType::class,
                 [
-                    'choices'    => array_flip($choices),
+                    'choices'           => array_flip($choices),
                     'choices_as_values' => true,
-                    'expanded'   => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'multiple'   => false,
-                    'label'      => 'plugin.citrix.first_name',
-                    'attr'       => [
+                    'expanded'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'multiple'          => false,
+                    'label'             => 'plugin.citrix.first_name',
+                    'attr'              => [
                         'class'   => 'form-control',
                         'tooltip' => 'plugin.citrix.first_name.tooltip',
                     ],
@@ -146,13 +146,13 @@ class CitrixActionType extends AbstractType
                 'lastname',
                 ChoiceType::class,
                 [
-                    'choices'    => array_flip($choices),
+                    'choices'           => array_flip($choices),
                     'choices_as_values' => true,
-                    'expanded'   => false,
-                    'label_attr' => ['class' => 'control-label'],
-                    'multiple'   => false,
-                    'label'      => 'plugin.citrix.last_name',
-                    'attr'       => [
+                    'expanded'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'multiple'          => false,
+                    'label'             => 'plugin.citrix.last_name',
+                    'attr'              => [
                         'class'   => 'form-control',
                         'tooltip' => 'plugin.citrix.last_name.tooltip',
                     ],
@@ -170,13 +170,13 @@ class CitrixActionType extends AbstractType
             'email',
             ChoiceType::class,
             [
-                'choices'    => array_flip($choices),
+                'choices'           => array_flip($choices),
                 'choices_as_values' => true,
-                'expanded'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'multiple'   => false,
-                'label'      => 'plugin.citrix.selectidentifier',
-                'attr'       => [
+                'expanded'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => false,
+                'label'             => 'plugin.citrix.selectidentifier',
+                'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'plugin.citrix.selectidentifier.tooltip',
                 ],
