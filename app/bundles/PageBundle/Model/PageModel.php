@@ -38,6 +38,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
@@ -269,17 +270,17 @@ class PageModel extends FormModel
             throw new MethodNotAllowedHttpException(['Page']);
         }
 
-        $formName = 'page';
+        $formClass = PageType::class;
 
         if (!empty($options['formName'])) {
-            $formName = $options['formName'];
+            $formClass = $options['formName'];
         }
 
         if (!empty($action)) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create($formName, $entity, $options);
+        return $formFactory->create($formClass, $entity, $options);
     }
 
     /**

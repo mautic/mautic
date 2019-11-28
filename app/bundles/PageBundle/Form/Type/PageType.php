@@ -266,7 +266,7 @@ class PageType extends AbstractType
 
         $builder->add(
           'redirectType',
-          'redirect_list',
+          RedirectListType::class,
           [
               'feature' => 'page',
               'attr'    => [
