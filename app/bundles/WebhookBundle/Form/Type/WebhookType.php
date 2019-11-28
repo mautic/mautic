@@ -74,14 +74,14 @@ class WebhookType extends AbstractType
 
         $choices = [];
         foreach ($events as $type => $event) {
-            $choices[$type] = $event['label'];
+            $choices[$event['label']] = $type;
         }
 
         $builder->add(
             'events',
             ChoiceType::class,
             [
-                'choices'           => array_flip($choices),
+                'choices'           => $choices,
                 'multiple'          => true,
                 'expanded'          => true,
                 'label'             => 'mautic.webhook.form.webhook.events',
