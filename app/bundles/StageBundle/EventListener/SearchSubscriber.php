@@ -13,13 +13,12 @@ namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\StageBundle\Model\StageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var StageModel
@@ -27,13 +26,28 @@ class SearchSubscriber extends CommonSubscriber
     protected $stageModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param StageModel $stageModel
+     * @var CorePermissions
      */
-    public function __construct(StageModel $stageModel)
-    {
+    protected $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    /**
+     * @param StageModel       $stageModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
+    public function __construct(
+        StageModel $stageModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->stageModel = $stageModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**

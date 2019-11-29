@@ -11,16 +11,13 @@
 
 namespace Mautic\StageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\StageBundle\Event as Events;
 use Mautic\StageBundle\StageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class StageSubscriber.
- */
-class StageSubscriber extends CommonSubscriber
+class StageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
@@ -33,8 +30,6 @@ class StageSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * StageSubscriber constructor.
-     *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      */
