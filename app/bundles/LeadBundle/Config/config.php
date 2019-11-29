@@ -916,6 +916,13 @@ return [
                     \Mautic\LeadBundle\Entity\LeadList::class,
                 ],
             ],
+            'mautic.lead.repository.points_change_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\PointsChangeLog::class,
+                ],
+            ],
             'mautic.lead.repository.merged_records' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
