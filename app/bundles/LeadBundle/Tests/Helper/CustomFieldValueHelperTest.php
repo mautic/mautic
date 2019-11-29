@@ -49,6 +49,16 @@ class CustomFieldValueHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Second option', $normalizedFields['core']['test']['normalizedValue']);
     }
 
+    public function testNormalizeValueSelectWithoutProperties()
+    {
+        $fields['core']['test'] = [
+            'type'      => CustomFieldValueHelper::TYPE_SELECT,
+            'value'     => 'second',
+        ];
+        $normalizedFields = CustomFieldValueHelper::normalizeValues($fields);
+        $this->assertEquals('second', $normalizedFields['core']['test']['normalizedValue']);
+    }
+
     public function testNormalizeValueMultiSelect()
     {
         $fieldParams = [
