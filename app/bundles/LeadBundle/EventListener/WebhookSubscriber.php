@@ -121,7 +121,6 @@ class WebhookSubscriber extends CommonSubscriber
         // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
-                'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
             ],
             [
@@ -142,7 +141,6 @@ class WebhookSubscriber extends CommonSubscriber
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POINTS_CHANGE,
             [
-                'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
                 'points'  => [
                     'old_points' => $event->getOldPoints(),
@@ -169,7 +167,6 @@ class WebhookSubscriber extends CommonSubscriber
             LeadEvents::LEAD_POST_DELETE,
             [
                 'id'      => $lead->deletedId,
-                'lead'    => $lead,
                 'contact' => $lead,
             ],
             [
