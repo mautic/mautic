@@ -11,10 +11,8 @@
 
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
@@ -22,11 +20,10 @@ use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CitrixModel
@@ -34,13 +31,18 @@ class LeadSubscriber extends CommonSubscriber
     protected $model;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param CitrixModel $model
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $model)
+    protected $translator;
+
+    /**
+     * @param CitrixModel         $model
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(CitrixModel $model, TranslatorInterface $translator)
     {
-        $this->model = $model;
+        $this->model      = $model;
+        $this->translator = $translator;
     }
 
     /**
@@ -54,14 +56,6 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE => ['onListOperatorsGenerate', 0],
             LeadEvents::LIST_FILTERS_ON_FILTERING          => ['onListFiltering', 0],
         ];
-    }
-
-    /**
-     * @param LeadListFiltersOperatorsEvent $event
-     */
-    public function onListOperatorsGenerate(LeadListFiltersOperatorsEvent $event)
-    {
-        // TODO: add custom operators
     }
 
     /**
@@ -171,7 +165,7 @@ class LeadSubscriber extends CommonSubscriber
             $eventNamesWithAny = array_merge(
                 [
                     '-'   => '-',
-                    'any' => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.any'),
+                    'any' => $this->translator->trans('plugin.citrix.event.'.$product.'.any'),
                 ],
                 $eventNames
             );
@@ -181,14 +175,14 @@ class LeadSubscriber extends CommonSubscriber
                     'lead',
                     $product.'-registration',
                     [
-                        'label'      => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.registration'),
+                        'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.registration'),
                         'properties' => [
                             'type' => 'select',
                             'list' => $eventNamesWithAny,
                         ],
                         'operators' => [
-                            'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
-                            '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
+                            'in'  => $this->translator->trans('mautic.core.operator.in'),
+                            '!in' => $this->translator->trans('mautic.core.operator.notin'),
                         ],
                     ]
                 );
@@ -198,14 +192,14 @@ class LeadSubscriber extends CommonSubscriber
                 'lead',
                 $product.'-attendance',
                 [
-                    'label'      => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.attendance'),
+                    'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.attendance'),
                     'properties' => [
                         'type' => 'select',
                         'list' => $eventNamesWithAny,
                     ],
                     'operators' => [
-                        'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
-                        '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
+                        'in'  => $this->translator->trans('mautic.core.operator.in'),
+                        '!in' => $this->translator->trans('mautic.core.operator.notin'),
                     ],
                 ]
             );
@@ -214,13 +208,13 @@ class LeadSubscriber extends CommonSubscriber
                 'lead',
                 $product.'-no-attendance',
                 [
-                    'label'      => $event->getTranslator()->trans('plugin.citrix.event.'.$product.'.no.attendance'),
+                    'label'      => $this->translator->trans('plugin.citrix.event.'.$product.'.no.attendance'),
                     'properties' => [
                         'type' => 'select',
                         'list' => $eventNamesWithoutAny,
                     ],
                     'operators' => [
-                        'in' => $event->getTranslator()->trans('mautic.core.operator.in'),
+                        'in' => $this->translator->trans('mautic.core.operator.in'),
                     ],
                 ]
             );

@@ -12,7 +12,8 @@
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -32,12 +33,11 @@ use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     use CitrixRegistrationTrait;
     use CitrixStartTrait;
@@ -58,17 +58,44 @@ class FormSubscriber extends CommonSubscriber
     protected $citrixModel;
 
     /**
-     * FormSubscriber constructor.
-     *
-     * @param CitrixModel     $citrixModel
-     * @param FormModel       $formModel
-     * @param SubmissionModel $submissionModel
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $citrixModel, FormModel $formModel, SubmissionModel $submissionModel)
-    {
+    protected $translator;
+
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
+     *
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    /**
+     * @param CitrixModel         $citrixModel
+     * @param FormModel           $formModel
+     * @param SubmissionModel     $submissionModel
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $entityManager
+     * @param TemplatingHelper    $templating
+     */
+    public function __construct(
+        CitrixModel $citrixModel,
+        FormModel $formModel,
+        SubmissionModel $submissionModel,
+        TranslatorInterface $translator,
+        EntityManager $entityManager,
+        TemplatingHelper $templating
+    ) {
         $this->citrixModel     = $citrixModel;
         $this->formModel       = $formModel;
         $this->submissionModel = $submissionModel;
+        $this->translator      = $translator;
+        $this->em              = $entityManager;
+        $this->templating      = $templating;
     }
 
     /**
@@ -233,33 +260,12 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Helper function to debug REST responses.
-     *
-     * @param PluginIntegrationRequestEvent $event
-     */
-    public function onResponse(PluginIntegrationRequestEvent $event)
-    {
-        //        /** @var Response $response */
-//        $response = $event->getResponse();
-//        CitrixHelper::log(
-//            PHP_EOL. //$response->getStatusCode() . ' ' .
-//            print_r($response, true)
-//        );
-    }
-
-    /**
      * Helper function to debug REST requests.
      *
      * @param PluginIntegrationRequestEvent $event
      */
     public function onRequest(PluginIntegrationRequestEvent $event)
     {
-        //        CitrixHelper::log(
-//            PHP_EOL.$event->getMethod().' '.$event->getUrl().' '.
-//            var_export($event->getHeaders(), true).
-//            var_export($event->getParameters(), true)
-//        );
-
         // clean parameter that was breaking the call
         if (preg_match('/\/G2W\/rest\//', $event->getUrl())) {
             $params = $event->getParameters();

@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -21,11 +21,11 @@ use MauticPlugin\MauticCitrixBundle\Event\TokenGenerateEvent;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CitrixModel
@@ -33,13 +33,30 @@ class EmailSubscriber extends CommonSubscriber
     protected $citrixModel;
 
     /**
-     * FormSubscriber constructor.
-     *
-     * @param CitrixModel $citrixModel
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $citrixModel)
-    {
+    private $translator;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        CitrixModel $citrixModel,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $dispatcher,
+        TemplatingHelper $templating
+    ) {
         $this->citrixModel = $citrixModel;
+        $this->translator  = $translator;
+        $this->dispatcher  = $dispatcher;
+        $this->templating  = $templating;
     }
 
     /**

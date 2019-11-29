@@ -14,7 +14,7 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType;
@@ -22,11 +22,10 @@ use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     use CitrixRegistrationTrait;
     use CitrixStartTrait;
@@ -37,13 +36,32 @@ class CampaignSubscriber extends CommonSubscriber
     protected $citrixModel;
 
     /**
-     * CampaignSubscriber constructor.
+     * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
-     * @param CitrixModel $citrixModel
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $citrixModel)
-    {
+    protected $translator;
+
+    /**
+     * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
+     *
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    /**
+     * @param CitrixModel         $citrixModel
+     * @param TranslatorInterface $translator
+     * @param TemplatingHelper    $templating
+     */
+    public function __construct(
+        CitrixModel $citrixModel,
+        TranslatorInterface $translator,
+        TemplatingHelper $templating
+    ) {
         $this->citrixModel = $citrixModel;
+        $this->translator  = $translator;
+        $this->templating  = $templating;
     }
 
     /**

@@ -34,6 +34,9 @@ return [
                     'mautic.citrix.model.citrix',
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.templating',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
@@ -43,6 +46,7 @@ return [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
+                    'translator',
                 ],
             ],
             'mautic.citrix.campaignbundle.subscriber' => [
@@ -58,6 +62,9 @@ return [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.citrix.stats.subscriber' => [
