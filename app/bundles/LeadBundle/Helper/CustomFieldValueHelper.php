@@ -71,12 +71,12 @@ class CustomFieldValueHelper
                     }
                     break;
                 case self::TYPE_SELECT:
-                    $value = self::setValueFromProperties($properties, $value);
+                    $value = self::setValueFromPropertiesList($properties, $value);
                     break;
                 case self::TYPE_MULTISELECT:
                     $values = explode('|', $value);
                     foreach ($values as &$val) {
-                        $val = self::setValueFromProperties($properties, $val);
+                        $val = self::setValueFromPropertiesList($properties, $val);
                     }
                     $value = implode('|', $values);
                     break;
@@ -92,7 +92,7 @@ class CustomFieldValueHelper
      *
      * @return string
      */
-    private static function setValueFromProperties(array $properties, $value)
+    private static function setValueFromPropertiesList(array $properties, $value)
     {
         if (isset($properties['list'])) {
             foreach ($properties['list'] as $property) {

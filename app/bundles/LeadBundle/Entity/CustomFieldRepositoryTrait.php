@@ -314,6 +314,7 @@ trait CustomFieldRepositoryTrait
         foreach ($values as $k => $r) {
             if (isset($fields[$k])) {
                 $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
+
                 if (!is_null($r)) {
                     switch ($fields[$k]['type']) {
                         case 'number':
@@ -328,12 +329,12 @@ trait CustomFieldRepositoryTrait
                 $alias = $fields[$k]['alias'];
 
                 if ($byGroup) {
-                    $group                                          = $fields[$k]['group'];
-                    $fieldValues[$group][$alias]                    = $fields[$k];
-                    $fieldValues[$group][$alias]['value']           = $r;
+                    $group                                = $fields[$k]['group'];
+                    $fieldValues[$group][$alias]          = $fields[$k];
+                    $fieldValues[$group][$alias]['value'] = $r;
                 } else {
-                    $fieldValues[$alias]                    = $fields[$k];
-                    $fieldValues[$alias]['value']           = $r;
+                    $fieldValues[$alias]          = $fields[$k];
+                    $fieldValues[$alias]['value'] = $r;
                 }
 
                 unset($fields[$k]);
