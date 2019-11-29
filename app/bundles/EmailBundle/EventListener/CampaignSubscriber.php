@@ -25,6 +25,7 @@ use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
+use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
@@ -183,7 +184,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'label'                => 'mautic.email.campaign.event.send.to.user',
                 'description'          => 'mautic.email.campaign.event.send.to.user_descr',
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'             => 'email_to_user',
+                'formType'             => EmailToUserType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_useremail_email'],
                 'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
                 'channel'              => 'email',
