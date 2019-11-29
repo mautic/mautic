@@ -15,6 +15,7 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DashboardSubscriber implements EventSubscriberInterface
 {
