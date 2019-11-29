@@ -14,12 +14,12 @@ namespace Mautic\WebhookBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CampaignHelper

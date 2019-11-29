@@ -11,16 +11,13 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\WebhookEvents as WebhookEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class WebhookSubscriber.
- */
-class WebhookSubscriber extends CommonSubscriber
+class WebhookSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
@@ -33,8 +30,6 @@ class WebhookSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * WebhookSubscriber constructor.
-     *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      */
