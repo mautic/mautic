@@ -123,7 +123,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
                     $expressions[] = $queryBuilder->expr()->$operator('l.'.$filter->getField(), $parameter);
                 }
 
-                if ($filter->contactSegmentFilterCrate->getSourceOperator() == 'contains') {
+                if ($filter->contactSegmentFilterCrate->getSourceOperator() == 'inX') {
                     $expression = $queryBuilder->expr()->orX($expressions);
                 } else {
                     $expression = $queryBuilder->expr()->andX($expressions);

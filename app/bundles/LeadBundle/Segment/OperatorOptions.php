@@ -86,6 +86,11 @@ class OperatorOptions
             'expr'        => 'notIn',
             'negate_expr' => 'in',
         ],
+        'inX' => [
+            'label'       => 'mautic.lead.list.form.operator.inX',
+            'expr'        => 'inX',
+            'negate_expr' => 'notInX',
+        ],
         'regexp' => [
             'label'       => 'mautic.lead.list.form.operator.regexp',
             'expr'        => 'regexp', //special case

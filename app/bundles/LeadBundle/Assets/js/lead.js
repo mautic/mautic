@@ -458,7 +458,7 @@ Mautic.convertLeadFilterInput = function(el) {
 
     if (mQuery(filterId).is('select')) {
         var isMultiple  = mQuery(filterId).attr('multiple');
-        var multiple    = (operator == 'in' || operator == '!in' || operator == 'contains');
+        var multiple    = (operator == 'in' || operator == '!in' || operator == 'inX');
         var placeholder = mQuery(filterId).attr('data-placeholder');
 
         if (multiple && !isMultiple) {

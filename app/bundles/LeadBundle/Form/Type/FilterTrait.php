@@ -254,7 +254,7 @@ trait FilterTrait
                     ]
                 );
 
-                if (in_array($data['operator'], ['in', '!in', 'contains'])) {
+                if (in_array($data['operator'], ['in', '!in', 'inX'])) {
                     $customOptions['multiple'] = true;
                     if (!isset($data['filter'])) {
                         $data['filter'] = [];

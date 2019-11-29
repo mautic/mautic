@@ -60,7 +60,7 @@ trait OperatorListTrait
             'include' => [
                 'in',
                 '!in',
-                'contains',
+                'inX',
                 'empty',
                 '!empty',
             ],

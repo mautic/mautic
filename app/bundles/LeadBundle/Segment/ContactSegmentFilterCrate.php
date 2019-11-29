@@ -166,7 +166,7 @@ class ContactSegmentFilterCrate
     /**
      * @return string|null
      */
-    public function getType()
+    private function getType()
     {
         return $this->type;
     }
@@ -183,7 +183,7 @@ class ContactSegmentFilterCrate
     {
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 
-        if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in', 'contains'])) {
+        if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in', 'inX'])) {
             $neg            = strpos($operator, '!') === false ? '' : '!';
             $this->operator = $neg.$this->getType();
 
