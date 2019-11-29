@@ -25,7 +25,6 @@ use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
-use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
@@ -103,8 +102,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
             EmailEvents::ON_CAMPAIGN_BATCH_ACTION   => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
-            ],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
@@ -183,14 +180,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction(
             'email.send.to.user',
             [
-                'label'           => 'mautic.email.campaign.event.send.to.user',
-                'description'     => 'mautic.email.campaign.event.send.to.user_descr',
-                'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formType'        => EmailToUserType::class,
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_useremail_email'],
-                'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-                'channel'         => 'email',
-                'channelIdField'  => 'email',
+                'label'                => 'mautic.email.campaign.event.send.to.user',
+                'description'          => 'mautic.email.campaign.event.send.to.user_descr',
+                'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                'formType'             => 'email_to_user',
+                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_useremail_email'],
+                'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
+                'channel'              => 'email',
+                'channelIdField'       => 'email',
             ]
         );
     }
@@ -376,24 +373,29 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Triggers the action which sends email to user, contact owner or specified email addresses.
-     *
-     * @param CampaignExecutionEvent $event
+     * @param PendingEvent $event
      */
-    public function onCampaignTriggerActionSendEmailToUser(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event)
     {
         if (!$event->checkContext('email.send.to.user')) {
             return;
         }
 
-        $config = $event->getConfig();
-        $lead   = $event->getLead();
+        $config   = $event->getEvent()->getProperties();
+        $contacts = $event->getContacts();
+        $pending  = $event->getPending();
 
-        try {
-            $this->sendEmailToUser->sendEmailToUsers($config, $lead);
-            $event->setResult(true);
-        } catch (EmailCouldNotBeSentException $e) {
-            $event->setFailed($e->getMessage());
+        /**
+         * @var int
+         * @var Lead $contact
+         */
+        foreach ($contacts as $logId => $contact) {
+            try {
+                $this->sendEmailToUser->sendEmailToUsers($config, $contact);
+                $event->pass($pending->get($logId));
+            } catch (EmailCouldNotBeSentException $e) {
+                $event->fail($pending->get($logId), $e->getMessage());
+            }
         }
     }
 }
