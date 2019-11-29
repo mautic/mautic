@@ -13,14 +13,13 @@ namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserModel
@@ -33,15 +32,31 @@ class SearchSubscriber extends CommonSubscriber
     protected $userRoleModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserModel $userModel
-     * @param RoleModel $roleModel
+     * @var CorePermissions
      */
-    public function __construct(UserModel $userModel, RoleModel $roleModel)
-    {
+    protected $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    /**
+     * @param UserModel        $userModel
+     * @param RoleModel        $roleModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
+    public function __construct(
+        UserModel $userModel,
+        RoleModel $roleModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userModel     = $userModel;
         $this->userRoleModel = $roleModel;
+        $this->security      = $security;
+        $this->templating    = $templating;
     }
 
     /**
