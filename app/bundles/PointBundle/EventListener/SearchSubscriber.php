@@ -13,14 +13,13 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
@@ -33,15 +32,31 @@ class SearchSubscriber extends CommonSubscriber
     protected $pointTriggerModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param PointModel   $pointModel
-     * @param TriggerModel $pointTriggerModel
+     * @var CorePermissions
      */
-    public function __construct(PointModel $pointModel, TriggerModel $pointTriggerModel)
-    {
+    protected $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templating;
+
+    /**
+     * @param PointModel       $pointModel
+     * @param TriggerModel     $pointTriggerModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
+    public function __construct(
+        PointModel $pointModel,
+        TriggerModel $pointTriggerModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->pointModel        = $pointModel;
         $this->pointTriggerModel = $pointTriggerModel;
+        $this->security          = $security;
+        $this->templating        = $templating;
     }
 
     /**
