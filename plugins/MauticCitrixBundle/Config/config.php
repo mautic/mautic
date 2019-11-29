@@ -53,6 +53,8 @@ return [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.citrix.model.citrix',
+                    'translator',
+                    'mautic.helper.templating',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],

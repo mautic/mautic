@@ -265,7 +265,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
-        $logs                      = $this->LeadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
+        $logs                      = $this->contactEventLogRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->campaignModel->getEvents();
 
         // Add total number to counter

@@ -14,8 +14,8 @@ namespace Mautic\ChannelBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
-use Symfony\Bundle\FrameworkBundle\Routing\RouterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface

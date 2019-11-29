@@ -96,6 +96,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.page.model.page',
+                    'monolog.logger.mautic',
                     'mautic.page.repository.hit',
                     'mautic.page.repository.page',
                     'mautic.page.repository.redirect',

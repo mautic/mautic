@@ -14,8 +14,8 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SearchSubscriber implements EventSubscriberInterface
@@ -31,14 +31,19 @@ class SearchSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var DelegatingEngine
+     * @var TemplatingHelper
      */
     private $templating;
 
+    /**
+     * @param CampaignModel    $campaignModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
     public function __construct(
         CampaignModel $campaignModel,
         CorePermissions $security,
-        DelegatingEngine $templating
+        TemplatingHelper $templating
     ) {
         $this->campaignModel = $campaignModel;
         $this->security      = $security;

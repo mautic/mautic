@@ -15,8 +15,10 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -54,6 +56,16 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $router;
 
     /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * @var ModelFactory
      */
     protected $modelFactory;
@@ -62,17 +74,23 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @param AuditLogModel       $auditLogModel
      * @param TranslatorInterface $translator
      * @param AuditLogModel       $router
+     * @param CorePermissions     $security
+     * @param CorePermissions     $dispatcher
      * @param ModelFactory        $modelFactory
      */
     public function __construct(
         AuditLogModel $auditLogModel,
         TranslatorInterface $translator,
         RouterInterface $router,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
         ModelFactory $modelFactory
     ) {
         $this->auditLogModel = $auditLogModel;
         $this->translator    = $translator;
         $this->router        = $router;
+        $this->security      = $security;
+        $this->dispatcher    = $dispatcher;
         $this->modelFactory  = $modelFactory;
     }
 

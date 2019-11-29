@@ -19,7 +19,8 @@ use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -40,17 +41,17 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $session;
 
     /**
-     * @var ContainerAwareEventDispatcher
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @param LeadModel                     $leadModel
-     * @param DynamicContentModel           $dynamicContentModel
-     * @param Session                       $session
-     * @param ContainerAwareEventDispatcher $dispatcher
+     * @param LeadModel                $leadModel
+     * @param DynamicContentModel      $dynamicContentModel
+     * @param Session                  $session
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, ContainerAwareEventDispatcher $dispatcher)
+    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
     {
         $this->leadModel           = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;

@@ -369,7 +369,7 @@ return [
                     'mautic.lead.event.dispatcher',
                     'mautic.helper.template.dnc_reason',
                     'doctrine.orm.entity_manager',
-                    'tanslator',
+                    'translator',
                     'router',
                 ],
                 'methodCalls' => [
@@ -404,7 +404,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.lead.model.company',
                     'mautic.campaign.model.campaign',
-                    "parameter('mautic.parameters')",
+                    '%mautic.parameters%',
                 ],
             ],
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [

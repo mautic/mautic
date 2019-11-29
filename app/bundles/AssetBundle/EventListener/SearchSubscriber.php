@@ -14,9 +14,9 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SearchSubscriber implements EventSubscriberInterface
@@ -37,7 +37,7 @@ class SearchSubscriber implements EventSubscriberInterface
     private $userHelper;
 
     /**
-     * @var DelegatingEngine
+     * @var TemplatingHelper
      */
     private $templating;
 
@@ -45,9 +45,9 @@ class SearchSubscriber implements EventSubscriberInterface
      * @param AssetModel       $assetModel
      * @param CorePermissions  $security
      * @param UserHelper       $userHelper
-     * @param DelegatingEngine $templating
+     * @param TemplatingHelper $templating
      */
-    public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, DelegatingEngine $templating)
+    public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, TemplatingHelper $templating)
     {
         $this->assetModel = $assetModel;
         $this->security   = $security;

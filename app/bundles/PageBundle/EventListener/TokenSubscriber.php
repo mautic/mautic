@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class TokenSubscriber implements EventSubscriberInterface
 {

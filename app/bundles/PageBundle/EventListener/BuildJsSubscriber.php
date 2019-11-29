@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
 {

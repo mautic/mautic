@@ -114,12 +114,12 @@ return [
                 'class'     => \Mautic\ApiBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.api.model.client',
-                    'mautic.helper.templating',
                     'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.api.rate_limit_generate_key.subscriber' => [
-              'class'     => 'Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber',
+              'class'     => \Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber::class,
               'arguments' => [
                 'mautic.helper.core_parameters',
               ],

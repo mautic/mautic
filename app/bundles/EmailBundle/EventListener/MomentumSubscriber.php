@@ -22,6 +22,7 @@ use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
 use Mautic\QueueBundle\QueueEvents;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MomentumSubscriber implements EventSubscriberInterface
 {

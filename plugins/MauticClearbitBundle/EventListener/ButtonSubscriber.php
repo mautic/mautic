@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ButtonSubscriber implements EventSubscriberInterface

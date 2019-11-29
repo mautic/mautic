@@ -167,7 +167,7 @@ class CoreSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $list        = $this->formRepository > getSimpleList();
+        $list        = $this->formRepository->getSimpleList();
         $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
 
         $this->assetsHelper->addScriptDeclaration("var mauticForms = {$mauticForms};");

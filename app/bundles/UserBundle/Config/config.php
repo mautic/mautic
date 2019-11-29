@@ -146,7 +146,7 @@ return [
             'mautic.user.route.subscriber' => [
                 'class'     => \Mautic\UserBundle\EventListener\RouteSubscriber::class,
                 'arguments' => [
-                    "parameter('mautic.parameters')",
+                    '%mautic.parameters%',
                 ],
             ],
             'mautic.user.security_subscriber' => [

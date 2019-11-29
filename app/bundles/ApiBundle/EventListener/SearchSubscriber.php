@@ -14,8 +14,8 @@ namespace Mautic\ApiBundle\EventListener;
 use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SearchSubscriber implements EventSubscriberInterface
@@ -31,16 +31,16 @@ class SearchSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var DelegatingEngine
+     * @var TemplatingHelper
      */
     private $templating;
 
     /**
      * @param ClientModel      $apiClientModel
      * @param CorePermissions  $security
-     * @param DelegatingEngine $templating
+     * @param TemplatingHelper $templating
      */
-    public function __construct(ClientModel $apiClientModel, CorePermissions $security, DelegatingEngine $templating)
+    public function __construct(ClientModel $apiClientModel, CorePermissions $security, TemplatingHelper $templating)
     {
         $this->apiClientModel = $apiClientModel;
         $this->security       = $security;

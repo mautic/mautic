@@ -164,7 +164,7 @@ return [
                     'translator',
                     'request_stack',
                     'mautic.form.repository.form',
-                    "parameter('mautic.parameters')",
+                    '%mautic.parameters%',
                     'mautic.factory',
                 ],
             ],
@@ -172,7 +172,7 @@ return [
                 'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
                 'arguments' => [
                     'mautic.helper.cookie',
-                    "parameter('mautic.parameters')",
+                    '%mautic.parameters%',
                 ],
             ],
             'mautic.core.configbundle.subscriber' => [
@@ -194,6 +194,8 @@ return [
                     'mautic.core.model.auditlog',
                     'translator',
                     'router',
+                    'mautic.security',
+                    'event_dispatcher',
                     'mautic.model.factory',
                 ],
             ],
