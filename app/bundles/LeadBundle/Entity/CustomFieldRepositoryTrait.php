@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
-use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 
 /**
  * Class CustomFieldRepositoryTrait.
@@ -332,11 +331,9 @@ trait CustomFieldRepositoryTrait
                     $group                                          = $fields[$k]['group'];
                     $fieldValues[$group][$alias]                    = $fields[$k];
                     $fieldValues[$group][$alias]['value']           = $r;
-                    $fieldValues[$group][$alias]['normalizedValue'] = CustomFieldValueHelper::normalizeValue($fieldValues[$group][$alias]);
                 } else {
                     $fieldValues[$alias]                    = $fields[$k];
                     $fieldValues[$alias]['value']           = $r;
-                    $fieldValues[$alias]['normalizedValue'] = CustomFieldValueHelper::normalizeValue($fieldValues[$alias]);
                 }
 
                 unset($fields[$k]);
