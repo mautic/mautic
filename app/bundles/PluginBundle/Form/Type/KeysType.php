@@ -12,6 +12,8 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -52,7 +54,7 @@ class KeysType extends AbstractType
                     ),
                 ] : [];
 
-            $type = ($isSecret) ? 'password' : 'text';
+            $type = ($isSecret) ? PasswordType::class : TextType::class;
 
             $builder->add(
                 $key,

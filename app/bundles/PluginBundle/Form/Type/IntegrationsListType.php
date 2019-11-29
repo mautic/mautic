@@ -53,7 +53,7 @@ class IntegrationsListType extends AbstractType
                 if (!isset($integrations[$settings->getPlugin()->getName()])) {
                     $integrations[$settings->getPlugin()->getName()] = [];
                 }
-                $integrations[$settings->getPlugin()->getName()][$object->getName()] = $object->getDisplayName();
+                $integrations[$settings->getPlugin()->getName()][$object->getDisplayName()] = $object->getName();
             }
         }
 
@@ -77,6 +77,7 @@ class IntegrationsListType extends AbstractType
                         ['message' => 'mautic.core.value.required']
                     ),
                 ],
+                'choices_as_values' => true,
             ]
         );
 
@@ -85,7 +86,6 @@ class IntegrationsListType extends AbstractType
             $campaignChoices = [];
 
             if (isset($data['integration'])) {
-                $integration       = $data['integration'];
                 $integrationObject = $integrationHelper->getIntegrationObject($data['integration']);
                 if (method_exists($integrationObject, 'getCampaigns')) {
                     $campaigns = $integrationObject->getCampaigns();

@@ -12,7 +12,9 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -132,7 +134,7 @@ trait FieldsTypeTrait
                     ++$index;
                     $form->add(
                         'label_'.$index,
-                        'text',
+                        TextType::class,
                         [
                             'label' => false,
                             'data'  => $choices[$field],
@@ -194,9 +196,9 @@ trait FieldsTypeTrait
 
                     $form->add(
                         'm_'.$index,
-                        'choice',
+                        ChoiceType::class,
                         [
-                            'choices'    => $mauticFields,
+                            'choices'    => array_flip($mauticFields),
                             'label'      => false,
                             'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                             'label_attr' => ['class' => 'control-label'],
@@ -207,6 +209,7 @@ trait FieldsTypeTrait
                                 'data-value'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
+                            'choices_as_values' => true,
                         ]
                     );
                     $form->add(
