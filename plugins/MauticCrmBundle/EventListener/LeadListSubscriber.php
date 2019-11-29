@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
@@ -19,28 +18,36 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadListsSubscriber.
- */
-class LeadListSubscriber extends CommonSubscriber
+class LeadListSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IntegrationHelper
      */
     protected $helper;
 
+    /**
+     * @var ListModel
+     */
     protected $listModel;
 
     /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $helper
+     * @var TranslatorInterface
      */
-    public function __construct(IntegrationHelper $helper, ListModel $listModel)
+    protected $translator;
+
+    /**
+     * @param IntegrationHelper   $helper
+     * @param ListModel           $listModel
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(IntegrationHelper $helper, ListModel $listModel, TranslatorInterface $translator)
     {
-        $this->helper    = $helper;
-        $this->listModel = $listModel;
+        $this->helper     = $helper;
+        $this->listModel  = $listModel;
+        $this->translator = $translator;
     }
 
     /**

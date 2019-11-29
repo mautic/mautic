@@ -14,14 +14,11 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetListType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IntegrationHelper
@@ -29,8 +26,6 @@ class ChannelSubscriber extends CommonSubscriber
     protected $helper;
 
     /**
-     * ChannelSubscriber constructor.
-     *
      * @param IntegrationHelper $helper
      */
     public function __construct(IntegrationHelper $helper)

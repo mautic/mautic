@@ -11,15 +11,12 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FocusModel
@@ -27,8 +24,6 @@ class FormSubscriber extends CommonSubscriber
     protected $model;
 
     /**
-     * FormSubscriber constructor.
-     *
      * @param FocusModel $model
      */
     public function __construct(FocusModel $model)

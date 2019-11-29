@@ -11,18 +11,16 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class StatSubscriber.
- */
-class StatSubscriber extends CommonSubscriber
+class StatSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FocusModel
@@ -30,13 +28,18 @@ class StatSubscriber extends CommonSubscriber
     protected $model;
 
     /**
-     * FormSubscriber constructor.
-     *
-     * @param FocusModel $model
+     * @var RequestStack
      */
-    public function __construct(FocusModel $model)
+    protected $requestStack;
+
+    /**
+     * @param FocusModel   $model
+     * @param RequestStack $requestStack
+     */
+    public function __construct(FocusModel $model, RequestStack $requestStack)
     {
-        $this->model = $model;
+        $this->model        = $model;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -76,7 +79,7 @@ class StatSubscriber extends CommonSubscriber
     public function onFormSubmit(SubmissionEvent $event)
     {
         // Check the request for a focus field
-        $mauticform = $this->request->request->get('mauticform', []);
+        $mauticform = $this->requestStack->getCurrentRequest()->request->get('mauticform', []);
         $id         = $mauticform['focusId'] ?? false;
 
         if (!empty($id)) {

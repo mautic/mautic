@@ -14,13 +14,14 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CampaignEventHelper
@@ -33,15 +34,23 @@ class CampaignSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
-     * CampaignSubscriber constructor.
-     *
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param CampaignEventHelper $campaignEventHelper
      * @param IntegrationHelper   $helper
+     * @param TranslatorInterface $translator
      */
-    public function __construct(CampaignEventHelper $campaignEventHelper, IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        CampaignEventHelper $campaignEventHelper,
+        IntegrationHelper $integrationHelper,
+        TranslatorInterface $translator
+    ) {
         $this->campaignEventHelper = $campaignEventHelper;
         $this->integrationHelper   = $integrationHelper;
+        $this->translator          = $translator;
     }
 
     /**
