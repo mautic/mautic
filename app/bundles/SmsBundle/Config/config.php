@@ -13,14 +13,14 @@ return [
     'services' => [
         'events' => [
             'mautic.sms.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\SmsBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.sms.model.sms',
                     'mautic.sms.transport_chain',
                 ],
             ],
             'mautic.sms.smsbundle.subscriber' => [
-                'class'     => 'Mautic\SmsBundle\EventListener\SmsSubscriber',
+                'class'     => \Mautic\SmsBundle\EventListener\SmsSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
                     'mautic.page.model.trackable',

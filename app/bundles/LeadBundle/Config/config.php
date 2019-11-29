@@ -874,6 +874,13 @@ return [
                     \Mautic\LeadBundle\Entity\CompanyLead::class,
                 ],
             ],
+            'mautic.lead.repository.stages_lead_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\StagesChangeLog::class,
+                ],
+            ],
             'mautic.lead.repository.dnc' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],

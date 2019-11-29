@@ -14,16 +14,13 @@ namespace Mautic\SmsBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var SmsModel
@@ -36,8 +33,6 @@ class CampaignSubscriber extends CommonSubscriber
     protected $transportChain;
 
     /**
-     * CampaignSubscriber constructor.
-     *
      * @param SmsModel       $smsModel
      * @param TransportChain $transportChain
      */
@@ -45,8 +40,8 @@ class CampaignSubscriber extends CommonSubscriber
         SmsModel $smsModel,
         TransportChain $transportChain
     ) {
-        $this->smsModel          = $smsModel;
-        $this->transportChain    = $transportChain;
+        $this->smsModel       = $smsModel;
+        $this->transportChain = $transportChain;
     }
 
     /**
