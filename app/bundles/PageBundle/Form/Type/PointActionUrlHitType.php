@@ -38,15 +38,6 @@ class PointActionUrlHitType extends AbstractType
             ],
         ]);
 
-        // $default = (isset($options['data']) && isset($options['data']['first_time'])) ? $options['data']['first_time'] : false;
-        // $builder->add('first_time', 'yesno_button_group', array(
-        //     'label'       => 'mautic.page.point.action.form.first.time.only',
-        //     'attr'        => array(
-        //         'tooltip' => 'mautic.page.point.action.form.first.time.only.descr'
-        //     ),
-        //     'data'        => $default
-        // ));
-
         $builder->add('page_hits', 'integer', [
             'label'      => 'mautic.page.hits',
             'label_attr' => ['class' => 'control-label'],

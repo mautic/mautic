@@ -11,6 +11,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\AssetEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\PageEvents;
@@ -42,7 +43,7 @@ class PageSubscriber extends CommonSubscriber
             $assetDownloads = [
                 'group'    => 'mautic.asset.abtest.criteria',
                 'label'    => 'mautic.asset.abtest.criteria.downloads',
-                'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner',
+                'event'    => AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('asset.downloads', $assetDownloads);
         }

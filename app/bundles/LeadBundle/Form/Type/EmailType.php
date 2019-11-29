@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -122,7 +123,7 @@ class EmailType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'apply_text'  => false,
             'save_text'   => 'mautic.email.send',
             'save_class'  => 'btn btn-primary',

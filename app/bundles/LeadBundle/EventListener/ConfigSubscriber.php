@@ -14,10 +14,8 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Form\Type\ConfigType;
 
-/**
- * Class ConfigSubscriber.
- */
 class ConfigSubscriber extends CommonSubscriber
 {
     /**
@@ -35,6 +33,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticLeadBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticLeadBundle'),
         ]);

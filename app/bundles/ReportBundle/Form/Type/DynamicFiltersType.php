@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -43,7 +44,7 @@ class DynamicFiltersType extends AbstractType
                 switch ($definition['type']) {
                     case 'bool':
                     case 'boolean':
-                        $type                      = 'button_group';
+                        $type                      = ButtonGroupType::class;
                         $args['choices_as_values'] = true;
                         $args['choices']           = [
                             [

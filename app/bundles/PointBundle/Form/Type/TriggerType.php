@@ -11,9 +11,12 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -74,7 +77,7 @@ class TriggerType extends AbstractType
         //add category
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             [
                 'bundle' => 'point',
             ]
@@ -115,7 +118,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'triggerExistingLeads',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.point.trigger.form.existingleads',
             ]
@@ -134,7 +137,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'isPublished',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'read_only' => $readonly,
                 'data'      => $data,
@@ -181,7 +184,7 @@ class TriggerType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

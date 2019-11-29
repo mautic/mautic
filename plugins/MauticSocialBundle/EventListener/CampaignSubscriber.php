@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 
@@ -66,7 +67,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description'     => 'mautic.social.twitter.tweet.event.open_desc',
                 'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_channelId'],
-                'formType'        => 'tweetsend_list',
+                'formType'        => TweetSendType::class,
                 'channel'         => 'social.tweet',
                 'channelIdField'  => 'channelId',
             ];

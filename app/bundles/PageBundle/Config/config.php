@@ -157,10 +157,8 @@ return [
                 ],
             ],
             'mautic.page.webhook.subscriber' => [
-                'class'       => 'Mautic\PageBundle\EventListener\WebhookSubscriber',
-                'methodCalls' => [
-                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
-                ],
+                'class'       => \Mautic\PageBundle\EventListener\WebhookSubscriber::class,
+                'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.page.dashboard.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\DashboardSubscriber',
@@ -185,6 +183,13 @@ return [
                 'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.page.subscriber.determine_winner' => [
+                'class'     => \Mautic\PageBundle\EventListener\DetermineWinnerSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
                 ],
             ],
         ],

@@ -59,38 +59,33 @@ return [
         ],
         'forms' => [
             'mautic.form.type.sms' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sms',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
             ],
             'mautic.form.type.smsconfig' => [
-                'class' => 'Mautic\SmsBundle\Form\Type\ConfigType',
-                'alias' => 'smsconfig',
+                'class' => \Mautic\SmsBundle\Form\Type\ConfigType::class,
             ],
             'mautic.form.type.smssend_list' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsSendType',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsSendType::class,
                 'arguments' => 'router',
-                'alias'     => 'smssend_list',
             ],
             'mautic.form.type.sms_list' => [
-                'class' => 'Mautic\SmsBundle\Form\Type\SmsListType',
-                'alias' => 'sms_list',
+                'class' => \Mautic\SmsBundle\Form\Type\SmsListType::class,
             ],
             'mautic.form.type.sms.config.form' => [
                 'class'     => \Mautic\SmsBundle\Form\Type\ConfigType::class,
-                'alias'     => 'smsconfig',
                 'arguments' => ['mautic.sms.transport_chain', 'translator'],
             ],
         ],
         'helpers' => [
             'mautic.helper.sms' => [
-                'class'     => 'Mautic\SmsBundle\Helper\SmsHelper',
+                'class'     => \Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
                     'mautic.sms.model.sms',
                     'mautic.helper.integration',
+                    'mautic.lead.model.dnc',
                 ],
                 'alias' => 'sms_helper',
             ],

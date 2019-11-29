@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -125,7 +126,7 @@ class FocusController extends FormController
             // For line graphs in the view
             $dateRangeValues = $this->request->get('daterange', []);
             $dateRangeForm   = $this->get('form.factory')->create(
-                'daterange',
+                DateRangeType::class,
                 $dateRangeValues,
                 [
                     'action' => $this->generateUrl(

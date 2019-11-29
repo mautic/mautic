@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -73,7 +74,7 @@ class NoteType extends AbstractType
             'data'   => $data,
         ]);
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'apply_text' => false,
             'save_text'  => 'mautic.core.form.save',
         ]);

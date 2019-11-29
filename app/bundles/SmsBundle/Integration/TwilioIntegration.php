@@ -12,7 +12,10 @@
 
 namespace Mautic\SmsBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 /**
  * Class TwilioIntegration.
@@ -101,7 +104,7 @@ class TwilioIntegration extends AbstractIntegration
             );
             $builder->add(
                 'disable_trackable_urls',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
                     'attr'  => [
@@ -110,9 +113,9 @@ class TwilioIntegration extends AbstractIntegration
                     'data'=> !empty($data['disable_trackable_urls']) ? true : false,
                 ]
             );
-            $builder->add('frequency_number', 'number',
+            $builder->add('frequency_number', NumberType::class,
                 [
-                    'precision'  => 0,
+                    'scale'      => 0,
                     'label'      => 'mautic.sms.list.frequency.number',
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
@@ -120,7 +123,7 @@ class TwilioIntegration extends AbstractIntegration
                         'class' => 'form-control frequency',
                     ],
                 ]);
-            $builder->add('frequency_time', 'choice',
+            $builder->add('frequency_time', ChoiceType::class,
                 [
                     'choices' => [
                         'DAY'   => 'day',

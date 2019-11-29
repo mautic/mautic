@@ -219,10 +219,8 @@ return [
                 ],
             ],
             'mautic.email.webhook.subscriber' => [
-                'class'       => 'Mautic\EmailBundle\EventListener\WebhookSubscriber',
-                'methodCalls' => [
-                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
-                ],
+                'class'       => \Mautic\EmailBundle\EventListener\WebhookSubscriber::class,
+                'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.email.configbundle.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\ConfigSubscriber',
@@ -272,6 +270,13 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\TrackingSubscriber::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
+                ],
+            ],
+            'mautic.email.subscriber.determine_winner' => [
+                'class'     => \Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
                 ],
             ],
         ],
