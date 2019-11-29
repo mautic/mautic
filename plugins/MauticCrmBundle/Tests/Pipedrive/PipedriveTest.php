@@ -19,7 +19,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

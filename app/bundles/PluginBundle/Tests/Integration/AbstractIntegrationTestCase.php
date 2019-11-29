@@ -104,7 +104,7 @@ class AbstractIntegrationTestCase extends MauticMysqlTestCase
      */
     protected $integrationEntityModel;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

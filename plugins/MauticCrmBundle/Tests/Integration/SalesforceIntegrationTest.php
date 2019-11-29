@@ -112,7 +112,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      */
     protected $leadsCreatedCounter = 0;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -28,7 +28,7 @@ class TokenHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         $reflectionProperty = new ReflectionProperty(TokenHelper::class, 'parameters');
         $reflectionProperty->setAccessible(true);

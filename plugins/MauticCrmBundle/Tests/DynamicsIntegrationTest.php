@@ -16,7 +16,7 @@ class DynamicsIntegrationTest extends AbstractIntegrationTestCase
     /** @var DynamicsIntegration */
     private $integration;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
