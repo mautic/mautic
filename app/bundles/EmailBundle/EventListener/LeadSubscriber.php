@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
@@ -38,7 +38,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -46,13 +46,13 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param EmailReplyRepositoryInterface $emailReplyRepository
      * @param StatRepository                $statRepository
      * @param TranslatorInterface           $translator
-     * @param Router                        $router
+     * @param RouterInterface               $router
      */
     public function __construct(
         EmailReplyRepositoryInterface $emailReplyRepository,
         StatRepository $statRepository,
         TranslatorInterface $translator,
-        Router $router
+        RouterInterface $router
     ) {
         $this->emailReplyRepository = $emailReplyRepository;
         $this->statRepository       = $statRepository;

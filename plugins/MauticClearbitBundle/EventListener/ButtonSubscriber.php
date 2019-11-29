@@ -27,7 +27,7 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $helper;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $translator;
 
@@ -39,9 +39,9 @@ class ButtonSubscriber implements EventSubscriberInterface
     /**
      * @param IntegrationHelper   $helper
      * @param TranslatorInterface $translator
-     * @param Router              $router
+     * @param RouterInterface     $router
      */
-    public function __construct(IntegrationHelper $helper, TranslatorInterface $translator, Router $router)
+    public function __construct(IntegrationHelper $helper, TranslatorInterface $translator, RouterInterface $router)
     {
         $this->helper     = $helper;
         $this->translator = $translator;

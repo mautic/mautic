@@ -31,16 +31,16 @@ class BuildJsSubscriber implements EventSubscriberInterface
     private $trackingHelper;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
     /**
-     * @param AssetsHelper   $assetsHelper
-     * @param TrackingHelper $trackingHelper
-     * @param Router         $router
+     * @param AssetsHelper    $assetsHelper
+     * @param TrackingHelper  $trackingHelper
+     * @param RouterInterface $router
      */
-    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, Router $router)
+    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, RouterInterface $router)
     {
         $this->assetsHelper   = $assetsHelper;
         $this->trackingHelper = $trackingHelper;

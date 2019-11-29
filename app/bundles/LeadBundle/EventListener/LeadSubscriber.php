@@ -65,7 +65,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -76,7 +76,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param DncReasonHelper           $dncReasonHelper
      * @param EntityManager             $entityManager
      * @param TranslatorInterface       $translator
-     * @param Router                    $router
+     * @param RouterInterface           $router
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -85,7 +85,7 @@ class LeadSubscriber implements EventSubscriberInterface
         DncReasonHelper $dncReasonHelper,
         EntityManager $entityManager,
         TranslatorInterface $translator,
-        Router $router
+        RouterInterface $router
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
         $this->auditLogModel       = $auditLogModel;

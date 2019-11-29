@@ -15,7 +15,7 @@ use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
@@ -26,7 +26,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -37,12 +37,12 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * @param TranslatorInterface    $translator
-     * @param Router                 $router
+     * @param RouterInterface        $router
      * @param MessageQueueRepository $messageQueueRepository
      */
     public function __construct(
         TranslatorInterface $translator,
-        Router $router,
+        RouterInterface $router,
         MessageQueueRepository $messageQueueRepository
     ) {
         $this->translator             = $translator;

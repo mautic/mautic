@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Bundle\FrameworkBundle\Routing\RouterInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -34,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -46,13 +46,13 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @param AssetModel          $assetModel
      * @param TranslatorInterface $translator
-     * @param Router              $router
+     * @param RouterInterface     $router
      * @param DownloadRepository  $downloadRepository
      */
     public function __construct(
         AssetModel $assetModel,
         TranslatorInterface $translator,
-        Router $router,
+        RouterInterface $router,
         DownloadRepository $downloadRepository
     ) {
         $this->assetModel         = $assetModel;

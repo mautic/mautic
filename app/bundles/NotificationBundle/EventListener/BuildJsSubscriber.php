@@ -31,16 +31,16 @@ class BuildJsSubscriber implements EventSubscriberInterface
     private $integrationHelper;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
     /**
      * @param NotificationHelper $notificationHelper
      * @param IntegrationHelper  $integrationHelper
-     * @param Router             $router
+     * @param RouterInterface    $router
      */
-    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, Router $router)
+    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
     {
         $this->notificationHelper = $notificationHelper;
         $this->integrationHelper  = $integrationHelper;

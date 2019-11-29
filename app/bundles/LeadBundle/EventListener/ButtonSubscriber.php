@@ -25,15 +25,15 @@ class ButtonSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
     /**
      * @param TranslatorInterface $translator
-     * @param Router              $router
+     * @param RouterInterface     $router
      */
-    public function __construct(TranslatorInterface $translator, Router $router)
+    public function __construct(TranslatorInterface $translator, RouterInterface $router)
     {
         $this->translator = $translator;
         $this->router     = $router;

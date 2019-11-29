@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CalendarSubscriber implements EventSubscriberInterface
@@ -45,7 +45,7 @@ class CalendarSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -54,14 +54,14 @@ class CalendarSubscriber implements EventSubscriberInterface
      * @param Connection          $connection
      * @param CorePermissions     $security
      * @param TranslatorInterface $translator
-     * @param Router              $router
+     * @param RouterInterface     $router
      */
     public function __construct(
         PageModel $pageModel,
         Connection $connection,
         CorePermissions $security,
         TranslatorInterface $translator,
-        Router $router
+        RouterInterface $router
     ) {
         $this->pageModel  = $pageModel;
         $this->connection = $connection;

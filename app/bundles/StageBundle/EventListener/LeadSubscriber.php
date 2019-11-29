@@ -37,7 +37,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -45,13 +45,13 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param StagesChangeLogRepository $stagesChangeLogRepository
      * @param LeadStageLogRepository    $leadStageLogRepository
      * @param TranslatorInterface       $translator
-     * @param Router                    $router
+     * @param RouterInterface           $router
      */
     public function __construct(
         StagesChangeLogRepository $stagesChangeLogRepository,
         LeadStageLogRepository $leadStageLogRepository,
         TranslatorInterface $translator,
-        Router $router
+        RouterInterface $router
     ) {
         $this->stagesChangeLogRepository = $stagesChangeLogRepository;
         $this->leadStageLogRepository    = $leadStageLogRepository;

@@ -26,7 +26,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
@@ -57,7 +57,7 @@ class FormSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -67,7 +67,7 @@ class FormSubscriber implements EventSubscriberInterface
      * @param MailHelper           $mailer
      * @param CoreParametersHelper $coreParametersHelper
      * @param TranslatorInterface  $translator
-     * @param Router               $router
+     * @param RouterInterface      $router
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -75,7 +75,7 @@ class FormSubscriber implements EventSubscriberInterface
         MailHelper $mailer,
         CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
-        Router $router
+        RouterInterface $router
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->auditLogModel        = $auditLogModel;

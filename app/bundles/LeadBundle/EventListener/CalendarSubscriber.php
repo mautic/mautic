@@ -31,16 +31,16 @@ class CalendarSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
     /**
      * @param Connection          $connection
      * @param TranslatorInterface $translator
-     * @param Router              $router
+     * @param RouterInterface     $router
      */
-    public function __construct(Connection $connection, TranslatorInterface $translator, Router $router)
+    public function __construct(Connection $connection, TranslatorInterface $translator, RouterInterface $router)
     {
         $this->connection = $connection;
         $this->translator = $translator;

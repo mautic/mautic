@@ -40,10 +40,10 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var TranslatorInterface
      */
-    private $pagtranslatoreModel;
+    private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -52,14 +52,14 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param PageModel            $pageModel
      * @param SubmissionRepository $submissionRepository
      * @param TranslatorInterface  $translator
-     * @param Router               $router
+     * @param RouterInterface      $router
      */
     public function __construct(
         FormModel $formModel,
         PageModel $pageModel,
         SubmissionRepository $submissionRepository,
         TranslatorInterface $translator,
-        Router $router
+        RouterInterface $router
     ) {
         $this->formModel            = $formModel;
         $this->pageModel            = $pageModel;

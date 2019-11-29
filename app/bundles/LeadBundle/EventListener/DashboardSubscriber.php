@@ -15,7 +15,7 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
@@ -68,7 +68,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $leadListModel;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     protected $router;
 
@@ -80,10 +80,10 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * @param LeadModel           $leadModel
      * @param ListModel           $leadListModel
-     * @param Router              $router
+     * @param RouterInterface     $router
      * @param TranslatorInterface $translator
      */
-    public function __construct(LeadModel $leadModel, ListModel $leadListModel, Router $router, TranslatorInterface $translator)
+    public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator)
     {
         $this->leadModel     = $leadModel;
         $this->leadListModel = $leadListModel;

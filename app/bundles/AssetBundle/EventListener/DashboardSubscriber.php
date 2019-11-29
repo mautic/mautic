@@ -14,7 +14,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -53,15 +53,15 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $assetModel;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     protected $router;
 
     /**
-     * @param AssetModel $assetModel
-     * @param Router     $router
+     * @param AssetModel      $assetModel
+     * @param RouterInterface $router
      */
-    public function __construct(AssetModel $assetModel, Router $router)
+    public function __construct(AssetModel $assetModel, RouterInterface $router)
     {
         $this->assetModel = $assetModel;
         $this->router     = $router;

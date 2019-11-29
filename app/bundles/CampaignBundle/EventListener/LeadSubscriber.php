@@ -28,7 +28,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
@@ -54,7 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $entityManager;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
@@ -88,7 +88,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param LeadModel           $leadModel
      * @param TranslatorInterface $translator
      * @param EntityManager       $entityManager
-     * @param Router              $router
+     * @param RouterInterface     $router
      * @param CorePermissions     $security
      */
     public function __construct(
@@ -96,7 +96,7 @@ class LeadSubscriber implements EventSubscriberInterface
         LeadModel $leadModel,
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        Router $router,
+        RouterInterface $router,
         CorePermissions $security
     ) {
         $this->campaignModel             = $campaignModel;
