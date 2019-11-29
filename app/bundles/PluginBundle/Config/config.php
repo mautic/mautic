@@ -99,44 +99,36 @@ return [
         ],
         'forms' => [
             'mautic.form.type.integration.details' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\DetailsType',
-                'alias' => 'integration_details',
+                'class' => \Mautic\PluginBundle\Form\Type\DetailsType::class,
             ],
             'mautic.form.type.integration.settings' => [
-                'class'     => 'Mautic\PluginBundle\Form\Type\FeatureSettingsType',
+                'class'     => \Mautic\PluginBundle\Form\Type\FeatureSettingsType::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',
                     'monolog.logger.mautic',
                 ],
-                'alias' => 'integration_featuresettings',
             ],
             'mautic.form.type.integration.fields' => [
-                'class'     => 'Mautic\PluginBundle\Form\Type\FieldsType',
-                'alias'     => 'integration_fields',
+                'class'     => \Mautic\PluginBundle\Form\Type\FieldsType::class,
                 'arguments' => 'translator',
             ],
             'mautic.form.type.integration.company.fields' => [
-                'class'     => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
-                'alias'     => 'integration_company_fields',
+                'class'     => \Mautic\PluginBundle\Form\Type\CompanyFieldsType::class,
                 'arguments' => 'translator',
             ],
             'mautic.form.type.integration.keys' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\KeysType',
-                'alias' => 'integration_keys',
+                'class' => \Mautic\PluginBundle\Form\Type\KeysType::class,
             ],
             'mautic.form.type.integration.list' => [
-                'class'     => 'Mautic\PluginBundle\Form\Type\IntegrationsListType',
+                'class'     => \Mautic\PluginBundle\Form\Type\IntegrationsListType::class,
                 'arguments' => 'mautic.factory',
-                'alias'     => 'integration_list',
             ],
             'mautic.form.type.integration.config' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\IntegrationConfigType',
-                'alias' => 'integration_config',
+                'class' => \Mautic\PluginBundle\Form\Type\IntegrationConfigType::class,
             ],
             'mautic.form.type.integration.campaign' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\IntegrationCampaignsType',
-                'alias' => 'integration_campaign_status',
+                'class' => \Mautic\PluginBundle\Form\Type\IntegrationCampaignsType::class,
             ],
         ],
         'other' => [
