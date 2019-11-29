@@ -26,22 +26,22 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
      * @var FocusModel
      */
-    protected $focusModel;
+    private $focusModel;
 
     /**
      * @var TrackingHelper
      */
-    protected $trackingHelper;
+    private $trackingHelper;
 
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
 
     /**
      * @param EventModel      $eventModel

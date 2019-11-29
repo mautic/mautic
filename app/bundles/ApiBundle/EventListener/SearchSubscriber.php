@@ -23,17 +23,17 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var ClientModel
      */
-    protected $apiClientModel;
+    private $apiClientModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var DelegatingEngine
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param ClientModel      $apiClientModel

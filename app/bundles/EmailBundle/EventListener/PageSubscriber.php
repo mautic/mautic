@@ -23,17 +23,17 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    private $requestStack;
 
     /**
      * @param EmailModel   $emailModel

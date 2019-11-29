@@ -30,27 +30,27 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var NotificationModel
      */
-    protected $notificationModel;
+    private $notificationModel;
 
     /**
      * @var AbstractNotificationApi
      */
-    protected $notificationApi;
+    private $notificationApi;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var EventDispatcherInterface
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     /**
      * @param IntegrationHelper        $integrationHelper

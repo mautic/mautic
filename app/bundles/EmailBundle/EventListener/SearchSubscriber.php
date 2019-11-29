@@ -24,22 +24,22 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var TemplatingHelper
      */
-    protected $templating;
+    private $templating;
 
     public function __construct(
         UserHelper $userHelper,

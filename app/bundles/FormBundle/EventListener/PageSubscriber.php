@@ -13,8 +13,8 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
-use Mautic\FormBundle\FormEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -29,22 +29,22 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var MauticFactory
      */
-    protected $mauticFactory;
+    private $mauticFactory;
 
     /**
      * @param FormModel           $formModel

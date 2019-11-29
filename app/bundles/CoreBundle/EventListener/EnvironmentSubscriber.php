@@ -22,12 +22,12 @@ class EnvironmentSubscriber implements EventSubscriberInterface
     /**
      * @var CookieHelper
      */
-    protected $cookieHelper;
+    private $cookieHelper;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * System params.

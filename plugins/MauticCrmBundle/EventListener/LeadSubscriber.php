@@ -23,12 +23,12 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var LeadExport
      */
-    protected $leadExport;
+    private $leadExport;
 
     /**
      * @param IntegrationHelper $integrationHelper

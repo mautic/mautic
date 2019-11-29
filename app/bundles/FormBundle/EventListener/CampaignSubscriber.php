@@ -26,17 +26,17 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var SubmissionModel
      */
-    protected $formSubmissionModel;
+    private $formSubmissionModel;
 
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
      * @param FormModel       $formModel

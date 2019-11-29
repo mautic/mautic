@@ -24,22 +24,22 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var TemplatingHelper
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param UserHelper       $userHelper

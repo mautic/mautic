@@ -23,7 +23,7 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
      * @param PointModel $pointModel

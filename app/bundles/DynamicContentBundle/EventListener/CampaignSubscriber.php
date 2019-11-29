@@ -27,22 +27,22 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var DynamicContentModel
      */
-    protected $dynamicContentModel;
+    private $dynamicContentModel;
 
     /**
      * @var Session
      */
-    protected $session;
+    private $session;
 
     /**
      * @var ContainerAwareEventDispatcher
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     /**
      * @param LeadModel                     $leadModel

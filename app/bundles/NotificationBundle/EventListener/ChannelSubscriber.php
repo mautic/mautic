@@ -24,7 +24,7 @@ class ChannelSubscriber implements EventSubscriberInterface
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @param IntegrationHelper $integrationHelper

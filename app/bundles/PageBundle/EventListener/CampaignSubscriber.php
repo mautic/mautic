@@ -28,22 +28,22 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var TrackingHelper
      */
-    protected $trackingHelper;
+    private $trackingHelper;
 
     /**
      * @param PageModel      $pageModel

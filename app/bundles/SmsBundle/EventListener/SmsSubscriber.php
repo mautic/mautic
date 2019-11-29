@@ -29,27 +29,27 @@ class SmsSubscriber implements EventSubscriberInterface
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var SmsHelper
      */
-    protected $smsHelper;
+    private $smsHelper;
 
     /**
      * @param AuditLogModel    $auditLogModel

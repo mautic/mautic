@@ -45,34 +45,34 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var SubmissionModel
      */
-    protected $submissionModel;
+    private $submissionModel;
 
     /**
      * @var CitrixModel
      */
-    protected $citrixModel;
+    private $citrixModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var EntityManager
      */
-    protected $entityManager;
+    private $entityManager;
 
     /**
      * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
      * @var TemplatingHelper
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param CitrixModel         $citrixModel

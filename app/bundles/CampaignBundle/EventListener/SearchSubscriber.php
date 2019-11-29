@@ -23,17 +23,17 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var DelegatingEngine
      */
-    protected $templating;
+    private $templating;
 
     public function __construct(
         CampaignModel $campaignModel,

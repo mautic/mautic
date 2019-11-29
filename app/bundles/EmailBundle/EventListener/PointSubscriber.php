@@ -30,12 +30,12 @@ class PointSubscriber implements EventSubscriberInterface
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
      * @var EntityManager
      */
-    protected $entityManager;
+    private $entityManager;
 
     /**
      * @param PointModel    $pointModel

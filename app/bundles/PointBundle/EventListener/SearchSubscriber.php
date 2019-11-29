@@ -24,22 +24,22 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
      * @var TriggerModel
      */
-    protected $pointTriggerModel;
+    private $pointTriggerModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var TemplatingHelper
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param PointModel       $pointModel

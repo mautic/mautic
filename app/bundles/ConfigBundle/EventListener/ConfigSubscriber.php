@@ -22,7 +22,7 @@ class ConfigSubscriber implements EventSubscriberInterface
     /**
      * @var CoreParametersHelper
      */
-    protected $paramHelper;
+    private $paramHelper;
 
     /**
      * @var ConfigChangeLogger

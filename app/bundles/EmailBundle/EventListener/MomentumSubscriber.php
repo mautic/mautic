@@ -28,7 +28,7 @@ class MomentumSubscriber implements EventSubscriberInterface
     /**
      * @var MomentumCallbackInterface
      */
-    protected $momentumCallback;
+    private $momentumCallback;
 
     /**
      * @var QueueService

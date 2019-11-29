@@ -27,22 +27,22 @@ class NotificationSubscriber implements EventSubscriberInterface
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @param AuditLogModel    $auditLogModel

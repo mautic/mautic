@@ -29,7 +29,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var CompanyReportData

@@ -24,17 +24,17 @@ class CategorySubscriber implements EventSubscriberInterface
     /**
      * @var BundleHelper
      */
-    protected $bundleHelper;
+    private $bundleHelper;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @param BundleHelper   $bundleHelper

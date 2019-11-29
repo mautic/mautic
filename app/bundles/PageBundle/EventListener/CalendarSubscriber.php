@@ -27,27 +27,27 @@ class CalendarSubscriber implements EventSubscriberInterface
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
      * @var Connection
      */
-    protected $connection;
+    private $connection;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @param PageModel           $pageModel

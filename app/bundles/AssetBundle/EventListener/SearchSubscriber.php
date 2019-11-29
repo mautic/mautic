@@ -24,22 +24,22 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var DelegatingEngine
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param AssetModel       $assetModel

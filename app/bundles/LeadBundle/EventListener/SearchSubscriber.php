@@ -31,7 +31,7 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var LeadRepository

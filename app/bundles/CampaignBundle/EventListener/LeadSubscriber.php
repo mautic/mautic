@@ -36,52 +36,52 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var EntityManager
      */
-    protected $entityManager;
+    private $entityManager;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var CampaignRepository
      */
-    protected $campaignRepository;
+    private $campaignRepository;
 
     /**
      * @var LeadListRepository
      */
-    protected $segmentRepository;
+    private $segmentRepository;
 
     /**
      * @var LeadEventLogRepository
      */
-    protected $contactEventLogRepository;
+    private $contactEventLogRepository;
 
     /**
      * @var LeadRepository
      */
-    protected $contactRepository;
+    private $contactRepository;
 
     /**
      * @param CampaignModel       $campaignModel
@@ -253,7 +253,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                   $eventTypeKey
      * @param                   $eventTypeName
      */
-    protected function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup('campaignList');

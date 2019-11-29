@@ -25,7 +25,7 @@ class QueueSubscriber implements EventSubscriberInterface
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @param EmailModel $emailModel

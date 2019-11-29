@@ -26,12 +26,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
     /**
      * @param LeadModel  $leadModel

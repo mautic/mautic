@@ -30,7 +30,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * @var CitrixModel
      */
-    protected $citrixModel;
+    private $citrixModel;
 
     /**
      * @var TranslatorInterface

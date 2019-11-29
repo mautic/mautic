@@ -26,22 +26,22 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @var DownloadRepository
      */
-    protected $downloadRepository;
+    private $downloadRepository;
 
     /**
      * @param AssetModel          $assetModel

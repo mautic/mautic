@@ -21,7 +21,7 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @var FocusModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @param FocusModel $model

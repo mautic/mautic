@@ -25,12 +25,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var SmsModel
      */
-    protected $smsModel;
+    private $smsModel;
 
     /**
      * @var TransportChain
      */
-    protected $transportChain;
+    private $transportChain;
 
     /**
      * @param SmsModel       $smsModel

@@ -22,12 +22,12 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @param Connection          $db

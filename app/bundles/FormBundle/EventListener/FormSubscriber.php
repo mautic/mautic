@@ -34,32 +34,32 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * @var MailHelper
      */
-    protected $mailer;
+    private $mailer;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @param IpLookupHelper       $ipLookupHelper

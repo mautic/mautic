@@ -22,12 +22,12 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @param AssetsHelper      $assetsHelper

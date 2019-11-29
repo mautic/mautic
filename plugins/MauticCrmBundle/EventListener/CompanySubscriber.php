@@ -23,12 +23,12 @@ class CompanySubscriber implements EventSubscriberInterface
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var CompanyExport
      */
-    protected $companyExport;
+    private $companyExport;
 
     /**
      * @param IntegrationHelper $integrationHelper

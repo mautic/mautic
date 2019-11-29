@@ -386,7 +386,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                          $eventTypeKey
      * @param                          $eventTypeName
      */
-    protected function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $lead = $event->getLead();
         $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
@@ -429,7 +429,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                          $eventTypeKey
      * @param                          $eventTypeName
      */
-    protected function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
@@ -463,7 +463,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                          $eventTypeKey
      * @param                          $eventTypeName
      */
-    protected function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
@@ -499,7 +499,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                          $eventTypeKey
      * @param                          $eventTypeName
      */
-    protected function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $utmRepo = $this->entityManager->getRepository(UtmTag::class);
         $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
@@ -561,7 +561,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                          $eventTypeKey
      * @param                          $eventTypeName
      */
-    protected function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
@@ -646,7 +646,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param                          $eventTypeKey
      * @param                          $eventTypeName
      */
-    protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
         $imports      = $eventLogRepo->getEvents(

@@ -28,24 +28,24 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var FocusModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * Must be there until BuilderTokenHelper is refactored.
      *
      * @var MauticFactory
      */
-    protected $factory;
+    private $factory;
 
     /**
      * @param FocusModel      $model

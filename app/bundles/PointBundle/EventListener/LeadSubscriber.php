@@ -28,27 +28,27 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var TriggerModel
      */
-    protected $triggerModel;
+    private $triggerModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var PointsChangeLogRepository
      */
-    protected $pointsChangeLogRepository;
+    private $pointsChangeLogRepository;
 
     /**
      * @var LeadPointLogRepository
      */
-    protected $leadPointLogRepository;
+    private $leadPointLogRepository;
 
     /**
      * @var LeadTriggerLogRepository
      */
-    protected $leadTriggerLogRepository;
+    private $leadTriggerLogRepository;
 
     /**
      * @param TriggerModel              $triggerModel

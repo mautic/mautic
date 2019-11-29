@@ -22,7 +22,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var LookupHelper
      */
-    protected $lookupHelper;
+    private $lookupHelper;
 
     /**
      * @param LookupHelper $lookupHelper

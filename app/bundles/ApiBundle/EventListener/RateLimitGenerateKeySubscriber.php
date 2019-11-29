@@ -21,7 +21,7 @@ class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @param CoreParametersHelper $coreParametersHelper

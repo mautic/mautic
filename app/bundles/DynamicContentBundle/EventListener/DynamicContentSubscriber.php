@@ -42,32 +42,32 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var FormTokenHelper
      */
-    protected $formTokenHelper;
+    private $formTokenHelper;
 
     /**
      * @var FocusTokenHelper
      */
-    protected $focusTokenHelper;
+    private $focusTokenHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var LeadModel

@@ -26,17 +26,17 @@ class LeadListSubscriber implements EventSubscriberInterface
     /**
      * @var IntegrationHelper
      */
-    protected $helper;
+    private $helper;
 
     /**
      * @var ListModel
      */
-    protected $listModel;
+    private $listModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @param IntegrationHelper   $helper

@@ -22,7 +22,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
     /**
      * @var SmsModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @param SmsModel $model

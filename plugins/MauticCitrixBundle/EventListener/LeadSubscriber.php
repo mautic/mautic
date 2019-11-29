@@ -28,12 +28,12 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var CitrixModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @param CitrixModel         $model

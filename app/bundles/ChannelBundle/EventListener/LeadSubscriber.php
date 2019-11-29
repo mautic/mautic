@@ -74,7 +74,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param LeadTimelineEvent $event
      * @param                   $state
      */
-    protected function addChannelMessageEvents(LeadTimelineEvent $event)
+    private function addChannelMessageEvents(LeadTimelineEvent $event)
     {
         $eventTypeKey  = 'message.queue';
         $eventTypeName = $this->translator->trans('mautic.message.queue');

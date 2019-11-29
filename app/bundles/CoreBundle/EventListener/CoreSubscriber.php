@@ -35,67 +35,67 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\SecurityContext;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
     /**
      * @var BundleHelper
      */
-    protected $bundleHelper;
+    private $bundleHelper;
 
     /**
      * @var MenuHelper
      */
-    protected $menuHelper;
+    private $menuHelper;
 
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var SecurityContext
      */
-    protected $securityContext;
+    private $securityContext;
 
     /**
      * @var UserModel
      */
-    protected $userModel;
+    private $userModel;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var EventDispatcherInterface
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    private $requestStack;
 
     /**
      * @var FormRepository
      */
-    protected $formRepository;
+    private $formRepository;
 
     /**
      * System parameters.
@@ -107,7 +107,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * @var MauticFactory
      */
-    protected $factory;
+    private $factory;
 
     public function __construct(
         BundleHelper $bundleHelper,

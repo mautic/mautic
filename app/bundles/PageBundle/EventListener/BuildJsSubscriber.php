@@ -23,17 +23,17 @@ class BuildJsSubscriber implements EventSubscriberInterface
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var TrackingHelper
      */
-    protected $trackingHelper;
+    private $trackingHelper;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @param AssetsHelper   $assetsHelper

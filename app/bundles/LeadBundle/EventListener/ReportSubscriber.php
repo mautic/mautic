@@ -54,22 +54,22 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
 
     /**
      * @var CompanyModel
      */
-    protected $companyModel;
+    private $companyModel;
 
     /**
      * @var FieldsBuilder
@@ -79,12 +79,12 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    protected $channels;
+    private $channels;
 
     /**
      * @var array
      */
-    protected $channelActions;
+    private $channelActions;
 
     /**
      * @var CompanyReportData

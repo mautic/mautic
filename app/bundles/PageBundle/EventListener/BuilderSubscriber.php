@@ -51,12 +51,12 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * @var TokenHelper
      */
-    protected $tokenHelper;
+    private $tokenHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var TranslatorInterface
@@ -86,15 +86,15 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * @var PageModel
      */
-    protected $pageModel;
-    protected $pageTokenRegex      = '{pagelink=(.*?)}';
-    protected $dwcTokenRegex       = '{dwc=(.*?)}';
-    protected $langBarRegex        = '{langbar}';
-    protected $shareButtonsRegex   = '{sharebuttons}';
-    protected $titleRegex          = '{pagetitle}';
-    protected $descriptionRegex    = '{pagemetadescription}';
-    protected $emailIsInternalSend = false;
-    protected $emailEntity         = null;
+    private $pageModel;
+    private $pageTokenRegex      = '{pagelink=(.*?)}';
+    private $dwcTokenRegex       = '{dwc=(.*?)}';
+    private $langBarRegex        = '{langbar}';
+    private $shareButtonsRegex   = '{sharebuttons}';
+    private $titleRegex          = '{pagetitle}';
+    private $descriptionRegex    = '{pagemetadescription}';
+    private $emailIsInternalSend = false;
+    private $emailEntity         = null;
 
     const segmentListRegex  = '{segmentlist}';
     const categoryListRegex = '{categorylist}';
@@ -527,7 +527,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderSocialShareButtons()
+    private function renderSocialShareButtons()
     {
         static $content = '';
 
@@ -562,7 +562,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderSegmentList(array $params = [])
+    private function renderSegmentList(array $params = [])
     {
         static $content = '';
 
@@ -580,7 +580,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderCategoryList(array $params = [])
+    private function renderCategoryList(array $params = [])
     {
         static $content = '';
 
@@ -598,7 +598,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderPreferredChannel(array $params = [])
+    private function renderPreferredChannel(array $params = [])
     {
         static $content = '';
 
@@ -616,7 +616,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderChannelFrequency(array $params = [])
+    private function renderChannelFrequency(array $params = [])
     {
         static $content = '';
 
@@ -634,7 +634,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderSavePrefs(array $params = [])
+    private function renderSavePrefs(array $params = [])
     {
         static $content = '';
 
@@ -652,7 +652,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderSuccessMessage(array $params = [])
+    private function renderSuccessMessage(array $params = [])
     {
         static $content = '';
 
@@ -672,7 +672,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    protected function renderLanguageBar($page)
+    private function renderLanguageBar($page)
     {
         static $langbar = '';
 

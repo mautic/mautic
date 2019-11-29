@@ -99,7 +99,7 @@ class LeadSubscriber implements EventSubscriberInterface
      * @param LeadTimelineEvent $event
      * @param                   $state
      */
-    protected function addEmailEvents(LeadTimelineEvent $event, $state)
+    private function addEmailEvents(LeadTimelineEvent $event, $state)
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;
@@ -170,7 +170,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @param LeadTimelineEvent $event
      */
-    protected function addEmailReplies(LeadTimelineEvent $event)
+    private function addEmailReplies(LeadTimelineEvent $event)
     {
         $eventTypeKey  = 'email.replied';
         $eventTypeName = $this->translator->trans('mautic.email.replied');

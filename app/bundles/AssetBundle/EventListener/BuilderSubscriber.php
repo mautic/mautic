@@ -28,27 +28,27 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * @var string
      */
-    protected $assetToken = '{assetlink=(.*?)}';
+    private $assetToken = '{assetlink=(.*?)}';
 
     /**
      * @var TokenHelper
      */
-    protected $tokenHelper;
+    private $tokenHelper;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var MauticFactory
      */
-    protected $factory;
+    private $factory;
 
     /**
      * @param TokenHelper     $tokenHelper

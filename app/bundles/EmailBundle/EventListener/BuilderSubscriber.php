@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
 use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
@@ -18,7 +19,6 @@ use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
 use Mautic\CoreBundle\Form\Type\SlotImageCardType;
 use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
 use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -38,22 +38,22 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @var TrackableModel
      */
-    protected $pageTrackableModel;
+    private $pageTrackableModel;
 
     /**
      * @var RedirectModel
      */
-    protected $pageRedirectModel;
+    private $pageRedirectModel;
 
     /**
      * @var TranslatorInterface
@@ -349,7 +349,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      *
      * @return mixed
      */
-    protected function parseContentForUrls(EmailSendEvent $event, $emailId)
+    private function parseContentForUrls(EmailSendEvent $event, $emailId)
     {
         static $convertedContent = [];
 

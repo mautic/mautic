@@ -22,12 +22,12 @@ class StageSubscriber implements EventSubscriberInterface
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @param IpLookupHelper $ipLookupHelper

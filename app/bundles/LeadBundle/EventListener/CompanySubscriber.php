@@ -22,12 +22,12 @@ class CompanySubscriber implements EventSubscriberInterface
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @param IpLookupHelper $ipLookupHelper

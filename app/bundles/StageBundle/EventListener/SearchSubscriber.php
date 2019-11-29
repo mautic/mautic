@@ -23,17 +23,17 @@ class SearchSubscriber implements EventSubscriberInterface
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * @var TemplatingHelper
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param StageModel       $stageModel

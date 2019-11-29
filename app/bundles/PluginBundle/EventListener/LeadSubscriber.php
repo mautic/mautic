@@ -22,7 +22,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var PluginModel
      */
-    protected $pluginModel;
+    private $pluginModel;
 
     /**
      * @param PluginModel $pluginModel

@@ -24,12 +24,12 @@ class AssetsSubscriber implements EventSubscriberInterface
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var ContainerAwareEventDispatcher
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     /**
      * @param AssetsHelper                  $assetsHelper

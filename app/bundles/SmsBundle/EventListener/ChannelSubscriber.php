@@ -25,7 +25,7 @@ class ChannelSubscriber implements EventSubscriberInterface
     /**
      * @var TransportChain
      */
-    protected $transportChain;
+    private $transportChain;
 
     /**
      * @param TransportChain $transportChain

@@ -25,12 +25,12 @@ class StatSubscriber implements EventSubscriberInterface
     /**
      * @var FocusModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    private $requestStack;
 
     /**
      * @param FocusModel   $model

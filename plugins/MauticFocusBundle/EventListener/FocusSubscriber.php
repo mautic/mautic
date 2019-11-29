@@ -36,42 +36,42 @@ class FocusSubscriber implements EventSubscriberInterface
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipHelper;
+    private $ipHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var FocusModel
      */
-    protected $focusModel;
+    private $focusModel;
 
     /**
      * @var RequestStack
      */
-    protected $requestStack;
+    private $requestStack;
 
     /**
      * @param RouterInterface  $router

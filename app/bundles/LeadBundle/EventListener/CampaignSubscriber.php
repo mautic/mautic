@@ -35,32 +35,32 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var FieldModel
      */
-    protected $leadFieldModel;
+    private $leadFieldModel;
 
     /**
      * @var ListModel
      */
-    protected $listModel;
+    private $listModel;
 
     /**
      * @var CompanyModel
      */
-    protected $companyModel;
+    private $companyModel;
 
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
 
     /**
      * System params.

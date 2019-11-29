@@ -25,27 +25,27 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
      * @var SubmissionRepository
      */
-    protected $submissionRepository;
+    private $submissionRepository;
 
     /**
      * @var TranslatorInterface
      */
-    protected $pagtranslatoreModel;
+    private $pagtranslatoreModel;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @param FormModel            $formModel

@@ -25,7 +25,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
     /**
      * @var EmailValidator
      */
-    protected $validator;
+    private $validator;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher

@@ -32,47 +32,47 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
      * @var Logger
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @var HitRepository
      */
-    protected $hitRepository;
+    private $hitRepository;
 
     /**
      * @var PageRepository
      */
-    protected $pageRepository;
+    private $pageRepository;
 
     /**
      * @var RedirectRepository
      */
-    protected $redirectRepository;
+    private $redirectRepository;
 
     /**
      * @var LeadRepository
      */
-    protected $contactRepository;
+    private $contactRepository;
 
     /**
      * @param AssetsHelper       $assetsHelper

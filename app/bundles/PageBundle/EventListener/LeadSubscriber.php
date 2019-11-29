@@ -28,12 +28,12 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
      * @var VideoModel
      */
-    protected $pageVideoModel;
+    private $pageVideoModel;
 
     /**
      * @var TranslatorInterface

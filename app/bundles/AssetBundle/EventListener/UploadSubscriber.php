@@ -26,12 +26,12 @@ class UploadSubscriber implements EventSubscriberInterface
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
      * @var FileUploadValidator

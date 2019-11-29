@@ -21,7 +21,7 @@ class MessageSubscriber implements EventSubscriberInterface
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @param AuditLogModel $auditLogModel

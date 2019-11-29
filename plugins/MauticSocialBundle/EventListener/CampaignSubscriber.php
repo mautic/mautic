@@ -26,12 +26,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var CampaignEventHelper
      */
-    protected $campaignEventHelper;
+    private $campaignEventHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var TranslatorInterface

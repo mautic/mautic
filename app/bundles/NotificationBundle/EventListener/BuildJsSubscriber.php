@@ -23,17 +23,17 @@ class BuildJsSubscriber implements EventSubscriberInterface
     /**
      * @var NotificationHelper
      */
-    protected $notificationHelper;
+    private $notificationHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
      * @var Router
      */
-    protected $router;
+    private $router;
 
     /**
      * @param NotificationHelper $notificationHelper

@@ -24,12 +24,12 @@ class ConfigSubscriber implements EventSubscriberInterface
     /**
      * @var LanguageHelper
      */
-    protected $languageHelper;
+    private $languageHelper;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @param LanguageHelper       $languageHelper

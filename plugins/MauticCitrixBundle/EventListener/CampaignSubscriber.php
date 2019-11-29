@@ -33,21 +33,21 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var CitrixModel
      */
-    protected $citrixModel;
+    private $citrixModel;
 
     /**
      * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
      * @var TemplatingHelper
      */
-    protected $templating;
+    private $templating;
 
     /**
      * @param CitrixModel         $citrixModel
