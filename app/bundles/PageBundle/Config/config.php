@@ -243,12 +243,6 @@ return [
             'mautic.form.type.trackingconfig' => [
                 'class' => \Mautic\PageBundle\Form\Type\ConfigTrackingPageType::class,
             ],
-            'mautic.form.type.slideshow_config' => [
-                'class' => \Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType::class,
-            ],
-            'mautic.form.type.slideshow_slide_config' => [
-                'class' => \Mautic\PageBundle\Form\Type\SlideshowSlideConfigType::class,
-            ],
             'mautic.form.type.redirect_list' => [
                 'class'     => \Mautic\PageBundle\Form\Type\RedirectListType::class,
                 'arguments' => ['mautic.helper.core_parameters'],
