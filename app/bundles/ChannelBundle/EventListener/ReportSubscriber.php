@@ -17,6 +17,7 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
@@ -27,9 +28,19 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $companyReportData;
 
-    public function __construct(CompanyReportData $companyReportData)
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @param CompanyReportData $companyReportData
+     * @param RouterInterface   $router
+     */
+    public function __construct(CompanyReportData $companyReportData, RouterInterface $router)
     {
         $this->companyReportData = $companyReportData;
+        $this->router            = $router;
     }
 
     /**
@@ -151,7 +162,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $data = $event->getData();
         if ($event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
             if (isset($data[0]['channel']) && isset($data[0]['channel_id'])) {
-                foreach ($data as $key => &$row) {
+                foreach ($data as &$row) {
                     $href = $this->router->generate('mautic_'.$row['channel'].'_action', ['objectAction' => 'view', 'objectId' => $row['channel_id']]);
                     if (isset($row['channel'])) {
                         $row['channel'] = '<a href="'.$href.'">'.$row['channel'].'</a>';

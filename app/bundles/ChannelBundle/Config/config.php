@@ -96,6 +96,7 @@ return [
                 'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'router',
                 ],
             ],
             'mautic.channel.button.subscriber' => [

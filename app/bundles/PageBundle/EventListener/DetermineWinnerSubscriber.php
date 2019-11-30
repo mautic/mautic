@@ -13,6 +13,8 @@ namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -58,7 +60,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
     {
         //find the hits that did not go any further
-        $repo      = $this->em->getRepository('MauticPageBundle:Hit');
+        /** @var HitRepository $repo */
+        $repo      = $this->em->getRepository(Hit::class);
         $parent    = $event->getParameters()['parent'];
         $children  = $event->getParameters()['children'];
         $pageIds   = $parent->getRelatedEntityIds();

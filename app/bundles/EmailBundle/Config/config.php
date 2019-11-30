@@ -270,6 +270,7 @@ return [
             'mautic.email.stats.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

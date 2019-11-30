@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class BuildJsSubscriber implements EventSubscriberInterface
@@ -37,18 +38,26 @@ class BuildJsSubscriber implements EventSubscriberInterface
     private $requestStack;
 
     /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * @param AssetsHelper        $assetsHelper
      * @param TranslatorInterface $translator
      * @param RequestStack        $requestStack
+     * @param RouterInterface     $router
      */
     public function __construct(
         AssetsHelper $assetsHelper,
         TranslatorInterface $translator,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        RouterInterface $router
     ) {
         $this->assetsHelper = $assetsHelper;
         $this->translator   = $translator;
         $this->requestStack = $requestStack;
+        $this->router       = $router;
     }
 
     /**

@@ -69,6 +69,7 @@ return [
                     'templating.helper.assets',
                     'translator',
                     'request_stack',
+                    'router',
                 ],
             ],
             'mautic.dynamicContent.subscriber' => [

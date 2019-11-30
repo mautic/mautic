@@ -447,7 +447,8 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
-        $lead = $event->getLead();
+        $lead   = $event->getLead();
+        $result = false;
 
         if (!$lead || !$lead->getId()) {
             return $event->setResult(false);

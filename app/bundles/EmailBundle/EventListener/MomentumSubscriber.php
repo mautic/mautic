@@ -42,6 +42,11 @@ class MomentumSubscriber implements EventSubscriberInterface
     private $requestStorageHelper;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param MomentumCallbackInterface $momentumCallback
      * @param QueueService              $queueService
      * @param RequestStorageHelper      $requestStorageHelper

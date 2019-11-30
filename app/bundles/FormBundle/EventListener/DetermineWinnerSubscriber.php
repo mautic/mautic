@@ -14,6 +14,8 @@ namespace Mautic\FormBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -57,7 +59,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
     {
-        $repo       = $this->em->getRepository('MauticFormBundle:Submission');
+        /** @var SubmissionRepository $repo */
+        $repo       = $this->em->getRepository(Submission::class);
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
