@@ -139,7 +139,10 @@ class LeadSubscriber implements EventSubscriberInterface
 
         //get campaigns for the list
         if (!isset($listCampaigns[$list->getId()])) {
-            $listCampaigns[$list->getId()] = $this->campaignRepository->getPublishedCampaignsByLeadLists($list->getId(), $this->security->isGranted('campaign:campaigns:viewother'));
+            $listCampaigns[$list->getId()] = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists(
+                $list->getId(),
+                $this->security->isGranted('campaign:campaigns:viewother')
+            );
         }
 
         $leadLists = $this->segmentRepository->getLeadLists($leads, true, true);
@@ -191,7 +194,10 @@ class LeadSubscriber implements EventSubscriberInterface
         $action = $event->wasAdded() ? 'added' : 'removed';
 
         //get campaigns for the list
-        $listCampaigns = $this->campaignRepository->getPublishedCampaignsByLeadLists($list->getId(), $this->security->isGranted('campaign:campaigns:viewother'));
+        $listCampaigns = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists(
+            $list->getId(),
+            $this->security->isGranted('campaign:campaigns:viewother')
+        );
 
         $leadLists     = $this->leadModel->getLists($lead, true);
         $leadListIds   = array_keys($leadLists);
