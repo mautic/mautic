@@ -541,7 +541,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
+            $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
         }
 
         return $content;
@@ -568,7 +568,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -586,7 +586,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -604,7 +604,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-preferredchannel'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -622,7 +622,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-channelfrequency'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -640,7 +640,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -658,7 +658,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class=\"pref-successmessage\">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -731,7 +731,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
         }
 
         return $langbar;

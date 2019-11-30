@@ -91,7 +91,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $pointsResults = [];
                 $canEdit       = $this->security->isGranted('point:points:edit');
                 foreach ($items as $item) {
-                    $pointsResults[] = $this->templating->renderResponse(
+                    $pointsResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_point.html.php',
                         [
                             'item'    => $item,
@@ -100,7 +100,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if ($pointCount > 5) {
-                    $pointsResults[] = $this->templating->renderResponse(
+                    $pointsResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_point.html.php',
                         [
                             'showMore'     => true,
@@ -130,7 +130,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $results = [];
                 $canEdit = $this->security->isGranted('point:triggers:edit');
                 foreach ($items as $item) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_trigger.html.php',
                         [
                             'item'    => $item,
@@ -139,7 +139,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if ($count > 5) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPointBundle:SubscribedEvents\Search:global_trigger.html.php',
                         [
                             'showMore'     => true,

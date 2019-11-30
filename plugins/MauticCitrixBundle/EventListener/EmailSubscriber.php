@@ -201,7 +201,7 @@ class EmailSubscriber implements EventSubscriberInterface
                     unset($tokenEvent);
                 }
 
-                $button = $this->templating->render(
+                $button = $this->templating->getTemplating()->render(
                     'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
                     $params
                 );

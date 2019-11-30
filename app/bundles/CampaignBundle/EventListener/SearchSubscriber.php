@@ -81,7 +81,7 @@ class SearchSubscriber implements EventSubscriberInterface
             if (count($campaigns) > 0) {
                 $campaignResults = [];
                 foreach ($campaigns as $campaign) {
-                    $campaignResults[] = $this->templating->renderResponse(
+                    $campaignResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'campaign' => $campaign,
@@ -89,7 +89,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if (count($campaigns) > 5) {
-                    $campaignResults[] = $this->templating->renderResponse(
+                    $campaignResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

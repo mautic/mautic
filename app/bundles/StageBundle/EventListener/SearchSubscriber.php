@@ -82,7 +82,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $stagesResults = [];
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
-                    $stagesResults[] = $this->templating->renderResponse(
+                    $stagesResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticStageBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'item'    => $item,
@@ -91,7 +91,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if ($stageCount > 5) {
-                    $stagesResults[] = $this->templating->renderResponse(
+                    $stagesResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticStageBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

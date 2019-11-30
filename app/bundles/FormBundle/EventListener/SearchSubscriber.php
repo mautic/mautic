@@ -94,13 +94,13 @@ class SearchSubscriber implements EventSubscriberInterface
             if (count($forms) > 0) {
                 $formResults = [];
                 foreach ($forms as $form) {
-                    $formResults[] = $this->templating->renderResponse(
+                    $formResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticFormBundle:SubscribedEvents\Search:global.html.php',
                         ['form' => $form[0]]
                     )->getContent();
                 }
                 if (count($forms) > 5) {
-                    $formResults[] = $this->templating->renderResponse(
+                    $formResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticFormBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

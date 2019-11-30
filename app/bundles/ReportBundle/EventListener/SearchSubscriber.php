@@ -106,13 +106,13 @@ class SearchSubscriber implements EventSubscriberInterface
                 $results = [];
 
                 foreach ($items as $item) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticReportBundle:SubscribedEvents\Search:global.html.php',
                         ['item' => $item]
                     )->getContent();
                 }
                 if ($count > 5) {
-                    $results[] = $this->templating->renderResponse(
+                    $results[] = $this->templating->getTemplating()->renderResponse(
                         'MauticReportBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

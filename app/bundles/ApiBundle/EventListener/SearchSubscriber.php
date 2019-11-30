@@ -79,7 +79,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $clientResults = [];
                 $canEdit       = $this->security->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
-                    $clientResults[] = $this->templating->renderResponse(
+                    $clientResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticApiBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'client'  => $client,
@@ -88,7 +88,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if (count($clients) > 5) {
-                    $clientResults[] = $this->templating->renderResponse(
+                    $clientResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticApiBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

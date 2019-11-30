@@ -88,7 +88,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $userResults = [];
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
-                    $userResults[] = $this->templating->renderResponse(
+                    $userResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
                         [
                             'user'    => $user,
@@ -97,7 +97,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if (count($users) > 5) {
-                    $userResults[] = $this->templating->renderResponse(
+                    $userResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
                         [
                             'showMore'     => true,
@@ -122,7 +122,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit     = $this->security->isGranted('user:roles:edit');
 
                 foreach ($roles as $role) {
-                    $roleResults[] = $this->templating->renderResponse(
+                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
                         [
                             'role'    => $role,
@@ -131,7 +131,7 @@ class SearchSubscriber implements EventSubscriberInterface
                     )->getContent();
                 }
                 if (count($roles) > 5) {
-                    $roleResults[] = $this->templating->renderResponse(
+                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
                         [
                             'showMore'     => true,
