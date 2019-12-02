@@ -420,8 +420,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         if (empty($config['leadFields'])) {
             return [];
         }
-
-        $object     = 'contacts';
+        $object     =  !empty($config['push_object']) ? $config['push_object'] : 'contacts';
         $mappedData = $this->populateLeadData($lead, $config, $object);
 
         $this->amendLeadDataBeforePush($mappedData);
