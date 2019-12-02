@@ -313,7 +313,9 @@ class IntegrationHelper
                 }
             }
 
-            $returnServices[$integrationName] = $this->integrations[$integrationName];
+            if (isset($this->integrations[$integrationName])) {
+                $returnServices[$integrationName] = $this->integrations[$integrationName];
+            }
         }
 
         foreach ($returnServices as $key => $value) {
