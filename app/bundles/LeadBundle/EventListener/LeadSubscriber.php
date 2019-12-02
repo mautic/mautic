@@ -669,8 +669,12 @@ class LeadSubscriber implements EventSubscriberInterface
                             'eventLabel' => !empty($import['object_id']) ? [
                                 'label' => $eventLabel,
                                 'href'  => $this->router->generate(
-                                    'mautic_contact_import_action',
-                                    ['objectAction' => 'view', 'objectId' => $import['object_id']]
+                                    'mautic_import_action',
+                                    [
+                                        'objectAction' => 'view',
+                                        'object'       => 'lead',
+                                        'objectId'     => $import['object_id'],
+                                    ]
                                 ),
                             ] : $eventLabel,
                             'timestamp'       => $import['date_added'],

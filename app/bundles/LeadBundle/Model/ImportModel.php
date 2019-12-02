@@ -144,8 +144,8 @@ class ImportModel extends FormModel
     public function generateLink(Import $import)
     {
         return '<a href="'.$this->router->generate(
-            'mautic_contact_import_action',
-            ['objectAction' => 'view', 'objectId' => $import->getId()]
+            'mautic_import_action',
+            ['objectAction' => 'view', 'object' => 'lead', 'objectId' => $import->getId()]
         ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>';
     }
 
