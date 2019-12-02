@@ -77,7 +77,7 @@ class AvatarHelper extends Helper
     /**
      * Get avatar path.
      *
-     * @param string $absolute
+     * @param bool $absolute
      *
      * @return string
      */
