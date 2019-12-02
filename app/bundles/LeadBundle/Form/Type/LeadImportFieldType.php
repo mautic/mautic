@@ -51,22 +51,22 @@ class LeadImportFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $specialFields = [
-            'dateAdded'      => 'mautic.lead.import.label.dateAdded',
-            'createdByUser'  => 'mautic.lead.import.label.createdByUser',
-            'dateModified'   => 'mautic.lead.import.label.dateModified',
-            'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
-            'lastActive'     => 'mautic.lead.import.label.lastActive',
-            'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
-            'ip'             => 'mautic.lead.import.label.ip',
-            'points'         => 'mautic.lead.import.label.points',
-            'stage'          => 'mautic.lead.import.label.stage',
-            'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
-            'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+            'mautic.lead.import.label.dateAdded'      => 'dateAdded',
+            'mautic.lead.import.label.createdByUser'  => 'createdByUser',
+            'mautic.lead.import.label.dateModified'   => 'dateModified',
+            'mautic.lead.import.label.modifiedByUser' => 'modifiedByUser',
+            'mautic.lead.import.label.lastActive'     => 'lastActive',
+            'mautic.lead.import.label.dateIdentified' => 'dateIdentified',
+            'mautic.lead.import.label.ip'             => 'ip',
+            'mautic.lead.import.label.points'         => 'points',
+            'mautic.lead.import.label.stage'          => 'stage',
+            'mautic.lead.import.label.doNotEmail'     => 'doNotEmail',
+            'mautic.lead.import.label.ownerusername'  => 'ownerusername',
         ];
 
         $importChoiceFields = [
-            'mautic.lead.contact'        => $options['lead_fields'],
-            'mautic.lead.company'        => $options['company_fields'],
+            'mautic.lead.contact'        => array_flip($options['lead_fields']),
+            'mautic.lead.company'        => array_flip($options['company_fields']),
             'mautic.lead.special_fields' => $specialFields,
         ];
 
