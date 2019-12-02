@@ -65,7 +65,7 @@ class LeadType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-orm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
