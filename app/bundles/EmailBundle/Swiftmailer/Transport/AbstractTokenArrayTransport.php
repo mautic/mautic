@@ -107,8 +107,8 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param \Swift_Mime_SimpleMessage $message
+     * @param null                      $failedRecipients
      *
      * @return int
      *

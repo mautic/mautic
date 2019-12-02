@@ -36,7 +36,7 @@ class SendGridApiFacadeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -81,7 +81,7 @@ class SendGridApiFacadeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -130,7 +130,7 @@ class SendGridApiFacadeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->disableOriginalConstructor()
             ->getMock();
 
