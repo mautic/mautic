@@ -17,6 +17,8 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
@@ -256,7 +258,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'citrix.event.'.$product,
                 [
                     'label'           => 'plugin.citrix.campaign.event.'.$product.'.label',
-                    'formType'        => 'citrix_campaign_event',
+                    'formType'        => CitrixCampaignEventType::class,
                     'formTypeOptions' => [
                         'attr' => [
                             'data-product' => $product,
@@ -272,7 +274,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'citrix.action.'.$product,
                 [
                     'label'           => 'plugin.citrix.campaign.action.'.$product.'.label',
-                    'formType'        => 'citrix_campaign_action',
+                    'formType'        => CitrixCampaignActionType::class,
                     'formTypeOptions' => [
                         'attr' => [
                             'data-product' => $product,
