@@ -204,6 +204,26 @@ return [
                     'mautic.plugin.model.integration_entity',
                 ],
             ],
+            'mautic.integration.pipedrive' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                ],
+            ],
         ],
         'other' => [
             'mautic_integration.pipedrive.guzzle.client' => [
