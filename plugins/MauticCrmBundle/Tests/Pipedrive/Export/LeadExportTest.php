@@ -72,8 +72,6 @@ class LeadExportTest extends PipedriveTest
 
     public function testUpdatePerson()
     {
-        $integrationId = 99;
-
         $this->installPipedriveIntegration(
             true,
             $this->features,
