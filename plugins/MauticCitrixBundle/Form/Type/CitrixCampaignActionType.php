@@ -67,7 +67,7 @@ class CitrixCampaignActionType extends AbstractType
         $newChoices = [];
         foreach ($choices as $k => $c) {
             if (0 === strpos($k, $product)) {
-                $newChoices[$k] = $c;
+                $newChoices[$c] = $k;
             }
         }
 
@@ -76,7 +76,7 @@ class CitrixCampaignActionType extends AbstractType
             ChoiceType::class,
             [
                 'label'             => $this->translator->trans('plugin.citrix.action.criteria'),
-                'choices'           => array_flip($newChoices),
+                'choices'           => $newChoices,
                 'choices_as_values' => true,
             ]
         );
@@ -94,9 +94,9 @@ class CitrixCampaignActionType extends AbstractType
             );
         }
 
-        if (array_key_exists('meeting_start', $newChoices)
-            || array_key_exists('training_start', $newChoices)
-            || array_key_exists('assist_screensharing', $newChoices)
+        if (in_array('meeting_start', $newChoices)
+            || in_array('training_start', $newChoices)
+            || in_array('assist_screensharing', $newChoices)
         ) {
             $defaultOptions = [
                 'label'      => 'plugin.citrix.emailtemplate',
