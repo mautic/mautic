@@ -176,7 +176,19 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      */
     public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
+        if (empty($lead)) {
+            return;
+        }
+
+        if ($lead instanceof Lead && !$lead->getId()) {
+            return;
+        }
+
         if (is_array($lead)) {
+            if (empty($lead['id'])) {
+                return;
+            }
+
             $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
         }
 

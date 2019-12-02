@@ -107,7 +107,8 @@ class ListType extends AbstractType
         }
         ksort($this->emailChoices);
 
-        $assets = $assetModel->getLookupResults('asset');
+        // Get assets without 'filter' or 'limit'
+        $assets = $assetModel->getLookupResults('asset', null, 0);
         foreach ($assets as $asset) {
             $this->assetChoices[$asset['language']][$asset['id']] = $asset['title'];
         }
@@ -202,7 +203,7 @@ class ListType extends AbstractType
 
         $builder->add('isPublished', 'yesno_button_group');
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, ['object'=>'lead']);
         $builder->add(
             $builder->create(
                 'filters',

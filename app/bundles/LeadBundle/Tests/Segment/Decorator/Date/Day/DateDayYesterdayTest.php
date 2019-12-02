@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayYesterday;
+use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
@@ -24,13 +25,14 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorBetween()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $filter        = [
             'operator' => '=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 
@@ -42,7 +44,8 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOperatorLessOrEqual()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $dateDecorator->method('getOperator')
             ->with()
@@ -52,7 +55,7 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
             'operator' => 'lte',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 
@@ -64,11 +67,12 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueBetween()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $dateDecorator->method('getDefaultDate')
+        $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -76,7 +80,7 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
             'operator' => '!=',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 
@@ -88,11 +92,12 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetParameterValueSingle()
     {
-        $dateDecorator = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('2018-03-02', null, 'local');
 
-        $dateDecorator->method('getDefaultDate')
+        $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
 
@@ -100,7 +105,7 @@ class DateDayYesterdayTest extends \PHPUnit_Framework_TestCase
             'operator' => 'lt',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, []);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateDayYesterday($dateDecorator, $dateOptionParameters);
 

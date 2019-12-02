@@ -12,6 +12,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Helper\Serializer;
 
 class Version20181204000000 extends AbstractMauticMigration
 {
@@ -31,7 +32,7 @@ class Version20181204000000 extends AbstractMauticMigration
             ->fetchAll();
 
         foreach ($roles as $role) {
-            $unserializedArray = unserialize($role['readable_permissions']);
+            $unserializedArray = Serializer::decode($role['readable_permissions']);
 
             if (null !== $unserializedArray && isset($unserializedArray['campaign:campaigns'])) {
                 $newPermissions = [];
