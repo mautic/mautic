@@ -114,7 +114,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
      *
      * @throws \Exception
      */
-    abstract public function send(\Swift_Mime_Message $message, &$failedRecipients = null);
+    abstract public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null);
 
     /**
      * Get the metadata from a MauticMessage.
