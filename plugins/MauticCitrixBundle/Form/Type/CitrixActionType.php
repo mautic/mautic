@@ -79,7 +79,7 @@ class CitrixActionType extends AbstractType
             )) {
                 continue;
             }
-            $choices[$f['id']] = $f['label'];
+            $choices[$f['label']] = $f['id'];
         }
 
         if (array_key_exists('data-product-action', $options['attr']) &&
@@ -123,7 +123,7 @@ class CitrixActionType extends AbstractType
                 'firstname',
                 ChoiceType::class,
                 [
-                    'choices'           => array_flip($choices),
+                    'choices'           => $choices,
                     'choices_as_values' => true,
                     'expanded'          => false,
                     'label_attr'        => ['class' => 'control-label'],
@@ -146,7 +146,7 @@ class CitrixActionType extends AbstractType
                 'lastname',
                 ChoiceType::class,
                 [
-                    'choices'           => array_flip($choices),
+                    'choices'           => $choices,
                     'choices_as_values' => true,
                     'expanded'          => false,
                     'label_attr'        => ['class' => 'control-label'],
@@ -170,7 +170,7 @@ class CitrixActionType extends AbstractType
             'email',
             ChoiceType::class,
             [
-                'choices'           => array_flip($choices),
+                'choices'           => $choices,
                 'choices_as_values' => true,
                 'expanded'          => false,
                 'label_attr'        => ['class' => 'control-label'],
