@@ -778,9 +778,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
-
-            return $message;
+            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new \Swift_Message());
         } catch (\Exception $e) {
             $this->logError($e);
 
