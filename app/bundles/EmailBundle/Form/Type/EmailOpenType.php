@@ -50,7 +50,7 @@ class EmailOpenType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['list_options']);
+        $resolver->setDefined(['list_options']);
     }
 
     /**

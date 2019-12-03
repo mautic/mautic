@@ -34,7 +34,7 @@ class AbTestPropertiesType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional([
+        $resolver->setDefined([
             'formType',
             'formTypeOptions',
         ]);
