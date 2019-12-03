@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CampaignBundle\Form\Type\CampaignListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -60,7 +61,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
 
         $builder->add(
             'campaignId',
-            'campaign_list',
+            CampaignListType::class,
             [
                 'label'       => 'mautic.email.campaignId.filter',
                 'label_attr'  => ['class' => 'control-label'],

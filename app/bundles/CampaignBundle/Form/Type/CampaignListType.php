@@ -85,14 +85,6 @@ class CampaignListType extends AbstractType
         );
     }
 
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return self::class;
-    }
-
     public function getParent()
     {
         return ChoiceType::class;

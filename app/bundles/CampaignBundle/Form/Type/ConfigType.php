@@ -58,12 +58,4 @@ class ConfigType extends AbstractType
             ]
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::class;
-    }
 }

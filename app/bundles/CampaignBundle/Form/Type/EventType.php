@@ -301,14 +301,6 @@ class EventType extends AbstractType
     }
 
     /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return self::class;
-    }
-
-    /**
      * @param array $data
      * @param       $name
      *

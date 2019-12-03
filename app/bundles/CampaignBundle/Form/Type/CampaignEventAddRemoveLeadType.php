@@ -49,14 +49,6 @@ class CampaignEventAddRemoveLeadType extends AbstractType
     }
 
     /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return self::class;
-    }
-
-    /**
      * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)

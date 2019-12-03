@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CampaignBundle\Form\Type\CampaignListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
@@ -42,7 +43,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('campaigns',
-            'campaign_list', [
+            CampaignListType::class, [
             'label'      => 'mautic.lead.lead.events.campaigns.membership',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [

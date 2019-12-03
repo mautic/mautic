@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -77,7 +78,7 @@ class EventController extends CommonFormController
         //fire the builder event
         $events = $this->getModel('campaign')->getEvents();
         $form   = $this->get('form.factory')->create(
-            'campaignevent',
+            EventType::class,
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'new']),
@@ -280,7 +281,7 @@ class EventController extends CommonFormController
          */
         $supportedEvents = $this->getModel('campaign')->getEvents()[$event['eventType']];
         $form            = $this->get('form.factory')->create(
-            'campaignevent',
+            EventType::class,
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),

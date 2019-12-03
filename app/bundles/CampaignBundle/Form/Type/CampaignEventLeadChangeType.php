@@ -51,12 +51,4 @@ class CampaignEventLeadChangeType extends AbstractType
             'required' => false,
         ]);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return self::class;
-    }
 }

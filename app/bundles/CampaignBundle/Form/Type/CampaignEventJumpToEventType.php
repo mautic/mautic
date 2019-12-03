@@ -56,12 +56,4 @@ class CampaignEventJumpToEventType extends AbstractType
         // Allows additional values (new events) to be selected before persisting
         $builder->get('jumpToEvent')->resetViewTransformers();
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return self::class;
-    }
 }
