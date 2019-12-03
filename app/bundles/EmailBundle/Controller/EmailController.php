@@ -449,20 +449,18 @@ class EmailController extends FormController
 
         $method  = $this->request->getMethod();
         $session = $this->get('session');
+
         if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.email.page', 1);
-        $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('emailform[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $page         = $session->get('mautic.email.page', 1);
+        $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
+        $emailForm    = $this->request->request->get('emailform', []);
+        $updateSelect = $method === 'POST'
+            ? ($emailForm['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
             // Force type to template
@@ -473,8 +471,9 @@ class EmailController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ($method === 'POST') {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');
                 if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
@@ -656,14 +655,11 @@ class EmailController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('emailform[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $emailform    = $this->request->request->get('emailform', []);
+        $updateSelect = $method === 'POST'
+            ? ($emailform['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
             // Force type to template
@@ -673,7 +669,7 @@ class EmailController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && $method === 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');

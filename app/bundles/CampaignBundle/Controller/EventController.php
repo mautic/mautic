@@ -218,19 +218,20 @@ class EventController extends CommonFormController
      */
     public function editAction($objectId)
     {
-        $session    = $this->get('session');
-        $valid      = $cancelled = false;
-        $method     = $this->request->getMethod();
-        $campaignId = $method === 'POST'
-            ? $this->request->request->get('campaignevent[campaignId]', '', true)
+        $session       = $this->get('session');
+        $valid         = $cancelled = false;
+        $method        = $this->request->getMethod();
+        $campaignEvent = $this->request->request->get('campaignevent', []);
+        $campaignId    = $method === 'POST'
+            ? ($campaignEvent['campaignId'] ?? '')
             : $this->request->query->get('campaignId');
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $event          = array_key_exists($objectId, $modifiedEvents) ? $modifiedEvents[$objectId] : [];
 
         if ($method === 'POST') {
             $event = array_merge($event, [
-                'anchor'          => $this->request->request->get('campaignevent[anchor]', '', true),
-                'anchorEventType' => $this->request->request->get('campaignevent[anchorEventType]', '', true),
+                'anchor'          => $campaignEvent['anchor'] ?? '',
+                'anchorEventType' => $campaignEvent['anchorEventType'] ?? '',
             ]);
         } else {
             if (!isset($event['anchor'])) {
