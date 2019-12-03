@@ -718,6 +718,12 @@ class MailHelper
         /** @var \Swift_Mime_Header $header */
         foreach ($message->getHeaders()->getAll() as $header) {
             $headerBody = $header->getFieldBodyModel();
+            if ($headerBody instanceof \DateTimeInterface) {
+                // It's not possible to replace tokens in \DateTime objects
+                // because they can't contain tokens
+                continue;
+            }
+
             $updated    = false;
             if (is_array($headerBody)) {
                 $bodyReplaced = [];
