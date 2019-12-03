@@ -107,11 +107,12 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'encryption',
                 ChoiceType::class,
                 [
-                    'choices' => [
-                        '/ssl'                 => 'mautic.email.config.mailer_encryption.ssl',
-                        '/ssl/novalidate-cert' => 'mautic.email.config.monitored_email_encryption.ssl_novalidate',
-                        '/tls'                 => 'mautic.email.config.mailer_encryption.tls',
-                        '/tls/novalidate-cert' => 'mautic.email.config.monitored_email_encryption.tls_novalidate',
+                    'choices_as_values' => true,
+                    'choices'           => [
+                        'mautic.email.config.mailer_encryption.ssl'                     => '/ssl',
+                        'mautic.email.config.monitored_email_encryption.ssl_novalidate' => '/ssl/novalidate-cert',
+                        'mautic.email.config.mailer_encryption.tls'                     => '/tls',
+                        'mautic.email.config.monitored_email_encryption.tls_novalidate' => '/tls/novalidate-cert',
                     ],
                     'label'    => 'mautic.email.config.monitored_email_encryption',
                     'required' => false,

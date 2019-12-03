@@ -245,10 +245,11 @@ class ConfigType extends AbstractType
             'mailer_transport',
             ChoiceType::class,
             [
-                'choices'     => $this->getTransportChoices(),
-                'label'       => 'mautic.email.config.mailer.transport',
-                'required'    => false,
-                'attr'        => [
+                'choices_as_values' => true,
+                'choices'           => $this->getTransportChoices(),
+                'label'             => 'mautic.email.config.mailer.transport',
+                'required'          => false,
+                'attr'              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.transport.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton()',
@@ -322,10 +323,11 @@ class ConfigType extends AbstractType
             'mailer_amazon_region',
             ChoiceType::class,
             [
-                'choices'     => [
-                    'email-smtp.eu-west-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
-                    'email-smtp.us-east-1.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.us_east_1',
-                    'email-smtp.us-west-2.amazonaws.com' => 'mautic.email.config.mailer.amazon_host.eu_west_2',
+                'choices_as_values' => true,
+                'choices'           => [
+                    'mautic.email.config.mailer.amazon_host.eu_west_1' => 'email-smtp.eu-west-1.amazonaws.com',
+                    'mautic.email.config.mailer.amazon_host.us_east_1' => 'email-smtp.us-east-1.amazonaws.com',
+                    'mautic.email.config.mailer.amazon_host.eu_west_2' => 'email-smtp.us-west-2.amazonaws.com',
                 ],
                 'label'       => 'mautic.email.config.mailer.amazon_host',
                 'required'    => false,
@@ -360,10 +362,11 @@ class ConfigType extends AbstractType
             'mailer_auth_mode',
             ChoiceType::class,
             [
-                'choices'     => [
-                    'plain'    => 'mautic.email.config.mailer_auth_mode.plain',
-                    'login'    => 'mautic.email.config.mailer_auth_mode.login',
-                    'cram-md5' => 'mautic.email.config.mailer_auth_mode.cram-md5',
+                'choices_as_values' => true,
+                'choices'           => [
+                    'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
+                    'mautic.email.config.mailer_auth_mode.login'    => 'login',
+                    'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
                 ],
                 'label'       => 'mautic.email.config.mailer.auth.mode',
                 'label_attr'  => ['class' => 'control-label'],
@@ -452,9 +455,10 @@ class ConfigType extends AbstractType
             'mailer_encryption',
             ChoiceType::class,
             [
-                'choices'     => [
-                    'ssl' => 'mautic.email.config.mailer_encryption.ssl',
-                    'tls' => 'mautic.email.config.mailer_encryption.tls',
+                'choices_as_values' => true,
+                'choices'           => [
+                    'mautic.email.config.mailer_encryption.ssl' => 'ssl',
+                    'mautic.email.config.mailer_encryption.tls' => 'tls',
                 ],
                 'label'       => 'mautic.email.config.mailer.encryption',
                 'required'    => false,
@@ -541,9 +545,10 @@ class ConfigType extends AbstractType
             'mailer_spool_type',
             ChoiceType::class,
             [
-                'choices'     => [
-                    'memory' => 'mautic.email.config.mailer_spool_type.memory',
-                    'file'   => 'mautic.email.config.mailer_spool_type.file',
+                'choices_as_values' => true,
+                'choices'           => [
+                    'mautic.email.config.mailer_spool_type.memory' => 'memory',
+                    'mautic.email.config.mailer_spool_type.file'   => 'file',
                 ],
                 'label'       => 'mautic.email.config.mailer.spool.type',
                 'label_attr'  => ['class' => 'control-label'],
@@ -688,10 +693,11 @@ class ConfigType extends AbstractType
             'email_frequency_time',
             ChoiceType::class,
             [
-                'choices'    => [
-                    'DAY'   => 'day',
-                    'WEEK'  => 'week',
-                    'MONTH' => 'month',
+                'choices_as_values' => true,
+                'choices'           => [
+                    'day'   => 'DAY',
+                    'week'  => 'WEEK',
+                    'month' => 'MONTH',
                 ],
                 'label'      => 'mautic.lead.list.frequency.times',
                 'label_attr' => ['class' => 'control-label'],
@@ -804,7 +810,7 @@ class ConfigType extends AbstractType
         $choices = $this->transportType->getTransportTypes();
 
         foreach ($choices as $value => $label) {
-            $choices[$value] = $this->translator->trans($label);
+            $choices[$this->translator->trans($label)] = $value;
         }
 
         asort($choices, SORT_NATURAL);

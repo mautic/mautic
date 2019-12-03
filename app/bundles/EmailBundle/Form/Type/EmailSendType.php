@@ -69,9 +69,10 @@ class EmailSendType extends AbstractType
                 'email_type',
                 ButtonGroupType::class,
                 [
-                    'choices' => [
-                        'transactional' => 'mautic.email.send.emailtype.transactional',
-                        'marketing'     => 'mautic.email.send.emailtype.marketing',
+                    'choices_as_values' => true,
+                    'choices'           => [
+                        'mautic.email.send.emailtype.transactional' => 'transactional',
+                        'mautic.email.send.emailtype.marketing'     => 'marketing',
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
@@ -156,9 +157,10 @@ class EmailSendType extends AbstractType
                     'priority',
                     ChoiceType::class,
                     [
-                        'choices' => [
-                            MessageQueue::PRIORITY_NORMAL => 'mautic.channel.message.send.priority.normal',
-                            MessageQueue::PRIORITY_HIGH   => 'mautic.channel.message.send.priority.high',
+                        'choices_as_values' => true,
+                        'choices'           => [
+                            'mautic.channel.message.send.priority.normal' => MessageQueue::PRIORITY_NORMAL,
+                            'mautic.channel.message.send.priority.high'   => MessageQueue::PRIORITY_HIGH,
                         ],
                         'label'    => 'mautic.channel.message.send.priority',
                         'required' => false,
