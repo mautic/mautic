@@ -972,6 +972,13 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ]
             );
 
+        $integrationEntityModelMock = $this->getMockBuilder(IntegrationEntityModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $integrationEntityModelMock->method('getEntityByIdAndSetSyncDate')
+            ->willReturn(new IntegrationEntity());
+
         $sf = $this->getMockBuilder(SalesforceIntegration::class)
             ->setConstructorArgs([
                 $this->dispatcher,
@@ -988,19 +995,10 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 $this->pathsHelper,
                 $this->notificationModel,
                 $this->fieldModel,
-                $this->integrationEntityModel,
+                $integrationEntityModelMock,
             ])
             ->setMethods($this->sfMockMethods)
             ->getMock();
-
-        $integrationEntityModelMock = $this->getMockBuilder(IntegrationEntityModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $integrationEntityModelMock->method('getEntityByIdAndSetSyncDate')
-            ->willReturn(new IntegrationEntity());
-
-        $sf->setIntegrationEntityModel($integrationEntityModelMock);
 
         $sf->method('makeRequest')
             ->will(

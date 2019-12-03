@@ -48,33 +48,11 @@ class ZohoIntegrationTest extends AbstractIntegrationTestCase
         $translator->expects($this->any())
                    ->method('trans')
                    ->willReturnArgument(0);
-        $this->integration = $this->getMockBuilder(ZohoIntegration::class)
-            ->setMethods(['getApiHelper'])
-            ->setConstructorArgs([
-                $this->dispatcher,
-                $this->cache,
-                $this->em,
-                $this->session,
-                $this->request,
-                $this->router,
-                $this->translator,
-                $this->logger,
-                $this->encryptionHelper,
-                $this->leadModel,
-                $this->companyModel,
-                $this->pathsHelper,
-                $this->notificationModel,
-                $this->fieldModel,
-                $this->integrationEntityModel,
-            ])
-            ->getMock();
 
-        $this->integration->setTranslator($translator);
-        $this->integration->setEncryptionHelper($encryptionHelper);
         $eventMock = $this->getMockBuilder(Event::class)
-                          ->disableOriginalConstructor()
-                          ->setMethods(['getKeys'])
-                          ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['getKeys'])
+            ->getMock();
         $apiKeys = [
             'EMAIL_ID'     => 'test',
             'PASSWORD'     => 'test',
@@ -84,16 +62,37 @@ class ZohoIntegrationTest extends AbstractIntegrationTestCase
             'RESULT'       => 'test',
         ];
         $eventMock->expects($this->any())
-                  ->method('getKeys')
-                  ->willReturn($apiKeys);
+            ->method('getKeys')
+            ->willReturn($apiKeys);
         $dispatcherMock = $this->getMockBuilder(EventDispatcher::class)
-                               ->disableOriginalConstructor()
-                               ->setMethods(['dispatch'])
-                               ->getMock();
-        $dispatcherMock->expects($this->any())
-                       ->method('dispatch')
-                       ->willReturn($eventMock);
-        $this->integration->setDispatcher($dispatcherMock);
+            ->disableOriginalConstructor()
+            ->setMethods(['dispatch'])
+            ->getMock();
+        $dispatcherMock
+            ->method('dispatch')
+            ->willReturn($eventMock);
+
+        $this->integration = $this->getMockBuilder(ZohoIntegration::class)
+            ->setMethods(['getApiHelper'])
+            ->setConstructorArgs([
+                $dispatcherMock,
+                $this->cache,
+                $this->em,
+                $this->session,
+                $this->request,
+                $this->router,
+                $translator,
+                $this->logger,
+                $encryptionHelper,
+                $this->leadModel,
+                $this->companyModel,
+                $this->pathsHelper,
+                $this->notificationModel,
+                $this->fieldModel,
+                $this->integrationEntityModel,
+            ])
+            ->getMock();
+
         $settings        = new Integration();
         $featureSettings = [
             'update_mautic' => [
@@ -141,9 +140,9 @@ class ZohoIntegrationTest extends AbstractIntegrationTestCase
                           ->disableOriginalConstructor()
                           ->setMethods(['getLeadFields'])
                           ->getMock();
-        $apiHelper->expects($this->any())
-                       ->method('getLeadFields')
-                       ->willReturn($leadFields);
+        $apiHelper
+            ->method('getLeadFields')
+            ->willReturn($leadFields);
         $this->integration->method('getApiHelper')
             ->willReturn($apiHelper);
         $this->integration->setIntegrationSettings($settings);
