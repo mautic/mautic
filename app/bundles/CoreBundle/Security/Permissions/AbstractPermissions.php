@@ -367,17 +367,17 @@ abstract class AbstractPermissions
     protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
-            'view'   => 'mautic.core.permissions.view',
-            'edit'   => 'mautic.core.permissions.edit',
-            'create' => 'mautic.core.permissions.create',
-            'delete' => 'mautic.core.permissions.delete',
+            'mautic.core.permissions.view'   => 'view',
+            'mautic.core.permissions.edit'   => 'edit',
+            'mautic.core.permissions.create' => 'create',
+            'mautic.core.permissions.delete' => 'delete',
         ];
 
         if ($includePublish) {
-            $choices['publish'] = 'mautic.core.permissions.publish';
+            $choices['mautic.core.permissions.publish'] = 'publish';
         }
 
-        $choices['full'] = 'mautic.core.permissions.full';
+        $choices['mautic.core.permissions.full'] = 'full';
 
         $label = ($level == 'categories') ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
         $builder->add(
@@ -422,7 +422,7 @@ abstract class AbstractPermissions
     protected function addManageFormFields($bundle, $level, &$builder, $data)
     {
         $choices = [
-            'manage' => 'mautic.core.permissions.manage',
+            'mautic.core.permissions.manage' => 'manage',
         ];
 
         $builder->add(
@@ -483,26 +483,26 @@ abstract class AbstractPermissions
     {
         $choices = $includePublish ?
             [
-                'viewown'      => 'mautic.core.permissions.viewown',
-                'viewother'    => 'mautic.core.permissions.viewother',
-                'editown'      => 'mautic.core.permissions.editown',
-                'editother'    => 'mautic.core.permissions.editother',
-                'create'       => 'mautic.core.permissions.create',
-                'deleteown'    => 'mautic.core.permissions.deleteown',
-                'deleteother'  => 'mautic.core.permissions.deleteother',
-                'publishown'   => 'mautic.core.permissions.publishown',
-                'publishother' => 'mautic.core.permissions.publishother',
-                'full'         => 'mautic.core.permissions.full',
+                'mautic.core.permissions.viewown'      => 'viewown',
+                'mautic.core.permissions.viewother'    => 'viewother',
+                'mautic.core.permissions.editown'      => 'editown',
+                'mautic.core.permissions.editother'    => 'editother',
+                'mautic.core.permissions.create'       => 'create',
+                'mautic.core.permissions.deleteown'    => 'deleteown',
+                'mautic.core.permissions.deleteother'  => 'deleteother',
+                'mautic.core.permissions.publishown'   => 'publishown',
+                'mautic.core.permissions.publishother' => 'publishother',
+                'mautic.core.permissions.full'         => 'full',
             ] :
             [
-                'viewown'     => 'mautic.core.permissions.viewown',
-                'viewother'   => 'mautic.core.permissions.viewother',
-                'editown'     => 'mautic.core.permissions.editown',
-                'editother'   => 'mautic.core.permissions.editother',
-                'create'      => 'mautic.core.permissions.create',
-                'deleteown'   => 'mautic.core.permissions.deleteown',
-                'deleteother' => 'mautic.core.permissions.deleteother',
-                'full'        => 'mautic.core.permissions.full',
+                'mautic.core.permissions.viewown'     => 'viewown',
+                'mautic.core.permissions.viewother'   => 'viewother',
+                'mautic.core.permissions.editown'     => 'editown',
+                'mautic.core.permissions.editother'   => 'editother',
+                'mautic.core.permissions.create'      => 'create',
+                'mautic.core.permissions.deleteown'   => 'deleteown',
+                'mautic.core.permissions.deleteother' => 'deleteother',
+                'mautic.core.permissions.full'        => 'full',
             ];
 
         $builder->add(

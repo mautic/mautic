@@ -65,10 +65,10 @@ class LeadPermissions extends AbstractPermissions
             PermissionListType::class,
             [
                 'choices' => [
-                    'viewother'   => 'mautic.core.permissions.viewother',
-                    'editother'   => 'mautic.core.permissions.editother',
-                    'deleteother' => 'mautic.core.permissions.deleteother',
-                    'full'        => 'mautic.core.permissions.full',
+                    'mautic.core.permissions.viewother'   => 'viewother',
+                    'mautic.core.permissions.editother'   => 'editother',
+                    'mautic.core.permissions.deleteother' => 'deleteother',
+                    'mautic.core.permissions.full'        => 'full',
                 ],
                 'label'  => 'mautic.lead.permissions.lists',
                 'data'   => (!empty($data['lists']) ? $data['lists'] : []),
@@ -82,7 +82,7 @@ class LeadPermissions extends AbstractPermissions
             PermissionListType::class,
             [
                 'choices' => [
-                    'full' => 'mautic.core.permissions.manage',
+                    'mautic.core.permissions.manage' => 'full',
                 ],
                 'label'  => 'mautic.lead.permissions.fields',
                 'data'   => (!empty($data['fields']) ? $data['fields'] : []),

@@ -53,7 +53,7 @@ class ApiPermissions extends AbstractPermissions
             PermissionListType::class,
             [
                 'choices' => [
-                    'full' => 'mautic.api.permissions.granted',
+                    'mautic.api.permissions.granted' => 'full',
                 ],
                 'label'  => 'mautic.api.permissions.apiaccess',
                 'data'   => (!empty($data['access']) ? $data['access'] : []),
