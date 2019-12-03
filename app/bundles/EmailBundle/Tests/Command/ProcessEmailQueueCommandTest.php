@@ -92,7 +92,6 @@ class ProcessEmailQueueCommandTest extends \PHPUnit_Framework_TestCase
      */
     public function testCommandWhenQueueIsEnabled()
     {
-        $a                      = \Swift_Mime_SimpleMessage::class;
         $tryAgainMessageFile    = '0HZYoueQaC.tryagain';
         $tmpSpoolDir            = sys_get_temp_dir().'/mauticSpoolTestDir';
         $tryAgainMessage        = __DIR__.'/../Data/SpoolSample/'.$tryAgainMessageFile;
