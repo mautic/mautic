@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
 
 /**
@@ -43,7 +44,7 @@ class CampaignSubscriber extends CommonSubscriber
         $action = [
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
-            'formType'    => 'integration_list',
+            'formType'    => IntegrationsListType::class,
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
