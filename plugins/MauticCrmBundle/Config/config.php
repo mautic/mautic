@@ -222,6 +222,8 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic_integration.service.transport',
+                    'mautic_integration.pipedrive.export.lead',
                 ],
             ],
         ],
