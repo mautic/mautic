@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use MauticPlugin\MauticCrmBundle\Services\Transport;
 use Monolog\Logger;
@@ -30,20 +31,25 @@ class PipedriveIntegration extends CrmAbstractIntegration
     const ORGANIZATION_ENTITY_TYPE = 'organization';
     const COMPANY_ENTITY_TYPE      = 'company';
 
+    /**
+     * @var Transport
+     */
+    private $transport;
+
+    /**
+     * @var LeadExport
+     */
+    private $leadExport;
+
+    /**
+     * @var CrmApi
+     */
     private $apiHelper;
 
     private $requiredFields = [
         'person'        => ['firstname', 'lastname', 'email'],
         'organization'  => ['name'],
     ];
-    /**
-     * @var Transport
-     */
-    private $transport;
-    /**
-     * @var LeadExport
-     */
-    private $leadExport;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
