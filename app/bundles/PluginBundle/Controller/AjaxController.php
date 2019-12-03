@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
 use Mautic\PluginBundle\Form\Type\FieldsType;
+use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
 use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -219,7 +220,7 @@ class AjaxController extends CommonAjaxController
                         }
                     }
                 }
-                $form = $this->createForm('integration_campaign_status', $statusData, [
+                $form = $this->createForm(IntegrationCampaignsType::class, $statusData, [
                     'csrf_protection'       => false,
                     'campaignContactStatus' => $statusData,
                 ]);
