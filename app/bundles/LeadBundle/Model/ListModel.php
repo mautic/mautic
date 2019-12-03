@@ -792,8 +792,8 @@ class ListModel extends FormModel
                 if ('boolean' == $type) {
                     //create a lookup list with ID
                     $properties['list'] = [
-                        $properties['no']  => 0,
-                        $properties['yes'] => 1,
+                        0 => $properties['no'],
+                        1 => $properties['yes'],
                     ];
                 } else {
                     $properties['callback'] = 'activateLeadFieldTypeahead';

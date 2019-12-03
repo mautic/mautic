@@ -137,13 +137,8 @@ abstract class AbstractFormFieldHelper
             $choices = [];
             foreach ($list as $val => $label) {
                 if (is_array($label) && isset($label['value'])) {
-                    if ($flipArray) {
-                        $val   = $label['label'];
-                        $label = $label['value'];
-                    } else {
-                        $val   = $label['value'];
-                        $label = $label['label'];
-                    }
+                    $val   = $label['value'];
+                    $label = $label['label'];
                 }
                 if ($removeEmpty && empty($val) && empty($label)) {
                     continue;
@@ -151,7 +146,13 @@ abstract class AbstractFormFieldHelper
                     $label = $val;
                 }
                 if (!is_array($label)) {
-                    $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                    $value = trim(html_entity_decode($val, ENT_QUOTES));
+                    $label = trim(html_entity_decode($label, ENT_QUOTES));
+                    if ($flipArray) {
+                        $choices[$label] = $value;
+                    } else {
+                        $choices[$value] = $label;
+                    }
                 }
             }
 
