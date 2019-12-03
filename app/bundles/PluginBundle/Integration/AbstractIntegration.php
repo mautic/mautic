@@ -47,7 +47,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -205,7 +204,7 @@ abstract class AbstractIntegration
      * @param Session                  $session
      * @param RequestStack             $requestStack
      * @param Router                   $router
-     * @param DataCollectorTranslator  $translator
+     * @param TranslatorInterface      $translator
      * @param Logger                   $logger
      * @param EncryptionHelper         $encryptionHelper
      * @param LeadModel                $leadModel
@@ -222,7 +221,7 @@ abstract class AbstractIntegration
         Session $session,
         RequestStack $requestStack,
         Router $router,
-        DataCollectorTranslator $translator,
+        TranslatorInterface $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,

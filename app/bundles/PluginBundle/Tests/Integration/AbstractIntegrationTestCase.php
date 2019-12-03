@@ -25,7 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AbstractIntegrationTestCase extends MauticMysqlTestCase
 {
@@ -60,7 +60,7 @@ class AbstractIntegrationTestCase extends MauticMysqlTestCase
     protected $router;
 
     /**
-     * @var DataCollectorTranslator|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $translator;
 
@@ -114,7 +114,7 @@ class AbstractIntegrationTestCase extends MauticMysqlTestCase
         $this->session                = $this->createMock(Session::class);
         $this->request                = $this->createMock(RequestStack::class);
         $this->router                 = $this->createMock(Router::class);
-        $this->translator             = $this->createMock(DataCollectorTranslator::class);
+        $this->translator             = $this->createMock(TranslatorInterface::class);
         $this->logger                 = $this->createMock(Logger::class);
         $this->encryptionHelper       = $this->createMock(EncryptionHelper::class);
         $this->leadModel              = $this->createMock(LeadModel::class);
