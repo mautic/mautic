@@ -198,7 +198,7 @@ trait FieldsTypeTrait
                         'm_'.$index,
                         ChoiceType::class,
                         [
-                            'choices'    => array_flip($mauticFields),
+                            'choices'    => $mauticFields,
                             'label'      => false,
                             'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                             'label_attr' => ['class' => 'control-label'],
