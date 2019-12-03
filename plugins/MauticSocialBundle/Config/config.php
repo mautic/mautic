@@ -193,6 +193,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.integration.foursquare' => [
@@ -213,6 +214,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.integration.googleplus' => [
@@ -233,6 +235,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.integration.instagram' => [
@@ -253,6 +256,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.integration.linkedin' => [
@@ -273,6 +277,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.integration.twitter' => [
@@ -293,6 +298,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.helper.integration',
                 ],
             ],
         ],
