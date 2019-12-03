@@ -13,6 +13,8 @@ namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
+use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -79,7 +81,7 @@ class AjaxController extends CommonAjaxController
                     $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
-                    $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
+                    $formType           = $isLead ? FieldsType::class : CompanyFieldsType::class;
                     $form               = $this->createForm(
                         $formType,
                         isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
