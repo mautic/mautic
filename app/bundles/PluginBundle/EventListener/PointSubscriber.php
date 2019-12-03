@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
+use Mautic\PluginBundle\Helper\EventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 
@@ -41,7 +42,7 @@ class PointSubscriber extends CommonSubscriber
             'label'     => 'mautic.plugin.actions.push_lead',
             'formType'  => IntegrationsListType::class,
             'formTheme' => 'MauticPluginBundle:FormTheme\Integration',
-            'callback'  => ['\\Mautic\\PluginBundle\\Helper\\EventHelper', 'pushLead'],
+            'callback'  => [EventHelper::class, 'pushLead'],
         ];
 
         $event->addEvent('plugin.leadpush', $action);
