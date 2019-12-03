@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,13 +27,16 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class IntegrationsListType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var IntegrationHelper
      */
-    private $factory;
+    private $integrationHelper;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function __construct(IntegrationHelper $integrationHelper)
     {
-        $this->factory = $factory;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -41,9 +44,7 @@ class IntegrationsListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper  = $this->factory->getHelper('integration');
-        $integrationObjects = $integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
+        $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
         $integrations       = ['' => ''];
 
         foreach ($integrationObjects as $name => $object) {
@@ -86,7 +87,7 @@ class IntegrationsListType extends AbstractType
             $campaignChoices = [];
 
             if (isset($data['integration'])) {
-                $integrationObject = $integrationHelper->getIntegrationObject($data['integration']);
+                $integrationObject = $this->integrationHelper->getIntegrationObject($data['integration']);
                 if (method_exists($integrationObject, 'getCampaigns')) {
                     $campaigns = $integrationObject->getCampaigns();
 

@@ -122,7 +122,9 @@ return [
             ],
             'mautic.form.type.integration.list' => [
                 'class'     => \Mautic\PluginBundle\Form\Type\IntegrationsListType::class,
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
             ],
             'mautic.form.type.integration.config' => [
                 'class' => \Mautic\PluginBundle\Form\Type\IntegrationConfigType::class,
