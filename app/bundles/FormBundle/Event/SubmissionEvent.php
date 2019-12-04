@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class SubmissionEvent.
@@ -87,6 +88,11 @@ class SubmissionEvent extends CommonEvent
      * @var Request
      */
     private $request;
+
+    /**
+     * @var Response
+     */
+    private $postSubmitResponse;
 
     /**
      * SubmissionEvent constructor.
@@ -281,8 +287,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function setPostSubmitCallback($key, array $callback)
     {
-        // support for `callback` is @deprecated and should be removed in 3.0
-        if (!array_key_exists('eventName', $callback) && !array_key_exists('callback', $callback)) {
+        if (!array_key_exists('eventName', $callback)) {
             throw new \InvalidArgumentException('eventName or callback required');
         }
 
@@ -323,5 +328,20 @@ class SubmissionEvent extends CommonEvent
         $this->callbackResponses[$key] = $callbackResponse;
 
         return $this;
+    }
+
+    public function hasPostSubmitResponse(): bool
+    {
+        return $this->postSubmitResponse instanceof Response;
+    }
+
+    public function getPostSubmitResponse(): ?Response
+    {
+        return $this->postSubmitResponse;
+    }
+
+    public function setPostSubmitResponse(Response $response): void
+    {
+        $this->postSubmitResponse = $response;
     }
 }

@@ -77,7 +77,15 @@ return [
                 ],
             ],
             'mautic.asset.formbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\FormSubscriber',
+                'class'     => Mautic\AssetBundle\EventListener\FormSubscriber::class,
+                'arguments' => [
+                    'mautic.asset.model.asset',
+                    'translator',
+                    'mautic.helper.template.analytics',
+                    'templating.helper.assets',
+                    'mautic.helper.theme',
+                    'mautic.helper.templating',
+                ],
             ],
             'mautic.asset.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\CampaignSubscriber',

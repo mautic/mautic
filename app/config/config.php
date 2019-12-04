@@ -246,7 +246,7 @@ if ('pdo_sqlite' == $dbDriver) {
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
     'orm'  => [
-        'auto_generate_proxy_classes' => '%kernel.debug%',
+        'auto_generate_proxy_classes' => true, //'%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $ormMappings,
     ],

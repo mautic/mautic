@@ -11,6 +11,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -219,6 +220,7 @@ class AssetRepository extends CommonRepository
      * @return Asset
      *
      * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getLatestAssetForCategory($categoryId)
     {

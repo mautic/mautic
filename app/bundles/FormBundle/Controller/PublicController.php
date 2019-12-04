@@ -136,33 +136,10 @@ class PublicController extends CommonFormController
                                 $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
 
                                 $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
-                            } elseif (isset($callbackRequested['callback'])) {
-                                // @deprecated - to be removed in 3.0; use eventName instead - be sure to remove callback key support from SubmissionEvent::setPostSubmitCallback
-                                $callback = $callbackRequested['callback'];
-                                if (is_callable($callback)) {
-                                    if (is_array($callback)) {
-                                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                                    } elseif (false !== strpos($callback, '::')) {
-                                        $parts      = explode('::', $callback);
-                                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                                    } else {
-                                        $reflection = new \ReflectionMethod(null, $callback);
-                                    }
+                            }
 
-                                    //add the factory to the arguments
-                                    $callbackRequested['factory'] = $this->factory;
-
-                                    $pass = [];
-                                    foreach ($reflection->getParameters() as $param) {
-                                        if (isset($callbackRequested[$param->getName()])) {
-                                            $pass[] = $callbackRequested[$param->getName()];
-                                        } else {
-                                            $pass[] = null;
-                                        }
-                                    }
-
-                                    $callbackResponses[$key] = $reflection->invokeArgs($this, $pass);
-                                }
+                            if ($submissionEvent->isPropagationStopped() && $submissionEvent->hasPostSubmitResponse()) {
+                                return $submissionEvent->getPostSubmitResponse();
                             }
 
                             if (!$firstResponseObject && $callbackResponses[$key] instanceof Response) {
@@ -171,7 +148,7 @@ class PublicController extends CommonFormController
                         }
 
                         if ($firstResponseObject && !$messengerMode && !$isAjax) {
-                            // Return the response given by the sbumit action
+                            // Return the response given by the submit action
 
                             return $callbackResponses[$firstResponseObject];
                         }

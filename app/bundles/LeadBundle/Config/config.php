@@ -384,9 +384,12 @@ return [
                 'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
             ],
             'mautic.lead.formbundle.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\FormSubscriber',
+                'class'     => Mautic\LeadBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
             'mautic.lead.campaignbundle.subscriber' => [

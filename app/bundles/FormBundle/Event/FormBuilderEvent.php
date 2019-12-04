@@ -78,7 +78,7 @@ class FormBuilderEvent extends Event
 
         // check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['group', 'label', 'formType', 'eventName'],
+            ['group', 'label', 'formType', ['eventName', 'callback']],
             $action
         );
 
