@@ -935,7 +935,10 @@ return [
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
-                'class' => 'Mautic\CoreBundle\Model\AuditLogModel',
+                'class'     => 'Mautic\CoreBundle\Model\AuditLogModel',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'mautic.core.model.notification' => [
                 'class'     => 'Mautic\CoreBundle\Model\NotificationModel',

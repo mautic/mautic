@@ -11,7 +11,9 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -20,13 +22,19 @@ use Mautic\UserBundle\Entity\User;
 class AuditLogModel extends AbstractCommonModel
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CoreBundle\Entity\AuditLogRepository
+     * @var EntityManager
      */
-    public function getRepository()
+    protected $em;
+
+    /**
+     * @var AuditLogRepository
+     */
+    protected $repository;
+
+    public function __construct(EntityManager $em)
     {
-        return $this->em->getRepository('MauticCoreBundle:AuditLog');
+        $this->em         = $em;
+        $this->repository = $this->em->getRepository('MauticCoreBundle:AuditLog');
     }
 
     /**
@@ -62,7 +70,7 @@ class AuditLogModel extends AbstractCommonModel
         $log->setUserId($userId);
         $log->setUserName($userName);
 
-        $this->em->getRepository('MauticCoreBundle:AuditLog')->saveEntity($log);
+        $this->repository->saveEntity($log);
 
         $this->em->detach($log);
     }
@@ -80,6 +88,6 @@ class AuditLogModel extends AbstractCommonModel
      */
     public function getLogForObject($object, $id, $afterDate = null, $limit = 10, $bundle = null)
     {
-        return $this->getRepository()->getLogForObject($object, $id, $limit, $afterDate, $bundle);
+        return $this->repository->getLogForObject($object, $id, $limit, $afterDate, $bundle);
     }
 }

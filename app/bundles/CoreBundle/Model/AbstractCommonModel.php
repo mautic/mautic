@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -32,25 +31,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 abstract class AbstractCommonModel
 {
-    /**
-     * Do not use Factory in Models. There's a couple places where we
-     * still need to in core, but we are working on refactoring. This
-     * is completely temporary.
-     *
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @deprecated 2.0; to be removed in 3.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
