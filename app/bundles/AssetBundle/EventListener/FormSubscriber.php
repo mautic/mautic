@@ -13,7 +13,6 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
@@ -94,8 +93,10 @@ class FormSubscriber extends CommonSubscriber
     {
         return [
             FormEvents::FORM_ON_BUILD                 => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION      => ['onFormSubmitActionAssetDownload', 0],
-            AssetEvents::ON_FORM_SUBMIT_DOWNLOAD_FILE => ['onFormSubmitDownloadFile', 0],
+            FormEvents::ON_EXECUTE_SUBMIT_ACTION      => [
+                ['onFormSubmitActionAssetDownload', 0],
+                ['onFormSubmitActionDownloadFile', 0],
+            ],
         ];
     }
 
@@ -142,7 +143,7 @@ class FormSubscriber extends CommonSubscriber
 
         if ($asset instanceof Asset && $asset->isPublished()) {
             $event->setPostSubmitCallback('asset.download_file', [
-                'eventName' => AssetEvents::ON_FORM_SUBMIT_DOWNLOAD_FILE,
+                'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
                 'form'      => $event->getAction()->getForm(),
                 'asset'     => $asset,
                 'message'   => $properties['message'] ?? '',
@@ -152,6 +153,10 @@ class FormSubscriber extends CommonSubscriber
 
     public function onFormSubmitDownloadFile(SubmissionEvent $event): void
     {
+        if (false === $event->checkContext('asset.download_file')) {
+            return;
+        }
+
         /*
          * No further actions can run after this, as we need to send the
          * download response to the client.
