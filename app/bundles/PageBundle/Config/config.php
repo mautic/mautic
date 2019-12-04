@@ -104,6 +104,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [

@@ -12,7 +12,7 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -37,15 +37,22 @@ class PageSubscriber extends CommonSubscriber
     protected $router;
 
     /**
+     * @var BuilderTokenHelperFactory
+     */
+    protected $builderTokenHelperFactory;
+
+    /**
      * PageSubscriber constructor.
      *
-     * @param FocusModel      $model
-     * @param RouterInterface $router
+     * @param FocusModel                $model
+     * @param RouterInterface           $router
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
-    public function __construct(FocusModel $model, RouterInterface $router)
+    public function __construct(FocusModel $model, RouterInterface $router, BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
-        $this->router = $router;
-        $this->model  = $model;
+        $this->router                    = $router;
+        $this->model                     = $model;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**
@@ -67,7 +74,7 @@ class PageSubscriber extends CommonSubscriber
     public function onPageBuild(PageBuilderEvent $event)
     {
         if ($event->tokensRequested($this->regex)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
             $event->addTokensFromHelper($tokenHelper, $this->regex, 'name', 'id', true);
         }
     }

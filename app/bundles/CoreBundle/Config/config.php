@@ -588,7 +588,15 @@ return [
                     'doctrine.orm.entity_manager',
                     'database_connection',
                     'mautic.helper.user',
-                    'kernel',
+                ],
+            ],
+            'mautic.helper.token_builder.factory' => [
+                'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
+                'arguments' => [
+                    'mautic.security',
+                    'doctrine.orm.entity_manager',
+                    'database_connection',
+                    'mautic.helper.user',
                 ],
             ],
         ],

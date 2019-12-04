@@ -64,6 +64,7 @@ return [
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.focus.subscriber.stat' => [
