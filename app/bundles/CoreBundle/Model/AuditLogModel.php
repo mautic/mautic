@@ -14,7 +14,9 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AuditLogModel.
@@ -27,13 +29,25 @@ class AuditLogModel extends AbstractCommonModel
     protected $em;
 
     /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var AuditLogRepository
      */
     protected $repository;
 
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, UserHelper $userHelper, TranslatorInterface $translator)
     {
         $this->em         = $em;
+        $this->userHelper = $userHelper;
+        $this->translator = $translator;
         $this->repository = $this->em->getRepository('MauticCoreBundle:AuditLog');
     }
 

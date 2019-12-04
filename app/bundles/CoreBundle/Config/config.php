@@ -938,6 +938,8 @@ return [
                 'class'     => 'Mautic\CoreBundle\Model\AuditLogModel',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.helper.user',
+                    'translator',
                 ],
             ],
             'mautic.core.model.notification' => [
