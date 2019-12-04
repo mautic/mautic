@@ -84,20 +84,6 @@ class SubmissionEvent extends CommonEvent
     private $action;
 
     /**
-     * Configuration for the action.
-     *
-     * @var array
-     */
-    private $actionConfig = [];
-
-    /**
-     * Active action.
-     *
-     * @var string
-     */
-    private $actionContext;
-
-    /**
      * @var Request
      */
     private $request;

@@ -21,8 +21,6 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class FormSubscriber.
@@ -49,23 +47,16 @@ class FormSubscriber extends CommonSubscriber
      */
     protected $ipLookupHelper;
 
-    /**
-     * @var Request
-     */
-    protected $request;
-
     public function __construct(
         EmailModel $emailModel,
         LeadModel $leadModel,
         ContactTracker $contactTracker,
-        IpLookupHelper $ipLookupHelper,
-        RequestStack $requestStack
+        IpLookupHelper $ipLookupHelper
     ) {
         $this->emailModel     = $emailModel;
         $this->leadModel      = $leadModel;
         $this->contactTracker = $contactTracker;
         $this->ipLookupHelper = $ipLookupHelper;
-        $this->request        = $requestStack->getCurrentRequest() ?? Request::createFromGlobals();
     }
 
     /**
@@ -232,8 +223,8 @@ class FormSubscriber extends CommonSubscriber
 
         $queryReferer = $queryArray = [];
 
-        parse_str($this->request->server->get('QUERY_STRING'), $queryArray);
-        $refererURL       = $this->request->server->get('HTTP_REFERER');
+        parse_str($event->getRequest()->server->get('QUERY_STRING'), $queryArray);
+        $refererURL       = $event->getRequest()->server->get('HTTP_REFERER');
         $refererParsedUrl = parse_url($refererURL);
 
         if (isset($refererParsedUrl['query'])) {
@@ -242,12 +233,12 @@ class FormSubscriber extends CommonSubscriber
 
         $utmValues = new UtmTag();
         $utmValues->setLead($contact);
-        $utmValues->setQuery($this->request->query->all());
+        $utmValues->setQuery($event->getRequest()->query->all());
         $utmValues->setReferer($refererURL);
-        $utmValues->setUrl($this->request->server->get('REQUEST_URI'));
+        $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
         $utmValues->setDateAdded(new \Datetime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
-        $utmValues->setUserAgent($this->request->server->get('HTTP_USER_AGENT') ?? null);
+        $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);
         $utmValues->setUtmContent($queryArray['utm_content'] ?? $queryReferer['utm_content'] ?? null);
         $utmValues->setUtmMedium($queryArray['utm_medium'] ?? $queryReferer['utm_medium'] ?? null);

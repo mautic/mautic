@@ -198,7 +198,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return bool|array
      */
-    public function saveSubmission($post, $server, Form $form, Request $request = null, $returnEvent = false)
+    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
     {
         $leadFields = $this->leadFieldModel->getFieldListWithProperties(false);
 
