@@ -12,7 +12,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Exception;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -66,13 +66,6 @@ class IntegrationHelper
      */
     protected $pluginModel;
 
-    /**
-     * @deprecated 2.8.2 To be removed in 3.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     private $integrations = [];
 
     private $available = [];
@@ -82,8 +75,6 @@ class IntegrationHelper
     private $byPlugin = [];
 
     /**
-     * IntegrationHelper constructor.
-     *
      * @param Kernel               $kernel
      * @param EntityManager        $em
      * @param PathsHelper          $pathsHelper
@@ -91,9 +82,18 @@ class IntegrationHelper
      * @param CoreParametersHelper $coreParametersHelper
      * @param TemplatingHelper     $templatingHelper
      * @param PluginModel          $pluginModel
+     *
+     * @throws Exception
      */
-    public function __construct(Kernel $kernel, EntityManager $em, PathsHelper $pathsHelper, BundleHelper $bundleHelper, CoreParametersHelper $coreParametersHelper, TemplatingHelper $templatingHelper, PluginModel $pluginModel)
-    {
+    public function __construct(
+        Kernel $kernel,
+        EntityManager $em,
+        PathsHelper $pathsHelper,
+        BundleHelper $bundleHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TemplatingHelper $templatingHelper,
+        PluginModel $pluginModel
+    ) {
         $this->container            = $kernel->getContainer();
         $this->em                   = $em;
         $this->pathsHelper          = $pathsHelper;
@@ -101,7 +101,6 @@ class IntegrationHelper
         $this->pluginModel          = $pluginModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->templatingHelper     = $templatingHelper;
-        $this->factory              = $this->container->get('mautic.factory');
     }
 
     /**
@@ -114,6 +113,8 @@ class IntegrationHelper
      * @param bool|false   $publishedOnly
      *
      * @return mixed
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false)
     {
