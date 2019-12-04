@@ -13,12 +13,16 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
+use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
@@ -50,23 +54,31 @@ class FormSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
+     * @var DoNotContactModel
+     */
+    protected $dncModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param IntegrationHelper       $integrationHelper
      * @param LeadModel               $leadModel
      * @param NotificationModel       $notificationModel
      * @param AbstractNotificationApi $notificationApi
+     * @param DoNotContactModel       $dncModel
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
-        AbstractNotificationApi $notificationApi
+        AbstractNotificationApi $notificationApi,
+        DoNotContactModel $dncModel
     ) {
         $this->integrationHelper = $integrationHelper;
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi   = $notificationApi;
+        $this->dncModel          = $dncModel;
     }
 
     /**
@@ -82,43 +94,45 @@ class FormSubscriber extends CommonSubscriber
 
     /**
      * @param FormBuilderEvent $event
+     *
+     * @throws BadConfigurationException
      */
     public function onFormBuild(FormBuilderEvent $event)
     {
-        $action = [
+        $event->addSubmitAction('notification.send_mobile_notification', [
             'group'       => 'mautic.notification.actions',
             'description' => 'mautic.notification.actions.mobile_tooltip',
             'label'       => 'mautic.notification.actions.send_mobile_notification',
             'formType'    => 'notification_list',
             'formTheme'   => 'MauticNotificationBundle:FormTheme\NotificationSendList',
             'eventName'   => NotificationEvents::NOTIFICATION_ON_FORM_ACTION_SEND,
-        ];
-        $event->addSubmitAction('notification.send_mobile_notification', $action);
+        ]);
     }
 
-    public function onFormActionSend(SubmissionEvent $event)
+    public function onFormActionSend(SubmissionEvent $event): void
     {
         $lead         = $event->getLead();
         $actionConfig = $event->getActionConfig();
 
-        if (DoNotContact::IS_CONTACTABLE !== $this->leadModel->isContactable($lead, 'notification')) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
+        if ($this->dncModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
+            $event->setFailed('mautic.notification.campaign.failed.not_contactable');
+
+            return;
         }
 
         // If lead has subscribed on multiple devices, get all of them.
-        /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
-        $pushIDs = $lead->getPushIDs();
-
+        /** @var PushID[] $pushIDs */
+        $pushIDs  = $lead->getPushIDs();
         $playerID = [];
 
         foreach ($pushIDs as $pushID) {
             // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext('notification.send_mobile_notification') && false == $pushID->isMobile()) {
+            if ($event->checkContext('notification.send_mobile_notification') && false === $pushID->isMobile()) {
                 continue;
             }
 
             // Skip mobile PushIDs if this is a non-mobile event
-            if ($event->checkContext('notification.send_notification') && true == $pushID->isMobile()) {
+            if ($event->checkContext('notification.send_notification') && true === $pushID->isMobile()) {
                 continue;
             }
 
@@ -126,16 +140,20 @@ class FormSubscriber extends CommonSubscriber
         }
 
         if (empty($playerID)) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
+            $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
+
+            return;
         }
 
         $notificationId = (int) $actionConfig['properties'][0];
 
-        /** @var \Mautic\NotificationBundle\Entity\Notification $notification */
+        /** @var Notification $notification */
         $notification = $this->notificationModel->getEntity($notificationId);
 
         if ($notification->getId() !== $notificationId) {
-            return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
+            $event->setFailed('mautic.notification.campaign.failed.missing_entity');
+
+            return;
         }
 
         if ($url = $notification->getUrl()) {
@@ -177,8 +195,10 @@ class FormSubscriber extends CommonSubscriber
         $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
-        if (200 !== $response->code) {
-            return $event->setResult(false);
+        if ($response->code !== 200) {
+            $event->setResult(false);
+
+            return;
         }
 
         $this->notificationModel->createStatEntry($notification, $lead);
