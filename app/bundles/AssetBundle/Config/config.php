@@ -85,6 +85,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.theme',
                     'mautic.helper.templating',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.asset.campaignbundle.subscriber' => [

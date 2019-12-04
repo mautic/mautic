@@ -139,11 +139,11 @@ class PublicController extends CommonFormController
                             }
 
                             if ($submissionEvent->isPropagationStopped() && $submissionEvent->hasPostSubmitResponse()) {
-                                return $submissionEvent->getPostSubmitResponse();
-                            }
-
-                            if (!$firstResponseObject && $callbackResponses[$key] instanceof Response) {
-                                $firstResponseObject = $key;
+                                if ($messengerMode) {
+                                    $callbackResponses[$key] = $submissionEvent->getPostSubmitResponse();
+                                } else {
+                                    return $submissionEvent->getPostSubmitResponse();
+                                }
                             }
                         }
 

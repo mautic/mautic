@@ -90,7 +90,7 @@ class SubmissionEvent extends CommonEvent
     private $request;
 
     /**
-     * @var Response
+     * @var array|null|Response
      */
     private $postSubmitResponse;
 
@@ -332,15 +332,15 @@ class SubmissionEvent extends CommonEvent
 
     public function hasPostSubmitResponse(): bool
     {
-        return $this->postSubmitResponse instanceof Response;
+        return null !== $this->postSubmitResponse;
     }
 
-    public function getPostSubmitResponse(): ?Response
+    public function getPostSubmitResponse()
     {
         return $this->postSubmitResponse;
     }
 
-    public function setPostSubmitResponse(Response $response): void
+    public function setPostSubmitResponse($response): void
     {
         $this->postSubmitResponse = $response;
     }

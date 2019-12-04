@@ -20,6 +20,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
@@ -28,7 +29,6 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -64,20 +64,27 @@ class FormSubscriber extends CommonSubscriber
      */
     private $templatingHelper;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     public function __construct(
         AssetModel $assetModel,
         TranslatorInterface $translator,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         ThemeHelper $themeHelper,
-        TemplatingHelper $templatingHelper
+        TemplatingHelper $templatingHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->assetModel       = $assetModel;
-        $this->translator       = $translator;
-        $this->analyticsHelper  = $analyticsHelper;
-        $this->assetsHelper     = $assetsHelper;
-        $this->themeHelper      = $themeHelper;
-        $this->templatingHelper = $templatingHelper;
+        $this->assetModel           = $assetModel;
+        $this->translator           = $translator;
+        $this->analyticsHelper      = $analyticsHelper;
+        $this->assetsHelper         = $assetsHelper;
+        $this->themeHelper          = $themeHelper;
+        $this->templatingHelper     = $templatingHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -166,7 +173,9 @@ class FormSubscriber extends CommonSubscriber
         $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]);
 
         if ($messengerMode) {
-            $event->setPostSubmitResponse(new JsonResponse(['download' => $url]));
+            $event->setPostSubmitResponse(['download' => $url]);
+
+            return;
         }
 
         $msg = $message.$this->translator->trans('mautic.asset.asset.submitaction.downloadfile.msg', [
@@ -182,11 +191,11 @@ class FormSubscriber extends CommonSubscriber
 
         $event->setPostSubmitResponse(new Response(
             $this->templatingHelper->getTemplating()->renderResponse(
-                $this->themeHelper->checkForTwigTemplate(':'.$factory->getParameter('theme').':message.html.php'),
+                $this->themeHelper->checkForTwigTemplate(':'.$this->coreParametersHelper->getParameter('theme').':message.html.php'),
                 [
                     'message'  => $msg,
                     'type'     => 'notice',
-                    'template' => $factory->getParameter('theme'),
+                    'template' => $this->coreParametersHelper->getParameter('theme'),
                 ]
             )->getContent()
         ));
