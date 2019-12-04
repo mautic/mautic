@@ -23,7 +23,7 @@ class SendGridMailMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $sendGridMailMetadata = new SendGridMailMetadata();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->getMock();
 
         $message->expects($this->exactly(2))

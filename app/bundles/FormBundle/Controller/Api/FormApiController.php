@@ -11,7 +11,7 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -161,7 +161,7 @@ class FormApiController extends CommonApiController
                         'flashes'
                     );
 
-                    return $this->returnError($msg, Codes::HTTP_NOT_FOUND);
+                    return $this->returnError($msg, Response::HTTP_NOT_FOUND);
                 }
 
                 $fieldEntityArray           = $fieldEntity->convertToArray();
@@ -186,7 +186,7 @@ class FormApiController extends CommonApiController
                     $formErrors = $this->getFormErrorMessages($fieldForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 
@@ -228,7 +228,7 @@ class FormApiController extends CommonApiController
                     $formErrors = $this->getFormErrorMessages($actionForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 

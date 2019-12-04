@@ -29,7 +29,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
+use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -94,7 +94,7 @@ class Version<version> extends AbstractMauticMigration
 }
 ';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
                 ->setName('mautic:migrations:generate')

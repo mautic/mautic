@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -61,7 +60,7 @@ class DeviceApiController extends CommonApiController
             $entity->setLead($lead);
             unset($parameters['lead'], $parameters['contact']);
         } elseif ($action === 'new') {
-            return $this->returnError('contact ID is mandatory', Codes::HTTP_BAD_REQUEST);
+            return $this->returnError('contact ID is mandatory', Response::HTTP_BAD_REQUEST);
         }
     }
 

@@ -13,6 +13,8 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
+use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Model\TransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -258,7 +260,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_convert_embed_images',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.convert.embed.images',
                 'label_attr' => ['class' => 'control-label'],
@@ -273,7 +275,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_append_tracking_pixel',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.append.tracking.pixel',
                 'label_attr' => ['class' => 'control-label'],
@@ -288,7 +290,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'disable_trackable_urls',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.disable.trackable.urls',
                 'label_attr' => ['class' => 'control-label'],
@@ -469,7 +471,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_test_connection_button',
-            'standalone_button',
+            StandAloneButtonType::class,
             [
                 'label'    => 'mautic.email.config.mailer.transport.test_connection',
                 'required' => false,
@@ -482,7 +484,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_test_send_button',
-            'standalone_button',
+            StandAloneButtonType::class,
             [
                 'label'    => 'mautic.email.config.mailer.transport.test_send',
                 'required' => false,
@@ -495,7 +497,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_mailjet_sandbox',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.mailjet.sandbox',
                 'label_attr' => ['class' => 'control-label'],
@@ -658,7 +660,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'mailer_is_owner',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.is.owner',
                 'label_attr' => ['class' => 'control-label'],
@@ -703,7 +705,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_segments',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.segments',
                 'label_attr' => ['class' => 'control-label'],
@@ -717,7 +719,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_preferences',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.preference.options',
                 'label_attr' => ['class' => 'control-label'],
@@ -731,7 +733,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_frequency',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.frequency',
                 'label_attr' => ['class' => 'control-label'],
@@ -745,7 +747,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_pause_dates',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.pause.dates',
                 'label_attr' => ['class' => 'control-label'],
@@ -759,7 +761,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_categories',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.categories',
                 'label_attr' => ['class' => 'control-label'],
@@ -773,7 +775,7 @@ class ConfigType extends AbstractType
         );
         $builder->add(
             'show_contact_preferred_channels',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.preferred.channels',
                 'label_attr' => ['class' => 'control-label'],

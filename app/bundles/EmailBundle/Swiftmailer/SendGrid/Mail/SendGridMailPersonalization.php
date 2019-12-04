@@ -20,9 +20,9 @@ class SendGridMailPersonalization
 {
     /**
      * @param Mail                $mail
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      */
-    public function addPersonalizedDataToMail(Mail $mail, \Swift_Mime_Message $message)
+    public function addPersonalizedDataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
         if (!$message instanceof MauticMessage) { //Used for "Send test email" in settings
             foreach ($message->getTo() as $recipientEmail => $recipientName) {

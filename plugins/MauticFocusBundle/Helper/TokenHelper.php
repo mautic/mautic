@@ -63,8 +63,8 @@ class TokenHelper
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(
-                            'plugin:focus:items:viewown',
-                            'plugin:focus:items:viewother',
+                            'focus:items:viewown',
+                            'focus:items:viewother',
                             $focus->getCreatedBy()
                         )
                     )

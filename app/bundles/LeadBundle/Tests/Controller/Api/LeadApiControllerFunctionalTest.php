@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,11 +43,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         // Assert status codes
-        $this->assertEquals(Codes::HTTP_CREATED, $response['statusCodes'][0]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
         $contactId1 = $response['contacts'][0]['id'];
-        $this->assertEquals(Codes::HTTP_CREATED, $response['statusCodes'][1]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1]);
         $contactId2 = $response['contacts'][1]['id'];
-        $this->assertEquals(Codes::HTTP_CREATED, $response['statusCodes'][2]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][2]);
         $contactId3 = $response['contacts'][2]['id'];
 
         // Assert email
@@ -90,11 +90,11 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertEquals(Codes::HTTP_OK, $response['statusCodes'][0]);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertEquals($contactId1, $response['contacts'][0]['id']);
-        $this->assertEquals(Codes::HTTP_OK, $response['statusCodes'][1]);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][1]);
         $this->assertEquals($contactId2, $response['contacts'][1]['id']);
-        $this->assertEquals(Codes::HTTP_OK, $response['statusCodes'][2]);
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][2]);
         $this->assertEquals($contactId3, $response['contacts'][2]['id']);
 
         // Assert email

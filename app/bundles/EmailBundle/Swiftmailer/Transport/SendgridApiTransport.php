@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Swift_Events_EventListener;
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use Symfony\Component\HttpFoundation\Request;
 
 class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
@@ -73,19 +73,27 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     }
 
     /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
+    }
+
+    /**
      * Send the given Message.
      *
      * Recipient/sender data will be retrieved from the Message API.
      * The return value is the number of recipients who were accepted for delivery.
      *
-     * @param Swift_Mime_Message $message
+     * @param Swift_Mime_SimpleMessage $message
      * @param string[]           $failedRecipients An array of failures by-reference
      *
      * @return int
      *
      * @throws \Swift_TransportException
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->sendGridApiFacade->send($message);
 

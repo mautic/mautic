@@ -1,3 +1,5 @@
+# This is the developer branch for 3.x in preparation for the Mautic Community Sprint in Amsterdam. It is completely and utterly broken so don't try to install it :-)
+
 Mautic Introduction
 ===========
 ![Mautic](https://www.mautic.org/media/images/github_readme.png "Mautic Open Source Marketing Automation")

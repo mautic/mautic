@@ -29,7 +29,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->getMock();
 
         $message->expects($this->once())
@@ -92,7 +92,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->getMock();
 
         $message->expects($this->once())
@@ -143,7 +143,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 
         $sendGridMailBase = new SendGridMailBase($plainTextMessageHelper);
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
             ->getMock();
 
         $message->expects($this->once())

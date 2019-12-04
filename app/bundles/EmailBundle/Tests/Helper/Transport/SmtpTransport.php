@@ -11,11 +11,11 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 
 class SmtpTransport implements \Swift_Transport
 {
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
     }
 

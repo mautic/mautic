@@ -17,6 +17,7 @@ use Mautic\Middleware\MiddlewareBuilder;
 use Symfony\Component\ClassLoader\ApcClassLoader;
 
 $loader = require_once __DIR__.'/app/autoload.php';
+//include_once __DIR__.'/var/bootstrap.php.cache';
 
 /*
  * Use APC for autoloading to improve performance. Change 'sf2' to a unique prefix

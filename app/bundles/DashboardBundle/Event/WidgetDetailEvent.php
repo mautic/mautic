@@ -165,7 +165,7 @@ class WidgetDetailEvent extends CommonEvent
 
         // Store the template data to the cache
         if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {
-            $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
+            $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
             // must pass a DateTime object or a int of seconds to expire as 3rd attribute to set().
             $expireTime = $this->widget->getCacheTimeout() * 60;
             $cache->set($this->getUniqueWidgetId(), $templateData, (int) $expireTime);
@@ -240,7 +240,7 @@ class WidgetDetailEvent extends CommonEvent
             return false;
         }
 
-        $cache = new CacheStorageHelper($this->cacheDir, $this->uniqueCacheDir);
+        $cache = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->uniqueCacheDir, null, $this->cacheDir);
         $data  = $cache->get($this->getUniqueWidgetId(), $this->cacheTimeout);
 
         if ($data) {

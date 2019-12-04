@@ -11,12 +11,12 @@
 
 namespace Mautic\CoreBundle\Templating\Engine;
 
+use Psr\Container\ContainerInterface;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Symfony\Bundle\FrameworkBundle\Templating\GlobalVariables;
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine as BasePhpEngine;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -210,11 +210,6 @@ class PhpEngine extends BasePhpEngine
                         'code'    => 500,
                         'type'    => null,
                     ],
-                ],
-                // @deprecated 2.6.0 to be removed in 3.0
-                'error' => [
-                    'message' => $exception->getMessage().' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                    'code'    => 500,
                 ],
             ];
             if ('dev' === MAUTIC_ENV) {

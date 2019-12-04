@@ -27,7 +27,7 @@ class AjaxController extends CommonAjaxController
     {
         $data = ['success' => 0];
 
-        if ($this->get('mautic.security')->isGranted('plugin:focus:items:create')) {
+        if ($this->get('mautic.security')->isGranted('focus:items:create')) {
             $website = InputHelper::url($request->request->get('website'));
 
             if ($website) {

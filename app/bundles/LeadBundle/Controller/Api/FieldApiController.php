@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -102,7 +102,7 @@ class FieldApiController extends CommonApiController
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);
 
             if ($result !== true) {
-                return $this->returnError($this->get('translator')->trans($result, [], 'validators'), Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($this->get('translator')->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
             }
         }
     }

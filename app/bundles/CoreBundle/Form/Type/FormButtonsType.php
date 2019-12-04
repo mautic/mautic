@@ -12,10 +12,12 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class FormButtonsType.
@@ -28,7 +30,7 @@ class FormButtonsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['pre_extra_buttons'] as $btn) {
-            $type = (empty($btn['type'])) ? 'button' : 'submit';
+            $type = (empty($btn['type'])) ? ButtonType::class : SubmitType::class;
             $builder->add(
                 $btn['name'],
                 $type,
@@ -94,7 +96,7 @@ class FormButtonsType extends AbstractType
         }
 
         foreach ($options['post_extra_buttons'] as $btn) {
-            $type = (empty($btn['type'])) ? 'button' : 'submit';
+            $type = (empty($btn['type'])) ? ButtonType::class : SubmitType::class;
             $builder->add(
                 $btn['name'],
                 $type,
@@ -109,40 +111,42 @@ class FormButtonsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'apply_text'         => 'mautic.core.form.apply',
-            'apply_icon'         => 'fa fa-check text-success',
-            'apply_class'        => 'btn btn-default btn-apply',
-            'apply_onclick'      => false,
-            'apply_attr'         => [],
-            'apply_type'         => 'submit',
-            'save_text'          => 'mautic.core.form.saveandclose',
-            'save_icon'          => 'fa fa-save',
-            'save_class'         => 'btn btn-default btn-save',
-            'save_onclick'       => false,
-            'save_attr'          => [],
-            'save_type'          => 'submit',
-            'cancel_text'        => 'mautic.core.form.cancel',
-            'cancel_icon'        => 'fa fa-times text-danger',
-            'cancel_class'       => 'btn btn-default btn-cancel',
-            'cancel_onclick'     => false,
-            'cancel_attr'        => [],
-            'cancel_type'        => 'submit',
-            'mapped'             => false,
-            'label'              => false,
-            'required'           => false,
-            'pre_extra_buttons'  => [],
-            'post_extra_buttons' => [],
-            'container_class'    => 'bottom-form-buttons',
-        ]);
+        $resolver->setDefaults(
+            [
+                'apply_text'         => 'mautic.core.form.apply',
+                'apply_icon'         => 'fa fa-check text-success',
+                'apply_class'        => 'btn btn-default btn-apply',
+                'apply_onclick'      => false,
+                'apply_attr'         => [],
+                'apply_type'         => SubmitType::class,
+                'save_text'          => 'mautic.core.form.saveandclose',
+                'save_icon'          => 'fa fa-save',
+                'save_class'         => 'btn btn-default btn-save',
+                'save_onclick'       => false,
+                'save_attr'          => [],
+                'save_type'          => SubmitType::class,
+                'cancel_text'        => 'mautic.core.form.cancel',
+                'cancel_icon'        => 'fa fa-times text-danger',
+                'cancel_class'       => 'btn btn-default btn-cancel',
+                'cancel_onclick'     => false,
+                'cancel_attr'        => [],
+                'cancel_type'        => SubmitType::class,
+                'mapped'             => false,
+                'label'              => false,
+                'required'           => false,
+                'pre_extra_buttons'  => [],
+                'post_extra_buttons' => [],
+                'container_class'    => 'bottom-form-buttons',
+            ]
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_buttons';
     }

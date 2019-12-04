@@ -50,14 +50,14 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param null                $failedRecipients
      *
      * @return int|void
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         // add leadIdHash to track this email
         if (isset($message->leadIdHash)) {

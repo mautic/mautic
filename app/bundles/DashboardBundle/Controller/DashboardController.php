@@ -12,6 +12,7 @@
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -66,7 +67,7 @@ class DashboardController extends FormController
         // Set the final date range to the form
         $dateRangeFilter['date_from'] = $filter['dateFrom']->format($humanFormat);
         $dateRangeFilter['date_to']   = $filter['dateTo']->format($humanFormat);
-        $dateRangeForm                = $this->get('form.factory')->create('daterange', $dateRangeFilter, ['action' => $action]);
+        $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
         $model->populateWidgetsContent($widgets, $filter);
 

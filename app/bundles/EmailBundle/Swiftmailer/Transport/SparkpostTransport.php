@@ -120,14 +120,14 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      * @param null                $failedRecipients
      *
      * @return int Number of messages sent
      *
      * @throws \Exception
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $sendCount = 0;
         if ($event = $this->getDispatcher()->createSendEvent($this, $message)) {
@@ -172,13 +172,13 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * https://jsapi.apiary.io/apis/sparkpostapi/introduction/subaccounts-coming-to-an-api-near-you-in-april!.html.
      *
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return array SparkPost Send Message
      *
      * @throws \Exception
      */
-    public function getSparkPostMessage(\Swift_Mime_Message $message)
+    public function getSparkPostMessage(\Swift_Mime_SimpleMessage $message)
     {
         $tags      = [];
         $inlineCss = null;

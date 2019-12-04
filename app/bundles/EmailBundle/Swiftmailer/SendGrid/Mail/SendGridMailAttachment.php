@@ -19,9 +19,9 @@ class SendGridMailAttachment
 {
     /**
      * @param Mail                $mail
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      */
-    public function addAttachmentsToMail(Mail $mail, \Swift_Mime_Message $message)
+    public function addAttachmentsToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
     {
         if (!$message instanceof MauticMessage || !$message->getAttachments()) {
             return;

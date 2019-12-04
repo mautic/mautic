@@ -36,11 +36,11 @@ final class SwiftMessageValidator implements SwiftMessageValidatorInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      *
      * @throws SwiftMessageValidationException
      */
-    public function validate(\Swift_Mime_Message $message)
+    public function validate(\Swift_Mime_SimpleMessage $message)
     {
         if (empty($message->getSubject())) {
             throw new SwiftMessageValidationException($this->translator->trans('mautic.email.subject.notblank', [], 'validators'));
