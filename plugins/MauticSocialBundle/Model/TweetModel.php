@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Event as Events;
+use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -155,7 +156,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
             $params['action'] = $action;
         }
 
-        return $formFactory->create('twitter_tweet', $entity, $params);
+        return $formFactory->create(TweetType::class, $entity, $params);
     }
 
     /**

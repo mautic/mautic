@@ -14,7 +14,6 @@ namespace Mautic\ApiBundle\Controller;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use FOS\RestBundle\Controller\FOSRestController;
-use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
@@ -33,6 +32,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -1242,13 +1242,6 @@ class CommonApiController extends FOSRestController implements MauticController
             [
                 'errors' => [
                     $error,
-                ],
-                // @deprecated 2.6.0 to be removed in 3.0
-                'error' => [
-                    'message' => $this->get('translator')->trans($msg, [], 'flashes')
-                        .' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                    'code'    => $code,
-                    'details' => $details,
                 ],
             ],
             $code

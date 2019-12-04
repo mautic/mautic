@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType;
+
 /**
  * Class LinkedInIntegration.
  */
@@ -199,5 +201,13 @@ class LinkedInIntegration extends SocialIntegration
             'publicProfileUrl' => ['type' => 'string', 'fieldName' => 'public-profile-url'],
             'emailAddress'     => ['type' => 'string', 'fieldName' => 'email-address'],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return LinkedInType::class;
     }
 }

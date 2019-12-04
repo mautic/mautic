@@ -13,11 +13,9 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter\LazyOpenCloud;
 use Gaufrette\Adapter\OpenStackCloudFiles\ObjectStoreFactory;
+use MauticPlugin\MauticCloudStorageBundle\Form\Type\RackspaceType;
 use OpenCloud\Rackspace;
 
-/**
- * Class RackspaceIntegration.
- */
 class RackspaceIntegration extends CloudStorageIntegration
 {
     /**
@@ -105,6 +103,14 @@ class RackspaceIntegration extends CloudStorageIntegration
         }
 
         return $this->adapter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        return RackspaceType::class;
     }
 
     /**

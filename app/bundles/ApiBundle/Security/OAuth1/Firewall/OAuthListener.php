@@ -12,7 +12,6 @@
 namespace Mautic\ApiBundle\Security\OAuth1\Firewall;
 
 use Bazinga\OAuthServerBundle\Security\Authentification\Token\OAuthToken;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -24,19 +23,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * @author William DURAND <william.durand1@gmail.com>
      *

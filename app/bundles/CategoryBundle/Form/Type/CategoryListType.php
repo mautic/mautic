@@ -15,10 +15,10 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -76,7 +76,7 @@ class CategoryListType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -119,7 +119,7 @@ class CategoryListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'category';
     }
@@ -129,6 +129,6 @@ class CategoryListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

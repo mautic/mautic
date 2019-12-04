@@ -11,15 +11,13 @@
 
 namespace Mautic\SmsBundle\Api;
 
-use Joomla\Http\Http;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 
 abstract class AbstractSmsApi
 {
     /**
-     * @var MauticFactory
+     * @var TrackableModel
      */
     protected $pageTrackableModel;
 

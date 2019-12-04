@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -90,7 +91,7 @@ abstract class AbstractFormStandardType extends AbstractType
         if (!$builder->has('category') && method_exists($options['data'], 'getCategory')) {
             $builder->add(
                 'category',
-                'category',
+                CategoryListType::class,
                 [
                     'bundle' => isset($options['category_bundle']) ? $options['category_bundle'] : 'global',
                 ]

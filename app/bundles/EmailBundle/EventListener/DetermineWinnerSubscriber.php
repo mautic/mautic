@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,25 +9,61 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Helper;
+namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class AbTestHelper
+class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param EntityManager       $em
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    {
+        $this->em         = $em;
+        $this->translator = $translator;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER         => ['onDetermineOpenRateWinner', 0],
+            EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER => ['onDetermineClickthroughRateWinner', 0],
+        ];
+    }
+
     /**
      * Determines the winner of A/B test based on open rate.
      *
-     * @param $factory
-     * @param $parent
-     * @param $children
-     *
-     * @return array
+     * @param DetermineWinnerEvent $event
      */
-    public static function determineOpenRateWinner($factory, $parent, $children)
+    public function onDetermineOpenRateWinner(DetermineWinnerEvent $event)
     {
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
+
         /** @var \Mautic\EmailBundle\Entity\StatRepository $repo */
-        $repo = $factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        $repo = $this->em->getRepository('MauticEmailBundle:Stat');
         /** @var Email $parent */
         $ids       = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
@@ -36,7 +72,8 @@ class AbTestHelper
             //get their bounce rates
             $counts = $repo->getOpenedRates($ids, $startDate);
 
-            $translator = $factory->getTranslator();
+            $translator = $this->translator;
+
             if ($counts) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
@@ -92,37 +129,39 @@ class AbTestHelper
                 //get the page ids with the most number of downloads
                 $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
-                return [
+                $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.openrate',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
-                ];
+                ]);
+
+                return;
             }
         }
 
-        return [
+        $event->setAbTestResults([
             'winners' => [],
             'support' => [],
             'basedOn' => 'email.openrate',
-        ];
+        ]);
     }
 
     /**
      * Determines the winner of A/B test based on clickthrough rates.
      *
-     * @param $factory
-     * @param $parent
-     * @param $children
-     *
-     * @return array
+     * @param DetermineWinnerEvent $event
      */
-    public static function determineClickthroughRateWinner($factory, $parent, $children)
+    public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event)
     {
+        $parameters = $event->getParameters();
+        $parent     = $parameters['parent'];
+        $children   = $parameters['children'];
+
         /** @var \Mautic\PageBundle\Entity\HitRepository $pageRepo */
-        $pageRepo = $factory->getEntityManager()->getRepository('MauticPageBundle:Hit');
+        $pageRepo = $this->em->getRepository('MauticPageBundle:Hit');
         /** @var \Mautic\EmailBundle\Entity\StatRepository $emailRepo */
-        $emailRepo = $factory->getEntityManager()->getRepository('MauticEmailBundle:Stat');
+        $emailRepo = $this->em->getRepository('MauticEmailBundle:Stat');
         /** @var Email $parent */
         $ids = $parent->getRelatedEntityIds();
 
@@ -132,7 +171,7 @@ class AbTestHelper
             $clickthroughCounts = $pageRepo->getEmailClickthroughHitCount($ids, $startDate);
             $sentCounts         = $emailRepo->getSentCounts($ids, $startDate);
 
-            $translator = $factory->getTranslator();
+            $translator = $this->translator;
             if ($clickthroughCounts) {
                 $rates      = $support      = $data      = [];
                 $hasResults = [];
@@ -151,9 +190,9 @@ class AbTestHelper
                     $name                = ($parentId === $id) ? $parent->getName() : $children[$id]->getName();
                     $support['labels'][] = $name.' ('.$rates[$id].'%)';
 
-                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][] = $count;
-                    $data[$translator->trans('mautic.email.abtest.label.opened')][]       = $sentCounts[$id];
-                    $hasResults[]                                                         = $id;
+                    $data[$translator->trans('mautic.email.abtest.label.clickthrough')][]     = $count;
+                    $data[$translator->trans('mautic.email.abtest.label.opened')][]           = $sentCounts[$id];
+                    $hasResults[]                                                             = $id;
                 }
 
                 if (!in_array($parent->getId(), $hasResults)) {
@@ -193,19 +232,21 @@ class AbTestHelper
                 //get the page ids with the most number of downloads
                 $winners = ($max > 0) ? array_keys($rates, $max) : [];
 
-                return [
+                $event->setAbTestResults([
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.clickthrough',
                     'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
-                ];
+                ]);
+
+                return;
             }
         }
 
-        return [
+        $event->setAbTestResults([
             'winners' => [],
             'support' => [],
             'basedOn' => 'email.clickthrough',
-        ];
+        ]);
     }
 }

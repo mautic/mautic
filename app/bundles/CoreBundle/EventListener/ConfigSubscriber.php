@@ -18,9 +18,6 @@ use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 
-/**
- * Class ConfigSubscriber.
- */
 class ConfigSubscriber extends CommonSubscriber
 {
     /**
@@ -34,8 +31,6 @@ class ConfigSubscriber extends CommonSubscriber
     protected $coreParametersHelper;
 
     /**
-     * ConfigSubscriber constructor.
-     *
      * @param LanguageHelper       $languageHelper
      * @param CoreParametersHelper $coreParametersHelper
      */
@@ -63,7 +58,8 @@ class ConfigSubscriber extends CommonSubscriber
         unset($coreParams['theme_import_allowed_extensions']);
         $event->addForm([
             'bundle'     => 'CoreBundle',
-            'formAlias'  => ConfigType::class,
+            'formType'   => ConfigType::class,
+            'formAlias'  => 'coreconfig',
             'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
             'parameters' => $coreParams,
         ]);

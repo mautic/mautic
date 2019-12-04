@@ -16,6 +16,8 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\Options;
@@ -65,7 +67,7 @@ class CategoryType extends AbstractType
                 $selected = $this->session->get('mautic.category.type', 'category');
                 $builder->add(
                     'bundle',
-                    'category_bundles_form',
+                    CategoryBundlesType::class,
                     [
                         'label'      => 'mautic.core.type',
                         'label_attr' => ['class' => 'control-label'],
@@ -78,7 +80,7 @@ class CategoryType extends AbstractType
                 // Create new category directly from another bundle - preset bundle
                 $builder->add(
                     'bundle',
-                    'hidden',
+                    HiddenType::class,
                     [
                         'data' => $options['bundle'],
                     ]
@@ -88,7 +90,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'title',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.title',
                 'label_attr' => ['class' => 'control-label'],
@@ -98,7 +100,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'description',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -109,7 +111,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -123,7 +125,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'color',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.color',
                 'label_attr' => ['class' => 'control-label'],
@@ -139,7 +141,7 @@ class CategoryType extends AbstractType
 
         $builder->add(
             'inForm',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -175,7 +177,7 @@ class CategoryType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'category_form';
     }

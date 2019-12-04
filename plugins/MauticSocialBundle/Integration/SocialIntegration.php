@@ -41,9 +41,10 @@ abstract class SocialIntegration extends AbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'features') {
-            $name = strtolower($this->getName());
-            if ($this->factory->serviceExists('mautic.form.type.social.'.$name)) {
-                $builder->add('shareButton', 'socialmedia_'.$name, [
+            $name     = strtolower($this->getName());
+            $formType = $this->getFormType();
+            if ($formType) {
+                $builder->add('shareButton', $formType, [
                     'label'    => 'mautic.integration.form.sharebutton',
                     'required' => false,
                     'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : [],
@@ -250,4 +251,11 @@ abstract class SocialIntegration extends AbstractIntegration
 
         return $accessToken;
     }
+
+    /**
+     * Returns form type.
+     *
+     * @return string|null
+     */
+    abstract public function getFormType();
 }

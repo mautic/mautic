@@ -52,7 +52,6 @@ class StageBuilderEvent extends Event
      *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to
      *                       change the configured stages or false to ignore the action
      *                       The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                       Mautic\CoreBundle\Factory\MauticFactory $factory
      *                       Mautic\LeadBundle\Entity\Lead $lead
      *                       $eventDetails - variable sent from firing function to call back function
      *                       array $action = array(

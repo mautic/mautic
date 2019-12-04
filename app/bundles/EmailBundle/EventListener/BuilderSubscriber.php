@@ -105,14 +105,14 @@ class BuilderSubscriber extends CommonSubscriber
             $openRate = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.open',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner',
+                'event'    => EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
             $clickThrough = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.clickthrough',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner',
+                'event'    => EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }

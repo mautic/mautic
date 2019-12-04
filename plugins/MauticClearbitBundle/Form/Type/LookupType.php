@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticClearbitBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class LookupType extends AbstractType
@@ -26,7 +27,7 @@ class LookupType extends AbstractType
     {
         $builder->add(
             'objectId',
-            'hidden',
+            HiddenType::class,
             [
                 'attr' => [
                     'value' => $options['data']['objectId'],
@@ -69,7 +70,7 @@ class LookupType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'clearbit_lookup';
     }
