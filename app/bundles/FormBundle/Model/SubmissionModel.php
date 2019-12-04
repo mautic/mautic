@@ -426,6 +426,9 @@ class SubmissionModel extends CommonFormModel
             return ['errors' => $validationErrors];
         }
 
+        // set results after uploader what can change file name if file name exists
+        $submissionEvent->setResults($submission->getResults());
+
         // Save the submission
         $this->saveEntity($submission);
         $this->fieldValueTransformer->transformValuesAfterSubmit($submissionEvent);
