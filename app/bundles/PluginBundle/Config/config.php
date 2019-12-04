@@ -111,11 +111,9 @@ return [
             ],
             'mautic.form.type.integration.fields' => [
                 'class'     => \Mautic\PluginBundle\Form\Type\FieldsType::class,
-                'arguments' => 'translator',
             ],
             'mautic.form.type.integration.company.fields' => [
                 'class'     => \Mautic\PluginBundle\Form\Type\CompanyFieldsType::class,
-                'arguments' => 'translator',
             ],
             'mautic.form.type.integration.keys' => [
                 'class' => \Mautic\PluginBundle\Form\Type\KeysType::class,

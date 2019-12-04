@@ -21,7 +21,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 trait FieldsTypeTrait
 {
@@ -31,6 +30,8 @@ trait FieldsTypeTrait
      * @param array                $integrationFields
      * @param array                $mauticFields
      * @param string               $fieldObject
+     * @param $limit
+     * @param $start
      */
     protected function buildFormFields(
         FormBuilderInterface $builder,
@@ -39,12 +40,11 @@ trait FieldsTypeTrait
         array $mauticFields,
         $fieldObject,
         $limit,
-        $start,
-        TranslatorInterface $translator
+        $start
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start, $translator) {
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
                 $form = $event->getForm();
                 $index = 0;
                 $choices = [];
@@ -52,6 +52,13 @@ trait FieldsTypeTrait
                 $optionalFields = [];
                 $group = [];
                 $fieldData = $event->getData();
+
+                foreach ($mauticFields as $key => $value) {
+                    if (is_array($mauticFields)) {
+                        $mauticFields[$key] = array_flip($value);
+                    }
+                }
+
                 // First loop to build options
                 foreach ($integrationFields as $field => $details) {
                     $groupName = '0default';
@@ -187,11 +194,11 @@ trait FieldsTypeTrait
                             ]
                         );
                     }
+
                     if (!$fieldObject) {
-                        $contactId['mauticContactId'] = $this->translator->trans('mautic.lead.report.contact_id');
-                        $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
-                        $isContactable['mauticContactIsContactableByEmail'] = $this->translator->trans('mautic.plugin.integration.contact.donotcontact.email');
-                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable, $contactId);
+                        $mauticFields['mautic.lead.report.contact_id'] = 'mauticContactId';
+                        $mauticFields['mautic.plugin.integration.contact.timeline.link'] = 'mauticContactTimelineLink';
+                        $mauticFields['mautic.plugin.integration.contact.donotcontact.email'] = 'mauticContactIsContactableByEmail';
                     }
 
                     $form->add(
