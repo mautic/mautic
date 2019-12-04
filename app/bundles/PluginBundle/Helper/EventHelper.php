@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\EventListener\PushToIntegrationTrait;
 
 /**
@@ -22,21 +22,20 @@ class EventHelper
     use PushToIntegrationTrait;
 
     /**
-     * @param $config
-     * @param                   $lead
-     * @param EntityManager     $em
-     * @param IntegrationHelper $integrationHelper
-     *
-     * @return bool
+     * @param               $lead
+     * @param MauticFactory $factory
      */
-    public static function pushLead($config, $lead, EntityManager $em, IntegrationHelper $integrationHelper)
+    public static function pushLead($config, $lead, MauticFactory $factory)
     {
-        $contact = $em->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+        $contact = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+
+        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
+        $integrationHelper = $factory->getHelper('integration');
 
         static::setStaticIntegrationHelper($integrationHelper);
-
         $errors  = [];
+        $success = static::pushIt($config, $contact, $errors);
 
-        return static::pushIt($config, $contact, $errors);
+        return $success;
     }
 }
