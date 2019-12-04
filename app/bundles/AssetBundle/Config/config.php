@@ -96,6 +96,7 @@ return [
                 'arguments' => [
                     'mautic.asset.helper.token',
                     'mautic.lead.model.lead',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.asset.leadbundle.subscriber' => [

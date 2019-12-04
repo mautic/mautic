@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
@@ -22,6 +21,8 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
  */
 class BuilderTokenHelper
 {
+    private $isConfigured = false;
+
     private $security;
     private $entityManager;
     private $connection;
@@ -34,19 +35,33 @@ class BuilderTokenHelper
     protected $bundleName         = null;
 
     /**
-     * @param MauticFactory $factory
-     * @param string        $modelName          Model name such as page
-     * @param string        $viewPermissionBase Permission base such as page:pages or null to generate from $modelName
-     * @param string        $bundleName         Bundle name such as MauticPageBundle or null to generate from $modelName
-     * @param null          $langVar            Language base for filter such as page.page or leave blank to use $modelName
+     * @param CorePermissions $security
+     * @param EntityManager   $entityManager
+     * @param Connection      $connection
+     * @param UserHelper      $userHelper
      */
-    public function __construct(CorePermissions $security, EntityManager $entityManager, Connection $connection, UserHelper $userHelper, $modelName, $viewPermissionBase = null, $bundleName = null, $langVar = null)
-    {
+    public function __construct(
+        CorePermissions $security,
+        EntityManager $entityManager,
+        Connection $connection,
+        UserHelper $userHelper
+    ) {
         $this->security      = $security;
         $this->entityManager = $entityManager;
         $this->connection    = $connection;
         $this->userHelper    = $userHelper;
+    }
 
+    /**
+     * This method must be called before the BuilderTokenHelper can be used.
+     *
+     * @param $modelName
+     * @param null $viewPermissionBase
+     * @param null $bundleName
+     * @param null $langVar
+     */
+    public function configure($modelName, $viewPermissionBase = null, $bundleName = null, $langVar = null)
+    {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
@@ -56,6 +71,8 @@ class BuilderTokenHelper
             $this->viewPermissionBase.':viewown',
             $this->viewPermissionBase.':viewother',
         ];
+
+        $this->isConfigured = true;
     }
 
     /**
@@ -66,6 +83,8 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
+     * @throws \Exception
+     *
      * @return array|void
      */
     public function getTokens(
@@ -75,6 +94,10 @@ class BuilderTokenHelper
         $valueColumn = 'id',
         CompositeExpression $expr = null
     ) {
+        if (!$this->isConfigured) {
+            throw new \Exception('You must call the "configure" method of this class first.');
+        }
+
         //set some permissions
         $permissions = $this->security->isGranted(
             $this->permissionSet,
@@ -133,24 +156,5 @@ class BuilderTokenHelper
     public function setPermissionSet(array $permissions)
     {
         $this->permissionSet = $permissions;
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @param $token
-     * @param $description
-     * @param $forPregReplace
-     *
-     * @return string
-     */
-    public static function getVisualTokenHtml($token, $description, $forPregReplace = false)
-    {
-        if ($forPregReplace) {
-            return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')
-            .'(.*?)'.preg_quote('**</strong>', '/');
-        }
-
-        return '<strong contenteditable="false" data-token="'.$token.'">**'.$description.'**</strong>';
     }
 }

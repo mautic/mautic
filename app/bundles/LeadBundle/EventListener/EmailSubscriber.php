@@ -12,7 +12,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -36,6 +36,19 @@ class EmailSubscriber extends CommonSubscriber
     private static $contactFieldRegex = '{contactfield=(.*?)}';
 
     /**
+     * @var BuilderTokenHelperFactory
+     */
+    protected $builderTokenHelperFactory;
+
+    /**
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
+     */
+    public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
+    {
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+    }
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
@@ -52,7 +65,7 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
+        $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
         $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 
