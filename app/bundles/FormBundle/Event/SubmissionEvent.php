@@ -85,6 +85,11 @@ class SubmissionEvent extends CommonEvent
     private $action;
 
     /**
+     * @var string
+     */
+    private $context;
+
+    /**
      * @var Request
      */
     private $request;
@@ -261,12 +266,18 @@ class SubmissionEvent extends CommonEvent
 
     public function checkContext(string $context): bool
     {
-        return $this->action->getType() === $context;
+        return $this->context === $context;
+    }
+
+    public function setContext(string $context): void
+    {
+        $this->context = $context;
     }
 
     public function setAction(?Action $action = null)
     {
         $this->action = $action;
+        $this->setContext($action->getType());
     }
 
     public function getAction(): ?Action
