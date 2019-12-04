@@ -288,7 +288,7 @@ class SubmissionEvent extends CommonEvent
     public function setPostSubmitCallback($key, array $callback)
     {
         if (!array_key_exists('eventName', $callback)) {
-            throw new \InvalidArgumentException('eventName or callback required');
+            throw new \InvalidArgumentException('eventName required');
         }
 
         $this->callbacks[$key] = $callback;

@@ -112,20 +112,8 @@ class PublicController extends CommonFormController
                         }
                     } elseif (!empty($result['callback'])) {
                         /** @var SubmissionEvent $submissionEvent */
-                        $submissionEvent = $result['callback'];
-
-                        // Return the first Response object if one is defined
-                        $firstResponseObject = false;
-                        if ($callbackResponses = $submissionEvent->getPostSubmitCallbackResponse()) {
-                            // Some submit actions already injected it's responses
-                            foreach ($callbackResponses as $key => $response) {
-                                if ($response instanceof Response) {
-                                    $firstResponseObject = $key;
-                                    break;
-                                }
-                            }
-                        }
-
+                        $submissionEvent   = $result['callback'];
+                        $callbackResponses = $submissionEvent->getPostSubmitCallbackResponse();
                         // These submit actions have requested a callback after all is said and done
                         $callbacksRequested = $submissionEvent->getPostSubmitCallback();
                         foreach ($callbacksRequested as $key => $callbackRequested) {
@@ -145,12 +133,6 @@ class PublicController extends CommonFormController
                                     return $submissionEvent->getPostSubmitResponse();
                                 }
                             }
-                        }
-
-                        if ($firstResponseObject && !$messengerMode && !$isAjax) {
-                            // Return the response given by the submit action
-
-                            return $callbackResponses[$firstResponseObject];
                         }
                     } elseif (isset($result['submission'])) {
                         /** @var SubmissionEvent $submissionEvent */
@@ -220,7 +202,6 @@ class PublicController extends CommonFormController
 
             if ($isAjax) {
                 // Post via ajax so return a json response
-
                 return new JsonResponse($data);
             } else {
                 $response = json_encode($data);
