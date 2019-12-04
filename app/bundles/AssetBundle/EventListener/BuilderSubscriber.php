@@ -14,7 +14,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -42,15 +42,22 @@ class BuilderSubscriber extends CommonSubscriber
     protected $leadModel;
 
     /**
+     * @var BuilderTokenHelperFactory
+     */
+    protected $builderTokenHelperFactory;
+
+    /**
      * BuilderSubscriber constructor.
      *
-     * @param TokenHelper $tokenHelper
-     * @param LeadModel   $leadModel
+     * @param TokenHelper               $tokenHelper
+     * @param LeadModel                 $leadModel
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
-    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel)
+    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel, BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
-        $this->tokenHelper = $tokenHelper;
-        $this->leadModel   = $leadModel;
+        $this->tokenHelper               = $tokenHelper;
+        $this->leadModel                 = $leadModel;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**
@@ -73,7 +80,7 @@ class BuilderSubscriber extends CommonSubscriber
     public function onBuilderBuild(BuilderEvent $event)
     {
         if ($event->tokensRequested($this->assetToken)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
             $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', false, true);
         }
     }

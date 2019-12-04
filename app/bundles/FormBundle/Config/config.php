@@ -185,6 +185,7 @@ return [
                 'class'     => PageSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.form.pointbundle.subscriber' => [
