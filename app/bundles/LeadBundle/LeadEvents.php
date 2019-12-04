@@ -564,15 +564,6 @@ final class LeadEvents
     const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
 
     /**
-     * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
-     *
-     * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.
-     *
-     * @var string
-     */
-    const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
-
-    /**
      * The mautic.clickthrough_contact_identification event is dispatched when a clickthrough array is parsed from a tracking
      * URL.
      *

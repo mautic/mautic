@@ -461,7 +461,7 @@ class SubmissionModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setActionConfig(null, []);
+            $submissionEvent->setAction(null);
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $submissionEvent);
@@ -776,13 +776,18 @@ class SubmissionModel extends CommonFormModel
      * Execute a form submit action.
      *
      * @param SubmissionEvent $event
-     *
-     * @throws ValidationException
      */
-    protected function executeFormActions(SubmissionEvent $event)
+    protected function executeFormActions(SubmissionEvent $event): void
     {
         $actions          = $event->getSubmission()->getForm()->getActions();
         $availableActions = $this->formModel->getCustomComponents()['actions'];
+
+        $actions->filter(function (Action $action) use ($availableActions) {
+            return array_key_exists($action->getType(), $availableActions);
+        })->map(function (Action $action) use ($event, $availableActions) {
+            $event->setAction($action);
+            $this->dispatcher->dispatch($availableActions[$action->getType()]['eventName'], $event);
+        });
 
         // @deprecated support for callback - to be removed in 3.0
         $args = [
@@ -796,61 +801,6 @@ class SubmissionModel extends CommonFormModel
             'feedback'   => [],
             'lead'       => $event->getSubmission()->getLead(),
         ];
-
-        foreach ($actions as $action) {
-            $key = $action->getType();
-            if (!isset($availableActions[$key])) {
-                continue;
-            }
-
-            $settings = $availableActions[$key];
-            if (isset($settings['eventName'])) {
-                $event->setActionConfig($key, $action->getProperties());
-                $this->dispatcher->dispatch($settings['eventName'], $event);
-
-                // @deprecated support for callback - to be removed in 3.0
-                $args['lead']     = $event->getSubmission()->getLead();
-                $args['feedback'] = $event->getActionFeedback();
-            } elseif (isset($settings['callback'])) {
-                // @deprecated support for callback - to be removed in 3.0; be sure to remove callback support from FormBuilderEvent as well
-
-                $args['action'] = $action;
-                $args['config'] = $action->getProperties();
-
-                // Set the lead each time in case an action updates it
-                $args['lead'] = $this->leadModel->getCurrentLead();
-
-                $callback = $settings['callback'];
-                if (is_callable($callback)) {
-                    if (is_array($callback)) {
-                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (false !== strpos($callback, '::')) {
-                        $parts      = explode('::', $callback);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $callback);
-                    }
-
-                    $pass = [];
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    $returned               = $reflection->invokeArgs($this, $pass);
-                    $args['feedback'][$key] = $returned;
-
-                    // Set these for updated plugins to leverage
-                    if (isset($returned['callback'])) {
-                        $event->setPostSubmitCallback($key, $returned);
-                    }
-
-                    $event->setActionFeedback($key, $returned);
-                }
-            }
-        }
     }
 
     /**

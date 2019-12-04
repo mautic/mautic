@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -78,6 +79,11 @@ class SubmissionEvent extends CommonEvent
     private $feedback = [];
 
     /**
+     * @var Action
+     */
+    private $action;
+
+    /**
      * Configuration for the action.
      *
      * @var array
@@ -87,9 +93,9 @@ class SubmissionEvent extends CommonEvent
     /**
      * Active action.
      *
-     * @var
+     * @var string
      */
-    private $action;
+    private $actionContext;
 
     /**
      * @var Request
@@ -252,7 +258,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function getActionFeedback($key = null)
     {
-        if (null == $key) {
+        if (null === $key) {
             return $this->feedback;
         } elseif (isset($this->feedback[$key])) {
             return $this->feedback[$key];
@@ -261,31 +267,24 @@ class SubmissionEvent extends CommonEvent
         return false;
     }
 
-    /**
-     * @param $action
-     *
-     * @return bool
-     */
-    public function checkContext($action)
+    public function checkContext(string $context): bool
     {
-        return $this->action === $action;
+        return $this->action->getType() === $context;
     }
 
-    /**
-     * @param array $config
-     */
-    public function setActionConfig($action, array $config)
+    public function setAction(?Action $action = null)
     {
-        $this->action       = $action;
-        $this->actionConfig = $config;
+        $this->action = $action;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getActionConfig()
+    public function getAction(): ?Action
     {
-        return $this->actionConfig;
+        return $this->action;
+    }
+
+    public function getActionConfig(): array
+    {
+        return $this->action ? $this->action->getProperties() : [];
     }
 
     /**
