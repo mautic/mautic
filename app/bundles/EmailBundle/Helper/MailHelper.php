@@ -749,7 +749,7 @@ class MailHelper
 
         // Parts (plaintext)
         $children = (array) $message->getChildren();
-        /** @var \Swift_Mime_MimeEntity $child */
+        /** @var \Swift_Mime_SimpleMimeEntity $child */
         foreach ($children as $child) {
             $childType  = $child->getContentType();
             list($type) = sscanf($childType, '%[^/]/%s');
@@ -933,7 +933,7 @@ class MailHelper
         if ($this->plainTextSet) {
             $children = (array) $this->message->getChildren();
 
-            /** @var \Swift_Mime_MimeEntity $child */
+            /** @var \Swift_Mime_SimpleMimeEntity $child */
             foreach ($children as $child) {
                 $childType = $child->getContentType();
                 if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
