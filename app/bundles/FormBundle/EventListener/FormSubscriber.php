@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -127,10 +128,12 @@ class FormSubscriber extends CommonSubscriber
      * Add a simple email form.
      *
      * @param Events\FormBuilderEvent $event
+     *
+     * @throws BadConfigurationException
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
-        $action = [
+        $event->addSubmitAction('form.email', [
             'group'              => 'mautic.email.actions',
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
@@ -141,11 +144,9 @@ class FormSubscriber extends CommonSubscriber
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
-        ];
+        ]);
 
-        $event->addSubmitAction('form.email', $action);
-
-        $action = [
+        $event->addSubmitAction('form.repost', [
             'group'              => 'mautic.form.actions',
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
@@ -158,9 +159,7 @@ class FormSubscriber extends CommonSubscriber
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
-        ];
-
-        $event->addSubmitAction('form.repost', $action);
+        ]);
     }
 
     /**
