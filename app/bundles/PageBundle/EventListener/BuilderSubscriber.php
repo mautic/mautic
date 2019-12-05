@@ -697,7 +697,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title');
         }
     }
 
@@ -708,7 +708,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $content      = $event->getContent();
         $plainText    = $event->getPlainText();
-        $clickthrough = ($event->shouldAppendClickthrough()) ? $event->generateClickthrough() : [];
+        $clickthrough = $event->shouldAppendClickthrough() ? $event->generateClickthrough() : [];
 
         $this->emailIsInternalSend = $event->isInternalSend();
         $this->emailEntity         = $event->getEmail();
