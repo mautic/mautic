@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd49081f09a81ae5af9fe1f67cf63f30",
+    "content-hash": "45613639249d77625a79c88344b0f235",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -7756,16 +7756,16 @@
         },
         {
             "name": "symfony/swiftmailer-bundle",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/swiftmailer-bundle.git",
-                "reference": "5410df3e67e0ce81a5b6eb367dabe529a2bdfbb4"
+                "reference": "5edfbd39eaefb176922a346c16b0ae3aaeec87e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/swiftmailer-bundle/zipball/5410df3e67e0ce81a5b6eb367dabe529a2bdfbb4",
-                "reference": "5410df3e67e0ce81a5b6eb367dabe529a2bdfbb4",
+                "url": "https://api.github.com/repos/symfony/swiftmailer-bundle/zipball/5edfbd39eaefb176922a346c16b0ae3aaeec87e0",
+                "reference": "5edfbd39eaefb176922a346c16b0ae3aaeec87e0",
                 "shasum": ""
             },
             "require": {
@@ -7811,7 +7811,7 @@
             ],
             "description": "Symfony SwiftmailerBundle",
             "homepage": "http://symfony.com",
-            "time": "2017-05-20T05:38:57+00:00"
+            "time": "2017-05-20T06:46:01+00:00"
         },
         {
             "name": "symfony/templating",

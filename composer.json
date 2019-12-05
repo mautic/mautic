@@ -52,7 +52,7 @@
         "symfony/framework-bundle": "~2.8",
         "symfony/monolog-bundle": "^3.3",
         "symfony/security-bundle": "^2.8.41",
-        "symfony/swiftmailer-bundle": "3.0.0",
+        "symfony/swiftmailer-bundle": "3.0.1",
 
         "symfony/doctrine-bridge": "~2.8",
         "symfony/monolog-bridge": "~2.8",
