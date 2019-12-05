@@ -957,7 +957,14 @@ return [
                 ],
             ],
             'mautic.core.model.form' => [
-                'class' => 'Mautic\CoreBundle\Model\FormModel',
+                'class'     => 'Mautic\CoreBundle\Model\FormModel',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.user',
+                    'mautic.helper.core_parameters',
+                    'translator',
+                    'monolog.logger',
+                ],
             ],
             /* @deprecated - 2.4 to be removed in 3.0; use mautic.channel.model.queue instead */
             'mautic.core.model.messagequeue' => [

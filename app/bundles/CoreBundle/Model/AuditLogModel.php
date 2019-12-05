@@ -43,6 +43,11 @@ class AuditLogModel extends AbstractCommonModel
      */
     protected $repository;
 
+    /**
+     * @param EntityManager       $em
+     * @param UserHelper          $userHelper
+     * @param TranslatorInterface $translator
+     */
     public function __construct(EntityManager $em, UserHelper $userHelper, TranslatorInterface $translator)
     {
         $this->em         = $em;

@@ -11,8 +11,15 @@
 
 namespace Mautic\CoreBundle\Model;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
+use Monolog\Logger;
+use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,6 +28,58 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class FormModel extends AbstractCommonModel
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
+     * @var CommonRepository
+     */
+    protected $repository;
+
+    /**
+     * @param EntityManager        $em
+     * @param UserHelper           $userHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param TranslatorInterface  $translator
+     * @param Logger               $logger
+     */
+    public function __construct(
+        EntityManager $em,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator,
+        Logger $logger
+    ) {
+        $this->em                   = $em;
+        $this->userHelper           = $userHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
+        $this->logger               = $logger;
+        $this->repository           = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
+    }
+
     /**
      * Lock an entity to prevent multiple people from editing.
      *
@@ -111,7 +170,7 @@ class FormModel extends AbstractCommonModel
         $this->setTimestamps($entity, $isNew, $unlock);
 
         $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-        $this->getRepository()->saveEntity($entity);
+        $this->repository->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, $isNew, $event);
     }
 
@@ -148,7 +207,7 @@ class FormModel extends AbstractCommonModel
             $this->setTimestamps($entity, $isNew, $unlock);
 
             $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            $this->getRepository()->saveEntity($entity, false);
+            $this->repository->saveEntity($entity, false);
             if (++$i % $batchSize === 0) {
                 $this->em->flush();
             }
@@ -217,7 +276,7 @@ class FormModel extends AbstractCommonModel
 
         //hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity, false);
-        $this->getRepository()->saveEntity($entity);
+        $this->repository->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, false, $event);
 
         return false;
@@ -286,7 +345,7 @@ class FormModel extends AbstractCommonModel
         //take note of ID before doctrine wipes it out
         $id    = $entity->getId();
         $event = $this->dispatchEvent('pre_delete', $entity);
-        $this->getRepository()->deleteEntity($entity);
+        $this->repository->deleteEntity($entity);
 
         //set the id for use in events
         $entity->deletedId = $id;
@@ -310,7 +369,7 @@ class FormModel extends AbstractCommonModel
             $entities[$id] = $entity;
             if ($entity !== null) {
                 $event = $this->dispatchEvent('pre_delete', $entity);
-                $this->getRepository()->deleteEntity($entity, false);
+                $this->repository->deleteEntity($entity, false);
                 //set the id for use in events
                 $entity->deletedId = $id;
                 $this->dispatchEvent('post_delete', $entity, false, $event);
