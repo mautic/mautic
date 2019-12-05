@@ -51,7 +51,7 @@ class EncryptionHelper
             $this->availableCiphers[] = $possibleCipher;
         }
 
-        if (!$this->availableCiphers || count($this->availableCiphers) === 0) {
+        if (!$this->availableCiphers || 0 === count($this->availableCiphers)) {
             throw new \RuntimeException('None of possible cryptography libraries is supported');
         }
 

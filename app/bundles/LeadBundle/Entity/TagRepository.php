@@ -82,7 +82,7 @@ class TagRepository extends CommonRepository
     public function removeMinusFromTags(array $tags)
     {
         return array_map(function ($val) {
-            return (strpos($val, '-') === 0) ? substr($val, 1) : $val;
+            return (0 === strpos($val, '-')) ? substr($val, 1) : $val;
         }, $tags);
     }
 

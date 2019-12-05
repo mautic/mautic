@@ -34,7 +34,7 @@ class FieldController extends CommonFormController
         $method  = $this->request->getMethod();
         $session = $this->get('session');
 
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $formField = $this->request->request->get('formfield');
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
@@ -66,7 +66,7 @@ class FieldController extends CommonFormController
         }
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -91,7 +91,7 @@ class FieldController extends CommonFormController
                     $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
-                    if ($formField['type'] == 'captcha') {
+                    if ('captcha' == $formField['type']) {
                         $formField['isRequired'] = !empty($formField['properties']['captcha']);
                     }
 
@@ -188,13 +188,13 @@ class FieldController extends CommonFormController
     {
         $session   = $this->get('session');
         $method    = $this->request->getMethod();
-        $formId    = ($method == 'POST') ? $this->request->request->get('formfield[formId]', '', true) : $this->request->query->get('formId');
+        $formId    = ('POST' == $method) ? $this->request->request->get('formfield[formId]', '', true) : $this->request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
         $valid     = $cancelled     = false;
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : [];
 
-        if ($formField !== null) {
+        if (null !== $formField) {
             $fieldType = $formField['type'];
 
             //ajax only for form fields
@@ -209,7 +209,7 @@ class FieldController extends CommonFormController
             $form = $this->getFieldForm($formId, $formField);
 
             //Check for a submitted form and process it
-            if ($method == 'POST') {
+            if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -224,7 +224,7 @@ class FieldController extends CommonFormController
                         //overwrite with updated data
                         $formField = array_merge($fields[$objectId], $formData);
 
-                        if (strpos($objectId, 'new') !== false) {
+                        if (false !== strpos($objectId, 'new')) {
                             // Get aliases in order to generate update for this one
                             $aliases = [];
                             foreach ($fields as $k => $f) {
@@ -236,7 +236,7 @@ class FieldController extends CommonFormController
                         }
 
                         // Force required for captcha if not a honeypot
-                        if ($formField['type'] == 'captcha') {
+                        if ('captcha' == $formField['type']) {
                             $formField['isRequired'] = !empty($formField['properties']['captcha']);
                         }
 
@@ -349,7 +349,7 @@ class FieldController extends CommonFormController
 
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $formField !== null) {
+        if ('POST' == $this->request->getMethod() && null !== $formField) {
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
 
             // Allow to select the lead field from the delete field again

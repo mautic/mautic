@@ -243,7 +243,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         // Ensure that list emails are published
-        if ($entity->getEmailType() == 'list') {
+        if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
             /** @var Email $translationParent */
             if ($translationParent = $entity->getTranslationParent()) {
@@ -279,7 +279,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->postTranslationEntitySave($entity);
 
             // Force translations for this entity to use the same segments
-            if ($entity->getEmailType() == 'list' && $entity->hasTranslations()) {
+            if ('list' == $entity->getEmailType() && $entity->hasTranslations()) {
                 $translations                      = $entity->getTranslationChildren()->toArray();
                 $this->updatingTranslationChildren = true;
                 foreach ($translations as $translation) {
@@ -321,7 +321,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if (++$i % $batchSize === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->em->flush();
             }
         }
@@ -369,16 +369,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $id
      *
-     * @return null|Email
+     * @return Email|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Email();
             $entity->setSessionId('new_'.hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
-            if ($entity !== null) {
+            if (null !== $entity) {
                 $entity->setSessionId($entity->getId());
             }
         }
@@ -401,11 +401,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
             $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
 
-            if ($queued !== false) {
+            if (false !== $queued) {
                 $entity->setQueuedCount($queued);
             }
 
-            if ($pending !== false) {
+            if (false !== $pending) {
                 $entity->setPendingCount($pending);
             }
         }
@@ -561,9 +561,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
-     * @param null|Email   $email
+     * @param Email|null   $email
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param null|string  $tokenFilter
+     * @param string|null  $tokenFilter
      *
      * @return array
      */
@@ -616,7 +616,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 'contact_id'    => $stat['lead_id'],
                 'contact_email' => $stat['email_address'],
                 'open'          => $stat['is_read'],
-                'click'         => ($stat['link_hits'] !== null) ? $stat['link_hits'] : 0,
+                'click'         => (null !== $stat['link_hits']) ? $stat['link_hits'] : 0,
                 'links_clicked' => [],
                 'email_id'      => (string) $stat['email_id'],
                 'email_name'    => (string) $stat['email_name'],
@@ -1075,7 +1075,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         foreach ($lists as $list) {
-            if (!$batch && $limit !== null && $limit <= 0) {
+            if (!$batch && null !== $limit && $limit <= 0) {
                 // Hit the max for this batch
                 break;
             }
@@ -1087,7 +1087,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             while ($leadCount) {
                 $sentCount += $leadCount;
 
-                if (!$batch && $limit != null) {
+                if (!$batch && null != $limit) {
                     // Only retrieve the difference between what has already been sent and the limit
                     $limit -= $leadCount;
                 }
@@ -1609,7 +1609,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             if (!isset($user['email'])) {
                 $userEntity = $this->userModel->getEntity($id);
 
-                if ($userEntity === null) {
+                if (null === $userEntity) {
                     continue;
                 }
 
@@ -1894,7 +1894,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chart      = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query      = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || !$flag || in_array('sent', $datasets)) {
+        if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'sent_and_opened' == $flag || !$flag || in_array('sent', $datasets)) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1906,7 +1906,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.email.sent.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'sent_and_opened' || $flag == 'opened' || in_array('opened', $datasets)) {
+        if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'sent_and_opened' == $flag || 'opened' == $flag || in_array('opened', $datasets)) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_read', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1918,7 +1918,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.email.read.emails'), $data);
         }
 
-        if ($flag == 'sent_and_opened_and_failed' || $flag == 'all' || $flag == 'failed' || in_array('failed', $datasets)) {
+        if ('sent_and_opened_and_failed' == $flag || 'all' == $flag || 'failed' == $flag || in_array('failed', $datasets)) {
             $q = $query->prepareTimeDataQuery('email_stats', 'date_sent', $filter);
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -1932,10 +1932,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.email.failed.emails'), $data);
         }
 
-        if ($flag == 'all' || $flag == 'clicked' || in_array('clicked', $datasets)) {
+        if ('all' == $flag || 'clicked' == $flag || in_array('clicked', $datasets)) {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', []);
 
-            if ($segmentId !== null) {
+            if (null !== $segmentId) {
                 $q->innerJoin('t', '(SELECT DISTINCT email_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'email_stats WHERE list_id = :segmentId)', 'es', 't.source_id = es.email_id');
                 $q->setParameter('segmentId', $segmentId);
             }
@@ -1964,12 +1964,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.email.clicked'), $data);
         }
 
-        if ($flag == 'all' || $flag == 'unsubscribed' || in_array('unsubscribed', $datasets)) {
+        if ('all' == $flag || 'unsubscribed' == $flag || in_array('unsubscribed', $datasets)) {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::UNSUBSCRIBED, $canViewOthers, $companyId, $campaignId, $segmentId);
             $chart->setDataset($this->translator->trans('mautic.email.unsubscribed'), $data);
         }
 
-        if ($flag == 'all' || $flag == 'bounced' || in_array('bounced', $datasets)) {
+        if ('all' == $flag || 'bounced' == $flag || in_array('bounced', $datasets)) {
             $data = $this->getDncLineChartDataset($query, $filter, DoNotContact::BOUNCED, $canViewOthers, $companyId, $campaignId, $segmentId);
             $chart->setDataset($this->translator->trans('mautic.email.bounced'), $data);
         }
@@ -2197,11 +2197,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
 
-        if (isset($options['groupBy']) && $options['groupBy'] == 'sends') {
+        if (isset($options['groupBy']) && 'sends' == $options['groupBy']) {
             $chartQuery->applyDateFilters($q, 'date_sent');
         }
 
-        if (isset($options['groupBy']) && $options['groupBy'] == 'reads') {
+        if (isset($options['groupBy']) && 'reads' == $options['groupBy']) {
             $chartQuery->applyDateFilters($q, 'date_read');
         }
 

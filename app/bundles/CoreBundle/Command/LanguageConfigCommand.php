@@ -101,7 +101,7 @@ EOT
         $string .= "\$config = array(\n";
 
         foreach ($data as $key => $value) {
-            if ($value !== '') {
+            if ('' !== $value) {
                 if (is_string($value)) {
                     $value = "'$value'";
                 } elseif (is_bool($value)) {

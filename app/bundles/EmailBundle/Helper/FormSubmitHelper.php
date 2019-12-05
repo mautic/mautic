@@ -37,7 +37,7 @@ class FormSubmitHelper
         $leadModel = $factory->getModel('lead');
 
         //make sure the email still exists and is published
-        if ($email != null && $email->isPublished()) {
+        if (null != $email && $email->isPublished()) {
             // Deal with Lead email
             if (!empty($feedback['lead.create']['lead'])) {
                 //the lead was just created via the lead.create action

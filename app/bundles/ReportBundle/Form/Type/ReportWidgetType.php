@@ -12,7 +12,6 @@
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\Serializer;
-use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

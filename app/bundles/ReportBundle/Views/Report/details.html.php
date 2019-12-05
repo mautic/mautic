@@ -13,9 +13,9 @@ $header = $view['translator']->trans(
     ['%name%' => $view->escape($view['translator']->trans($report->getName()))]
 );
 
-if ($tmpl == 'index') {
-    $showDynamicFilters  = (!empty($report->getSettings()['showDynamicFilters']) === true);
-    $hideDateRangeFilter = (!empty($report->getSettings()['hideDateRangeFilter']) === true);
+if ('index' == $tmpl) {
+    $showDynamicFilters  = (true === !empty($report->getSettings()['showDynamicFilters']));
+    $hideDateRangeFilter = (true === !empty($report->getSettings()['hideDateRangeFilter']));
 
     $view->extend('MauticCoreBundle:Default:content.html.php');
     $view['slots']->set('mauticContent', 'report');
@@ -138,7 +138,7 @@ if ($tmpl == 'index') {
                     </div>
                     <?php $view['form']->start($dynamicFilterForm); ?>
                     <?php foreach ($dynamicFilterForm->children as $filter): ?>
-                    <?php if ($filter->vars['block_prefixes'][1] == 'hidden') {
+                    <?php if ('hidden' == $filter->vars['block_prefixes'][1]) {
                         continue;
                     } ?>
                     <div class="col-sm-4">

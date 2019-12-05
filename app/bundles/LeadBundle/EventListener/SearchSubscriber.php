@@ -84,7 +84,7 @@ class SearchSubscriber extends CommonSubscriber
         $filter    = ['string' => $str, 'force' => ''];
 
         //only show results that are not anonymous so as to not clutter up things
-        if (strpos($str, "$anonymous") === false) {
+        if (false === strpos($str, "$anonymous")) {
             $filter['force'] = " !$anonymous";
         }
 

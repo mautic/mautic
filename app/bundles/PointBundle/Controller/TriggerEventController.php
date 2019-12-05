@@ -32,7 +32,7 @@ class TriggerEventController extends CommonFormController
         $method  = $this->request->getMethod();
         $session = $this->get('session');
 
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $triggerEvent = $this->request->request->get('pointtriggerevent');
             $eventType    = $triggerEvent['type'];
             $triggerId    = $triggerEvent['triggerId'];
@@ -67,7 +67,7 @@ class TriggerEventController extends CommonFormController
         $triggerEvent['settings'] = $events[$eventType];
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -153,13 +153,13 @@ class TriggerEventController extends CommonFormController
     {
         $session      = $this->get('session');
         $method       = $this->request->getMethod();
-        $triggerId    = ($method == 'POST') ? $this->request->request->get('pointtriggerevent[triggerId]', '', true) : $this->request->query->get('triggerId');
+        $triggerId    = ('POST' == $method) ? $this->request->request->get('pointtriggerevent[triggerId]', '', true) : $this->request->query->get('triggerId');
         $events       = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $success      = 0;
         $valid        = $cancelled        = false;
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
-        if ($triggerEvent !== null) {
+        if (null !== $triggerEvent) {
             $eventType = $triggerEvent['type'];
 
             $events                   = $this->getModel('point.trigger')->getEvents();
@@ -182,7 +182,7 @@ class TriggerEventController extends CommonFormController
             ]);
             $form->get('triggerId')->setData($triggerId);
             //Check for a submitted form and process it
-            if ($method == 'POST') {
+            if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -291,7 +291,7 @@ class TriggerEventController extends CommonFormController
 
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $triggerEvent !== null) {
+        if ('POST' == $this->request->getMethod() && null !== $triggerEvent) {
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
@@ -354,7 +354,7 @@ class TriggerEventController extends CommonFormController
 
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $triggerEvent !== null) {
+        if ('POST' == $this->request->getMethod() && null !== $triggerEvent) {
             //add the field to the delete list
             if (in_array($objectId, $delete)) {
                 $key = array_search($objectId, $delete);

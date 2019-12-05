@@ -138,7 +138,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $queryBuilder = $this->configureBuilder($options);
 
-        if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
+        if (QueryBuilder::SELECT !== $queryBuilder->getType()) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -200,7 +200,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'like':
                             case 'notLike':
                             case 'contains':
-                                if ($condition === 'notLike') {
+                                if ('notLike' === $condition) {
                                     $dynamicFilter['expr'] = 'notLike';
                                 }
 
@@ -339,7 +339,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Replace {{count}} with the count query
         array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
-            if (strpos($columnValue, '{{count}}') !== false) {
+            if (false !== strpos($columnValue, '{{count}}')) {
                 $columnValue = str_replace('{{count}}', $countSql, $columnValue);
             }
         });
@@ -360,7 +360,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
 
-                if ($aggregator['function'] === 'AVG') {
+                if ('AVG' === $aggregator['function']) {
                     $selectText = sprintf('ROUND(%s)', $selectText);
                 }
 
@@ -411,7 +411,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
-                if (array_key_exists('glue', $filter) && $filter['glue'] === 'or') {
+                if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
                     if ($groupExpr->count()) {
                         $groups[]  = $groupExpr;
                         $groupExpr = $queryBuilder->expr()->andX();
@@ -436,7 +436,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         );
                         break;
                     default:
-                        if (trim($filter['value']) == '') {
+                        if ('' == trim($filter['value'])) {
                             // Ignore empty
                             break;
                         }
@@ -504,7 +504,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $groups[] = $groupExpr;
         }
 
-        if (count($groups) === 1) {
+        if (1 === count($groups)) {
             // Only one andX expression
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {

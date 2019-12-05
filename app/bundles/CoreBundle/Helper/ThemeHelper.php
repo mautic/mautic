@@ -133,7 +133,7 @@ class ThemeHelper
      */
     public function createThemeHelper($themeName)
     {
-        if ($themeName === 'current') {
+        if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
         }
 
@@ -420,11 +420,11 @@ class ThemeHelper
      */
     public function install($zipFile)
     {
-        if (file_exists($zipFile) === false) {
+        if (false === file_exists($zipFile)) {
             throw new MauticException\FileNotFoundException();
         }
 
-        if (class_exists('ZipArchive') === false) {
+        if (false === class_exists('ZipArchive')) {
             throw new \Exception('mautic.core.ziparchive.not.installed');
         }
 
@@ -440,7 +440,7 @@ class ThemeHelper
         $zipper    = new \ZipArchive();
         $archive   = $zipper->open($zipFile);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
         }
 
@@ -452,7 +452,7 @@ class ThemeHelper
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
             $entry = $zipper->getNameIndex($i);
-            if (strpos($entry, '/') === 0) {
+            if (0 === strpos($entry, '/')) {
                 $entry = substr($entry, 1);
             }
 
@@ -566,7 +566,7 @@ class ThemeHelper
 
         $finder->files()->in($themePath);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             throw new \Exception($this->getExtractError($archive));
         } else {
             foreach ($finder as $file) {

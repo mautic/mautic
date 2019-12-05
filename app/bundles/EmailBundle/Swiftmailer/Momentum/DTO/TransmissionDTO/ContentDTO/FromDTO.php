@@ -56,7 +56,7 @@ final class FromDTO implements \JsonSerializable
         $json = [
             'email' => $this->email,
         ];
-        if ($this->name !== null) {
+        if (null !== $this->name) {
             $json['name'] = $this->name;
         }
 

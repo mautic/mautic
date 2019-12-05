@@ -64,7 +64,7 @@ class InstallController extends CommonController
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));
         }
 
-        if (strpos($index, '.') !== false) {
+        if (false !== strpos($index, '.')) {
             list($index, $subIndex) = explode('.', $index);
         }
 
@@ -388,7 +388,7 @@ class InstallController extends CommonController
             $existingUser = null;
         }
 
-        if ($existingUser != null) {
+        if (null != $existingUser) {
             $user = $existingUser;
         } else {
             $user = new User();

@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -58,13 +59,13 @@
                             $destColor = $destTransparentColor;
                         } else {
                             $maskRGB = $mask->getRGBAt($mx, $my);
-                            if ($maskRGB['red'] == 0) {
+                            if (0 == $maskRGB['red']) {
                                 $destColor = $destTransparentColor;
                             } elseif ($srcColor >= 0) {
                                 $imageRGB          = $image->getRGBAt($x, $y);
                                 $level             = ($maskRGB['red'] / 255) * (1 - $imageRGB['alpha'] / 127);
                                 $imageRGB['alpha'] = 127 - round($level * 127);
-                                if ($imageRGB['alpha'] == 127) {
+                                if (127 == $imageRGB['alpha']) {
                                     $destColor = $destTransparentColor;
                                 } else {
                                     $destColor = $result->allocateColorAlpha($imageRGB);

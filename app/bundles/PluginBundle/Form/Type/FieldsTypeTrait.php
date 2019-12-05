@@ -73,7 +73,7 @@ trait FieldsTypeTrait
                         $optionalFields[$groupName] = [];
                     }
 
-                    if (is_array($details) && (!empty($details['required']) || $choices[$field] == 'Email')) {
+                    if (is_array($details) && (!empty($details['required']) || 'Email' == $choices[$field])) {
                         $requiredFields[$groupName][$field] = $details;
                     } else {
                         $optionalFields[$groupName][$field] = $details;
@@ -113,7 +113,7 @@ trait FieldsTypeTrait
                 }
 
                 // Ensure that fields aren't hidden
-                if ($start > count($fields) || $options['page'] == 0) {
+                if ($start > count($fields) || 0 == $options['page']) {
                     $start = 0;
                 }
 
@@ -128,7 +128,7 @@ trait FieldsTypeTrait
 
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$fieldsName][$field]);
-                    $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
+                    $required = (int) (!empty($integrationFields[$field]['required']) || 'Email' == $choices[$field]);
                     ++$index;
                     $form->add(
                         'label_'.$index,

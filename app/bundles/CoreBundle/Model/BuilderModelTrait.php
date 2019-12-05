@@ -25,7 +25,7 @@ trait BuilderModelTrait
      */
     public function getCommonBuilderComponents($requestedComponents, BuilderEvent $event)
     {
-        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
+        $singleComponent = (!is_array($requestedComponents) && 'all' != $requestedComponents);
         $components      = [];
 
         if (!is_array($requestedComponents)) {

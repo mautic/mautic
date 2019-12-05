@@ -129,7 +129,7 @@ class RoleModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Role();
         }
 

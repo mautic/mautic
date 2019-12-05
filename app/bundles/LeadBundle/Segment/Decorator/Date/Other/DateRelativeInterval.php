@@ -51,7 +51,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -75,10 +75,10 @@ class DateRelativeInterval implements FilterDecoratorInterface
      */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        if ($contactSegmentFilterCrate->getOperator() === '=') {
+        if ('=' === $contactSegmentFilterCrate->getOperator()) {
             return 'like';
         }
-        if ($contactSegmentFilterCrate->getOperator() === '!=') {
+        if ('!=' === $contactSegmentFilterCrate->getOperator()) {
             return 'notLike';
         }
 
@@ -99,7 +99,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return array|bool|float|null|string
+     * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -108,7 +108,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
-        if ($operator === 'like' || $operator === 'notLike') {
+        if ('like' === $operator || 'notLike' === $operator) {
             $format .= '%';
         }
 
@@ -138,7 +138,7 @@ class DateRelativeInterval implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

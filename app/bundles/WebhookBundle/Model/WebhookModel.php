@@ -152,7 +152,7 @@ class WebhookModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Webhook();
         }
 
@@ -324,7 +324,7 @@ class WebhookModel extends FormModel
             // throw an error exception if we don't get a 200 back
             if ($response->code >= 300 || $response->code < 200) {
                 // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
-                if ($response->code == 410) {
+                if (410 == $response->code) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
@@ -388,7 +388,7 @@ class WebhookModel extends FormModel
         $successRadio = $this->getLogRepository()->getSuccessVsErrorStatusCodeRatio($webhook->getId(), $this->disableLimit);
 
         // If there are no log rows yet, consider it healthy
-        if ($successRadio === null) {
+        if (null === $successRadio) {
             return false;
         }
 
@@ -496,7 +496,7 @@ class WebhookModel extends FormModel
 
         $payload = [];
 
-        if ($this->queueMode === self::COMMAND_PROCESS) {
+        if (self::COMMAND_PROCESS === $this->queueMode) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
             $queuesArray = [isset($queue) ? [$queue] : []];

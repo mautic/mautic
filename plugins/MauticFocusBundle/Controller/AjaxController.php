@@ -44,7 +44,7 @@ class AjaxController extends CommonAjaxController
                 $http     = $this->get('mautic.http.connector');
                 $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);
 
-                if ($response->code === 200) {
+                if (200 === $response->code) {
                     $package = json_decode($response->body, true);
                     if (isset($package['images'])) {
                         $data['image']['desktop'] = $package['images']['desktop'];

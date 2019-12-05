@@ -190,7 +190,7 @@ abstract class AbstractCommonModel
     {
         static $commonRepo;
 
-        if ($commonRepo === null) {
+        if (null === $commonRepo) {
             $commonRepo = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
         }
 
@@ -234,7 +234,7 @@ abstract class AbstractCommonModel
      *
      * @param int|array id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
@@ -312,12 +312,12 @@ abstract class AbstractCommonModel
         $locales   = Intl::getLocaleBundle()->getLocaleNames();
 
         switch (true) {
-            case $slugCount === 3:
+            case 3 === $slugCount:
                 list($lang, $category, $idSlug) = $slugs;
 
                 break;
 
-            case $slugCount === 2:
+            case 2 === $slugCount:
                 list($category, $idSlug) = $slugs;
 
                 // Check if the first slug is actually a locale
@@ -328,7 +328,7 @@ abstract class AbstractCommonModel
 
                 break;
 
-            case $slugCount === 1:
+            case 1 === $slugCount:
                 $idSlug = $slugs[0];
 
                 break;
@@ -346,9 +346,9 @@ abstract class AbstractCommonModel
         }
 
         $entity = false;
-        if (strpos($idSlug, ':') !== false) {
+        if (false !== strpos($idSlug, ':')) {
             $parts = explode(':', $idSlug);
-            if (count($parts) == 2) {
+            if (2 == count($parts)) {
                 $entity = $this->getEntity($parts[0]);
             }
         } else {
@@ -366,7 +366,7 @@ abstract class AbstractCommonModel
     /**
      * @param $alias
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {

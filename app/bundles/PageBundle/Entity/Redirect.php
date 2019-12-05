@@ -136,7 +136,7 @@ class Redirect extends FormEntity
      */
     public function setRedirectId($redirectId = null)
     {
-        if ($redirectId === null) {
+        if (null === $redirectId) {
             $redirectId = substr(hash('sha1', uniqid(mt_rand())), 0, 25);
         }
         $this->redirectId = $redirectId;

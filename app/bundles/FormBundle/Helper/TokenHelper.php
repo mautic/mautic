@@ -61,7 +61,7 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
+                if (null !== $form &&
                     (
                         $form->isPublished(false) ||
                         $this->security->hasEntityAccess(

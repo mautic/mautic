@@ -70,7 +70,7 @@ class PointSubscriber extends CommonSubscriber
     {
         $asset = $event->getRecord()->getAsset();
 
-        if ($asset !== null) {
+        if (null !== $asset) {
             $this->pointModel->triggerAction('asset.download', $asset);
         }
     }

@@ -160,7 +160,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.function.simplexml';
         }
 
-        if ($this->openSSLCipher->isSupported() === false) {
+        if (false === $this->openSSLCipher->isSupported()) {
             $messages[] = 'mautic.install.extension.openssl';
         }
 
@@ -259,7 +259,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.imap';
         }
 
-        if (substr($this->site_url, 0, 5) !== 'https') {
+        if ('https' !== substr($this->site_url, 0, 5)) {
             $messages[] = 'mautic.install.ssl.certificate';
         }
 
@@ -355,7 +355,7 @@ class CheckStep implements StepInterface
     {
         $val = trim($val);
 
-        if ($val == -1) {
+        if (-1 == $val) {
             return PHP_INT_MAX;
         }
 
@@ -366,8 +366,10 @@ class CheckStep implements StepInterface
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
                 $val *= 1024;
+                // no break
             case 'm':
                 $val *= 1024;
+                // no break
             case 'k':
                 $val *= 1024;
         }

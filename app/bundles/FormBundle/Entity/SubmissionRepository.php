@@ -180,13 +180,13 @@ class SubmissionRepository extends CommonRepository
      *
      * @param int $id
      *
-     * @return null|Submission
+     * @return Submission|null
      */
     public function getEntity($id = 0)
     {
         $entity = parent::getEntity($id);
 
-        if ($entity != null) {
+        if (null != $entity) {
             $form = $entity->getForm();
 
             //use DBAL to get entity fields
@@ -210,7 +210,7 @@ class SubmissionRepository extends CommonRepository
      */
     public function getFilterExpr(&$q, $filter, $parameterName = null)
     {
-        if ($filter['column'] == 's.date_submitted') {
+        if ('s.date_submitted' == $filter['column']) {
             $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
@@ -338,7 +338,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('page', (int) $pageId);
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
                 ->setParameter('date', $dh->toUtcString());
@@ -375,7 +375,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('id', (int) $emailId);
         }
 
-        if ($fromDate != null) {
+        if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
             $q->andWhere($q->expr()->gte('s.date_submitted', ':date'))
                 ->setParameter('date', $dh->toUtcString());

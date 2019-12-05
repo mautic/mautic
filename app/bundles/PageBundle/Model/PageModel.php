@@ -285,16 +285,16 @@ class PageModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return null|Page
+     * @return Page|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Page();
             $entity->setSessionId('new_'.hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
-            if ($entity !== null) {
+            if (null !== $entity) {
                 $entity->setSessionId($entity->getId());
             }
         }
@@ -381,7 +381,7 @@ class PageModel extends FormModel
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
-        if ($parent != null) {
+        if (null != $parent) {
             $entity = $parent;
         }
 
@@ -573,7 +573,7 @@ class PageModel extends FormModel
         $clickthrough = $this->generateClickThrough($hit);
         if (!empty($clickthrough)) {
             if (!empty($clickthrough['channel'])) {
-                if (count($clickthrough['channel']) === 1) {
+                if (1 === count($clickthrough['channel'])) {
                     $channelId = reset($clickthrough['channel']);
                     $channel   = key($clickthrough['channel']);
                 } else {
@@ -709,7 +709,7 @@ class PageModel extends FormModel
             }
 
             foreach ($query as $key => $value) {
-                if (strpos($key, 'utm_') !== false) {
+                if (false !== strpos($key, 'utm_')) {
                     $queryHasUtmTags = true;
                     break;
                 }
@@ -752,7 +752,7 @@ class PageModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = strpos(';q=', $l) !== false) {
+                if ($pos = false !== strpos(';q=', $l)) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
@@ -783,7 +783,7 @@ class PageModel extends FormModel
 
     /**
      * @param Request            $request
-     * @param null|Redirect|Page $page
+     * @param Redirect|Page|null $page
      *
      * @return array
      */
@@ -808,9 +808,9 @@ class PageModel extends FormModel
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
-     * @param null|Page    $page
+     * @param Page|null    $page
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param null|string  $tokenFilter
+     * @param string|null  $tokenFilter
      *
      * @return array
      */
@@ -871,7 +871,7 @@ class PageModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag == 'total_and_unique') {
+        if (!$flag || 'total_and_unique' == $flag) {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
 
             if (!$canViewOthers) {
@@ -882,7 +882,7 @@ class PageModel extends FormModel
             $chart->setDataset($this->translator->trans('mautic.page.show.total.visits'), $data);
         }
 
-        if ($flag == 'unique' || $flag == 'total_and_unique') {
+        if ('unique' == $flag || 'total_and_unique' == $flag) {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
 
             if (!$canViewOthers) {
@@ -1125,13 +1125,13 @@ class PageModel extends FormModel
 
         // Use the current URL
         $isPageEvent = false;
-        if (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker')) !== false) {
+        if (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors')) !== false) {
+        } elseif (false !== strpos($request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }
@@ -1187,7 +1187,7 @@ class PageModel extends FormModel
         }
 
         $pageURL = 'http';
-        if ($request->server->get('HTTPS') == 'on') {
+        if ('on' == $request->server->get('HTTPS')) {
             $pageURL .= 's';
         }
         $pageURL .= '://';

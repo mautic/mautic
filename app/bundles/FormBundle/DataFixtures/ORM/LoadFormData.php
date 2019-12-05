@@ -53,7 +53,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
             $form = new Form();
             $key  = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
 
                     if (in_array($col, ['dateAdded'])) {
@@ -77,7 +77,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
         foreach ($fields as $count => $rows) {
             $field = new Field();
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
 
                     if (in_array($col, ['form'])) {
@@ -101,14 +101,14 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
         foreach ($actions as $count => $rows) {
             $action = new Action();
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
 
                     if (in_array($col, ['form'])) {
                         $action->$setter($this->getReference('form-'.$val));
                     } elseif (in_array($col, ['properties'])) {
                         $val = Serializer::decode(stripslashes($val));
-                        if ($col == 'settings') {
+                        if ('settings' == $col) {
                             $val['callback'] = stripslashes($val['callback']);
                         }
 

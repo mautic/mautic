@@ -52,11 +52,11 @@ class RouterSubscriber implements EventSubscriberInterface
      * RouterSubscriber constructor.
      *
      * @param RouterInterface $router
-     * @param null|string     $scheme
-     * @param null|string     $host
-     * @param null|string     $httpsPort
-     * @param null|string     $httpPort
-     * @param null|string     $baseUrl
+     * @param string|null     $scheme
+     * @param string|null     $host
+     * @param string|null     $httpsPort
+     * @param string|null     $httpPort
+     * @param string|null     $baseUrl
      */
     public function __construct(RouterInterface $router, $scheme, $host, $httpsPort, $httpPort, $baseUrl)
     {
@@ -102,7 +102,7 @@ class RouterSubscriber implements EventSubscriberInterface
         }
 
         // Append index_dev.php for installations at the root level
-        if ('dev' === MAUTIC_ENV && strpos($this->baseUrl, 'index_dev.php') === false) {
+        if ('dev' === MAUTIC_ENV && false === strpos($this->baseUrl, 'index_dev.php')) {
             $this->baseUrl = $this->baseUrl.'/index_dev.php';
         }
 

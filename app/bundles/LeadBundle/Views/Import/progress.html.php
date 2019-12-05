@@ -18,7 +18,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.impor
 $percent    = $progress->toPercent();
 $id         = ($complete) ? 'leadImportProgressComplete' : 'leadImportProgress';
 $header     = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave';
-$indexRoute = $object === 'contacts' ? 'mautic_contact_index' : 'mautic_company_index';
+$indexRoute = 'contacts' === $object ? 'mautic_contact_index' : 'mautic_company_index';
 ?>
 
 <div class="row ma-lg" id="<?php echo $id; ?>">

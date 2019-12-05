@@ -104,7 +104,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->setParameter('campaign', $campaignId);
 
-        if ($eventId != null) {
+        if (null != $eventId) {
             $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('el.id')
                 ->from('MauticCampaignBundle:LeadEventLog', 'ell')
@@ -611,7 +611,7 @@ class LeadRepository extends CommonRepository
      */
     private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
     {
-        if (count($segments) === 0) {
+        if (0 === count($segments)) {
             // No segments so nothing to exclude
             return;
         }

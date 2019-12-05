@@ -81,7 +81,7 @@ class DetailsType extends AbstractType
         $tooltips = $options['integration_object']->getSupportedFeatureTooltips();
         if (!empty($features)) {
             // Check to see if the integration is a new entry and thus not configured
-            $configured      = $options['data']->getId() !== null;
+            $configured      = null !== $options['data']->getId();
             $enabledFeatures = $options['data']->getSupportedFeatures();
             $data            = ($configured) ? $enabledFeatures : $features;
 

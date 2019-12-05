@@ -49,7 +49,7 @@ class FormSubmitHelper
         }
 
         //make sure the asset still exists and is published
-        if ($asset !== null && $asset->isPublished()) {
+        if (null !== $asset && $asset->isPublished()) {
             //register a callback after the other actions have been fired
             return [
                 'callback' => '\Mautic\AssetBundle\Helper\FormSubmitHelper::downloadFile',

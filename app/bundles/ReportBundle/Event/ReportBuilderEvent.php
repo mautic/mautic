@@ -104,7 +104,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             if (!isset($d['alias'])) {
                 $d['alias'] = substr(
                     $column,
-                    ($pos = strpos($column, '.')) !== false ? $pos + 1 : 0
+                    false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
                 );
             }
         }
@@ -122,7 +122,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 if (!isset($d['alias'])) {
                     $d['alias'] = substr(
                         $column,
-                        ($pos = strpos($column, '.')) !== false ? $pos + 1 : 0
+                        false !== ($pos = strpos($column, '.')) ? $pos + 1 : 0
                     );
                 }
             }
@@ -157,7 +157,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
      *
-     * @param   $prefix
+     * @param $prefix
      *
      * @return array
      */
@@ -236,7 +236,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns lead columns.
      *
-     * @param   $prefix
+     * @param $prefix
      *
      * @return array
      */

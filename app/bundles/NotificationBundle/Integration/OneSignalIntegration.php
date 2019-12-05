@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -103,7 +102,7 @@ class OneSignalIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             /* @var FormBuilder $builder */
             $builder->add(
                 'subdomain_name',

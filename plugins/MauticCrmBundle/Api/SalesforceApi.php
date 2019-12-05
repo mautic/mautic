@@ -51,7 +51,7 @@ class SalesforceApi extends CrmApi
         $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
 
         $settings   = $this->requestSettings;
-        if ($method == 'PATCH') {
+        if ('PATCH' == $method) {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
@@ -80,7 +80,7 @@ class SalesforceApi extends CrmApi
      */
     public function getLeadFields($object = null)
     {
-        if ($object == 'company') {
+        if ('company' == $object) {
             $object = 'Account'; //salesforce object name
         }
 
@@ -274,9 +274,9 @@ class SalesforceApi extends CrmApi
                         $namespace.'ReferenceId__c'  => $record['id'].'-'.$sfId,
                     ];
 
-                    if ($object === 'Lead') {
+                    if ('Lead' === $object) {
                         $body[$namespace.'WhoId__c'] = $sfId;
-                    } elseif ($object === 'Contact') {
+                    } elseif ('Contact' === $object) {
                         $body[$namespace.'contact_id__c'] = $sfId;
                     }
 
@@ -349,11 +349,11 @@ class SalesforceApi extends CrmApi
             $fields   = implode(', ', array_unique($fields));
 
             $config = $this->integration->mergeConfigToFeatureSettings([]);
-            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+            if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && 'updateOwner' == $config['updateOwner'][0]) {
                 $fields = 'Owner.Name, Owner.Email, '.$fields;
             }
 
-            $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
+            $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where SystemModStamp>='.$query['start'].' and SystemModStamp<='.$query['end']
                 .$ignoreConvertedLeads;

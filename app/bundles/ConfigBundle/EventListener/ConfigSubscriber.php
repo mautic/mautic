@@ -59,7 +59,7 @@ class ConfigSubscriber extends CommonSubscriber
 
         $escapeInvalidReference = function ($reference) {
             // only escape when the referenced variable doesn't exist
-            if ($this->paramHelper->getParameter($reference[1]) === null) {
+            if (null === $this->paramHelper->getParameter($reference[1])) {
                 return '%'.$reference[0].'%';
             }
 

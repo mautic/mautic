@@ -48,7 +48,7 @@ class NoteController extends FormController
             'mautic.lead.'.$lead->getId().'.note.limit',
             $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
         );
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -71,7 +71,7 @@ class NoteController extends FormController
 
         $tmpl     = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $noteType = InputHelper::clean($this->request->request->get('noteTypes', [], true));
-        if (empty($noteType) && $tmpl == 'index') {
+        if (empty($noteType) && 'index' == $tmpl) {
             $noteType = $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []);
         }
         $session->set('mautic.lead.'.$lead->getId().'.notetype.filter', $noteType);
@@ -164,7 +164,7 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -240,7 +240,7 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
 
-        if ($note === null || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if (null === $note || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             return $this->accessDenied();
         }
 
@@ -255,7 +255,7 @@ class NoteController extends FormController
         $form = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -311,7 +311,7 @@ class NoteController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -325,7 +325,7 @@ class NoteController extends FormController
         $model = $this->getModel('lead.note');
         $note  = $model->getEntity($objectId);
 
-        if ($note === null) {
+        if (null === $note) {
             return $this->notFound();
         }
 

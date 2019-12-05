@@ -134,13 +134,13 @@ class FormType extends AbstractType
         );
 
         // Render style for new form by default
-        if ($options['data']->getId() === null) {
+        if (null === $options['data']->getId()) {
             $options['data']->setRenderStyle(true);
         }
 
         $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
-            'data'       => ($options['data']->getRenderStyle() === null) ? true : $options['data']->getRenderStyle(),
+            'data'       => (null === $options['data']->getRenderStyle()) ? true : $options['data']->getRenderStyle(),
             'empty_data' => true,
             'attr'       => [
                 'tooltip' => 'mautic.form.form.renderstyle.tooltip',

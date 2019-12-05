@@ -40,7 +40,7 @@ JS;
             </div>
             <div class="panel-body">
                 <div class="the-price">
-                    <h4> <?php echo $leadName?></h4>
+                    <h4> <?php echo $leadName; ?></h4>
                     <small> <?php
                         echo $view['translator']->trans('mautic.lead.message.preferences.descr'); ?></small>
                 </div>
@@ -57,11 +57,11 @@ JS;
                                 <input type="hidden" id="<?php echo $channel->value; ?>"
                                        name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                                        value="">
-                                <input type="checkbox" id="<?php echo $channel->value ?>"
+                                <input type="checkbox" id="<?php echo $channel->value; ?>"
                                        name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                                        onclick="togglePreferredChannel(this.value);"
-                                       value="<?php echo $view->escape($channel->value) ?>" <?php echo $checked; ?>>
-                                <label for="<?php echo $channel->value ?>" id="is-contactable-<?php echo $channel->value ?>">
+                                       value="<?php echo $view->escape($channel->value); ?>" <?php echo $checked; ?>>
+                                <label for="<?php echo $channel->value; ?>" id="is-contactable-<?php echo $channel->value; ?>">
                                     <?php echo $view['translator']->trans('mautic.lead.contact.me.label', ['%channel%' => $channelName]); ?>
                                 </label>
                             </div>
@@ -148,7 +148,7 @@ JS;
                 ?>
             </div>
             <div class="panel-footer text-left">
-                <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']) ?></div>
+                <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?></div>
         </div>
     </div>
 

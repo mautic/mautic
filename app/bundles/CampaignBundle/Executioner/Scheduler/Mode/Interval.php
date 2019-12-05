@@ -124,7 +124,7 @@ class Interval implements ScheduleModeInterface
      * @param Event           $event
      * @param ArrayCollection $contacts
      * @param \DateTime       $executionDate
-     * @param null|\DateTime  $compareFromDateTime
+     * @param \DateTime|null  $compareFromDateTime
      *
      * @return GroupExecutionDateDAO[]
      */

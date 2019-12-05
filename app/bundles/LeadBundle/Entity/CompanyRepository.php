@@ -110,7 +110,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies by lead.
      *
-     * @param   $leadId
+     * @param $leadId
      *
      * @return array
      */
@@ -406,7 +406,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $reflection = new \ReflectionClass(new $class());
 
         // Get the label column if necessary
-        if ($labelColumn == null) {
+        if (null == $labelColumn) {
             if ($reflection->hasMethod('getTitle')) {
                 $labelColumn = 'title';
             } else {
@@ -425,7 +425,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->from($tableName, $alias)
             ->orderBy($prefix.$labelColumn);
 
-        if ($expr !== null && $expr->count()) {
+        if (null !== $expr && $expr->count()) {
             $q->where($expr);
         }
 

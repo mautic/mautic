@@ -31,7 +31,7 @@ if (!auth()) {
 if (!isset($_GET)) {
     $fm->error($fm->lang('INVALID_ACTION'));
 } else {
-    if (isset($_GET['mode']) && $_GET['mode'] != '') {
+    if (isset($_GET['mode']) && '' != $_GET['mode']) {
         switch ($_GET['mode']) {
             default:
 
@@ -109,7 +109,7 @@ if (!isset($_GET)) {
                 }
                 break;
         }
-    } elseif (isset($_POST['mode']) && $_POST['mode'] != '') {
+    } elseif (isset($_POST['mode']) && '' != $_POST['mode']) {
         switch ($_POST['mode']) {
             default:
 

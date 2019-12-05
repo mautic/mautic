@@ -153,7 +153,7 @@ class MembershipBuilder
                 )
             );
 
-            if ($countResult->getCount() === 0) {
+            if (0 === $countResult->getCount()) {
                 // No use continuing
                 return 0;
             }
@@ -215,7 +215,7 @@ class MembershipBuilder
                 )
             );
 
-            if ($countResult->getCount() === 0) {
+            if (0 === $countResult->getCount()) {
                 // No use continuing
                 return 0;
             }

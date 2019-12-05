@@ -40,7 +40,7 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $name     = strtolower($this->getName());
             $formType = $this->getFormType();
             if ($formType) {
@@ -98,7 +98,7 @@ abstract class SocialIntegration extends AbstractIntegration
                         }
                         break;
                     case 'array_object':
-                        if ($field == 'urls' || $field == 'url') {
+                        if ('urls' == $field || 'url' == $field) {
                             foreach ($socialProfileUrls as $p => $d) {
                                 $fields["{$p}ProfileHandle"] = (!$label)
                                     ? $this->translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")

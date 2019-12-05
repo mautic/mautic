@@ -56,6 +56,7 @@ class ConnectwiseApi extends CrmApi
                         break;
                     case 'errors':
                         $errors[] = $response['message'];
+                        // no break
                     case 'code':
                         $errors[] = $response['message'];
                         break;

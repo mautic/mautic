@@ -1,4 +1,5 @@
 <?php
+
  //[STAMP] a6ad52da3240b4dea3611f54dd9c3513
 
 namespace Mautic\CoreBundle\_generated;
@@ -569,8 +570,8 @@ trait FunctionalTesterActions
      * $I->seeInSource('<h1>Green eggs &amp; ham</h1>');
      * ```
      *
-     * @param   $raw
-     *               Conditional Assertion: Test won't be stopped on fail
+     * @param $raw
+     *              Conditional Assertion: Test won't be stopped on fail
      *
      * @see \Codeception\Lib\InnerBrowser::seeInSource()
      */
@@ -590,7 +591,7 @@ trait FunctionalTesterActions
      * $I->seeInSource('<h1>Green eggs &amp; ham</h1>');
      * ```
      *
-     * @param   $raw
+     * @param $raw
      *
      * @see \Codeception\Lib\InnerBrowser::seeInSource()
      */
@@ -610,8 +611,8 @@ trait FunctionalTesterActions
      * $I->dontSeeInSource('<h1>Green eggs &amp; ham</h1>');
      * ```
      *
-     * @param   $raw
-     *               Conditional Assertion: Test won't be stopped on fail
+     * @param $raw
+     *              Conditional Assertion: Test won't be stopped on fail
      *
      * @see \Codeception\Lib\InnerBrowser::dontSeeInSource()
      */
@@ -631,7 +632,7 @@ trait FunctionalTesterActions
      * $I->dontSeeInSource('<h1>Green eggs &amp; ham</h1>');
      * ```
      *
-     * @param   $raw
+     * @param $raw
      *
      * @see \Codeception\Lib\InnerBrowser::dontSeeInSource()
      */
@@ -1930,7 +1931,7 @@ trait FunctionalTesterActions
      *
      * @param $field
      *
-     * @return array|mixed|null|string
+     * @return array|mixed|string|null
      *
      * @see \Codeception\Lib\InnerBrowser::grabValueFrom()
      */

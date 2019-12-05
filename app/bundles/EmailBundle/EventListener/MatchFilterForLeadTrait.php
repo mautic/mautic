@@ -32,7 +32,7 @@ trait MatchFilterForLeadTrait
         $groupNum = 0;
 
         foreach ($filter as $key => $data) {
-            $isCompanyField = (strpos($data['field'], 'company') === 0 && $data['field'] !== 'company');
+            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
             if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
@@ -44,7 +44,7 @@ trait MatchFilterForLeadTrait
              * The first filter and any filters whose glue is
              * "or" will start a new group.
              */
-            if ($groupNum === 0 || $data['glue'] === 'or') {
+            if (0 === $groupNum || 'or' === $data['glue']) {
                 ++$groupNum;
                 $groups[$groupNum] = null;
             }
@@ -54,7 +54,7 @@ trait MatchFilterForLeadTrait
              * is no need to continue checking the others
              * in the group.
              */
-            if ($groups[$groupNum] === false) {
+            if (false === $groups[$groupNum]) {
                 continue;
             }
 
@@ -62,7 +62,7 @@ trait MatchFilterForLeadTrait
              * If we are checking the first filter in a group
              * assume that the group will not match.
              */
-            if ($groups[$groupNum] === null) {
+            if (null === $groups[$groupNum]) {
                 $groups[$groupNum] = false;
             }
 
@@ -71,11 +71,11 @@ trait MatchFilterForLeadTrait
 
             switch ($data['type']) {
                 case 'boolean':
-                    if ($leadVal !== null) {
+                    if (null !== $leadVal) {
                         $leadVal = (bool) $leadVal;
                     }
 
-                    if ($filterVal !== null) {
+                    if (null !== $filterVal) {
                         $filterVal = (bool) $filterVal;
                     }
                     break;
@@ -93,7 +93,7 @@ trait MatchFilterForLeadTrait
                     $leadValCount   = substr_count($leadVal, ':');
                     $filterValCount = substr_count($filterVal, ':');
 
-                    if ($leadValCount === 2 && $filterValCount === 1) {
+                    if (2 === $leadValCount && 1 === $filterValCount) {
                         $filterVal .= ':00';
                     }
                     break;
@@ -122,14 +122,14 @@ trait MatchFilterForLeadTrait
 
             switch ($data['operator']) {
                 case '=':
-                    if ($data['type'] === 'boolean') {
+                    if ('boolean' === $data['type']) {
                         $groups[$groupNum] = $leadVal === $filterVal;
                     } else {
                         $groups[$groupNum] = $leadVal == $filterVal;
                     }
                     break;
                 case '!=':
-                    if ($data['type'] === 'boolean') {
+                    if ('boolean' === $data['type']) {
                         $groups[$groupNum] = $leadVal !== $filterVal;
                     } else {
                         $groups[$groupNum] = $leadVal != $filterVal;
@@ -155,12 +155,12 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'like':
                     $filterVal         = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
-                    $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) === 1;
+                    $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/', $leadVal);
                     break;
                 case '!like':
                     $filterVal         = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
                     $filterVal         = str_replace('%', '.*', $filterVal);
-                    $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) !== 1;
+                    $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
                 case 'in':
                     $leadValMatched = false;
@@ -187,10 +187,10 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = $leadValNotMatched;
                     break;
                 case 'regexp':
-                    $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) === 1;
+                    $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
                 case '!regexp':
-                    $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) !== 1;
+                    $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                     break;
             }
         }

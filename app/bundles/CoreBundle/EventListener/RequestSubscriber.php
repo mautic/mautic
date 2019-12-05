@@ -65,7 +65,7 @@ class RequestSubscriber extends CommonSubscriber
      */
     private function isAjaxPost(Request $request)
     {
-        return $request->isXmlHttpRequest() && $request->getMethod() === Request::METHOD_POST;
+        return $request->isXmlHttpRequest() && Request::METHOD_POST === $request->getMethod();
     }
 
     /**
@@ -73,7 +73,7 @@ class RequestSubscriber extends CommonSubscriber
      */
     private function isSecurePath(Request $request)
     {
-        return preg_match('/^\/s\//', $request->getPathinfo()) === 1;
+        return 1 === preg_match('/^\/s\//', $request->getPathinfo());
     }
 
     /**

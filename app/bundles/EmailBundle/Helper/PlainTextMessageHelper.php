@@ -29,7 +29,7 @@ class PlainTextMessageHelper
 
         foreach ($children as $child) {
             $childType = $child->getContentType();
-            if ($childType === 'text/plain' && $child instanceof \Swift_MimePart) {
+            if ('text/plain' === $childType && $child instanceof \Swift_MimePart) {
                 return $child->getBody();
             }
         }

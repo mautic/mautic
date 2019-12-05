@@ -11,13 +11,13 @@
 
 namespace Mautic\DashboardBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -105,7 +105,7 @@ class WidgetApiController extends CommonApiController
         $widget->setType($type);
         $widget->setHeight($widgetHeight);
 
-        if ($cacheTimeout !== null) {
+        if (null !== $cacheTimeout) {
             $widget->setCacheTimeout($cacheTimeout);
         }
 
@@ -116,7 +116,7 @@ class WidgetApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if ($dataFormat == 'raw') {
+        if ('raw' == $dataFormat) {
             if (isset($data['chartData']['labels']) && isset($data['chartData']['datasets'])) {
                 $rawData = [];
                 foreach ($data['chartData']['datasets'] as $dataset) {

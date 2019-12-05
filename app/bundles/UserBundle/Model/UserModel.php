@@ -160,7 +160,7 @@ class UserModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new User();
         }
 
@@ -349,7 +349,7 @@ class UserModel extends FormModel
      */
     public function setPreference($key, $value = null, User $user = null)
     {
-        if ($user == null) {
+        if (null == $user) {
             $user = $this->userHelper->getUser();
         }
 
@@ -370,7 +370,7 @@ class UserModel extends FormModel
      */
     public function getPreference($key, $default = null, User $user = null)
     {
-        if ($user == null) {
+        if (null == $user) {
             $user = $this->userHelper->getUser();
         }
         $preferences = $user->getPreferences();

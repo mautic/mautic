@@ -355,7 +355,7 @@ class ImportModel extends FormModel
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
-            if ($lineNumber === 1) {
+            if (1 === $lineNumber) {
                 ++$lineNumber;
                 continue;
             }
@@ -385,7 +385,7 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $entityModel = $import->getObject() === 'company' ? $this->companyModel : $this->leadModel;
+                    $entityModel = 'company' === $import->getObject() ? $this->companyModel : $this->leadModel;
 
                     $merged = $entityModel->import(
                         $import->getMatchedFields(),
@@ -427,7 +427,7 @@ class ImportModel extends FormModel
             $this->em->clear(Company::class);
 
             // Save Import entity once per batch so the user could see the progress
-            if ($batchSize === 0 && $import->isBackgroundProcess()) {
+            if (0 === $batchSize && $import->isBackgroundProcess()) {
                 $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
 
                 if (!$isPublished) {
@@ -514,7 +514,7 @@ class ImportModel extends FormModel
             return true;
         }
 
-        if (count($row) === 1 && ($row[0] === '' || $row[0] === null)) {
+        if (1 === count($row) && ('' === $row[0] || null === $row[0])) {
             return true;
         }
 
@@ -661,11 +661,11 @@ class ImportModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Import();
         }
 

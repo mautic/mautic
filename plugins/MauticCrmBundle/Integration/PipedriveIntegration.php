@@ -218,7 +218,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'objects',
                 ChoiceType::class,
@@ -282,7 +282,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         $router     = $this->factory->get('router');
         $translator = $this->getTranslator();
 
-        if ($section == 'authorization') {
+        if ('authorization' == $section) {
             return [
                 $translator->trans('mautic.pipedrive.webhook_callback').$router->generate(
                     'mautic_integration.pipedrive.webhook',

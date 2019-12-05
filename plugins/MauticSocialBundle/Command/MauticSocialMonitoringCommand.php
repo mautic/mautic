@@ -115,7 +115,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             'limit' => 100,
         ];
 
-        if ($id !== null) {
+        if (null !== $id) {
             $filter['filter'] = [
                 'force' => [
                     [
@@ -147,16 +147,16 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
         $commandName = '';
 
         // hashtag command
-        if ($networkType == 'twitter_hashtag') {
+        if ('twitter_hashtag' == $networkType) {
             $commandName = 'social:monitor:twitter:hashtags';
         }
 
         // mention command
-        if ($networkType == 'twitter_handle') {
+        if ('twitter_handle' == $networkType) {
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ($commandName == '') {
+        if ('' == $commandName) {
             $this->output->writeln('Matching command not found.');
 
             return 1;

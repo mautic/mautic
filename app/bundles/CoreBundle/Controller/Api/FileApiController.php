@@ -61,7 +61,7 @@ class FileApiController extends CommonApiController
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
-                    if (substr($dir, 0, 6) === 'images') {
+                    if ('images' === substr($dir, 0, 6)) {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
                     }
 
@@ -97,7 +97,7 @@ class FileApiController extends CommonApiController
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
                 // remove hidden files
-                if (substr($name, 0, 1) === '.') {
+                if ('.' === substr($name, 0, 1)) {
                     unset($fnames[$key]);
                 }
             }
@@ -155,7 +155,7 @@ class FileApiController extends CommonApiController
             $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['/']));
 
             // Dots in the dir name are slashes
-            if (strpos($dir, '.') !== false && !$subdir) {
+            if (false !== strpos($dir, '.') && !$subdir) {
                 $dirs = explode('.', $dir);
                 $dir  = $dirs[0];
                 unset($dirs[0]);
@@ -166,17 +166,17 @@ class FileApiController extends CommonApiController
                 throw new \InvalidArgumentException($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
             }
 
-            if ($dir === 'images') {
+            if ('images' === $dir) {
                 $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
-            } elseif ($dir === 'assets') {
+            } elseif ('assets' === $dir) {
                 $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
             }
 
-            if ($absoluteDir === false) {
+            if (false === $absoluteDir) {
                 throw new \InvalidArgumentException($dir.' dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            if (is_writable($absoluteDir) === false) {
+            if (false === is_writable($absoluteDir)) {
                 throw new \InvalidArgumentException($dir.' dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
@@ -184,7 +184,7 @@ class FileApiController extends CommonApiController
 
             if (!file_exists($path)) {
                 if ($createDir) {
-                    if (mkdir($path) === false) {
+                    if (false === mkdir($path)) {
                         throw new \InvalidArgumentException(
                             $dir.'/'.$subdir.' subdirectory could not be created.',
                             Response::HTTP_INTERNAL_SERVER_ERROR

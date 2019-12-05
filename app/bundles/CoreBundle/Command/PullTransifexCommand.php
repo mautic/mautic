@@ -77,7 +77,7 @@ EOT
                     $languageStats = $transifex->statistics->getStatistics('mautic', $alias);
 
                     foreach ($languageStats as $language => $stats) {
-                        if ($language == 'en') {
+                        if ('en' == $language) {
                             continue;
                         }
 

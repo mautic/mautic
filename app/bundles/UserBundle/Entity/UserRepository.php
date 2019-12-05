@@ -35,7 +35,7 @@ class UserRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return ($result != null) ? $result[0] : null;
+        return (null != $result) ? $result[0] : null;
     }
 
     /**

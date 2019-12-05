@@ -74,7 +74,7 @@ class GooglePlusIntegration extends SocialIntegration
 
         if ($userId = $this->getContactUserId($identifier, $socialCache)) {
             $url = $this->getApiUrl("people/{$userId}");
-            if ($userId == 'me') {
+            if ('me' == $userId) {
                 // Request using contact's access token
                 $data = $this->makeRequest(
                     $url,
@@ -360,7 +360,7 @@ class GooglePlusIntegration extends SocialIntegration
         // Get user ID using the Mautic users access token/key
         $data = $this->makeRequest($this->getApiUrl('people'), ['query' => $identifier]);
 
-        if (!empty($data->items) && count($data->items) === 1) {
+        if (!empty($data->items) && 1 === count($data->items)) {
             $socialCache['id'] = $data->items[0]->id;
 
             return $socialCache['id'];

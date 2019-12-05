@@ -413,7 +413,7 @@ class EmailType extends AbstractType
                     !empty($data['variantParent'])
                 );
 
-                if (isset($data['emailType']) && $data['emailType'] == 'list') {
+                if (isset($data['emailType']) && 'list' == $data['emailType']) {
                     $data['translationParent'] = isset($data['segmentTranslationParent']) ? $data['segmentTranslationParent'] : null;
                 } else {
                     $data['translationParent'] = isset($data['templateTranslationParent']) ? $data['templateTranslationParent'] : null;

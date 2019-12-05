@@ -78,7 +78,7 @@ class OpenSSLCipher implements SymmetricCipherInterface
         }
         $testForRandom = $this->getRandomInitVector();
 
-        return $testForRandom !== false;
+        return false !== $testForRandom;
     }
 
     /**

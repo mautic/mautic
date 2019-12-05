@@ -39,7 +39,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class FormModel extends CommonFormModel
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     protected $request;
 
@@ -175,7 +175,7 @@ class FormModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Form();
         }
 
@@ -347,10 +347,10 @@ class FormModel extends CommonFormModel
 
                 $func = 'set'.ucfirst($f);
 
-                if ($f == 'properties') {
+                if ('properties' == $f) {
                     if (isset($v['mappedFields'])) {
                         foreach ($v['mappedFields'] as $pk => $pv) {
-                            if (strpos($pv, 'new') !== false) {
+                            if (false !== strpos($pv, 'new')) {
                                 $v['mappedFields'][$pk] = $fieldIds[$pv];
                             }
                         }
@@ -698,7 +698,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && $f->getSaveResult() !== false) {
+            if (!in_array($f->getType(), $ignoreTypes) && false !== $f->getSaveResult()) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
@@ -865,7 +865,7 @@ class FormModel extends CommonFormModel
         foreach ($autoFillFields as $field) {
             $value = $lead->getFieldValue($field->getLeadField());
             // just skip string empty field
-            if ($value !== '') {
+            if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
@@ -936,7 +936,7 @@ class FormModel extends CommonFormModel
             ],
         ];
 
-        return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];
+        return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
     }
 
     /**

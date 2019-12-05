@@ -62,7 +62,7 @@ class CategoryType extends AbstractType
 
         if (!$options['data']->getId()) {
             // Do not allow custom bundle
-            if ($options['show_bundle_select'] == true) {
+            if (true == $options['show_bundle_select']) {
                 // Create new category from category bundle - let user select the bundle
                 $selected = $this->session->get('mautic.category.type', 'category');
                 $builder->add(

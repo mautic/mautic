@@ -66,7 +66,7 @@ class UpdateController extends CommonController
             $env  = $this->factory->getEnvironment();
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env];
 
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 $args[] = '--no-debug';
             }
 
@@ -86,10 +86,10 @@ class UpdateController extends CommonController
             $outputBuffer = $output->fetch();
 
             // Check if migrations executed
-            $noMigrations = ($result === 0 && strpos($outputBuffer, 'No migrations') !== false);
+            $noMigrations = (0 === $result && false !== strpos($outputBuffer, 'No migrations'));
         }
 
-        if ($result !== 0) {
+        if (0 !== $result) {
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $outputBuffer));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));

@@ -49,7 +49,7 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
             $page = new Page();
             $key  = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' != $val) {
                     $setter = 'set'.ucfirst($col);
                     if (in_array($col, ['translationParent', 'variantParent'])) {
                         $page->$setter($this->getReference('page-'.$val));

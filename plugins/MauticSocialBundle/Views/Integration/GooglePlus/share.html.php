@@ -11,7 +11,7 @@
 $dataHeight     = (!empty($settings['height'])) ? ' data-height="'.$settings['height'].'"' : '';
 $dataAnnotation = (!empty($settings['annotation'])) ? $settings['annotation'] : 'inline';
 $locale         = $app->getRequest()->getLocale();
-$language       = ($locale != 'en_US') ? "window.___gcfg = {lang: '$locale'};" : '';
+$language       = ('en_US' != $locale) ? "window.___gcfg = {lang: '$locale'};" : '';
 $js             = <<<JS
 $language
 (function() {
@@ -21,5 +21,5 @@ $language
 })();
 JS;
 ?>
-<div class="g-plus googleplus-share-button share-button layout-<?php echo $dataAnnotation; ?>" data-action="share" data-annotation="<?php echo $dataAnnotation ?>"<?php echo $dataHeight; ?>></div>
+<div class="g-plus googleplus-share-button share-button layout-<?php echo $dataAnnotation; ?>" data-action="share" data-annotation="<?php echo $dataAnnotation; ?>"<?php echo $dataHeight; ?>></div>
 <script><?php echo $js; ?></script>

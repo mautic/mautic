@@ -16,9 +16,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\FormBundle\Entity\Field;
-use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
-use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -55,16 +53,16 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                 $submission->setDateSubmitted(new \DateTime());
 
                 foreach ($rows as $col => $val) {
-                    if ($val != 'NULL') {
+                    if ('NULL' != $val) {
                         $setter = 'set'.\ucfirst($col);
                         if (\in_array($col, ['form', 'page', 'ipAddress', 'lead'])) {
-                            if ($col === 'lead') {
+                            if ('lead' === $col) {
                                 // For some reason the lead must be linked with id - 1
                                 $entity = $fixture->getReference($col.'-'.($val - 1));
                             } else {
                                 $entity = $fixture->getReference($col.'-'.$val);
                             }
-                            if ($col == 'page') {
+                            if ('page' == $col) {
                                 $submission->setReferer($pageModel->generateUrl($entity));
                             }
                             $submission->$setter($entity);

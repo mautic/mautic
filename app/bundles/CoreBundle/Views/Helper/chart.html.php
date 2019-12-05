@@ -12,7 +12,7 @@
 <div class="chart-wrapper">
     <div class="pt-sd pr-md pb-md pl-md">
         <div style="height:<?php echo $chartHeight; ?>px">
-            <canvas class="chart <?php echo $chartType; ?>-chart" <?php echo isset($disableLegend) ? 'data-disable-legend' : ''?>>
+            <canvas class="chart <?php echo $chartType; ?>-chart" <?php echo isset($disableLegend) ? 'data-disable-legend' : ''; ?>>
                 <?php echo json_encode($chartData); ?>
             </canvas>
         </div>

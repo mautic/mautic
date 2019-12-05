@@ -56,7 +56,7 @@ class DateDecorator extends CustomMappedDecorator
     /**
      * @deprecated Use DateOptionParameters->getDefaultDate() which takes timezone into account
      *
-     * @param null|string $relativeDate
+     * @param string|null $relativeDate
      *
      * @return DateTimeHelper
      */

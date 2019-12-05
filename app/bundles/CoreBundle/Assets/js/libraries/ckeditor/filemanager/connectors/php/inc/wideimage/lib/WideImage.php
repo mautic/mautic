@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -68,7 +69,7 @@
          */
         public static function path()
         {
-            if (self::$path === null) {
+            if (null === self::$path) {
                 self::$path = dirname(__FILE__).DIRECTORY_SEPARATOR;
             }
 
@@ -132,7 +133,7 @@
         {
             $predictedSourceType = '';
 
-            if ($source == '') {
+            if ('' == $source) {
                 $predictedSourceType = 'String';
             }
 
@@ -349,7 +350,7 @@
          */
         public static function isValidImageHandle($handle)
         {
-            return is_resource($handle) && get_resource_type($handle) == 'gd';
+            return is_resource($handle) && 'gd' == get_resource_type($handle);
         }
 
         /**

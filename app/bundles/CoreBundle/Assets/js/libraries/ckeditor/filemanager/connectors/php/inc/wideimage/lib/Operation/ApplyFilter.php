@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -34,9 +35,9 @@
 
             if (in_array($filter, self::$one_arg_filters)) {
                 $res = imagefilter($new->getHandle(), $filter, $arg1);
-            } elseif (defined('IMG_FILTER_PIXELATE') && $filter == IMG_FILTER_PIXELATE) {
+            } elseif (defined('IMG_FILTER_PIXELATE') && IMG_FILTER_PIXELATE == $filter) {
                 $res = imagefilter($new->getHandle(), $filter, $arg1, $arg2);
-            } elseif ($filter == IMG_FILTER_COLORIZE) {
+            } elseif (IMG_FILTER_COLORIZE == $filter) {
                 $res = imagefilter($new->getHandle(), $filter, $arg1, $arg2, $arg3, $arg4);
             } else {
                 $res = imagefilter($new->getHandle(), $filter);

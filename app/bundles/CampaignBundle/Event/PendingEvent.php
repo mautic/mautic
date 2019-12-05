@@ -217,7 +217,7 @@ class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @param string   $channel
-     * @param null|int $channelId
+     * @param int|null $channelId
      */
     public function setChannel($channel, $channelId = null)
     {

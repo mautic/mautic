@@ -53,7 +53,7 @@ class UserMapper implements UsernameMapperInterface
     /**
      * @param Assertion $assertion
      *
-     * @return null|string
+     * @return string|null
      */
     private function getValueFromAssertion(Assertion $assertion, User $user)
     {
@@ -68,7 +68,7 @@ class UserMapper implements UsernameMapperInterface
                         $assertion->getSubject() &&
                         $assertion->getSubject()->getNameID() &&
                         $assertion->getSubject()->getNameID()->getValue() &&
-                        $assertion->getSubject()->getNameID()->getFormat() != SamlConstants::NAME_ID_FORMAT_TRANSIENT
+                        SamlConstants::NAME_ID_FORMAT_TRANSIENT != $assertion->getSubject()->getNameID()->getFormat()
                     ) {
                         $attributes['username'] = $assertion->getSubject()->getNameID()->getValue();
                     }

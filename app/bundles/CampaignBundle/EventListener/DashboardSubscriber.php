@@ -80,7 +80,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('campaign:campaigns:viewother');
 
-        if ($event->getType() == 'events.in.time') {
+        if ('events.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -103,7 +103,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'leads.added.in.time') {
+        if ('leads.added.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 

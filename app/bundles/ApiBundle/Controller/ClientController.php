@@ -33,7 +33,7 @@ class ClientController extends FormController
 
         //set limits
         $limit = $this->get('session')->get('mautic.client.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -59,7 +59,7 @@ class ClientController extends FormController
         $count = count($clients);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->get('session')->set('mautic.client.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_client_index', ['page' => $lastPage]);
 
@@ -141,13 +141,13 @@ class ClientController extends FormController
         $success = 0;
         $flashes = [];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model = $this->getModel('api.client');
 
             $client = $model->getEntity($clientId);
 
-            if ($client === null) {
+            if (null === $client) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
@@ -191,7 +191,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $apiMode = ($objectId === 0) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
+        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
@@ -216,7 +216,7 @@ class ClientController extends FormController
         $form->remove('consumerSecret');
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -301,7 +301,7 @@ class ClientController extends FormController
         ];
 
         //client not found
-        if ($client === null) {
+        if (null === $client) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -328,7 +328,7 @@ class ClientController extends FormController
         $form->remove('api_mode');
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -406,11 +406,11 @@ class ClientController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\ApiBundle\Model\ClientModel $model */
             $model  = $this->getModel('api.client');
             $entity = $model->getEntity($objectId);
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',

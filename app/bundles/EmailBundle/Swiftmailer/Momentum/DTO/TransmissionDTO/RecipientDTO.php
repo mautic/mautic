@@ -58,7 +58,7 @@ final class RecipientDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $returnPath
+     * @param string|null $returnPath
      *
      * @return RecipientDTO
      */
@@ -116,14 +116,14 @@ final class RecipientDTO implements \JsonSerializable
         $json = [
             'address' => $this->address,
         ];
-        if (count($this->tags) !== 0) {
+        if (0 !== count($this->tags)) {
             $json['tags'] = $this->tags;
         }
-        if (count($this->metadata) !== 0) {
+        if (0 !== count($this->metadata)) {
             $json['metadata'] = $this->metadata;
         }
 
-        if (count($this->substitutionData) === 0) {
+        if (0 === count($this->substitutionData)) {
             // `substitution_data` is required but Sparkpost will return the following error with empty arrays:
             // field 'substitution_data' is of type 'json_array', but needs to be of type 'json_object'
             $json['substitution_data'] = new \stdClass();
@@ -131,7 +131,7 @@ final class RecipientDTO implements \JsonSerializable
             $json['substitution_data'] = $this->substitutionData;
         }
 
-        if ($this->returnPath !== null) {
+        if (null !== $this->returnPath) {
             $json['return_path'] = $this->returnPath;
         }
 

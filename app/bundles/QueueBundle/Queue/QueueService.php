@@ -118,6 +118,6 @@ class QueueService
      */
     public function isQueueEnabled()
     {
-        return $this->coreParametersHelper->getParameter('queue_protocol') != '';
+        return '' != $this->coreParametersHelper->getParameter('queue_protocol');
     }
 }

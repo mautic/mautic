@@ -116,7 +116,7 @@ class PointModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Point();
         }
 
@@ -202,7 +202,7 @@ class PointModel extends CommonFormModel
             return;
         }
 
-        if ($typeId !== null && MAUTIC_ENV === 'prod') {
+        if (null !== $typeId && MAUTIC_ENV === 'prod') {
             //let's prevent some unnecessary DB calls
             $triggeredEvents = $this->session->get('mautic.triggered.point.actions', []);
             if (in_array($typeId, $triggeredEvents)) {
@@ -264,7 +264,7 @@ class PointModel extends CommonFormModel
             if (is_callable($callback)) {
                 if (is_array($callback)) {
                     $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                } elseif (strpos($callback, '::') !== false) {
+                } elseif (false !== strpos($callback, '::')) {
                     $parts      = explode('::', $callback);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {

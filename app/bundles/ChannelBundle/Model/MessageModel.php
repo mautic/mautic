@@ -100,7 +100,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Message();
         }
 

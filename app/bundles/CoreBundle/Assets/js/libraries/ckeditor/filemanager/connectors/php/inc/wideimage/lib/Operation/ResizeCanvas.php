@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -31,17 +32,17 @@
             $new_width  = WideImage_Coordinate::fix($width, $img->getWidth());
             $new_height = WideImage_Coordinate::fix($height, $img->getHeight());
 
-            if ($scale == 'down') {
+            if ('down' == $scale) {
                 $new_width  = min($new_width, $img->getWidth());
                 $new_height = min($new_height, $img->getHeight());
-            } elseif ($scale == 'up') {
+            } elseif ('up' == $scale) {
                 $new_width  = max($new_width, $img->getWidth());
                 $new_height = max($new_height, $img->getHeight());
             }
 
             $new = WideImage::createTrueColorImage($new_width, $new_height);
             if ($img->isTrueColor()) {
-                if ($color === null) {
+                if (null === $color) {
                     $color = $new->allocateColorAlpha(0, 0, 0, 127);
                 }
             } else {
@@ -53,7 +54,7 @@
                     $t_color = $new->allocateColorAlpha($tc_rgb);
                 }
 
-                if ($color === null) {
+                if (null === $color) {
                     if ($img->isTransparent()) {
                         $color = $t_color;
                     } else {

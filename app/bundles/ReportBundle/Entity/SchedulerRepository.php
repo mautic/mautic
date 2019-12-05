@@ -22,7 +22,7 @@ class SchedulerRepository extends EntityRepository
     /**
      * @param Report $report
      *
-     * @return null|Report
+     * @return Report|null
      */
     public function getSchedulerByReport(Report $report)
     {

@@ -80,7 +80,7 @@ class EmailController extends FormController
 
         //set limits
         $limit = $session->get('mautic.email.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -200,7 +200,7 @@ class EmailController extends FormController
         $count = count($emails);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (floor($count / $limit)) ?: 1;
@@ -269,7 +269,7 @@ class EmailController extends FormController
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if ($email === null) {
+        if (null === $email) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
 
@@ -457,7 +457,7 @@ class EmailController extends FormController
         $page   = $session->get('mautic.email.page', 1);
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
 
-        $updateSelect = ($method == 'POST')
+        $updateSelect = ('POST' == $method)
             ? $this->request->request->get('emailform[updateSelect]', false, true)
             : $this->request->get(
                 'updateSelect',
@@ -473,7 +473,7 @@ class EmailController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');
@@ -628,7 +628,7 @@ class EmailController extends FormController
         ];
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -658,7 +658,7 @@ class EmailController extends FormController
         //Create the form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
-        $updateSelect = ($method == 'POST')
+        $updateSelect = ('POST' == $method)
             ? $this->request->request->get('emailform[updateSelect]', false, true)
             : $this->request->get(
                 'updateSelect',
@@ -673,7 +673,7 @@ class EmailController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');
@@ -832,7 +832,7 @@ class EmailController extends FormController
         /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('email:emails:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
@@ -856,7 +856,7 @@ class EmailController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -876,11 +876,11 @@ class EmailController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('email');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.email.error.notfound',
@@ -935,7 +935,7 @@ class EmailController extends FormController
         $model = $this->getModel('email');
 
         //permission check
-        if (strpos($objectId, 'new') !== false) {
+        if (false !== strpos($objectId, 'new')) {
             $isNew = true;
             if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
                 return $this->accessDenied();
@@ -945,7 +945,7 @@ class EmailController extends FormController
         } else {
             $isNew  = false;
             $entity = $model->getEntity($objectId);
-            if ($entity == null
+            if (null == $entity
                 || !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',
@@ -1001,7 +1001,7 @@ class EmailController extends FormController
         $model  = $this->getModel('email');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             $parent = $entity->getVariantParent();
 
             if ($parent || !$this->get('mautic.security')->isGranted('email:emails:create')
@@ -1051,11 +1051,11 @@ class EmailController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('email');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.email.error.notfound',
@@ -1130,7 +1130,7 @@ class EmailController extends FormController
         ];
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -1167,7 +1167,7 @@ class EmailController extends FormController
             );
         }
 
-        if ($entity->getEmailType() == 'template'
+        if ('template' == $entity->getEmailType()
             || !$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -1201,7 +1201,7 @@ class EmailController extends FormController
         $form     = $this->get('form.factory')->create('batch_send', [], ['action' => $action]);
         $complete = $this->request->request->get('complete', false);
 
-        if ($this->request->getMethod() == 'POST' && ($complete || $this->isFormValid($form))) {
+        if ('POST' == $this->request->getMethod() && ($complete || $this->isFormValid($form))) {
             if (!$complete) {
                 $progress = [0, (int) $pending];
                 $session->set('mautic.email.send.progress', $progress);
@@ -1271,7 +1271,7 @@ class EmailController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model = $this->getModel('email');
             $ids   = json_decode($this->request->query->get('ids', '{}'));
 
@@ -1281,7 +1281,7 @@ class EmailController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.email.error.notfound',
@@ -1335,7 +1335,7 @@ class EmailController extends FormController
         $entity = $model->getEntity($objectId);
 
         //not found or not allowed
-        if ($entity === null
+        if (null === $entity
             || (!$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -1359,7 +1359,7 @@ class EmailController extends FormController
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
         /* @var \Mautic\EmailBundle\Model\EmailModel $model */
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $isCancelled = $this->isFormCancelled($form);
             $isValid     = $this->isFormValid($form);
             if (!$isCancelled && $isValid) {
@@ -1398,7 +1398,7 @@ class EmailController extends FormController
                     }
                 }
 
-                if (count($errors) != 0) {
+                if (0 != count($errors)) {
                     $this->addFlash(implode('; ', $errors));
                 } else {
                     $this->addFlash('mautic.email.notice.test_sent_multiple.success');
@@ -1443,7 +1443,7 @@ class EmailController extends FormController
         $entity = $model->getEntity($objectId);
 
         //not found or not allowed
-        if ($entity === null
+        if (null === $entity
             || (!$this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',

@@ -42,7 +42,7 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
 
         $serialized = serialize($value);
 
-        if (strpos($serialized, chr(0)) !== false) {
+        if (false !== strpos($serialized, chr(0))) {
             throw new \Doctrine\DBAL\Types\ConversionException(
                 'Serialized array includes null-byte. This cannot be saved as a text. Please check if you not provided object with protected or private members.'
             );

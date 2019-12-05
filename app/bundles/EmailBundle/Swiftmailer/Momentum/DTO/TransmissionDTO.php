@@ -94,7 +94,7 @@ class TransmissionDTO implements \JsonSerializable
             'recipients'  => $this->recipients,
             'content'     => $this->content,
         ];
-        if ($this->options !== null) {
+        if (null !== $this->options) {
             $json['options'] = $this->options;
         }
         if (!empty($this->campaignId)) {

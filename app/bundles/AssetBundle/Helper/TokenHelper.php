@@ -53,7 +53,7 @@ class TokenHelper
                 }
 
                 $asset          = $this->model->getEntity($assetId);
-                $tokens[$token] = ($asset !== null) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
+                $tokens[$token] = (null !== $asset) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
             }
         }
 

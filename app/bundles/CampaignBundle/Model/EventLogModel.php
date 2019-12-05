@@ -122,7 +122,7 @@ class EventLogModel extends AbstractCommonModel
 
         // Check that contact is part of the campaign
         $membership = $campaign->getContactMembership($contact);
-        if (count($membership) === 0) {
+        if (0 === count($membership)) {
             return 'mautic.campaign.error.contact_not_in_campaign';
         }
 

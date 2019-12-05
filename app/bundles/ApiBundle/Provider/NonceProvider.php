@@ -65,7 +65,7 @@ class NonceProvider implements NonceProviderInterface
                 //make sure nonce has not been used before
                 $usedNonces = $this->repo->findBy(['nonce' => $nonce]);
 
-                if (count($usedNonces) === 0) {
+                if (0 === count($usedNonces)) {
                     $notUsed = true;
                 }
 

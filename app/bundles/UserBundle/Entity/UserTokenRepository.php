@@ -31,7 +31,7 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
             ->setMaxResults(1)
             ->getQuery()->execute();
 
-        return count($tokens) === 0;
+        return 0 === count($tokens);
     }
 
     /**
@@ -50,8 +50,8 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
             ->setParameter('now', new \DateTime())
             ->setMaxResults(1)
             ->getQuery()->execute();
-        $verified = (count($userTokens) !== 0);
-        if ($verified === false) {
+        $verified = (0 !== count($userTokens));
+        if (false === $verified) {
             return false;
         }
         $userToken = reset($userTokens);

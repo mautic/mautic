@@ -66,7 +66,7 @@ class EmailGraphStatsController extends Controller
         $dateFromObject = new \DateTime($dateFrom);
         $dateToObject   = new \DateTime($dateTo);
 
-        if ($email->getEmailType() === 'template') {
+        if ('template' === $email->getEmailType()) {
             $stats = $model->getEmailGeneralStats(
                 $email,
                 $includeVariants,

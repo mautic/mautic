@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -23,6 +22,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -58,7 +58,7 @@ class LeadApiController extends CommonApiController
      * @param array $parameters
      * @param null  $id
      *
-     * @return null|Lead
+     * @return Lead|null
      *
      * @deprecated since 2.12.2, to be removed in 3.0.0. Use $model->checkForDuplicateContact directly instead
      */
@@ -140,7 +140,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -194,7 +194,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -247,7 +247,7 @@ class LeadApiController extends CommonApiController
     public function getListsAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
@@ -288,7 +288,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -319,7 +319,7 @@ class LeadApiController extends CommonApiController
     public function getCampaignsAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $entity->getPermissionUser())) {
                 return $this->accessDenied();
             }
@@ -367,7 +367,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -418,7 +418,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -451,7 +451,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -483,7 +483,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity((int) $id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -494,7 +494,7 @@ class LeadApiController extends CommonApiController
         // calls add/remove method as appropriate
         $result = $this->model->$method($entity, $data);
 
-        if ($result === false) {
+        if (false === $result) {
             return $this->badRequest();
         }
 
@@ -550,7 +550,7 @@ class LeadApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -660,7 +660,7 @@ class LeadApiController extends CommonApiController
 
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
-                if ($reason === DoNotContact::IS_CONTACTABLE) {
+                if (DoNotContact::IS_CONTACTABLE === $reason) {
                     // Remove DNC record
                     $this->model->removeDncForLead($entity, $channel, false);
                 } else {

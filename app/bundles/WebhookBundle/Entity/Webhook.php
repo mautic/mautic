@@ -586,7 +586,7 @@ class Webhook extends FormEntity
     {
         $dateModified = $this->getDateModified();
 
-        if ($dateModified === null) {
+        if (null === $dateModified) {
             return false;
         }
 
@@ -607,13 +607,13 @@ class Webhook extends FormEntity
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
-        } elseif ($prop == 'events') {
+        } elseif ('events' == $prop) {
             $this->changes[$prop] = [];
         } elseif ($current != $val) {
             $this->changes[$prop] = [$current, $val];

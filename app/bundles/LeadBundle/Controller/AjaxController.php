@@ -174,7 +174,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
+            if (null !== $lead && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $leadFields = $lead->getFields();
                 /** @var IntegrationHelper $integrationHelper */
                 $integrationHelper = $this->factory->getHelper('integration');
@@ -236,7 +236,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
+            if (null !== $lead && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editown', $lead->getPermissionUser())) {
                 $dataArray['success'] = 1;
                 /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
                 $helper         = $this->factory->getHelper('integration');
@@ -281,7 +281,7 @@ class AjaxController extends CommonAjaxController
             $model = $this->getModel('lead.lead');
             $lead  = $model->getEntity($leadId);
 
-            if ($lead !== null) {
+            if (null !== $lead) {
                 $session = $this->get('session');
 
                 $filter = [
@@ -338,8 +338,8 @@ class AjaxController extends CommonAjaxController
             $lead = $leadModel->getEntity($leadId);
             $list = $listModel->getEntity($listId);
 
-            if ($lead !== null && $list !== null) {
-                $class = $action == 'add' ? 'addToLists' : 'removeFromLists';
+            if (null !== $lead && null !== $list) {
+                $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
                 $leadModel->$class($lead, $list);
                 $dataArray['success'] = 1;
             }
@@ -365,10 +365,10 @@ class AjaxController extends CommonAjaxController
 
             $lead = $leadModel->getEntity($leadId);
 
-            if ($lead !== null && $channel !== null) {
-                if ($action === 'remove') {
+            if (null !== $lead && null !== $channel) {
+                if ('remove' === $action) {
                     $leadModel->addDncForLead($lead, $channel, 'user', DoNotContact::MANUAL);
-                } elseif ($action === 'add') {
+                } elseif ('add' === $action) {
                     $leadModel->removeDncForLead($lead, $channel);
                 }
                 $dataArray['success'] = 1;
@@ -397,7 +397,7 @@ class AjaxController extends CommonAjaxController
             $lead     = $leadModel->getEntity($leadId);
             $campaign = $campaignModel->getEntity($campaignId);
 
-            if ($lead !== null && $campaign !== null) {
+            if (null !== $lead && null !== $campaign) {
                 $class = "{$action}Lead";
                 $campaignModel->$class($campaign, $lead, true);
                 $dataArray['success'] = 1;
@@ -426,8 +426,8 @@ class AjaxController extends CommonAjaxController
             $lead    = $leadModel->getEntity($leadId);
             $company = $companyModel->getEntity($companyId);
 
-            if ($lead !== null && $company !== null) {
-                $class = $action == 'add' ? 'addLeadToCompany' : 'removeLeadFromCompany';
+            if (null !== $lead && null !== $company) {
+                $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
                 $companyModel->$class($company, $lead);
                 $dataArray['success'] = 1;
             }
@@ -534,7 +534,7 @@ class AjaxController extends CommonAjaxController
             $session->set('mautic.lead.indexmode', $indexMode);
 
             // (strpos($search, "$isCommand:$anonymous") === false && strpos($search, "$listCommand:") === false)) ||
-            if ($indexMode != 'list') {
+            if ('list' != $indexMode) {
                 //remove anonymous leads unless requested to prevent clutter
                 $filter['force'][] = "!$anonymous";
             }
@@ -565,7 +565,7 @@ class AjaxController extends CommonAjaxController
                 /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
                 $emailRepo          = $this->getModel('email')->getRepository();
                 $indexMode          = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
-                $template           = ($indexMode == 'list') ? 'list_rows' : 'grid_cards';
+                $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->factory->getTemplating()->render(
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
@@ -601,7 +601,7 @@ class AjaxController extends CommonAjaxController
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($emailId);
 
-        if ($email !== null
+        if (null !== $email
             && $this->get('mautic.security')->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
@@ -632,7 +632,7 @@ class AjaxController extends CommonAjaxController
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
 
-        if ($lead !== null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if (null !== $lead && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $leadModel->setTags($lead, $updatedTags, true);
 
             /** @var \Doctrine\ORM\PersistentCollection $leadTags */
@@ -791,7 +791,7 @@ class AjaxController extends CommonAjaxController
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = FormFieldHelper::parseList($properties['list']);
-            } elseif (!empty($properties) && $leadFieldType == 'boolean') {
+            } elseif (!empty($properties) && 'boolean' == $leadFieldType) {
                 // Boolean options
                 $options = [
                     0 => $properties['no'],

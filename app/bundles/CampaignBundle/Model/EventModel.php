@@ -64,11 +64,11 @@ class EventModel extends LegacyEventModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Event();
         }
 
@@ -91,7 +91,7 @@ class EventModel extends LegacyEventModel
                 $deleteMe = $deleteMe->getId();
             }
 
-            if (strpos($deleteMe, 'new') === 0) {
+            if (0 === strpos($deleteMe, 'new')) {
                 unset($deletedEvents[$k]);
             }
 

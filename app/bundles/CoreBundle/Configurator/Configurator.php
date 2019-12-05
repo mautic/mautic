@@ -221,7 +221,7 @@ class Configurator
         $string .= "\$parameters = array(\n";
 
         foreach ($this->parameters as $key => $value) {
-            if ($value !== '') {
+            if ('' !== $value) {
                 if (is_string($value)) {
                     $value = "'".addcslashes($value, '\\\'')."'";
                 } elseif (is_bool($value)) {
@@ -291,7 +291,7 @@ class Configurator
 
         $return = file_put_contents($this->filename, $this->render());
 
-        if ($return === false) {
+        if (false === $return) {
             throw new RuntimeException('An error occurred while attempting to write the config file to the filesystem.');
         }
 

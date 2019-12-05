@@ -28,7 +28,7 @@ class Serializer
      */
     public static function decode($serializedString, array $options = ['allowed_classes' => false])
     {
-        if (stripos($serializedString, 'o:') !== false) {
+        if (false !== stripos($serializedString, 'o:')) {
             throw new \InvalidArgumentException(sprintf('The string %s contains an object.', $serializedString));
         }
 

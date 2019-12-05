@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -400,7 +401,7 @@
         {
             if ($sourceImage->isTransparent()) {
                 $rgba = $sourceImage->getTransparentColorRGB();
-                if ($rgba === null) {
+                if (null === $rgba) {
                     return;
                 }
 
@@ -908,7 +909,7 @@
          **/
         public function getCanvas()
         {
-            if ($this->canvas == null) {
+            if (null == $this->canvas) {
                 $this->canvas = new WideImage_Canvas($this);
             }
 

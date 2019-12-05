@@ -130,7 +130,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     /**
      * Get the common directory for data.
      *
-     * @return null|string
+     * @return string|null
      */
     protected function getDataDir()
     {

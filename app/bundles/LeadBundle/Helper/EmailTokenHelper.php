@@ -49,7 +49,7 @@ class EmailTokenHelper
         //set limits
         $limit = 5;
 
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -83,7 +83,7 @@ class EmailTokenHelper
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $page = 1;
             } else {
                 $page = (ceil($count / $limit)) ?: 1;

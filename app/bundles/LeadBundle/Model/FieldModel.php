@@ -354,11 +354,11 @@ class FieldModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadField();
         }
 
@@ -443,7 +443,7 @@ class FieldModel extends FormModel
         $object  = $objects[$entity->getObject()];
         $type    = $entity->getType();
 
-        if ($type == 'time') {
+        if ('time' == $type) {
             //time does not work well with list filters
             $entity->setIsListable(false);
         }
@@ -471,7 +471,7 @@ class FieldModel extends FormModel
             } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
 
-                if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
+                if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
                     throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
                 } else {
                     throw $e;
@@ -479,7 +479,7 @@ class FieldModel extends FormModel
             }
 
             // If this is a new contact field, and it was successfully added to the contacts table, save it
-            if ($isNew === true) {
+            if (true === $isNew) {
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
                 $this->getRepository()->saveEntity($entity);
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -510,7 +510,7 @@ class FieldModel extends FormModel
 
                     $modifySchema->executeChanges();
                 } catch (DriverException $e) {
-                    if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
+                    if (1069 === $e->getErrorCode() /* ER_TOO_MANY_KEYS */) {
                         $this->logger->addWarning($e->getMessage());
                     } else {
                         throw $e;
@@ -624,7 +624,7 @@ class FieldModel extends FormModel
     public function filterUsedFieldIds(array $ids)
     {
         return array_filter($ids, function ($id) {
-            return $this->isUsedField($this->getEntity($id)) === false;
+            return false === $this->isUsedField($this->getEntity($id));
         });
     }
 
@@ -1039,7 +1039,7 @@ class FieldModel extends FormModel
                 $schemaType = 'string';
                 break;
             case 'text':
-                $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
+                $schemaType = (false !== strpos($alias, 'description')) ? 'text' : 'string';
                 break;
             default:
                 $schemaType = 'text';

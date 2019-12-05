@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -29,7 +30,7 @@
             }
 
             $corner = WideImage::createTrueColorImage($radius * $sample_ratio, $radius * $sample_ratio);
-            if ($color === null) {
+            if (null === $color) {
                 imagepalettecopy($corner->getHandle(), $image->getHandle());
                 $bg_color = $corner->allocateColor(0, 0, 0);
 
@@ -41,7 +42,7 @@
                 $result = $image->asTrueColor();
 
                 $tc = $result->getTransparentColor();
-                if ($tc == -1) {
+                if (-1 == $tc) {
                     $tc = $result->allocateColorAlpha(255, 255, 255, 127);
                     imagecolortransparent($result->getHandle(), $tc);
                     $result->setTransparentColor($tc);

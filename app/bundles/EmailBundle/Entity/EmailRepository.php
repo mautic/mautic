@@ -76,7 +76,7 @@ class EmailRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
         $dnc     = count($results) ? $results[0] : null;
 
-        if ($dnc === null) {
+        if (null === $dnc) {
             return false;
         }
 
@@ -84,9 +84,9 @@ class EmailRepository extends CommonRepository
 
         return [
             'id'           => $dnc['id'],
-            'unsubscribed' => ($dnc['reason'] === DoNotContact::UNSUBSCRIBED),
-            'bounced'      => ($dnc['reason'] === DoNotContact::BOUNCED),
-            'manual'       => ($dnc['reason'] === DoNotContact::MANUAL),
+            'unsubscribed' => (DoNotContact::UNSUBSCRIBED === $dnc['reason']),
+            'bounced'      => (DoNotContact::BOUNCED === $dnc['reason']),
+            'manual'       => (DoNotContact::MANUAL === $dnc['reason']),
             'comments'     => $dnc['comments'],
         ];
     }
@@ -117,7 +117,7 @@ class EmailRepository extends CommonRepository
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
 
-            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
+            if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || 'list' == $args['email_type'])) {
                 $q->leftJoin('e.lists', 'l');
             }
         }
@@ -372,9 +372,9 @@ class EmailRepository extends CommonRepository
         }
 
         if ($topLevel) {
-            if (true === $topLevel || $topLevel == 'variant') {
+            if (true === $topLevel || 'variant' == $topLevel) {
                 $q->andWhere($q->expr()->isNull('e.variantParent'));
-            } elseif ($topLevel == 'translation') {
+            } elseif ('translation' == $topLevel) {
                 $q->andWhere($q->expr()->isNull('e.translationParent'));
             }
         }

@@ -42,7 +42,7 @@ class ActionModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Action();
         }
 
@@ -65,7 +65,7 @@ class ActionModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        if (empty($options['formId']) && $entity->getForm() !== null) {
+        if (empty($options['formId']) && null !== $entity->getForm()) {
             $options['formId'] = $entity->getForm()->getId();
         }
 

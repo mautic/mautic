@@ -89,7 +89,7 @@ class PageSubscriber extends CommonSubscriber
         if (count($matches[0])) {
             foreach ($matches[1] as $k => $id) {
                 $form = $this->formModel->getEntity($id);
-                if ($form !== null &&
+                if (null !== $form &&
                     (
                         $form->isPublished(false) ||
                         $this->security->hasEntityAccess(

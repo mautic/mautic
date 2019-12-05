@@ -40,7 +40,7 @@ class ConsoleTerminateListener
         $statusCode = $event->getExitCode();
         $command    = $event->getCommand();
 
-        if ($statusCode === 0) {
+        if (0 === $statusCode) {
             return;
         }
 

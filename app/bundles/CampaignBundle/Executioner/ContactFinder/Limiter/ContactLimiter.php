@@ -219,7 +219,7 @@ class ContactLimiter
      */
     public function hasCampaignLimit()
     {
-        return $this->campaignLimit !== null;
+        return null !== $this->campaignLimit;
     }
 
     /**

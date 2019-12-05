@@ -58,7 +58,7 @@ class IpLookupFactory
      * @param null  $auth
      * @param array $ipLookupConfig
      *
-     * @return null|AbstractLookup
+     * @return AbstractLookup|null
      */
     public function getService($service, $auth = null, array $ipLookupConfig = [])
     {
@@ -74,7 +74,7 @@ class IpLookupFactory
             }
 
             $className = $this->lookupServices[$service]['class'];
-            if (substr($className, 0, 1) !== '\\') {
+            if ('\\' !== substr($className, 0, 1)) {
                 $className = '\\'.$className;
             }
 
