@@ -16,7 +16,7 @@ use Mautic\CoreBundle\IpLookup\IpstackLookup;
 /**
  * Class FreegeoipLookupTest.
  */
-class IpstackLookupTest extends \PHPUnit_Framework_TestCase
+class IpstackLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testIpLookupSuccessful()
     {

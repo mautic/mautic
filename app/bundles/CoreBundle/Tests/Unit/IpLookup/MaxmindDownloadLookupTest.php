@@ -16,7 +16,7 @@ use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
 /**
  * Class MaxmindDownloadTest.
  */
-class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
+class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testDownloadDataStore()
     {

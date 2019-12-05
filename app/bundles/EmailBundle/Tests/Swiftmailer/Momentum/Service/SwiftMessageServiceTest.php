@@ -9,7 +9,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 /**
  * Class SwiftMessageServiceTest.
  */
-class SwiftMessageServiceTest extends \PHPUnit_Framework_TestCase
+class SwiftMessageServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

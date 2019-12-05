@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Test\Model;
 
 use Mautic\EmailBundle\Model\TransportType;
 
-class TransportTypeTest extends \PHPUnit_Framework_TestCase
+class TransportTypeTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetTransportTypes()
     {

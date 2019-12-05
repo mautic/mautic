@@ -18,7 +18,7 @@ use Mautic\EmailBundle\EventListener\TrackingSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 
-class TrackingSubscriberTest extends \PHPUnit_Framework_TestCase
+class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|StatRepository

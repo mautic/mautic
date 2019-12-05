@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class CompanyModelTest.
  */
-final class DeviceTrackingServiceTest extends \PHPUnit_Framework_TestCase
+final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

@@ -38,7 +38,7 @@ use Symfony\Component\Routing\Router;
 /**
  * Class SalesforceIntegrationTest.
  */
-class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
+class SalesforceIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
     const SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
@@ -453,11 +453,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     $args = func_get_args();
 
                     // Checking for campaign members should return empty array for testing purposes
-                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'CampaignMember') !== false) {
+                    if (false !== strpos($args[0], '/query') && false !== strpos($args[1]['q'], 'CampaignMember')) {
                         return [];
                     }
 
-                    if (strpos($args[0], '/composite') !== false) {
+                    if (false !== strpos($args[0], '/composite')) {
                         $this->assertSame(
                             '1-CampaignMemberNew-null-1',
                             $args[1]['compositeRequest'][0]['referenceId'],
@@ -489,11 +489,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     $args = func_get_args();
 
                     // Checking for campaign members should return empty array for testing purposes
-                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'Account') !== false) {
+                    if (false !== strpos($args[0], '/query') && false !== strpos($args[1]['q'], 'Account')) {
                         return [];
                     }
 
-                    if (strpos($args[0], '/composite') !== false) {
+                    if (false !== strpos($args[0], '/composite')) {
                         $this->assertSame(
                             '1-Account-null-1',
                             $args[1]['compositeRequest'][0]['referenceId'],
@@ -1090,26 +1090,26 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         $args = func_get_args();
                         // Determine what to return by analyzing the URL and query parameters
                         switch (true) {
-                            case strpos($args[0], '/query') !== false:
-                                if (isset($args[1]['q']) && strpos($args[0], 'from CampaignMember') !== false) {
+                            case false !== strpos($args[0], '/query'):
+                                if (isset($args[1]['q']) && false !== strpos($args[0], 'from CampaignMember')) {
                                     return [];
-                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
+                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Campaign')) {
                                     return [
                                         'totalSize' => 0,
                                         'records'   => [],
                                     ];
-                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
+                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from Account')) {
                                     return [
                                         'totalSize' => 0,
                                         'records'   => [],
                                     ];
-                                } elseif (isset($args[1]['q']) && $args[1]['q'] === 'SELECT CreatedDate from Organization') {
+                                } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
                                     return [
                                         'records' => [
                                             ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                                         ],
                                     ];
-                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from '.$updateObject.'History') !== false) {
+                                } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from '.$updateObject.'History')) {
                                     return $this->getSalesforceDNCHistory($updateObject);
                                 } else {
                                     // Extract emails
@@ -1122,7 +1122,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                         return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
                                     }
                                 }
-                            case strpos($args[0], '/composite') !== false:
+                                // no break
+                            case false !== strpos($args[0], '/composite'):
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }
                     }
@@ -1469,11 +1470,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 $contactId = '';
                 $parts     = explode('-', $subrequest['referenceId']);
 
-                if (count($parts) === 3) {
+                if (3 === count($parts)) {
                     list($contactId, $sfObject, $id) = $parts;
-                } elseif (count($parts) === 2) {
+                } elseif (2 === count($parts)) {
                     list($contactId, $sfObject) = $parts;
-                } elseif (count($parts) === 4) {
+                } elseif (4 === count($parts)) {
                     list($contactId, $sfObject, $empty, $campaignId) = $parts;
                 }
                 $response[] = [

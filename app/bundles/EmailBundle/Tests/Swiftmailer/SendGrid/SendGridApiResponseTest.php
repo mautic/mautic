@@ -17,7 +17,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse;
 use Monolog\Logger;
 use SendGrid\Response;
 
-class SendGridApiResponseTest extends \PHPUnit_Framework_TestCase
+class SendGridApiResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider successfulResponseProvider

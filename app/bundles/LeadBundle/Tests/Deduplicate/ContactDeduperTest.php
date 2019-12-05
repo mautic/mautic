@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class ContactDeduperTest extends \PHPUnit_Framework_TestCase
+class ContactDeduperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|FieldModel
@@ -124,8 +124,8 @@ class ContactDeduperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param   $id
-     * @param   $email
+     * @param $id
+     * @param $email
      *
      * @return Lead|\PHPUnit_Framework_MockObject_MockObject
      */

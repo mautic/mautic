@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Helper\FileUploader;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileUploaderTest extends \PHPUnit_Framework_TestCase
+class FileUploaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Uploader uploads files correctly

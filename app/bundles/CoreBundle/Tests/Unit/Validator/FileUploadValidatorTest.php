@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FileUploadValidatorTest extends \PHPUnit_Framework_TestCase
+class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Check that extension is valid

@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 /**
  * Class ColorHelper test.
  */
-class LineChartTest extends \PHPUnit_Framework_TestCase
+class LineChartTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The getUnitInterval returns the correct interval objects

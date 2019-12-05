@@ -11,7 +11,7 @@ namespace MauticCrmBundle\Api;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsApiTest extends \PHPUnit_Framework_TestCase
+class DynamicsApiTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DynamicsApi */
     private $api;

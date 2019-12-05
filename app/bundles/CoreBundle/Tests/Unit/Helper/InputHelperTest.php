@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 /**
  * Class InputHelperTest test.
  */
-class InputHelperTest extends \PHPUnit_Framework_TestCase
+class InputHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The html returns correct values

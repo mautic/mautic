@@ -19,7 +19,7 @@ use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 
-class EventLoggerTest extends \PHPUnit_Framework_TestCase
+class EventLoggerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject

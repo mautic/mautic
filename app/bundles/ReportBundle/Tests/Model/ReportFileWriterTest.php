@@ -21,7 +21,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportFileWriterTest extends \PHPUnit_Framework_TestCase
+class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 {
     public function testWriteReportData()
     {

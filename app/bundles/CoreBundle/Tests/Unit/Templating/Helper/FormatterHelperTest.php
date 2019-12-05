@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FormatterHelperTest extends \PHPUnit_Framework_TestCase
+class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStrictHtmlFormatIsRemovingScriptTags()
     {

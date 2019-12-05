@@ -46,7 +46,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailModelTest extends \PHPUnit_Framework_TestCase
+class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
     private $ipLookupHelper;
     private $themeHelper;
@@ -558,7 +558,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $this->emailEntity->method('getId')
             ->will($this->returnValue(1));
 
-        $this->assertTrue(count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])) === 0);
+        $this->assertTrue(0 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
     }
 
     /**
@@ -637,7 +637,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ],
             ['email_type' => 'marketing']
         );
-        $this->assertTrue(count($result) === 0, print_r($result, true));
+        $this->assertTrue(0 === count($result), print_r($result, true));
     }
 
     public function testHitEmailSavesEmailStatAndDeviceStatInTwoTransactions()

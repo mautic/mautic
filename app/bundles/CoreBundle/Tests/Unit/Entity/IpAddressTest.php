@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 
-class IpAddressTest extends \PHPUnit_Framework_TestCase
+class IpAddressTest extends \PHPUnit\Framework\TestCase
 {
     public function testExactIp()
     {

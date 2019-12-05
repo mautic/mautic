@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ProcessEmailQueueCommandTest extends \PHPUnit_Framework_TestCase
+class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
 {
     private $coreParametersHelper;
     private $dispatcher;

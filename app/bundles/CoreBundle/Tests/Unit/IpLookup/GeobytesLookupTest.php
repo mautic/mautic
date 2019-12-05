@@ -16,7 +16,7 @@ use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 /**
  * Class GeobytesLookupTest.
  */
-class GeobytesLookupTest extends \PHPUnit_Framework_TestCase
+class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testIpLookupSuccessful()
     {

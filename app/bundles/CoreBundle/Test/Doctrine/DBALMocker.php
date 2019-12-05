@@ -26,7 +26,7 @@ class DBALMocker
         'parameters' => [],
     ];
 
-    public function __construct(\PHPUnit_Framework_TestCase $testCase)
+    public function __construct(\PHPUnit\Framework\TestCase $testCase)
     {
         $this->testCase = $testCase;
     }
@@ -83,7 +83,7 @@ class DBALMocker
 
     public function getMockEm()
     {
-        if ($this->mockEm === null) {
+        if (null === $this->mockEm) {
             $mock = $this->testCase->getMockBuilder(EntityManager::class)
                 ->disableOriginalConstructor()
                 ->setMethods(
@@ -120,7 +120,7 @@ class DBALMocker
 
     public function getMockConnection()
     {
-        if ($this->mockConnection === null) {
+        if (null === $this->mockConnection) {
             $mock = $this->testCase->getMockBuilder(Connection::class)
                 ->disableOriginalConstructor()
                 ->setMethods([
@@ -159,7 +159,7 @@ class DBALMocker
 
     public function getMockQueryBuilder()
     {
-        if ($this->mockQueryBuilder === null) {
+        if (null === $this->mockQueryBuilder) {
             $mock = $this->testCase->getMockBuilder(QueryBuilder::class)
                 ->disableOriginalConstructor()
                 ->setMethods(

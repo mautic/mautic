@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder\Limiter;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
-class ContactLimiterTest extends \PHPUnit_Framework_TestCase
+class ContactLimiterTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters()
     {

@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 /**
  * Class Mailbox.
  */
-class MailboxTest extends \PHPUnit_Framework_TestCase
+class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithDefaultConfig()
     {

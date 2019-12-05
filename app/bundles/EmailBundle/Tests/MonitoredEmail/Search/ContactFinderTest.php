@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
 
-class ContactFinderTest extends \PHPUnit_Framework_TestCase
+class ContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Contact should be found via contact email address

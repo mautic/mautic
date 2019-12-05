@@ -18,7 +18,7 @@ use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MessageScheduleTest extends \PHPUnit_Framework_TestCase
+class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider testSendFileProvider

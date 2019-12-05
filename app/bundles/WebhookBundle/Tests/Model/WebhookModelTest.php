@@ -21,7 +21,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 
-class WebhookModelTest extends \PHPUnit_Framework_TestCase
+class WebhookModelTest extends \PHPUnit\Framework\TestCase
 {
     private $parametersHelperMock;
     private $serializerMock;

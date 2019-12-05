@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\FileHelper;
 
-class FileHelperTest extends \PHPUnit_Framework_TestCase
+class FileHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Conversion of Bytes to Megebytes

@@ -17,7 +17,7 @@ use SendGrid\Email;
 use SendGrid\Mail;
 use SendGrid\Personalization;
 
-class SendGridMailPersonalizationTest extends \PHPUnit_Framework_TestCase
+class SendGridMailPersonalizationTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotMauticMessage()
     {

@@ -13,7 +13,7 @@ namespace Mautic\CampaignBundle\Tests\Model;
 
 use Mautic\CampaignBundle\Model\EventModel;
 
-class EventModelTest extends \PHPUnit_Framework_TestCase
+class EventModelTest extends \PHPUnit\Framework\TestCase
 {
     public function testThatClonedEventsDoNotAttemptNullingParentInDeleteEvents()
     {

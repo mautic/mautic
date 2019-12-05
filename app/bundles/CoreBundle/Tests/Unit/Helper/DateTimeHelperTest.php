@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * Class DateTimeHelper test.
  */
-class DateTimeHelperTest extends \PHPUnit_Framework_TestCase
+class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The guessTimezoneFromOffset returns correct values

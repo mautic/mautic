@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class EmailControllerTest extends \PHPUnit_Framework_TestCase
+class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
     private $translatorMock;
     private $sessionMock;

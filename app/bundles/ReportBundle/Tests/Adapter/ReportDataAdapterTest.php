@@ -18,7 +18,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
+class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided()
     {

@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class PointEventHelper extends \PHPUnit_Framework_TestCase
+class PointEventHelper extends \PHPUnit\Framework\TestCase
 {
     public function testSendEmail()
     {

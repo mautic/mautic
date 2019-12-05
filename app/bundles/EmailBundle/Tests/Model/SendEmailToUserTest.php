@@ -19,7 +19,7 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 
-class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
+class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmailNotFound()
     {

@@ -15,7 +15,7 @@ use Mautic\ConfigBundle\Exception\BadFormConfigException;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ConfigMapperTest extends \PHPUnit_Framework_TestCase
+class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
     private $forms = [
         'emailconfig' => [

@@ -19,7 +19,7 @@ use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
-class SchedulerPlannerTest extends \PHPUnit_Framework_TestCase
+class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 {
     public function testComputeSchedule()
     {

@@ -29,7 +29,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends \PHPUnit_Framework_TestCase
+class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface

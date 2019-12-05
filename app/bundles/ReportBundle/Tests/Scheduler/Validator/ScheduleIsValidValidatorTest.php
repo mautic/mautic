@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class ScheduleIsValidValidatorTest extends \PHPUnit_Framework_TestCase
+class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoSchedule()
     {

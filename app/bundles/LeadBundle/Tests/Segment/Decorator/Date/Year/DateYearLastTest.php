@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateYearLastTest extends \PHPUnit_Framework_TestCase
+class DateYearLastTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast::getOperator

@@ -22,7 +22,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class MembershipManagerTest extends \PHPUnit_Framework_TestCase
+class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Adder|\PHPUnit_Framework_MockObject_MockObject

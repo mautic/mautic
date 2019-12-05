@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class CommonStatsSubscriberTest extends \PHPUnit_Framework_TestCase
+class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

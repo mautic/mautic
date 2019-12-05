@@ -17,7 +17,7 @@ use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\Translator;
 
-class EmailValidatorTest extends \PHPUnit_Framework_TestCase
+class EmailValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidGmailEmail()
     {

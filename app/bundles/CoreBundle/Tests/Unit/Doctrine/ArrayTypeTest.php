@@ -35,7 +35,7 @@ class ExampleClassWithPublicProperty
 /**
  * Class IpLookupFactoryTest.
  */
-class ArrayTypeTest extends \PHPUnit_Framework_TestCase
+class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 

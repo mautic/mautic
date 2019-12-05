@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class IpLookupHelperTest.
  */
-class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
+class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function __construct($name = null, array $data = [], $dataName = '')
     {
@@ -100,7 +100,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getParameter')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
-                    return $param === 'mautic.track_private_ip_ranges' ? true : $defaultValue;
+                    return 'mautic.track_private_ip_ranges' === $param ? true : $defaultValue;
                 }
             );
         $ip      = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();

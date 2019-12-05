@@ -20,7 +20,7 @@ use Mautic\UserBundle\Model\UserToken\UserTokenService;
 /**
  * Class UserTokenServiceTest.
  */
-class UserTokenServiceTest extends \PHPUnit_Framework_TestCase
+class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
