@@ -271,6 +271,7 @@ return [
             'mautic.campaign.model.event_log' => [
                 'class'     => 'Mautic\CampaignBundle\Model\EventLogModel',
                 'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
                     'mautic.helper.ip_lookup',

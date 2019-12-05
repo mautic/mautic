@@ -11,8 +11,10 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -24,6 +26,11 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class EventLogModel extends AbstractCommonModel
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     /**
      * @var EventModel
      */
@@ -45,18 +52,30 @@ class EventLogModel extends AbstractCommonModel
     protected $eventScheduler;
 
     /**
-     * EventLogModel constructor.
-     *
+     * @var LeadEventLogRepository
+     */
+    protected $repository;
+
+    /**
+     * @param EntityManager  $em
      * @param EventModel     $eventModel
      * @param CampaignModel  $campaignModel
      * @param IpLookupHelper $ipLookupHelper
+     * @param EventScheduler $eventScheduler
      */
-    public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper, EventScheduler $eventScheduler)
-    {
+    public function __construct(
+        EntityManager $em,
+        EventModel $eventModel,
+        CampaignModel $campaignModel,
+        IpLookupHelper $ipLookupHelper,
+        EventScheduler $eventScheduler
+    ) {
+        $this->em             = $em;
         $this->eventModel     = $eventModel;
         $this->campaignModel  = $campaignModel;
         $this->ipLookupHelper = $ipLookupHelper;
         $this->eventScheduler = $eventScheduler;
+        $this->repository     = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
     }
 
     /**
@@ -66,7 +85,7 @@ class EventLogModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        return $this->repository;
     }
 
     /**
