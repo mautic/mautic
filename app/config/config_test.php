@@ -112,10 +112,8 @@ $container->loadFromExtension('monolog', [
 ]);
 
 $container->loadFromExtension('liip_test_fixtures', [
-    [
-        'cache_db' => [
-            'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
-        ],
+    'cache_db' => [
+        'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
     ],
 ]);
 
