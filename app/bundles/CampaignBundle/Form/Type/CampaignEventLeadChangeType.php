@@ -51,4 +51,9 @@ class CampaignEventLeadChangeType extends AbstractType
             'required' => false,
         ]);
     }
+
+    public function getBlockPrefix()
+    {
+        return 'campaignevent_leadchange';
+    }
 }

@@ -48,6 +48,11 @@ class CampaignEventAddRemoveLeadType extends AbstractType
         ]);
     }
 
+    public function getBlockPrefix()
+    {
+        return 'campaignevent_addremovelead';
+    }
+
     /**
      * @param OptionsResolver $resolver
      */

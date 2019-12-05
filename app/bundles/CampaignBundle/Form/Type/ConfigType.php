@@ -58,4 +58,9 @@ class ConfigType extends AbstractType
             ]
         );
     }
+
+    public function getBlockPrefix()
+    {
+        return 'campaignconfig';
+    }
 }
