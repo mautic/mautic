@@ -144,8 +144,8 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $user              = $this->request->request->get('user', []);
-                $submittedPassword = $user['plainPassword']['password'] ?? null;
+                $formUser          = $this->request->request->get('user', []);
+                $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $encoder           = $this->get('security.encoder_factory')->getEncoder($user);
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -251,8 +251,7 @@ class UserController extends FormController
             ],
         ];
 
-        //user not found
-        if ($user === null) {
+        if (null === $user) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -278,8 +277,8 @@ class UserController extends FormController
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $user              = $this->request->request->get('user', []);
-                $submittedPassword = $user['plainPassword']['password'] ?? null;
+                $formUser          = $this->request->request->get('user', []);
+                $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $encoder           = $this->get('security.encoder_factory')->getEncoder($user);
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 

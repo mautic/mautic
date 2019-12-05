@@ -149,8 +149,8 @@ class ProfileController extends FormController
             $this->get('session')->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed
-            $user                  = $this->request->request->get('user', []);
-            $submittedPassword     = $user['plainPassword']['password'] ?? null;
+            $formUser              = $this->request->request->get('user', []);
+            $submittedPassword     = $formUser['plainPassword']['password'] ?? null;
             $encoder               = $this->get('security.encoder_factory')->getEncoder($me);
             $overrides['password'] = $model->checkNewPassword($me, $encoder, $submittedPassword);
             if (!$cancelled = $this->isFormCancelled($form)) {

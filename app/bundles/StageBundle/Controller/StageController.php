@@ -160,7 +160,7 @@ class StageController extends AbstractFormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($method === 'POST') {
+        if ('POST' === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -272,7 +272,7 @@ class StageController extends AbstractFormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
