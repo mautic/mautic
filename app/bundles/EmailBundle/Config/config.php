@@ -766,7 +766,7 @@ return [
         'mailer_from_name'             => 'Mautic',
         'mailer_from_email'            => 'email@yoursite.com',
         'mailer_return_path'           => null,
-        'mailer_transport'             => 'mail',
+        'mailer_transport'             => 'smtp',
         'mailer_append_tracking_pixel' => true,
         'mailer_convert_embed_images'  => false,
         'mailer_host'                  => '',
