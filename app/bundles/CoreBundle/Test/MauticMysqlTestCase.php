@@ -107,7 +107,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $connection = $this->container->get('doctrine.dbal.default_connection');
         $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} > {$this->sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
+        $command    = "mysqldump --add-drop-table --no-defaults --opt -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} > {$this->sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
 
         $lastLine = system($command, $status);
         if (0 !== $status) {
@@ -116,7 +116,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
         $f         = fopen($this->sqlDumpFile, 'r');
         $firstLine = fgets($f);
-        if (strpos($firstLine, 'Using a password') !== false) {
+        if (false !== strpos($firstLine, 'Using a password')) {
             $file = file($this->sqlDumpFile);
             unset($file[0]);
             file_put_contents($this->sqlDumpFile, $file);
