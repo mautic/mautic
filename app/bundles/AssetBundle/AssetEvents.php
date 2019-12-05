@@ -105,12 +105,4 @@ final class AssetEvents
      * @var string
      */
     const ON_DETERMINE_DOWNLOAD_RATE_WINNER = 'mautic.asset.on_download_rate_winner';
-
-    /**
-     * The mautic.asset.download_file event is fired after a successful form submission that gets through form validation
-     * and needs to direct the user to the file download.
-     *
-     * The event listener receives a \Mautic\FormBundle\Event\SubmissionEvent
-     */
-    const ON_FORM_SUBMIT_DOWNLOAD_FILE  = 'mautic.asset.download_file';
 }
