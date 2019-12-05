@@ -19,7 +19,7 @@ use SendGrid\ReplyTo;
 class SendGridMailMetadata
 {
     /**
-     * @param Mail                $mail
+     * @param Mail                      $mail
      * @param \Swift_Mime_SimpleMessage $message
      */
     public function addMetadataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)

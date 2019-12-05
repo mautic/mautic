@@ -51,7 +51,7 @@ final class MomentumCallback implements MomentumCallbackInterface
 
     /**
      * @param \Swift_Mime_SimpleMessage $message
-     * @param array               $response
+     * @param array                     $response
      *
      * @return mixed|void
      */

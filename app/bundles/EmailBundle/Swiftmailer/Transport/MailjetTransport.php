@@ -51,7 +51,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
 
     /**
      * @param \Swift_Mime_SimpleMessage $message
-     * @param null                $failedRecipients
+     * @param null                      $failedRecipients
      *
      * @return int|void
      *
@@ -115,20 +115,20 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
                 continue;
             }
 
-            if ($event['event'] === 'bounce' || $event['event'] === 'blocked') {
+            if ('bounce' === $event['event'] || 'blocked' === $event['event']) {
                 $reason = $event['error_related_to'].': '.$event['error'];
                 $type   = DoNotContact::BOUNCED;
-            } elseif ($event['event'] === 'spam') {
+            } elseif ('spam' === $event['event']) {
                 $reason = 'User reported email as spam, source: '.$event['source'];
                 $type   = DoNotContact::UNSUBSCRIBED;
-            } elseif ($event['event'] === 'unsub') {
+            } elseif ('unsub' === $event['event']) {
                 $reason = 'User unsubscribed';
                 $type   = DoNotContact::UNSUBSCRIBED;
             } else {
                 continue;
             }
 
-            if (isset($event['CustomID']) && $event['CustomID'] !== '' && strpos($event['CustomID'], '-', 0) !== false) {
+            if (isset($event['CustomID']) && '' !== $event['CustomID'] && false !== strpos($event['CustomID'], '-', 0)) {
                 $fistDashPos = strpos($event['CustomID'], '-', 0);
                 $leadIdHash  = substr($event['CustomID'], 0, $fistDashPos);
                 $leadEmail   = substr($event['CustomID'], $fistDashPos + 1, strlen($event['CustomID']));
