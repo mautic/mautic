@@ -75,10 +75,6 @@ return [
                     'translator',
                 ],
             ],
-            // @deprecated 2.12.0; to be removed in 3.0
-            'mautic.config.model.config' => [
-                'class' => \Mautic\ConfigBundle\Model\ConfigModel::class,
-            ],
         ],
         'others' => [
             'mautic.config.mapper' => [
