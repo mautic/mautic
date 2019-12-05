@@ -150,7 +150,8 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $permissions = $this->request->request->get('role[permissions]', null, true);
+                    $role        = $this->request->request->get('role', []);
+                    $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
@@ -254,12 +255,14 @@ class RoleController extends FormController
         $form              = $model->createForm($entity, $this->get('form.factory'), $action, ['permissionsConfig' => $permissionsConfig['config']]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() === 'POST') {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $permissions = $this->request->request->get('role[permissions]', null, true);
+                    $role        = $this->request->request->get('role', []);
+                    $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data

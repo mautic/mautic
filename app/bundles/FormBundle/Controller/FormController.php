@@ -284,9 +284,9 @@ class FormController extends CommonFormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.form.page', 1);
-
-        $sessionId = $this->request->request->get('mauticform[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
+        $page       = $this->get('session')->get('mautic.form.page', 1);
+        $mauticform = $this->request->request->get('mauticform', []);
+        $sessionId  = $mauticform['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
 
         //set added/updated fields
         $modifiedFields = $session->get('mautic.form.'.$sessionId.'.fields.modified', []);
