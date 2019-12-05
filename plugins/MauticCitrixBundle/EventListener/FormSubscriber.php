@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -33,6 +34,7 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Process\Exception\InvalidArgumentException;
 
 /**
  * Class FormSubscriber.
@@ -517,40 +519,35 @@ class FormSubscriber extends CommonSubscriber
     /**
      * @param Events\FormBuilderEvent $event
      *
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     * @throws BadConfigurationException
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
-        $activeProducts = [];
-        foreach (CitrixProducts::toArray() as $p) {
-            if (CitrixHelper::isAuthorized('Goto'.$p)) {
-                $activeProducts[] = $p;
-            }
-        }
+        $activeProducts = array_filter(CitrixProducts::toArray(), function ($product) {
+            return CitrixHelper::isAuthorized('Goto'.$product);
+        });
+
         if (0 === count($activeProducts)) {
             return;
         }
 
         foreach ($activeProducts as $product) {
-            // Select field
-            $field = [
+            $event->addFormField('plugin.citrix.select.'.$product, [
                 'label'    => 'plugin.citrix.'.$product.'.listfield',
                 'formType' => CitrixListType::class,
                 'template' => 'MauticCitrixBundle:Field:citrixlist.html.php',
                 'listType' => $product,
-            ];
-            $event->addFormField('plugin.citrix.select.'.$product, $field);
+            ]);
 
-            $validator = [
+            $event->addValidator('plugin.citrix.validate.'.$product, [
                 'eventName' => CitrixEvents::ON_FORM_VALIDATE_ACTION,
                 'fieldType' => 'plugin.citrix.select.'.$product,
-            ];
-            $event->addValidator('plugin.citrix.validate.'.$product, $validator);
+            ]);
 
-            // actions
             switch ($product) {
                 case CitrixProducts::GOTOWEBINAR:
-                    $action = [
+                    $event->addSubmitAction('plugin.citrix.action.register.webinar', [
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.webinar',
                         'label'           => 'plugin.citrix.action.register.webinar',
@@ -563,12 +560,10 @@ class FormSubscriber extends CommonSubscriber
                         ],
                         'template'  => 'MauticFormBundle:Action:generic.html.php',
                         'eventName' => CitrixEvents::ON_WEBINAR_REGISTER_ACTION,
-                    ];
-                    $event->addSubmitAction('plugin.citrix.action.register.webinar', $action);
+                    ]);
                     break;
-
                 case CitrixProducts::GOTOMEETING:
-                    $action = [
+                    $event->addSubmitAction('plugin.citrix.action.start.meeting', [
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.meeting',
                         'label'           => 'plugin.citrix.action.start.meeting',
@@ -581,12 +576,10 @@ class FormSubscriber extends CommonSubscriber
                                 'data-product-action' => 'start',
                             ],
                         ],
-                    ];
-                    $event->addSubmitAction('plugin.citrix.action.start.meeting', $action);
+                    ]);
                     break;
-
                 case CitrixProducts::GOTOTRAINING:
-                    $action = [
+                    $event->addSubmitAction('plugin.citrix.action.register.training', [
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.training',
                         'label'           => 'plugin.citrix.action.register.training',
@@ -599,10 +592,9 @@ class FormSubscriber extends CommonSubscriber
                                 'data-product-action' => 'register',
                             ],
                         ],
-                    ];
-                    $event->addSubmitAction('plugin.citrix.action.register.training', $action);
+                    ]);
 
-                    $action = [
+                    $event->addSubmitAction('plugin.citrix.action.start.training', [
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.start.training',
                         'label'           => 'plugin.citrix.action.start.training',
@@ -615,12 +607,10 @@ class FormSubscriber extends CommonSubscriber
                                 'data-product-action' => 'start',
                             ],
                         ],
-                    ];
-                    $event->addSubmitAction('plugin.citrix.action.start.training', $action);
+                    ]);
                     break;
-
                 case CitrixProducts::GOTOASSIST:
-                    $action = [
+                    $event->addSubmitAction('plugin.citrix.action.screensharing.assist', [
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.assist',
                         'label'           => 'plugin.citrix.action.screensharing.assist',
@@ -633,10 +623,8 @@ class FormSubscriber extends CommonSubscriber
                                 'data-product-action' => 'screensharing',
                             ],
                         ],
-                    ];
-                    $event->addSubmitAction('plugin.citrix.action.screensharing.assist', $action);
+                    ]);
                     break;
-
                 default:
                     break;
             }
