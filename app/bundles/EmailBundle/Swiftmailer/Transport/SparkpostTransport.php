@@ -83,7 +83,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getApiKey()
     {
@@ -121,7 +121,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @param \Swift_Mime_SimpleMessage $message
-     * @param null                $failedRecipients
+     * @param null                      $failedRecipients
      *
      * @return int Number of messages sent
      *
@@ -415,7 +415,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         $response = $promise->wait();
         $body     = $response->getBody();
 
-        if ($response->getStatusCode() === 403) {
+        if (403 === $response->getStatusCode()) {
             // We cannot fail as it would be a BC break. Throw a warning and continue.
             $this->logger->warning("The permission 'Templates: Preview' is not enabled. Enable it to let Mautic check email template validity before send.");
 
@@ -514,5 +514,13 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $this->transportCallback->addFailureByAddress($email, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
                 break;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

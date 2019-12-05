@@ -73,21 +73,13 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     }
 
     /**
-     * @return bool
-     */
-    public function ping()
-    {
-        return true;
-    }
-
-    /**
      * Send the given Message.
      *
      * Recipient/sender data will be retrieved from the Message API.
      * The return value is the number of recipients who were accepted for delivery.
      *
      * @param Swift_Mime_SimpleMessage $message
-     * @param string[]           $failedRecipients An array of failures by-reference
+     * @param string[]                 $failedRecipients An array of failures by-reference
      *
      * @return int
      *
@@ -115,7 +107,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      */
     private function getDispatcher()
     {
-        if ($this->swiftEventDispatcher === null) {
+        if (null === $this->swiftEventDispatcher) {
             $this->swiftEventDispatcher = new \Swift_Events_SimpleEventDispatcher();
         }
 
@@ -177,5 +169,13 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     public function processCallbackRequest(Request $request)
     {
         $this->sendGridApiCallback->processCallbackRequest($request);
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

@@ -107,7 +107,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
      */
     protected function getDispatcher()
     {
-        if ($this->dispatcher == null) {
+        if (null == $this->dispatcher) {
             $this->dispatcher = new \Swift_Events_SimpleEventDispatcher();
         }
 
@@ -116,7 +116,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 
     /**
      * @param \Swift_Mime_SimpleMessage $message
-     * @param null                $failedRecipients
+     * @param null                      $failedRecipients
      *
      * @return int
      *
@@ -279,7 +279,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
         $headers            = $this->message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->standardHeaderKeys)) {
+            if (\Swift_Mime_Header::TYPE_TEXT == $header->getFieldType() && !in_array($header->getFieldName(), $this->standardHeaderKeys)) {
                 $message['headers'][$header->getFieldName()] = $header->getFieldBodyModel();
             }
         }

@@ -19,7 +19,7 @@ use SendGrid\Personalization;
 class SendGridMailPersonalization
 {
     /**
-     * @param Mail                $mail
+     * @param Mail                      $mail
      * @param \Swift_Mime_SimpleMessage $message
      */
     public function addPersonalizedDataToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)

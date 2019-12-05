@@ -18,7 +18,7 @@ use SendGrid\Mail;
 class SendGridMailAttachment
 {
     /**
-     * @param Mail                $mail
+     * @param Mail                      $mail
      * @param \Swift_Mime_SimpleMessage $message
      */
     public function addAttachmentsToMail(Mail $mail, \Swift_Mime_SimpleMessage $message)
@@ -29,7 +29,7 @@ class SendGridMailAttachment
 
         foreach ($message->getAttachments() as $emailAttachment) {
             $fileContent = @file_get_contents($emailAttachment['filePath']);
-            if ($fileContent === false) {
+            if (false === $fileContent) {
                 continue;
             }
             $base64 = base64_encode($fileContent);

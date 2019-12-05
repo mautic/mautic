@@ -53,4 +53,12 @@ class SmtpTransport implements \Swift_Transport
     public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
     }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
+    }
 }
