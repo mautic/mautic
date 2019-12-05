@@ -18,34 +18,26 @@ return [
     'services' => [
         'events' => [
             'mautic.cloudstorage.remoteassetbrowse.subscriber' => [
-                'class' => 'MauticPlugin\MauticCloudStorageBundle\EventListener\RemoteAssetBrowseSubscriber',
+                'class' => \MauticPlugin\MauticCloudStorageBundle\EventListener\RemoteAssetBrowseSubscriber::class,
             ],
         ],
         'forms' => [
             'mautic.form.type.cloudstorage.openstack' => [
-                'class' => 'MauticPlugin\MauticCloudStorageBundle\Form\Type\OpenStackType',
-                'alias' => 'cloudstorage_openstack',
+                'class' => \MauticPlugin\MauticCloudStorageBundle\Form\Type\OpenStackType::class,
             ],
             'mautic.form.type.cloudstorage.rackspace' => [
-                'class' => 'MauticPlugin\MauticCloudStorageBundle\Form\Type\RackspaceType',
-                'alias' => 'cloudstorage_rackspace',
+                'class' => \MauticPlugin\MauticCloudStorageBundle\Form\Type\RackspaceType::class,
             ],
         ],
         'integrations' => [
             'mautic.integration.amazons3' => [
                 'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,
-                'arguments' => [
-                ],
             ],
             'mautic.integration.openstack' => [
                 'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\OpenStackIntegration::class,
-                'arguments' => [
-                ],
             ],
             'mautic.integration.rackspace' => [
                 'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\RackspaceIntegration::class,
-                'arguments' => [
-                ],
             ],
         ],
     ],

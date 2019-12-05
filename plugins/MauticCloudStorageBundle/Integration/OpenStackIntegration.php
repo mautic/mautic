@@ -13,11 +13,9 @@ namespace MauticPlugin\MauticCloudStorageBundle\Integration;
 
 use Gaufrette\Adapter\LazyOpenCloud;
 use Gaufrette\Adapter\OpenStackCloudFiles\ObjectStoreFactory;
+use MauticPlugin\MauticCloudStorageBundle\Form\Type\OpenStackType;
 use OpenCloud\OpenStack;
 
-/**
- * Class OpenStackIntegration.
- */
 class OpenStackIntegration extends CloudStorageIntegration
 {
     /**
@@ -97,6 +95,14 @@ class OpenStackIntegration extends CloudStorageIntegration
         }
 
         return $this->adapter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        return OpenStackType::class;
     }
 
     /**

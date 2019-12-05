@@ -104,7 +104,7 @@ class CheckStep implements StepInterface
     {
         $messages = [];
 
-        if (version_compare(PHP_VERSION, '5.6.19', '<')) {
+        if (version_compare(PHP_VERSION, '7.2.0', '<')) {
             $messages[] = 'mautic.install.php.version.not.supported';
         }
 
@@ -138,16 +138,6 @@ class CheckStep implements StepInterface
 
         if (get_magic_quotes_gpc()) {
             $messages[] = 'mautic.install.magic_quotes_enabled';
-        }
-
-        if (
-            version_compare(PHP_VERSION, '5.6.0', '>=')
-            &&
-            version_compare(PHP_VERSION, '7', '<')
-            &&
-            ini_get('always_populate_raw_post_data') != -1
-        ) {
-            $messages[] = 'mautic.install.always_populate_raw_post_data_enabled';
         }
 
         if (!function_exists('json_encode')) {

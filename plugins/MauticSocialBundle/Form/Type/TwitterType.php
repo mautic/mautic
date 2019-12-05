@@ -13,6 +13,8 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -26,20 +28,21 @@ class TwitterType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('count', 'choice', [
+        $builder->add('count', ChoiceType::class, [
             'choices' => [
-                'horizontal' => 'mautic.integration.Twitter.share.layout.horizontal',
-                'vertical'   => 'mautic.integration.Twitter.share.layout.vertical',
-                'none'       => 'mautic.integration.Twitter.share.layout.none',
+                'mautic.integration.Twitter.share.layout.horizontal' => 'horizontal',
+                'mautic.integration.Twitter.share.layout.vertical'   => 'vertical',
+                'mautic.integration.Twitter.share.layout.none'       => 'none',
             ],
-            'label'       => 'mautic.integration.Twitter.share.layout',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => ['class' => 'form-control'],
+            'choices_as_values' => true,
+            'label'             => 'mautic.integration.Twitter.share.layout',
+            'required'          => false,
+            'empty_value'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => ['class' => 'form-control'],
         ]);
 
-        $builder->add('text', 'text', [
+        $builder->add('text', TextType::class, [
             'label_attr' => ['class' => 'control-label'],
             'label'      => 'mautic.integration.Twitter.share.text',
             'required'   => false,
@@ -49,7 +52,7 @@ class TwitterType extends AbstractType
             ],
         ]);
 
-        $builder->add('via', 'text', [
+        $builder->add('via', TextType::class, [
             'label_attr' => ['class' => 'control-label'],
             'label'      => 'mautic.integration.Twitter.share.via',
             'required'   => false,
@@ -60,7 +63,7 @@ class TwitterType extends AbstractType
             ],
         ]);
 
-        $builder->add('related', 'text', [
+        $builder->add('related', TextType::class, [
             'label_attr' => ['class' => 'control-label'],
             'label'      => 'mautic.integration.Twitter.share.related',
             'required'   => false,
@@ -71,7 +74,7 @@ class TwitterType extends AbstractType
             ],
         ]);
 
-        $builder->add('hashtags', 'text', [
+        $builder->add('hashtags', TextType::class, [
             'label_attr' => ['class' => 'control-label'],
             'label'      => 'mautic.integration.Twitter.share.hashtag',
             'required'   => false,
@@ -93,7 +96,7 @@ class TwitterType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'socialmedia_twitter';
     }

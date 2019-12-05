@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use DateTime;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;

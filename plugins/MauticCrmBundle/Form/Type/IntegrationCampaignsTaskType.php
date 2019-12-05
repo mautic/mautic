@@ -15,9 +15,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class IntegrationCampaignsTaskType.
@@ -56,8 +56,9 @@ class IntegrationCampaignsTaskType extends AbstractType
             'campaign_activity_type',
             ChoiceType::class,
             [
-                'choices' => $activityTypes,
-                'attr'    => [
+                'choices'           => array_flip($activityTypes), // Choice type expects labels as keys
+                'choices_as_values' => true,
+                'attr'              => [
                     'class' => 'form-control', ],
                 'label'    => 'mautic.plugin.integration.campaigns.connectwise.activity.type',
                 'required' => false,
@@ -68,8 +69,9 @@ class IntegrationCampaignsTaskType extends AbstractType
             'campaign_members',
             ChoiceType::class,
             [
-                'choices' => $members,
-                'attr'    => [
+                'choices'           => array_flip($members),  // Choice type expects labels as keys
+                'choices_as_values' => true,
+                'attr'              => [
                     'class' => 'form-control', ],
                 'label'       => 'mautic.plugin.integration.campaigns.connectwise.members',
                 'constraints' => [
@@ -89,15 +91,15 @@ class IntegrationCampaignsTaskType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['helper']);
+        $resolver->setDefined(['helper']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_campaign_task';
     }

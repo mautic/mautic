@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
 
@@ -67,7 +68,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.stage.campaign.event.change',
             'description' => 'mautic.stage.campaign.event.change_descr',
             'eventName'   => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => 'stageaction_change',
+            'formType'    => StageActionChangeType::class,
             'formTheme'   => 'MauticStageBundle:FormTheme\StageActionChange',
         ];
         $event->addAction('stage.change', $action);

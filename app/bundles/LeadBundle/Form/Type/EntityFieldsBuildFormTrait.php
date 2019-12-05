@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\TelType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -280,6 +281,10 @@ trait EntityFieldsBuildFormTrait
                             if ($type == 'multiselect') {
                                 $constraints[] = new Length(['max' => 255]);
                             }
+                            break;
+                        case 'tel':
+                            $type = TelType::class;
+                        break;
                     }
 
                     $builder->add(

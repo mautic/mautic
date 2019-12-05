@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.2.0 <7.3",
 
         "symfony/console": "~3.4.0",
         "symfony/debug": "~3.4.0",
@@ -144,6 +144,12 @@
             "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
         ],
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist"
+    },
+    "config": {
+        "bin-dir": "bin",
+        "platform": {
+            "php": "7.2.0"
+        }
     },
     "extra": {
         "symfony-app-dir": "app",

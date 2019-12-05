@@ -11,10 +11,11 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Form\Type\UploadType;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * Class DashboardController.
  */
-class DashboardController extends FormController
+class DashboardController extends AbstractFormController
 {
     /**
      * Generates the default view.
@@ -428,7 +429,7 @@ class DashboardController extends FormController
         ];
 
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']);
-        $form   = $this->get('form.factory')->create('dashboard_upload', [], ['action' => $action]);
+        $form   = $this->get('form.factory')->create(UploadType::class, [], ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {

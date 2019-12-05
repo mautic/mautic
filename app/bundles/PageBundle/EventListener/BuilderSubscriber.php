@@ -119,14 +119,14 @@ class BuilderSubscriber extends CommonSubscriber
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner',
+                'event'    => PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
             $dwellTime = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.dwelltime',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner',
+                'event'    => PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
             ];
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
