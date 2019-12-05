@@ -58,7 +58,7 @@ class VariantType extends AbstractType
             ]
         );
 
-        $abTestWinnerCriteria = $this->factory->getModel('email')->getBuilderComponents(null, 'abTestWinnerCriteria');
+        $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {
             $criteria = $abTestWinnerCriteria['criteria'];
@@ -76,7 +76,7 @@ class VariantType extends AbstractType
                     ],
                     'expanded'    => false,
                     'multiple'    => false,
-                    'choices'     => array_flip($choices),
+                    'choices'     => $choices,
                     'empty_value' => 'mautic.core.form.chooseone',
                     'constraints' => [
                         new NotBlank(
