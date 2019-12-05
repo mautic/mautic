@@ -449,6 +449,10 @@ class FieldType extends AbstractType
                     $data['defaultValue'] = null;
                 }
 
+                if (isset($data['type']) && !in_array($data['type'], $this->indexableFieldsWithLimits)) {
+                    $data['charLengthLimit'] = null;
+                }
+
                 $event->setData($data);
             }
         );
