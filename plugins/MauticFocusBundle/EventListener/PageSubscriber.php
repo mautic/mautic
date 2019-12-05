@@ -75,7 +75,7 @@ class PageSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested($this->regex)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
-            $event->addTokensFromHelper($tokenHelper, $this->regex, 'name', 'id', true);
+            $event->addTokensFromHelper($tokenHelper, $this->regex, 'name');
         }
     }
 

@@ -81,7 +81,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested($this->assetToken)) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
-            $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title');
+            $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', true);
         }
     }
 

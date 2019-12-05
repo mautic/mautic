@@ -697,7 +697,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
-            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title');
+            $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
         }
     }
 
