@@ -111,8 +111,12 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
-$container->loadFromExtension('liip_functional_test', [
-    'cache_sqlite_db' => true,
+$container->loadFromExtension('liip_test_fixtures', [
+    [
+        'cache_db' => [
+            'sqlite' => 'liip_functional_test.services_database_backup.sqlite',
+        ],
+    ],
 ]);
 
 // Enable api by default

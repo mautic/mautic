@@ -118,7 +118,8 @@
         "sensio/generator-bundle": "~3.1.0",
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
-        "friendsofphp/php-cs-fixer": "~2.15.0"
+        "friendsofphp/php-cs-fixer": "~2.15.0",
+        "liip/test-fixtures-bundle": "^1.6"
     },
     "repositories": [
         {
