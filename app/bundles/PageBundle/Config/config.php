@@ -292,6 +292,7 @@ return [
             'mautic.page.model.trackable' => [
                 'class'     => \Mautic\PageBundle\Model\TrackableModel::class,
                 'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'mautic.page.model.redirect',
                     'mautic.lead.repository.field',
                 ],

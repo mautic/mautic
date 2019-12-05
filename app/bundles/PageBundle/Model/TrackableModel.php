@@ -11,12 +11,13 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 
@@ -54,6 +55,11 @@ class TrackableModel extends AbstractCommonModel
     protected $usingClickthrough = true;
 
     /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
      * @var RedirectModel
      */
     protected $redirectModel;
@@ -69,24 +75,26 @@ class TrackableModel extends AbstractCommonModel
     private $contactFieldUrlTokens;
 
     /**
-     * TrackableModel constructor.
-     *
-     * @param RedirectModel $redirectModel
+     * @var TrackableRepository
      */
-    public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
-    {
-        $this->redirectModel       = $redirectModel;
-        $this->leadFieldRepository = $leadFieldRepository;
-    }
+    private $repository;
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\PageBundle\Entity\TrackableRepository
+     * @param EntityManager       $em
+     * @param RedirectModel       $redirectModel
+     * @param LeadFieldRepository $leadFieldRepository
      */
+    public function __construct(EntityManager $em, RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
+    {
+        $this->em                  = $em;
+        $this->redirectModel       = $redirectModel;
+        $this->leadFieldRepository = $leadFieldRepository;
+        $this->repository          = $this->em->getRepository('MauticPageBundle:Trackable');
+    }
+
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPageBundle:Trackable');
+        return $this->repository;
     }
 
     /**
