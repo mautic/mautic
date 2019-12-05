@@ -934,6 +934,17 @@ return [
             ],
         ],
         'models' => [
+            'mautic.core.model.abstract_common_model' => [
+                'abstract' => true,
+                'class'    => 'Mautic\CoreBundle\Model\AbstractCommonModel',
+                'calls'    => [
+                    'setEntityManager'        => ['doctrine.orm.entity_manager'],
+                    'setUserHelper'           => ['mautic.helper.user'],
+                    'setCoreParametersHelper' => ['mautic.helper.core_parameters'],
+                    'setTranslator'           => ['translator'],
+                    'setLogger'               => ['monolog.logger'],
+                ],
+            ],
             'mautic.core.model.auditlog' => [
                 'class'     => 'Mautic\CoreBundle\Model\AuditLogModel',
                 'arguments' => [
@@ -958,13 +969,7 @@ return [
             ],
             'mautic.core.model.form' => [
                 'class'     => 'Mautic\CoreBundle\Model\FormModel',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.helper.user',
-                    'mautic.helper.core_parameters',
-                    'translator',
-                    'monolog.logger',
-                ],
+                'parent'    => 'mautic.core.model.abstract_common_model',
             ],
             /* @deprecated - 2.4 to be removed in 3.0; use mautic.channel.model.queue instead */
             'mautic.core.model.messagequeue' => [

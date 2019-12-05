@@ -15,7 +15,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Monolog\Logger;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -47,6 +49,16 @@ abstract class AbstractCommonModel
     protected $userHelper;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var Logger
+     */
+    protected $logger;
+
+    /**
      * @param EntityManager $em
      */
     public function setEntityManager(EntityManager $em)
@@ -60,6 +72,14 @@ abstract class AbstractCommonModel
     public function setRouter(Router $router)
     {
         $this->router = $router;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -78,6 +98,14 @@ abstract class AbstractCommonModel
     public function setUserHelper(UserHelper $userHelper)
     {
         $this->userHelper = $userHelper;
+    }
+
+    /**
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
