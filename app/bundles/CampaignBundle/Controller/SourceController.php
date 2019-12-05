@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Source;
+use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -60,7 +61,7 @@ class SourceController extends CommonFormController
 
         $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
-            'campaign_leadsource',
+            CampaignLeadSourceType::class,
             $source,
             [
                 'action'         => $this->generateUrl('mautic_campaignsource_action', ['objectAction' => 'new', 'objectId' => $objectId]),
@@ -165,7 +166,7 @@ class SourceController extends CommonFormController
 
         $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
-            'campaign_leadsource',
+            CampaignLeadSourceType::class,
             $source,
             [
                 'action'         => $this->generateUrl('mautic_campaignsource_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
