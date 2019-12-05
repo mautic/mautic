@@ -295,6 +295,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.page.model.redirect',
                     'mautic.lead.repository.field',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.page.model.video' => [

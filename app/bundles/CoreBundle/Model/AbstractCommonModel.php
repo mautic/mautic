@@ -15,13 +15,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Monolog\Logger;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -35,16 +30,6 @@ abstract class AbstractCommonModel
      * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
-
-    /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
-     */
-    protected $security;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
 
     /**
      * @var Router
@@ -62,37 +47,11 @@ abstract class AbstractCommonModel
     protected $userHelper;
 
     /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @param EntityManager $em
      */
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;
-    }
-
-    /**
-     * @param CorePermissions $security
-     */
-    public function setSecurity(CorePermissions $security)
-    {
-        $this->security = $security;
-    }
-
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -112,14 +71,6 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
      * Initialize the user parameter for use in locking procedures.
      *
      * @param UserHelper $userHelper
@@ -127,16 +78,6 @@ abstract class AbstractCommonModel
     public function setUserHelper(UserHelper $userHelper)
     {
         $this->userHelper = $userHelper;
-    }
-
-    /**
-     * Initialize the CoreParameters parameter.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
-    {
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

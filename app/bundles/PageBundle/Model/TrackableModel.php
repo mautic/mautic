@@ -20,6 +20,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class TrackableModel.
@@ -70,6 +71,11 @@ class TrackableModel extends AbstractCommonModel
     private $leadFieldRepository;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
      * @var array|null
      */
     private $contactFieldUrlTokens;
@@ -80,15 +86,21 @@ class TrackableModel extends AbstractCommonModel
     private $repository;
 
     /**
-     * @param EntityManager       $em
-     * @param RedirectModel       $redirectModel
-     * @param LeadFieldRepository $leadFieldRepository
+     * @param EntityManager            $em
+     * @param RedirectModel            $redirectModel
+     * @param LeadFieldRepository      $leadFieldRepository
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(EntityManager $em, RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
-    {
+    public function __construct(
+        EntityManager $em,
+        RedirectModel $redirectModel,
+        LeadFieldRepository $leadFieldRepository,
+        EventDispatcherInterface $eventDispatcher
+    ) {
         $this->em                  = $em;
         $this->redirectModel       = $redirectModel;
         $this->leadFieldRepository = $leadFieldRepository;
+        $this->dispatcher          = $eventDispatcher;
         $this->repository          = $this->em->getRepository('MauticPageBundle:Trackable');
     }
 
