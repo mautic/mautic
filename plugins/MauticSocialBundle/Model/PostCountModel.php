@@ -11,14 +11,35 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
+use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
 
 /**
  * Class PostCountModel.
  */
 class PostCountModel extends AbstractCommonModel
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var PostCountRepository
+     */
+    protected $repository;
+
+    /**
+     * @param EntityManager $em
+     */
+    public function __construct(EntityManager $em)
+    {
+        $this->em         = $em;
+        $this->repository = $this->em->getRepository('MauticSocialBundle:PostCount');
+    }
+
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
@@ -47,7 +68,7 @@ class PostCountModel extends AbstractCommonModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSocialBundle:PostCount');
+        return $this->repository;
     }
 
     /*

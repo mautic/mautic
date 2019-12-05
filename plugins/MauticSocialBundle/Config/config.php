@@ -155,7 +155,10 @@ return [
                 'class' => 'MauticPlugin\MauticSocialBundle\Model\MonitoringModel',
             ],
             'mautic.social.model.postcount' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Model\PostCountModel',
+                'class'     => 'MauticPlugin\MauticSocialBundle\Model\PostCountModel',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'mautic.social.model.tweet' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Model\TweetModel',
