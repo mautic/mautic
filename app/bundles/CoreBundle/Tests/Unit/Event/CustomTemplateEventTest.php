@@ -22,7 +22,7 @@ class CustomTemplateEventTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyTemplateThrowsException()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         new CustomTemplateEvent();
     }

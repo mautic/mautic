@@ -38,7 +38,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildIntervalWithBadUnit()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $helper = new DateTimeHelper();
         $helper->buildInterval(4, 'j');
     }

@@ -375,7 +375,7 @@ class SalesforceIntegrationTest extends \PHPUnit\Framework\TestCase
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturn('Some Error');
 
-        $this->setExpectedException(ApiErrorException::class);
+        $this->expectException(ApiErrorException::class);
 
         $sf->pushLeads();
     }

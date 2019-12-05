@@ -39,7 +39,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $config                       = [];
         $config['useremail']['email'] = 100;
 
-        $this->setExpectedException(EmailCouldNotBeSentException::class);
+        $this->expectException(EmailCouldNotBeSentException::class);
 
         $sendEmailToUser->sendEmailToUsers($config, $lead);
     }
@@ -65,7 +65,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $config                       = [];
         $config['useremail']['email'] = 100;
 
-        $this->setExpectedException(EmailCouldNotBeSentException::class);
+        $this->expectException(EmailCouldNotBeSentException::class);
 
         $sendEmailToUser->sendEmailToUsers($config, $lead);
     }
