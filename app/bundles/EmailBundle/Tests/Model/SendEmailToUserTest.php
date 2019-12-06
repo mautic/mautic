@@ -119,12 +119,12 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                     ['id' => 7],
                     ['id' => 10], // owner ID
                 ];
-                \PHPUnit_Framework_Assert::assertTrue($email instanceof Email);
-                \PHPUnit_Framework_Assert::assertEquals($expectedUsers, $users);
-                \PHPUnit_Framework_Assert::assertFalse($saveStat);
-                \PHPUnit_Framework_Assert::assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
-                \PHPUnit_Framework_Assert::assertEquals([], $cc);
-                \PHPUnit_Framework_Assert::assertEquals(['hidden@translation.in'], $bcc);
+                $this->assertInstanceOf(Email::class, $email);
+                $this->assertEquals($expectedUsers, $users);
+                $this->assertFalse($saveStat);
+                $this->assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
+                $this->assertEquals([], $cc);
+                $this->assertEquals(['hidden@translation.in'], $bcc);
             }));
 
         $sendEmailToUser = new SendEmailToUser($mockEmailModel);
