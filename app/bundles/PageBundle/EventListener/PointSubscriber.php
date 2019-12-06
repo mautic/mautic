@@ -62,7 +62,7 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.page.point.action.pagehit',
             'description' => 'mautic.page.point.action.pagehit_descr',
             'callback'    => [PointActionHelper::class, 'validatePageHit'],
-            'formAlias'   => 'pointaction_pagehit',
+            'formAlias'   => PointActionPageHitType::class,
             'formType'    => PointActionPageHitType::class,
         ];
 
@@ -73,7 +73,7 @@ class PointSubscriber extends CommonSubscriber
             'label'       => 'mautic.page.point.action.urlhit',
             'description' => 'mautic.page.point.action.urlhit_descr',
             'callback'    => [PointActionHelper::class, 'validateUrlHit'],
-            'formAlias'   => 'pointaction_urlhit',
+            'formAlias'   => PointActionUrlHitType::class,
             'formType'    => PointActionUrlHitType::class,
             'formTheme'   => 'MauticPageBundle:FormTheme\Point',
         ];
