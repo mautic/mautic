@@ -15,6 +15,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
 
@@ -56,7 +57,7 @@ class ChannelSubscriber extends CommonSubscriber
                         'asset.download',
                         'form.submit',
                     ],
-                    'lookupFormType' => 'email_list',
+                    'lookupFormType' => EmailListType::class,
                 ],
                 LeadModel::CHANNEL_FEATURE   => [],
                 ReportModel::CHANNEL_FEATURE => [

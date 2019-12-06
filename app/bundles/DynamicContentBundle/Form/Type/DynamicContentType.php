@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -217,7 +218,7 @@ class DynamicContentType extends AbstractType
         );
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],

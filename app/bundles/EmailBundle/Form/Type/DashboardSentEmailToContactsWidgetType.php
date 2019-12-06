@@ -6,9 +6,6 @@ use Mautic\CampaignBundle\Form\Type\CampaignListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardSentEmailToContactsWidgetType.
- */
 class DashboardSentEmailToContactsWidgetType extends AbstractType
 {
     /**
@@ -61,7 +58,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_dashboard_sent_email_to_contacts_widget';
     }

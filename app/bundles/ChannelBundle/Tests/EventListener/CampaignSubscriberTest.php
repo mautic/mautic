@@ -29,6 +29,7 @@ use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -92,7 +93,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType'             => 'email_list',
+                        'lookupFormType'             => EmailListType::class,
                     ],
                     'sms'   => [
                         'campaignAction'             => 'sms.send_text_sms',
@@ -172,7 +173,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
                                     'label'                => 'mautic.email.campaign.event.send',
                                     'description'          => 'mautic.email.campaign.event.send_descr',
                                     'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-                                    'formType'             => 'emailsend_list',
+                                    'formType'             => EmailSendType::class,
                                     'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
                                     'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
                                     'channel'              => 'email',
