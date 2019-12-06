@@ -89,7 +89,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
             return;
         }
 
@@ -138,7 +138,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $lead = $event->getLead();
 
-        if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
+        if (DoNotContact::IS_CONTACTABLE !== $this->leadModel->isContactable($lead, 'notification')) {
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 
@@ -163,12 +163,12 @@ class CampaignSubscriber extends CommonSubscriber
 
         foreach ($pushIDs as $pushID) {
             // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext('notification.send_mobile_notification') && $pushID->isMobile() == false) {
+            if ($event->checkContext('notification.send_mobile_notification') && false == $pushID->isMobile()) {
                 continue;
             }
 
             // Skip mobile PushIDs if this is a non-mobile event
-            if ($event->checkContext('notification.send_notification') && $pushID->isMobile() == true) {
+            if ($event->checkContext('notification.send_notification') && true == $pushID->isMobile()) {
                 continue;
             }
 
@@ -220,7 +220,7 @@ class CampaignSubscriber extends CommonSubscriber
         $event->setChannel('notification', $notification->getId());
 
         // If for some reason the call failed, tell mautic to try again by return false
-        if ($response->code !== 200) {
+        if (200 !== $response->code) {
             return $event->setResult(false);
         }
 

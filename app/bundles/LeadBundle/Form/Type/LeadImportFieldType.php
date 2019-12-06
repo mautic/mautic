@@ -58,7 +58,7 @@ class LeadImportFieldType extends AbstractType
             'mautic.lead.special_fields' => $specialFields,
         ];
 
-        if ($options['object'] !== 'lead') {
+        if ('lead' !== $options['object']) {
             unset($importChoiceFields['mautic.lead.contact']);
         }
 
@@ -99,7 +99,7 @@ class LeadImportFieldType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        if ($options['object'] === 'lead') {
+        if ('lead' === $options['object']) {
             $builder->add(
                 $builder->create(
                     'list',

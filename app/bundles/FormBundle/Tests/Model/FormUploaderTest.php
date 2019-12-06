@@ -21,7 +21,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormUploaderTest extends \PHPUnit_Framework_TestCase
+class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Uploader uploads files correctly

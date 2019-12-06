@@ -51,7 +51,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $translator   = $this->container->get('translator');
         $indexesToAdd = [];
         foreach ($fieldGroups as $object => $fields) {
-            if ($object == 'company') {
+            if ('company' == $object) {
                 /** @var ColumnSchemaHelper $schema */
                 $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'companies');
             } else {
@@ -102,7 +102,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         }
 
         foreach ($indexesToAdd as $object => $indexes) {
-            if ($object == 'company') {
+            if ('company' == $object) {
                 /** @var IndexSchemaHelper $indexHelper */
                 $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'companies');
             } else {
@@ -116,7 +116,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                     $indexHelper->addIndex([$name], $name.'_search');
                 }
             }
-            if ($object == 'lead') {
+            if ('lead' == $object) {
                 // Add an attribution index
                 $indexHelper->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
                 //Add date added and country index

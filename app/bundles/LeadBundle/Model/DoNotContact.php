@@ -100,7 +100,7 @@ class DoNotContact
         $dnc     = false;
         $contact = $this->leadModel->getEntity($contactId);
 
-        if ($contact === null) {
+        if (null === $contact) {
             // Contact not found, nothing to do
             return false;
         }
@@ -109,7 +109,7 @@ class DoNotContact
         $isContactable = ($checkCurrentStatus) ? $this->isContactable($contact, $channel) : DNC::IS_CONTACTABLE;
 
         // If they don't have a DNC entry yet
-        if ($isContactable === DNC::IS_CONTACTABLE) {
+        if (DNC::IS_CONTACTABLE === $isContactable) {
             $dnc = $this->createDncRecord($contact, $channel, $reason, $comments);
         } elseif ($isContactable !== $reason) {
             // Or if the given reason is different than the stated reason
@@ -117,7 +117,7 @@ class DoNotContact
             /** @var DNC $dnc */
             foreach ($contact->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves or if the code forces it
-                $allowOverride = ($allowUnsubscribeOverride || $dnc->getReason() !== DNC::UNSUBSCRIBED);
+                $allowOverride = ($allowUnsubscribeOverride || DNC::UNSUBSCRIBED !== $dnc->getReason());
 
                 // Only update if the contact did not unsubscribe themselves
                 if ($allowOverride && $dnc->getChannel() === $channel) {
@@ -165,7 +165,7 @@ class DoNotContact
         }
 
         foreach ($dncEntries as $dnc) {
-            if ($dnc->getReason() !== DNC::IS_CONTACTABLE) {
+            if (DNC::IS_CONTACTABLE !== $dnc->getReason()) {
                 return $dnc->getReason();
             }
         }

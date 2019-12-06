@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 
-class AbstractFormFieldHelperTest extends \PHPUnit_Framework_TestCase
+class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The string is parsed correctly into a choice array

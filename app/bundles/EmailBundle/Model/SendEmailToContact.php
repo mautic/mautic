@@ -47,7 +47,7 @@ class SendEmailToContact
     private $translator;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $singleEmailMode = null;
 
@@ -92,12 +92,12 @@ class SendEmailToContact
     private $emailEntityErrors;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $emailEntityId;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $listId;
 
@@ -199,7 +199,7 @@ class SendEmailToContact
     }
 
     /**
-     * @param null|int $id
+     * @param int|null $id
      *
      * @return $this
      */

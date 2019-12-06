@@ -92,7 +92,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 'required'          => false,
             ]
         );
-        if ($formArea === 'features') {
+        if ('features' === $formArea) {
             $builder->add(
                 'objects',
                 ChoiceType::class,
@@ -410,7 +410,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param array      $params
-     * @param null|array $query
+     * @param array|null $query
      *
      * @return int|null
      */

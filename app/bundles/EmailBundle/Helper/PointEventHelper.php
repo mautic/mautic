@@ -62,7 +62,7 @@ class PointEventHelper
         $email = $model->getEntity($emailId);
 
         //make sure the email still exists and is published
-        if ($email != null && $email->isPublished()) {
+        if (null != $email && $email->isPublished()) {
             $leadFields = $lead->getFields();
             if (isset($leadFields['core']['email']['value']) && $leadFields['core']['email']['value']) {
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */

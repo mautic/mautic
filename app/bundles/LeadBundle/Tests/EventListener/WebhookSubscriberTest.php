@@ -21,7 +21,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
+class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNewContactEventIsFiredWhenIdentified()
     {

@@ -231,7 +231,7 @@ class CorePermissions
      */
     public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
     {
-        if ($userEntity === null) {
+        if (null === $userEntity) {
             $userEntity = $this->userHelper->getUser();
         }
 
@@ -247,7 +247,7 @@ class CorePermissions
             }
 
             $parts = explode(':', $permission);
-            if (count($parts) != 3) {
+            if (3 != count($parts)) {
                 throw new PermissionBadFormatException(
                     $this->getTranslator()->trans(
                         'mautic.core.permissions.badformat',
@@ -277,7 +277,7 @@ class CorePermissions
                             )
                         );
                     }
-                } elseif ($userEntity == 'anon.') {
+                } elseif ('anon.' == $userEntity) {
                     //anon user or session timeout
                     $permissions[$permission] = false;
                 } elseif (!isset($activePermissions[$parts[0]])) {
@@ -291,13 +291,13 @@ class CorePermissions
             $this->grantedPermissions[$permission] = $permissions[$permission];
         }
 
-        if ($mode == 'MATCH_ALL') {
+        if ('MATCH_ALL' == $mode) {
             //deny if any of the permissions are denied
             return in_array(0, $permissions) ? false : true;
-        } elseif ($mode == 'MATCH_ONE') {
+        } elseif ('MATCH_ONE' == $mode) {
             //grant if any of the permissions were granted
             return in_array(1, $permissions) ? true : false;
-        } elseif ($mode == 'RETURN_ARRAY') {
+        } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
         } else {
             throw new PermissionNotFoundException(
@@ -328,7 +328,7 @@ class CorePermissions
             }
 
             $parts = explode(':', $p);
-            if (count($parts) != 3) {
+            if (3 != count($parts)) {
                 $result[$p] = false;
             } else {
                 //check against bundle permissions class
@@ -385,7 +385,7 @@ class CorePermissions
 
         $ownerId = (int) $ownerId;
 
-        if ($ownerId === 0) {
+        if (0 === $ownerId) {
             if ($other) {
                 return true;
             } else {

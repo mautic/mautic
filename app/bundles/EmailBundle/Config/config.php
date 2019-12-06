@@ -760,6 +760,13 @@ return [
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.email.fixture.email' => [
+                'class'     => Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.email.model.email'],
+            ],
+        ],
     ],
     'parameters' => [
         'mailer_api_key'               => null, // Api key from mail delivery provider.

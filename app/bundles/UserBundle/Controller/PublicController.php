@@ -29,13 +29,13 @@ class PublicController extends FormController
         $form   = $this->get('form.factory')->create('passwordreset', $data, ['action' => $action]);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 //find the user
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
-                if ($user == null) {
+                if (null == $user) {
                     $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
                 } else {
                     try {
@@ -76,14 +76,14 @@ class PublicController extends FormController
         }
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             if ($isValid = $this->isFormValid($form)) {
                 //find the user
                 $data = $form->getData();
                 /** @var \Mautic\UserBundle\Entity\User $user */
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
-                if ($user == null) {
+                if (null == $user) {
                     $form['identifier']->addError(new FormError($this->translator->trans('mautic.user.user.passwordreset.nouserfound', [], 'validators')));
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {

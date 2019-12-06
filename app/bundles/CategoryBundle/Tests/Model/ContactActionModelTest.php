@@ -15,7 +15,7 @@ use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class ContactActionModelTest extends \PHPUnit_Framework_TestCase
+class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

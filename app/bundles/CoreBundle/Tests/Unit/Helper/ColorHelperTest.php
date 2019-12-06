@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Helper\ColorHelper;
 /**
  * Class ColorHelper test.
  */
-class ColorHelperTest extends \PHPUnit_Framework_TestCase
+class ColorHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox The helper is instantiated correctly

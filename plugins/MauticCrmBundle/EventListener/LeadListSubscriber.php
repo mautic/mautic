@@ -117,8 +117,8 @@ class LeadListSubscriber extends CommonSubscriber
         $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
 
         foreach ($filters as $filter) {
-            if ($filter['field'] == 'integration_campaigns') {
-                if (strpos($filter['filter'], '::') !== false) {
+            if ('integration_campaigns' == $filter['field']) {
+                if (false !== strpos($filter['filter'], '::')) {
                     list($integrationName, $campaignId) = explode('::', $filter['filter']);
                 } else {
                     // Assuming this is a Salesforce integration for BC with pre 2.11.0

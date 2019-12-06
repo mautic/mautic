@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\Callback\MomentumCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class MomentumTransportTest extends \PHPUnit_Framework_TestCase
+class MomentumTransportTest extends \PHPUnit\Framework\TestCase
 {
     public function testWebhookPayloadIsProcessed()
     {

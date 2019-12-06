@@ -209,7 +209,7 @@ if (!isset($inBuilder)) {
 
 echo $view['form']->end($form);
 
-if ($activeForm->getFormType() === null || !empty($forceTypeSelection)):
+if (null === $activeForm->getFormType() || !empty($forceTypeSelection)):
     echo $view->render(
         'MauticCoreBundle:Helper:form_selecttype.html.php',
         [

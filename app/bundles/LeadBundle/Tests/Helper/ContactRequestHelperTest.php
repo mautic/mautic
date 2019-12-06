@@ -27,7 +27,7 @@ use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactRequestHelperTest extends \PHPUnit_Framework_TestCase
+class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel

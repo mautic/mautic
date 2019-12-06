@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -50,7 +51,7 @@
                 }
 
                 if ($flush_operand) {
-                    if (trim($current_operand) != '') {
+                    if ('' != trim($current_operand)) {
                         $tokens[] = ['type' => 'operand', 'value' => trim($current_operand)];
                     }
 
@@ -83,7 +84,7 @@
                 $sign = intval($matches[1].'1');
                 $val  = $matches[2];
                 if (in_array($val, self::$coord_align)) {
-                    if ($sec_dim === null) {
+                    if (null === $sec_dim) {
                         switch ($val) {
                             case 'left':
                             case 'top':
@@ -118,7 +119,7 @@
                                 return null;
                         }
                     }
-                } elseif (substr($val, -1) === '%') {
+                } elseif ('%' === substr($val, -1)) {
                     return intval(round($sign * $dim * floatval(str_replace('%', '', $val)) / 100));
                 } else {
                     return $sign * intval(round($val));
@@ -139,33 +140,33 @@
         {
             $coord_tokens = self::parse($value);
 
-            if (count($coord_tokens) == 0 || $coord_tokens[count($coord_tokens) - 1]['type'] != 'operand') {
+            if (0 == count($coord_tokens) || 'operand' != $coord_tokens[count($coord_tokens) - 1]['type']) {
                 throw new WideImage_InvalidCoordinateException("Couldn't parse coordinate '$value' properly.");
             }
 
             $value     = 0;
             $operation = 1;
             foreach ($coord_tokens as $token) {
-                if ($token['type'] == 'operand') {
+                if ('operand' == $token['type']) {
                     $operand_value = self::evaluate($token['value'], $dim, $sec_dim);
-                    if ($operation == 1) {
+                    if (1 == $operation) {
                         $value = $value + $operand_value;
-                    } elseif ($operation == -1) {
+                    } elseif (-1 == $operation) {
                         $value = $value - $operand_value;
                     } else {
                         throw new WideImage_InvalidCoordinateException('Invalid coordinate syntax.');
                     }
 
                     $operation = 0;
-                } elseif ($token['type'] == 'operator') {
-                    if ($token['value'] == '-') {
-                        if ($operation == 0) {
+                } elseif ('operator' == $token['type']) {
+                    if ('-' == $token['value']) {
+                        if (0 == $operation) {
                             $operation = -1;
                         } else {
                             $operation = $operation * -1;
                         }
-                    } elseif ($token['value'] == '+') {
-                        if ($operation == 0) {
+                    } elseif ('+' == $token['value']) {
+                        if (0 == $operation) {
                             $operation = '1';
                         }
                     }

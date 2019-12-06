@@ -74,7 +74,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         $headers = $message->getHeaders()->getAll();
         /** @var \Swift_Mime_Header $header */
         foreach ($headers as $header) {
-            if ($header->getFieldType() == \Swift_Mime_Header::TYPE_TEXT && !in_array($header->getFieldName(), $this->reservedKeys)) {
+            if (\Swift_Mime_Header::TYPE_TEXT == $header->getFieldType() && !in_array($header->getFieldName(), $this->reservedKeys)) {
                 $content->addHeader($header->getFieldName(), $header->getFieldBodyModel());
             }
         }
@@ -115,7 +115,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         }
 
         $cssHeader = $message->getHeaders()->get('X-MC-InlineCSS');
-        if ($cssHeader !== null) {
+        if (null !== $cssHeader) {
             $content->setInlineCss($cssHeader);
         }
 
@@ -131,7 +131,7 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         ];
 
         foreach ($recipientsGrouped as $group => $recipients) {
-            $isBcc = ($group === 'bcc');
+            $isBcc = ('bcc' === $group);
             foreach ($recipients as $email => $name) {
                 $addressDTO   = new TransmissionDTO\RecipientDTO\AddressDTO($email, $name, $isBcc);
                 $recipientDTO = new TransmissionDTO\RecipientDTO(

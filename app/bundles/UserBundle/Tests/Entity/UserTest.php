@@ -13,7 +13,7 @@ namespace Mautic\UserBundle\Tests\Entity;
 
 use Mautic\UserBundle\Entity\User;
 
-class UserTest extends \PHPUnit_Framework_TestCase
+class UserTest extends \PHPUnit\Framework\TestCase
 {
     public function testUserIsGuest()
     {

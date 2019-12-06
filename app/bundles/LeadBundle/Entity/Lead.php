@@ -523,8 +523,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     protected function isChanged($prop, $val, $oldValue = null)
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $oldValue !== null ? $oldValue : $this->$getter();
-        if ($prop == 'owner') {
+        $current = null !== $oldValue ? $oldValue : $this->$getter();
+        if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
@@ -532,7 +532,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
-        } elseif ($prop == 'ipAddresses') {
+        } elseif ('ipAddresses' == $prop) {
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
 
             if (empty($this->changes['ipAddressList'])) {
@@ -540,13 +540,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             }
 
             $this->changes['ipAddressList'][$val->getIpAddress()] = $val;
-        } elseif ($prop == 'tags') {
+        } elseif ('tags' == $prop) {
             if ($val instanceof Tag) {
                 $this->changes['tags']['added'][] = $val->getTag();
             } else {
                 $this->changes['tags']['removed'][] = $val;
             }
-        } elseif ($prop == 'utmtags') {
+        } elseif ('utmtags' == $prop) {
             if ($val instanceof UtmTag) {
                 if ($val->getUtmContent()) {
                     $this->changes['utmtags'] = ['utm_content', $val->getUtmContent()];
@@ -564,7 +564,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
             }
-        } elseif ($prop == 'frequencyRules') {
+        } elseif ('frequencyRules' == $prop) {
             if (!isset($this->changes['frequencyRules'])) {
                 $this->changes['frequencyRules'] = [];
             }
@@ -576,7 +576,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } else {
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
-        } elseif ($prop == 'stage') {
+        } elseif ('stage' == $prop) {
             if ($current && !$val) {
                 $this->changes['stage'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
@@ -584,7 +584,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
-        } elseif ($prop == 'points' && $current != $val) {
+        } elseif ('points' == $prop && $current != $val) {
             $this->changes['points'] = [$current, $val];
         } else {
             parent::isChanged($prop, $val);
@@ -939,7 +939,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
     {
-        if ($pointChanges === 0) {
+        if (0 === $pointChanges) {
             // No need to record no change
             return;
         }
@@ -1277,7 +1277,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function wasAnonymous()
     {
-        return $this->dateIdentified == null && $this->isAnonymous() === false;
+        return null == $this->dateIdentified && false === $this->isAnonymous();
     }
 
     /**

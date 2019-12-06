@@ -105,7 +105,7 @@ class CommonRepository extends EntityRepository
             if (is_array($args['order'])) {
                 foreach ($args['order'] as &$o) {
                     $alias = '';
-                    if (strpos($o, '.') !== false) {
+                    if (false !== strpos($o, '.')) {
                         list($alias, $o) = explode('.', $o);
                     }
 
@@ -174,7 +174,7 @@ class CommonRepository extends EntityRepository
         foreach ($entities as $entity) {
             $this->deleteEntity($entity, false);
 
-            if (++$i % $batchSize === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->_em->flush();
             }
         }
@@ -368,7 +368,7 @@ class CommonRepository extends EntityRepository
      *
      * @param int $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = 0)
     {
@@ -393,7 +393,7 @@ class CommonRepository extends EntityRepository
      */
     public function getExpressionBuilder()
     {
-        if (self::$expressionBuilder === null) {
+        if (null === self::$expressionBuilder) {
             self::$expressionBuilder = new ExpressionBuilder();
         }
 
@@ -426,7 +426,7 @@ class CommonRepository extends EntityRepository
                 }
                 $expr->add($groupExpr);
             }
-        } elseif (strpos($filter['column'], ',') !== false) {
+        } elseif (false !== strpos($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
             $expr         = $q->expr()->orX();
             $setParameter = false;
@@ -456,7 +456,7 @@ class CommonRepository extends EntityRepository
                 if (isset($filter['strict']) && !$filter['strict']) {
                     if (is_numeric($filter['value'])) {
                         // Postgres doesn't like using "LIKE" with numbers
-                        $func = ($func == 'like') ? 'eq' : 'neq';
+                        $func = ('like' == $func) ? 'eq' : 'neq';
                     } else {
                         $filter['value'] = "%{$filter['value']}%";
                     }
@@ -499,7 +499,7 @@ class CommonRepository extends EntityRepository
     ) {
         $isORM = ($q instanceof QueryBuilder);
 
-        if ($alias === null) {
+        if (null === $alias) {
             $alias = $this->getTableAlias();
         }
 
@@ -584,7 +584,7 @@ class CommonRepository extends EntityRepository
 
         if ($select) {
             foreach ($select as &$column) {
-                if (strpos($column, '.') === false) {
+                if (false === strpos($column, '.')) {
                     $column = $alias.'.'.$column;
                 }
             }
@@ -670,7 +670,7 @@ class CommonRepository extends EntityRepository
         $reflection = new \ReflectionClass(new $class());
 
         // Get the label column if necessary
-        if ($labelColumn == null) {
+        if (null == $labelColumn) {
             if ($reflection->hasMethod('getTitle')) {
                 $labelColumn = 'title';
             } else {
@@ -682,7 +682,7 @@ class CommonRepository extends EntityRepository
           ->from($tableName, $alias)
           ->orderBy($prefix.$labelColumn);
 
-        if ($expr !== null && $expr->count()) {
+        if (null !== $expr && $expr->count()) {
             $q->where($expr);
         }
 
@@ -772,7 +772,7 @@ class CommonRepository extends EntityRepository
         foreach ($entities as $entity) {
             $this->saveEntity($entity, false);
 
-            if (++$i % $batchSize === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->getEntityManager()->flush();
             }
         }
@@ -1012,7 +1012,7 @@ class CommonRepository extends EntityRepository
         $string = $filter->string;
 
         if (!$filter->strict) {
-            if (strpos($string, '%') === false) {
+            if (false === strpos($string, '%')) {
                 $string = "$string%";
             }
         }
@@ -1096,12 +1096,12 @@ class CommonRepository extends EntityRepository
                 foreach ($joins as $joinPrefix => $joinStatements) {
                     /** @var Query\Expr\Join $join */
                     foreach ($joinStatements as $join) {
-                        if (strpos($join->getJoin(), '.category') !== false) {
+                        if (false !== strpos($join->getJoin(), '.category')) {
                             $catPrefix = $join->getAlias();
                             break;
                         }
                     }
-                    if ($catPrefix !== false) {
+                    if (false !== $catPrefix) {
                         break;
                     }
                 }
@@ -1129,7 +1129,7 @@ class CommonRepository extends EntityRepository
         } else {
             $string = $filter->string;
             if (!$filter->strict) {
-                if (strpos($string, '%') === false) {
+                if (false === strpos($string, '%')) {
                     $string = "$string%";
                 }
             }
@@ -1230,7 +1230,7 @@ class CommonRepository extends EntityRepository
                 $indexAlias = $this->getTableAlias();
                 $indexBy    = $args['index_by'];
             }
-            if (strpos($indexBy, $indexAlias) !== 0) {
+            if (0 !== strpos($indexBy, $indexAlias)) {
                 $indexBy = $indexAlias.'.'.$indexBy;
             }
             $q->indexBy($indexAlias, $indexBy);
@@ -1297,7 +1297,7 @@ class CommonRepository extends EntityRepository
         if ($clauses && is_array($clauses)) {
             foreach ($clauses as $clause) {
                 $clause = $this->validateOrderByClause($clause);
-                $column = (strpos($clause['col'], '.') === false) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                $column = (false === strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
                 $query->addOrderBy($column, $clause['dir']);
             }
         }
@@ -1319,7 +1319,7 @@ class CommonRepository extends EntityRepository
 
             $selects = [];
             foreach ($args['select'] as $select) {
-                if (strpos($select, '.') !== false) {
+                if (false !== strpos($select, '.')) {
                     list($alias, $select) = explode('.', $select);
                 } else {
                     $alias = $this->getTableAlias();
@@ -1358,9 +1358,9 @@ class CommonRepository extends EntityRepository
                 } else {
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
-                    } elseif (strpos($select, $this->getTableAlias().',') !== false) {
+                    } elseif (false !== strpos($select, $this->getTableAlias().',')) {
                         $q->select(str_replace($this->getTableAlias().',', $newSelect.','));
-                    } elseif (strpos($select, $this->getTableAlias().'.*,') !== false) {
+                    } elseif (false !== strpos($select, $this->getTableAlias().'.*,')) {
                         $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.','));
                     }
                 }
@@ -1481,7 +1481,7 @@ class CommonRepository extends EntityRepository
         // Parameters have to be set even if there are no expressions just in case a search command
         // passed back a parameter it used
         foreach ($queryParameters as $k => $v) {
-            if ($v === true || $v === false) {
+            if (true === $v || false === $v) {
                 $q->setParameter($k, $v, 'boolean');
             } else {
                 $q->setParameter($k, $v);
@@ -1525,13 +1525,13 @@ class CommonRepository extends EntityRepository
                     }
                 } else {
                     $clause = $this->validateWhereClause($clause);
-                    $column = (strpos($clause['col'], '.') === false) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
+                    $column = (false === strpos($clause['col'], '.')) ? $this->getTableAlias().'.'.$clause['col'] : $clause['col'];
 
                     $whereClause = null;
                     switch ($clause['expr']) {
                         case 'between':
                         case 'notBetween':
-                            if (is_array($clause['val']) && count($clause['val']) === 2) {
+                            if (is_array($clause['val']) && 2 === count($clause['val'])) {
                                 $not   = 'notBetween' === $clause['expr'] ? ' NOT' : '';
                                 $param = $this->generateRandomParameterName();
                                 $query->setParameter($param, $clause['val'][0]);
@@ -1564,6 +1564,7 @@ class CommonRepository extends EntityRepository
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
                                 $query->setParameter($param, $clause['val']);
                             }
+                            // no break
                         default:
                             if (method_exists($query->expr(), $clause['expr'])) {
                                 if (in_array($clause['expr'], $columnValue)) {
@@ -1724,7 +1725,7 @@ class CommonRepository extends EntityRepository
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';
-            if (strpos($col, '.') !== false) {
+            if (false !== strpos($col, '.')) {
                 list($alias, $col) = explode('.', $col);
             }
 

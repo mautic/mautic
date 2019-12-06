@@ -99,7 +99,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+        if ('file' == $this->coreParametersHelper->getParameter('mailer_spool_type')) {
             $default = isset($options['data']['immediately']) ? $options['data']['immediately'] : false;
             $builder->add(
                 'immediately',

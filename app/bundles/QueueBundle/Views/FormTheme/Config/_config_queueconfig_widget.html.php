@@ -25,7 +25,7 @@ $template  = '<div class="col-md-6">{content}</div>';
         </div>
 
         <?php foreach ($fields as $fieldname => $field): ?>
-            <?php if ($fieldname === 'queue_protocol') {
+            <?php if ('queue_protocol' === $fieldname) {
     continue;
 } ?>
             <div class="row">

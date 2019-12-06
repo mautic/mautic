@@ -28,7 +28,7 @@ class FormFieldSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['field_type'] == 'select') {
+        if ('select' == $options['field_type']) {
             $this->addSortableList($builder, $options);
         }
 

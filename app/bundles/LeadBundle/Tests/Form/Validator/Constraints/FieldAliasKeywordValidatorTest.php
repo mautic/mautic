@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class FieldAliasKeywordValidatorTest extends \PHPUnit_Framework_TestCase
+class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
     private $listModelMock;
     private $fieldAliasHelperlMock;

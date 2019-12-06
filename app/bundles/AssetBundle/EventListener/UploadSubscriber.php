@@ -101,7 +101,7 @@ class UploadSubscriber extends CommonSubscriber
         $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
-        if ($file === null) {
+        if (null === $file) {
             return;
         }
 

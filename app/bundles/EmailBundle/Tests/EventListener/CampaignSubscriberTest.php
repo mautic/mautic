@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
+class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
     private $config = [

@@ -296,7 +296,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
         $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
 
-        while (($next = $campaigns->next()) !== false) {
+        while (false !== ($next = $campaigns->next())) {
             // Key is ID and not 0
             $campaign = reset($next);
             $this->triggerCampaign($campaign);

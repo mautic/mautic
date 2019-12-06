@@ -80,7 +80,7 @@ class ConfigSubscriber extends CommonSubscriber
                     $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
                 }
 
-                if ($key != 'general') {
+                if ('general' != $key) {
                     if (empty($monitor['host']) || empty($monitor['address']) || empty($monitor['folder'])) {
                         // Reset to defaults
                         $data['monitored_email'][$key]['override_settings'] = 0;

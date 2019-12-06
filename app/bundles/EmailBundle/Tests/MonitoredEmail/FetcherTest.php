@@ -18,7 +18,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class FetcherTest extends \PHPUnit_Framework_TestCase
+class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     protected $mailboxes = [
         'EmailBundle_bounces' => [

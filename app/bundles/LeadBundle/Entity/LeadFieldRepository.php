@@ -169,7 +169,7 @@ class LeadFieldRepository extends CommonRepository
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        if ($field === 'tags') {
+        if ('tags' === $field) {
             // Special reserved tags field
             $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
                 ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
@@ -184,20 +184,20 @@ class LeadFieldRepository extends CommonRepository
 
             $result = $q->execute()->fetch();
 
-            if (($operatorExpr === 'eq') || ($operatorExpr === 'like')) {
+            if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
-            } elseif (($operatorExpr === 'neq') || ($operatorExpr === 'notLike')) {
+            } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
                 return empty($result['id']);
             } else {
                 return false;
             }
         } else {
             $property = $this->getPropertyByField($field, $q);
-            if ($operatorExpr === 'empty' || $operatorExpr === 'notEmpty') {
+            if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
                 $q->where(
                     $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
-                        ($operatorExpr === 'empty') ?
+                        ('empty' === $operatorExpr) ?
                             $q->expr()->orX(
                                 $q->expr()->isNull($property),
                                 $q->expr()->eq($property, $q->expr()->literal(''))
@@ -210,8 +210,8 @@ class LeadFieldRepository extends CommonRepository
                     )
                 )
                   ->setParameter('lead', (int) $lead);
-            } elseif ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
-                if ($operatorExpr === 'regexp') {
+            } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
+                if ('regexp' === $operatorExpr) {
                     $where = $property.' REGEXP  :value';
                 } else {
                     $where = $property.' NOT REGEXP  :value';
@@ -225,13 +225,13 @@ class LeadFieldRepository extends CommonRepository
                 )
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
-            } elseif ($operatorExpr === 'in' || $operatorExpr === 'notIn') {
+            } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
                 $value = $q->expr()->literal(
                     InputHelper::clean($value)
                 );
 
                 $value = trim($value, "'");
-                if (substr($operatorExpr, 0, 3) === 'not') {
+                if ('not' === substr($operatorExpr, 0, 3)) {
                     $operator = 'NOT REGEXP';
                 } else {
                     $operator = 'REGEXP';
@@ -252,7 +252,7 @@ class LeadFieldRepository extends CommonRepository
                     $q->expr()->eq('l.id', ':lead')
                 );
 
-                if ($operatorExpr == 'neq') {
+                if ('neq' == $operatorExpr) {
                     // include null
                     $expr->add(
                         $q->expr()->orX(
@@ -285,7 +285,7 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }
-            if (strpos($property, 'u.') === 0) {
+            if (0 === strpos($property, 'u.')) {
                 // Match only against the latest UTM properties.
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);

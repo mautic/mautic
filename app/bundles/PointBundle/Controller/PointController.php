@@ -45,7 +45,7 @@ class PointController extends AbstractFormController
 
         //set limits
         $limit = $this->get('session')->get('mautic.point.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -67,7 +67,7 @@ class PointController extends AbstractFormController
 
         $count = count($points);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->get('session')->set('mautic.point.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $lastPage]);
 
@@ -132,7 +132,7 @@ class PointController extends AbstractFormController
         //set the page we came from
         $page = $this->get('session')->get('mautic.point.page', 1);
 
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : '';
+        $actionType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('point[type]', '', true) : '';
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
         $actions = $model->getPointActions();
@@ -143,7 +143,7 @@ class PointController extends AbstractFormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -242,7 +242,7 @@ class PointController extends AbstractFormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -261,7 +261,7 @@ class PointController extends AbstractFormController
             return $this->isLocked($postActionVars, $entity, 'point');
         }
 
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : $entity->getType();
+        $actionType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('point[type]', '', true) : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $actions = $model->getPointActions();
@@ -271,7 +271,7 @@ class PointController extends AbstractFormController
         ]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -351,7 +351,7 @@ class PointController extends AbstractFormController
         $model  = $this->getModel('point');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('point:points:create')) {
                 return $this->accessDenied();
             }
@@ -386,11 +386,11 @@ class PointController extends AbstractFormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('point');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.point.error.notfound',
@@ -443,7 +443,7 @@ class PointController extends AbstractFormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model     = $this->getModel('point');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -452,7 +452,7 @@ class PointController extends AbstractFormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.point.error.notfound',

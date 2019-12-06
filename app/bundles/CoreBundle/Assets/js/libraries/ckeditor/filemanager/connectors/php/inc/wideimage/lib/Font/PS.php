@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -19,7 +20,7 @@
             $this->handle = imagepsloadfont($file);
             $this->size   = $size;
             $this->color  = $color;
-            if ($bgcolor === null) {
+            if (null === $bgcolor) {
                 $this->bgcolor = $color;
             } else {
                 $this->color = $color;

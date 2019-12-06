@@ -21,7 +21,7 @@ $replaceRootPlaceholder = function (&$value) use ($root, &$replaceRootPlaceholde
         foreach ($value as &$v) {
             $replaceRootPlaceholder($v);
         }
-    } elseif (strpos($value, '%kernel.root_dir%') !== false) {
+    } elseif (false !== strpos($value, '%kernel.root_dir%')) {
         $value = str_replace('%kernel.root_dir%', $root, $value);
     }
 };

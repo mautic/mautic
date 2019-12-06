@@ -101,7 +101,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if (++$i % $batchSize === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->em->flush();
             }
         }
@@ -130,7 +130,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        $type = strpos($action, 'mobile_') !== false ? 'mobile_notification' : 'notification';
+        $type = false !== strpos($action, 'mobile_') ? 'mobile_notification' : 'notification';
 
         return $formFactory->create($type, $entity, $options);
     }
@@ -140,11 +140,11 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $id
      *
-     * @return null|Notification
+     * @return Notification|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Notification();
         } else {
             $entity = parent::getEntity($id);
@@ -254,7 +254,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('push_notification_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {

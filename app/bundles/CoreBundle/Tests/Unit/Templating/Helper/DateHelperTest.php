@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DateHelperTest extends \PHPUnit_Framework_TestCase
+class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
 

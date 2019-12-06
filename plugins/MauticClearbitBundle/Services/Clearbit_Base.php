@@ -113,7 +113,7 @@ class Clearbit_Base
         $headers = [];
 
         foreach (explode("\r\n", $response_headers) as $i => $line) {
-            if ($i === 0) {
+            if (0 === $i) {
                 $headers['http_code'] = $line;
             } else {
                 list($key, $value) = explode(': ', $line);

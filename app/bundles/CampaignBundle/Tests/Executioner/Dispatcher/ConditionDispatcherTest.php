@@ -18,7 +18,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConditionDispatcherTest extends \PHPUnit_Framework_TestCase
+class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface

@@ -25,7 +25,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class ScheduledExecutionerTest extends \PHPUnit_Framework_TestCase
+class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadEventLogRepository

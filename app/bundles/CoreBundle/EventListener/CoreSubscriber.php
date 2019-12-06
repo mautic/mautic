@@ -395,7 +395,7 @@ class CoreSubscriber extends CommonSubscriber
                             $id = explode('_', $item['id']);
                             if (isset($id[1])) {
                                 // some bundle names are in plural, create also singular item
-                                if (substr($id[1], -1) == 's') {
+                                if ('s' == substr($id[1], -1)) {
                                     $event->addIcon(rtrim($id[1], 's'), $item['iconClass']);
                                 }
                                 $event->addIcon($id[1], $item['iconClass']);
@@ -428,20 +428,20 @@ class CoreSubscriber extends CommonSubscriber
         }
         if (isset($details['format'])) {
             $defaults['_format'] = $details['format'];
-        } elseif ($type == 'api') {
+        } elseif ('api' == $type) {
             $defaults['_format'] = 'json';
         }
         $method = '';
         if (isset($details['method'])) {
             $method = $details['method'];
-        } elseif ($type === 'api') {
+        } elseif ('api' === $type) {
             $method = 'GET';
         }
         // Set requirements
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];
 
         // Set some very commonly used defaults and requirements
-        if (strpos($details['path'], '{page}') !== false) {
+        if (false !== strpos($details['path'], '{page}')) {
             if (!isset($defaults['page'])) {
                 $defaults['page'] = 0;
             }
@@ -449,7 +449,7 @@ class CoreSubscriber extends CommonSubscriber
                 $requirements['page'] = '\d+';
             }
         }
-        if (strpos($details['path'], '{objectId}') !== false) {
+        if (false !== strpos($details['path'], '{objectId}')) {
             if (!isset($defaults['objectId'])) {
                 // Set default to 0 for the "new" actions
                 $defaults['objectId'] = 0;
@@ -459,8 +459,8 @@ class CoreSubscriber extends CommonSubscriber
                 $requirements['objectId'] = '[a-zA-Z0-9_-]+';
             }
         }
-        if ($type == 'api') {
-            if (strpos($details['path'], '{id}') !== false) {
+        if ('api' == $type) {
+            if (false !== strpos($details['path'], '{id}')) {
                 if (!isset($requirements['page'])) {
                     $requirements['id'] = '\d+';
                 }

@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Tomasz Kapusta
      * @copyright 2010
@@ -105,7 +106,7 @@
          */
         public function saltPepperNoise_fun(&$r, &$g, &$b, $amount)
         {
-            if (mt_rand(0, 255 - $amount) != 0) {
+            if (0 != mt_rand(0, 255 - $amount)) {
                 return;
             }
 

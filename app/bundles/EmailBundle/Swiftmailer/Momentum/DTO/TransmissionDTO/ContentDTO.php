@@ -72,7 +72,7 @@ final class ContentDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $html
+     * @param string|null $html
      *
      * @return ContentDTO
      */
@@ -96,7 +96,7 @@ final class ContentDTO implements \JsonSerializable
     }
 
     /**
-     * @param null|string $text
+     * @param string|null $text
      *
      * @return ContentDTO
      */
@@ -141,22 +141,22 @@ final class ContentDTO implements \JsonSerializable
             'subject' => $this->subject,
             'from'    => $this->from,
         ];
-        if ($this->html !== null) {
+        if (null !== $this->html) {
             $json['html'] = $this->html;
         }
-        if ($this->text !== null) {
+        if (null !== $this->text) {
             $json['text'] = $this->text;
         }
-        if ($this->replyTo !== null) {
+        if (null !== $this->replyTo) {
             $json['reply_to'] = $this->replyTo;
         }
-        if (count($this->headers) !== 0) {
+        if (0 !== count($this->headers)) {
             $json['headers'] = $this->headers;
         }
-        if (count($this->attachments) !== 0) {
+        if (0 !== count($this->attachments)) {
             $json['attachments'] = $this->attachments;
         }
-        if ($this->inlineCss !== null) {
+        if (null !== $this->inlineCss) {
             $json['inline_css'] = $this->inlineCss;
         }
 

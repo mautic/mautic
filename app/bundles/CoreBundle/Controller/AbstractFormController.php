@@ -35,7 +35,7 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            if ($entity !== null && $entity->getCheckedOutBy() !== null) {
+            if (null !== $entity && null !== $entity->getCheckedOutBy()) {
                 $model->unlockEntity($entity);
             }
             $returnUrl = urldecode($this->request->get('returnUrl'));
@@ -147,7 +147,7 @@ abstract class AbstractFormController extends CommonController
     {
         $name = $form->getName();
 
-        return $this->request->request->get($name.'[buttons][cancel]', false, true) !== false;
+        return false !== $this->request->request->get($name.'[buttons][cancel]', false, true);
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class AbstractFormController extends CommonController
     {
         $name = $form->getName();
 
-        return $this->request->request->get($name.'[buttons][apply]', false, true) !== false;
+        return false !== $this->request->request->get($name.'[buttons][apply]', false, true);
     }
 
     /**

@@ -136,7 +136,7 @@ class LeadSubscriber extends CommonSubscriber
                             'type' => $state,
                         ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
-                        'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
+                        'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
                     ]
                 );

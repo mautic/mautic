@@ -11,7 +11,7 @@
 
 // Defaults
 $appendAttribute = function (&$attributes, $attributeName, $append) {
-    if (stripos($attributes, "{$attributeName}=") === false) {
+    if (false === stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';
     } else {
         $attributes = str_ireplace($attributeName.'="', $attributeName.'="'.$append.' ', $attributes);
@@ -172,7 +172,7 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     if ($field['leadField'] && !empty($formFields[$field['leadField']]['type']) && in_array($formFields[$field['leadField']]['type'], ['datetime', 'date'])) {
         $tempLeadFieldType = $formFields[$field['leadField']]['type'];
         foreach ($parseList as $key => $aTemp) {
-            if ($date = ($tempLeadFieldType == 'datetime' ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
+            if ($date = ('datetime' == $tempLeadFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
                 $parseList[$key]['label'] = $date;
             }
         }

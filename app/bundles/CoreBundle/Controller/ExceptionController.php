@@ -30,21 +30,21 @@ class ExceptionController extends CommonController
         $class = $exception->getClass();
 
         //ignore authentication exceptions
-        if (strpos($class, 'Authentication') === false) {
+        if (false === strpos($class, 'Authentication')) {
             $env            = $this->factory->getEnvironment();
             $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
-            $layout         = $env == 'prod' ? 'Error' : 'Exception';
+            $layout         = 'prod' == $env ? 'Error' : 'Exception';
             $code           = $exception->getStatusCode();
-            if ($code === 0) {
+            if (0 === $code) {
                 //thrown exception that didn't set a code
                 $code = 500;
             }
 
             // Special handling for oauth and api urls
             if (
-                (strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) ||
-                strpos($request->getUri(), '/api') !== false ||
-                (!defined('MAUTIC_AJAX_VIEW') && strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json') !== false)
+                (false !== strpos($request->getUri(), '/oauth') && false === strpos($request->getUri(), 'authorize')) ||
+                false !== strpos($request->getUri(), '/api') ||
+                (!defined('MAUTIC_AJAX_VIEW') && false !== strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json'))
             ) {
                 $message   = ('dev' === MAUTIC_ENV) ? $exception->getMessage() : $this->get('translator')->trans('mautic.core.error.generic', ['%code%' => $code]);
                 $dataArray = [
@@ -56,7 +56,7 @@ class ExceptionController extends CommonController
                         ],
                     ],
                 ];
-                if ($env == 'dev') {
+                if ('dev' == $env) {
                     $dataArray['trace'] = $exception->getTrace();
                 }
 
@@ -104,8 +104,8 @@ class ExceptionController extends CommonController
                         'error' => [
                             'code'      => $code,
                             'text'      => $statusText,
-                            'exception' => ($env == 'dev') ? $exception->getMessage() : '',
-                            'trace'     => ($env == 'dev') ? $exception->getTrace() : '',
+                            'exception' => ('dev' == $env) ? $exception->getMessage() : '',
+                            'trace'     => ('dev' == $env) ? $exception->getTrace() : '',
                         ],
                         'route' => $urlParts['path'],
                     ],

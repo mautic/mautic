@@ -133,7 +133,7 @@ class ContactMerger
          * Alternatively, if the winner's date identified is null,
          * use the loser's date identified (doesn't matter if it is null).
          */
-        if (($loser->getDateIdentified() !== null && $loser->getDateIdentified() < $winner->getDateIdentified()) || $winner->getDateIdentified() === null) {
+        if ((null !== $loser->getDateIdentified() && $loser->getDateIdentified() < $winner->getDateIdentified()) || null === $winner->getDateIdentified()) {
             $winner->setDateIdentified($loser->getDateIdentified());
         }
 
@@ -224,7 +224,7 @@ class ContactMerger
         $oldOwner = $winner->getOwner();
         $newOwner = $loser->getOwner();
 
-        if ($oldOwner === null && $newOwner !== null) {
+        if (null === $oldOwner && null !== $newOwner) {
             $winner->setOwner($newOwner);
 
             $this->logger->debug("CONTACT: New owner of {$winner->getId()} is {$newOwner->getId()}");

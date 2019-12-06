@@ -74,7 +74,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('asset:assets:viewother');
 
-        if ($event->getType() == 'asset.downloads.in.time') {
+        if ('asset.downloads.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -96,7 +96,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'unique.vs.repetitive.downloads') {
+        if ('unique.vs.repetitive.downloads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $model  = $this->factory->getModel('asset');
@@ -111,7 +111,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'popular.assets') {
+        if ('popular.assets' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -157,7 +157,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.assets') {
+        if ('created.assets' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 

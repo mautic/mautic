@@ -54,7 +54,7 @@ class FormModel extends AbstractCommonModel
                 $checkedOutBy = $entity->getCheckedOutBy();
                 $maxLockTime  = $this->coreParametersHelper->getParameter('max_entity_lock_time', 0);
 
-                if ($maxLockTime != 0 && is_numeric($maxLockTime)) {
+                if (0 != $maxLockTime && is_numeric($maxLockTime)) {
                     $lockValidityDate = clone $checkedOut;
                     $lockValidityDate->add(new \DateInterval('PT'.$maxLockTime.'S'));
                 } else {
@@ -62,7 +62,7 @@ class FormModel extends AbstractCommonModel
                 }
 
                 //is lock expired ?
-                if ($lockValidityDate !== false && (new \DateTime()) > $lockValidityDate) {
+                if (false !== $lockValidityDate && (new \DateTime()) > $lockValidityDate) {
                     return false;
                 }
 
@@ -149,7 +149,7 @@ class FormModel extends AbstractCommonModel
 
             $event = $this->dispatchEvent('pre_save', $entity, $isNew);
             $this->getRepository()->saveEntity($entity, false);
-            if (++$i % $batchSize === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->em->flush();
             }
         }
@@ -308,14 +308,14 @@ class FormModel extends AbstractCommonModel
         foreach ($ids as $k => $id) {
             $entity        = $this->getEntity($id);
             $entities[$id] = $entity;
-            if ($entity !== null) {
+            if (null !== $entity) {
                 $event = $this->dispatchEvent('pre_delete', $entity);
                 $this->getRepository()->deleteEntity($entity, false);
                 //set the id for use in events
                 $entity->deletedId = $id;
                 $this->dispatchEvent('post_delete', $entity, false, $event);
             }
-            if ((($k + 1) % $batchSize) === 0) {
+            if (0 === (($k + 1) % $batchSize)) {
                 $this->em->flush();
             }
         }
@@ -427,7 +427,7 @@ class FormModel extends AbstractCommonModel
             $alias = substr($alias, 0, $maxLength);
         }
 
-        if (substr($alias, -1) == '_') {
+        if ('_' == substr($alias, -1)) {
             $alias = substr($alias, 0, -1);
         }
 

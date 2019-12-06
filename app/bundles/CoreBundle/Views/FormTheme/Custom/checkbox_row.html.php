@@ -9,6 +9,6 @@ $feedbackClass = (!empty($hasErrors)) ? ' has-error' : ''; ?>
                 <?php echo $view['translator']->trans($form->vars['label']); ?>
             </label>
         </div>
-        <?php echo $view['form']->errors($form) ?>
+        <?php echo $view['form']->errors($form); ?>
     </div>
 </div>

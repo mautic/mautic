@@ -238,7 +238,7 @@ class Lead
      */
     public function startNewRotation()
     {
-        $this->rotation += 1;
+        ++$this->rotation;
         $this->dateAdded = new \DateTime();
 
         return $this;

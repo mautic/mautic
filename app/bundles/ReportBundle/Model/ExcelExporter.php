@@ -56,14 +56,14 @@ class ExcelExporter
             foreach ($reportData['data'] as $count => $data) {
                 $row = [];
                 foreach ($data as $k => $v) {
-                    if ($count === 0) {
+                    if (0 === $count) {
                         //set the header
                         $header[] = $k;
                     }
                     $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
                 }
 
-                if ($count === 0) {
+                if (0 === $count) {
                     //write the column names row
                     $objPHPExcel->getActiveSheet()->fromArray($header);
                 }

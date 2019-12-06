@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -55,7 +56,7 @@
                     }
 
                     $color = $copy->getExactColor($newRGB);
-                    if ($color == -1) {
+                    if (-1 == $color) {
                         $color = $copy->allocateColor($newRGB);
                     }
 

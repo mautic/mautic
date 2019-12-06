@@ -14,7 +14,7 @@
     <div class="img-grid row">
         <?php $count = 0; ?>
         <?php foreach ($activity as $a): ?>
-        <?php if ($count > 0 && $count % 3 == 0): echo '</div><div class="row">'; endif; ?>
+        <?php if ($count > 0 && 0 == $count % 3): echo '</div><div class="row">'; endif; ?>
         <div class="col-xs-4 social-image"'>
             <a href="javascript: void(0);" onclick="Mautic.showSocialMediaImageModal('<?php echo $a['url']; ?>');">
                 <img class="img-responsive img-thumbnail" src="<?php echo $a['url']; ?>" />

@@ -68,7 +68,7 @@ class MonitoringModel extends FormModel
      *
      * @param $id
      *
-     * @return null|Monitoring
+     * @return Monitoring|null
      */
     public function getEntity($id = null)
     {

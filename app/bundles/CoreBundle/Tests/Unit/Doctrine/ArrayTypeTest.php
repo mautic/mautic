@@ -35,7 +35,7 @@ class ExampleClassWithPublicProperty
 /**
  * Class IpLookupFactoryTest.
  */
-class ArrayTypeTest extends \PHPUnit_Framework_TestCase
+class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
@@ -67,21 +67,21 @@ class ArrayTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGiven_nullPoisonedString_when_convertsToDatabaseValue_then_error()
     {
-        $this->setExpectedException('Doctrine\DBAL\Types\ConversionException');
+        $this->expectException('Doctrine\DBAL\Types\ConversionException');
 
         $this->arrayType->convertToDatabaseValue(["abcd\0efgh"], $this->platform);
     }
 
     public function testGiven_objectWithPrivateProperty_when_convertsToDatabaseValue_then_error()
     {
-        $this->setExpectedException('Doctrine\DBAL\Types\ConversionException');
+        $this->expectException('Doctrine\DBAL\Types\ConversionException');
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithPrivateProperty()], $this->platform);
     }
 
     public function testGiven_objectWithProtectedProperty_when_convertsToDatabaseValue_then_error()
     {
-        $this->setExpectedException('Doctrine\DBAL\Types\ConversionException');
+        $this->expectException('Doctrine\DBAL\Types\ConversionException');
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithProtectedProperty()], $this->platform);
     }

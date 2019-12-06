@@ -226,7 +226,7 @@ class LeadEventLogRepository extends CommonRepository
                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
 
         $join = 'innerJoin';
-        if ($all === true) {
+        if (true === $all) {
             $join = 'leftJoin';
         }
         $q->$join(

@@ -100,7 +100,7 @@ class ApiSubscriber extends CommonSubscriber
         $content    = $response->getContent();
         $statusCode = $response->getStatusCode();
 
-        if ($this->isApiRequest($event) && strpos($content, 'error') !== false) {
+        if ($this->isApiRequest($event) && false !== strpos($content, 'error')) {
             // Override api messages with something useful
             if ($data = json_decode($content, true)) {
                 $type = null;
@@ -164,7 +164,7 @@ class ApiSubscriber extends CommonSubscriber
     public function isBasicAuth(Request $request)
     {
         try {
-            return strpos(strtolower($request->headers->get('Authorization')), 'basic') === 0;
+            return 0 === strpos(strtolower($request->headers->get('Authorization')), 'basic');
         } catch (\Exception $e) {
             return false;
         }
@@ -221,7 +221,7 @@ class ApiSubscriber extends CommonSubscriber
         $requestUrl = $request->getRequestUri();
 
         // Check if /oauth or /api
-        $isApiRequest = (strpos($requestUrl, '/oauth') !== false || strpos($requestUrl, '/api') !== false);
+        $isApiRequest = (false !== strpos($requestUrl, '/oauth') || false !== strpos($requestUrl, '/api'));
 
         defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
 

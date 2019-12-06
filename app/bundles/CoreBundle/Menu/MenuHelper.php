@@ -27,7 +27,7 @@ class MenuHelper
     protected $security;
 
     /**
-     * @var null|Request
+     * @var Request|null
      */
     protected $request;
 
@@ -80,7 +80,7 @@ class MenuHelper
             }
 
             // Remove the item if the checks fail
-            if ($this->handleChecks($i) === false) {
+            if (false === $this->handleChecks($i)) {
                 unset($items[$k]);
                 continue;
             }
@@ -340,7 +340,7 @@ class MenuHelper
      */
     protected function handleChecks(array $menuItem)
     {
-        if (isset($menuItem['access']) && $this->handleAccessCheck($menuItem['access']) === false) {
+        if (isset($menuItem['access']) && false === $this->handleAccessCheck($menuItem['access'])) {
             return false;
         }
 
@@ -353,7 +353,7 @@ class MenuHelper
                 }
 
                 foreach ($checkConfig as $name => $value) {
-                    if ($this->$checkMethod($name, $value) === false) {
+                    if (false === $this->$checkMethod($name, $value)) {
                         return false;
                     }
                 }

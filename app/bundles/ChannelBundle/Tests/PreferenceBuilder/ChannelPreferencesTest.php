@@ -17,7 +17,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
 use Psr\Log\NullLogger;
 
-class ChannelPreferencesTest extends \PHPUnit_Framework_TestCase
+class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
 {
     public function testLogsAreOrganizedByPriority()
     {

@@ -43,7 +43,7 @@ class BaseDecorator implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -117,7 +117,7 @@ class BaseDecorator implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return array|bool|float|null|string
+     * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -130,7 +130,7 @@ class BaseDecorator implements FilterDecoratorInterface
         switch ($contactSegmentFilterCrate->getOperator()) {
             case 'like':
             case '!like':
-                return strpos($filter, '%') === false ? '%'.$filter.'%' : $filter;
+                return false === strpos($filter, '%') ? '%'.$filter.'%' : $filter;
             case 'contains':
                 return '%'.$filter.'%';
             case 'startsWith':
@@ -167,7 +167,7 @@ class BaseDecorator implements FilterDecoratorInterface
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return null|CompositeExpression|string
+     * @return CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

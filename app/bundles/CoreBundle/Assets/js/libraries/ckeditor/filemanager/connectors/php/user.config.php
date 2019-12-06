@@ -85,25 +85,25 @@ if ($authenticated) {
     $baseDir = $session->get('mautic.basepath', false);
     $docRoot = $session->get('mautic.docroot', false);
 
-    if (substr($userDir, -1) !== '/') {
+    if ('/' !== substr($userDir, -1)) {
         $userDir .= '/';
     }
 
-    if ($baseDir && $baseDir != '/') {
-        if (substr($baseDir, 0, 1) == '/') {
+    if ($baseDir && '/' != $baseDir) {
+        if ('/' == substr($baseDir, 0, 1)) {
             $baseDir = substr($baseDir, 1);
         }
 
-        if (substr($baseDir, -1) == '/') {
+        if ('/' == substr($baseDir, -1)) {
             $baseDir = substr($baseDir, 0, -1);
         }
 
-        if (substr($userDir, 0, 1) == '/') {
+        if ('/' == substr($userDir, 0, 1)) {
             $userDir = substr($userDir, 1);
         }
 
         $userDir = $baseDir.'/'.$userDir;
-    } elseif (substr($userDir, 0, 1) == '/') {
+    } elseif ('/' == substr($userDir, 0, 1)) {
         $userDir = substr($userDir, 1);
     }
 

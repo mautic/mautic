@@ -11,9 +11,9 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -92,9 +92,9 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        if ($entity === null) {
-            if ($method === 'PATCH' ||
-                ($method === 'PUT' && !$this->get('mautic.security')->isGranted('user:users:create'))
+        if (null === $entity) {
+            if ('PATCH' === $method ||
+                ('PUT' === $method && !$this->get('mautic.security')->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
@@ -111,7 +111,7 @@ class UserApiController extends CommonApiController
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
-            if ($method == 'PATCH') {
+            if ('PATCH' == $method) {
                 //PATCH will accept a diff so just remove the entities
 
                 //Changing username via API is forbidden

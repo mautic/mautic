@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MembershipBuilderTest extends \PHPUnit_Framework_TestCase
+class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MembershipManager|\PHPUnit_Framework_MockObject_MockObject

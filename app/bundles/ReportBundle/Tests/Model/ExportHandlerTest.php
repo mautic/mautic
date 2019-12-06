@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\Model\ExportHandler;
 
-class ExportHandlerTest extends \PHPUnit_Framework_TestCase
+class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testHandler()
     {

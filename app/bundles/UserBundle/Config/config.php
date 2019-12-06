@@ -334,6 +334,18 @@ return [
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.user.fixture.role' => [
+                'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadRoleData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.user.model.role'],
+            ],
+            'mautic.user.fixture.user' => [
+                'class'     => \Mautic\UserBundle\DataFixtures\ORM\LoadUserData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['security.encoder_factory'],
+            ],
+        ],
     ],
     'parameters' => [
         'saml_idp_metadata'            => '',

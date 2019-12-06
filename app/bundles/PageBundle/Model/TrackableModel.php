@@ -119,9 +119,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Return a channel Trackable entity by URL.
      *
-     * @param   $url
-     * @param   $channel
-     * @param   $channelId
+     * @param $url
+     * @param $channel
+     * @param $channelId
      *
      * @return Trackable|null
      */
@@ -132,12 +132,12 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (strpos($url, '&amp;') !== false) {
+        while (false !== strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
         $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
-        if ($trackable == null) {
+        if (null == $trackable) {
             $trackable = $this->createTrackableEntity($url, $channel, $channelId);
             $this->getRepository()->saveEntity($trackable->getRedirect());
             $this->getRepository()->saveEntity($trackable);
@@ -350,7 +350,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function extractTrackablesFromContent($content)
     {
-        if (preg_match('/<[^<]+>/', $content) !== 0) {
+        if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML
             $trackableUrls = $this->extractTrackablesFromHtml($content);
         } else {
@@ -461,7 +461,7 @@ class TrackableModel extends AbstractCommonModel
         $url = trim($url);
 
         // Ensure these are & for the sake of parsing
-        while (strpos($url, '&amp;') !== false) {
+        while (false !== strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
@@ -757,9 +757,9 @@ class TrackableModel extends AbstractCommonModel
             } else {
                 // Join the original URL path with the new path
                 if (isset($parts['path']) && (HTTP_URL_JOIN_PATH & $flags)) {
-                    if (isset($url['path']) && $url['path'] != '') {
+                    if (isset($url['path']) && '' != $url['path']) {
                         // If the URL doesn't start with a slash, we need to merge
-                        if ($url['path'][0] != '/') {
+                        if ('/' != $url['path'][0]) {
                             // If the path ends with a slash, store as is
                             if ('/' == $parts['path'][strlen($parts['path']) - 1]) {
                                 $sBasePath = $parts['path'];
@@ -867,7 +867,7 @@ class TrackableModel extends AbstractCommonModel
      */
     private function isContactFieldToken($token)
     {
-        return strpos($token, '{contactfield') !== false || strpos($token, '{leadfield') !== false;
+        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
     }
 
     /**

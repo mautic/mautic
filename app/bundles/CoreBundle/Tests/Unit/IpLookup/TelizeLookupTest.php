@@ -16,7 +16,7 @@ use Mautic\CoreBundle\IpLookup\TelizeLookup;
 /**
  * Class TelizeLookupTest.
  */
-class TelizeLookupTest extends \PHPUnit_Framework_TestCase
+class TelizeLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testIpLookupSuccessful()
     {

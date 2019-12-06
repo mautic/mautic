@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class IntervalTest extends \PHPUnit_Framework_TestCase
+class IntervalTest extends \PHPUnit\Framework\TestCase
 {
     public function testRescheduledToDueBeingBeforeSpecificHourRestriction()
     {

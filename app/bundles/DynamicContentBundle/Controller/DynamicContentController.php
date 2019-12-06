@@ -57,7 +57,7 @@ class DynamicContentController extends FormController
 
         //set limits
         $limit = $this->get('session')->get('mautic.dynamicContent.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -136,13 +136,13 @@ class DynamicContentController extends FormController
         $retUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
         $action = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'new']);
 
-        $updateSelect = ($this->request->getMethod() === 'POST')
+        $updateSelect = ('POST' === $this->request->getMethod())
             ? $this->request->request->get('dwc[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
-        if ($this->request->getMethod() === 'POST') {
+        if ('POST' === $this->request->getMethod()) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -254,7 +254,7 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -278,14 +278,14 @@ class DynamicContentController extends FormController
 
         $action = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
-        $updateSelect = ($this->request->getMethod() === 'POST')
+        $updateSelect = ('POST' === $this->request->getMethod())
             ? $this->request->request->get('dwc[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -354,7 +354,7 @@ class DynamicContentController extends FormController
         //set the page we came from
         $page = $this->get('session')->get('mautic.dynamicContent.page', 1);
 
-        if ($entity === null) {
+        if (null === $entity) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
 
@@ -443,7 +443,7 @@ class DynamicContentController extends FormController
         $model  = $this->getModel('dynamicContent');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',
@@ -463,7 +463,7 @@ class DynamicContentController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -483,11 +483,11 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('dynamicContent');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.dynamicContent.error.notfound',
@@ -540,7 +540,7 @@ class DynamicContentController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model = $this->getModel('dynamicContent');
             $ids   = json_decode($this->request->query->get('ids', '{}'));
 
@@ -550,7 +550,7 @@ class DynamicContentController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.dynamicContent.error.notfound',

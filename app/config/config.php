@@ -10,11 +10,11 @@ $ipLookupServices   = [];
 $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings, &$ipLookupServices) {
     $isPlugin = $isMautic = false;
 
-    if (strpos($namespace, 'MauticPlugin\\') !== false) {
+    if (false !== strpos($namespace, 'MauticPlugin\\')) {
         $isPlugin   = true;
         $bundleBase = $bundle;
         $relative   = $paths['plugins'].'/'.$bundleBase;
-    } elseif (strpos($namespace, 'Mautic\\') !== false) {
+    } elseif (false !== strpos($namespace, 'Mautic\\')) {
         $isMautic   = true;
         $bundleBase = str_replace('Mautic', '', $bundle);
         $relative   = $paths['bundles'].'/'.$bundleBase;
@@ -162,7 +162,7 @@ $container->loadFromExtension('mautic_core');
 $engines = ['php', 'twig'];
 
 // Decide on secure cookie based on site_url setting
-$secureCookie = $container->hasParameter('mautic.site_url') && substr(ltrim($container->getParameter('mautic.site_url')), 0, 5) === 'https';
+$secureCookie = $container->hasParameter('mautic.site_url') && 'https' === substr(ltrim($container->getParameter('mautic.site_url')), 0, 5);
 
 // Generate session name
 // Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
@@ -239,7 +239,7 @@ $dbalSettings = [
 
 // If using pdo_sqlite as the database driver, add the path to config file
 $dbDriver = $container->getParameter('mautic.db_driver');
-if ($dbDriver == 'pdo_sqlite') {
+if ('pdo_sqlite' == $dbDriver) {
     $dbalSettings['path'] = '%mautic.db_path%';
 }
 
@@ -274,7 +274,7 @@ $mailerSettings = [
 
 // Only spool if using file as otherwise emails are not sent on redirects
 $spoolType = $container->getParameter('mautic.mailer_spool_type');
-if ($spoolType == 'file') {
+if ('file' == $spoolType) {
     $mailerSettings['spool'] = [
         'type' => '%mautic.mailer_spool_type%',
         'path' => '%mautic.mailer_spool_path%',
@@ -365,7 +365,7 @@ $container->loadFromExtension('doctrine_cache', [
 
 $api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'           => $api_rate_limiter_limit == 0 ? false : true,
+  'enabled'           => 0 == $api_rate_limiter_limit ? false : true,
   'storage_engine'    => 'doctrine',
   'doctrine_provider' => 'api_rate_limiter_cache',
   'path_limits'       => [

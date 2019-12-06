@@ -83,7 +83,7 @@ class ChannelActionModel
         foreach ($subscribedChannels as $subscribedChannel) {
             if (!array_key_exists($subscribedChannel, $contactChannels)) {
                 $contactable = $this->doNotContact->isContactable($contact, $subscribedChannel);
-                if ($contactable !== DNC::UNSUBSCRIBED) {
+                if (DNC::UNSUBSCRIBED !== $contactable) {
                     $this->doNotContact->removeDncForContact($contact->getId(), $subscribedChannel);
                 }
             }

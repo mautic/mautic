@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -34,7 +35,7 @@
                 $pixel_cutoff = 1;
             }
 
-            if ($base_color === null) {
+            if (null === $base_color) {
                 $rgb_base = $img->getRGBAt(0, 0);
             } else {
                 if ($base_color < 0) {

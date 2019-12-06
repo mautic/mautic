@@ -61,7 +61,7 @@ class UpdateHelper
             ];
         }
 
-        if ($data->code != 200) {
+        if (200 != $data->code) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.package',
@@ -167,7 +167,7 @@ class UpdateHelper
             ];
         }
 
-        if ($data->code != 200) {
+        if (200 != $data->code) {
             // Log the error
             $logger = $this->factory->getLogger();
             $logger->addError(

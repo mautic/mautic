@@ -91,7 +91,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     public function isTracked()
     {
-        return $this->getTrackedDevice() !== null;
+        return null !== $this->getTrackedDevice();
     }
 
     /**
@@ -109,7 +109,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         }
 
         $trackingId = $this->getTrackedIdentifier();
-        if ($trackingId === null) {
+        if (null === $trackingId) {
             return null;
         }
 
@@ -173,7 +173,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private function getTrackedIdentifier()
     {
-        if ($this->request === null) {
+        if (null === $this->request) {
             return null;
         }
 
@@ -183,7 +183,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         }
 
         $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id', null);
-        if ($deviceTrackingId === null) {
+        if (null === $deviceTrackingId) {
             $deviceTrackingId = $this->request->get('mautic_device_id', null);
         }
 
@@ -198,7 +198,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         do {
             $generatedIdentifier = $this->randomHelper->generate(23);
             $device              = $this->leadDeviceRepository->getByTrackingId($generatedIdentifier);
-        } while ($device !== null);
+        } while (null !== $device);
 
         return $generatedIdentifier;
     }

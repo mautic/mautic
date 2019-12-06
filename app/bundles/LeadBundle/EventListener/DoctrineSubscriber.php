@@ -79,7 +79,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
                 foreach ($fields as $f) {
-                    if ($f['is_unique'] && $f['alias'] != 'email') {
+                    if ($f['is_unique'] && 'email' != $f['alias']) {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));

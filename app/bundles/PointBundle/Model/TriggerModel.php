@@ -189,7 +189,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Trigger();
         }
 
@@ -324,7 +324,7 @@ class TriggerModel extends CommonFormModel
             return false;
         }
 
-        if ($lead == null) {
+        if (null == $lead) {
             $lead = $this->leadModel->getCurrentLead();
         }
 
@@ -379,7 +379,7 @@ class TriggerModel extends CommonFormModel
 
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-        } elseif (strpos($settings['callback'], '::') !== false) {
+        } elseif (false !== strpos($settings['callback'], '::')) {
             $parts      = explode('::', $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {

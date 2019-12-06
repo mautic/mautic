@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class SendGridApiCallbackTest extends \PHPUnit_Framework_TestCase
+class SendGridApiCallbackTest extends \PHPUnit\Framework\TestCase
 {
     public function testSupportedEvents()
     {

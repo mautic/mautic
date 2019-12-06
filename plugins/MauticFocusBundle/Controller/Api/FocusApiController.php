@@ -11,8 +11,8 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**

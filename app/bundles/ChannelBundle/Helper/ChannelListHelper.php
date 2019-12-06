@@ -103,7 +103,7 @@ class ChannelListHelper extends Helper
             $channels[$feature] = $returnChannels;
         }
 
-        if (count($features) === 1) {
+        if (1 === count($features)) {
             $channels = $channels[$features[0]];
         }
 

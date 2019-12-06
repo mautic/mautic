@@ -59,7 +59,7 @@ class ContactRequestHelper
     private $contactTracker;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     private $request;
 

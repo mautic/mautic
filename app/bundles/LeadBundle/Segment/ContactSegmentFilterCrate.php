@@ -195,13 +195,13 @@ class ContactSegmentFilterCrate
         $operator = isset($filter['operator']) ? $filter['operator'] : null;
 
         if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = strpos($operator, '!') === false ? '' : '!';
+            $neg            = false === strpos($operator, '!') ? '' : '!';
             $this->operator = $neg.$this->getType();
 
             return;
         }
         if ('page_id' === $this->getField() || 'email_id' === $this->getField() || 'redirect_id' === $this->getField() || 'notification' === $this->getField()) {
-            $operator = ($operator === '=') === $this->getFilter() ? 'notEmpty' : 'empty';
+            $operator = ('=' === $operator) === $this->getFilter() ? 'notEmpty' : 'empty';
         }
 
         if ('=' === $operator && is_array($this->getFilter())) { //Fix for old segments which can have stored = instead on in operator

@@ -131,7 +131,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getWhere()
     {
@@ -139,7 +139,7 @@ class ContactSegmentFilter
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getGlue()
     {
@@ -179,7 +179,7 @@ class ContactSegmentFilter
      */
     public function isContactSegmentReference()
     {
-        return $this->getField() === 'leadlist';
+        return 'leadlist' === $this->getField();
     }
 
     /**

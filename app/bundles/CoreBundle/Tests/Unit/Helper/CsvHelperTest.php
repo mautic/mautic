@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
 
-class CsvHelperTest extends \PHPUnit_Framework_TestCase
+class CsvHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testSanitizeHeaders()
     {

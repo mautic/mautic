@@ -79,9 +79,9 @@ class PublicController extends CommonFormController
 
             // Add subject as title
             if (!empty($subject)) {
-                if (strpos($content, '<title></title>') !== false) {
+                if (false !== strpos($content, '<title></title>')) {
                     $content = str_replace('<title></title>', "<title>$subject</title>", $content);
-                } elseif (strpos($content, '<title>') === false) {
+                } elseif (false === strpos($content, '<title>')) {
                     $content = str_replace('<head>', "<head>\n<title>$subject</title>", $content);
                 }
             }
@@ -149,7 +149,7 @@ class PublicController extends CommonFormController
 
                 /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
                 $unsubscribeForm = $email->getUnsubscribeForm();
-                if ($unsubscribeForm != null && $unsubscribeForm->isPublished()) {
+                if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
@@ -372,7 +372,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = ($email !== null && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
+        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
 
         $theme = $this->factory->getTheme($template);
 
@@ -458,7 +458,7 @@ class PublicController extends CommonFormController
         $model       = $this->getModel('email');
         $emailEntity = $model->getEntity($objectId);
 
-        if ($emailEntity === null) {
+        if (null === $emailEntity) {
             return $this->notFound();
         }
 
@@ -587,7 +587,7 @@ class PublicController extends CommonFormController
             return;
         }
 
-        if (strpos($query_string, 'r=') === 0) {
+        if (0 === strpos($query_string, 'r=')) {
             $query_string = substr($query_string, strpos($query_string, '?') + 1);
         } // remove route variable
 
@@ -613,7 +613,7 @@ class PublicController extends CommonFormController
 
         // generate signature
         $salt = $keys['secret'];
-        if (strpos($salt, '$1$') === false) {
+        if (false === strpos($salt, '$1$')) {
             $salt = '$1$'.$salt;
         } // add MD5 prefix
         $cr    = crypt(urlencode($query['d']), $salt);
@@ -651,11 +651,11 @@ class PublicController extends CommonFormController
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
-            if ($lead === null) {
+            if (null === $lead) {
                 $lead = $this->createLead($email, $repo);
             }
 
-            if ($lead === null) {
+            if (null === $lead) {
                 continue;
             } // lead was not created
 
@@ -665,14 +665,14 @@ class PublicController extends CommonFormController
             $stat = $model->getEmailStatus($idHash);
 
             // stat doesn't exist, create one
-            if ($stat === null) {
+            if (null === $stat) {
                 $lead['email'] = $email; // needed for stat
                 $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
 
             $stat->setSource('email.client');
 
-            if ($stat || $integration !== 'Outlook') { // Outlook requests the tracking gif on send
+            if ($stat || 'Outlook' !== $integration) { // Outlook requests the tracking gif on send
                 $model->hitEmail($idHash, $this->request); // add email event
             }
         }
@@ -698,7 +698,7 @@ class PublicController extends CommonFormController
      */
     private function addStat($lead, $email, $query, $idHash)
     {
-        if ($lead !== null) {
+        if (null !== $lead) {
             /** @var \Mautic\EmailBundle\Helper\MailHelper $mailer */
             $mailer = $this->get('mautic.helper.mailer');
 

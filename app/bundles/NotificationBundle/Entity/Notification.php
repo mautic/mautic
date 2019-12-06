@@ -239,7 +239,7 @@ class Notification extends FormEntity
         $metadata->addConstraint(new Callback([
             'callback' => function (Notification $notification, ExecutionContextInterface $context) {
                 $type = $notification->getNotificationType();
-                if ($type == 'list') {
+                if ('list' == $type) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $notification->getLists(),
@@ -309,7 +309,7 @@ class Notification extends FormEntity
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'category' || $prop == 'list') {
+        if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

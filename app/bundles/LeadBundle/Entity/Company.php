@@ -228,7 +228,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'owner') {
+        if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {

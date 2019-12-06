@@ -66,7 +66,7 @@ class MenuEvent extends Event
         $defaultPriority = isset($menuItems['priority']) ? $menuItems['priority'] : 9999;
         $items           = isset($menuItems['items']) ? $menuItems['items'] : $menuItems;
 
-        $isRoot = isset($items['name']) && ($items['name'] == 'root' || $items['name'] == $items['name']);
+        $isRoot = isset($items['name']) && ('root' == $items['name'] || $items['name'] == $items['name']);
         if (!$isRoot) {
             $this->helper->createMenuStructure($items, 0, $defaultPriority, $this->type);
 

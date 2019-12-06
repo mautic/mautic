@@ -151,7 +151,7 @@ class FocusModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Focus();
         }
 
@@ -189,7 +189,7 @@ class FocusModel extends FormModel
             $focusArray = $focus->toArray();
 
             $url = '';
-            if ($focusArray['type'] == 'link' && !empty($focusArray['properties']['content']['link_url'])) {
+            if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
                 $trackable = $this->trackableModel->getTrackableByUrl(
                     $focusArray['properties']['content']['link_url'],
                     'focus',
@@ -440,8 +440,8 @@ class FocusModel extends FormModel
         $data = $query->loadAndBuildTimeData($q);
         $chart->setDataset($this->translator->trans('mautic.focus.graph.views'), $data);
 
-        if ($focus->getType() != 'notification') {
-            if ($focus->getType() == 'link') {
+        if ('notification' != $focus->getType()) {
+            if ('link' == $focus->getType()) {
                 $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);

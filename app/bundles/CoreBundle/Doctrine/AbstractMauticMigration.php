@@ -149,9 +149,9 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                         $isIdx  = stripos($name, 'idx');
                         $isUniq = stripos($name, 'uniq');
 
-                        if ($isIdx !== false || $isUniq !== false) {
+                        if (false !== $isIdx || false !== $isUniq) {
                             $key     = substr($name, -4);
-                            $keyType = ($isIdx !== false) ? 'idx' : 'uniq';
+                            $keyType = (false !== $isIdx) ? 'idx' : 'uniq';
 
                             $tables[$table]['idx'][$keyType][$key] = $name;
                         }

@@ -50,11 +50,11 @@ class SendGridApiResponse
 
         $body    = @json_decode($response->body(), true);
         $message = '';
-        if ($body !== false && isset($body['errors'][0]['message'])) {
+        if (false !== $body && isset($body['errors'][0]['message'])) {
             $message = $body['errors'][0]['message'];
         }
 
-        if ($statusCode === 401) {
+        if (401 === $statusCode) {
             throw new SendGridBadLoginException($message);
         }
 

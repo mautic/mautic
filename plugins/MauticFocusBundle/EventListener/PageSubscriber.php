@@ -85,7 +85,7 @@ class PageSubscriber extends CommonSubscriber
         if (count($matches[0])) {
             foreach ($matches[1] as $k => $id) {
                 $focus = $this->model->getEntity($id);
-                if ($focus !== null
+                if (null !== $focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(

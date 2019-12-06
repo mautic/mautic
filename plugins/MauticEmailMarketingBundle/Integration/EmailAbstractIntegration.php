@@ -35,12 +35,12 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features' || $formArea == 'integration') {
+        if ('features' == $formArea || 'integration' == $formArea) {
             if ($this->isAuthorized()) {
                 $formType = $this->getFormType();
 
                 if ($formType) {
-                    if ($formArea == 'integration' && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
+                    if ('integration' == $formArea && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
                         $data['list_settings']['leadFields'] = $data['leadFields'];
                     }
 

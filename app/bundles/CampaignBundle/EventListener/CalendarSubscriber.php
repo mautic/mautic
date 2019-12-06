@@ -64,7 +64,7 @@ class CalendarSubscriber extends CommonSubscriber
                     $query->expr()->gte($eventType['dateName'], ':start'),
                     $query->expr()->lte($eventType['dateName'], ':end')
                 ));
-            if ($eventKey == 'upcoming') {
+            if ('upcoming' == $eventKey) {
                 $query->andWhere($query->expr()->gte($eventType['dateName'], ':now'))
                     ->setParameter('now', $now->toUtcString());
             }

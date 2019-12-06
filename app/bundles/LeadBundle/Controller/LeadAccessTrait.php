@@ -39,7 +39,7 @@ trait LeadAccessTrait
             $leadId = $lead->getId();
         }
 
-        if ($lead === null || !$lead->getId()) {
+        if (null === $lead || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
                 //set the return URL
                 $page      = $this->get('session')->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
@@ -110,7 +110,7 @@ trait LeadAccessTrait
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]);
 
-        if ($leads === null) {
+        if (null === $leads) {
             return $this->accessDenied();
         }
 

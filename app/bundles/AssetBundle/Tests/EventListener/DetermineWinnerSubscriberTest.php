@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit_Framework_TestCase
+class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $em;
     private $translator;

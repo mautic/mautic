@@ -27,7 +27,7 @@ if (!isset($background_color) || !$background_color) {
     $background_color = 'transparent';
 }
 
-if ($background_color != 'transparent') {
+if ('transparent' != $background_color) {
     $background_color = '#'.$background_color;
 }
 
@@ -49,13 +49,13 @@ $view['assets']->addStyleDeclaration($css);
 ?>
 
 <!-- Header Carousel -->
-<div id="carousel-generic-<?php echo $slot ?>" class="carousel slide slideshow-<?php echo $slot ?>" data-ride="carousel">
+<div id="carousel-generic-<?php echo $slot; ?>" class="carousel slide slideshow-<?php echo $slot; ?>" data-ride="carousel">
 
 <?php if (isset($dot_navigation) && $dot_navigation) : ?>
     <!-- Indicators -->
     <ol class="carousel-indicators">
     <?php foreach ($slides as $key => $slide) : ?>
-        <li data-target="#carousel-generic-<?php echo $slot ?>" data-slide-to="<?php echo $key; ?>" <?php echo $key == 0 ? 'class="active"' : '' ?>></li>
+        <li data-target="#carousel-generic-<?php echo $slot; ?>" data-slide-to="<?php echo $key; ?>" <?php echo 0 == $key ? 'class="active"' : ''; ?>></li>
 	<?php endforeach; ?>
     </ol>
 <?php endif; ?>
@@ -74,7 +74,7 @@ CSS;
 
 $view['assets']->addStyleDeclaration($css);
         ?>
-        <div class="item text-center <?php echo $key == 0 ? 'active' : '' ?> slide-<?php echo $slot ?>-<?php echo $key ?>">
+        <div class="item text-center <?php echo 0 == $key ? 'active' : ''; ?> slide-<?php echo $slot; ?>-<?php echo $key; ?>">
             <?php if (!empty($slide['captionheader']) || !empty($slide['captionheader'])) : ?>
             <div class="carousel-caption">
 	            <?php if (!empty($slide['captionheader'])) : ?>
@@ -91,11 +91,11 @@ $view['assets']->addStyleDeclaration($css);
 
 <?php if (isset($arrow_navigation) && $arrow_navigation) : ?>
     <!-- Controls -->
-    <a class="left carousel-control" href="#carousel-generic-<?php echo $slot ?>" role="button" data-slide="prev">
+    <a class="left carousel-control" href="#carousel-generic-<?php echo $slot; ?>" role="button" data-slide="prev">
         <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
         <span class="sr-only">Previous</span>
     </a>
-    <a class="right carousel-control" href="#carousel-generic-<?php echo $slot ?>" role="button" data-slide="next">
+    <a class="right carousel-control" href="#carousel-generic-<?php echo $slot; ?>" role="button" data-slide="next">
         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
     </a>
@@ -109,12 +109,12 @@ $view['assets']->addStyleDeclaration($css);
 		</button>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="slideshow-options">
 			<li role="presentation">
-				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-global-config<?php echo $slot ?>">
+				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-global-config<?php echo $slot; ?>">
 					<i class="fa fa-pencil-square-o"></i> Edit Slideshow
 				</a>
 			</li>
 			<li role="presentation">
-				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-slides-config<?php echo $slot ?>">
+				<a role="menuitem" tabindex="-1" href="#" data-toggle="modal" data-target=".slideshow-slides-config<?php echo $slot; ?>">
 					<i class="fa fa-bars"></i> Edit Slides
 				</a>
 			</li>
@@ -125,7 +125,7 @@ $view['assets']->addStyleDeclaration($css);
 
 <?php if (!$public) : ?>
 <!-- Slideshow global config modal edit form -->
-<div class="modal fade slideshow-global-config<?php echo $slot ?>" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade slideshow-global-config<?php echo $slot; ?>" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -138,7 +138,7 @@ $view['assets']->addStyleDeclaration($css);
 				<?php echo $view['form']->end($configForm); ?>
 			</div>
 			<div class="modal-footer">
-                <button type="button" class="btn btn-default" onclick="SlideshowManager.saveConfigObject('<?php echo $slot ?>');">
+                <button type="button" class="btn btn-default" onclick="SlideshowManager.saveConfigObject('<?php echo $slot; ?>');">
 	                <i class="fa fa-check"></i> Apply
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">
@@ -150,7 +150,7 @@ $view['assets']->addStyleDeclaration($css);
 </div>
 
 <!-- Slideshow slide config modal edit form -->
-<div class="modal fade slideshow-slides-config<?php echo $slot ?> slides-config" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade slideshow-slides-config<?php echo $slot; ?> slides-config" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -161,7 +161,7 @@ $view['assets']->addStyleDeclaration($css);
 				<div class="col-md-3 bg-white height-auto list-of-slides">
 					<ul class="list-group list-group-tabs" data-toggle="sortablelist">
 					<?php foreach ($slides as $key => $slide) : ?>
-		                 <li class="list-group-item <?php echo $key == 0 ? 'active' : '' ?>">
+		                 <li class="list-group-item <?php echo 0 == $key ? 'active' : ''; ?>">
 							<a href="#slide-tab-<?php echo $key; ?>" class="steps" data-toggle="tab">
 								Slide <span class="slide-id"><?php echo $key; ?></span>
 							</a>
@@ -177,7 +177,7 @@ $view['assets']->addStyleDeclaration($css);
 	            </div>
 	            <div class="tab-content col-md-9 bg-auto height-auto bdr-l config-fields">
 				<?php foreach ($slides as $key => $slide) : ?>
-					<div class="tab-pane fade bdr-rds-0 bdr-w-0 <?php echo $key == 0 ? 'in active' : '' ?>" id="slide-tab-<?php echo $key; ?>">
+					<div class="tab-pane fade bdr-rds-0 bdr-w-0 <?php echo 0 == $key ? 'in active' : ''; ?>" id="slide-tab-<?php echo $key; ?>">
 						<?php echo $view['form']->start($slide['form']); ?>
 						<div class="row text-right">
 							<?php echo $view['form']->row($slide['form']['slides:'.$key.':remove']); ?>
@@ -203,7 +203,7 @@ $view['assets']->addStyleDeclaration($css);
 				<div id="fileManager"></div>
 			</div>
 			<div class="modal-footer">
-                <button type="button" class="btn btn-default" onclick="SlideshowManager.saveConfigObject('<?php echo $slot ?>');">
+                <button type="button" class="btn btn-default" onclick="SlideshowManager.saveConfigObject('<?php echo $slot; ?>');">
 	                <i class="fa fa-check"></i> Apply
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">

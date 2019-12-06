@@ -13,7 +13,7 @@ namespace Mautic\ReportBundle\Tests\Option;
 
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
-class ExportOptionTest extends \PHPUnit_Framework_TestCase
+class ExportOptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testReportId()
     {

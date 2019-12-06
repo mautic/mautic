@@ -100,7 +100,7 @@ class ReloadHelper
                 $plugin       = $this->mapConfigToPluginEntity($plugin, $pluginConfig);
 
                 //compare versions to see if an update is necessary
-                if (!empty($oldVersion) && version_compare($oldVersion, $plugin->getVersion()) == -1) {
+                if (!empty($oldVersion) && -1 == version_compare($oldVersion, $plugin->getVersion())) {
                     //call the update callback
                     $callback = $pluginConfig['bundleClass'];
                     $metadata = isset($pluginMetadata[$pluginConfig['namespace']])
@@ -143,7 +143,7 @@ class ReloadHelper
                 $metadata        = isset($pluginMetadata[$pluginConfig['namespace']]) ? $pluginMetadata[$pluginConfig['namespace']] : null;
                 $installedSchema = null;
 
-                if (isset($installedPluginsSchemas[$pluginConfig['namespace']]) && count($installedPluginsSchemas[$pluginConfig['namespace']]->getTables()) !== 0) {
+                if (isset($installedPluginsSchemas[$pluginConfig['namespace']]) && 0 !== count($installedPluginsSchemas[$pluginConfig['namespace']]->getTables())) {
                     $installedSchema = true;
                 }
 

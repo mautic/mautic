@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -104,7 +103,7 @@ class NotificationHelper
         if ($this->hasScript()) {
             $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-            if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
                 return;
             }
 
@@ -130,7 +129,7 @@ class NotificationHelper
             }
 
             $server        = $this->request->getCurrentRequest()->server;
-            $https         = (parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) == 'https') ? true : false;
+            $https         = ('https' == parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME)) ? true : false;
             $subdomainName = '';
 
             if (!$https && $notificationSubdomainName) {
@@ -218,25 +217,25 @@ JS;
             return false;
         }
 
-        if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
+        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url'))) {
             $landingPage = false;
         }
 
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+        if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
             return false;
         }
 
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
 
         // disable on Landing pages
-        if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
+        if (true === $landingPage && !in_array('landing_page_enabled', $supportedFeatures)) {
             return false;
         }
 
         // disable on Landing pages
-        if ($landingPage === false && !in_array('tracking_page_enabled', $supportedFeatures)) {
+        if (false === $landingPage && !in_array('tracking_page_enabled', $supportedFeatures)) {
             return false;
         }
 

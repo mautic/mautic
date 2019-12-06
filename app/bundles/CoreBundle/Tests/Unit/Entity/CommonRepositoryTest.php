@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class CommonRepositoryTest extends \PHPUnit_Framework_TestCase
+class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CommonRepository

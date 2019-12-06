@@ -177,7 +177,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && strpos($options['data']['id'], 'new') === false) ? true : false,
+                    'disabled' => (!empty($options['data']['id']) && false === strpos($options['data']['id'], 'new')) ? true : false,
                     'required' => false,
                 ]
             );
@@ -198,7 +198,7 @@ class FieldType extends AbstractType
         if ($addDefaultValue) {
             $builder->add(
                 'defaultValue',
-                ($type == 'textarea') ? 'textarea' : 'text',
+                ('textarea' == $type) ? 'textarea' : 'text',
                 [
                     'label'      => 'mautic.core.defaultvalue',
                     'label_attr' => ['class' => 'control-label'],
@@ -303,7 +303,7 @@ class FieldType extends AbstractType
         }
 
         if ($addSaveResult) {
-            $default = (!isset($options['data']['saveResult']) || $options['data']['saveResult'] === null) ? true
+            $default = (!isset($options['data']['saveResult']) || null === $options['data']['saveResult']) ? true
                 : (bool) $options['data']['saveResult'];
             $builder->add(
                 'saveResult',
@@ -319,7 +319,7 @@ class FieldType extends AbstractType
         }
 
         if ($addBehaviorFields) {
-            $default = (!isset($options['data']['showWhenValueExists']) || $options['data']['showWhenValueExists'] === null) ? true
+            $default = (!isset($options['data']['showWhenValueExists']) || null === $options['data']['showWhenValueExists']) ? true
                 : (bool) $options['data']['showWhenValueExists'];
             $builder->add(
                 'showWhenValueExists',

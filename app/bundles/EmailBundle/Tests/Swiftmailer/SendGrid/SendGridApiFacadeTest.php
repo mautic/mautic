@@ -20,7 +20,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper;
 use SendGrid\Mail;
 use SendGrid\Response;
 
-class SendGridApiFacadeTest extends \PHPUnit_Framework_TestCase
+class SendGridApiFacadeTest extends \PHPUnit\Framework\TestCase
 {
     public function testRequest()
     {

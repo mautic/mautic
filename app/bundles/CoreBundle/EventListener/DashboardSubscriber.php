@@ -60,7 +60,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
-        if ($event->getType() == 'recent.activity') {
+        if ('recent.activity' == $event->getType()) {
             if (!$event->isCached()) {
                 $height = $event->getWidget()->getHeight();
                 $limit  = round(($height - 80) / 75);
@@ -75,7 +75,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             if (method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();
 
-                                if ($log['bundle'] == 'lead' && $log['objectName'] == 'mautic.lead.lead.anonymous') {
+                                if ('lead' == $log['bundle'] && 'mautic.lead.lead.anonymous' == $log['objectName']) {
                                     $log['objectName'] = $this->translator->trans('mautic.lead.lead.anonymous');
                                 }
                             } else {
@@ -83,7 +83,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             }
 
                             $routeName = 'mautic_'.$log['bundle'].'_action';
-                            if ($this->router->getRouteCollection()->get($routeName) !== null) {
+                            if (null !== $this->router->getRouteCollection()->get($routeName)) {
                                 $log['route'] = $this->router->generate(
                                     'mautic_'.$log['bundle'].'_action',
                                     ['objectAction' => 'view', 'objectId' => $log['objectId']]

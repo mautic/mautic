@@ -176,7 +176,7 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $sql = $this->em->getConnection()->getDatabasePlatform()->getName() === 'sqlite' ? [] : ['SET foreign_key_checks = 0;'];
+        $sql = 'sqlite' === $this->em->getConnection()->getDatabasePlatform()->getName() ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {
@@ -253,7 +253,7 @@ class SchemaHelper
             //drop old indexes
             /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
             foreach ($backupIndexes[$t] as $indexName => $oldIndex) {
-                if ($indexName == 'primary') {
+                if ('primary' == $indexName) {
                     continue;
                 }
 
@@ -335,7 +335,7 @@ class SchemaHelper
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix) || strpos($name, $prefix) === false) {
+        if (empty($prefix) || false === strpos($name, $prefix)) {
             return $backupPrefix.$name;
         } else {
             return str_replace($prefix, $backupPrefix, $name);

@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\ResponseItems;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
-class ResponseItemsTest extends \PHPUnit_Framework_TestCase
+class ResponseItemsTest extends \PHPUnit\Framework\TestCase
 {
     public function testResponseItems()
     {

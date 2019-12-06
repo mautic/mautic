@@ -169,7 +169,7 @@ class Trigger extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        if ($prop == 'events') {
+        if ('events' == $prop) {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
         } else {

@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 /**
  * Exercises CircularDependencyValidator.
  */
-class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
+class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|ListModel

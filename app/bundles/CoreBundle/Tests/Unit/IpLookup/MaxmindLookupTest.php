@@ -21,7 +21,7 @@ use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and
  * classes are initiated
  */
-class MaxmindLookupTest extends \PHPUnit_Framework_TestCase
+class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     protected $mockHttp;
 

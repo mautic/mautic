@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventSchedulerTest extends \PHPUnit_Framework_TestCase
+class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject

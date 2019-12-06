@@ -99,11 +99,11 @@ class DashboardModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Widget();
         }
 
@@ -239,7 +239,7 @@ class DashboardModel extends FormModel
     {
         $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
-        if ($widget->getCacheTimeout() === null || $widget->getCacheTimeout() === -1) {
+        if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
             $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
         }
 

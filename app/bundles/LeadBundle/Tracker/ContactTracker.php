@@ -52,12 +52,12 @@ class ContactTracker
     private $security;
 
     /**
-     * @var null|Lead
+     * @var Lead|null
      */
     private $systemContact;
 
     /**
-     * @var null|Lead
+     * @var Lead|null
      */
     private $trackedContact;
 
@@ -226,7 +226,7 @@ class ContactTracker
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getTrackingId()
     {
@@ -379,7 +379,7 @@ class ContactTracker
      */
     private function useSystemContact()
     {
-        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || $this->request === null;
+        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->request;
     }
 
     /**
@@ -401,7 +401,7 @@ class ContactTracker
             "CONTACT: Tracking code changed from $previouslyTrackedId for contact ID# {$previouslyTrackedContact->getId()} to $newTrackingId for contact ID# {$this->trackedContact->getId()}"
         );
 
-        if ($previouslyTrackedId !== null) {
+        if (null !== $previouslyTrackedId) {
             if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
                 $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
@@ -411,7 +411,7 @@ class ContactTracker
 
     private function generateTrackingCookies()
     {
-        if ($leadId = $this->trackedContact->getId() && $this->request !== null) {
+        if ($leadId = $this->trackedContact->getId() && null !== $this->request) {
             $this->deviceTracker->createDeviceFromUserAgent($this->trackedContact, $this->request->server->get('HTTP_USER_AGENT'));
         }
     }

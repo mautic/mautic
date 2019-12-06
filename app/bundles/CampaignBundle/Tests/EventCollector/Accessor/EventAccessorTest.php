@@ -17,7 +17,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
 
-class EventAccessorTest extends \PHPUnit_Framework_TestCase
+class EventAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array

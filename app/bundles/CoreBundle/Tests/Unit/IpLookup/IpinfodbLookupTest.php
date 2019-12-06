@@ -16,7 +16,7 @@ use Mautic\CoreBundle\IpLookup\IpinfodbLookup;
 /**
  * Class IpinfodbLookupTest.
  */
-class IpinfodbLookupTest extends \PHPUnit_Framework_TestCase
+class IpinfodbLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testIpLookupSuccessful()
     {

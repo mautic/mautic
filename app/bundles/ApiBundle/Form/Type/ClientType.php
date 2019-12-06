@@ -122,7 +122,7 @@ class ClientType extends AbstractType
             ]
         );
 
-        if ($this->apiMode == 'oauth2') {
+        if ('oauth2' == $this->apiMode) {
             $arrayStringTransformer = new Transformers\ArrayStringTransformer();
             $builder->add(
                 $builder->create(
@@ -288,7 +288,7 @@ class ClientType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $dataClass = ($this->apiMode == 'oauth2') ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
+        $dataClass = ('oauth2' == $this->apiMode) ? 'Mautic\ApiBundle\Entity\oAuth2\Client' : 'Mautic\ApiBundle\Entity\oAuth1\Consumer';
         $resolver->setDefaults(
             [
                 'data_class' => $dataClass,

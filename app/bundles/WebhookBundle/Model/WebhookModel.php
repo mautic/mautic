@@ -13,7 +13,7 @@ namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
-use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializerInterface;
 use Joomla\Http\Http;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -32,9 +32,6 @@ use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ReportModel.
- */
 class WebhookModel extends FormModel
 {
     /**
@@ -86,7 +83,7 @@ class WebhookModel extends FormModel
     protected $logMax;
 
     /**
-     * @var Serializer
+     * @var SerializerInterface
      */
     protected $serializer;
 
@@ -104,15 +101,13 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
-     * WebhookModel constructor.
-     *
      * @param CoreParametersHelper $coreParametersHelper
-     * @param Serializer           $serializer
+     * @param SerializerInterface  $serializer
      * @param NotificationModel    $notificationModel
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        Serializer $serializer,
+        SerializerInterface $serializer,
         NotificationModel $notificationModel
     ) {
         $this->setConfigProps($coreParametersHelper);
@@ -152,7 +147,7 @@ class WebhookModel extends FormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Webhook();
         }
 
@@ -324,7 +319,7 @@ class WebhookModel extends FormModel
             // throw an error exception if we don't get a 200 back
             if ($response->code >= 300 || $response->code < 200) {
                 // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
-                if ($response->code == 410) {
+                if (410 == $response->code) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
@@ -388,7 +383,7 @@ class WebhookModel extends FormModel
         $successRadio = $this->getLogRepository()->getSuccessVsErrorStatusCodeRatio($webhook->getId(), $this->disableLimit);
 
         // If there are no log rows yet, consider it healthy
-        if ($successRadio === null) {
+        if (null === $successRadio) {
             return false;
         }
 
@@ -496,7 +491,7 @@ class WebhookModel extends FormModel
 
         $payload = [];
 
-        if ($this->queueMode === self::COMMAND_PROCESS) {
+        if (self::COMMAND_PROCESS === $this->queueMode) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
             $queuesArray = [isset($queue) ? [$queue] : []];

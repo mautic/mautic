@@ -87,7 +87,7 @@ class LeadSubscriber extends CommonSubscriber
                     $campaignReferences[$c['id']] = $em->getReference('MauticCampaignBundle:Campaign', $c['id']);
                 }
 
-                if ($action == 'added') {
+                if ('added' == $action) {
                     $this->campaignModel->addLeads($campaignReferences[$c['id']], $leads, false, true);
                 } else {
                     if (!isset($campaignLists[$c['id']])) {
@@ -135,7 +135,7 @@ class LeadSubscriber extends CommonSubscriber
         $leadListIds = array_keys($leadLists);
 
         // If the lead was removed then don't count it
-        if ($action == 'removed') {
+        if ('removed' == $action) {
             $key = array_search($list->getId(), $leadListIds);
             unset($leadListIds[$key]);
         }
@@ -148,7 +148,7 @@ class LeadSubscriber extends CommonSubscriber
                     $campaignLists[$c['id']] = array_keys($c['lists']);
                 }
 
-                if ($action == 'added') {
+                if ('added' == $action) {
                     $this->campaignModel->addLead($campaign, $lead);
                 } else {
                     if (array_intersect($leadListIds, $campaignLists[$c['id']])) {

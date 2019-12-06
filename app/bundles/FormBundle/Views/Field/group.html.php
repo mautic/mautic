@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 $containerType     = "{$type}grp";
 $defaultInputClass = "{$containerType}-{$type}";
 $ignoreId          = true;
-$ignoreName        = ($type == 'checkbox');
+$ignoreName        = ('checkbox' == $type);
 
 include __DIR__.'/field_helper.php';
 
@@ -22,7 +22,7 @@ $optionLabelAttr = (isset($properties['labelAttributes'])) ? $properties['labelA
 $wrapDiv         = true;
 
 $defaultOptionLabelClass = 'mauticform-'.$containerType.'-label';
-if (stripos($optionLabelAttr, 'class') === false) {
+if (false === stripos($optionLabelAttr, 'class')) {
     $optionLabelAttr .= ' class="'.$defaultOptionLabelClass.'"';
 } else {
     $optionLabelAttr = str_ireplace('class="', 'class="'.$defaultOptionLabelClass.' ', $optionLabelAttr);
@@ -48,7 +48,7 @@ foreach ($list as $listValue => $listLabel):
 
 $id               = $field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($listValue)).$counter;
 $checked          = ($field['defaultValue'] === $listValue) ? 'checked="checked"' : '';
-$checkboxBrackets = ($type == 'checkbox') ? '[]' : '';
+$checkboxBrackets = ('checkbox' == $type) ? '[]' : '';
 
 $option = <<<HTML
 

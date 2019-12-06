@@ -165,7 +165,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['view'])) {
                 $level = 'view';
             }
-        } elseif ($level == 'view') {
+        } elseif ('view' == $level) {
             if (isset($this->permissions[$name]['viewown'])) {
                 $level = 'viewown';
             }
@@ -173,7 +173,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['edit'])) {
                 $level = 'edit';
             }
-        } elseif ($level == 'edit') {
+        } elseif ('edit' == $level) {
             if (isset($this->permissions[$name]['editown'])) {
                 $level = 'editown';
             }
@@ -181,7 +181,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['delete'])) {
                 $level = 'delete';
             }
-        } elseif ($level == 'delete') {
+        } elseif ('delete' == $level) {
             if (isset($this->permissions[$name]['deleteown'])) {
                 $level = 'deleteown';
             }
@@ -189,7 +189,7 @@ abstract class AbstractPermissions
             if (isset($this->permissions[$name]['publish'])) {
                 $level = 'publish';
             }
-        } elseif ($level == 'publish') {
+        } elseif ('publish' == $level) {
             if (isset($this->permissions[$name]['publishown'])) {
                 $level = 'publishown';
             }
@@ -294,7 +294,7 @@ abstract class AbstractPermissions
             $totalAvailable += count($perms);
 
             if (in_array('full', $perms)) {
-                if (count($perms) === 1) {
+                if (1 === count($perms)) {
                     //full is the only permission so count as 1
                     if (!empty($data[$level]) && in_array('full', $data[$level])) {
                         ++$totalGranted;
@@ -378,7 +378,7 @@ abstract class AbstractPermissions
 
         $choices['full'] = 'mautic.core.permissions.full';
 
-        $label = ($level == 'categories') ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
+        $label = ('categories' == $level) ? 'mautic.category.permissions.categories' : "mautic.$bundle.permissions.$level";
         $builder->add("$bundle:$level", 'permissionlist', [
             'choices' => $choices,
             'label'   => $label,

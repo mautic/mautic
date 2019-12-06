@@ -100,11 +100,11 @@ class GravatarHelper extends Helper
 
         $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
 
-        if ($default === null) {
+        if (null === $default) {
             $default = $localDefault;
         }
 
-        $default = (strpos($default, '.') !== false && strpos($default, 'http') !== 0) ? UrlHelper::rel2abs($default) : $default;
+        $default = (false !== strpos($default, '.') && 0 !== strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
         $url .= '&d='.urlencode($default);
 
         return $url;

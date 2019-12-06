@@ -32,7 +32,7 @@ class DoNotContactParts
     {
         $parts         = explode('_', $field);
         $this->type    = $parts[1];
-        $this->channel = count($parts) === 3 ? $parts[2] : 'email';
+        $this->channel = 3 === count($parts) ? $parts[2] : 'email';
     }
 
     /**

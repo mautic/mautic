@@ -33,7 +33,7 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * @return string|null
      *
      * @throws FeedbackLoopNotFound
      */
@@ -58,7 +58,7 @@ class Parser
      * @param string $content
      * @param string $pattern
      *
-     * @return null|string
+     * @return string|null
      */
     protected function searchMessage($pattern, $content)
     {

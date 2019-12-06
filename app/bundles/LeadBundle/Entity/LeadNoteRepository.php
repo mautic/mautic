@@ -54,13 +54,13 @@ class LeadNoteRepository extends CommonRepository
             ->where($q->expr()->eq('IDENTITY(n.lead)', ':lead'))
             ->setParameter('lead', $leadId);
 
-        if ($filter != null) {
+        if (null != $filter) {
             $q->andWhere(
                 $q->expr()->like('n.text', ':filter')
             )->setParameter('filter', '%'.$filter.'%');
         }
 
-        if ($noteTypes != null) {
+        if (null != $noteTypes) {
             $q->andWhere(
                 $q->expr()->in('n.type', ':noteTypes')
             )->setParameter('noteTypes', $noteTypes);

@@ -415,7 +415,7 @@ class CommonController extends Controller implements MauticController
         $this->get('session')->set('mautic.browser.notifications', []);
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $this->request->get('tmpl', 'index');
-        if ($tmpl == 'index') {
+        if ('index' == $tmpl) {
             $updatedContent = [];
             if (!empty($newContent)) {
                 $updatedContent['newContent'] = $newContent;
@@ -560,7 +560,7 @@ class CommonController extends Controller implements MauticController
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ($dir == 'ASC') ? 'DESC' : 'ASC';
+            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
@@ -575,7 +575,7 @@ class CommonController extends Controller implements MauticController
             $value   = InputHelper::clean($this->request->query->get('value'), true);
             $filters = $session->get("$name.filters", []);
 
-            if ($value == '') {
+            if ('' == $value) {
                 if (isset($filters[$filter])) {
                     unset($filters[$filter]);
                 }
@@ -611,7 +611,7 @@ class CommonController extends Controller implements MauticController
      */
     protected function getNotificationContent(Request $request = null)
     {
-        if ($request == null) {
+        if (null == $request) {
             $request = $this->request;
         }
 
@@ -659,11 +659,11 @@ class CommonController extends Controller implements MauticController
      */
     public function addFlash($message, $messageVars = [], $type = 'notice', $domain = 'flashes', $addNotification = false)
     {
-        if ($domain == null) {
+        if (null == $domain) {
             $domain = 'flashes';
         }
 
-        if ($domain === false) {
+        if (false === $domain) {
             //message is already translated
             $translatedMessage = $message;
         } else {
@@ -686,6 +686,7 @@ class CommonController extends Controller implements MauticController
                     break;
                 case 'notice':
                     $iconClass = 'fa-info-circle';
+                    // no break
                 default:
                     break;
             }
@@ -709,13 +710,13 @@ class CommonController extends Controller implements MauticController
      */
     public function addBrowserNotification($message, $messageVars = [], $domain = 'flashes', $title = null, $icon = null, $addNotification = true, $type = 'notice')
     {
-        if ($domain == null) {
+        if (null == $domain) {
             $domain = 'flashes';
         }
 
         $translator = $this->translator;
 
-        if ($domain === false) {
+        if (false === $domain) {
             //message is already translated
             $translatedMessage = $message;
         } else {
@@ -726,17 +727,17 @@ class CommonController extends Controller implements MauticController
             }
         }
 
-        if ($title !== null) {
+        if (null !== $title) {
             $title = $translator->trans($title);
         } else {
             $title = 'Mautic';
         }
 
-        if ($icon == null) {
+        if (null == $icon) {
             $icon = 'media/images/favicon.ico';
         }
 
-        if (strpos($icon, 'http') !== 0) {
+        if (0 !== strpos($icon, 'http')) {
             $assetHelper = $this->factory->getHelper('template.assets');
             $icon        = $assetHelper->getUrl($icon, null, null, true);
         }
@@ -761,6 +762,7 @@ class CommonController extends Controller implements MauticController
                     break;
                 case 'notice':
                     $iconClass = 'fa-info-circle';
+                    // no break
                 default:
                     break;
             }
@@ -794,8 +796,8 @@ class CommonController extends Controller implements MauticController
 
         $dateFormat  = $this->coreParametersHelper->getParameter('date_format_dateonly');
         $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $writer      = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $writer      = 'xlsx' === $type ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType = 'xlsx' === $type ? 'application/vnd.ms-excel' : 'text/csv';
         $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
         $handler     = Handler::create($sourceIterator, $writer);
 

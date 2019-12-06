@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Class ContactTrackingServiceTest.
  */
-final class ContactTrackingServiceTest extends \PHPUnit_Framework_TestCase
+final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

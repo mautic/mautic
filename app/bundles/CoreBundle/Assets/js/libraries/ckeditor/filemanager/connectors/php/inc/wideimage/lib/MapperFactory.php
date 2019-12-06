@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -75,7 +76,7 @@
 
         public static function determineFormat($uri, $format = null)
         {
-            if ($format == null) {
+            if (null == $format) {
                 $format = self::extractExtension($uri);
             }
 
@@ -88,7 +89,7 @@
 
             // clean the string
             $format = strtoupper(preg_replace('/[^a-z0-9_-]/i', '', $format));
-            if ($format == 'JPG') {
+            if ('JPG' == $format) {
                 $format = 'JPEG';
             }
 
@@ -103,7 +104,7 @@
         public static function extractExtension($uri)
         {
             $p = strrpos($uri, '.');
-            if ($p === false) {
+            if (false === $p) {
                 return '';
             } else {
                 return substr($uri, $p + 1);

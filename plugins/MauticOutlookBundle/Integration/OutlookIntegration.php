@@ -12,7 +12,6 @@
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 class OutlookIntegration extends AbstractIntegration

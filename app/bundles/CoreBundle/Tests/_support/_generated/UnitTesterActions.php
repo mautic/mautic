@@ -1,4 +1,5 @@
 <?php
+
  //[STAMP] 1dee20186393cae516aea4afa0d0d065
 
 namespace Mautic\CoreBundle\_generated;

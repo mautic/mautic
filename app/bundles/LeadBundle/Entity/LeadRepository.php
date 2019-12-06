@@ -426,7 +426,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $primary = null;
 
                 foreach ($companies as $company) {
-                    if (isset($company['is_primary']) && $company['is_primary'] == 1) {
+                    if (isset($company['is_primary']) && 1 == $company['is_primary']) {
                         $primary = $company;
                     }
                 }
@@ -492,7 +492,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                     // Try to find the primary company
                     foreach ($companies[$id] as $company) {
-                        if ($company['is_primary'] == 1) {
+                        if (1 == $company['is_primary']) {
                             $primary = $company;
                         }
                     }
@@ -625,7 +625,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
                 } else {
-                    if (strpos($column, '.') === false) {
+                    if (false === strpos($column, '.')) {
                         $column = "entity.$column";
                     }
 
@@ -1240,7 +1240,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         } catch (DriverException $exception) {
             $message = $exception->getMessage();
 
-            if (strpos($message, 'Deadlock') !== false && $tries <= 3) {
+            if (false !== strpos($message, 'Deadlock') && $tries <= 3) {
                 ++$tries;
 
                 $this->updateContactPoints($changes, $id, $tries);

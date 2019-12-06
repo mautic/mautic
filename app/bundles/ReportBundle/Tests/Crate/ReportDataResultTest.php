@@ -14,7 +14,7 @@ namespace Mautic\ReportBundle\Tests\Crate;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataResultTest extends \PHPUnit_Framework_TestCase
+class ReportDataResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidData()
     {

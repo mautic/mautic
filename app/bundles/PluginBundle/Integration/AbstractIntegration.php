@@ -101,12 +101,12 @@ abstract class AbstractIntegration
     protected $em;
 
     /**
-     * @var null|SessionInterface
+     * @var SessionInterface|null
      */
     protected $session;
 
     /**
-     * @var null|Request
+     * @var Request|null
      */
     protected $request;
 
@@ -680,7 +680,7 @@ abstract class AbstractIntegration
         $serialized = serialize($keys);
         if (empty($decryptedKeys[$serialized])) {
             $decrypted = $this->decryptApiKeys($keys, true);
-            if (count($keys) !== 0 && count($decrypted) === 0) {
+            if (0 !== count($keys) && 0 === count($decrypted)) {
                 $decrypted = $this->decryptApiKeys($keys);
                 $this->encryptAndSetApiKeys($decrypted, $entity);
                 $this->em->flush($entity);
@@ -727,7 +727,7 @@ abstract class AbstractIntegration
 
         foreach ($keys as $name => $key) {
             $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
-            if ($key === false) {
+            if (false === $key) {
                 return [];
             }
             $decrypted[$name] = $key;
@@ -978,13 +978,13 @@ abstract class AbstractIntegration
             ];
         }
 
-        if ($method == 'GET' && !empty($parameters)) {
+        if ('GET' == $method && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (false === strpos($url, '?')) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (false === strpos($url, '?')) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -997,13 +997,13 @@ abstract class AbstractIntegration
             $headers[]                        = "Content-Type: {$settings['content_type']}";
         }
 
-        if ($method !== 'GET') {
+        if ('GET' !== $method) {
             if (!empty($parameters)) {
-                if ($authType == 'oauth1a') {
+                if ('oauth1a' == $authType) {
                     $parameters = http_build_query($parameters);
                 }
                 if (!empty($settings['encode_parameters'])) {
-                    if ($settings['encode_parameters'] == 'json') {
+                    if ('json' == $settings['encode_parameters']) {
                         //encode the arguments as JSON
                         $parameters = json_encode($parameters);
                         if (empty($settings['encoding_headers_set'])) {
@@ -1044,7 +1044,7 @@ abstract class AbstractIntegration
         $headers = [];
         if (is_array($parseHeaders)) {
             foreach ($parseHeaders as $key => $value) {
-                if (strpos($value, ':') !== false) {
+                if (false !== strpos($value, ':')) {
                     list($key, $value) = explode(':', $value);
                     $key               = trim($key);
                     $value             = trim($value);
@@ -1201,7 +1201,7 @@ abstract class AbstractIntegration
                             $parameters[$settings['refresh_token']] = $this->keys[$settings['refresh_token']];
                         }
 
-                        if ($grantType == 'authorization_code') {
+                        if ('authorization_code' == $grantType) {
                             $parameters['code'] = $this->request->get('code');
                         }
                         if (empty($settings['ignore_redirecturi'])) {
@@ -1263,7 +1263,7 @@ abstract class AbstractIntegration
     {
         $authType = $this->getAuthenticationType();
 
-        if ($authType == 'oauth2') {
+        if ('oauth2' == $authType) {
             $callback    = $this->getAuthCallbackUrl();
             $clientIdKey = $this->getClientIdKey();
             $state       = $this->getAuthLoginState();
@@ -1401,7 +1401,7 @@ abstract class AbstractIntegration
     {
         //check to see if an entity exists
         $entity = $this->getIntegrationSettings();
-        if ($entity == null) {
+        if (null == $entity) {
             $entity = new Integration();
             $entity->setName($this->getName());
         }
@@ -1802,9 +1802,9 @@ abstract class AbstractIntegration
             if ('leadFields' === $fieldType) {
                 if ((is_array($details) && !empty($details['required'])) || 'email' === $field
                     || (isset($details['optionLabel'])
-                        && strtolower(
+                        && 'email' == strtolower(
                             $details['optionLabel']
-                        ) == 'email')
+                        ))
                 ) {
                     $requiredFields[$field] = $field;
                 }
@@ -1882,7 +1882,7 @@ abstract class AbstractIntegration
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
-                if (isset($fields[$mauticKey]) && $fields[$mauticKey] !== '' && $fields[$mauticKey] !== null) {
+                if (isset($fields[$mauticKey]) && '' !== $fields[$mauticKey] && null !== $fields[$mauticKey]) {
                     $matched[$matchIntegrationKey] = $this->cleanPushData(
                         $fields[$mauticKey],
                         (isset($field['type'])) ? $field['type'] : 'string'
@@ -1959,10 +1959,10 @@ abstract class AbstractIntegration
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
 
-        if ($object == null) {
+        if (null == $object) {
             $object = 'lead';
         }
-        if ($object == 'company') {
+        if ('company' == $object) {
             if (!isset($config['companyFields'])) {
                 $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -1973,7 +1973,7 @@ abstract class AbstractIntegration
 
             $fields = $config['companyFields'];
         }
-        if ($object == 'lead') {
+        if ('lead' == $object) {
             if (!isset($config['leadFields'])) {
                 $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -2249,7 +2249,7 @@ abstract class AbstractIntegration
         $retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        return $retcode == 200;
+        return 200 == $retcode;
     }
 
     /**
@@ -2364,7 +2364,7 @@ abstract class AbstractIntegration
      */
     public function getFormNotes($section)
     {
-        if ($section == 'leadfield_match') {
+        if ('leadfield_match' == $section) {
             return ['mautic.integration.form.field_match_notes', 'info'];
         } else {
             return ['', 'info'];
@@ -2473,7 +2473,7 @@ abstract class AbstractIntegration
      * returns template to render on popup window after trying to run OAuth.
      *
      *
-     * @return null|string
+     * @return string|null
      */
     public function getPostAuthTemplate()
     {
@@ -2782,7 +2782,7 @@ abstract class AbstractIntegration
             'mauticContactId'           => 'mauticContactId',
         ];
 
-        if ($this->updateDncByDate() === true) {
+        if (true === $this->updateDncByDate()) {
             $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
         }
 

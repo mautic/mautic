@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 
-class UrlHelperTest extends \PHPUnit_Framework_TestCase
+class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testSanitizeAbsoluteUrlDoesNotModifyCorrectFullUrl()
     {

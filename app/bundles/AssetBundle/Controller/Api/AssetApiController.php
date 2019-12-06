@@ -11,8 +11,8 @@
 
 namespace Mautic\AssetBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -61,21 +61,21 @@ class AssetApiController extends CommonApiController
         $entity->setUploadDir($assetDir);
 
         if (isset($parameters['file'])) {
-            if ($parameters['storageLocation'] === 'local') {
+            if ('local' === $parameters['storageLocation']) {
                 $entity->setPath($parameters['file']);
                 $entity->setFileInfoFromFile();
 
-                if ($entity->loadFile() === null) {
+                if (null === $entity->loadFile()) {
                     return $this->returnError('File '.$parameters['file'].' was not found in the asset directory.', Response::HTTP_BAD_REQUEST);
                 }
-            } elseif ($parameters['storageLocation'] === 'remote') {
+            } elseif ('remote' === $parameters['storageLocation']) {
                 $parameters['remotePath'] = $parameters['file'];
                 $entity->setFileInfoFromFile();
                 $entity->setFileNameFromRemote();
             }
 
             unset($parameters['file']);
-        } elseif ($action === 'new') {
+        } elseif ('new' === $action) {
             return $this->returnError('File of the asset is required.', Response::HTTP_BAD_REQUEST);
         }
 

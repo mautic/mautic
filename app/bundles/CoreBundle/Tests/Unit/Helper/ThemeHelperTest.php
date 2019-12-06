@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ThemeHelperTest extends \PHPUnit_Framework_TestCase
+class ThemeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject

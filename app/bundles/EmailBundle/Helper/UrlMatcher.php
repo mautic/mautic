@@ -51,7 +51,7 @@ class UrlMatcher
         $url = str_replace(['http://', 'https://'], '', $url);
 
         // Remove preceding //
-        if (strpos($url, '//') === 0) {
+        if (0 === strpos($url, '//')) {
             $url = str_replace('//', '', $url);
         }
 

@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Helper\MessageHelper;
 /**
  * Class MessageHelperTest.
  */
-class MessageHelperTest extends \PHPUnit_Framework_TestCase
+class MessageHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testHostNotFoundDsnReport()
     {

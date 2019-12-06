@@ -122,7 +122,7 @@ class CalendarSubscriber extends CommonSubscriber
     {
         $source = $event->getSource();
 
-        if ($source != 'page') {
+        if ('page' != $source) {
             return;
         }
 

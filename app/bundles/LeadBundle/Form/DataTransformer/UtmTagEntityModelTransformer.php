@@ -98,7 +98,7 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
                 ->findOneBy([$column => $id])
             ;
 
-            if ($entity === null) {
+            if (null === $entity) {
                 throw new TransformationFailedException(sprintf(
                     'UtmTag with "%s" does not exist!',
                     $id

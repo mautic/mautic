@@ -25,7 +25,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class InactiveExecutionerTest extends \PHPUnit_Framework_TestCase
+class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|InactiveContactFinder

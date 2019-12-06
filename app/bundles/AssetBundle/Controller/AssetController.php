@@ -48,13 +48,13 @@ class AssetController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $this->setListFilters();
         }
 
         //set limits
         $limit = $this->get('session')->get('mautic.asset.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_assetlimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -85,7 +85,7 @@ class AssetController extends FormController
         $count = count($assets);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current asset so redirect to the last asset
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
@@ -156,7 +156,7 @@ class AssetController extends FormController
         $action          = $this->generateUrl('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if ($activeAsset === null) {
+        if (null === $activeAsset) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
 
@@ -238,7 +238,7 @@ class AssetController extends FormController
         $model       = $this->getModel('asset');
         $activeAsset = $model->getEntity($objectId);
 
-        if ($activeAsset === null || !$this->get('mautic.security')->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+        if (null === $activeAsset || !$this->get('mautic.security')->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             return $this->modalAccessDenied();
         }
 
@@ -311,7 +311,7 @@ class AssetController extends FormController
         ], 'validators');
 
         // Create temporary asset ID
-        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $tempId = ('POST' == $method) ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
         $entity->setTempId($tempId);
 
         // Set the page we came from
@@ -326,7 +326,7 @@ class AssetController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -457,7 +457,7 @@ class AssetController extends FormController
         ];
 
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -480,7 +480,7 @@ class AssetController extends FormController
         }
 
         // Create temporary asset ID
-        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $tempId = ('POST' == $method) ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
         $entity->setTempId($tempId);
 
         //Create the form
@@ -488,7 +488,7 @@ class AssetController extends FormController
         $form   = $model->createForm($entity, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -587,7 +587,7 @@ class AssetController extends FormController
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('asset:assets:create') ||
                 !$this->get('mautic.security')->hasEntityAccess(
                     'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
@@ -629,12 +629,12 @@ class AssetController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $model */
             $model  = $this->getModel('asset');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.asset.asset.error.notfound',
@@ -692,7 +692,7 @@ class AssetController extends FormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $model */
             $model     = $this->getModel('asset');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
@@ -702,7 +702,7 @@ class AssetController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.asset.asset.error.notfound',

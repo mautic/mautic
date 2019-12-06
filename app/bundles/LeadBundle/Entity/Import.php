@@ -247,7 +247,7 @@ class Import extends FormEntity
             return false;
         }
 
-        if (file_exists($this->getFilePath()) === false || is_readable($this->getFilePath()) === false) {
+        if (false === file_exists($this->getFilePath()) || false === is_readable($this->getFilePath())) {
             $this->setStatus(self::FAILED);
             $this->setStatusInfo($this->getFile().' not found');
 
@@ -275,7 +275,7 @@ class Import extends FormEntity
      */
     public function isBackgroundProcess()
     {
-        return !($this->getStatus() === self::MANUAL);
+        return !(self::MANUAL === $this->getStatus());
     }
 
     /**
@@ -641,7 +641,7 @@ class Import extends FormEntity
     {
         $this->setDateEnded(new \DateTime());
 
-        if ($this->getStatus() === self::IN_PROGRESS) {
+        if (self::IN_PROGRESS === $this->getStatus()) {
             $this->setStatus(self::IMPORTED);
 
             if ($removeFile) {
@@ -683,7 +683,7 @@ class Import extends FormEntity
         $startTime = $this->getDateStarted();
         $endTime   = $this->getDateEnded();
 
-        if (!$endTime && $this->getStatus() === self::IN_PROGRESS) {
+        if (!$endTime && self::IN_PROGRESS === $this->getStatus()) {
             $endTime = $this->getDateModified();
         }
 
@@ -704,7 +704,7 @@ class Import extends FormEntity
         $startTime = $this->getDateStarted();
         $endTime   = $this->getDateEnded();
 
-        if (!$endTime && $this->getStatus() === self::IN_PROGRESS) {
+        if (!$endTime && self::IN_PROGRESS === $this->getStatus()) {
             $endTime = $this->getDateModified();
         }
 
@@ -938,11 +938,11 @@ class Import extends FormEntity
      */
     public function setIsPublished($isPublished)
     {
-        if ($isPublished && $this->getStatus() === self::STOPPED) {
+        if ($isPublished && self::STOPPED === $this->getStatus()) {
             $this->setStatus(self::QUEUED);
         }
 
-        if (!$isPublished && ($this->getStatus() === self::IN_PROGRESS || $this->getStatus() === self::QUEUED)) {
+        if (!$isPublished && (self::IN_PROGRESS === $this->getStatus() || self::QUEUED === $this->getStatus())) {
             $this->setStatus(self::STOPPED);
         }
 

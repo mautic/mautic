@@ -78,7 +78,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('page:pages:viewother');
 
-        if ($event->getType() == 'page.hits.in.time') {
+        if ('page.hits.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -105,7 +105,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'unique.vs.returning.leads') {
+        if ('unique.vs.returning.leads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -119,7 +119,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'dwell.times') {
+        if ('dwell.times' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
@@ -133,7 +133,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'popular.pages') {
+        if ('popular.pages' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -179,7 +179,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.pages') {
+        if ('created.pages' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -221,7 +221,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'device.granularity') {
+        if ('device.granularity' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 

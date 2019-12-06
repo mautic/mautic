@@ -84,9 +84,9 @@ class BuilderSubscriber extends CommonSubscriber
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $lead   = $event->getLead();
-        $leadId = ($lead !== null) ? $lead['id'] : null;
+        $leadId = (null !== $lead) ? $lead['id'] : null;
         $email  = $event->getEmail();
-        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), ($email === null) ? null : $email->getId());
+        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), (null === $email) ? null : $email->getId());
         $event->addTokens($tokens);
     }
 
@@ -123,7 +123,7 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
             $clickthrough = ['source' => $source];
 
-            if ($leadId !== null) {
+            if (null !== $leadId) {
                 $clickthrough['lead'] = $leadId;
             }
 

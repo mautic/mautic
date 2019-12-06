@@ -44,12 +44,12 @@ class Campaign extends FormEntity
     private $description;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $publishUp;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $publishDown;
 
@@ -235,7 +235,7 @@ class Campaign extends FormEntity
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

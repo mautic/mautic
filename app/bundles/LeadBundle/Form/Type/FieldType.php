@@ -290,7 +290,7 @@ class FieldType extends AbstractType
                         $noLabel  = !empty($props['no']) ? $props['no'] : 'mautic.core.form.no';
                     }
 
-                    if ($value !== '' && $value !== null) {
+                    if ('' !== $value && null !== $value) {
                         $value = (int) $value;
                     }
 
@@ -318,7 +318,7 @@ class FieldType extends AbstractType
                             $constraints = [
                                 new Assert\Callback(
                                     function ($object, ExecutionContextInterface $context) {
-                                        if (!empty($object) && \DateTime::createFromFormat('Y-m-d H:i', $object) === false) {
+                                        if (!empty($object) && false === \DateTime::createFromFormat('Y-m-d H:i', $object)) {
                                             $context->buildViolation('mautic.lead.datetime.invalid')->addViolation();
                                         }
                                     }
@@ -462,8 +462,8 @@ class FieldType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'disabled' => ($options['data']->getAlias() == 'email'),
-                'data'     => ($options['data']->getAlias() == 'email') ? true : $options['data']->getIsPublished(),
+                'disabled' => ('email' == $options['data']->getAlias()),
+                'data'     => ('email' == $options['data']->getAlias()) ? true : $options['data']->getIsPublished(),
             ]
         );
 

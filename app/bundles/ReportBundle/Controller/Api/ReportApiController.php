@@ -13,10 +13,10 @@ namespace Mautic\ReportBundle\Controller\Api;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 class ReportApiController extends CommonApiController

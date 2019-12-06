@@ -200,7 +200,7 @@ trait VariantEntityTrait
         $children = $this->getVariantChildren();
 
         if ($isChild) {
-            return ($parent === null) ? false : true;
+            return (null === $parent) ? false : true;
         } else {
             return (!empty($parent) || count($children)) ? true : false;
         }

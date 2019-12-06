@@ -42,7 +42,7 @@ class ClickthroughHelper
             return [];
         }
 
-        if (stripos($decoded, 'a') !== 0) {
+        if (0 !== stripos($decoded, 'a')) {
             throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array', $decoded));
         }
 

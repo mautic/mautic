@@ -95,7 +95,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
             $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
             $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
             if ($existing) {
-                if (strpos($existing, $unsubscribeEmail) === false) {
+                if (false === strpos($existing, $unsubscribeEmail)) {
                     $updatedHeader = $unsubscribeEmail.', '.$existing;
                 } else {
                     $updatedHeader = $existing;

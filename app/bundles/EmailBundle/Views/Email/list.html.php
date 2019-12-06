@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticEmailBundle:Email:index.html.php');
 }
 ?>
@@ -83,7 +83,7 @@ if ($tmpl == 'index') {
                             $permissions['email:emails:editother'],
                             $item->getCreatedBy()
                         );
-                        $customButtons = ($type == 'list') ? [
+                        $customButtons = ('list' == $type) ? [
                             [
                                 'attr' => [
                                     'data-toggle' => 'ajax',
@@ -136,7 +136,7 @@ if ($tmpl == 'index') {
                                     <i class="fa fa-fw fa-language"></i>
                                 </span>
                                 <?php endif; ?>
-                                <?php if ($type == 'list'): ?>
+                                <?php if ('list' == $type): ?>
                                 <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
                                         'mautic.email.icon_tooltip.list_email'
                                     ); ?>">
@@ -162,7 +162,7 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
                         <?php echo $view['content']->getCustomContent('email.stats.above', $mauticTemplateVars); ?>
-                        <span class="mt-xs label label-default has-click-event clickable-stat<?php echo $item->getPendingCount() > 0 && $item->getEmailType() === 'list' ? '' : ' hide'; ?>"
+                        <span class="mt-xs label label-default has-click-event clickable-stat<?php echo $item->getPendingCount() > 0 && 'list' === $item->getEmailType() ? '' : ' hide'; ?>"
                               id="pending-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">

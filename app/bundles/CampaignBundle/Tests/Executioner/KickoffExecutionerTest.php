@@ -26,7 +26,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class KickoffExecutionerTest extends \PHPUnit_Framework_TestCase
+class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|KickoffContactFinder

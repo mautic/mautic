@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class TrailingSlashHelperTest extends \PHPUnit_Framework_TestCase
+class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject

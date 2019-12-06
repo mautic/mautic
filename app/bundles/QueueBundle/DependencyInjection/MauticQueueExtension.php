@@ -35,12 +35,12 @@ class MauticQueueExtension extends Extension
             return;
         }
 
-        if ($queueProtocol == QueueProtocol::RABBITMQ) {
+        if (QueueProtocol::RABBITMQ == $queueProtocol) {
             $container->registerExtension(new OldSoundRabbitMqExtension());
             $container->addCompilerPass(new RegisterPartsPass());
         }
 
-        if ($queueProtocol == QueueProtocol::BEANSTALKD) {
+        if (QueueProtocol::BEANSTALKD == $queueProtocol) {
             $container->registerExtension(new LeezyPheanstalkExtension());
         }
 

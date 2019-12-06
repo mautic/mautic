@@ -48,7 +48,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
     protected $integrationHelper;
 
     /**
-     * @var null|requestStack
+     * @var requestStack|null
      */
     protected $requestStack;
 

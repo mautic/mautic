@@ -53,7 +53,7 @@ class CampaignApiController extends CommonApiController
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
-            if ($lead == null) {
+            if (null == $lead) {
                 return $this->notFound();
             } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                 return $this->accessDenied();
@@ -110,7 +110,7 @@ class CampaignApiController extends CommonApiController
     {
         $method = $this->request->getMethod();
 
-        if ($method === 'POST' || $method === 'PUT') {
+        if ('POST' === $method || 'PUT' === $method) {
             if (empty($parameters['events'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
@@ -130,7 +130,7 @@ class CampaignApiController extends CommonApiController
         ];
 
         // delete events and sources which does not exist in the PUT request
-        if ($method === 'PUT') {
+        if ('PUT' === $method) {
             $requestEventIds   = [];
             $requestSegmentIds = [];
             $requestFormIds    = [];
@@ -195,7 +195,7 @@ class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if ($method === 'PUT' && !empty($deletedEvents)) {
+        if ('PUT' === $method && !empty($deletedEvents)) {
             $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
@@ -233,7 +233,7 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -273,7 +273,7 @@ class CampaignApiController extends CommonApiController
 
     public function cloneCampaignAction($campaignId)
     {
-        if (empty($campaignId) || intval($campaignId) == false) {
+        if (empty($campaignId) || false == intval($campaignId)) {
             return $this->notFound();
         }
 

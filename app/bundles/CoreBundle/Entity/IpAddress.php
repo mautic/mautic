@@ -185,7 +185,7 @@ class IpAddress
     {
         if (!empty($this->doNotTrack)) {
             foreach ($this->doNotTrack as $ip) {
-                if (strpos($ip, '/') !== false) {
+                if (false !== strpos($ip, '/')) {
                     // has a netmask range
                     // https://gist.github.com/tott/7684443
                     list($range, $netmask) = explode('/', $ip, 2);

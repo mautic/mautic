@@ -181,7 +181,7 @@ class FormSubscriber extends CommonSubscriber
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = $lead !== null ? $lead->getEmail() : null;
+        $leadEmail = null !== $lead ? $lead->getEmail() : null;
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
@@ -213,7 +213,7 @@ class FormSubscriber extends CommonSubscriber
             $this->mailer->send(true);
         }
 
-        $owner = $lead !== null ? $lead->getOwner() : null;
+        $owner = null !== $lead ? $lead->getOwner() : null;
         if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
             $this->setMailer($config, $tokens, $owner->getEmail(), $lead);
@@ -265,7 +265,7 @@ class FormSubscriber extends CommonSubscriber
         ];
 
         if (!empty($config['authorization_header'])) {
-            if (strpos($config['authorization_header'], ':') !== false) {
+            if (false !== strpos($config['authorization_header'], ':')) {
                 list($key, $value) = explode(':', $config['authorization_header']);
             } else {
                 $key   = 'Authorization';
@@ -439,7 +439,7 @@ class FormSubscriber extends CommonSubscriber
         $this->mailer->reset();
 
         // ingore queue
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file' && $config['immediately']) {
+        if ('file' == $this->coreParametersHelper->getParameter('mailer_spool_type') && $config['immediately']) {
             $this->mailer = $this->mailer->getSampleMailer();
         }
 

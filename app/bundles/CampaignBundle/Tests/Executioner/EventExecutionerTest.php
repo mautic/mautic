@@ -36,7 +36,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-class EventExecutionerTest extends \PHPUnit_Framework_TestCase
+class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EventCollector|\PHPUnit_Framework_MockObject_MockObject

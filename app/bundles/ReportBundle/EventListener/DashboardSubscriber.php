@@ -74,7 +74,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     {
         $this->checkPermissions($event);
 
-        if ($event->getType() == 'report') {
+        if ('report' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
             if (!$event->isCached()) {

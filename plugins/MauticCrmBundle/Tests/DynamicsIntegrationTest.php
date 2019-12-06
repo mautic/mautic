@@ -10,7 +10,7 @@ namespace MauticCrmBundle\Integration;
 
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsIntegrationTest extends \PHPUnit_Framework_TestCase
+class DynamicsIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DynamicsIntegration */
     private $integration;

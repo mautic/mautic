@@ -59,7 +59,7 @@ class NoteType extends AbstractType
         ]);
 
         $dt   = $options['data']->getDatetime();
-        $data = ($dt == null) ? $this->dateHelper->getDateTime() : $dt;
+        $data = (null == $dt) ? $this->dateHelper->getDateTime() : $dt;
 
         $builder->add('dateTime', 'datetime', [
             'label'      => 'mautic.core.date.added',

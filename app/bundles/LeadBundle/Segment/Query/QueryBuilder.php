@@ -226,7 +226,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function execute()
     {
-        if ($this->type == self::SELECT) {
+        if (self::SELECT == $this->type) {
             return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
         } else {
             return $this->connection->executeUpdate($this->getSQL(), $this->params, $this->paramTypes);
@@ -249,7 +249,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function getSQL()
     {
-        if ($this->sql !== null && $this->state === self::STATE_CLEAN) {
+        if (null !== $this->sql && self::STATE_CLEAN === $this->state) {
             return $this->sql;
         }
 
@@ -296,7 +296,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function setParameter($key, $value, $type = null)
     {
-        if (substr($key, 0, 1) === ':') {
+        if (':' === substr($key, 0, 1)) {
             // For consistency sake, remove the :
             $key = substr($key, 1);
         }
@@ -305,7 +305,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             $value = (int) $value;
         }
 
-        if ($type !== null) {
+        if (null !== $type) {
             $this->paramTypes[$key] = $type;
         }
 
@@ -461,7 +461,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $this->state = self::STATE_DIRTY;
 
         if ($append) {
-            if ($sqlPartName == 'orderBy' || $sqlPartName == 'groupBy' || $sqlPartName == 'select' || $sqlPartName == 'set') {
+            if ('orderBy' == $sqlPartName || 'groupBy' == $sqlPartName || 'select' == $sqlPartName || 'set' == $sqlPartName) {
                 foreach ($sqlPart as $part) {
                     $this->sqlParts[$sqlPartName][] = $part;
                 }
@@ -810,7 +810,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function where($predicates)
     {
-        if (!(func_num_args() == 1 && $predicates instanceof CompositeExpression)) {
+        if (!(1 == func_num_args() && $predicates instanceof CompositeExpression)) {
             $predicates = new CompositeExpression(CompositeExpression::TYPE_AND, func_get_args());
         }
 
@@ -840,7 +840,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $args  = func_get_args();
         $where = $this->getQueryPart('where');
 
-        if ($where instanceof CompositeExpression && $where->getType() === CompositeExpression::TYPE_AND) {
+        if ($where instanceof CompositeExpression && CompositeExpression::TYPE_AND === $where->getType()) {
             $where->addMultiple($args);
         } else {
             array_unshift($args, $where);
@@ -873,7 +873,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $args  = func_get_args();
         $where = $this->getQueryPart('where');
 
-        if ($where instanceof CompositeExpression && $where->getType() === CompositeExpression::TYPE_OR) {
+        if ($where instanceof CompositeExpression && CompositeExpression::TYPE_OR === $where->getType()) {
             $where->addMultiple($args);
         } else {
             array_unshift($args, $where);
@@ -995,7 +995,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function having($having)
     {
-        if (!(func_num_args() == 1 && $having instanceof CompositeExpression)) {
+        if (!(1 == func_num_args() && $having instanceof CompositeExpression)) {
             $having = new CompositeExpression(CompositeExpression::TYPE_AND, func_get_args());
         }
 
@@ -1015,7 +1015,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $args   = func_get_args();
         $having = $this->getQueryPart('having');
 
-        if ($having instanceof CompositeExpression && $having->getType() === CompositeExpression::TYPE_AND) {
+        if ($having instanceof CompositeExpression && CompositeExpression::TYPE_AND === $having->getType()) {
             $having->addMultiple($args);
         } else {
             array_unshift($args, $having);
@@ -1038,7 +1038,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $args   = func_get_args();
         $having = $this->getQueryPart('having');
 
-        if ($having instanceof CompositeExpression && $having->getType() === CompositeExpression::TYPE_OR) {
+        if ($having instanceof CompositeExpression && CompositeExpression::TYPE_OR === $having->getType()) {
             $having->addMultiple($args);
         } else {
             array_unshift($args, $having);
@@ -1158,9 +1158,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $query = 'SELECT '.implode(', ', $this->sqlParts['select']);
 
         $query .= ($this->sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .($this->sqlParts['where'] !== null ? ' WHERE '.((string) $this->sqlParts['where']) : '')
+            .(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '')
             .($this->sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $this->sqlParts['groupBy']) : '')
-            .($this->sqlParts['having'] !== null ? ' HAVING '.((string) $this->sqlParts['having']) : '')
+            .(null !== $this->sqlParts['having'] ? ' HAVING '.((string) $this->sqlParts['having']) : '')
             .($this->sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $this->sqlParts['orderBy']) : '');
 
         if ($this->isLimitQuery()) {
@@ -1186,7 +1186,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
         // Loop through all FROM clauses
         foreach ($this->sqlParts['from'] as $from) {
-            if ($from['alias'] === null) {
+            if (null === $from['alias']) {
                 $tableSql       = $from['table'];
                 $tableReference = $from['table'];
             } else {
@@ -1223,7 +1223,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     private function isLimitQuery()
     {
-        return $this->maxResults !== null || $this->firstResult !== null;
+        return null !== $this->maxResults || null !== $this->firstResult;
     }
 
     /**
@@ -1248,7 +1248,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
         $query = 'UPDATE '.$table
             .' SET '.implode(', ', $this->sqlParts['set'])
-            .($this->sqlParts['where'] !== null ? ' WHERE '.((string) $this->sqlParts['where']) : '');
+            .(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '');
 
         return $query;
     }
@@ -1261,7 +1261,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private function getSQLForDelete()
     {
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
-        $query = 'DELETE FROM '.$table.($this->sqlParts['where'] !== null ? ' WHERE '.((string) $this->sqlParts['where']) : '');
+        $query = 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '');
 
         return $query;
     }
@@ -1308,7 +1308,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function createNamedParameter($value, $type = \PDO::PARAM_STR, $placeHolder = null)
     {
-        if ($placeHolder === null) {
+        if (null === $placeHolder) {
             ++$this->boundCounter;
             $placeHolder = ':dcValue'.$this->boundCounter;
         }
@@ -1544,14 +1544,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
             return $leadTable.'.id';
         }
 
-        if ($leadTable == 'orp') {
+        if ('orp' == $leadTable) {
             return 'orp.lead_id';
         }
 
         $joins     = $parts['join'][$leadTable];
 
         foreach ($joins as $join) {
-            if ($join['joinType'] == 'right') {
+            if ('right' == $join['joinType']) {
                 $matches = null;
                 if (preg_match('/'.$leadTable.'\.id \= ([^\ ]+)/i', $join['joinCondition'], $matches)) {
                     return $matches[1];
@@ -1676,7 +1676,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $glue = strtolower($glue);
 
         //  Different handling
-        if ($glue == 'or') {
+        if ('or' == $glue) {
             //  Is this the first condition in query builder?
             if (!is_null($this->sqlParts['where'])) {
                 // Are the any queued conditions?

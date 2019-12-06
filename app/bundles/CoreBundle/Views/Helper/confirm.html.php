@@ -48,7 +48,7 @@ if (!isset($confirmAction)) {
     $confirmAction = 'javascript:void(0);';
 }
 
-if (!isset($confirmCallback) && $confirmAction != 'javascript:void(0);') {
+if (!isset($confirmCallback) && 'javascript:void(0);' != $confirmAction) {
     $confirmCallback = 'executeAction';
 }
 
@@ -81,7 +81,7 @@ if (!isset($tag)) {
     $tag = 'a';
 }
 
-$buttonType = ($tag == 'button') ? ' type="button"' : '';
+$buttonType = ('button' == $tag) ? ' type="button"' : '';
 
 if (!isset($wrapOpeningTag)) {
     $wrapOpeningTag = $wrapClosingTag = '';
