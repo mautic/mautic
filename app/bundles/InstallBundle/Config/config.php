@@ -39,6 +39,18 @@ return [
     ],
 
     'services' => [
+        'fixtures' => [
+            'mautic.install.fixture.lead_field' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.role' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
                 'class'     => 'Mautic\InstallBundle\Configurator\Step\CheckStep',

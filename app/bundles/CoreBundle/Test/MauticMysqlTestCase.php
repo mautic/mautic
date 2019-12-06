@@ -2,6 +2,11 @@
 
 namespace Mautic\CoreBundle\Test;
 
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
+use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
     /**
@@ -69,7 +74,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $this->createDatabase();
         $this->applyMigrations();
-        $this->installDatabaseFixtures();
+        $this->installDatabaseFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
     }
 
     /**
