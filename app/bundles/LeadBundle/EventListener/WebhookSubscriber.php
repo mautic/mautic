@@ -132,7 +132,6 @@ class WebhookSubscriber extends CommonSubscriber
             ],
             [
                 'leadDetails',
-                'leadDetails',
                 'userList',
                 'publishDetails',
                 'ipAddress',
