@@ -21,7 +21,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider testSendFileProvider
+     * @dataProvider sendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -69,7 +69,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $messageSchedule->getMessage($report, 'path-to-a-file');
     }
 
-    public function testSendFileProvider()
+    public function sendFileProvider()
     {
         return [
             [10, 100],
@@ -80,7 +80,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider testDoSendFileProvider
+     * @dataProvider doSendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -129,7 +129,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
         $messageSchedule->getMessage($report, 'path-to-a-file');
     }
 
-    public function testDoSendFileProvider()
+    public function doSendFileProvider()
     {
         return [
             [100, 10],
@@ -138,7 +138,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider testSendFileProvider
+     * @dataProvider sendFileProvider
      *
      * @param int $fileSize
      * @param int $limit
@@ -179,7 +179,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider testDoSendFileProvider
+     * @dataProvider doSendFileProvider
      *
      * @param int $fileSize
      * @param int $limit

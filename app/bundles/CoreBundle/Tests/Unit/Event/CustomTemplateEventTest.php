@@ -17,7 +17,8 @@ class CustomTemplateEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testNullRequestDoesNotThrowException()
     {
-        new CustomTemplateEvent(null, 'test');
+        $event = new CustomTemplateEvent(null, 'test');
+        $this->assertSame('test', $event->getTemplate());
     }
 
     public function testEmptyTemplateThrowsException()

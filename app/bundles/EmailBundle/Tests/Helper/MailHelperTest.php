@@ -551,9 +551,7 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
         /** @var \Swift_Mime_Headers_ParameterizedHeader[] $headers */
         $headers = $mailer->message->getHeaders()->getAll();
         foreach ($headers as $header) {
-            if (false !== strpos($header->getFieldName(), 'X-Mautic-Test')) {
-                $this->fail('System headers were not supposed to be set');
-            }
+            $this->assertFalse(strpos($header->getFieldName(), 'X-Mautic-Test'), 'System headers were not supposed to be set');
         }
     }
 

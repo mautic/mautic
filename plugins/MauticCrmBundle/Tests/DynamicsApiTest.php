@@ -31,24 +31,4 @@ class DynamicsApiTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertSame('Dynamics', $this->integration->getName());
     }
-
-    public function testGetLeads()
-    {
-    }
-
-    public function testGetLeadFields()
-    {
-    }
-
-    public function testCompanies()
-    {
-    }
-
-    public function testCreateLead()
-    {
-    }
-
-    public function testRequest()
-    {
-    }
 }

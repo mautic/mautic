@@ -505,7 +505,7 @@ class SalesforceIntegrationTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $result = $sf->pushCompany($company);
+        $this->assertFalse($sf->pushCompany($company));
     }
 
     public function testExportingContactActivity()

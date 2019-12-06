@@ -71,5 +71,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         DateTimeHelper::validateMysqlDateTimeUnit('W');
         DateTimeHelper::validateMysqlDateTimeUnit('m');
         DateTimeHelper::validateMysqlDateTimeUnit('Y');
+
+        $this->assertTrue(true, 'Just to avoid the risky test warning...');
     }
 }

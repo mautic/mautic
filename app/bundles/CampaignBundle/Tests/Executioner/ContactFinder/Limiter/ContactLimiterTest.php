@@ -63,13 +63,13 @@ class ContactLimiterTest extends \PHPUnit\Framework\TestCase
     public function testExceptionNotThrownIfIdEqualsMinSoThatItsIsIncluded()
     {
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
-        $limiter->setBatchMinContactId(3);
+        $this->assertSame($limiter, $limiter->setBatchMinContactId(3));
     }
 
     public function testExceptionNotThrownIfIdEqualsMaxSoThatItsIsIncluded()
     {
         $limiter = new ContactLimiter(1, 2, 3, 10, [1, 2, 3]);
-        $limiter->setBatchMinContactId(10);
+        $this->assertSame($limiter, $limiter->setBatchMinContactId(10));
     }
 
     public function testExceptionThrownIfThreadIdLargerThanMaxThreads()
