@@ -13,7 +13,7 @@ namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
-use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializerInterface;
 use Joomla\Http\Http;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -32,9 +32,6 @@ use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ReportModel.
- */
 class WebhookModel extends FormModel
 {
     /**
@@ -86,7 +83,7 @@ class WebhookModel extends FormModel
     protected $logMax;
 
     /**
-     * @var Serializer
+     * @var SerializerInterface
      */
     protected $serializer;
 
@@ -104,15 +101,13 @@ class WebhookModel extends FormModel
     protected $eventsOrderByDir;
 
     /**
-     * WebhookModel constructor.
-     *
      * @param CoreParametersHelper $coreParametersHelper
-     * @param Serializer           $serializer
+     * @param SerializerInterface  $serializer
      * @param NotificationModel    $notificationModel
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        Serializer $serializer,
+        SerializerInterface $serializer,
         NotificationModel $notificationModel
     ) {
         $this->setConfigProps($coreParametersHelper);
