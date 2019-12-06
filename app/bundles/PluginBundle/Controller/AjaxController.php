@@ -13,6 +13,11 @@ namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
+use Mautic\PluginBundle\Form\Type\FieldsType;
+use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
+use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,11 +40,225 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
+     * Get the HTML for list of fields.
+     *
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getIntegrationFieldsAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $settings    = $request->request->get('settings');
+        $page        = $request->request->get('page');
+
+        $dataArray = ['success' => 0];
+
+        if (!empty($integration) && !empty($settings)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->get('mautic.helper.integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+            $integrationObject = $helper->getIntegrationObject($integration);
+
+            if ($integrationObject) {
+                if (!$object = $request->attributes->get('object')) {
+                    $object = (isset($settings['object'])) ? $settings['object'] : 'lead';
+                }
+
+                $isLead            = ('lead' === $object);
+                $integrationFields = ($isLead)
+                    ? $integrationObject->getFormLeadFields($settings)
+                    : $integrationObject->getFormCompanyFields(
+                        $settings
+                    );
+
+                if (!empty($integrationFields)) {
+                    $session = $this->get('session');
+                    $session->set('mautic.plugin.'.$integration.'.'.$object.'.page', $page);
+
+                    /** @var PluginModel $pluginModel */
+                    $pluginModel = $this->getModel('plugin');
+
+                    // Get a list of custom form fields
+                    $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
+                    $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
+                    $enableDataPriority = $integrationObject->getDataPriority();
+                    $formType           = $isLead ? FieldsType::class : CompanyFieldsType::class;
+                    $form               = $this->createForm(
+                        $formType,
+                        isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
+                        [
+                            'mautic_fields'        => $mauticFields,
+                            'data'                 => $featureSettings,
+                            'integration_fields'   => $integrationFields,
+                            'csrf_protection'      => false,
+                            'integration_object'   => $integrationObject,
+                            'enable_data_priority' => $enableDataPriority,
+                            'integration'          => $integration,
+                            'page'                 => $page,
+                            'limit'                => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
+                        ]
+                    );
+
+                    $html = $this->render(
+                        'MauticCoreBundle:Helper:blank_form.html.php',
+                        [
+                            'form' => $this->setFormTheme(
+                                $form,
+                                'MauticCoreBundle:Helper:blank_form.html.php',
+                                'MauticPluginBundle:FormTheme\Integration'
+                            ),
+                            'function' => 'row',
+                        ]
+                    )->getContent();
+
+                    if (!isset($settings['prefix'])) {
+                        $prefix = 'integration_details[featureSettings]['.$object.'Fields]';
+                    } else {
+                        $prefix = $settings['prefix'];
+                    }
+
+                    $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
+                    if (substr($idPrefix, -1) == '_') {
+                        $idPrefix = substr($idPrefix, 0, -1);
+                    }
+
+                    $html                 = preg_replace('/'.$formType.'\[(.*?)\]/', $prefix.'[$1]', $html);
+                    $html                 = str_replace($formType, $idPrefix, $html);
+                    $dataArray['success'] = 1;
+                    $dataArray['html']    = $html;
+                }
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Get the HTML for integration properties.
      *
-     * @throws \Exception
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getIntegrationConfigAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $settings    = $request->request->get('settings');
+        $dataArray   = ['success' => 0];
+
+        if (!empty($integration) && !empty($settings)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->factory->getHelper('integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            $object = $helper->getIntegrationObject($integration);
+
+            if ($object) {
+                $data           = $statusData           = [];
+                $objectSettings = $object->getIntegrationSettings();
+                $defaults       = $objectSettings->getFeatureSettings();
+                if (method_exists($object, 'getCampaigns')) {
+                    $campaigns = $object->getCampaigns();
+                    if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                        foreach ($campaigns['records'] as $campaign) {
+                            $data[$campaign['Id']] = $campaign['Name'];
+                        }
+                    }
+                }
+                $form = $this->createForm(IntegrationConfigType::class, $defaults, [
+                    'integration'     => $object,
+                    'csrf_protection' => false,
+                    'campaigns'       => $data,
+                ]);
+
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                    'form'      => $form,
+                    'function'  => 'widget',
+                    'variables' => [
+                        'integration' => $object,
+                    ],
+                ])->getContent();
+
+                $prefix   = str_replace('[integration]', '[config]', $settings['name']);
+                $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
+                if (substr($idPrefix, -1) == '_') {
+                    $idPrefix = substr($idPrefix, 0, -1);
+                }
+
+                $html = preg_replace('/integration_config\[(.*?)\]/', $prefix.'[$1]', $html);
+                $html = str_replace('integration_config', $idPrefix, $html);
+
+                $dataArray['success'] = 1;
+                $dataArray['html']    = $html;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function getIntegrationCampaignStatusAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $campaign    = $request->request->get('campaign');
+        $settings    = $request->request->get('settings');
+        $dataArray   = ['success' => 0];
+        $statusData  = [];
+        if (!empty($integration) && !empty($campaign)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->factory->getHelper('integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            $object = $helper->getIntegrationObject($integration);
+
+            if ($object) {
+                if (method_exists($object, 'getCampaignMemberStatus')) {
+                    $campaignMemberStatus = $object->getCampaignMemberStatus($campaign);
+                    if (isset($campaignMemberStatus['records']) && !empty($campaignMemberStatus['records'])) {
+                        foreach ($campaignMemberStatus['records'] as $status) {
+                            $statusData[$status['Label']] = $status['Label'];
+                        }
+                    }
+                }
+                $form = $this->createForm(IntegrationCampaignsType::class, $statusData, [
+                    'csrf_protection'       => false,
+                    'campaignContactStatus' => $statusData,
+                ]);
+
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                    'form'      => $form,
+                    'function'  => 'widget',
+                    'variables' => [
+                        'integration' => $object,
+                    ],
+                ])->getContent();
+
+                $prefix = str_replace('[integration]', '[campaign_member_status][campaign_member_status]', $settings['name']);
+
+                $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
+
+                if (substr($idPrefix, -1) == '_') {
+                    $idPrefix = substr($idPrefix, 0, -1);
+                }
+
+                $html = preg_replace('/integration_campaign_status_campaign_member_status\[(.*?)\]/', $prefix.'[$1]', $html);
+                $html = str_replace('integration_campaign_status_campaign_member_status', $idPrefix, $html);
+                $html = str_replace('integration_campaign_status[campaign_member_status]', $prefix, $html);
+
+                $dataArray['success'] = 1;
+                $dataArray['html']    = $html;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getIntegrationCampaignsAction(Request $request)
     {
