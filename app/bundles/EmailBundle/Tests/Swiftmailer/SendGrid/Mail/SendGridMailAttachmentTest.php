@@ -21,7 +21,8 @@ class SendGridMailAttachmentTest extends \PHPUnit_Framework_TestCase
     {
         $sendGridMailAttachment = new SendGridMailAttachment();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $mail = $this->getMockBuilder(Mail::class)

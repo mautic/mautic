@@ -272,11 +272,11 @@ class MobileNotificationController extends FormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.mobile_notification.page', 1);
-        $action = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'new']);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+        $page         = $session->get('mautic.mobile_notification.page', 1);
+        $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'new']);
+        $notification = $this->request->request->get('notification', []);
+        $updateSelect = $method === 'POST'
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
@@ -287,7 +287,7 @@ class MobileNotificationController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ($method === 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -443,10 +443,10 @@ class MobileNotificationController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+        $action       = $this->generateUrl('mautic_mobile_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $notification = $this->request->request->get('notification', []);
+        $updateSelect = $method === 'POST'
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);

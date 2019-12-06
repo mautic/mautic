@@ -12,6 +12,8 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
+use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
 
@@ -43,7 +45,7 @@ class FormSubscriber extends CommonSubscriber
             'group'             => 'mautic.email.actions',
             'label'             => 'mautic.email.form.action.sendemail.admin',
             'description'       => 'mautic.email.form.action.sendemail.admin.descr',
-            'formType'          => 'email_submitaction_useremail',
+            'formType'          => FormSubmitActionUserEmailType::class,
             'formTheme'         => 'MauticEmailBundle:FormTheme\EmailSendList',
             'callback'          => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',
             'allowCampaignForm' => true,
@@ -56,7 +58,7 @@ class FormSubscriber extends CommonSubscriber
             'group'           => 'mautic.email.actions',
             'label'           => 'mautic.email.form.action.sendemail.lead',
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
-            'formType'        => 'emailsend_list',
+            'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
             'callback'        => '\Mautic\EmailBundle\Helper\FormSubmitHelper::sendEmail',

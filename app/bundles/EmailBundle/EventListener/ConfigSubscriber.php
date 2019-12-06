@@ -70,7 +70,7 @@ class ConfigSubscriber extends CommonSubscriber
             ]
         );
 
-        $data = $event->getConfig('emailconfig');
+        $data = $event->getConfig(ConfigType::class);
 
         // Get the original data so that passwords aren't lost
         $monitoredEmail = $this->coreParametersHelper->getParameter('monitored_email');
@@ -95,6 +95,6 @@ class ConfigSubscriber extends CommonSubscriber
             }
         }
 
-        $event->setConfig($data, 'emailconfig');
+        $event->setConfig($data, ConfigType::class);
     }
 }

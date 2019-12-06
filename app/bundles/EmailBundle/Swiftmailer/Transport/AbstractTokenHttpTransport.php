@@ -117,14 +117,14 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param \Swift_Mime_SimpleMessage $message
+     * @param null                      $failedRecipients
      *
      * @return int
      *
      * @throws \Swift_TransportException
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message = $message;
 

@@ -311,7 +311,8 @@ class AssetController extends FormController
         ], 'validators');
 
         // Create temporary asset ID
-        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $asset  = $this->request->request->get('asset', []);
+        $tempId = $method === 'POST' ? ($asset['tempId'] ?? '') : uniqid('tmp_');
         $entity->setTempId($tempId);
 
         // Set the page we came from
@@ -480,7 +481,8 @@ class AssetController extends FormController
         }
 
         // Create temporary asset ID
-        $tempId = ($method == 'POST') ? $this->request->request->get('asset[tempId]', '', true) : uniqid('tmp_');
+        $asset  = $this->request->request->get('asset', []);
+        $tempId = $method === 'POST' ? ($asset['tempId'] ?? '') : uniqid('tmp_');
         $entity->setTempId($tempId);
 
         //Create the form
