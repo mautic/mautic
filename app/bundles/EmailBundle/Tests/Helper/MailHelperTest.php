@@ -383,7 +383,7 @@ class MailHelperTest extends \PHPUnit\Framework\TestCase
 
         foreach ($addresses as $address) {
             // will throw Swift_RfcComplianceException if it will find the address invalid
-            $helper::validateEmail($address);
+            $this->assertNull($helper::validateEmail($address));
         }
     }
 
