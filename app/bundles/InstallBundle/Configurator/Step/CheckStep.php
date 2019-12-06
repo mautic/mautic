@@ -104,7 +104,7 @@ class CheckStep implements StepInterface
     {
         $messages = [];
 
-        if (version_compare(PHP_VERSION, '7.2.0', '<')) {
+        if (version_compare(PHP_VERSION, '7.2.21', '<')) {
             $messages[] = 'mautic.install.php.version.not.supported';
         }
 

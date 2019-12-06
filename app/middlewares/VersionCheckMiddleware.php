@@ -19,7 +19,7 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
 {
     const PRIORITY = 10;
 
-    const MAUTIC_MINIMUM_PHP = '7.2.0';
+    const MAUTIC_MINIMUM_PHP = '7.2.21';
     const MAUTIC_MAXIMUM_PHP = '7.2.999';
 
     /**
