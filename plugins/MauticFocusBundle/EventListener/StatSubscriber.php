@@ -76,7 +76,8 @@ class StatSubscriber extends CommonSubscriber
     public function onFormSubmit(SubmissionEvent $event)
     {
         // Check the request for a focus field
-        $id = $this->request->request->get('mauticform[focusId]', false, true);
+        $mauticform = $this->request->request->get('mauticform', []);
+        $id         = $mauticform['focusId'] ?? false;
 
         if (!empty($id)) {
             $focus = $this->model->getEntity($id);

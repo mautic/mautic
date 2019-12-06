@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\EmailBundle\Form\Type\EmailListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
@@ -110,7 +111,7 @@ class EmailType extends AbstractType
 
         $builder->add(
             'templates',
-            'email_list',
+            EmailListType::class,
             [
                 'label'      => 'mautic.lead.email.template',
                 'label_attr' => ['class' => 'control-label'],

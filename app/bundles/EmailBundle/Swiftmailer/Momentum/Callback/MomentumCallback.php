@@ -50,12 +50,12 @@ final class MomentumCallback implements MomentumCallbackInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param array               $response
+     * @param \Swift_Mime_SimpleMessage $message
+     * @param array                     $response
      *
      * @return mixed|void
      */
-    public function processImmediateFeedback(\Swift_Mime_Message $message, array $response)
+    public function processImmediateFeedback(\Swift_Mime_SimpleMessage $message, array $response)
     {
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
             $comments     = $response['errors'][0]['description'];

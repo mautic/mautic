@@ -153,15 +153,15 @@ class TriggerEventController extends CommonFormController
     {
         $session      = $this->get('session');
         $method       = $this->request->getMethod();
-        $triggerId    = ($method == 'POST') ? $this->request->request->get('pointtriggerevent[triggerId]', '', true) : $this->request->query->get('triggerId');
+        $triggerEvent = $this->request->request->get('pointtriggerevent', []);
+        $triggerId    = $method === 'POST' ? ($triggerEvent['triggerId'] ?? '') : $this->request->query->get('triggerId');
         $events       = $session->get('mautic.point.'.$triggerId.'.triggerevents.modified', []);
         $success      = 0;
-        $valid        = $cancelled        = false;
-        $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
+        $valid        = $cancelled = false;
+        $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
 
         if ($triggerEvent !== null) {
-            $eventType = $triggerEvent['type'];
-
+            $eventType                = $triggerEvent['type'];
             $events                   = $this->getModel('point.trigger')->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
