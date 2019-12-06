@@ -374,24 +374,29 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Triggers the action which sends email to user, contact owner or specified email addresses.
-     *
-     * @param CampaignExecutionEvent $event
+     * @param PendingEvent $event
      */
-    public function onCampaignTriggerActionSendEmailToUser(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event)
     {
         if (!$event->checkContext('email.send.to.user')) {
             return;
         }
 
-        $config = $event->getConfig();
-        $lead   = $event->getLead();
+        $config   = $event->getEvent()->getProperties();
+        $contacts = $event->getContacts();
+        $pending  = $event->getPending();
 
-        try {
-            $this->sendEmailToUser->sendEmailToUsers($config, $lead);
-            $event->setResult(true);
-        } catch (EmailCouldNotBeSentException $e) {
-            $event->setFailed($e->getMessage());
+        /**
+         * @var int
+         * @var Lead $contact
+         */
+        foreach ($contacts as $logId => $contact) {
+            try {
+                $this->sendEmailToUser->sendEmailToUsers($config, $contact);
+                $event->pass($pending->get($logId));
+            } catch (EmailCouldNotBeSentException $e) {
+                $event->fail($pending->get($logId), $e->getMessage());
+            }
         }
     }
 }
