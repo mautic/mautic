@@ -107,7 +107,6 @@ class CampaignSubscriber extends CommonSubscriber
         $pageHitTrigger = [
             'label'          => 'mautic.page.campaign.event.pagehit',
             'description'    => 'mautic.page.campaign.event.pagehit_descr',
-            'formAlias'      => CampaignEventPageHitType::class,
             'formType'       => CampaignEventPageHitType::class,
             'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'channel'        => 'page',
@@ -119,7 +118,6 @@ class CampaignSubscriber extends CommonSubscriber
         $deviceHitTrigger = [
             'label'          => 'mautic.page.campaign.event.devicehit',
             'description'    => 'mautic.page.campaign.event.devicehit_descr',
-            'formAlias'      => CampaignEventLeadDeviceType::class,
             'formType'       => CampaignEventLeadDeviceType::class,
             'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
             'channel'        => 'page',
@@ -133,7 +131,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',
                 'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formAlias'              => TrackingPixelSendType::class,
+                'formType'               => TrackingPixelSendType::class,
                 'connectionRestrictions' => [
                     'anchor' => [
                         'decision.inaction',
