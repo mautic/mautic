@@ -18,11 +18,9 @@ use JMS\Serializer\Metadata\ClassMetadata;
  */
 class AnnotationDriver extends \JMS\Serializer\Metadata\Driver\AnnotationDriver
 {
-    public function loadMetadataForClass(\ReflectionClass $class)
+    public function loadMetadataForClass(\ReflectionClass $class): \Metadata\ClassMetadata
     {
         // Overriding annotation driver to not generate annotation cache files
-        $classMetadata = new ClassMetadata($name = $class->name);
-
-        return $classMetadata;
+        return new ClassMetadata($class->getName());
     }
 }
