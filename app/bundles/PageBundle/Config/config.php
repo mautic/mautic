@@ -317,6 +317,23 @@ return [
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.page.fixture.page_category' => [
+                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.category.model.category'],
+            ],
+            'mautic.page.fixture.page' => [
+                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.page.model.page'],
+            ],
+            'mautic.page.fixture.page_hit' => [
+                'class'     => \Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.page.model.page'],
+            ],
+        ],
         'other' => [
             'mautic.page.helper.token' => [
                 'class'     => 'Mautic\PageBundle\Helper\TokenHelper',

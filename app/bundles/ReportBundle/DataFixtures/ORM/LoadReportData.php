@@ -17,27 +17,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class LoadReportData.
- */
-class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadReportData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
     /**
      * @param ObjectManager $manager
      */

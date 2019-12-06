@@ -15,27 +15,29 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\CoreBundle\Helper\CsvHelper;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Submission;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\PageBundle\Model\PageModel;
 
-/**
- * Class LoadFormResultData.
- */
-class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var PageModel
      */
-    private $container;
+    private $pageModel;
+
+    /**
+     * @var SubmissionModel
+     */
+    private $submissionModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(PageModel $pageModel, SubmissionModel $submissionModel)
     {
-        $this->container = $container;
+        $this->pageModel       = $pageModel;
+        $this->submissionModel = $submissionModel;
     }
 
     /**
@@ -43,12 +45,8 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
-        $pageModel = $this->container->get('mautic.page.model.page');
-        $repo      = $this->container->get('mautic.form.model.submission')->getRepository();
-
-        $fixture       = &$this;
-        $importResults = function ($results) use ($pageModel, $repo, &$fixture) {
-            foreach ($results as $count => $rows) {
+        $importResults = function ($results) {
+            foreach ($results as $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());
 
@@ -58,12 +56,12 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                         if (\in_array($col, ['form', 'page', 'ipAddress', 'lead'])) {
                             if ('lead' === $col) {
                                 // For some reason the lead must be linked with id - 1
-                                $entity = $fixture->getReference($col.'-'.($val - 1));
+                                $entity = $this->getReference($col.'-'.($val - 1));
                             } else {
-                                $entity = $fixture->getReference($col.'-'.$val);
+                                $entity = $this->getReference($col.'-'.$val);
                             }
                             if ('page' == $col) {
-                                $submission->setReferer($pageModel->generateUrl($entity));
+                                $submission->setReferer($this->pageModel->generateUrl($entity));
                             }
                             $submission->$setter($entity);
                             unset($rows[$col]);
@@ -75,7 +73,7 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
                 }
 
                 $submission->setResults($rows);
-                $repo->saveEntity($submission);
+                $this->submissionModel->getRepository()->saveEntity($submission);
             }
         };
 

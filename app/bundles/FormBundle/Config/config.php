@@ -453,6 +453,18 @@ return [
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.form.fixture.form' => [
+                'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.form.model.form', 'mautic.form.model.field', 'mautic.form.model.action'],
+            ],
+            'mautic.form.fixture.form_result' => [
+                'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['mautic.page.model.page', 'mautic.form.model.submission'],
+            ],
+        ],
     ],
 
     'parameters' => [
