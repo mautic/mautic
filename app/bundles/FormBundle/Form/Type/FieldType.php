@@ -411,6 +411,18 @@ class FieldType extends AbstractType
                     'data'     => $data,
                 ]
             );
+
+            $builder->add(
+                'leadFieldNotOverwrite',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.form.field.form.leadFieldNotOverwrite',
+                    'data'  => isset($options['data']['leadFieldNotOverwrite']) ? $options['data']['leadFieldNotOverwrite'] : false,
+                    'attr'  => [
+                        'tooltip' => 'mautic.form.field.form.leadFieldNotOverwrite.tooltip',
+                    ],
+                ]
+            );
         }
 
         $builder->add('type', HiddenType::class);

@@ -159,9 +159,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                         </select>
                         <?php unset($form['leadField']); ?>
                     </div>
-                    <?php if (isset($form['skipIfExists'])): ?>
+                    <?php if (isset($form['leadFieldNotOverwrite'])): ?>
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['skipIfExists']); ?>
+                        <?php echo $view['form']->row($form['leadFieldNotOverwrite']); ?>
                     </div>
                     <?php endif; ?>
                 </div>

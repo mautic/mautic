@@ -231,13 +231,14 @@ class SubmissionModel extends CommonFormModel
         // Get a list of components to build custom fields from
         $components = $this->formModel->getCustomComponents();
 
-        $fields           = $form->getFields();
-        $fieldArray       = [];
-        $results          = [];
-        $tokens           = [];
-        $leadFieldMatches = [];
-        $validationErrors = [];
-        $filesToUpload    = new UploadFileCrate();
+        $fields                       = $form->getFields();
+        $fieldArray                   = [];
+        $results                      = [];
+        $tokens                       = [];
+        $leadFieldMatches             = [];
+        $leadFieldMatchesNotOverwrite = [];
+        $validationErrors             = [];
+        $filesToUpload                = new UploadFileCrate();
 
         /** @var Field $f */
         foreach ($fields as $f) {
@@ -340,6 +341,10 @@ class SubmissionModel extends CommonFormModel
                 $leadValue = $value;
 
                 $leadFieldMatches[$leadField] = $leadValue;
+
+                if ($f->isLeadFieldNotOverwrite()) {
+                    $leadFieldMatchesNotOverwrite[] = $leadField;
+                }
             }
 
             //convert array from checkbox groups and multiple selects
@@ -384,7 +389,7 @@ class SubmissionModel extends CommonFormModel
 
         // Create/update lead
         if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $leadFieldMatchesNotOverwrite);
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
@@ -778,7 +783,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws ORMException
      */
-    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields, $notOverwriteFields = [])
     {
         //set the mapped data
         $inKioskMode   = $form->isInKioskMode();
@@ -951,6 +956,18 @@ class SubmissionModel extends CommonFormModel
         }
 
         //set the mapped fields
+
+        // not overwrite if value exist
+        if (!empty($notOverwriteFields)) {
+            $this->logger->debug('FORM: Not overwrite contact fields to process '.implode(',', $notOverwriteFields));
+
+            foreach ($data as $alias=> $value) {
+                if (in_array($alias, $notOverwriteFields) && $value !== '') {
+                    unset($data[$alias]);
+                }
+            }
+        }
+
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
         // last active time

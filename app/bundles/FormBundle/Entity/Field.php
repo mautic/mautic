@@ -114,6 +114,11 @@ class Field
     private $leadField;
 
     /**
+     * @var string
+     */
+    private $leadFieldOverwrite;
+
+    /**
      * @var bool
      */
     private $saveResult = true;
@@ -139,6 +144,11 @@ class Field
      * @var int
      */
     private $showAfterXSubmissions;
+
+    /**
+     * @var bool
+     */
+    private $leadFieldNotOverwrite;
 
     /**
      * Reset properties on clone.
@@ -223,6 +233,8 @@ class Field
         $builder->addNullableField('containerAttributes', 'string', 'container_attr');
 
         $builder->addNullableField('leadField', 'string', 'lead_field');
+
+        $builder->addNullableField('leadFieldNotOverwrite', 'boolean', 'lead_field_not_overwrite');
 
         $builder->addNullableField('saveResult', 'boolean', 'save_result');
 
@@ -898,5 +910,21 @@ class Field
     public function isFileType()
     {
         return 'file' === $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLeadFieldNotOverwrite()
+    {
+        return $this->leadFieldNotOverwrite;
+    }
+
+    /**
+     * @param bool $leadFieldNotOverwrite
+     */
+    public function setLeadFieldNotOverwrite($leadFieldNotOverwrite)
+    {
+        $this->leadFieldNotOverwrite = $leadFieldNotOverwrite;
     }
 }
