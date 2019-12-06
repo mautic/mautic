@@ -51,7 +51,7 @@ class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
         $this->response           = $this->createMock(Response::class);
         $this->stream             = $this->createMock(Stream::class);
         $this->message            = $this->createMock(MauticMessage::class);
-        $this->headers            = $this->createMock(\Swift_Mime_HeaderSet::class);
+        $this->headers            = $this->createMock(\Swift_Mime_SimpleHeaderSet::class);
         $this->sparkpostFactory   = $this->createMock(SparkpostFactoryInterface::class);
         $this->logger             = $this->createMock(LoggerInterface::class);
         $this->sparkpostClient    = new SparkPost($this->httpClient, ['key' => '1234']);

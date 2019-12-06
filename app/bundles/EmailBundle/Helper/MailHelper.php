@@ -718,6 +718,12 @@ class MailHelper
         /** @var \Swift_Mime_Header $header */
         foreach ($message->getHeaders()->getAll() as $header) {
             $headerBody = $header->getFieldBodyModel();
+            if ($headerBody instanceof \DateTimeInterface) {
+                // It's not possible to replace tokens in \DateTime objects
+                // because they can't contain tokens
+                continue;
+            }
+
             $updated    = false;
             if (is_array($headerBody)) {
                 $bodyReplaced = [];
@@ -743,7 +749,7 @@ class MailHelper
 
         // Parts (plaintext)
         $children = (array) $message->getChildren();
-        /** @var \Swift_Mime_MimeEntity $child */
+        /** @var \Swift_Mime_SimpleMimeEntity $child */
         foreach ($children as $child) {
             $childType  = $child->getContentType();
             list($type) = sscanf($childType, '%[^/]/%s');
@@ -778,9 +784,7 @@ class MailHelper
     public function getMessageInstance()
     {
         try {
-            $message = ($this->tokenizationEnabled) ? MauticMessage::newInstance() : \Swift_Message::newInstance();
-
-            return $message;
+            return $this->tokenizationEnabled ? MauticMessage::newInstance() : (new \Swift_Message());
         } catch (\Exception $e) {
             $this->logError($e);
 
@@ -929,7 +933,7 @@ class MailHelper
         if ($this->plainTextSet) {
             $children = (array) $this->message->getChildren();
 
-            /** @var \Swift_Mime_MimeEntity $child */
+            /** @var \Swift_Mime_SimpleMimeEntity $child */
             foreach ($children as $child) {
                 $childType = $child->getContentType();
                 if ($childType == 'text/plain' && $child instanceof \Swift_MimePart) {
