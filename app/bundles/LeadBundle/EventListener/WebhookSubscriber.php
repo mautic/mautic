@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
 use Mautic\WebhookBundle\WebhookEvents;
@@ -26,6 +27,21 @@ use Mautic\WebhookBundle\WebhookEvents;
 class WebhookSubscriber extends CommonSubscriber
 {
     use WebhookModelTrait;
+
+    /**
+     * @var CompanyModel
+     */
+    private $companyModel;
+
+    /**
+     * WebhookSubscriber constructor.
+     *
+     * @param CompanyModel $companyModel
+     */
+    public function __construct(CompanyModel $companyModel)
+    {
+        $this->companyModel = $companyModel;
+    }
 
     /**
      * @return array
@@ -110,10 +126,12 @@ class WebhookSubscriber extends CommonSubscriber
         // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
-                'lead'    => $event->getLead(),
-                'contact' => $event->getLead(),
+                'lead'     => $lead,
+                'contact'  => $lead,
+                'companies'=> $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId()),
             ],
             [
+                'leadDetails',
                 'leadDetails',
                 'userList',
                 'publishDetails',

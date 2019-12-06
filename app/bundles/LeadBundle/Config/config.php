@@ -445,7 +445,10 @@ return [
                 ],
             ],
             'mautic.webhook.subscriber' => [
-                'class'       => 'Mautic\LeadBundle\EventListener\WebhookSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company',
+                ],
                 'methodCalls' => [
                     'setWebhookModel' => ['mautic.webhook.model.webhook'],
                 ],
