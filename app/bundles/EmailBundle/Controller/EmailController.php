@@ -361,7 +361,7 @@ class EmailController extends FormController
         list($translationParent, $translationChildren) = $email->getTranslations();
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());

@@ -491,7 +491,7 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $this->factory->getIpAddressFromRequest(),
                     ];
-                    $this->getModel('core.auditLog')->writeToLog($log);
+                    $this->getModel('core.auditlog')->writeToLog($log);
 
                     $this->addFlash('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }

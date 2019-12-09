@@ -157,7 +157,7 @@ $view['slots']->set(
         <div class="tab-content pa-md preview-detail">
             <?php echo $view->render(
                 'MauticAssetBundle:Asset:preview.html.php',
-                ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $view['router']->generate(
+                ['activeAsset' => $activeAsset, 'assetDownloadUrl' => $view['router']->url(
                     'mautic_asset_action',
                     ['objectAction' => 'preview', 'objectId' => $activeAsset->getId()]
                 )]

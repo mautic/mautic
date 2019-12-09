@@ -1145,7 +1145,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $this->setListFilters();
 
         // Audit log entries
-        $logs = ($logObject) ? $this->getModel('core.auditLog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : [];
+        $logs = ($logObject) ? $this->getModel('core.auditlog')->getLogForObject($logObject, $objectId, $entity->getDateAdded(), 10, $logBundle) : [];
 
         // Generate route
         $routeVars = [
