@@ -151,7 +151,7 @@ return [
     'services' => [
         'events' => [
             'mautic.core.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\CoreSubscriber',
+                'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
                 'arguments' => [
                     'mautic.helper.bundle',
                     'mautic.helper.menu',
@@ -160,16 +160,23 @@ return [
                     'mautic.helper.core_parameters',
                     'security.context',
                     'mautic.user.model.user',
+                    'event_dispatcher',
+                    'translator',
+                    'request_stack',
+                    'mautic.form.repository.form',
+                    '%mautic.parameters%',
+                    'mautic.factory',
                 ],
             ],
             'mautic.core.environment.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\EnvironmentSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
                 'arguments' => [
                     'mautic.helper.cookie',
+                    '%mautic.parameters%',
                 ],
             ],
             'mautic.core.configbundle.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.language',
                     'mautic.helper.core_parameters',
@@ -179,12 +186,17 @@ return [
                 'class'     => \Mautic\CoreBundle\EventListener\ConfigThemeSubscriber::class,
             ],
             'mautic.webpush.js.subscriber' => [
-                'class' => 'Mautic\CoreBundle\EventListener\BuildJsSubscriber',
+                'class' => \Mautic\CoreBundle\EventListener\BuildJsSubscriber::class,
             ],
             'mautic.core.dashboard.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
+                    'translator',
+                    'router',
+                    'mautic.security',
+                    'event_dispatcher',
+                    'mautic.model.factory',
                 ],
             ],
 
@@ -193,24 +205,29 @@ return [
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                     'mautic.user.token.repository',
+                    'translator',
                 ],
             ],
             'mautic.core.request.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
                 'arguments' => [
                     'security.csrf.token_manager',
+                    'translator',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.core.stats.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.core.assets.subscriber' => [
-                'class'     => 'Mautic\CoreBundle\EventListener\AssetsSubscriber',
+                'class'     => \Mautic\CoreBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.core.subscriber.router' => [

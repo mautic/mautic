@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\FormBundle\EventListener\CalendarSubscriber;
 use Mautic\FormBundle\EventListener\CampaignSubscriber;
 use Mautic\FormBundle\EventListener\DashboardSubscriber;
 use Mautic\FormBundle\EventListener\EmailSubscriber;
@@ -176,10 +175,15 @@ return [
                     'mautic.core.model.auditlog',
                     'mautic.helper.mailer',
                     'mautic.helper.core_parameters',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.form.validation.subscriber' => [
                 'class'     => \Mautic\FormBundle\EventListener\FormValidationSubscriber::class,
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.pagebundle.subscriber' => [
                 'class'     => PageSubscriber::class,
@@ -198,6 +202,7 @@ return [
                 'class'     => ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'mautic.form.repository.submission',
                 ],
             ],
             'mautic.form.campaignbundle.subscriber' => [
@@ -208,14 +213,14 @@ return [
                     'mautic.campaign.model.event',
                 ],
             ],
-            'mautic.form.calendarbundle.subscriber' => [
-                'class' => CalendarSubscriber::class,
-            ],
             'mautic.form.leadbundle.subscriber' => [
                 'class'     => LeadSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.page.model.page',
+                    'mautic.form.repository.submission',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.form.emailbundle.subscriber' => [
@@ -226,29 +231,35 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.form.model.form',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.form.webhook.subscriber' => [
-                'class'       => WebhookSubscriber::class,
-                'arguments'   => ['mautic.webhook.model.webhook'],
+                'class'     => WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
             ],
             'mautic.form.dashboard.subscriber' => [
                 'class'     => DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.form.model.submission',
                     'mautic.form.model.form',
+                    'router',
                 ],
             ],
             'mautic.form.stats.subscriber' => [
                 'class'     => \Mautic\FormBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.form.subscriber.determine_winner' => [
                 'class'     => \Mautic\FormBundle\EventListener\DetermineWinnerSubscriber::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.form.repository.submission',
                     'translator',
                 ],
             ],
@@ -405,6 +416,18 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.form.repository.form' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\FormBundle\Entity\Form::class,
+            ],
+            'mautic.form.repository.submission' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\FormBundle\Entity\Submission::class,
             ],
         ],
         'other' => [

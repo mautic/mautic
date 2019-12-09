@@ -14,26 +14,29 @@ namespace Mautic\LeadBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class MaintenanceSubscriber.
- */
-class MaintenanceSubscriber extends CommonSubscriber
+class MaintenanceSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
-     * MaintenanceSubscriber constructor.
-     *
-     * @param Connection $db
+     * @var TranslatorInterface
      */
-    public function __construct(Connection $db)
+    private $translator;
+
+    /**
+     * @param Connection          $db
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(Connection $db, TranslatorInterface $translator)
     {
-        $this->db = $db;
+        $this->db         = $db;
+        $this->translator = $translator;
     }
 
     /**

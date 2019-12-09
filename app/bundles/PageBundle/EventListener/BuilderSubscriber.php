@@ -11,9 +11,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use DOMDocument;
 use DOMXPath;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -40,21 +41,45 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TokenHelper
      */
-    protected $tokenHelper;
+    private $tokenHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
 
     /**
      * @var BuilderTokenHelperFactory
@@ -64,15 +89,15 @@ class BuilderSubscriber extends CommonSubscriber
     /**
      * @var PageModel
      */
-    protected $pageModel;
-    protected $pageTokenRegex      = '{pagelink=(.*?)}';
-    protected $dwcTokenRegex       = '{dwc=(.*?)}';
-    protected $langBarRegex        = '{langbar}';
-    protected $shareButtonsRegex   = '{sharebuttons}';
-    protected $titleRegex          = '{pagetitle}';
-    protected $descriptionRegex    = '{pagemetadescription}';
-    protected $emailIsInternalSend = false;
-    protected $emailEntity         = null;
+    private $pageModel;
+    private $pageTokenRegex      = '{pagelink=(.*?)}';
+    private $dwcTokenRegex       = '{dwc=(.*?)}';
+    private $langBarRegex        = '{langbar}';
+    private $shareButtonsRegex   = '{sharebuttons}';
+    private $titleRegex          = '{pagetitle}';
+    private $descriptionRegex    = '{pagemetadescription}';
+    private $emailIsInternalSend = false;
+    private $emailEntity         = null;
 
     const segmentListRegex  = '{segmentlist}';
     const categoryListRegex = '{categorylist}';
@@ -88,7 +113,7 @@ class BuilderSubscriber extends CommonSubscriber
      * @param TokenHelper               $tokenHelper
      * @param IntegrationHelper         $integrationHelper
      * @param PageModel                 $pageModel
-     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
+     * @param BuilderTokey $builderTokenHelperFactory
      */
     public function __construct(
         TokenHelper $tokenHelper,
@@ -147,7 +172,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             // add only filter based dwc tokens
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
-            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
+            $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
@@ -495,7 +520,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSocialShareButtons()
+    private function renderSocialShareButtons()
     {
         static $content = '';
 
@@ -503,13 +528,13 @@ class BuilderSubscriber extends CommonSubscriber
             $shareButtons = $this->integrationHelper->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
-            foreach ($shareButtons as $network => $button) {
+            foreach ($shareButtons as $button) {
                 $content .= $button;
             }
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
+            $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
         }
 
         return $content;
@@ -530,13 +555,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSegmentList(array $params = [])
+    private function renderSegmentList(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -548,13 +573,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderCategoryList(array $params = [])
+    private function renderCategoryList(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -566,13 +591,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderPreferredChannel(array $params = [])
+    private function renderPreferredChannel(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-preferredchannel'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -584,13 +609,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderChannelFrequency(array $params = [])
+    private function renderChannelFrequency(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-channelfrequency'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -602,13 +627,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSavePrefs(array $params = [])
+    private function renderSavePrefs(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -620,13 +645,13 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderSuccessMessage(array $params = [])
+    private function renderSuccessMessage(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class=\"pref-successmessage\">\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
+            $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:successmessage.html.php', $params);
             $content .= "</div>\n";
         }
 
@@ -640,7 +665,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return string
      */
-    protected function renderLanguageBar($page)
+    private function renderLanguageBar($page)
     {
         static $langbar = '';
 
@@ -699,7 +724,7 @@ class BuilderSubscriber extends CommonSubscriber
                 return;
             }
 
-            $langbar = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
         }
 
         return $langbar;

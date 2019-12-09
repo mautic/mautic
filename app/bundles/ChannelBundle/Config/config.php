@@ -79,18 +79,24 @@ return [
                 ],
             ],
             'mautic.channel.channelbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\MessageSubscriber',
+                'class'     => \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.channel.channelbundle.lead.subscriber' => [
-                'class' => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+                'class'     => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.channel.repository.message_queue',
+                ],
             ],
             'mautic.channel.reportbundle.subscriber' => [
                 'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'router',
                 ],
             ],
             'mautic.channel.button.subscriber' => [
@@ -161,6 +167,13 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.frequency_rule',
                 ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.channel.repository.message_queue' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\ChannelBundle\Entity\MessageQueue::class,
             ],
         ],
     ],

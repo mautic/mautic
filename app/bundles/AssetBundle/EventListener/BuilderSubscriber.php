@@ -20,21 +20,19 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var string
      */
-    protected $assetToken = '{assetlink=(.*?)}';
+    private $assetToken = '{assetlink=(.*?)}';
 
     /**
      * @var TokenHelper
      */
-    protected $tokenHelper;
+    private $tokenHelper;
 
     /**
      * @var ContactTracker

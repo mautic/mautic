@@ -17,24 +17,27 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     private $regex = '{focus=(.*?)}';
 
     /**
      * @var FocusModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
 
     /**
      * @var BuilderTokenHelperFactory

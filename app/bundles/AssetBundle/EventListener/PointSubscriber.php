@@ -14,17 +14,17 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
      * @param PointModel $pointModel

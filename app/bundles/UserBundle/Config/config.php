@@ -125,27 +125,32 @@ return [
     'services' => [
         'events' => [
             'mautic.user.subscriber' => [
-                'class'     => 'Mautic\UserBundle\EventListener\UserSubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\UserSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.user.search.subscriber' => [
-                'class'     => 'Mautic\UserBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.user.model.user',
                     'mautic.user.model.role',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.user.config.subscriber' => [
-                'class' => 'Mautic\UserBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.user.route.subscriber' => [
-                'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\RouteSubscriber::class,
+                'arguments' => [
+                    '%mautic.parameters%',
+                ],
             ],
             'mautic.user.security_subscriber' => [
-                'class'     => 'Mautic\UserBundle\EventListener\SecuritySubscriber',
+                'class'     => \Mautic\UserBundle\EventListener\SecuritySubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
