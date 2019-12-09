@@ -12,7 +12,6 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
-use Exception;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -83,7 +82,7 @@ class IntegrationHelper
      * @param TemplatingHelper     $templatingHelper
      * @param PluginModel          $pluginModel
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(
         Kernel $kernel,
