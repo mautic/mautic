@@ -169,6 +169,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
                 var params = {
                     page_title: d.title,
                     page_language: n.language,
+                    preferred_locale: n.language,
                     page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
                     page_url: l.href,
                     counter: m.pageViewCounter,
@@ -177,6 +178,10 @@ class BuildJsSubscriber implements EventSubscriberInterface
                     platform: m.getOs(),
                     do_not_track: navigator.doNotTrack == 1
                 };
+                
+                if (window.Intl && window.Intl.DateTimeFormat) {
+                    params.timezone =  new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+                }
                 
                 params = MauticJS.appendTrackedContact(params);
                 
