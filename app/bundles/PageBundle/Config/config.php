@@ -214,7 +214,7 @@ return [
             'mautic.page.subscriber.determine_winner' => [
                 'class'     => \Mautic\PageBundle\EventListener\DetermineWinnerSubscriber::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.page.repository.hit',
                     'translator',
                 ],
             ],
