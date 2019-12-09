@@ -13,13 +13,10 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array

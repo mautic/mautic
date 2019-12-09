@@ -11,11 +11,11 @@
 
 namespace Mautic\QueueBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\QueueEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-abstract class AbstractQueueSubscriber extends CommonSubscriber
+abstract class AbstractQueueSubscriber implements EventSubscriberInterface
 {
     protected $protocol              = '';
     protected $protocolUiTranslation = '';

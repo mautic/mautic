@@ -14,26 +14,40 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param CampaignModel $campaignModel
+     * @var CorePermissions
      */
-    public function __construct(CampaignModel $campaignModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @param CampaignModel    $campaignModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
+    public function __construct(
+        CampaignModel $campaignModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->campaignModel = $campaignModel;
+        $this->security      = $security;
+        $this->templating    = $templating;
     }
 
     /**
@@ -67,7 +81,7 @@ class SearchSubscriber extends CommonSubscriber
             if (count($campaigns) > 0) {
                 $campaignResults = [];
                 foreach ($campaigns as $campaign) {
-                    $campaignResults[] = $this->templating->renderResponse(
+                    $campaignResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'campaign' => $campaign,
@@ -75,7 +89,7 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($campaigns) > 5) {
-                    $campaignResults[] = $this->templating->renderResponse(
+                    $campaignResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticCampaignBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

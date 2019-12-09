@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -27,61 +26,73 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var FieldModel
      */
-    protected $leadFieldModel;
+    private $leadFieldModel;
 
     /**
      * @var ListModel
      */
-    protected $listModel;
+    private $listModel;
 
     /**
      * @var CompanyModel
      */
-    protected $companyModel;
+    private $companyModel;
 
     /**
      * @var CampaignModel
      */
-    protected $campaignModel;
+    private $campaignModel;
 
     /**
-     * CampaignSubscriber constructor.
+     * System params.
      *
+     * @var array
+     */
+    private $params;
+
+    /**
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
      * @param CompanyModel   $companyModel
      * @param CampaignModel  $campaignModel
+     * @param array          $params
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel, CompanyModel $companyModel, CampaignModel $campaignModel)
-    {
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        LeadModel $leadModel,
+        FieldModel $leadFieldModel,
+        ListModel $listModel,
+        CompanyModel $companyModel,
+        CampaignModel $campaignModel,
+        array $params
+    ) {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
         $this->listModel      = $listModel;
         $this->companyModel   = $companyModel;
         $this->campaignModel  = $campaignModel;
+        $this->params         = $params;
     }
 
     /**
@@ -363,12 +374,11 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $company           = $event->getConfig()['company'];
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        $company = $event->getConfig()['company'];
+        $lead    = $event->getLead();
 
         if (!empty($company)) {
-            $somethingHappened = $this->leadModel->addToCompany($lead, $company);
+            $this->leadModel->addToCompany($lead, $company);
         }
     }
 
@@ -437,7 +447,8 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
-        $lead = $event->getLead();
+        $lead   = $event->getLead();
+        $result = false;
 
         if (!$lead || !$lead->getId()) {
             return $event->setResult(false);

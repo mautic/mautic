@@ -11,21 +11,21 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Proceses queue (Beanstalk, RabitMQ, ...) jobs.
  */
-class QueueSubscriber extends CommonSubscriber
+class QueueSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @param EmailModel $emailModel

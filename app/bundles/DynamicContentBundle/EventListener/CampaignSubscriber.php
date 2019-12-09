@@ -15,44 +15,48 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var DynamicContentModel
      */
-    protected $dynamicContentModel;
+    private $dynamicContentModel;
 
     /**
      * @var Session
      */
-    protected $session;
+    private $session;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param LeadModel           $leadModel
-     * @param DynamicContentModel $dynamicContentModel
+     * @var EventDispatcherInterface
      */
-    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
+    private $dispatcher;
+
+    /**
+     * @param LeadModel                $leadModel
+     * @param DynamicContentModel      $dynamicContentModel
+     * @param Session                  $session
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
     {
         $this->leadModel           = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;
         $this->session             = $session;
+        $this->dispatcher          = $dispatcher;
     }
 
     /**
