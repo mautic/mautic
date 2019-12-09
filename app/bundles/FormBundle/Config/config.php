@@ -261,7 +261,7 @@ return [
             'mautic.form.subscriber.determine_winner' => [
                 'class'     => \Mautic\FormBundle\EventListener\DetermineWinnerSubscriber::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'mautic.form.repository.submission',
                     'translator',
                 ],
             ],
