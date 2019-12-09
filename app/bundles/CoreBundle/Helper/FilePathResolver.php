@@ -100,7 +100,7 @@ class FilePathResolver
     private function getFileExtension(UploadedFile $file)
     {
         $ext = $file->getClientOriginalExtension();
-        $ext = ($ext === '' ? '' : '.').$ext;
+        $ext = ('' === $ext ? '' : '.').$ext;
 
         return $ext;
     }

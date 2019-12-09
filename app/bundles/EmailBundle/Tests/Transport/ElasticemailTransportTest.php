@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 
-class ElasticemailTransportTest extends \PHPUnit_Framework_TestCase
+class ElasticemailTransportTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $transportCallback;

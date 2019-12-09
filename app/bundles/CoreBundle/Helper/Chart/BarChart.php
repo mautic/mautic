@@ -57,7 +57,7 @@ class BarChart extends AbstractChart implements ChartInterface
             'data'  => $data,
         ];
 
-        if ($order === null) {
+        if (null === $order) {
             $order = count($this->datasets);
         }
 

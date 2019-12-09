@@ -25,7 +25,7 @@ use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SparkpostTransportTest extends \PHPUnit_Framework_TestCase
+class SparkpostTransportTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $transportCallback;

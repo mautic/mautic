@@ -36,7 +36,7 @@ trait EntityFieldsBuildFormTrait
         $mapped = !$isObject;
 
         foreach ($options['fields'] as $field) {
-            if ($field['isPublished'] === false || $field['object'] !== $object) {
+            if (false === $field['isPublished'] || $field['object'] !== $object) {
                 continue;
             }
             $attr       = ['class' => 'form-control'];
@@ -122,14 +122,14 @@ trait EntityFieldsBuildFormTrait
                     }
                 }
 
-                if ($type == 'datetime') {
+                if ('datetime' == $type) {
                     $opts['model_timezone'] = 'UTC';
                     $opts['view_timezone']  = date_default_timezone_get();
                     $opts['format']         = 'yyyy-MM-dd HH:mm:ss';
                     $opts['with_seconds']   = true;
 
                     $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                } elseif ($type == 'date') {
+                } elseif ('date' == $type) {
                     $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                 } else {
                     $opts['model_timezone'] = 'UTC';
@@ -144,7 +144,7 @@ trait EntityFieldsBuildFormTrait
                             $data = $event->getData();
 
                             if (!empty($data[$alias])) {
-                                if (($timestamp = strtotime($data[$alias])) === false) {
+                                if (false === ($timestamp = strtotime($data[$alias]))) {
                                     $timestamp = null;
                                 }
                                 if ($timestamp) {
@@ -171,7 +171,7 @@ trait EntityFieldsBuildFormTrait
                 case 'select':
                 case 'multiselect':
                 case 'boolean':
-                    if ($type == 'multiselect') {
+                    if ('multiselect' == $type) {
                         $constraints[] = new Length(['max' => 255]);
                     }
 
@@ -193,19 +193,19 @@ trait EntityFieldsBuildFormTrait
                         $typeProperties['multiple']     = ('multiselect' === $type);
                         $cleaningRules[$field['alias']] = 'raw';
                     }
-                    if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
+                    if ('boolean' == $type && !empty($properties['yes']) && !empty($properties['no'])) {
                         $choiceType                  = YesNoButtonGroupType::class;
                         $typeProperties['expanded']  = true;
                         $typeProperties['yes_label'] = $properties['yes'];
                         $typeProperties['no_label']  = $properties['no'];
                         $typeProperties['attr']      = [];
                         $emptyValue                  = ' x ';
-                        if ($value !== '' && $value !== null) {
+                        if ('' !== $value && null !== $value) {
                             $value = (int) $value;
                         }
                     }
 
-                    $typeProperties['data']        = $type === 'multiselect' ? FormFieldHelper::parseList($value) : $value;
+                    $typeProperties['data']        = 'multiselect' === $type ? FormFieldHelper::parseList($value) : $value;
                     $typeProperties['empty_value'] = $emptyValue;
                     $builder->add(
                         $alias,
@@ -278,7 +278,7 @@ trait EntityFieldsBuildFormTrait
                             $constraints[] = new Length(['max' => 255]);
                             break;
                         case 'multiselect':
-                            if ($type == 'multiselect') {
+                            if ('multiselect' == $type) {
                                 $constraints[] = new Length(['max' => 255]);
                             }
                             break;

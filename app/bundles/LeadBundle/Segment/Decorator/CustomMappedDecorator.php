@@ -42,7 +42,7 @@ class CustomMappedDecorator extends BaseDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return null|string
+     * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
@@ -103,7 +103,7 @@ class CustomMappedDecorator extends BaseDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|null|string
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

@@ -245,7 +245,7 @@ class DynamicsApi extends CrmApi
         $input                = array_pop($a_blocks);
         list($header, $input) = explode("\r\n\r\n", $input, 2);
         foreach (explode("\r\n", $header) as $r) {
-            if (stripos($r, 'Content-Type:') === 0) {
+            if (0 === stripos($r, 'Content-Type:')) {
                 list($headername, $contentType) = explode(':', $r, 2);
             }
         }

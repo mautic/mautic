@@ -20,7 +20,7 @@
             <?php foreach ($logs as $log) : ?>
             <li class="media">
                 <div class="media-object pull-left">
-                <?php if ($log['action'] == 'create') : ?>
+                <?php if ('create' == $log['action']) : ?>
                     <span class="figure featured bg-success"><span class="fa fa-check"></span></span>
                 <?php else: ?>
                     <span class="figure"></span>

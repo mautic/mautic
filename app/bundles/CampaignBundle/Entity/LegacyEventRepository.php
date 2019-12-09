@@ -108,7 +108,7 @@ class LegacyEventRepository extends CommonRepository
                 ->setParameter('campaigns', $campaigns);
         }
 
-        if ($leadId != null) {
+        if (null != $leadId) {
             // Events that aren't fired yet
             $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('ellev.id')

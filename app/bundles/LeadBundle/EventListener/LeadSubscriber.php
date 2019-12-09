@@ -320,7 +320,7 @@ class LeadSubscriber extends CommonSubscriber
             $name = $this->translator->trans($label);
             $event->addEventType($type, $name);
 
-            if (!$event->isApplicable($type) || ($type != 'lead.utmtagsadded' && !empty($filters['search']))) {
+            if (!$event->isApplicable($type) || ('lead.utmtagsadded' != $type && !empty($filters['search']))) {
                 continue;
             }
 
@@ -370,7 +370,7 @@ class LeadSubscriber extends CommonSubscriber
             $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : null;
 
             foreach ($rows['results'] as $row) {
-                if ($ipAddresses !== null && !isset($ipAddresses[$row['ip_address']])) {
+                if (null !== $ipAddresses && !isset($ipAddresses[$row['ip_address']])) {
                     continue;
                 }
 

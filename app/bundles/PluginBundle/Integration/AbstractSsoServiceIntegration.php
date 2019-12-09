@@ -34,7 +34,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     /**
      * Get the user role for new users.
      *
-     * @return bool|\Doctrine\Common\Proxy\Proxy|null|object
+     * @return bool|\Doctrine\Common\Proxy\Proxy|object|null
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -147,7 +147,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add('auto_create_user',
                 YesNoButtonGroupType::class,
                 [

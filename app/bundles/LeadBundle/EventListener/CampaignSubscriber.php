@@ -248,7 +248,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         $somethingHappened = false;
 
-        if ($lead !== null && !empty($points)) {
+        if (null !== $lead && !empty($points)) {
             $lead->adjustPoints($points);
 
             //add a lead point change log
@@ -482,18 +482,18 @@ class CampaignSubscriber extends CommonSubscriber
         } elseif ($event->checkContext('lead.campaigns')) {
             $result = $this->campaignModel->getCampaignLeadRepository()->checkLeadInCampaigns($lead, $event->getConfig());
         } elseif ($event->checkContext('lead.field_value')) {
-            if ($event->getConfig()['operator'] === 'date') {
+            if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
-                if (strpos($event->getConfig()['value'], '+P') !== false) { //add date
+                if (false !== strpos($event->getConfig()['value'], '+P')) { //add date
                     $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (strpos($event->getConfig()['value'], '-P') !== false) { //subtract date
+                } elseif (false !== strpos($event->getConfig()['value'], '-P')) { //subtract date
                     $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif ($event->getConfig()['value'] === 'anniversary') {
+                } elseif ('anniversary' === $event->getConfig()['value']) {
                     /**
                      * note: currently mautic campaign only one time execution
                      * ( to integrate with: recursive campaign (future)).

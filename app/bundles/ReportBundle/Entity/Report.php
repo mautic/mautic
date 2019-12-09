@@ -95,22 +95,22 @@ class Report extends FormEntity implements SchedulerInterface
     private $isScheduled = false;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $toAddress;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $scheduleUnit;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $scheduleDay;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $scheduleMonthFrequency;
 
@@ -545,7 +545,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getToAddress()
     {
@@ -553,7 +553,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @param null|string $toAddress
+     * @param string|null $toAddress
      */
     public function setToAddress($toAddress)
     {
@@ -563,7 +563,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getScheduleUnit()
     {
@@ -571,7 +571,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @param null|string $scheduleUnit
+     * @param string|null $scheduleUnit
      */
     public function setScheduleUnit($scheduleUnit)
     {
@@ -581,7 +581,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getScheduleDay()
     {
@@ -589,7 +589,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @param null|string $scheduleDay
+     * @param string|null $scheduleDay
      */
     public function setScheduleDay($scheduleDay)
     {
@@ -599,7 +599,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getScheduleMonthFrequency()
     {
@@ -607,7 +607,7 @@ class Report extends FormEntity implements SchedulerInterface
     }
 
     /**
-     * @param null|string $scheduleMonthFrequency
+     * @param string|null $scheduleMonthFrequency
      */
     public function setScheduleMonthFrequency($scheduleMonthFrequency)
     {
@@ -664,7 +664,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function isScheduledDaily()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_DAILY;
+        return SchedulerEnum::UNIT_DAILY === $this->getScheduleUnit();
     }
 
     /**
@@ -672,7 +672,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function isScheduledWeekly()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_WEEKLY;
+        return SchedulerEnum::UNIT_WEEKLY === $this->getScheduleUnit();
     }
 
     /**
@@ -680,7 +680,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function isScheduledMonthly()
     {
-        return $this->getScheduleUnit() === SchedulerEnum::UNIT_MONTHLY;
+        return SchedulerEnum::UNIT_MONTHLY === $this->getScheduleUnit();
     }
 
     /**
@@ -688,6 +688,6 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function isScheduledWeekDays()
     {
-        return $this->getScheduleDay() === SchedulerEnum::DAY_WEEK_DAYS;
+        return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
     }
 }

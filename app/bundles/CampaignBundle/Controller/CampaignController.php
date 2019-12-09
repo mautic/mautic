@@ -143,7 +143,7 @@ class CampaignController extends AbstractStandardFormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -437,7 +437,7 @@ class CampaignController extends AbstractStandardFormController
      * @param          $action
      * @param null     $objectId
      *
-     * @return int|null|string
+     * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
     {
@@ -529,7 +529,7 @@ class CampaignController extends AbstractStandardFormController
                 $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
-                    if ($type == 'list') {
+                    if ('list' == $type) {
                         $listIds[] = (int) $fltr;
                     } else {
                         $formIds[] = (int) $fltr;
@@ -723,7 +723,7 @@ class CampaignController extends AbstractStandardFormController
                         $event['percent']            = $parentEvent['percent'];
                         $event['yesPercent']         = $parentEvent['yesPercent'];
                         $event['noPercent']          = $parentEvent['noPercent'];
-                        if ($event['decisionPath'] == 'yes') {
+                        if ('yes' == $event['decisionPath']) {
                             $event['noPercent'] = 0;
                         } else {
                             $event['yesPercent'] = 0;
@@ -821,7 +821,7 @@ class CampaignController extends AbstractStandardFormController
             switch ($event['triggerMode']) {
                 case 'interval':
                     $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.interval.label'.($event['decisionPath'] == 'no' ? '_inaction' : ''),
+                        'mautic.campaign.connection.trigger.interval.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%number%' => $event['triggerInterval'],
                             '%unit%'   => $translator->transChoice(
@@ -833,7 +833,7 @@ class CampaignController extends AbstractStandardFormController
                     break;
                 case 'date':
                     $label = $translator->trans(
-                        'mautic.campaign.connection.trigger.date.label'.($event['decisionPath'] == 'no' ? '_inaction' : ''),
+                        'mautic.campaign.connection.trigger.date.label'.('no' == $event['decisionPath'] ? '_inaction' : ''),
                         [
                             '%full%' => $dateHelper->toFull($event['triggerDate']),
                             '%time%' => $dateHelper->toTime($event['triggerDate']),
@@ -854,8 +854,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param   $objectId
-     * @param   $campaignSources
+     * @param $objectId
+     * @param $campaignSources
      */
     protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
     {

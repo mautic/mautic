@@ -61,7 +61,7 @@ class FormatterHelper extends Helper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && $type !== 'bool') {
+        if (empty($val) && 'bool' !== $type) {
             return $val;
         }
 
@@ -83,7 +83,7 @@ class FormatterHelper extends Helper
                         $stringParts[] = $v;
                     }
                 }
-                if ($round === 1) {
+                if (1 === $round) {
                     $string = implode('; ', $stringParts);
                 } else {
                     $string = implode(', ', $stringParts);

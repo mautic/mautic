@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -109,7 +110,7 @@
         public function getChannels()
         {
             $args = func_get_args();
-            if (count($args) == 1 && is_array($args[0])) {
+            if (1 == count($args) && is_array($args[0])) {
                 $args = $args[0];
             }
 

@@ -22,7 +22,7 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecisionDispatcherTest extends \PHPUnit_Framework_TestCase
+class DecisionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockBuilder|EventDispatcherInterface

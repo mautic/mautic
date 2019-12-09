@@ -162,7 +162,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
-                if ($type == 'captcha') {
+                if ('captcha' == $type) {
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
                         // Used as a honeypot
@@ -184,7 +184,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     foreach ($violations as $v) {
                         $transParameters = $v->getParameters();
 
-                        if ($f !== null) {
+                        if (null !== $f) {
                             $transParameters['%label%'] = '&quot;'.$f->getLabel().'&quot;';
                         }
 
@@ -278,7 +278,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $valueType = gettype($value);
         $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
         // for boolean expect 0 or 1
-        if ($valueType === 'boolean') {
+        if ('boolean' === $valueType) {
             return (int) $value;
         }
 

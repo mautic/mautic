@@ -110,7 +110,7 @@ class IntegrationHelper
      * @param array|string $specificIntegrations
      * @param array        $withFeatures
      * @param bool         $alphabetical
-     * @param null|int     $pluginFilter
+     * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
      * @return mixed
@@ -233,7 +233,7 @@ class IntegrationHelper
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (
                     // Skip plugin bundles
-                    strpos($coreBundle['directory'], 'app/bundles') !== false
+                    false !== strpos($coreBundle['directory'], 'app/bundles')
                     // Skip core bundles without an Integration directory
                     && is_dir($coreBundle['directory'].'/Integration')
                 ) {
@@ -287,11 +287,11 @@ class IntegrationHelper
         }
 
         // Ensure appropriate formats
-        if ($specificIntegrations !== null && !is_array($specificIntegrations)) {
+        if (null !== $specificIntegrations && !is_array($specificIntegrations)) {
             $specificIntegrations = [$specificIntegrations];
         }
 
-        if ($withFeatures !== null && !is_array($withFeatures)) {
+        if (null !== $withFeatures && !is_array($withFeatures)) {
             $withFeatures = [$withFeatures];
         }
 
@@ -659,7 +659,7 @@ class IntegrationHelper
                 foreach ($identifierField as $idf) {
                     $value = (is_array($fields[$f]) && isset($fields[$f]['value'])) ? $fields[$f]['value'] : $fields[$f];
 
-                    if (!in_array($value, $identifier) && strpos($f, $idf) !== false) {
+                    if (!in_array($value, $identifier) && false !== strpos($f, $idf)) {
                         $identifier[$f] = $value;
                         if (count($identifier) === count($identifierField)) {
                             //found enough matches so break
@@ -668,7 +668,7 @@ class IntegrationHelper
                         }
                     }
                 }
-            } elseif ($identifierField === $f || strpos($f, $identifierField) !== false) {
+            } elseif ($identifierField === $f || false !== strpos($f, $identifierField)) {
                 $matchFound = true;
                 $identifier = (is_array($fields[$f])) ? $fields[$f]['value'] : $fields[$f];
             }
@@ -676,7 +676,7 @@ class IntegrationHelper
 
         $groups = ['core', 'social', 'professional', 'personal'];
         $keys   = array_keys($fields);
-        if (count(array_intersect($groups, $keys)) !== 0 && count($keys) <= 4) {
+        if (0 !== count(array_intersect($groups, $keys)) && count($keys) <= 4) {
             //fields are group
             foreach ($fields as $group => $groupFields) {
                 $availableFields = array_keys($groupFields);

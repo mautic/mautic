@@ -42,7 +42,7 @@ class CoreParametersHelper
      */
     public function getParameter($name, $default = null)
     {
-        if ($name === 'db_table_prefix' && defined('MAUTIC_TABLE_PREFIX')) {
+        if ('db_table_prefix' === $name && defined('MAUTIC_TABLE_PREFIX')) {
             //use the constant in case in the installer
             return MAUTIC_TABLE_PREFIX;
         }

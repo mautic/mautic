@@ -32,7 +32,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Router;
 
-class SendEmailToContactTest extends \PHPUnit_Framework_TestCase
+class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 {
     protected $contacts = [
         [

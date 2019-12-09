@@ -94,7 +94,7 @@ class ChartQuery extends AbstractChart
                 $valId = $column.'_val';
 
                 // Special case: Lead list filter
-                if ($column === 'leadlist_id') {
+                if ('leadlist_id' === $column) {
                     $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
                     $query->andWhere('lll.leadlist_id = :'.$valId);
                     $query->setParameter($valId, $value['value']);
@@ -233,9 +233,9 @@ class ChartQuery extends AbstractChart
         }
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
 
-        if ($isEnumerable === true) {
+        if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
-        } elseif ($isEnumerable == 'sum') {
+        } elseif ('sum' == $isEnumerable) {
             $count = 'SUM('.$countColumn.') AS count';
         } else {
             $count = $countColumn.' AS count';
@@ -311,11 +311,11 @@ class ChartQuery extends AbstractChart
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
 
-        if ($this->unit === 'Y') {
+        if ('Y' === $this->unit) {
             $previousDate->modify('first day of January');
-        } elseif ($this->unit == 'm') {
+        } elseif ('m' == $this->unit) {
             $previousDate->modify('first day of this month');
-        } elseif ($this->unit === 'W') {
+        } elseif ('W' === $this->unit) {
             $previousDate->modify('Monday this week');
         }
 
@@ -323,9 +323,9 @@ class ChartQuery extends AbstractChart
         for ($i = 0; $i < $limit; ++$i) {
             $nextDate = clone $previousDate;
 
-            if ($this->unit === 'm') {
+            if ('m' === $this->unit) {
                 $nextDate->modify('first day of next month');
-            } elseif ($this->unit === 'W') {
+            } elseif ('W' === $this->unit) {
                 $nextDate->modify('Monday next week');
             } else {
                 $nextDate->add($oneUnit);
@@ -338,7 +338,7 @@ class ChartQuery extends AbstractChart
                          * PHP DateTime cannot parse the Y W (ex 2016 09)
                          * format, so we transform it into d-M-Y.
                          */
-                        if ($this->unit === 'W' && isset($item['date'])) {
+                        if ('W' === $this->unit && isset($item['date'])) {
                             list($year, $week) = explode(' ', $item['date']);
                             $newDate           = new \DateTime();
                             $newDate->setISODate($year, $week);
@@ -571,11 +571,11 @@ class ChartQuery extends AbstractChart
      */
     protected function prepareTable($table)
     {
-        if (MAUTIC_TABLE_PREFIX && strpos($table, MAUTIC_TABLE_PREFIX) === 0) {
+        if (MAUTIC_TABLE_PREFIX && 0 === strpos($table, MAUTIC_TABLE_PREFIX)) {
             return $table;
         }
 
-        if (strpos($table, '(') === 0) {
+        if (0 === strpos($table, '(')) {
             return $table;
         }
 

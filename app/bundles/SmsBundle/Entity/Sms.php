@@ -177,7 +177,7 @@ class Sms extends FormEntity
         $metadata->addConstraint(new Callback([
             'callback' => function (Sms $sms, ExecutionContextInterface $context) {
                 $type = $sms->getSmsType();
-                if ($type == 'list') {
+                if ('list' == $type) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $sms->getLists(),
@@ -242,7 +242,7 @@ class Sms extends FormEntity
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
-        if ($prop == 'category' || $prop == 'list') {
+        if ('category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

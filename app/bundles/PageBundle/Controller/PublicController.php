@@ -58,7 +58,7 @@ class PublicController extends CommonFormController
             // Make sure the page is published or deny access if not
             if (!$published && !$userAccess) {
                 // If the page has a redirect type, handle it
-                if ($entity->getRedirectType() != null) {
+                if (null != $entity->getRedirectType()) {
                     $model->hitPage($entity, $this->request, $entity->getRedirectType());
 
                     return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
@@ -308,7 +308,7 @@ class PublicController extends CommonFormController
         $model  = $this->getModel('page');
         $entity = $model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -398,7 +398,7 @@ class PublicController extends CommonFormController
         $lead = $leadModel->getCurrentLead();
         /** @var DeviceTrackingServiceInterface $trackedDevice */
         $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
-        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
@@ -454,7 +454,7 @@ class PublicController extends CommonFormController
 
         // Tak on anything left to the URL
         if (count($query)) {
-            $url .= (strpos($url, '?') !== false) ? '&' : '?';
+            $url .= (false !== strpos($url, '?')) ? '&' : '?';
             $url .= http_build_query($query);
         }
 
@@ -526,7 +526,7 @@ class PublicController extends CommonFormController
      */
     private function urlIsToken($url)
     {
-        return substr($url, 0, 1) === '{';
+        return '{' === substr($url, 0, 1);
     }
 
     /**
@@ -553,7 +553,7 @@ class PublicController extends CommonFormController
                 $slotConfig = [];
             }
 
-            if (isset($slotConfig['type']) && $slotConfig['type'] == 'slideshow') {
+            if (isset($slotConfig['type']) && 'slideshow' == $slotConfig['type']) {
                 if (isset($content[$slot])) {
                     $options = json_decode($content[$slot], true);
                 } else {
@@ -599,7 +599,7 @@ class PublicController extends CommonFormController
 
                 $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
-            } elseif (isset($slotConfig['type']) && $slotConfig['type'] == 'textarea') {
+            } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
                 $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
                 $slotsHelper->set($slot, $value);
             } else {
@@ -651,7 +651,7 @@ class PublicController extends CommonFormController
             $lead = $leadModel->getCurrentLead();
             /** @var DeviceTrackingServiceInterface $trackedDevice */
             $trackedDevice = $this->get('mautic.lead.service.device_tracking_service')->getTrackedDevice();
-            $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+            $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
             $data          = [
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,

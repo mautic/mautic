@@ -23,11 +23,11 @@ class MauticCrmBundle extends PluginBundleBase
 {
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
-        if ($metadata === null) {
+        if (null === $metadata) {
             $metadata = self::getMetadata($factory->getEntityManager());
         }
 
-        if ($metadata !== null) {
+        if (null !== $metadata) {
             parent::onPluginInstall($plugin, $factory, $metadata, $installedSchema);
         }
     }
@@ -49,7 +49,7 @@ class MauticCrmBundle extends PluginBundleBase
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            if (strpos($meta->namespace, 'MauticPlugin\\MauticCrmBundle') === false) {
+            if (false === strpos($meta->namespace, 'MauticPlugin\\MauticCrmBundle')) {
                 continue;
             }
 

@@ -15,7 +15,7 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
-class ConnectwiseIntegrationTest extends \PHPUnit_Framework_TestCase
+class ConnectwiseIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
 

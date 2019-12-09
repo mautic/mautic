@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -35,44 +36,44 @@
          */
         protected function prepareDimensions($img, $width, $height, $fit)
         {
-            if ($width === null && $height === null) {
+            if (null === $width && null === $height) {
                 $width  = $img->getWidth();
                 $height = $img->getHeight();
             }
 
-            if ($width !== null) {
+            if (null !== $width) {
                 $width = WideImage_Coordinate::fix($width, $img->getWidth());
             }
 
-            if ($height !== null) {
+            if (null !== $height) {
                 $height = WideImage_Coordinate::fix($height, $img->getHeight());
             }
 
-            if ($width === null) {
+            if (null === $width) {
                 $width = floor($img->getWidth() * $height / $img->getHeight());
             }
 
-            if ($height === null) {
+            if (null === $height) {
                 $height = floor($img->getHeight() * $width / $img->getWidth());
             }
 
-            if ($width === 0 || $height === 0) {
+            if (0 === $width || 0 === $height) {
                 return ['width' => 0, 'height' => 0];
             }
 
-            if ($fit == null) {
+            if (null == $fit) {
                 $fit = 'inside';
             }
 
             $dim = [];
-            if ($fit == 'fill') {
+            if ('fill' == $fit) {
                 $dim['width']  = $width;
                 $dim['height'] = $height;
-            } elseif ($fit == 'inside' || $fit == 'outside') {
+            } elseif ('inside' == $fit || 'outside' == $fit) {
                 $rx = $img->getWidth() / $width;
                 $ry = $img->getHeight() / $height;
 
-                if ($fit == 'inside') {
+                if ('inside' == $fit) {
                     $ratio = ($rx > $ry) ? $rx : $ry;
                 } else {
                     $ratio = ($rx < $ry) ? $rx : $ry;
@@ -101,8 +102,8 @@
         public function execute($img, $width, $height, $fit, $scale)
         {
             $dim = $this->prepareDimensions($img, $width, $height, $fit);
-            if (($scale === 'down' && ($dim['width'] >= $img->getWidth() && $dim['height'] >= $img->getHeight())) ||
-                ($scale === 'up' && ($dim['width'] <= $img->getWidth() && $dim['height'] <= $img->getHeight()))) {
+            if (('down' === $scale && ($dim['width'] >= $img->getWidth() && $dim['height'] >= $img->getHeight())) ||
+                ('up' === $scale && ($dim['width'] <= $img->getWidth() && $dim['height'] <= $img->getHeight()))) {
                 $dim = ['width' => $img->getWidth(), 'height' => $img->getHeight()];
             }
 

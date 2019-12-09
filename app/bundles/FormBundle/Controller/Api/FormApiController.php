@@ -11,9 +11,9 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -56,7 +56,7 @@ class FormApiController extends CommonApiController
 
         $entity = $this->model->getEntity($formId);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -86,7 +86,7 @@ class FormApiController extends CommonApiController
 
         $entity = $this->model->getEntity($formId);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
@@ -194,7 +194,7 @@ class FormApiController extends CommonApiController
         }
 
         // Remove fields which weren't in the PUT request
-        if (!$isNew && $method === 'PUT') {
+        if (!$isNew && 'PUT' === $method) {
             $fieldsToDelete = [];
 
             foreach ($currentFields as $currentField) {
@@ -239,7 +239,7 @@ class FormApiController extends CommonApiController
         }
 
         // Remove actions which weren't in the PUT request
-        if (!$isNew && $method === 'PUT') {
+        if (!$isNew && 'PUT' === $method) {
             $actionsToDelete = [];
 
             foreach ($currentActions as $currentAction) {

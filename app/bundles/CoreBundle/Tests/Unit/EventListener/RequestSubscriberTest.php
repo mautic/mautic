@@ -21,7 +21,7 @@ use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class RequestSubscriberTest extends \PHPUnit_Framework_TestCase
+class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RequestSubscriber

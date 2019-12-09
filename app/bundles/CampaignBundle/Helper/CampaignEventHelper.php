@@ -26,7 +26,7 @@ class CampaignEventHelper
      */
     public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event)
     {
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return true;
         }
 
@@ -75,7 +75,7 @@ class CampaignEventHelper
 
         if (!empty($removeFromCampaigns)) {
             foreach ($removeFromCampaigns as $c) {
-                if ($c == 'this') {
+                if ('this' == $c) {
                     $c = $event['campaign']['id'];
                 }
 

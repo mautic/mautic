@@ -75,7 +75,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         }
 
         $dataArray = ['success' => 0];
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $session         = $this->get('session');
             $formData        = $session->get($this->getSessionBase().'.data', []);
             $deletedFormData = $session->get($this->getSessionBase().'.data.deleted', []);
@@ -112,7 +112,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         }
 
         $dataArray = ['success' => 0];
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $session         = $this->get('session');
             $formData        = $session->get($this->getSessionBase().'.data', []);
             $deletedFormData = $session->get($this->getSessionBase().'.data.deleted', []);
@@ -172,7 +172,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
         $this->beforeFormProcessed($data, $form, $action, 'POST' === $method);
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     if (!$this->processFormData($data, $form, $action, $objectId)) {

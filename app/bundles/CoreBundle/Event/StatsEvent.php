@@ -32,7 +32,7 @@ class StatsEvent extends Event
     /**
      * Array of columns to fetch.
      *
-     * @var null|array
+     * @var array|null
      */
     protected $select = null;
 

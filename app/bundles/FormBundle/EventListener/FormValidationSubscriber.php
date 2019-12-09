@@ -57,7 +57,7 @@ class FormValidationSubscriber extends CommonSubscriber
     {
         $field = $event->getField();
         $value = $event->getValue();
-        if (!empty($value) && $field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
+        if (!empty($value) && 'tel' === $field->getType() && !empty($field->getValidation()['international'])) {
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);

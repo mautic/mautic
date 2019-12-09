@@ -18,7 +18,7 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\EventListener\TrackingSubscriber;
 
-class TrackingSubscriberTest extends \PHPUnit_Framework_TestCase
+class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|StatRepository

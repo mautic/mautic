@@ -54,7 +54,7 @@ class CookieHelper
      */
     public function getCookie($key, $default = null)
     {
-        if ($this->request === null) {
+        if (null === $this->request) {
             return $default;
         }
 
@@ -72,7 +72,7 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        if ($this->request == null || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
+        if (null == $this->request || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
             return true;
         }
 
@@ -80,10 +80,10 @@ class CookieHelper
             $name,
             $value,
             ($expire) ? (int) (time() + $expire) : null,
-            ($path == null) ? $this->path : $path,
-            ($domain == null) ? $this->domain : $domain,
-            ($secure == null) ? $this->secure : $secure,
-            ($httponly == null) ? $this->httponly : $httponly
+            (null == $path) ? $this->path : $path,
+            (null == $domain) ? $this->domain : $domain,
+            (null == $secure) ? $this->secure : $secure,
+            (null == $httponly) ? $this->httponly : $httponly
         );
     }
 

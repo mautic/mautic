@@ -48,7 +48,7 @@ class AccessToken implements AccessTokenInterface
     protected $secret;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     protected $expiresAt;
 

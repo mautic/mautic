@@ -51,7 +51,7 @@ class StageController extends AbstractFormController
             'mautic.stage.limit',
             $this->coreParametersHelper->getParameter('default_pagelimit')
         );
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -75,7 +75,7 @@ class StageController extends AbstractFormController
 
         $count = count($stages);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
+            $lastPage = (1 === $count) ? 1 : (ceil($count / $limit)) ?: 1;
             $this->get('session')->set('mautic.stage.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
 
@@ -144,7 +144,7 @@ class StageController extends AbstractFormController
         //set the page we came from
         $page = $this->get('session')->get('mautic.stage.page', 1);
 
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('stage[type]', '', true)
+        $actionType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('stage[type]', '', true)
             : '';
 
         $action  = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
@@ -161,7 +161,7 @@ class StageController extends AbstractFormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -272,7 +272,7 @@ class StageController extends AbstractFormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -309,7 +309,7 @@ class StageController extends AbstractFormController
         );
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -402,7 +402,7 @@ class StageController extends AbstractFormController
         $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('stage:stages:create')) {
                 return $this->accessDenied();
             }
@@ -437,11 +437,11 @@ class StageController extends AbstractFormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model  = $this->getModel('stage');
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.stage.error.notfound',
@@ -497,7 +497,7 @@ class StageController extends AbstractFormController
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $model     = $this->getModel('stage');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
@@ -506,7 +506,7 @@ class StageController extends AbstractFormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.stage.error.notfound',

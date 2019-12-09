@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
-class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
+class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function setUp()
     {

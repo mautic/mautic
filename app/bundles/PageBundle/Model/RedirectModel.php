@@ -50,7 +50,7 @@ class RedirectModel extends FormModel
     /**
      * @param $identifier
      *
-     * @return null|Redirect
+     * @return Redirect|null
      */
     public function getRedirectById($identifier)
     {
@@ -129,14 +129,14 @@ class RedirectModel extends FormModel
     public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (strpos($url, '&amp;') !== false) {
+        while (false !== strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
         $repo     = $this->getRepository();
         $redirect = $repo->findOneBy(['url' => $url]);
 
-        if ($redirect == null) {
+        if (null == $redirect) {
             $redirect = $this->createRedirectEntity($url);
         }
 

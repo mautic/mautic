@@ -67,12 +67,12 @@ class ConfigSubscriber extends CommonSubscriber
                         }
                         break;
                     case 'saml_idp_own_certificate':
-                        if (strpos($data[$field], '-----BEGIN CERTIFICATE-----') !== 0) {
+                        if (0 !== strpos($data[$field], '-----BEGIN CERTIFICATE-----')) {
                             $event->setError('mautic.user.saml.certificate.invalid', [], 'userconfig', $field);
                         }
                         break;
                     case 'saml_idp_own_private_key':
-                        if (strpos($data[$field], '-----BEGIN RSA PRIVATE KEY-----') !== 0) {
+                        if (0 !== strpos($data[$field], '-----BEGIN RSA PRIVATE KEY-----')) {
                             $event->setError('mautic.user.saml.private_key.invalid', [], 'userconfig', $field);
                         }
                         break;

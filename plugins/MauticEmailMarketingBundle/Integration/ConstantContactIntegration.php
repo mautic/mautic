@@ -113,7 +113,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
             $leadFields[$f] = [
                 'label'    => $this->translator->trans('mautic.constantcontact.field.'.$f),
                 'type'     => 'string',
-                'required' => ($f == 'email') ? true : false,
+                'required' => ('email' == $f) ? true : false,
             ];
         }
 
@@ -155,10 +155,10 @@ class ConstantContactIntegration extends EmailAbstractIntegration
                 $addresses    = [];
                 $customfields = [];
                 foreach ($mappedData as $k => $v) {
-                    if (strpos($v, 'address_') === 0) {
+                    if (0 === strpos($v, 'address_')) {
                         $addresses[str_replace('address_', '', $k)] = $v;
                         unset($mappedData[$k]);
-                    } elseif (strpos($v, 'customfield_') === 0) {
+                    } elseif (0 === strpos($v, 'customfield_')) {
                         $key            = str_replace('customfield_', 'CustomField', $k);
                         $customfields[] = [
                             'name'  => $key,

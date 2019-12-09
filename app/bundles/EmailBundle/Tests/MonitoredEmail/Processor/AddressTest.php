@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 
-class AddressTest extends \PHPUnit_Framework_TestCase
+class AddressTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that an email header with email addresses are parsed into array

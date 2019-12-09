@@ -86,7 +86,7 @@ class EventCollector
      *
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param null|string $type
+     * @param string|null $type
      *
      * @return array|mixed
      */

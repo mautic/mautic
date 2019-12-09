@@ -139,7 +139,7 @@ EOT
         $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             // Get the exact error
             switch ($archive) {
                 case \ZipArchive::ER_EXISTS:
@@ -256,7 +256,7 @@ EOT
             if (!isset($result['error'])) {
                 foreach ($supportedLanguages as $locale => $name) {
                     // We don't need to update en_US, that comes with the main package
-                    if ($locale == 'en_US') {
+                    if ('en_US' == $locale) {
                         continue;
                     }
 
@@ -307,7 +307,7 @@ EOT
         }
 
         // Output the error (if exists) from the migrate command after we've finished the progress bar
-        if ($migrateExitCode !== 0) {
+        if (0 !== $migrateExitCode) {
             $output->writeln("\n\n<error>".$translator->trans('mautic.core.update.error_performing_migration').'</error>');
         }
 

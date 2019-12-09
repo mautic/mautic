@@ -68,7 +68,7 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        if ($deviceNames !== null) {
+        if (null !== $deviceNames) {
             if (!is_array($deviceNames)) {
                 $deviceNames = [$deviceNames];
             }
@@ -80,7 +80,7 @@ class LeadDeviceRepository extends CommonRepository
             }
         }
 
-        if ($deviceBrands !== null) {
+        if (null !== $deviceBrands) {
             if (!is_array($deviceBrands)) {
                 $deviceBrands = [$deviceBrands];
             }
@@ -92,7 +92,7 @@ class LeadDeviceRepository extends CommonRepository
             }
         }
 
-        if ($deviceModels !== null) {
+        if (null !== $deviceModels) {
             if (!is_array($deviceModels)) {
                 $deviceModels = [$deviceModels];
             }
@@ -104,7 +104,7 @@ class LeadDeviceRepository extends CommonRepository
             }
         }
 
-        if ($deviceOss !== null) {
+        if (null !== $deviceOss) {
             if (!is_array($deviceOss)) {
                 $deviceOss = [$deviceOss];
             }
@@ -116,11 +116,11 @@ class LeadDeviceRepository extends CommonRepository
             }
         }
 
-        if ($deviceId !== null) {
+        if (null !== $deviceId) {
             $sq->andWhere(
                 $sq->expr()->eq('es.id', $deviceId)
             );
-        } elseif ($lead !== null) {
+        } elseif (null !== $lead) {
             $sq->andWhere(
                 $sq->expr()->eq('es.lead_id', $lead->getId())
             );

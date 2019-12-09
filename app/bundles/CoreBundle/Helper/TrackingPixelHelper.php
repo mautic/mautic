@@ -53,7 +53,7 @@ class TrackingPixelHelper
         $response->headers->set('Content-Encoding', 'none');
 
         //check to ses if request is a POST
-        if ($request->getMethod() == 'GET') {
+        if ('GET' == $request->getMethod()) {
             $response->headers->set('Connection', 'close');
 
             //return 1x1 pixel transparent gif

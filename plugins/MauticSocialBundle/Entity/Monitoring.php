@@ -388,7 +388,7 @@ class Monitoring extends FormEntity
         }
 
         // clean up property array for the twitter handle
-        if ($this->getNetworkType() == 'twitter_handle') {
+        if ('twitter_handle' == $this->getNetworkType()) {
             $this->setProperties(
                 [
                     'handle'     => $property['handle'],
@@ -398,7 +398,7 @@ class Monitoring extends FormEntity
         }
 
         // clean up property array for the hashtag
-        if ($this->getNetworkType() == 'twitter_hashtag') {
+        if ('twitter_hashtag' == $this->getNetworkType()) {
             $this->setProperties(
                 [
                     'hashtag'    => $property['hashtag'],
@@ -408,7 +408,7 @@ class Monitoring extends FormEntity
         }
 
         // clean up clean up property array for the custom action
-        if ($this->getNetworkType() == 'twitter_custom') {
+        if ('twitter_custom' == $this->getNetworkType()) {
             $this->setProperties(
                 [
                     'custom' => $property['custom'],

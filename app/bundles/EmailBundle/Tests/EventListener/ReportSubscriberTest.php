@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends \PHPUnit_Framework_TestCase
+class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $connectionMock;
     private $companyReportDataMock;

@@ -434,7 +434,7 @@ class TrackableModelTest extends WebTestCase
             1
         );
 
-        $this->assertTrue((strpos($content, $url) !== false), $content);
+        $this->assertTrue((false !== strpos($content, $url)), $content);
     }
 
     /**
@@ -679,7 +679,7 @@ TEXT;
         }
 
         foreach ($urls as $url) {
-            if ($type == 'html') {
+            if ('html' == $type) {
                 $dnc = ($doNotTrack) ? ' mautic:disable-tracking' : '';
 
                 $content .= <<<CONTENT

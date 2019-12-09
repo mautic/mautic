@@ -12,7 +12,7 @@
 namespace Mautic\WebhookBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Entity\Event;
@@ -21,7 +21,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 
-class WebhookModelTest extends \PHPUnit_Framework_TestCase
+class WebhookModelTest extends \PHPUnit\Framework\TestCase
 {
     private $parametersHelperMock;
     private $serializerMock;
@@ -32,7 +32,7 @@ class WebhookModelTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->parametersHelperMock  = $this->createMock(CoreParametersHelper::class);
-        $this->serializerMock        = $this->createMock(Serializer::class);
+        $this->serializerMock        = $this->createMock(SerializerInterface::class);
         $this->notificationModelMock = $this->createMock(NotificationModel::class);
         $this->entityManagerMock     = $this->createMock(EntityManager::class);
         $this->model                 = $this->initModel();

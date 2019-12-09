@@ -97,7 +97,7 @@ $view['slots']->set(
                                 <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
                                             'mautic.asset.filename.'.$location
                                         ); ?></span></td>
-                                <td><?php echo ($location == 'local') ? $activeAsset->getPath()
+                                <td><?php echo ('local' == $location) ? $activeAsset->getPath()
                                         : $activeAsset->getRemotePath(); ?></td>
                             </tr>
                             </tbody>

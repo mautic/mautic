@@ -76,7 +76,7 @@ class BuilderTokenHelper
             'RETURN_ARRAY'
         );
 
-        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
+        if (1 == count(array_unique($permissions)) && false == end($permissions)) {
             return;
         }
 
@@ -87,7 +87,7 @@ class BuilderTokenHelper
         }
 
         $exprBuilder = $this->factory->getDatabase()->getExpressionBuilder();
-        if ($expr == null) {
+        if (null == $expr) {
             $expr = $exprBuilder->andX();
         }
 

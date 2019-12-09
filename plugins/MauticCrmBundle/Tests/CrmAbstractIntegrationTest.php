@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
+class CrmAbstractIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testFieldMatchingPriority()
     {

@@ -93,7 +93,7 @@ class MauticFactory
      *
      * @param bool $nullIfGuest
      *
-     * @return null|User
+     * @return User|null
      */
     public function getUser($nullIfGuest = false)
     {

@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Asset\Packages;
 
-class AssetsHelperTest extends \PHPUnit_Framework_TestCase
+class AssetsHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAssetContext()
     {

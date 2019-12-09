@@ -47,7 +47,7 @@ class ProfileController extends FormController
 
         //make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
-            if ($permName == 'apiAccess') {
+            if ('apiAccess' == $permName) {
                 continue;
             }
 
@@ -145,7 +145,7 @@ class ProfileController extends FormController
 
         //Check for a submitted form and process it
         $submitted = $this->get('session')->get('formProcessed', 0);
-        if ($this->request->getMethod() == 'POST' && !$submitted) {
+        if ('POST' == $this->request->getMethod() && !$submitted) {
             $this->get('session')->set('formProcessed', 1);
 
             //check to see if the password needs to be rehashed

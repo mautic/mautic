@@ -111,7 +111,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $eventDetails = $event->getEventDetails();
 
-        if ($eventDetails === null) {
+        if (null === $eventDetails) {
             return $event->setResult(true);
         }
 

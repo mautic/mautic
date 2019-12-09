@@ -20,7 +20,7 @@ use Monolog\Logger;
 /**
  * Class AmazonTransportTest.
  */
-class AmazonTransportTest extends \PHPUnit_Framework_TestCase
+class AmazonTransportTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Logger

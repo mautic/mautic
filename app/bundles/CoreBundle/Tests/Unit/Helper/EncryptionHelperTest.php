@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 /**
  * Class EncryptionHelperTest.
  */
-class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
+class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $coreParametersHelperMock;

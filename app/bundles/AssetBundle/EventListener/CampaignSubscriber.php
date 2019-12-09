@@ -76,7 +76,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $asset = $event->getRecord()->getAsset();
 
-        if ($asset !== null) {
+        if (null !== $asset) {
             $this->campaignEventModel->triggerEvent('asset.download', $asset, 'asset', $asset->getId());
         }
     }
@@ -88,7 +88,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $eventDetails = $event->getEventDetails();
 
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return $event->setResult(true);
         }
 

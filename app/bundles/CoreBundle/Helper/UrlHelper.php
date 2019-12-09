@@ -63,7 +63,7 @@ class UrlHelper
         try {
             $response = $this->http->get($this->shortnerServiceUrl.urlencode($url));
 
-            if ($response->code === 200) {
+            if (200 === $response->code) {
                 return rtrim($response->body);
             } elseif ($this->logger) {
                 $this->logger->addWarning("Url shortner failed with code {$response->code}: {$response->body}");
@@ -89,11 +89,11 @@ class UrlHelper
     {
         $path = $host = $scheme = '';
 
-        $ssl    = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
+        $ssl    = !empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS'];
         $scheme = strtolower($_SERVER['SERVER_PROTOCOL']);
         $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
         $port   = $_SERVER['SERVER_PORT'];
-        $port   = ((!$ssl && $port == '80') || ($ssl && $port == '443')) ? '' : ":$port";
+        $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
         $host   = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
         $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
@@ -102,12 +102,12 @@ class UrlHelper
         $base = str_replace('/index.php', '', $base);
 
         /* return if already absolute URL */
-        if (parse_url($rel, PHP_URL_SCHEME) != '') {
+        if ('' != parse_url($rel, PHP_URL_SCHEME)) {
             return $rel;
         }
 
         /* queries and anchors */
-        if ($rel[0] == '#' || $rel[0] == '?') {
+        if ('#' == $rel[0] || '?' == $rel[0]) {
             return $base.$rel;
         }
 
@@ -116,7 +116,7 @@ class UrlHelper
         $urlPartsArray = parse_url($base);
 
         // We should have a valid URL by this point. If not, just return the original value
-        if ($urlPartsArray === false) {
+        if (false === $urlPartsArray) {
             return $rel;
         }
 
@@ -126,12 +126,12 @@ class UrlHelper
         $path = preg_replace('#/[^/]*$#', '', $path);
 
         /* destroy path if relative url points to root */
-        if ($rel[0] == '/') {
+        if ('/' == $rel[0]) {
             $path = '';
         }
 
         /* dirty absolute URL // with port number if exists */
-        if (parse_url($base, PHP_URL_PORT) != '') {
+        if ('' != parse_url($base, PHP_URL_PORT)) {
             $abs = "$host:".parse_url($base, PHP_URL_PORT)."$path/$rel";
         } else {
             $abs = "$host$path/$rel";
@@ -159,7 +159,7 @@ class UrlHelper
         $urls = [];
         // Check if there are any tokens that URL based fields
         foreach ($contactUrlFields as $field) {
-            if (strpos($text, "{contactfield=$field}") !== false) {
+            if (false !== strpos($text, "{contactfield=$field}")) {
                 $urls[] = "{contactfield=$field}";
             }
         }
@@ -218,13 +218,13 @@ class UrlHelper
      */
     private static function sanitizeUrlScheme($url)
     {
-        $isRelative = strpos($url, '//') === 0;
+        $isRelative = 0 === strpos($url, '//');
 
         if ($isRelative) {
             return $url;
         }
 
-        $containSlashes = strpos($url, '://') !== false;
+        $containSlashes = false !== strpos($url, '://');
 
         if (!$containSlashes) {
             $url = sprintf('://%s', $url);
@@ -269,7 +269,7 @@ class UrlHelper
     private static function removeTrailingNonAlphaNumeric($string)
     {
         // Special handling of closing bracket
-        if (substr($string, -1) === '}' && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
+        if ('}' === substr($string, -1) && preg_match('/^[^{\r\n]*\}.*?$/', $string)) {
             $string = substr($string, 0, -1);
 
             return self::removeTrailingNonAlphaNumeric($string);

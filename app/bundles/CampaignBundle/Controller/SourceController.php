@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Controller;
 
-use Mautic\CampaignBundle\Entity\Source;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -30,7 +29,7 @@ class SourceController extends CommonFormController
         $valid   = $cancelled   = false;
         $method  = $this->request->getMethod();
         $session = $this->get('session');
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $source     = $this->request->request->get('campaign_leadsource');
             $sourceType = $source['sourceType'];
         } else {
@@ -69,7 +68,7 @@ class SourceController extends CommonFormController
         );
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -132,7 +131,7 @@ class SourceController extends CommonFormController
         $session         = $this->get('session');
         $method          = $this->request->getMethod();
         $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $source     = $this->request->request->get('campaign_leadsource');
             $sourceType = $source['sourceType'];
         } else {
@@ -174,7 +173,7 @@ class SourceController extends CommonFormController
         );
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -231,7 +230,7 @@ class SourceController extends CommonFormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -254,7 +253,7 @@ class SourceController extends CommonFormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             // Add the field to the delete list
             if (isset($modifiedSources[$sourceType])) {
                 unset($modifiedSources[$sourceType]);

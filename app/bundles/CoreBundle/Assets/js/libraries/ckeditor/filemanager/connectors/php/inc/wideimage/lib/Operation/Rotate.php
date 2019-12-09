@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -28,15 +29,15 @@
             }
             $angle = $angle % 360;
 
-            if ($angle == 0) {
+            if (0 == $angle) {
                 return $image->copy();
             }
 
             $image = $image->asTrueColor();
 
-            if ($bgColor === null) {
+            if (null === $bgColor) {
                 $bgColor = $image->getTransparentColor();
-                if ($bgColor == -1) {
+                if (-1 == $bgColor) {
                     $bgColor = $image->allocateColorAlpha(255, 255, 255, 127);
                     imagecolortransparent($image->getHandle(), $bgColor);
                 }

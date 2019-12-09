@@ -353,7 +353,7 @@ trait FilterTrait
         } else {
             if (!empty($customOptions['constraints'])) {
                 foreach ($customOptions['constraints'] as $i => $constraint) {
-                    if (get_class($constraint) === 'NotBlank') {
+                    if ('NotBlank' === get_class($constraint)) {
                         array_splice($customOptions['constraints'], $i, 1);
                     }
                 }
@@ -397,7 +397,7 @@ trait FilterTrait
             ]
         );
 
-        if ($eventName == FormEvents::PRE_SUBMIT) {
+        if (FormEvents::PRE_SUBMIT == $eventName) {
             $event->setData($data);
         }
     }

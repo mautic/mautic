@@ -110,10 +110,10 @@ abstract class AbstractFormFieldHelper
         $checkNumericalKeys = true;
         if (!is_array($list)) {
             // Try to json decode first
-            if (strpos($list, '{') === 0 && $json = json_decode($list, true)) {
+            if (0 === strpos($list, '{') && $json = json_decode($list, true)) {
                 $list = $json;
             } else {
-                if (strpos($list, '|') !== false) {
+                if (false !== strpos($list, '|')) {
                     $checkNumericalKeys = false;
                     $parts              = explode('||', $list);
                     if (count($parts) > 1) {

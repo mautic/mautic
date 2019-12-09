@@ -23,7 +23,7 @@ class AjaxController extends CommonAjaxController
         $url = InputHelper::url($request->request->get('url'));
 
         // validate the URL
-        if ($url == '' || !$url) {
+        if ('' == $url || !$url) {
             // default to an error message
             $dataArray = [
                 'success' => 1,
@@ -63,7 +63,7 @@ class AjaxController extends CommonAjaxController
         ];
 
         // if we get a 2xx response convert to success message
-        if (substr($response->code, 0, 1) == 2) {
+        if (2 == substr($response->code, 0, 1)) {
             $dataArray['html'] =
                 '<div class="has-success"><span class="help-block">'
                 .$this->translator->trans('mautic.webhook.label.success')

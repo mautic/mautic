@@ -126,7 +126,7 @@ class FieldModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Field();
         }
 

@@ -208,7 +208,7 @@ class CampaignSubscriber extends CommonSubscriber
             return false;
         }
 
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return true;
         }
         $pageHit = $eventDetails->getPage();

@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -17,7 +18,7 @@
 
         public function save($handle, $uri = null)
         {
-            if ($uri == null) {
+            if (null == $uri) {
                 return imagegd($handle);
             } else {
                 return imagegd($handle, $uri);

@@ -31,7 +31,7 @@ class RouteSubscriber extends CommonSubscriber
             $request = $event->getRequest();
 
             $route = $request->attributes->get('_route');
-            if (strpos($route, 'lightsaml') !== false && empty($this->params['saml_idp_metadata'])) {
+            if (false !== strpos($route, 'lightsaml') && empty($this->params['saml_idp_metadata'])) {
                 throw new NotFoundHttpException();
             }
         }

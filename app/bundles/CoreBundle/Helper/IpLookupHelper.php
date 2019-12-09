@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class IpLookupHelper
 {
     /**
-     * @var null|Request
+     * @var Request|null
      */
     protected $request;
 
@@ -103,7 +103,7 @@ class IpLookupHelper
                 if ($this->request->server->get($key)) {
                     $ip = trim($this->request->server->get($key));
 
-                    if (strpos($ip, ',') !== false) {
+                    if (false !== strpos($ip, ',')) {
                         $ip = $this->getClientIpFromProxyList($ip);
                     }
 
@@ -130,7 +130,7 @@ class IpLookupHelper
     {
         static $ipAddresses = [];
 
-        if ($ip === null) {
+        if (null === $ip) {
             $ip = $this->getIpAddressFromRequest();
         }
 
@@ -142,9 +142,9 @@ class IpLookupHelper
         if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
-            $saveIp    = ($ipAddress === null);
+            $saveIp    = (null === $ipAddress);
 
-            if ($ipAddress === null) {
+            if (null === $ipAddress) {
                 $ipAddress = new IpAddress();
                 if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
                     $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
@@ -176,7 +176,7 @@ class IpLookupHelper
             if ($ipAddress->isTrackable() && $this->request) {
                 $userAgent = $this->request->headers->get('User-Agent');
                 foreach ($this->doNotTrackBots as $bot) {
-                    if (strpos($userAgent, $bot) !== false) {
+                    if (false !== strpos($userAgent, $bot)) {
                         $doNotTrack[] = $ip;
                         $ipAddress->setDoNotTrackList($doNotTrack);
                         continue;

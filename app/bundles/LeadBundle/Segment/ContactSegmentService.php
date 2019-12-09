@@ -196,7 +196,7 @@ class ContactSegmentService
     /**
      * @param LeadList $segment
      * @param array    $batchLimiters
-     * @param null|int $limit
+     * @param int|null $limit
      *
      * @return array
      *
@@ -259,7 +259,7 @@ class ContactSegmentService
     /**
      * @param LeadList $segment
      * @param array    $batchLimiters
-     * @param null|int $limit
+     * @param int|null $limit
      *
      * @return QueryBuilder
      *

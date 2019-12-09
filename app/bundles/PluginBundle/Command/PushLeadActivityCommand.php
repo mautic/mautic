@@ -94,7 +94,7 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             /** @var AbstractIntegration $integrationObject */
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {
+            if (null !== $integrationObject && method_exists($integrationObject, 'pushLeadActivity')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.push.leads.activity', ['%integration%' => $integration]).'</info>');
 
                 $params['start'] = $startDate;

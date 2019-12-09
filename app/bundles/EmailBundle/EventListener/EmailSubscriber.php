@@ -120,7 +120,7 @@ class EmailSubscriber extends CommonSubscriber
         if (isset($message->leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
 
-            if ($stat !== null) {
+            if (null !== $stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
                     '%subject%' => EmojiHelper::toShort($message->getSubject()),
                 ]);
@@ -140,7 +140,7 @@ class EmailSubscriber extends CommonSubscriber
 
         if (isset($message->leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($message->leadIdHash);
-            if ($stat !== null) {
+            if (null !== $stat) {
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();

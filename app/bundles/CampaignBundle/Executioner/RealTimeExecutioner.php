@@ -238,7 +238,7 @@ class RealTimeExecutioner
     {
         $this->logger->debug('CAMPAIGN: Executing '.$event->getType().' ID '.$event->getId().' for contact ID '.$this->contact->getId());
 
-        if ($event->getEventType() !== Event::TYPE_DECISION) {
+        if (Event::TYPE_DECISION !== $event->getEventType()) {
             @trigger_error(
                 "{$event->getType()} is not assigned to a decision and no longer supported. ".
                 'Check that you are executing RealTimeExecutioner::execute for an event registered as a decision.',
@@ -249,7 +249,7 @@ class RealTimeExecutioner
         }
 
         // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
-        if ($channel && $event->getChannel() && strpos($channel, $event->getChannel()) === false) {
+        if ($channel && $event->getChannel() && false === strpos($channel, $event->getChannel())) {
             throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
         }
 
@@ -259,19 +259,19 @@ class RealTimeExecutioner
 
         // Check if parent taken path is the path of this event, otherwise exit
         $parentEvent = $event->getParent();
-        if ($parentEvent !== null && $event->getDecisionPath() !== null) {
+        if (null !== $parentEvent && null !== $event->getDecisionPath()) {
             $rotation    = $this->leadRepository->getContactRotations([$this->contact->getId()], $event->getCampaign()->getId());
             $log         = $parentEvent->getLogByContactAndRotation($this->contact, $rotation);
 
-            if ($log === null) {
+            if (null === $log) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} has not been fired, event {$event->getId()} should not be fired.");
             }
 
             $pathTaken   = (int) $log->getNonActionPathTaken();
 
-            if ($pathTaken === 1 && !$parentEvent->getNegativeChildren()->contains($event)) {
+            if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
-            } elseif ($pathTaken === 0 && !$parentEvent->getPositiveChildren()->contains($event)) {
+            } elseif (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take positive path, event {$event->getId()} is on negative path.");
             }
         }

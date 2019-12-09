@@ -203,7 +203,7 @@ class TwitterCommandHelper
             $usersByHandles[] = $expr->literal($status['user']['screen_name']);
 
             // Split the twitter user's name into its parts if we're matching to contacts by name
-            if ($monitorProperties['checknames'] && $status['user']['name'] && strpos($status['user']['name'], ' ') !== false) {
+            if ($monitorProperties['checknames'] && $status['user']['name'] && false !== strpos($status['user']['name'], ' ')) {
                 list($firstName, $lastName) = $this->splitName($status['user']['name']);
 
                 if (!empty($firstName) && !empty($lastName)) {

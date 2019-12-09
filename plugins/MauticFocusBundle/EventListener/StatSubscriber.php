@@ -58,7 +58,7 @@ class StatSubscriber extends CommonSubscriber
         $hit    = $event->getHit();
         $source = $hit->getSource();
 
-        if ($source == 'focus' || $source == 'focus.focus') {
+        if ('focus' == $source || 'focus.focus' == $source) {
             $sourceId = $hit->getSourceId();
             $focus    = $this->model->getEntity($sourceId);
 

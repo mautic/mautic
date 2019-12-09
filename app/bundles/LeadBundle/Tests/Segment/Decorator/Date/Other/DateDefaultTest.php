@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
-class DateDefaultTest extends \PHPUnit_Framework_TestCase
+class DateDefaultTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault::getParameterValue

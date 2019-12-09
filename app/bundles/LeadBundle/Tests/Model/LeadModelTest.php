@@ -31,7 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class LeadModelTest extends \PHPUnit_Framework_TestCase
+class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
     private $requestStackMock;
     private $cookieHelperMock;

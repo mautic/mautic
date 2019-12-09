@@ -20,7 +20,7 @@ use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends \PHPUnit_Framework_TestCase
+class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MaintenanceSubscriber

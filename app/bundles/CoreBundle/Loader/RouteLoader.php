@@ -72,7 +72,7 @@ class RouteLoader extends Loader
         $forceSSL = false;
         if (!empty($siteUrl)) {
             $parts    = parse_url($siteUrl);
-            $forceSSL = (!empty($parts['scheme']) && $parts['scheme'] == 'https');
+            $forceSSL = (!empty($parts['scheme']) && 'https' == $parts['scheme']);
         }
 
         if ($forceSSL) {

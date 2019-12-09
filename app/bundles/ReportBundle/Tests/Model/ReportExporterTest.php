@@ -24,7 +24,7 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporterTest extends \PHPUnit_Framework_TestCase
+class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessExport()
     {

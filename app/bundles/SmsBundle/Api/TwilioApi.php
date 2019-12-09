@@ -89,7 +89,7 @@ class TwilioApi extends AbstractSmsApi
     {
         $number = $lead->getLeadPhoneNumber();
 
-        if ($number === null) {
+        if (null === $number) {
             return false;
         }
 

@@ -44,11 +44,11 @@ class AjaxController extends CommonController
     {
         $response = new JsonResponse();
 
-        if ($this->container->getParameter('kernel.environment') == 'dev' && $addIgnoreWdt) {
+        if ('dev' == $this->container->getParameter('kernel.environment') && $addIgnoreWdt) {
             $dataArray['ignore_wdt'] = 1;
         }
 
-        if ($statusCode !== null) {
+        if (null !== $statusCode) {
             $response->setStatusCode($statusCode);
         }
 
@@ -74,19 +74,19 @@ class AjaxController extends CommonController
         }
 
         if ($authenticationChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
-            if (strpos($action, ':') !== false) {
+            if (false !== strpos($action, ':')) {
                 //call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
                 $isPlugin  = false;
 
-                if (count($parts) == 3 && $parts['0'] == 'plugin') {
+                if (3 == count($parts) && 'plugin' == $parts['0']) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
                     $isPlugin = true;
                 }
 
-                if (count($parts) == 2) {
+                if (2 == count($parts)) {
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
@@ -171,13 +171,13 @@ class AjaxController extends CommonController
             if (is_array($c)) {
                 foreach ($c as $subc) {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                     $dataArray[$command.$translator->trans($subc)] = ['value' => $command.$translator->trans($subc)];
                 }
             } else {
                 $command = $translator->trans($c);
-                $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                 $dataArray[$command] = ['value' => $command];
             }
@@ -208,7 +208,7 @@ class AjaxController extends CommonController
             foreach ($commands as $k => $c) {
                 if (is_array($c)) {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                     foreach ($c as $subc) {
                         $subcommand = $command.$translator->trans($subc);
@@ -219,7 +219,7 @@ class AjaxController extends CommonController
                     }
                 } else {
                     $command = $translator->trans($k);
-                    $command = (strpos($command, ':') === false) ? $command.':' : $command;
+                    $command = (false === strpos($command, ':')) ? $command.':' : $command;
 
                     if (!in_array($command, $dupChecker)) {
                         $dataArray[]  = ['value' => $command];
@@ -257,7 +257,7 @@ class AjaxController extends CommonController
         }
 
         $entity = $model->getEntity($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             $permissionBase = $model->getPermissionBase();
             $security       = $this->get('mautic.security');
             $createdBy      = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
@@ -328,7 +328,7 @@ class AjaxController extends CommonController
 
         if (method_exists($entity, 'getCheckedOutBy')) {
             $checkedOut = $entity->getCheckedOutBy();
-            if ($entity !== null && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
+            if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
@@ -427,7 +427,7 @@ class AjaxController extends CommonController
         $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
 
-        if ($archive !== true) {
+        if (true !== $archive) {
             // Get the exact error
             switch ($archive) {
                 case \ZipArchive::ER_EXISTS:
@@ -544,7 +544,7 @@ class AjaxController extends CommonController
             if (!isset($result['error'])) {
                 foreach ($supportedLanguages as $locale => $name) {
                     // We don't need to update en_US, that comes with the main package
-                    if ($locale == 'en_US') {
+                    if ('en_US' == $locale) {
                         continue;
                     }
 
@@ -564,7 +564,7 @@ class AjaxController extends CommonController
             $env  = $this->factory->getEnvironment();
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env];
 
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 $args[] = '--no-debug';
             }
 
@@ -582,7 +582,7 @@ class AjaxController extends CommonController
             $result = $application->run($input, $output);
         }
 
-        if ($result !== 0) {
+        if (0 !== $result) {
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $output->fetch()));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
@@ -681,7 +681,7 @@ class AjaxController extends CommonController
 
         $currentStatus = $this->user->getOnlineStatus();
         if (!in_array($currentStatus, ['manualaway', 'dnd'])) {
-            if ($status == 'back') {
+            if ('back' == $status) {
                 $status = 'online';
             }
 

@@ -323,7 +323,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
         $field = $this->createField($name, $type)
             ->nullable();
 
-        if ($columnName !== null) {
+        if (null !== $columnName) {
             $field->columnName($columnName);
         }
 

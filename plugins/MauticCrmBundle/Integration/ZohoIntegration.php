@@ -141,9 +141,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                 foreach ($fl as $field) {
                     // Fix boolean comparison
                     $value = $field['content'];
-                    if ($field['content'] === 'true') {
+                    if ('true' === $field['content']) {
                         $value = true;
-                    } elseif ($field['content'] === 'false') {
+                    } elseif ('false' === $field['content']) {
                         $value = false;
                     }
 
@@ -610,7 +610,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'updateBlanks',
                 ChoiceType::class,
@@ -628,7 +628,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 ]
             );
         }
-        if ($formArea === 'keys') {
+        if ('keys' === $formArea) {
             $builder->add(
                 'datacenter',
                 ChoiceType::class,
@@ -692,7 +692,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $response = $this->makeRequest($request_url, $parameters, 'POST', ['authorize_session' => true]);
 
-        if ($response['RESULT'] == 'FALSE') {
+        if ('FALSE' == $response['RESULT']) {
             return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
         }
 
@@ -812,7 +812,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                                     'type'     => 'string',
                                     'label'    => $field['label'],
                                     'dv'       => $field['dv'],
-                                    'required' => $field['req'] === 'true',
+                                    'required' => 'true' === $field['req'],
                                 ];
                             }
                         }
@@ -826,7 +826,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
-                if (strpos($exception->getMessage(), 'Invalid Ticket Id') !== false) {
+                if (false !== strpos($exception->getMessage(), 'Invalid Ticket Id')) {
                     // Use a bit more friendly message
                     $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
                 }
@@ -1199,12 +1199,12 @@ class ZohoIntegration extends CrmAbstractIntegration
     public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
         //check if update blank fields is selected
-        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && 'updateBlanks' == $config['updateBlanks'][0]) {
             foreach ($sfRecord as $fieldName => $sfField) {
                 if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
                     continue; // this will be treated differently
                 }
-                if ($sfField === 'null' && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                if ('null' === $sfField && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
                     //map to mautic field
                     $fields[$fieldName] = $objectFields['create'][$fieldName];
                 }

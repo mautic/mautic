@@ -186,7 +186,7 @@ class ListModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
@@ -1197,7 +1197,7 @@ class ListModel extends FormModel
                 continue;
             }
 
-            if ($searchListLead == -1) {
+            if (-1 == $searchListLead) {
                 $listLead = null;
             } elseif ($searchListLead) {
                 $listLead = $this->getListLeadRepository()->findOneBy(
@@ -1793,7 +1793,7 @@ class ListModel extends FormModel
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
-                if ($eachFilter['type'] === 'leadlist' && in_array($segmentId, $eachFilter['filter'])) {
+                if ('leadlist' === $eachFilter['type'] && in_array($segmentId, $eachFilter['filter'])) {
                     $dependents[] = $entity->getName();
                 }
             }
@@ -1830,7 +1830,7 @@ class ListModel extends FormModel
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
-                if ($eachFilter['type'] !== 'leadlist') {
+                if ('leadlist' !== $eachFilter['type']) {
                     continue;
                 }
 

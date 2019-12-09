@@ -11,7 +11,7 @@ namespace MauticCrmBundle\Api;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsApiTest extends \PHPUnit_Framework_TestCase
+class DynamicsApiTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DynamicsApi */
     private $api;
@@ -30,25 +30,5 @@ class DynamicsApiTest extends \PHPUnit_Framework_TestCase
     public function testIntegration()
     {
         $this->assertSame('Dynamics', $this->integration->getName());
-    }
-
-    public function testGetLeads()
-    {
-    }
-
-    public function testGetLeadFields()
-    {
-    }
-
-    public function testCompanies()
-    {
-    }
-
-    public function testCreateLead()
-    {
-    }
-
-    public function testRequest()
-    {
     }
 }

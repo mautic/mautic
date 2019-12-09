@@ -93,7 +93,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                 $formFields = $formEntity->getFields();
 
                 foreach ($formFields as $field) {
-                    if ($field->getType() != 'button') {
+                    if ('button' != $field->getType()) {
                         $fields[$field->getAlias()]  = $field->getLabel();
                         $options[$field->getAlias()] = [];
                         $properties                  = $field->getProperties();

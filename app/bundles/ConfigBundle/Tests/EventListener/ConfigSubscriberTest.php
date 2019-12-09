@@ -8,7 +8,7 @@ use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents()
     {
@@ -55,7 +55,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $paramHelper->method('getParameter')->will($this->returnCallback(function ($param) {
-            if ($param === 'kernel.root_dir') {
+            if ('kernel.root_dir' === $param) {
                 return '/some/path';
             }
 

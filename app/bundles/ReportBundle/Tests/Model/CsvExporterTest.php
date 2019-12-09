@@ -20,7 +20,7 @@ use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CsvExporterTest extends \PHPUnit_Framework_TestCase
+class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testExport()
     {

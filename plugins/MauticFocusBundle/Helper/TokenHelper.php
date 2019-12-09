@@ -59,7 +59,7 @@ class TokenHelper
             foreach ($matches[1] as $k => $id) {
                 $token = '{focus='.$id.'}';
                 $focus = $this->model->getEntity($id);
-                if ($focus !== null
+                if (null !== $focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(

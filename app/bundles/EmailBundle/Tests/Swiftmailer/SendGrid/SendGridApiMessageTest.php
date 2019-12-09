@@ -18,7 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage;
 use SendGrid\Mail;
 
-class SendGridApiMessageTest extends \PHPUnit_Framework_TestCase
+class SendGridApiMessageTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetMail()
     {

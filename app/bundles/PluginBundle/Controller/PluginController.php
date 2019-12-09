@@ -14,7 +14,6 @@ namespace Mautic\PluginBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -166,7 +165,7 @@ class PluginController extends FormController
 
         $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
         $limit  = $this->coreParametersHelper->getParameter('default_pagelimit');
-        $start  = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start  = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -192,7 +191,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);

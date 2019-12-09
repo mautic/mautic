@@ -355,7 +355,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'role') {
+        if ('role' == $prop) {
             if ($current && !$val) {
                 $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$this->role && $val) {
@@ -787,7 +787,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
      */
     public function isAdmin()
     {
-        if ($this->role !== null) {
+        if (null !== $this->role) {
             return $this->role->isAdmin();
         } else {
             return false;

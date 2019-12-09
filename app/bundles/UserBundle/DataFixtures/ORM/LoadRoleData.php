@@ -15,25 +15,21 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\Role;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\UserBundle\Model\RoleModel;
 
-/**
- * Class LoadRoleData.
- */
-class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var RoleModel
      */
-    private $container;
+    private $roleModel;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(RoleModel $roleModel)
     {
-        $this->container = $container;
+        $this->roleModel = $roleModel;
     }
 
     /**
@@ -61,7 +57,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, C
             'user:profile' => ['editname'],
             'lead:leads'   => ['full'],
         ];
-        $this->container->get('mautic.user.model.role')->setRolePermissions($role, $permissions);
+        $this->roleModel->setRolePermissions($role, $permissions);
 
         $manager->persist($role);
         $manager->flush();

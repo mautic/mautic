@@ -83,11 +83,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param null $id
      *
-     * @return null|DynamicContent
+     * @return DynamicContent|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new DynamicContent();
         }
 
@@ -284,7 +284,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
@@ -295,7 +295,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.total.views'), $data);
         }
 
-        if ($flag === 'unique' || $flag === 'total_and_unique') {
+        if ('unique' === $flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
             $q->groupBy('t.lead_id, t.date_sent');
 

@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Templating\Helper\ContentHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContentHelperTest extends \PHPUnit_Framework_TestCase
+class ContentHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAssetContext()
     {

@@ -46,7 +46,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
     protected $integrationHelper;
 
     /**
-     * @var null|RequestStack
+     * @var RequestStack|null
      */
     protected $requestStack;
 

@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -38,7 +39,7 @@
                         }
 
                         $color = $copy->getExactColorAlpha($newRGBA);
-                        if ($color == -1) {
+                        if (-1 == $color) {
                             $color = $copy->allocateColorAlpha($newRGBA);
                         }
 

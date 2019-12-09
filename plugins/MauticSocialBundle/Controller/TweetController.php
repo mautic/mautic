@@ -105,7 +105,7 @@ class TweetController extends FormController
      */
     public function getUpdateSelect()
     {
-        return ($this->request->getMethod() == 'POST')
+        return ('POST' == $this->request->getMethod())
             ? $this->request->request->get('twitter_tweet[updateSelect]', false, true)
             : $this->request->get('updateSelect', false);
     }
@@ -152,7 +152,7 @@ class TweetController extends FormController
      */
     protected function getTemplateName($file)
     {
-        if ($file === 'form.html.php' && $this->request->get('modal') == 1) {
+        if ('form.html.php' === $file && 1 == $this->request->get('modal')) {
             return parent::getTemplateName('form.modal.html.php');
         }
 

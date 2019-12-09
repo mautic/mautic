@@ -123,6 +123,7 @@ class PathsHelper
                     return $this->temporaryDir;
                 }
 
+                // no break
             case 'images':
                 $path = $this->imagePath;
                 break;
@@ -132,7 +133,7 @@ class PathsHelper
                 //these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
-                if ($name == 'dashboard.global') {
+                if ('dashboard.global' == $name) {
                     return $globalPath;
                 }
 
@@ -151,7 +152,7 @@ class PathsHelper
             default:
                 if (isset($this->paths[$name])) {
                     $path = $this->paths[$name];
-                } elseif (strpos($name, '_root') !== false) {
+                } elseif (false !== strpos($name, '_root')) {
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
@@ -162,7 +163,7 @@ class PathsHelper
         if ($fullPath) {
             $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
 
-            if (strpos($path, $rootPath) === false) {
+            if (false === strpos($path, $rootPath)) {
                 return $rootPath.'/'.$path;
             }
         }
@@ -177,7 +178,7 @@ class PathsHelper
      */
     private function removeTrailingSlash($dir)
     {
-        if (substr($dir, -1) === '/') {
+        if ('/' === substr($dir, -1)) {
             $dir = substr($dir, 0, -1);
         }
 

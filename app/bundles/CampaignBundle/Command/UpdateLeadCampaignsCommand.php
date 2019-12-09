@@ -182,7 +182,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         if ($id) {
             $campaign = $this->campaignRepository->getEntity($id);
-            if ($campaign === null) {
+            if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
                 return 0;
@@ -196,7 +196,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 ]
             );
 
-            while (($results = $campaigns->next()) !== false) {
+            while (false !== ($results = $campaigns->next())) {
                 // Get first item; using reset as the key will be the ID and not 0
                 $campaign = reset($results);
 

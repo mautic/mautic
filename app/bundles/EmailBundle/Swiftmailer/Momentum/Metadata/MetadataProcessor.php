@@ -106,7 +106,7 @@ class MetadataProcessor
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getCampaignId()
     {

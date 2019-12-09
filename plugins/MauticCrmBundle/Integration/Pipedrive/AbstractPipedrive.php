@@ -141,7 +141,7 @@ abstract class AbstractPipedrive
     /**
      * @param array $criteria
      *
-     * @return IntegrationEntity|null|object
+     * @return IntegrationEntity|object|null
      */
     protected function getLeadIntegrationEntity(array $criteria = [])
     {
@@ -154,7 +154,7 @@ abstract class AbstractPipedrive
     /**
      * @param array $criteria
      *
-     * @return IntegrationEntity|null|object
+     * @return IntegrationEntity|object|null
      */
     protected function getCompanyIntegrationEntity(array $criteria = [])
     {
@@ -167,7 +167,7 @@ abstract class AbstractPipedrive
     /**
      * @param array $criteria
      *
-     * @return IntegrationEntity|null|object
+     * @return IntegrationEntity|object|null
      */
     private function getIntegrationEntity(array $criteria = [])
     {

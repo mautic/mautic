@@ -76,8 +76,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         }
 
         $startDate = $parent->getVariantStartDate();
-        if ($startDate != null && !empty($ids)) {
-            $counts = ($type == 'page') ? $repo->getSubmissionCountsByPage($ids, $startDate) : $repo->getSubmissionCountsByEmail($ids, $startDate);
+        if (null != $startDate && !empty($ids)) {
+            $counts = ('page' == $type) ? $repo->getSubmissionCountsByPage($ids, $startDate) : $repo->getSubmissionCountsByEmail($ids, $startDate);
 
             $translator = $this->translator;
             if ($counts) {
@@ -85,7 +85,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 $hasResults  = [];
 
                 $submissionLabel = $translator->trans('mautic.form.abtest.label.submissions');
-                $hitLabel        = ($type == 'page') ? $translator->trans('mautic.form.abtest.label.hits') : $translator->trans('mautic.form.abtest.label.sentemils');
+                $hitLabel        = ('page' == $type) ? $translator->trans('mautic.form.abtest.label.hits') : $translator->trans('mautic.form.abtest.label.sentemils');
 
                 foreach ($counts as $stats) {
                     $submissionRate            = ($stats['total']) ? round(($stats['count'] / $stats['total']) * 100, 2) : 0;
@@ -100,7 +100,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$submissionLabel][] = 0;
                     $data[$hitLabel][]        = 0;
-                    $support['labels'][]      = (($type == 'page') ? $parent->getTitle() : $parent->getName()).' (0%)';
+                    $support['labels'][]      = (('page' == $type) ? $parent->getTitle() : $parent->getName()).' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -108,7 +108,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$submissionLabel][] = 0;
                             $data[$hitLabel][]        = 0;
-                            $support['labels'][]      = (($type == 'page') ? $c->getTitle() : $c->getName()).' (0%)';
+                            $support['labels'][]      = (('page' == $type) ? $c->getTitle() : $c->getName()).' (0%)';
                         }
                     }
                 }

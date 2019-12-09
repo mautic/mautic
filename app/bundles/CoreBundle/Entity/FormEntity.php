@@ -28,22 +28,22 @@ class FormEntity extends CommonEntity
     private $isPublished = true;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $dateAdded = null;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $createdBy;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $createdByUser;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $dateModified;
 
@@ -53,22 +53,22 @@ class FormEntity extends CommonEntity
     private $modifiedBy;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $modifiedByUser;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $checkedOut;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $checkedOutBy;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $checkedOutByUser;
 
@@ -194,17 +194,17 @@ class FormEntity extends CommonEntity
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
-            if ($status == 'published') {
+            if ('published' == $status) {
                 //check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
-                    if ($category !== null && !$category->isPublished()) {
+                    if (null !== $category && !$category->isPublished()) {
                         return false;
                     }
                 }
             }
 
-            return ($status == 'published') ? true : false;
+            return ('published' == $status) ? true : false;
         }
 
         return $this->getIsPublished();
@@ -292,11 +292,11 @@ class FormEntity extends CommonEntity
      */
     public function setCreatedBy($createdBy = null)
     {
-        if ($createdBy != null && !$createdBy instanceof User) {
+        if (null != $createdBy && !$createdBy instanceof User) {
             $this->createdBy = $createdBy;
         } else {
-            $this->createdBy = ($createdBy != null) ? $createdBy->getId() : null;
-            if ($createdBy != null) {
+            $this->createdBy = (null != $createdBy) ? $createdBy->getId() : null;
+            if (null != $createdBy) {
                 $this->createdByUser = $createdBy->getName();
             }
         }
@@ -323,12 +323,12 @@ class FormEntity extends CommonEntity
      */
     public function setModifiedBy($modifiedBy = null)
     {
-        if ($modifiedBy != null && !$modifiedBy instanceof User) {
+        if (null != $modifiedBy && !$modifiedBy instanceof User) {
             $this->modifiedBy = $modifiedBy;
         } else {
-            $this->modifiedBy = ($modifiedBy != null) ? $modifiedBy->getId() : null;
+            $this->modifiedBy = (null != $modifiedBy) ? $modifiedBy->getId() : null;
 
-            if ($modifiedBy != null) {
+            if (null != $modifiedBy) {
                 $this->modifiedByUser = $modifiedBy->getName();
             }
         }
@@ -355,12 +355,12 @@ class FormEntity extends CommonEntity
      */
     public function setCheckedOutBy($checkedOutBy = null)
     {
-        if ($checkedOutBy != null && !$checkedOutBy instanceof User) {
+        if (null != $checkedOutBy && !$checkedOutBy instanceof User) {
             $this->checkedOutBy = $checkedOutBy;
         } else {
-            $this->checkedOutBy = ($checkedOutBy != null) ? $checkedOutBy->getId() : null;
+            $this->checkedOutBy = (null != $checkedOutBy) ? $checkedOutBy->getId() : null;
 
-            if ($checkedOutBy != null) {
+            if (null != $checkedOutBy) {
                 $this->checkedOutByUser = $checkedOutBy->getName();
             }
         }

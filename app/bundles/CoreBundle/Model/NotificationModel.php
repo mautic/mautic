@@ -124,11 +124,11 @@ class NotificationModel extends FormModel
         \DateTime $datetime = null,
         User $user = null
     ) {
-        if ($user === null) {
+        if (null === $user) {
             $user = $this->userHelper->getUser();
         }
 
-        if ($user === null || !$user->getId()) {
+        if (null === $user || !$user->getId()) {
             //ensure notifications aren't written for non users
             return;
         }
@@ -140,7 +140,7 @@ class NotificationModel extends FormModel
         $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
-        if ($datetime == null) {
+        if (null == $datetime) {
             $datetime = new \DateTime();
         }
         $notification->setDateAdded($datetime);

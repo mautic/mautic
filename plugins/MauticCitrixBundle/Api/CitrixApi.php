@@ -113,7 +113,7 @@ class CitrixApi
     private function isInvalidTokenFromReponse(Response $request)
     {
         $responseData = $this->integration->parseCallbackResponse($request->body);
-        if (isset($responseData['int_err_code']) && $responseData['int_err_code'] == 'InvalidToken') {
+        if (isset($responseData['int_err_code']) && 'InvalidToken' == $responseData['int_err_code']) {
             return true;
         }
 

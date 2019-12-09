@@ -37,13 +37,13 @@ class ModelFactory
     public function getModel($modelNameKey)
     {
         // Shortcut for models with the same name as the bundle
-        if (strpos($modelNameKey, '.') === false) {
+        if (false === strpos($modelNameKey, '.')) {
             $modelNameKey = "$modelNameKey.$modelNameKey";
         }
 
         $parts = explode('.', $modelNameKey);
 
-        if (count($parts) !== 2) {
+        if (2 !== count($parts)) {
             throw new \InvalidArgumentException($modelNameKey.' is not a valid model key.');
         }
 

@@ -111,7 +111,7 @@ class SysinfoModel
         ];
 
         // Show the spool folder only if the email queue is configured
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+        if ('file' == $this->coreParametersHelper->getParameter('mailer_spool_type')) {
             $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
         }
 
@@ -160,8 +160,8 @@ class SysinfoModel
 
         fseek($f, -1, SEEK_END);
 
-        if (fread($f, 1) != "\n") {
-            $lines -= 1;
+        if ("\n" != fread($f, 1)) {
+            --$lines;
         }
 
         while (ftell($f) > 0 && $lines >= 0) {

@@ -67,7 +67,7 @@ class ConfigSubscriber extends CommonSubscriber
 
         // Don't erase password if someone doesn't provide it
         foreach ($data as $key => $value) {
-            if (empty($value) && strpos($key, 'password') !== false) {
+            if (empty($value) && false !== strpos($key, 'password')) {
                 $data[$key] = $this->coreParametersHelper->getParameter($key);
             }
         }

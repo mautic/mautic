@@ -96,7 +96,7 @@ class MaintenanceSubscriber extends CommonSubscriber
             while (true) {
                 $ids = array_column($qb->execute()->fetchAll(), 'id');
 
-                if (sizeof($ids) === 0) {
+                if (0 === sizeof($ids)) {
                     break;
                 }
 

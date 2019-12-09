@@ -115,7 +115,7 @@ class AjaxController extends CommonAjaxController
                     }
 
                     $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                    if (substr($idPrefix, -1) == '_') {
+                    if ('_' == substr($idPrefix, -1)) {
                         $idPrefix = substr($idPrefix, 0, -1);
                     }
 
@@ -209,7 +209,7 @@ class AjaxController extends CommonAjaxController
 
                 $prefix   = str_replace('[integration]', '[config]', $settings['name']);
                 $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                if (substr($idPrefix, -1) == '_') {
+                if ('_' == substr($idPrefix, -1)) {
                     $idPrefix = substr($idPrefix, 0, -1);
                 }
 
@@ -265,7 +265,7 @@ class AjaxController extends CommonAjaxController
 
                 $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
 
-                if (substr($idPrefix, -1) == '_') {
+                if ('_' == substr($idPrefix, -1)) {
                     $idPrefix = substr($idPrefix, 0, -1);
                 }
 
@@ -341,8 +341,8 @@ class AjaxController extends CommonAjaxController
         $integration_object = $helper->getIntegrationObject($integration);
         $entity             = $integration_object->getIntegrationSettings();
         $featureSettings    = $entity->getFeatureSettings();
-        $doNotMatchField    = ($mautic_field === '-1' || $mautic_field === '');
-        if ($object == 'lead') {
+        $doNotMatchField    = ('-1' === $mautic_field || '' === $mautic_field);
+        if ('lead' == $object) {
             $fields       = 'leadFields';
             $updateFields = 'update_mautic';
         } else {

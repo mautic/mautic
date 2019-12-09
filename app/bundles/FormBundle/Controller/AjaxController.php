@@ -35,7 +35,7 @@ class AjaxController extends CommonAjaxController
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
         $session     = $this->get('session');
-        $orderName   = ($name == 'fields') ? 'mauticform' : 'mauticform_action';
+        $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->get($orderName));
         $components  = $session->get($sessionName);
 
@@ -73,7 +73,7 @@ class AjaxController extends CommonAjaxController
         $fields     = [];
 
         foreach ($formFields as $field) {
-            if ($field->getType() != 'button') {
+            if ('button' != $field->getType()) {
                 $properties = $field->getProperties();
                 $options    = [];
 

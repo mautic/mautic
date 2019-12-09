@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -39,7 +40,7 @@
             }
 
             $radius = abs(round($radius));     // Only integers make sense.
-            if ($radius == 0) {
+            if (0 == $radius) {
                 return $image;
             }
 

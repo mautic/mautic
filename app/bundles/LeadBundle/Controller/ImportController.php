@@ -268,7 +268,7 @@ class ImportController extends FormController
         }
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (isset($form) && !$this->isFormCancelled($form)) {
                 $valid = $this->isFormValid($form);
                 switch ($step) {
@@ -297,14 +297,14 @@ class ImportController extends FormController
                                     foreach ($config as $key => &$c) {
                                         $c = htmlspecialchars_decode($c);
 
-                                        if ($key == 'batchlimit') {
+                                        if ('batchlimit' == $key) {
                                             $c = (int) $c;
                                         }
                                     }
 
                                     $session->set('mautic.'.$object.'.import.config', $config);
 
-                                    if ($file !== false) {
+                                    if (false !== $file) {
                                         // Get the headers for matching
                                         $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
@@ -325,7 +325,7 @@ class ImportController extends FormController
                                         }
                                     }
                                 } catch (FileException $e) {
-                                    if (strpos($e->getMessage(), 'upload_max_filesize') !== false) {
+                                    if (false !== strpos($e->getMessage(), 'upload_max_filesize')) {
                                         $errorMessage    = 'mautic.lead.import.filetoolarge';
                                         $errorParameters = [
                                             '%upload_max_filesize%' => ini_get('upload_max_filesize'),
@@ -445,7 +445,7 @@ class ImportController extends FormController
             }
         }
 
-        if ($step === self::STEP_UPLOAD_CSV || $step === self::STEP_MATCH_FIELDS) {
+        if (self::STEP_UPLOAD_CSV === $step || self::STEP_MATCH_FIELDS === $step) {
             $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
             $viewParameters  = ['form' => $form->createView()];
         } else {
@@ -463,7 +463,7 @@ class ImportController extends FormController
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
-            $activeLink = $object === 'lead' ? '#mautic_contact_index' : '#mautic_company_index';
+            $activeLink = 'lead' === $object ? '#mautic_contact_index' : '#mautic_company_index';
 
             return $this->delegateView(
                 [
@@ -475,7 +475,7 @@ class ImportController extends FormController
                         'route'         => $this->generateUrl(
                             'mautic_import_action',
                             [
-                                'object'       => $object === 'lead' ? 'contacts' : 'companies',
+                                'object'       => 'lead' === $object ? 'contacts' : 'companies',
                                 'objectAction' => 'new',
                             ]
                         ),

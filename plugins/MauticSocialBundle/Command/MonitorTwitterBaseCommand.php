@@ -175,7 +175,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->queryCount = $this->input->getOption('query-count');
         $this->twitter    = $this->integrationHelper->getIntegrationObject('Twitter');
 
-        if ($this->twitter === false || $this->twitter->getIntegrationSettings()->getIsPublished() === false) {
+        if (false === $this->twitter || false === $this->twitter->getIntegrationSettings()->getIsPublished()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
 
             return 1;
@@ -231,7 +231,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     {
         $results = $this->getTweets($monitor);
 
-        if ($results === false || !isset($results['statuses'])) {
+        if (false === $results || !isset($results['statuses'])) {
             $this->output->writeln('No statuses found');
 
             if (!empty($results['errors'])) {

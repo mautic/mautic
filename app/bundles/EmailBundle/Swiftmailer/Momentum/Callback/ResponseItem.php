@@ -60,7 +60,7 @@ class ResponseItem
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getReason()
     {
@@ -76,7 +76,7 @@ class ResponseItem
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getStatHash()
     {

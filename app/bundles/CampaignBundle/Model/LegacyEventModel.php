@@ -348,7 +348,7 @@ class LegacyEventModel extends CommonFormModel
         &$totalEventCount = 0
     ) {
         $repo         = $this->getRepository();
-        $decisionPath = ($response === true) ? 'yes' : 'no';
+        $decisionPath = (true === $response) ? 'yes' : 'no';
         $childEvents  = $repo->getEventsByParent($event['id'], $decisionPath);
 
         $this->logger->debug(
@@ -677,17 +677,17 @@ class LegacyEventModel extends CommonFormModel
             $action = $action->convertToArray();
         }
 
-        if ($action['decisionPath'] == 'no' && !$allowNegative) {
+        if ('no' == $action['decisionPath'] && !$allowNegative) {
             $this->logger->debug('CAMPAIGN: '.ucfirst($action['eventType']).' is attached to a negative path which is not allowed');
 
             return false;
         } else {
-            $negate = ($action['decisionPath'] == 'no' && $allowNegative);
+            $negate = ('no' == $action['decisionPath'] && $allowNegative);
 
-            if ($action['triggerMode'] == 'interval') {
+            if ('interval' == $action['triggerMode']) {
                 $triggerOn = $negate ? clone $parentTriggeredDate : new \DateTime();
 
-                if ($triggerOn == null) {
+                if (null == $triggerOn) {
                     $triggerOn = new \DateTime();
                 }
 
@@ -701,7 +701,7 @@ class LegacyEventModel extends CommonFormModel
                 if ($triggerOn > $now) {
                     $this->logger->debug(
                         'CAMPAIGN: Date to execute ('.$triggerOn->format('Y-m-d H:i:s T').') is later than ('.$now->format('Y-m-d H:i:s T')
-                        .')'.(($action['decisionPath'] == 'no') ? ' so ignore' : ' so schedule')
+                        .')'.(('no' == $action['decisionPath']) ? ' so ignore' : ' so schedule')
                     );
 
                     // Save some RAM for batch processing
@@ -710,7 +710,7 @@ class LegacyEventModel extends CommonFormModel
                     //the event is to be scheduled based on the time interval
                     return $triggerOn;
                 }
-            } elseif ($action['triggerMode'] == 'date') {
+            } elseif ('date' == $action['triggerMode']) {
                 if (!$action['triggerDate'] instanceof \DateTime) {
                     $triggerDate           = new DateTimeHelper($action['triggerDate']);
                     $action['triggerDate'] = $triggerDate->getDateTime();
@@ -770,7 +770,7 @@ class LegacyEventModel extends CommonFormModel
     {
         $log = new LeadEventLog();
 
-        if ($ipAddress == null) {
+        if (null == $ipAddress) {
             // Lead triggered from system IP
             $ipAddress = $this->ipLookupHelper->getIpAddress();
         }
@@ -786,7 +786,7 @@ class LegacyEventModel extends CommonFormModel
         }
         $log->setCampaign($campaign);
 
-        if ($lead == null) {
+        if (null == $lead) {
             $lead = $this->leadModel->getCurrentLead();
         }
         $log->setLead($lead);

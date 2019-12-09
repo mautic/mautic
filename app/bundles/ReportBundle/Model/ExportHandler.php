@@ -45,7 +45,7 @@ class ExportHandler
     {
         $path = $this->getPath($fileName);
 
-        if (($handler = @fopen($path, 'a')) === false) {
+        if (false === ($handler = @fopen($path, 'a'))) {
             throw new FileIOException('Could not open file '.$path);
         }
 

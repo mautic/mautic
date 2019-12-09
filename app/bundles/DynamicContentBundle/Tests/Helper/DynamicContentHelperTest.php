@@ -16,7 +16,7 @@ use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DynamicContentHelperTest extends \PHPUnit_Framework_TestCase
+class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetDwcBySlotNameWithPublished()
     {

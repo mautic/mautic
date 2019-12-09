@@ -14,7 +14,7 @@ namespace Mautic\LeadBundle\Tests\Segment\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 
-class DoNotContactPartsTest extends \PHPUnit_Framework_TestCase
+class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts::getChannel

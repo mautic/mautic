@@ -32,7 +32,7 @@ abstract class PluginBundleBase extends Bundle
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
-        if ($metadata !== null) {
+        if (null !== $metadata) {
             self::installPluginSchema($metadata, $factory, $installedSchema);
         }
     }

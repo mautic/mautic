@@ -210,7 +210,7 @@ class SubmissionModel extends CommonFormModel
         //set the landing page the form was submitted from if applicable
         if (!empty($post['mauticpage'])) {
             $page = $this->pageModel->getEntity((int) $post['mauticpage']);
-            if ($page != null) {
+            if (null != $page) {
                 $submission->setPage($page);
             }
         }
@@ -276,9 +276,9 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
-            if ($value === '' && $f->isRequired()) {
+            if ('' === $value && $f->isRequired()) {
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
-                if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {
+                if (false === $f->getShowWhenValueExists() && !isset($post[$alias])) {
                     continue;
                 }
 
@@ -363,7 +363,7 @@ class SubmissionModel extends CommonFormModel
             $tokens["{formfield={$alias}}"] = $value;
 
             //save the result
-            if ($f->getSaveResult() !== false) {
+            if (false !== $f->getSaveResult()) {
                 $results[$alias] = $value;
             }
         }
@@ -388,7 +388,7 @@ class SubmissionModel extends CommonFormModel
 
         $lead          = $this->leadModel->getCurrentLead();
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
@@ -530,7 +530,7 @@ class SubmissionModel extends CommonFormModel
                             $translator->trans('mautic.form.result.thead.referrer'),
                         ];
                         foreach ($fields as $f) {
-                            if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+                            if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                                 continue;
                             }
                             $header[] = $f->getLabel();
@@ -606,7 +606,7 @@ class SubmissionModel extends CommonFormModel
                                 $translator->trans('mautic.form.result.thead.referrer'),
                             ];
                             foreach ($fields as $f) {
-                                if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+                                if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                                     continue;
                                 }
                                 $header[] = $f->getLabel();
@@ -824,7 +824,7 @@ class SubmissionModel extends CommonFormModel
                 if (is_callable($callback)) {
                     if (is_array($callback)) {
                         $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (strpos($callback, '::') !== false) {
+                    } elseif (false !== strpos($callback, '::')) {
                         $parts      = explode('::', $callback);
                         $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {
@@ -1150,7 +1150,7 @@ class SubmissionModel extends CommonFormModel
                 if (is_callable($callback)) {
                     if (is_array($callback)) {
                         $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                    } elseif (strpos($callback, '::') !== false) {
+                    } elseif (false !== strpos($callback, '::')) {
                         $parts      = explode('::', $callback);
                         $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                     } else {

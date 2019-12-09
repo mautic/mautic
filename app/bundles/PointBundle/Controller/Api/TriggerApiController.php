@@ -83,7 +83,7 @@ class TriggerApiController extends CommonApiController
         }
 
         // Remove events which weren't in the PUT request
-        if (!$isNew && $method === 'PUT') {
+        if (!$isNew && 'PUT' === $method) {
             foreach ($currentEvents as $currentEvent) {
                 if (!in_array($currentEvent->getId(), $requestTriggerIds)) {
                     $entity->removeTriggerEvent($currentEvent);
@@ -148,7 +148,7 @@ class TriggerApiController extends CommonApiController
 
         $entity = $this->model->getEntity($triggerId);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 

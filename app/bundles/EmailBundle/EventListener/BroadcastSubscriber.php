@@ -74,7 +74,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
         // Get list of published broadcasts or broadcast if there is only a single ID
         $emails = $this->model->getRepository()->getPublishedBroadcasts($event->getId());
 
-        while (($email = $emails->next()) !== false) {
+        while (false !== ($email = $emails->next())) {
             $emailEntity                                            = $email[0];
             list($sentCount, $failedCount, $failedRecipientsByList) = $this->model->sendEmailToLists(
                 $emailEntity,

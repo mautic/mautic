@@ -78,7 +78,7 @@ class PreferenceBuilder
     {
         $channelPreferences = $this->getChannelPreferenceObject($channel, $priority);
 
-        if ($rule['dnc'] !== DoNotContact::IS_CONTACTABLE) {
+        if (DoNotContact::IS_CONTACTABLE !== $rule['dnc']) {
             $log->appendToMetadata(
                 [
                     $channel => [

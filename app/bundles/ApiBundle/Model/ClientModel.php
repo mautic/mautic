@@ -74,7 +74,7 @@ class ClientModel extends FormModel
      */
     public function getRepository()
     {
-        if ($this->apiMode == 'oauth2') {
+        if ('oauth2' == $this->apiMode) {
             return $this->em->getRepository('MauticApiBundle:oAuth2\Client');
         } else {
             return $this->em->getRepository('MauticApiBundle:oAuth1\Consumer');
@@ -108,12 +108,12 @@ class ClientModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return null|Client|Consumer
+     * @return Client|Consumer|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
-            return $this->apiMode == 'oauth2' ? new Client() : new Consumer();
+        if (null === $id) {
+            return 'oauth2' == $this->apiMode ? new Client() : new Consumer();
         }
 
         return parent::getEntity($id);
@@ -176,7 +176,7 @@ class ClientModel extends FormModel
         }
 
         //remove the user from the client
-        if ($this->apiMode == 'oauth2') {
+        if ('oauth2' == $this->apiMode) {
             $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);
         } else {

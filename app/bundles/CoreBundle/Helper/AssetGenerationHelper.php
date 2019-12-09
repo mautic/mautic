@@ -65,7 +65,7 @@ class AssetGenerationHelper
             $assetsPath = $this->pathsHelper->getSystemPath('assets');
 
             $assetsFullPath = "$rootPath/$assetsPath";
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 $loadAll = false; //by default, loading should not be required
 
                 //check for libraries and app files and generate them if they don't exist if in prod environment
@@ -85,7 +85,7 @@ class AssetGenerationHelper
             }
 
             if ($loadAll || $forceRegeneration) {
-                if ($env == 'prod') {
+                if ('prod' == $env) {
                     ini_set('max_execution_time', 300);
 
                     $inProgressFile = "$assetsFullPath/generation_in_progress.txt";
@@ -118,7 +118,7 @@ class AssetGenerationHelper
                 $modifiedLast = array_merge($modifiedLast, $this->findOverrides($env, $assets));
 
                 //combine the files into their corresponding name and put in the root media folder
-                if ($env == 'prod') {
+                if ('prod' == $env) {
                     $checkPaths = [
                         $assetsFullPath,
                         "$assetsFullPath/css",
@@ -145,7 +145,7 @@ class AssetGenerationHelper
                                     unlink($assetFile);
                                 }
 
-                                if ($type == 'css') {
+                                if ('css' == $type) {
                                     $out = fopen($assetFile, 'w');
 
                                     foreach ($files as $relPath => $details) {
@@ -185,7 +185,7 @@ class AssetGenerationHelper
                 }
             }
 
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 //return prod generated assets
                 $assets = [
                     'css' => [
@@ -246,7 +246,7 @@ class AssetGenerationHelper
                 foreach ($files as $file) {
                     $fullPath = $file->getPathname();
                     $relPath  = str_replace($rootPath, '', $file->getPathname());
-                    if (strpos($relPath, '/') === 0) {
+                    if (0 === strpos($relPath, '/')) {
                         $relPath = substr($relPath, 1);
                     }
 
@@ -255,7 +255,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ($env == 'prod') {
+                    if ('prod' == $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
                             $modifiedLast[$group] = $lastModified;
@@ -287,7 +287,7 @@ class AssetGenerationHelper
                 'relPath'  => $relPath,
             ];
 
-            if ($env == 'prod') {
+            if ('prod' == $env) {
                 $lastModified = filemtime($fullPath);
                 if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
                     $modifiedLast['app'] = $lastModified;
@@ -332,7 +332,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ($env == 'prod') {
+                    if ('prod' == $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$ext][$group]) || $lastModified > $modifiedLast[$ext][$group]) {
                             $modifiedLast[$ext][$group] = $lastModified;

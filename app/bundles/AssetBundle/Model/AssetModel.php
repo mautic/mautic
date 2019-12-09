@@ -51,7 +51,7 @@ class AssetModel extends FormModel
     protected $leadModel;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request|null
      */
     protected $request;
 
@@ -167,7 +167,7 @@ class AssetModel extends FormModel
             return;
         }
 
-        if ($request == null) {
+        if (null == $request) {
             $request = $this->request;
         }
 
@@ -183,7 +183,7 @@ class AssetModel extends FormModel
 
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                    if ($lead !== null) {
+                    if (null !== $lead) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
                         $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();
@@ -197,7 +197,7 @@ class AssetModel extends FormModel
                     }
                 }
                 if (!empty($clickthrough['channel'])) {
-                    if (count($clickthrough['channel']) === 1) {
+                    if (1 === count($clickthrough['channel'])) {
                         $channelId = reset($clickthrough['channel']);
                         $channel   = key($clickthrough['channel']);
                     } else {
@@ -225,7 +225,7 @@ class AssetModel extends FormModel
                 $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
                 $trackingId                = null;
                 $trackingNewlyGenerated    = false;
-                if ($trackedDevice !== null) {
+                if (null !== $trackedDevice) {
                     $trackingId             = $trackedDevice->getTrackingId();
                     $trackingNewlyGenerated = !$wasTrackedAlready;
                 }
@@ -299,7 +299,7 @@ class AssetModel extends FormModel
         $download->setCode($code);
         $download->setIpAddress($ipAddress);
 
-        if ($request !== null) {
+        if (null !== $request) {
             $download->setReferer($request->server->get('HTTP_REFERER'));
         }
 
@@ -393,11 +393,11 @@ class AssetModel extends FormModel
      *
      * @param $id
      *
-     * @return null|Asset
+     * @return Asset|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Asset();
         } else {
             $entity = parent::getEntity($id);
@@ -511,7 +511,7 @@ class AssetModel extends FormModel
     public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
-        $maxAssetSize  = ($maxAssetSize == -1 || $maxAssetSize === 0) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
         $maxPostSize   = Asset::getIniValue('post_max_size');
         $maxUploadSize = Asset::getIniValue('upload_max_filesize');
         $memoryLimit   = Asset::getIniValue('memory_limit');

@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -228,7 +227,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         if (!$updateLink) {
             foreach ($leadData as $field => $value) {
-                if ($field == 'lifecyclestage' || $field == 'associatedcompanyid') {
+                if ('lifecyclestage' == $field || 'associatedcompanyid' == $field) {
                     continue;
                 }
                 $formattedLeadData['properties'][] = [
@@ -270,7 +269,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea == 'features') {
+        if ('features' == $formArea) {
             $builder->add(
                 'objects',
                 ChoiceType::class,
@@ -305,9 +304,9 @@ class HubspotIntegration extends CrmAbstractIntegration
         foreach ($data['properties'] as $key => $field) {
             $fieldsValues[$key] = $field['value'];
         }
-        if ($object == 'Lead' && !isset($fieldsValues['email'])) {
+        if ('Lead' == $object && !isset($fieldsValues['email'])) {
             foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
-                if ($identifiedProfile['type'] == 'EMAIL') {
+                if ('EMAIL' == $identifiedProfile['type']) {
                     $fieldsValues['email'] = $identifiedProfile['value'];
                 }
             }

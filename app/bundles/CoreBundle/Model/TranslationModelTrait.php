@@ -79,7 +79,7 @@ trait TranslationModelTrait
                     $browserLanguages = explode(',', $browserLanguages);
                     if (!empty($browserLanguages)) {
                         foreach ($browserLanguages as $language) {
-                            if ($pos = strpos($language, ';q=') !== false) {
+                            if ($pos = false !== strpos($language, ';q=')) {
                                 //remove weights
                                 $language = substr($language, 0, ($pos + 1));
                             }
@@ -152,7 +152,7 @@ trait TranslationModelTrait
      */
     protected function getTranslationLocaleCore($locale)
     {
-        if (strpos($locale, '_') !== false) {
+        if (false !== strpos($locale, '_')) {
             $locale = substr($locale, 0, 2);
         }
 

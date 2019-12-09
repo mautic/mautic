@@ -183,7 +183,7 @@ class TableSchemaHelper
 
         if (!empty($options)) {
             foreach ($options as $option => $value) {
-                $func = ($option == 'uniqueIndex' ? 'add' : 'set').ucfirst($option);
+                $func = ('uniqueIndex' == $option ? 'add' : 'set').ucfirst($option);
                 $newTable->$func($value);
             }
         }

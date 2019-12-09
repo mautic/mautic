@@ -201,7 +201,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $email = $event->getEmail();
 
-        if ($email !== null) {
+        if (null !== $email) {
             $this->campaignEventModel->triggerEvent('email.open', $email, 'email', $email->getId());
         }
     }
@@ -214,7 +214,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function onEmailReply(EmailReplyEvent $event)
     {
         $email = $event->getEmail();
-        if ($email !== null) {
+        if (null !== $email) {
             $this->campaignEventModel->triggerEvent('email.reply', $email, 'email', $email->getId());
         }
     }
@@ -229,12 +229,12 @@ class CampaignSubscriber implements EventSubscriberInterface
         $eventParent  = $event->getEvent()['parent'];
         $eventConfig  = $event->getConfig();
 
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return $event->setResult(false);
         }
 
         //check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
-        if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
+        if (!empty($eventParent) && 'email.send' === $eventParent['type']) {
             // click decision
             if ($event->checkContext('email.click')) {
                 /** @var Hit $hit */

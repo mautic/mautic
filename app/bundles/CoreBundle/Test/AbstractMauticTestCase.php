@@ -2,12 +2,10 @@
 
 namespace Mautic\CoreBundle\Test;
 
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
+use Liip\TestFixturesBundle\Test\FixturesTrait;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -22,6 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
+    use FixturesTrait;
     /**
      * @var EntityManager
      */
@@ -129,38 +128,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * @param array|null $paths
      */
-    protected function installDatabaseFixtures(array $paths = null)
+    protected function installDatabaseFixtures(array $classNames = [])
     {
-        if (null === $paths) {
-            $paths = [
-                dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM',
-                // Default user and roles
-                dirname(__DIR__).'/../UserBundle/DataFixtures/ORM',
-            ];
-        }
-
-        $loader = new ContainerAwareLoader($this->container);
-
-        foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
-            } elseif (file_exists($path)) {
-                $loader->loadFromFile($path);
-            }
-        }
-
-        $fixtures = $loader->getFixtures();
-
-        if (!$fixtures) {
-            throw new \InvalidArgumentException(
-                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
-            );
-        }
-
-        $purger = new ORMPurger($this->em);
-        $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
-        $executor = new ORMExecutor($this->em, $purger);
-        $executor->execute($fixtures, true);
+        $this->loadFixtures($classNames);
     }
 
     /**

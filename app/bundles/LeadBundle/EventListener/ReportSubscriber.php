@@ -409,7 +409,7 @@ class ReportSubscriber extends CommonSubscriber
 
             $chartQuery->applyDateFilters($queryBuilder, 'date_added', 'l');
 
-            if ($queryBuilder->getQueryPart('from')[0]['alias'] === 'lp') {
+            if ('lp' === $queryBuilder->getQueryPart('from')[0]['alias']) {
                 $queryBuilder->resetQueryPart('join');
                 $queryBuilder->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
             }
@@ -581,7 +581,7 @@ class ReportSubscriber extends CommonSubscriber
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
-                        if ($count['companycountry'] != '') {
+                        if ('' != $count['companycountry']) {
                             $chart->setDataset($count['companycountry'], $count['companies']);
                         }
                         $companyCount += $count['companies'];
@@ -610,7 +610,7 @@ class ReportSubscriber extends CommonSubscriber
                     $chart        = new PieChart();
                     $companyCount = 0;
                     foreach ($counts as $count) {
-                        if ($count['companyindustry'] != '') {
+                        if ('' != $count['companyindustry']) {
                             $chart->setDataset($count['companyindustry'], $count['companies']);
                         }
                         $companyCount += $count['companies'];

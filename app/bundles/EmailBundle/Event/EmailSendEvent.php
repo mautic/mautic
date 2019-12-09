@@ -130,7 +130,7 @@ class EmailSendEvent extends CommonEvent
 
         if (isset($args['internalSend'])) {
             $this->internalSend = $args['internalSend'];
-        } elseif ($helper !== null) {
+        } elseif (null !== $helper) {
             $this->internalSend = $helper->isInternalSend();
         }
 
@@ -158,7 +158,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function inTokenizationMode()
     {
-        return ($this->helper !== null) ? $this->helper->inTokenizationMode() : false;
+        return (null !== $this->helper) ? $this->helper->inTokenizationMode() : false;
     }
 
     /**
@@ -168,7 +168,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getEmail()
     {
-        return ($this->helper !== null) ? $this->helper->getEmail() : $this->email;
+        return (null !== $this->helper) ? $this->helper->getEmail() : $this->email;
     }
 
     /**
@@ -180,7 +180,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getContent($replaceTokens = false)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $content = $this->helper->getBody();
         } else {
             $content = $this->content;
@@ -196,7 +196,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function setContent($content)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->setBody($content, 'text/html', null, true, true);
         } else {
             $this->content = $content;
@@ -210,7 +210,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getPlainText()
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             return $this->helper->getPlainText();
         } else {
             return $this->plainText;
@@ -222,7 +222,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function setPlainText($content)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->setPlainText($content);
         } else {
             $this->plainText = $content;
@@ -234,7 +234,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSubject()
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             return $this->helper->getSubject();
         } else {
             return $this->subject;
@@ -248,7 +248,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function setSubject($subject)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->setSubject($subject);
         } else {
             $this->subject = $subject;
@@ -270,7 +270,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getLead()
     {
-        return ($this->helper !== null) ? $this->helper->getLead() : $this->lead;
+        return (null !== $this->helper) ? $this->helper->getLead() : $this->lead;
     }
 
     /**
@@ -278,7 +278,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getIdHash()
     {
-        return ($this->helper !== null) ? $this->helper->getIdHash() : $this->idHash;
+        return (null !== $this->helper) ? $this->helper->getIdHash() : $this->idHash;
     }
 
     /**
@@ -286,7 +286,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getSource()
     {
-        return ($this->helper !== null) ? $this->helper->getSource() : $this->source;
+        return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }
 
     /**
@@ -328,7 +328,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function addTextHeader($name, $value)
     {
-        if ($this->helper !== null) {
+        if (null !== $this->helper) {
             $this->helper->addCustomHeader($name, $value);
         } else {
             $this->textHeaders[$name] = $value;
@@ -340,7 +340,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getTextHeaders()
     {
-        return ($this->helper !== null) ? $this->helper->getCustomHeaders() : $this->textHeaders;
+        return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
     }
 
     /**
@@ -366,11 +366,11 @@ class EmailSendEvent extends CommonEvent
             //what entity is sending the email?
             'source' => $source,
             //the email being sent to be logged in page hit if applicable
-            'email' => ($email != null) ? $email->getId() : null,
+            'email' => (null != $email) ? $email->getId() : null,
             'stat'  => $this->getIdHash(),
         ];
         $lead = $this->getLead();
-        if ($lead !== null) {
+        if (null !== $lead) {
             $clickthrough['lead'] = $lead['id'];
         }
 

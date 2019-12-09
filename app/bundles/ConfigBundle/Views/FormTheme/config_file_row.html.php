@@ -29,22 +29,22 @@ $removeUrl = $view['router']->path('mautic_config_action',
 );
 ?>
 <div class="row">
-    <div class="form-group col-xs-12 <?php echo $feedbackClass ?>">
-        <?php echo $view['form']->label($form, $form->vars['label']) ?>
+    <div class="form-group col-xs-12 <?php echo $feedbackClass; ?>">
+        <?php echo $view['form']->label($form, $form->vars['label']); ?>
         <span class="small pull-right<?php echo $hide; ?>">
             <a
                data-toggle="confirmation"
-               href="<?php echo $removeUrl ?>"
-               data-message="<?php echo $view->escape($view['translator']->trans('mautic.config.remove_file_contents')) ?>"
-               data-confirm-text="<?php echo $view->escape($view['translator']->trans('mautic.core.remove')) ?>"
+               href="<?php echo $removeUrl; ?>"
+               data-message="<?php echo $view->escape($view['translator']->trans('mautic.config.remove_file_contents')); ?>"
+               data-confirm-text="<?php echo $view->escape($view['translator']->trans('mautic.core.remove')); ?>"
                data-confirm-callback="removeConfigValue"
                data-cancel-text="<?php echo $view->escape($view['translator']->trans('mautic.core.form.cancel')); ?>">
-                <?php echo $view['translator']->trans('mautic.core.remove') ?>
+                <?php echo $view['translator']->trans('mautic.core.remove'); ?>
             </a>
             <span> | </span>
-            <a href="<?php echo $downloadUrl ?>"><?php echo $view['translator']->trans('mautic.core.download') ?></a>
+            <a href="<?php echo $downloadUrl; ?>"><?php echo $view['translator']->trans('mautic.core.download'); ?></a>
         </span>
-        <?php echo $view['form']->widget($form) ?>
-        <?php echo $view['form']->errors($form) ?>
+        <?php echo $view['form']->widget($form); ?>
+        <?php echo $view['form']->errors($form); ?>
     </div>
 </div>

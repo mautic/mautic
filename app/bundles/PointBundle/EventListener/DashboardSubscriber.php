@@ -71,7 +71,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('point:points:viewother');
 
-        if ($event->getType() == 'points.in.time') {
+        if ('points.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 

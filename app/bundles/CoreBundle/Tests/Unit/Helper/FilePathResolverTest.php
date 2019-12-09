@@ -18,7 +18,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FilePathResolverTest extends \PHPUnit_Framework_TestCase
+class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Get correct name if few previous names are taken

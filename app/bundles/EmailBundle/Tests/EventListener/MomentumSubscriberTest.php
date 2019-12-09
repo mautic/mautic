@@ -23,7 +23,7 @@ use Mautic\QueueBundle\Queue\QueueService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class MomentumSubscriberTest extends \PHPUnit_Framework_TestCase
+class MomentumSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $queueServiceMock;
     private $momentumCallbackMock;

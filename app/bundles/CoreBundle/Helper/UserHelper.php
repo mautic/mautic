@@ -44,7 +44,7 @@ class UserHelper
         $user  = null;
         $token = $this->tokenStorage->getToken();
 
-        if ($token !== null) {
+        if (null !== $token) {
             $user = $token->getUser();
         }
 

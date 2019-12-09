@@ -119,7 +119,7 @@ class FocusController extends FormController
      */
     public function customizeViewArguments($args, $view)
     {
-        if ($view == 'view') {
+        if ('view' == $view) {
             /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $item */
             $item = $args['viewParameters']['item'];
 
@@ -167,7 +167,7 @@ class FocusController extends FormController
      */
     protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $updateSelect = ($this->request->getMethod() == 'POST')
+        $updateSelect = ('POST' == $this->request->getMethod())
             ? $this->request->request->get('focus[updateSelect]', false, true)
             : $this->request->get(
                 'updateSelect',
@@ -199,7 +199,7 @@ class FocusController extends FormController
      */
     protected function getEntityFormOptions()
     {
-        $updateSelect = ($this->request->getMethod() == 'POST')
+        $updateSelect = ('POST' == $this->request->getMethod())
             ? $this->request->request->get('focus[updateSelect]', false, true)
             : $this->request->get(
                 'updateSelect',

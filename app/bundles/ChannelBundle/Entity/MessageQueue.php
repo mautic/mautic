@@ -85,17 +85,17 @@ class MessageQueue
     private $datePublished;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $scheduledDate;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $lastAttempt;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $dateSent;
 

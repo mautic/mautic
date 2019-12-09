@@ -93,7 +93,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <?php
                                     foreach ($fields as $object => $field):
                                         $header = $object;
-                                        $icon   = ($object == 'company') ? 'building' : 'user';
+                                        $icon   = ('company' == $object) ? 'building' : 'user';
                                     ?>
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
@@ -125,7 +125,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                 <div class="alert alert-danger has-error">
                                     <?php echo $view['form']->errors($form['filters']); ?>
                                 </div>
-                            <?php endif ?>
+                            <?php endif; ?>
                             <?php echo $view['form']->widget($form['filters']); ?>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
         <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter"<?php echo $attr; ?>>
             <?php
             if (isset($form->vars[$dataKey])):
@@ -157,7 +157,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         endforeach;
                         echo "</optgroup>\n";
                     else:
-                        if ($dataKey == 'lists' && (isset($currentListId) && (int) $value === (int) $currentListId)) {
+                        if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
                         }
                         echo "<option value=\"$value\">$label</option>\n";

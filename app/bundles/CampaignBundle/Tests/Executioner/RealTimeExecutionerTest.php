@@ -26,7 +26,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends \PHPUnit_Framework_TestCase
+class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel

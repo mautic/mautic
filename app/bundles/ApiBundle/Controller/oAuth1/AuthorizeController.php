@@ -50,7 +50,7 @@ class AuthorizeController extends Controller
         $consumer = $token->getConsumer();
 
         $restricted_oauth_callback = $consumer->getCallback();
-        if (!empty($restricted_oauth_callback) && strpos($oauth_callback, $restricted_oauth_callback) !== 0) {
+        if (!empty($restricted_oauth_callback) && 0 !== strpos($oauth_callback, $restricted_oauth_callback)) {
             throw new AccessDeniedException('Callback is not valid.');
         }
 

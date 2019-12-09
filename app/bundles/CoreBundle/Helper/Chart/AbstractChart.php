@@ -96,7 +96,7 @@ abstract class AbstractChart
         $isTime  = in_array($unit, ['H', 'i', 's']) ? 'T' : '';
         $toUpper = ['d', 'i'];
 
-        if ($unit == 'i') {
+        if ('i' == $unit) {
             $unit = 'M';
         }
 

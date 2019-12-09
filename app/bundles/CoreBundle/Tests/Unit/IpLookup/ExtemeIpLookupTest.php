@@ -16,7 +16,7 @@ use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 /**
  * Class ExtremeIpLookupTest.
  */
-class ExtemeIpLookupTest extends \PHPUnit_Framework_TestCase
+class ExtemeIpLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testIpLookupSuccessful()
     {

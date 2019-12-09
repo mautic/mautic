@@ -50,7 +50,7 @@ class ZohoApi extends CrmApi
      */
     public function getLeadFields($object = 'Leads')
     {
-        if ($object == 'company') {
+        if ('company' == $object) {
             $object = 'Accounts'; // Zoho object name
         }
 

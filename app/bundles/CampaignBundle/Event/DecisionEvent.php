@@ -13,7 +13,6 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
-use Symfony\Component\EventDispatcher\Event;
 
 class DecisionEvent extends CampaignExecutionEvent
 {
@@ -111,7 +110,7 @@ class DecisionEvent extends CampaignExecutionEvent
 
     /**
      * @param string   $channel
-     * @param null|int $channelId
+     * @param int|null $channelId
      */
     public function setChannel($channel, $channelId = null)
     {

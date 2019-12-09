@@ -100,7 +100,7 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * @param string   $channel
-     * @param null|int $channelId
+     * @param int|null $channelId
      */
     public function setChannel($channel, $channelId = null)
     {

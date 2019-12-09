@@ -1,4 +1,5 @@
 <?php
+
     /**
      * @author Gasper Kozak
      * @copyright 2007-2011
@@ -23,7 +24,7 @@
 
         public function save($handle, $uri = null)
         {
-            if ($uri == null) {
+            if (null == $uri) {
                 return WideImage_vendor_de77_BMP::imagebmp($handle);
             } else {
                 return WideImage_vendor_de77_BMP::imagebmp($handle, $uri);

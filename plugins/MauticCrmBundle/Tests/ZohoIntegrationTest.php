@@ -21,7 +21,7 @@ use Symfony\Component\Translation\Translator;
 /**
  * Class ZohoIntegrationTest.
  */
-class ZohoIntegrationTest extends \PHPUnit_Framework_TestCase
+class ZohoIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ZohoIntegration */
     private $integration;

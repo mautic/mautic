@@ -13,7 +13,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho\Xml;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer;
 
-class WriterTest extends \PHPUnit_Framework_TestCase
+class WriterTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that a single row is generated correctly with numerical index

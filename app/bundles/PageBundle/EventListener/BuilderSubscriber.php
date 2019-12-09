@@ -344,21 +344,21 @@ class BuilderSubscriber extends CommonSubscriber
         $page    = $event->getPage();
         $params  = $event->getParams();
 
-        if (strpos($content, $this->langBarRegex) !== false) {
+        if (false !== strpos($content, $this->langBarRegex)) {
             $langbar = $this->renderLanguageBar($page);
             $content = str_ireplace($this->langBarRegex, $langbar, $content);
         }
 
-        if (strpos($content, $this->shareButtonsRegex) !== false) {
+        if (false !== strpos($content, $this->shareButtonsRegex)) {
             $buttons = $this->renderSocialShareButtons();
             $content = str_ireplace($this->shareButtonsRegex, $buttons, $content);
         }
 
-        if (strpos($content, $this->titleRegex) !== false) {
+        if (false !== strpos($content, $this->titleRegex)) {
             $content = str_ireplace($this->titleRegex, $page->getTitle(), $content);
         }
 
-        if (strpos($content, $this->descriptionRegex) !== false) {
+        if (false !== strpos($content, $this->descriptionRegex)) {
             $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
@@ -443,7 +443,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
             // add form before first block of prefs center
-            if (isset($params['startform']) && strpos($content, 'data-prefs-center') !== false) {
+            if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
                 $dom = new DOMDocument('1.0', 'utf-8');
                 $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
                 $xpath      = new DOMXPath($dom);

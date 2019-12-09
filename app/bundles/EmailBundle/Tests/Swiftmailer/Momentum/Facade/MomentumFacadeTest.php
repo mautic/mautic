@@ -17,7 +17,7 @@ use SparkPost\SparkPostResponse;
 /**
  * Class MomentumFacadeTest.
  */
-class MomentumFacadeTest extends \PHPUnit_Framework_TestCase
+class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject

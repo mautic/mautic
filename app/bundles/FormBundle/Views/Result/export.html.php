@@ -25,7 +25,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.form.resul
             <?php
             $fields = $form->getFields();
             foreach ($fields as $f):
-            if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+            if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                 continue;
             }
             ?>

@@ -67,7 +67,7 @@ class Filemanager
         ];
 
         // Log actions or not?
-        if ($this->config['options']['logger'] == true) {
+        if (true == $this->config['options']['logger']) {
             if (isset($this->config['options']['logfile'])) {
                 $this->logfile = $this->config['options']['logfile'];
             }
@@ -77,8 +77,8 @@ class Filemanager
         // if fileRoot is set manually, $this->doc_root takes fileRoot value
         // for security check in is_valid_path() method
         // else it takes $_SERVER['DOCUMENT_ROOT'] default value
-        if ($this->config['options']['fileRoot'] !== false) {
-            if ($this->config['options']['serverRoot'] === true) {
+        if (false !== $this->config['options']['fileRoot']) {
+            if (true === $this->config['options']['serverRoot']) {
                 $this->doc_root      = $_SERVER['DOCUMENT_ROOT'];
                 $this->separator     = basename($this->config['options']['fileRoot']);
                 $this->path_to_files = $_SERVER['DOCUMENT_ROOT'].'/'.$this->config['options']['fileRoot'];
@@ -112,7 +112,7 @@ class Filemanager
     // allow Filemanager to be used with dynamic folders
     public function setFileRoot($path, $documentRoot = null)
     {
-        if ($documentRoot == null) {
+        if (null == $documentRoot) {
             $documentRoot = $_SERVER['DOCUMENT_ROOT'];
         }
 
@@ -122,7 +122,7 @@ class Filemanager
         // [2] $this->dynamic_fileroot. The second part of the path : '/Filemanager/assets/' ( doc_root - $_SERVER['DOCUMENT_ROOT'])
         // [3] $this->path_to_files or $this->doc_root. The full path : '/var/www/Filemanager/assets/'
 
-        if ($this->config['options']['serverRoot'] === true) {
+        if (true === $this->config['options']['serverRoot']) {
             $this->doc_root = $documentRoot.'/'.$path; // i.e  '/var/www'
         } else {
             $this->doc_root = $path; // i.e  '/var/www'
@@ -159,7 +159,7 @@ class Filemanager
 
     public function lang($string)
     {
-        if (isset($this->language[$string]) && $this->language[$string] != '') {
+        if (isset($this->language[$string]) && '' != $this->language[$string]) {
             return $this->language[$string];
         } else {
             return 'Language string error on '.$string;
@@ -168,7 +168,7 @@ class Filemanager
 
     public function getvar($var, $sanitize = true)
     {
-        if (!isset($_GET[$var]) || $_GET[$var] == '') {
+        if (!isset($_GET[$var]) || '' == $_GET[$var]) {
             $this->error(sprintf($this->lang('INVALID_VAR'), $var));
         } else {
             if ($sanitize) {
@@ -183,7 +183,7 @@ class Filemanager
 
     public function postvar($var, $sanitize = true)
     {
-        if (!isset($_POST[$var]) || ($var != 'content' && $_POST[$var] == '')) {
+        if (!isset($_POST[$var]) || ('content' != $var && '' == $_POST[$var])) {
             $this->error(sprintf($this->lang('INVALID_VAR'), $var));
         } else {
             if ($sanitize) {
@@ -203,7 +203,7 @@ class Filemanager
         $this->get_file_info('', false);
 
         // handle path when set dynamically with $fm->setFileRoot() method
-        if ($this->dynamic_fileroot != '') {
+        if ('' != $this->dynamic_fileroot) {
             $path = $this->dynamic_fileroot.$this->get['path'];
             // $path = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->path_to_files) . $this->get['path']; // instruction could replace the line above
             $path = preg_replace('~/+~', '/', $path); // remove multiple slashes
@@ -249,7 +249,7 @@ class Filemanager
             $this->error(sprintf($this->lang('UNABLE_TO_OPEN_DIRECTORY'), $this->get['path']));
         } else {
             while (false !== ($file = readdir($handle))) {
-                if ($file != '.' && $file != '..') {
+                if ('.' != $file && '..' != $file) {
                     array_push($filesDir, $file);
                 }
             }
@@ -311,14 +311,14 @@ class Filemanager
                     $this->get_file_info($this->get['path'].$file, true);
 
                     if (!isset($this->params['type'])
-                        || (isset($this->params['type']) && strtolower($this->params['type']) == 'images'
+                        || (isset($this->params['type']) && 'images' == strtolower($this->params['type'])
                             && in_array(
                                 strtolower($this->item['filetype']),
                                 array_map('strtolower', $this->config['images']['imagesExt'])
                             ))
                     ) {
-                        if ($this->config['upload']['imagesOnly'] == false
-                            || ($this->config['upload']['imagesOnly'] == true
+                        if (false == $this->config['upload']['imagesOnly']
+                            || (true == $this->config['upload']['imagesOnly']
                                 && in_array(
                                     strtolower($this->item['filetype']),
                                     array_map('strtolower', $this->config['images']['imagesExt'])
@@ -363,7 +363,7 @@ class Filemanager
         $content = file_get_contents($current_path);
         $content = htmlspecialchars($content);
 
-        if ($content === false) {
+        if (false === $content) {
             $this->error(sprintf($this->lang('ERROR_OPENING_FILE')));
         }
 
@@ -411,7 +411,7 @@ class Filemanager
     {
         $suffix = '';
 
-        if (substr($this->get['old'], -1, 1) == '/') {
+        if ('/' == substr($this->get['old'], -1, 1)) {
             $this->get['old'] = substr($this->get['old'], 0, (strlen($this->get['old']) - 1));
             $suffix           = '/';
         }
@@ -444,10 +444,10 @@ class Filemanager
         $this->__log(__METHOD__.' - renaming '.$old_file.' to '.$new_file);
 
         if (file_exists($new_file)) {
-            if ($suffix == '/' && is_dir($new_file)) {
+            if ('/' == $suffix && is_dir($new_file)) {
                 $this->error(sprintf($this->lang('DIRECTORY_ALREADY_EXISTS'), $this->get['new']));
             }
-            if ($suffix == '' && is_file($new_file)) {
+            if ('' == $suffix && is_file($new_file)) {
                 $this->error(sprintf($this->lang('FILE_ALREADY_EXISTS'), $this->get['new']));
             }
         }
@@ -474,7 +474,7 @@ class Filemanager
     public function move()
     {
         // dynamic fileroot dir must be used when enabled
-        if ($this->dynamic_fileroot != '') {
+        if ('' != $this->dynamic_fileroot) {
             $rootDir = $this->dynamic_fileroot;
         //$rootDir = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->path_to_files); // instruction could replace the line above
         } else {
@@ -500,7 +500,7 @@ class Filemanager
         $path     = '/'.implode('/', $tmp).'/';
 
         // new path
-        if (substr($this->get['new'], 0, 1) != '/') {
+        if ('/' != substr($this->get['new'], 0, 1)) {
             // make path relative from old dir
             $newPath = $path.'/'.$this->get['new'].'/';
         } else {
@@ -641,7 +641,7 @@ class Filemanager
             );
         }
         // we determine max upload size if not set
-        if ($this->config['upload']['fileSizeLimit'] == 'auto') {
+        if ('auto' == $this->config['upload']['fileSizeLimit']) {
             $this->config['upload']['fileSizeLimit'] = $this->getMaxUploadFileSize();
         }
 
@@ -667,7 +667,7 @@ class Filemanager
         }
 
         // we check if only images are allowed
-        if ($this->config['upload']['imagesOnly'] || (isset($this->params['type']) && strtolower($this->params['type']) == 'images')) {
+        if ($this->config['upload']['imagesOnly'] || (isset($this->params['type']) && 'images' == strtolower($this->params['type']))) {
             if (!($size = @getimagesize($_FILES['fileR']['tmp_name']))) {
                 $this->error(sprintf($this->lang('UPLOAD_IMAGES_ONLY')), true);
             }
@@ -756,7 +756,7 @@ class Filemanager
             );
         }
         // we determine max upload size if not set
-        if ($this->config['upload']['fileSizeLimit'] == 'auto') {
+        if ('auto' == $this->config['upload']['fileSizeLimit']) {
             $this->config['upload']['fileSizeLimit'] = $this->getMaxUploadFileSize();
         }
 
@@ -770,7 +770,7 @@ class Filemanager
         }
 
         // we check if only images are allowed
-        if ($this->config['upload']['imagesOnly'] || (isset($this->params['type']) && strtolower($this->params['type']) == 'images')) {
+        if ($this->config['upload']['imagesOnly'] || (isset($this->params['type']) && 'images' == strtolower($this->params['type']))) {
             if (!($size = @getimagesize($_FILES['newfile']['tmp_name']))) {
                 $this->error(sprintf($this->lang('UPLOAD_IMAGES_ONLY')), true);
             }
@@ -879,7 +879,7 @@ class Filemanager
             //$zip->addEmptyDir(basename($source) . '/');
         }
 
-        if (is_dir($source) === true) {
+        if (true === is_dir($source)) {
             // add file to prevent empty archive error on download
             $zip->addFromString('fm', "This archive has been generated by simogeo's Filemanager : https://github.com/simogeo/Filemanager/");
 
@@ -887,13 +887,13 @@ class Filemanager
             foreach ($files as $file) {
                 $file = str_replace('\\', '/', realpath($file));
 
-                if (is_dir($file) === true) {
+                if (true === is_dir($file)) {
                     $zip->addEmptyDir(str_replace($source.'/', '', $flag.$file.'/'));
-                } elseif (is_file($file) === true) {
+                } elseif (true === is_file($file)) {
                     $zip->addFromString(str_replace($source.'/', '', $flag.$file), file_get_contents($file));
                 }
             }
-        } elseif (is_file($source) === true) {
+        } elseif (true === is_file($source)) {
             $zip->addFromString($flag.basename($source), file_get_contents($source));
         }
 
@@ -920,7 +920,7 @@ class Filemanager
             }
         } else {
             // check if permission is granted
-            if (is_dir($current_path) && $this->config['security']['allowFolderDownload'] == false) {
+            if (is_dir($current_path) && false == $this->config['security']['allowFolderDownload']) {
                 $this->error(sprintf($this->lang('NOT_ALLOWED')), true);
             }
 
@@ -960,7 +960,7 @@ class Filemanager
 
         if (isset($this->get['path']) && file_exists($current_path)) {
             // if $thumbnail is set to true we return the thumbnail
-            if ($this->config['options']['generateThumbnails'] == true && $thumbnail == true) {
+            if (true == $this->config['options']['generateThumbnails'] && true == $thumbnail) {
                 // get thumbnail (and create it if needed)
                 $returned_path = $this->get_thumbnail($current_path);
             } else {
@@ -998,12 +998,12 @@ class Filemanager
         $tmp    = (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '/');
         $tmp    = explode('?', $tmp);
         $params = [];
-        if (isset($tmp[1]) && $tmp[1] != '') {
+        if (isset($tmp[1]) && '' != $tmp[1]) {
             $params_tmp = explode('&', $tmp[1]);
             if (is_array($params_tmp)) {
                 foreach ($params_tmp as $value) {
                     $tmp = explode('=', $value);
-                    if (isset($tmp[0]) && $tmp[0] != '' && isset($tmp[1]) && $tmp[1] != '') {
+                    if (isset($tmp[0]) && '' != $tmp[0] && isset($tmp[1]) && '' != $tmp[1]) {
                         $params[$tmp[0]] = $tmp[1];
                     }
                 }
@@ -1042,7 +1042,7 @@ class Filemanager
     {
         // DO NOT  rawurlencode() since $current_path it
         // is used for displaying name file
-        if ($path == '') {
+        if ('' == $path) {
             $current_path = $this->get['path'];
         } else {
             $current_path = $path;
@@ -1071,7 +1071,7 @@ class Filemanager
             $this->item['preview'] = $this->config['icons']['path'].$this->config['icons']['directory'];
         } elseif (in_array(strtolower($this->item['filetype']), array_map('strtolower', $this->config['images']['imagesExt']))) {
             // svg should not be previewed as raster formats images
-            if ($this->item['filetype'] == 'svg') {
+            if ('svg' == $this->item['filetype']) {
                 $this->item['preview'] = $current_path;
             } else {
                 $this->item['preview'] = 'connectors/php/filemanager.php?mode=preview&path='.rawurlencode($current_path).'&'.time();
@@ -1106,13 +1106,13 @@ class Filemanager
 
     private function getFullPath($path = '')
     {
-        if ($path == '') {
+        if ('' == $path) {
             $path = $this->getRelPath();
         }
 
-        if ($this->config['options']['fileRoot'] !== false) {
+        if (false !== $this->config['options']['fileRoot']) {
             $full_path = $this->doc_root.rawurldecode(str_replace($this->doc_root, '', $path));
-            if ($this->dynamic_fileroot != '') {
+            if ('' != $this->dynamic_fileroot) {
                 $full_path = $this->doc_root.rawurldecode(str_replace($this->dynamic_fileroot, '', $path));
                 // $dynPart = str_replace($_SERVER['DOCUMENT_ROOT'], '', $this->path_to_files); // instruction could replace the line above
                 // $full_path = $this->path_to_files . rawurldecode(str_replace ( $dynPart , '' , $path)); // instruction could replace the line above
@@ -1143,7 +1143,7 @@ class Filemanager
      */
     private function formatPath($path)
     {
-        if ($this->dynamic_fileroot != '') {
+        if ('' != $this->dynamic_fileroot) {
             $a = explode($this->separator, $path);
 
             return end($a);
@@ -1155,44 +1155,44 @@ class Filemanager
     private function sortFiles($array)
     {
         // handle 'NAME_ASC'
-        if ($this->config['options']['fileSorting'] == 'NAME_ASC') {
+        if ('NAME_ASC' == $this->config['options']['fileSorting']) {
             $array = array_reverse($array);
         }
 
         // handle 'TYPE_ASC' and 'TYPE_DESC'
-        if (strpos($this->config['options']['fileSorting'], 'TYPE_') !== false || $this->config['options']['fileSorting'] == 'default') {
+        if (false !== strpos($this->config['options']['fileSorting'], 'TYPE_') || 'default' == $this->config['options']['fileSorting']) {
             $a = [];
             $b = [];
 
             foreach ($array as $key => $item) {
-                if (strcmp($item['File Type'], 'dir') == 0) {
+                if (0 == strcmp($item['File Type'], 'dir')) {
                     $a[$key] = $item;
                 } else {
                     $b[$key] = $item;
                 }
             }
 
-            if ($this->config['options']['fileSorting'] == 'TYPE_ASC') {
+            if ('TYPE_ASC' == $this->config['options']['fileSorting']) {
                 $array = array_merge($a, $b);
             }
 
-            if ($this->config['options']['fileSorting'] == 'TYPE_DESC' || $this->config['options']['fileSorting'] == 'default') {
+            if ('TYPE_DESC' == $this->config['options']['fileSorting'] || 'default' == $this->config['options']['fileSorting']) {
                 $array = array_merge($b, $a);
             }
         }
 
         // handle 'MODIFIED_ASC' and 'MODIFIED_DESC'
-        if (strpos($this->config['options']['fileSorting'], 'MODIFIED_') !== false) {
+        if (false !== strpos($this->config['options']['fileSorting'], 'MODIFIED_')) {
             $modified_order_array = [];  // new array as a column to sort collector
 
             foreach ($array as $item) {
                 $modified_order_array[] = $item['Properties']['filemtime'];
             }
 
-            if ($this->config['options']['fileSorting'] == 'MODIFIED_ASC') {
+            if ('MODIFIED_ASC' == $this->config['options']['fileSorting']) {
                 array_multisort($modified_order_array, SORT_ASC, $array);
             }
-            if ($this->config['options']['fileSorting'] == 'MODIFIED_DESC') {
+            if ('MODIFIED_DESC' == $this->config['options']['fileSorting']) {
                 array_multisort($modified_order_array, SORT_DESC, $array);
             }
 
@@ -1219,7 +1219,7 @@ class Filemanager
             return;
         }
         while (false !== ($obj = readdir($dh))) {
-            if ($obj == '.' || $obj == '..') {
+            if ('.' == $obj || '..' == $obj) {
                 continue;
             }
 
@@ -1255,12 +1255,12 @@ class Filemanager
 
         $exts = array_map('strtolower', $this->config['security']['uploadRestrictions']);
 
-        if ($this->config['security']['uploadPolicy'] == 'DISALLOW_ALL') {
+        if ('DISALLOW_ALL' == $this->config['security']['uploadPolicy']) {
             if (!in_array(strtolower($path_parts['extension']), $exts)) {
                 return false;
             }
         }
-        if ($this->config['security']['uploadPolicy'] == 'ALLOW_ALL') {
+        if ('ALLOW_ALL' == $this->config['security']['uploadPolicy']) {
             if (in_array(strtolower($path_parts['extension']), $exts)) {
                 return false;
             }
@@ -1369,7 +1369,7 @@ class Filemanager
             foreach ($string as $key => $clean) {
                 $clean = strtr($clean, $mapping);
 
-                if ($this->config['options']['chars_only_latin'] == true) {
+                if (true == $this->config['options']['chars_only_latin']) {
                     $clean = preg_replace("/[^{$allow}_a-zA-Z0-9]/u", '', $clean);
                     // $clean = preg_replace("/[^{$allow}_a-zA-Z0-9\x{0430}-\x{044F}\x{0410}-\x{042F}]/u", '', $clean); // allow only latin alphabet with cyrillic
                 }
@@ -1377,7 +1377,7 @@ class Filemanager
             }
         } else {
             $clean = strtr($string, $mapping);
-            if ($this->config['options']['chars_only_latin'] == true) {
+            if (true == $this->config['options']['chars_only_latin']) {
                 $clean = preg_replace("/[^{$allow}_a-zA-Z0-9]/u", '', $clean);
                 // $clean = preg_replace("/[^{$allow}_a-zA-Z0-9\x{0430}-\x{044F}\x{0410}-\x{042F}]/u", '', $string); // allow only latin alphabet with cyrillic
             }
@@ -1486,7 +1486,7 @@ class Filemanager
                 $i.'.',
                 $filename
             );
-            if ($i == '') {
+            if ('' == $i) {
                 $i = 1;
             } else {
                 ++$i;
@@ -1519,7 +1519,7 @@ class Filemanager
     {
         if ($handle = opendir($this->root.'/scripts/languages/')) {
             while (false !== ($file = readdir($handle))) {
-                if ($file != '.' && $file != '..') {
+                if ('.' != $file && '..' != $file) {
                     array_push($this->languages, pathinfo($file, PATHINFO_FILENAME));
                 }
             }
@@ -1568,7 +1568,7 @@ class Filemanager
 
     private function __log($msg)
     {
-        if ($this->logger == true) {
+        if (true == $this->logger) {
             $fp  = fopen($this->logfile, 'a');
             $str = '['.date('d/m/Y h:i:s', time()).']#'.$this->get_user_ip().'#'.$msg;
             fwrite($fp, $str.PHP_EOL);
@@ -1580,7 +1580,7 @@ class Filemanager
     {
         $this->logger = true;
 
-        if ($logfile != '') {
+        if ('' != $logfile) {
             $this->logfile = $logfile;
         }
 
@@ -1608,7 +1608,7 @@ class Filemanager
         $fullPath = [];
 
         foreach ($todo as $dir) {
-            if ($dir == '..') {
+            if ('..' == $dir) {
                 $element = array_pop($fullPath);
                 if (is_null($element)) {
                     return false;

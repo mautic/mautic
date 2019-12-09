@@ -27,7 +27,7 @@
                     <thead>
                         <tr>
                             <?php foreach ($graph['data'][0] as $key => $value) : ?>
-                                <?php if ($key != 'id') : ?>
+                                <?php if ('id' != $key) : ?>
                                     <th class="col-report-count"><?php echo ucfirst($key); ?></th>
                                 <?php endif; ?>
                             <?php endforeach; ?>
@@ -37,13 +37,13 @@
                         <?php foreach ($graph['data'] as $rowKey => $row) : ?>
                         <tr>
                             <?php foreach ($row as $cellName => $cell) : ?>
-                                <?php if (array_key_exists('id', $graph['data'][0]) && $cellName == 'title' && isset($graph['link'])) : ?>
+                                <?php if (array_key_exists('id', $graph['data'][0]) && 'title' == $cellName && isset($graph['link'])) : ?>
                                     <td>
                                         <a href="<?php echo $view['router']->path($graph['link'], ['objectAction' => 'view', 'objectId' => $row['id']]); ?>" data-toggle="ajax">
                                             <?php echo $cell; ?>
                                         </a>
                                     </td>
-                                <?php elseif ($cellName != 'id') : ?>
+                                <?php elseif ('id' != $cellName) : ?>
                                     <td><?php echo $view['assets']->makeLinks($cell); ?></td>
                                 <?php endif; ?>
                             <?php endforeach; ?>

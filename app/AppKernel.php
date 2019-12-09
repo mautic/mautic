@@ -82,22 +82,22 @@ class AppKernel extends Kernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (strpos($request->getRequestUri(), 'installer') !== false || !$this->isInstalled()) {
+        if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
         }
 
         if (defined('MAUTIC_INSTALLER')) {
             $uri = $request->getRequestUri();
-            if (strpos($uri, 'installer') === false) {
+            if (false === strpos($uri, 'installer')) {
                 $base   = $request->getBaseUrl();
                 $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
-                if (stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache') === false
+                if (false === stripos($request->server->get('SERVER_SOFTWARE', ''), 'apache')
                     || !file_exists(__DIR__.'../.htaccess')
-                    && strpos(
+                    && false === strpos(
                         $base,
                         'index'
-                    ) === false
+                    )
                 ) {
                     $prefix .= '/index.php';
                 }
@@ -239,6 +239,7 @@ class AppKernel extends Kernel
 
         if (in_array($this->getEnvironment(), ['test'])) {
             $bundles[] = new Liip\FunctionalTestBundle\LiipFunctionalTestBundle();
+            $bundles[] = new Liip\TestFixturesBundle\LiipTestFixturesBundle();
         }
 
         // Check for local bundle inclusion
@@ -331,7 +332,7 @@ class AppKernel extends Kernel
     {
         static $isInstalled = null;
 
-        if ($isInstalled === null) {
+        if (null === $isInstalled) {
             $params      = $this->getLocalParams();
             $isInstalled = (is_array($params) && !empty($params['db_driver']) && !empty($params['mailer_from_name']));
         }
@@ -358,10 +359,10 @@ class AppKernel extends Kernel
             $dbParams   = [];
             foreach ($testParams as &$p) {
                 $param = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
-                if ($p == 'port') {
+                if ('port' == $p) {
                     $param = (int) $param;
                 }
-                $name            = ($p == 'name') ? 'dbname' : $p;
+                $name            = ('name' == $p) ? 'dbname' : $p;
                 $dbParams[$name] = $param;
             }
 
@@ -392,7 +393,7 @@ class AppKernel extends Kernel
     {
         $parameters = $this->getLocalParams();
         if (isset($parameters['cache_path'])) {
-            $envFolder = (substr($parameters['cache_path'], -1) != '/') ? '/'.$this->environment : $this->environment;
+            $envFolder = ('/' != substr($parameters['cache_path'], -1)) ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
         } else {
