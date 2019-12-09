@@ -13,7 +13,6 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -64,11 +63,6 @@ class LeadSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
      * @var LeadListRepository
      */
     private $segmentRepository;
@@ -105,7 +99,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->entityManager             = $entityManager;
         $this->router                    = $router;
         $this->security                  = $security;
-        $this->campaignRepository        = $entityManager->getRepository(Campaign::class);
         $this->segmentRepository         = $entityManager->getRepository(LeadList::class);
         $this->contactEventLogRepository = $entityManager->getRepository(LeadEventLog::class);
         $this->contactRepository         = $entityManager->getRepository(Lead::class);
@@ -211,6 +204,7 @@ class LeadSubscriber implements EventSubscriberInterface
 
         if (!empty($listCampaigns)) {
             foreach ($listCampaigns as $c) {
+                /** @var Campaign $campaign */
                 $campaign = $this->entityManager->getReference(Campaign::class, $c['id']);
 
                 if (!isset($campaignLists[$c['id']])) {
