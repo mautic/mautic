@@ -58,7 +58,7 @@ class CompanyMergeType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(
+        $resolver->setDefined(
             ['main_entity']
         );
     }
