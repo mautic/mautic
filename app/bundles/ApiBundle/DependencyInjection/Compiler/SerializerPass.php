@@ -22,7 +22,11 @@ class SerializerPass implements CompilerPassInterface
     {
         if ($container->hasDefinition('jms_serializer.metadata.chain_driver')) {
             $definition = $container->getDefinition('jms_serializer.metadata.chain_driver');
-            $definition->replaceArgument(0, [new Reference('jms_serializer.metadata.api_metadata_driver')]);
+            $drivers    = $definition->getArgument(0);
+
+            array_unshift($drivers, new Reference('jms_serializer.metadata.api_metadata_driver'));
+
+            $definition->replaceArgument(0, $drivers);
         }
     }
 }
