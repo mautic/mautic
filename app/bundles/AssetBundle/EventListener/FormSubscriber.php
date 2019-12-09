@@ -151,7 +151,7 @@ class FormSubscriber extends CommonSubscriber
         }
     }
 
-    public function onFormSubmitDownloadFile(SubmissionEvent $event): void
+    public function onFormSubmitActionDownloadFile(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('asset.download_file')) {
             return;

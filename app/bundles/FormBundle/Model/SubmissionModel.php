@@ -186,11 +186,11 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param              $post
-     * @param              $server
-     * @param Form         $form
-     * @param Request|null $request
-     * @param bool         $returnEvent
+     * @param         $post
+     * @param         $server
+     * @param Form    $form
+     * @param Request $request
+     * @param bool    $returnEvent
      *
      * @return bool|array
      *

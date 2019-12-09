@@ -70,7 +70,7 @@ class FormSubscriber extends CommonSubscriber
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionChangePoints', 0],
                 ['onFormSubmitActionChangeList', 1],
-                ['onFormSubmitActionUpdateTags', 2],
+                ['onFormSubmitActionChangeTags', 2],
                 ['onFormSubmitActionAddUtmTags', 3],
                 ['onFormSubmitActionScoreContactsCompanies', 4],
                 ['onFormSubmitActionRemoveFromDoNotContact', 5],
