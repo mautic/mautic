@@ -36,6 +36,7 @@ class ConfigType extends AbstractType
 
     /**
      * @param CoreParametersHelper $parametersHelper
+     * @param TranslatorInterface  $translator
      */
     public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {
