@@ -54,7 +54,7 @@ class ConfigSubscriber extends CommonSubscriber
      */
     public function onConfigSave(ConfigEvent $event)
     {
-        $data = $event->getConfig('userconfig');
+        $data = $event->getConfig(ConfigType::class);
 
         foreach ($this->fileFields as $field) {
             if (isset($data[$field]) && $data[$field] instanceof UploadedFile) {
@@ -82,7 +82,7 @@ class ConfigSubscriber extends CommonSubscriber
             }
         }
 
-        $event->setConfig($data, 'userconfig');
+        $event->setConfig($data, ConfigType::class);
     }
 
     /**

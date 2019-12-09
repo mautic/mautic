@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,15 +36,19 @@ class FormSubmitActionUserEmailType extends AbstractType
             ]
         );
 
-        $builder->add('user_id', 'user_list', [
-            'label'      => 'mautic.email.form.users',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.help.autocomplete',
-            ],
-            'required' => false,
-        ]);
+        $builder->add(
+            'user_id',
+            UserListType::class,
+            [
+                'label'      => 'mautic.email.form.users',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.help.autocomplete',
+                ],
+                'required' => false,
+            ]
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver)

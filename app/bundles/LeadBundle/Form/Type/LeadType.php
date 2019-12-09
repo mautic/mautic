@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Form\Type\StageListType;
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -152,7 +153,7 @@ class LeadType extends AbstractType
         $builder->add(
             $builder->create(
                 'owner',
-                'user_list',
+                UserListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => ['class' => 'control-label'],
