@@ -198,16 +198,4 @@ class FormatterHelper extends Helper
     {
         return 'formatter';
     }
-
-    /**
-     * @return string
-     *
-     * @deprecated - Use VersionHelper or AppVersion class
-     *
-     * @todo Remove this method and $this->appVersion in Mautic 3.0
-     */
-    public function getVersion()
-    {
-        return $this->appVersion->getVersion();
-    }
 }

@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -28,7 +29,7 @@ class FocusPropertiesType extends AbstractType
             case 'bar':
                 $builder->add(
                     'allow_hide',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.allow_hide',
                         'data'  => (isset($options['data']['allow_hide'])) ? $options['data']['allow_hide'] : true,
@@ -40,7 +41,7 @@ class FocusPropertiesType extends AbstractType
 
                 $builder->add(
                     'push_page',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.push_page',
                         'attr'  => [
@@ -53,7 +54,7 @@ class FocusPropertiesType extends AbstractType
 
                 $builder->add(
                     'sticky',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label' => 'mautic.focus.form.bar.sticky',
                         'attr'  => [

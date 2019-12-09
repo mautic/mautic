@@ -78,7 +78,7 @@ class WebhookModelTest extends \PHPUnit_Framework_TestCase
 
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
 
-        $this->parametersHelperMock->expects($this->at(5))
+        $this->parametersHelperMock->expects($this->at(4))
             ->method('getParameter')
             ->with('queue_mode')
             ->willReturn(WebhookModel::COMMAND_PROCESS);
@@ -118,7 +118,7 @@ class WebhookModelTest extends \PHPUnit_Framework_TestCase
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
-        $this->parametersHelperMock->expects($this->at(5))
+        $this->parametersHelperMock->expects($this->at(4))
             ->method('getParameter')
             ->with('queue_mode')
             ->willReturn(WebhookModel::IMMEDIATE_PROCESS);

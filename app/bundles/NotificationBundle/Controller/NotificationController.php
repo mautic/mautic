@@ -12,6 +12,7 @@
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
@@ -201,7 +202,7 @@ class NotificationController extends AbstractFormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_notification_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
@@ -275,11 +276,11 @@ class NotificationController extends AbstractFormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.notification.page', 1);
-        $action = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
-
+        $page         = $session->get('mautic.notification.page', 1);
+        $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
+        $notification = $this->request->request->get('notification', []);
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
@@ -290,7 +291,7 @@ class NotificationController extends AbstractFormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ($method === 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -443,17 +444,18 @@ class NotificationController extends AbstractFormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+        $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $notification = $this->request->request->get('notification', []);
+        $updateSelect = $method === 'POST'
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && $method === 'POST') {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data

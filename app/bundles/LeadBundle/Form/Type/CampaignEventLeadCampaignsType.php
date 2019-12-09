@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CampaignBundle\Form\Type\CampaignListType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -41,7 +43,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('campaigns',
-            'campaign_list', [
+            CampaignListType::class, [
             'label'      => 'mautic.lead.lead.events.campaigns.membership',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
@@ -52,7 +54,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
 
         $builder->add(
             'dataAddedLimit',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.lead.lead.events.campaigns.date.added.filter',
                 'data'  => (isset($options['data']['dataAddedLimit'])) ? $options['data']['dataAddedLimit'] : false,

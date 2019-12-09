@@ -11,7 +11,9 @@
 
 namespace Mautic\ApiBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -28,7 +30,7 @@ class ConfigType extends AbstractType
     {
         $builder->add(
             'api_enabled',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.enabled',
                 'data'  => (bool) $options['data']['api_enabled'],
@@ -40,7 +42,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'api_enable_basic_auth',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.api.config.form.api.basic_auth_enabled',
                 'data'  => (bool) $options['data']['api_enable_basic_auth'],
@@ -52,7 +54,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'api_oauth2_access_token_lifetime',
-            'number',
+            NumberType::class,
             [
                 'label' => 'mautic.api.config.form.api.oauth2_access_token_lifetime',
                 'attr'  => [
@@ -72,7 +74,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'api_oauth2_refresh_token_lifetime',
-            'number',
+            NumberType::class,
             [
                 'label' => 'mautic.api.config.form.api.oauth2_refresh_token_lifetime',
                 'attr'  => [
@@ -92,7 +94,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
           'api_rate_limiter_limit',
-          'number',
+          NumberType::class,
           [
             'label' => 'mautic.api.config.form.api.rate_limiter_limit',
             'attr'  => [
@@ -114,7 +116,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'apiconfig';
     }

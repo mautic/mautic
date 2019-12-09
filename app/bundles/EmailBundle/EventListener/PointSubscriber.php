@@ -15,6 +15,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Form\Type\EmailOpenType;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
@@ -63,7 +65,7 @@ class PointSubscriber extends CommonSubscriber
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.open',
             'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
-            'formType' => 'emailopen_list',
+            'formType' => EmailOpenType::class,
         ];
 
         $event->addAction('email.open', $action);
@@ -72,7 +74,7 @@ class PointSubscriber extends CommonSubscriber
             'group'    => 'mautic.email.actions',
             'label'    => 'mautic.email.point.action.send',
             'callback' => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'validateEmail'],
-            'formType' => 'emailopen_list',
+            'formType' => EmailOpenType::class,
         ];
 
         $event->addAction('email.send', $action);
@@ -87,7 +89,7 @@ class PointSubscriber extends CommonSubscriber
             'group'           => 'mautic.email.point.trigger',
             'label'           => 'mautic.email.point.trigger.sendemail',
             'callback'        => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'],
-            'formType'        => 'emailsend_list',
+            'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
         ];

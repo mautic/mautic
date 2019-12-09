@@ -728,7 +728,8 @@ class LeadController extends FormController
      */
     private function uploadAvatar(Lead $lead)
     {
-        $file      = $this->request->files->get('lead[custom_avatar]', null, true);
+        $lead      = $this->request->files->get('lead', []);
+        $file      = $lead['custom_avatar'] ?? null;
         $avatarDir = $this->get('mautic.helper.template.avatar')->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {

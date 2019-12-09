@@ -12,6 +12,13 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\SlotButtonType;
+use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
+use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
+use Mautic\CoreBundle\Form\Type\SlotImageCaptionType;
+use Mautic\CoreBundle\Form\Type\SlotImageCardType;
+use Mautic\CoreBundle\Form\Type\SlotSeparatorType;
+use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -98,14 +105,14 @@ class BuilderSubscriber extends CommonSubscriber
             $openRate = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.open',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineOpenRateWinner',
+                'event'    => EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.openrate', $openRate);
 
             $clickThrough = [
                 'group'    => 'mautic.email.stats',
                 'label'    => 'mautic.email.abtest.criteria.clickthrough',
-                'callback' => '\Mautic\EmailBundle\Helper\AbTestHelper::determineClickthroughRateWinner',
+                'event'    => EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('email.clickthrough', $clickThrough);
         }
@@ -119,8 +126,7 @@ class BuilderSubscriber extends CommonSubscriber
 
         if ($event->tokensRequested(array_keys($tokens))) {
             $event->addTokens(
-                $event->filterTokens($tokens),
-                true
+                $event->filterTokens($tokens)
             );
         }
 
@@ -149,7 +155,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot_image',
+                SlotImageCardType::class,
                 900
             );
             $event->addSlotType(
@@ -157,7 +163,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
                 'MauticCoreBundle:Slots:imagecard.html.php',
-                'slot_imagecard',
+                SlotImageCardType::class,
                 870
             );
             $event->addSlotType(
@@ -165,7 +171,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
-                'slot_imagecaption',
+                SlotImageCaptionType::class,
                 850
             );
             $event->addSlotType(
@@ -173,7 +179,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
-                'slot_button',
+                SlotButtonType::class,
                 800
             );
             $event->addSlotType(
@@ -181,7 +187,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
-                'slot_socialfollow',
+                SlotSocialFollowType::class,
                 600
             );
             $event->addSlotType(
@@ -189,7 +195,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
                 'MauticCoreBundle:Slots:codemode.html.php',
-                'slot_codemode',
+                SlotCodeModeType::class,
                 500
             );
             $event->addSlotType(
@@ -197,7 +203,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot_separator',
+                SlotSeparatorType::class,
                 400
             );
 
@@ -206,7 +212,7 @@ class BuilderSubscriber extends CommonSubscriber
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'tag',
                 'MauticCoreBundle:Slots:dynamiccontent.html.php',
-                'slot_dynamiccontent',
+                SlotDynamicContentType::class,
                 300
             );
         }

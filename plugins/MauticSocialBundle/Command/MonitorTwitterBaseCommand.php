@@ -342,47 +342,4 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->printTweets($results['statuses']);
         $this->output->writeln('------------------------');
     }
-
-    /**
-     * Processes a list of tweets and creates / updates leads in Mautic.
-     *
-     * @deprecated 2.12 to be removed in 3.0 Use the TwitterCommandHelper directly
-     *
-     * @param array      $statusList
-     * @param Monitoring $monitor
-     *
-     * @return int
-     */
-    protected function createLeadsFromStatuses($statusList, $monitor)
-    {
-        return $this->twitterCommandHelper->createLeadsFromStatuses($statusList, $monitor);
-    }
-
-    /**
-     * Gets the twitter integration object and returns the settings.
-     *
-     * @deprecated 2.12 to be removed in 3.0 Use $this->twitter directly
-     *
-     * @return TwitterIntegration
-     */
-    protected function getTwitterIntegration()
-    {
-        return $this->twitter;
-    }
-
-    /**
-     * takes an array of query params for twitter and gives a list back.
-     *
-     * URL Encoding done in makeRequest()
-     *
-     * @deprecated 2.12 to be removed in 3.0 Just implode directly in your code
-     *
-     * @param array $query
-     *
-     * @return string
-     */
-    protected function buildTwitterSearchQuery(array $query)
-    {
-        return implode(' ', $query);
-    }
 }

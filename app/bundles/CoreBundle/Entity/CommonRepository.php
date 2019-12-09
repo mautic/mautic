@@ -19,7 +19,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
@@ -42,11 +41,6 @@ class CommonRepository extends EntityRepository
      * @var User
      */
     protected $currentUser;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
 
     /**
      * @var TranslatorInterface
@@ -817,51 +811,11 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    /**
      * @param TranslatorInterface $translator
      */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-    }
-
-    /**
-     * Validate array for one order by condition.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0; use validateOrderByClause() instead
-     *
-     * @param array $args ['col' => 'column_a', 'dir' => 'ASC']
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return array
-     */
-    public function validateDbalOrderByArray(array $args)
-    {
-        return $this->validateOrderByClause($args);
-    }
-
-    /**
-     * Validate the array for one where condition.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0; use validateWhereClause() instead
-     *
-     * @param array $args ['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return array
-     */
-    public function validateDbalWhereArray(array $args)
-    {
-        return $this->validateWhereClause($args);
     }
 
     /**
@@ -1261,32 +1215,6 @@ class CommonRepository extends EntityRepository
         }
 
         return $joinAdded;
-    }
-
-    /**
-     * Build order by from an array.
-     *
-     * @deprecated 2.6.0 to be removed in 3.0; use buildOrderByClauseFromArray() instead
-     *
-     * @param QueryBuilder $query
-     * @param array        $args  [['col' => 'column_a', 'dir' => 'ASC']]
-     *
-     * @return array
-     */
-    protected function buildDbalOrderBy($query, $args)
-    {
-        $this->buildOrderByClauseFromArray($query, $args);
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0
-     *
-     * @param QueryBuilder $query
-     * @param array        $args  [['expr' => 'DBAL expression', 'col' => 'DB column', 'val' => 'value to search for']]
-     */
-    protected function buildDbalWhere($query, $args)
-    {
-        $this->buildWhereClauseFromArray($query, $args);
     }
 
     /**
@@ -1771,19 +1699,6 @@ class CommonRepository extends EntityRepository
 
             $this->appendExpression($expressions, $expr);
         }
-    }
-
-    /**
-     * @deprecated 2.5 to be removed in 3.0; BC for mispelled method
-     *
-     * @param $parseFilters
-     * @param $qb
-     * @param $expressions
-     * @param $parameters
-     */
-    protected function parseSearchFitlers($parseFilters, $qb, $expressions, &$parameters)
-    {
-        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
     }
 
     /**

@@ -22,6 +22,7 @@ use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
+use Mautic\EmailBundle\Form\Type\ConfigType as EmailConfigType;
 use Mautic\EmailBundle\Model\TransportType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
@@ -43,9 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class RestrictionHelperTest.
- *
- * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper
+ * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 class RestrictionHelperTest extends TypeTestCase
 {
@@ -71,6 +70,7 @@ class RestrictionHelperTest extends TypeTestCase
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
             'formAlias'  => 'emailconfig',
+            'formType'   => EmailConfigType::class,
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
                 'mailer_api_key'               => null,

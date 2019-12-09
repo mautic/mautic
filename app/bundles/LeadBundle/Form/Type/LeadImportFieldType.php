@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -159,7 +160,7 @@ class LeadImportFieldType extends AbstractType
             );
         }
 
-        $builder->add('buttons', 'form_buttons', $buttons);
+        $builder->add('buttons', FormButtonsType::class, $buttons);
     }
 
     /**

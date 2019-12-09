@@ -15,12 +15,10 @@ use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use Joomla\Http\Http;
-use Joomla\Http\Response;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
@@ -29,8 +27,8 @@ use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
+use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -51,13 +49,6 @@ class WebhookModel extends FormModel
      * @var string
      */
     protected $queueMode;
-
-    /**
-     * Deprecated property, should be 0 by default.
-     *
-     * @var int
-     */
-    protected $webhookStart;
 
     /**
      * How many entities to add into one queued webhook.
@@ -153,7 +144,7 @@ class WebhookModel extends FormModel
 
         $params['events'] = $this->getEvents();
 
-        return $formFactory->create('webhook', $entity, $params);
+        return $formFactory->create(WebhookType::class, $entity, $params);
     }
 
     /**
@@ -558,7 +549,7 @@ class WebhookModel extends FormModel
         return $queueRepo->getEntities(
             [
                 'iterator_mode' => true,
-                'start'         => $this->webhookStart,
+                'start'         => 0,
                 'limit'         => $this->webhookLimit,
                 'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
                 'orderByDir'    => $this->getEventsOrderbyDir($webhook),
@@ -684,7 +675,6 @@ class WebhookModel extends FormModel
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {
-        $this->webhookStart     = (int) $coreParametersHelper->getParameter('webhook_start', 0);
         $this->webhookLimit     = (int) $coreParametersHelper->getParameter('webhook_limit', 10);
         $this->disableLimit     = (int) $coreParametersHelper->getParameter('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);

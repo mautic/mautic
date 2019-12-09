@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
-use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 
 /**
@@ -25,7 +25,18 @@ use Mautic\WebhookBundle\WebhookEvents;
  */
 class WebhookSubscriber extends CommonSubscriber
 {
-    use WebhookModelTrait;
+    /**
+     * @var WebhookModel
+     */
+    private $webhookModel;
+
+    /**
+     * @param WebhookModel $webhookModel
+     */
+    public function __construct(WebhookModel $webhookModel)
+    {
+        $this->webhookModel = $webhookModel;
+    }
 
     /**
      * @return array
@@ -110,7 +121,6 @@ class WebhookSubscriber extends CommonSubscriber
         // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
-                'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
             ],
             [
@@ -131,7 +141,6 @@ class WebhookSubscriber extends CommonSubscriber
         $this->webhookModel->queueWebhooksByType(
             LeadEvents::LEAD_POINTS_CHANGE,
             [
-                'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
                 'points'  => [
                     'old_points' => $event->getOldPoints(),
@@ -158,7 +167,6 @@ class WebhookSubscriber extends CommonSubscriber
             LeadEvents::LEAD_POST_DELETE,
             [
                 'id'      => $lead->deletedId,
-                'lead'    => $lead,
                 'contact' => $lead,
             ],
             [

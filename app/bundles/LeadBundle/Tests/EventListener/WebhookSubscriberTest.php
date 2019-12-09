@@ -45,9 +45,8 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $webhookSubscriber = new WebhookSubscriber();
+        $webhookSubscriber = new WebhookSubscriber($mockModel);
         $webhookSubscriber->setFactory($mockFactory);
-        $webhookSubscriber->setWebhookModel($mockModel);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -80,9 +79,8 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $webhookSubscriber = new WebhookSubscriber();
+        $webhookSubscriber = new WebhookSubscriber($mockModel);
         $webhookSubscriber->setFactory($mockFactory);
-        $webhookSubscriber->setWebhookModel($mockModel);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -109,9 +107,8 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
         $mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber();
+        $webhookSubscriber = new WebhookSubscriber($mockModel);
         $webhookSubscriber->setFactory($mockFactory);
-        $webhookSubscriber->setWebhookModel($mockModel);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -158,9 +155,8 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber();
+        $webhookSubscriber = new WebhookSubscriber($mockModel);
         $webhookSubscriber->setFactory($mockFactory);
-        $webhookSubscriber->setWebhookModel($mockModel);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 

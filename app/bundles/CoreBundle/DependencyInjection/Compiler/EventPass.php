@@ -12,7 +12,6 @@
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\WebhookBundle\EventListener\WebhookSubscriberBase;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -56,10 +55,6 @@ class EventPass implements CompilerPassInterface
             // Temporary, for development purposes
             if ($reflected->hasProperty('factory')) {
                 $definition->addMethodCall('setFactory', [new Reference('mautic.factory')]);
-            }
-
-            if (in_array(WebhookSubscriberBase::class, $classParents)) {
-                $definition->addMethodCall('setWebhookModel', [new Reference('mautic.webhook.model.webhook')]);
             }
 
             $definition->addMethodCall('init');

@@ -12,13 +12,11 @@
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class EmailToUserType.
- */
 class EmailToUserType extends AbstractType
 {
     use ToBcBccFieldsTrait;
@@ -29,14 +27,16 @@ class EmailToUserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('useremail', 'emailsend_list', [
-            'label' => 'mautic.email.emails',
-            'attr'  => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.email.choose.emails_descr',
-            ],
-            'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
-        ]);
+        $builder->add('useremail',
+            EmailSendType::class, [
+                'label' => 'mautic.email.emails',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.choose.emails_descr',
+                ],
+                'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
+            ]
+        );
 
         $builder->add('user_id', 'user_list', [
             'label'      => 'mautic.email.form.users',
@@ -50,7 +50,7 @@ class EmailToUserType extends AbstractType
 
         $builder->add(
             'to_owner',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.send.email.to.owner',
                 'data'  => isset($options['data']['to_owner']) ? $options['data']['to_owner'] : false,
@@ -75,7 +75,7 @@ class EmailToUserType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_to_user';
     }

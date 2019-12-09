@@ -49,11 +49,6 @@ class SlotsHelper extends BaseSlotsHelper
      */
     public function hasContent($names)
     {
-        // @deprecated Kept for BC in PHP templates. Remove in 2.0
-        if (isset($this->slots['public'])) {
-            return true;
-        }
-
         // If we're in the builder, return true so all slots show.
         if ($this->inBuilder) {
             return true;
