@@ -15,7 +15,6 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
@@ -23,22 +22,11 @@ use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\CampaignEventPageHitType;
 use Mautic\PageBundle\Form\Type\TrackingPixelSendType;
 use Mautic\PageBundle\Helper\TrackingHelper;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var EventModel
-     */
-    private $campaignEventModel;
-
     /**
      * @var LeadModel
      */
@@ -55,23 +43,15 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $realTimeExecutioner;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param PageModel           $pageModel
-     * @param EventModel          $campaignEventModel
      * @param LeadModel           $leadModel
      * @param TrackingHelper      $trackingHelper
      * @param RealTimeExecutioner $realTimeExecutioner
      */
     public function __construct(
-        PageModel $pageModel,
-        EventModel $campaignEventModel,
         LeadModel $leadModel,
         TrackingHelper $trackingHelper,
         RealTimeExecutioner $realTimeExecutioner
     ) {
-        $this->pageModel           = $pageModel;
-        $this->campaignEventModel  = $campaignEventModel;
         $this->leadModel           = $leadModel;
         $this->trackingHelper      = $trackingHelper;
         $this->realTimeExecutioner = $realTimeExecutioner;
