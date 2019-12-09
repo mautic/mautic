@@ -157,7 +157,6 @@ return [
                 'class'     => \Mautic\UserBundle\Form\Type\UserType::class,
                 'arguments' => [
                     'translator',
-                    'doctrine.orm.entity_manager',
                     'mautic.user.model.user',
                     'mautic.helper.language',
                     'mautic.helper.core_parameters',

@@ -11,7 +11,6 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -42,11 +41,6 @@ class UserType extends AbstractType
     private $translator;
 
     /**
-     * @var EntityManager
-     */
-    private $em;
-
-    /**
      * @var UserModel
      */
     private $model;
@@ -63,20 +57,17 @@ class UserType extends AbstractType
 
     /**
      * @param TranslatorInterface  $translator
-     * @param EntityManager        $em
      * @param UserModel            $model
      * @param LanguageHelper       $languageHelper
      * @param CoreParametersHelper $parametersHelper
      */
     public function __construct(
         TranslatorInterface $translator,
-        EntityManager $em,
         UserModel $model,
         LanguageHelper $languageHelper,
         CoreParametersHelper $parametersHelper
     ) {
         $this->translator       = $translator;
-        $this->em               = $em;
         $this->model            = $model;
         $this->languageHelper   = $languageHelper;
         $this->parametersHelper = $parametersHelper;
