@@ -80,40 +80,32 @@ return [
         'forms' => [
             'mautic.form.type.notification' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
-                'alias' => 'notification',
             ],
             'mautic.form.type.mobile.notification' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
-                'alias' => 'mobile_notification',
             ],
             'mautic.form.type.mobile.notification_details' => [
                 'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType::class,
                 'arguments' => [
                     'mautic.helper.integration',
                 ],
-                'alias' => 'mobile_notification_details',
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
-                'alias' => 'notificationconfig',
             ],
             'mautic.form.type.notificationsend_list' => [
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
                 'arguments' => 'router',
-                'alias'     => 'notificationsend_list',
             ],
             'mautic.form.type.notification_list' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
-                'alias' => 'notification_list',
             ],
             'mautic.form.type.mobilenotificationsend_list' => [
                 'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationSendType::class,
                 'arguments' => 'router',
-                'alias'     => 'mobilenotificationsend_list',
             ],
             'mautic.form.type.mobilenotification_list' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
-                'alias' => 'mobilenotification_list',
             ],
         ],
         'helpers' => [
@@ -121,12 +113,13 @@ return [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
                 'alias'     => 'notification_helper',
                 'arguments' => [
-                    'mautic.factory',
+                    'doctrine.orm.entity_manager',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                     'router',
                     'request_stack',
+                    'mautic.lead.model.dnc',
                 ],
             ],
         ],
@@ -134,7 +127,6 @@ return [
             'mautic.notification.api' => [
                 'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.http.connector',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',

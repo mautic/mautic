@@ -15,6 +15,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 
@@ -66,7 +67,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'notification_list',
+                        'lookupFormType' => NotificationListType::class,
                         'repository'     => 'MauticNotificationBundle:Notification',
                         'lookupOptions'  => [
                             'mobile'  => false,
@@ -93,7 +94,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'notification_list',
+                        'lookupFormType' => NotificationListType::class,
                         'repository'     => 'MauticNotificationBundle:Notification',
                         'lookupOptions'  => [
                             'mobile'  => true,
