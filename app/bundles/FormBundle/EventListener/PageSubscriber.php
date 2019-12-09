@@ -11,8 +11,8 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
@@ -36,15 +36,33 @@ class PageSubscriber implements EventSubscriberInterface
     protected $builderTokenHelperFactory;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var CorePermissions
+     */
+    protected $security;
+
+    /**
      * PageSubscriber constructor.
      *
      * @param FormModel                 $formModel
      * @param BuilderTokenHelperFactory $builderTokenHelperFactory
+     * @param TranslatorInterface       $translator
+     * @param CorePermissions           $security
      */
-    public function __construct(FormModel $formModel, BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        FormModel $formModel,
+        BuilderTokenHelperFactory $builderTokenHelperFactory,
+        TranslatorInterface $translator,
+        CorePermissions $security
+    ) {
         $this->formModel                 = $formModel;
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+        $this->translator                = $translator;
+        $this->security                  = $security;
     }
 
     /**

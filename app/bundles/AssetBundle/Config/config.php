@@ -98,6 +98,7 @@ return [
             'mautic.asset.builder.subscriber' => [
                 'class'     => BuilderSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'mautic.asset.helper.token',
                     'mautic.tracker.contact',
                     'mautic.helper.token_builder.factory',

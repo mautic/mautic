@@ -13,8 +13,8 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -28,6 +28,11 @@ class BuilderSubscriber implements EventSubscriberInterface
      * @var string
      */
     private $assetToken = '{assetlink=(.*?)}';
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
 
     /**
      * @var TokenHelper
@@ -47,12 +52,18 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * BuilderSubscriber constructor.
      *
+     * @param CorePermissions           $security
      * @param TokenHelper               $tokenHelper
      * @param ContactTracker            $contactTracker
      * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
-    public function __construct(TokenHelper $tokenHelper, ContactTracker $contactTracker, BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        CorePermissions $security,
+        TokenHelper $tokenHelper,
+        ContactTracker $contactTracker,
+        BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
+        $this->security                  = $security;
         $this->tokenHelper               = $tokenHelper;
         $this->contactTracker            = $contactTracker;
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;

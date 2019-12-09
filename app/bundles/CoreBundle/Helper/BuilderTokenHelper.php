@@ -158,9 +158,6 @@ class BuilderTokenHelper
         $this->permissionSet = $permissions;
     }
 
-        }
-    }
-
     /**
      * @deprecated 2.6.0 to be removed in 3.0
      *

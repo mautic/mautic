@@ -33,6 +33,7 @@ use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -110,17 +111,20 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * BuilderSubscriber constructor.
      *
-     * @param TokenHelper               $tokenHelper
-     * @param IntegrationHelper         $integrationHelper
-     * @param PageModel                 $pageModel
-     * @param BuilderTokey $builderTokenHelperFactory
+     * @param CorePermissions   $security
+     * @param TokenHelper       $tokenHelper
+     * @param IntegrationHelper $integrationHelper
+     * @param PageModel         $pageModel
+     * @param BuilderTokey      $builderTokenHelperFactory
      */
     public function __construct(
+        CorePermissions $security,
         TokenHelper $tokenHelper,
         IntegrationHelper $integrationHelper,
         PageModel $pageModel,
         BuilderTokenHelperFactory $builderTokenHelperFactory
     ) {
+        $this->security                  = $security;
         $this->tokenHelper               = $tokenHelper;
         $this->integrationHelper         = $integrationHelper;
         $this->pageModel                 = $pageModel;

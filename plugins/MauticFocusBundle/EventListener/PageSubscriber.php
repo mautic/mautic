@@ -11,8 +11,8 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -47,12 +47,18 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * PageSubscriber constructor.
      *
+     * @param CorePermissions           $security
      * @param FocusModel                $model
      * @param RouterInterface           $router
      * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
-    public function __construct(FocusModel $model, RouterInterface $router, BuilderTokenHelperFactory $builderTokenHelperFactory)
-    {
+    public function __construct(
+        CorePermissions $security,
+        FocusModel $model,
+        RouterInterface $router,
+        BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
+        $this->security                  = $security;
         $this->router                    = $router;
         $this->model                     = $model;
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;

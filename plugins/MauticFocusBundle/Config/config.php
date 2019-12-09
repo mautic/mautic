@@ -62,6 +62,7 @@ return [
             'mautic.focus.subscriber.page_bundle' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'mautic.focus.model.focus',
                     'router',
                     'mautic.helper.token_builder.factory',

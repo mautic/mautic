@@ -106,6 +106,7 @@ return [
             'mautic.pagebuilder.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',

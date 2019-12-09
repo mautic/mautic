@@ -190,6 +190,8 @@ return [
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.helper.token_builder.factory',
+                    'translator',
+                    'mautic.security',
                 ],
             ],
             'mautic.form.pointbundle.subscriber' => [
