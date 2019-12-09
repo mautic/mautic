@@ -35,7 +35,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'page.hits.in.time' => [
-            'formType' => DashboardHitsInTimeWidgetType::class,
+            'formAlias' => DashboardHitsInTimeWidgetType::class,
         ],
         'unique.vs.returning.leads' => [],
         'dwell.times'               => [],
