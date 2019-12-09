@@ -15,7 +15,10 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\StageBundle\Form\Type\StageListType;
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -150,7 +153,7 @@ class LeadType extends AbstractType
         $builder->add(
             $builder->create(
                 'owner',
-                'user_list',
+                UserListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => ['class' => 'control-label'],
@@ -172,7 +175,7 @@ class LeadType extends AbstractType
         $builder->add(
             $builder->create(
                 'stage',
-                'stage_list',
+                StageListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.stage',
                     'label_attr' => ['class' => 'control-label'],
@@ -187,11 +190,11 @@ class LeadType extends AbstractType
         );
 
         if (!$options['isShortForm']) {
-            $builder->add('buttons', 'form_buttons');
+            $builder->add('buttons', FormButtonsType::class);
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                     'save_text'  => 'mautic.core.form.save',

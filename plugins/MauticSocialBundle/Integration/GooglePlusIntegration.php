@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType;
+
 /**
  * Class GooglePlusIntegration.
  */
@@ -365,5 +367,13 @@ class GooglePlusIntegration extends SocialIntegration
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return GooglePlusType::class;
     }
 }

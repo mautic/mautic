@@ -11,6 +11,8 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -148,7 +150,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         if ($formArea == 'features') {
             $builder->add('auto_create_user',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.integration.sso.auto_create_user',
                     'data'  => (isset($data['auto_create_user'])) ? (bool) $data['auto_create_user'] : false,
@@ -160,7 +162,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
             $builder->add(
                 'new_user_role',
-                'role_list',
+                RoleListType::class,
                 [
                     'label'      => 'mautic.integration.sso.new_user_role',
                     'label_attr' => ['class' => 'control-label'],

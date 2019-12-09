@@ -72,13 +72,13 @@ final class MomentumFacade implements MomentumFacadeInterface
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return mixed
      *
      * @throws \Swift_TransportException
      */
-    public function send(\Swift_Mime_Message $message)
+    public function send(\Swift_Mime_SimpleMessage $message)
     {
         try {
             $this->swiftMessageValidator->validate($message);

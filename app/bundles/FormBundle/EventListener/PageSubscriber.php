@@ -71,7 +71,7 @@ class PageSubscriber extends CommonSubscriber
             $formSubmissions = [
                 'group'    => 'mautic.form.abtest.criteria',
                 'label'    => 'mautic.form.abtest.criteria.submissions',
-                'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner',
+                'event'    => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
         }

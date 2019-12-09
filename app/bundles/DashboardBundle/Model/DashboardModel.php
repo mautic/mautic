@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
+use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -273,7 +274,8 @@ class DashboardModel extends FormModel
     public function clearDashboardCache()
     {
         $cacheDir     = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
-        $cacheStorage = new CacheStorageHelper($cacheDir, $this->userHelper->getUser()->getId());
+        $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
+
         $cacheStorage->clear();
     }
 
@@ -299,7 +301,7 @@ class DashboardModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('widget', $entity, $options);
+        return $formFactory->create(WidgetType::class, $entity, $options);
     }
 
     /**

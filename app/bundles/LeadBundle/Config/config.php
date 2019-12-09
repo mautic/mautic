@@ -448,10 +448,8 @@ return [
                 ],
             ],
             'mautic.webhook.subscriber' => [
-                'class'       => 'Mautic\LeadBundle\EventListener\WebhookSubscriber',
-                'methodCalls' => [
-                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
-                ],
+                'class'       => \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,
+                'arguments'   => ['mautic.webhook.model.webhook'],
             ],
             'mautic.lead.dashboard.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\DashboardSubscriber',

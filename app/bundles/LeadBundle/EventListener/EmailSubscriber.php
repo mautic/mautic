@@ -70,7 +70,7 @@ class EmailSubscriber extends CommonSubscriber
         $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 
         if ($event->tokensRequested(self::$contactFieldRegex)) {
-            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias', true);
+            $event->addTokensFromHelper($tokenHelper, self::$contactFieldRegex, 'label', 'alias');
         }
     }
 

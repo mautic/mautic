@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
 use Twig_Extension;
 use Twig_SimpleFunction;
@@ -23,9 +22,9 @@ class SlotExtension extends Twig_Extension
      */
     protected $helper;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(SlotsHelper $slotsHelper)
     {
-        $this->helper = $factory->getHelper('template.slots');
+        $this->helper = $slotsHelper;
     }
 
     /**

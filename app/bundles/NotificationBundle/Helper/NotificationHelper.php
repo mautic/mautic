@@ -11,22 +11,22 @@
 
 namespace Mautic\NotificationBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class NotificationHelper
 {
     /**
-     * @var MauticFactory
+     * @var EntityManager
      */
-    protected $factory;
+    protected $em;
 
     /**
      * @var IntegrationHelper
@@ -54,23 +54,30 @@ class NotificationHelper
     protected $request;
 
     /**
+     * @var \Mautic\LeadBundle\Model\DoNotContact
+     */
+    private $doNotContact;
+
+    /**
      * NotificationHelper constructor.
      *
-     * @param MauticFactory        $factory
-     * @param AssetsHelper         $assetsHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param IntegrationHelper    $integrationHelper
-     * @param Router               $router
-     * @param RequestStack         $requestStack
+     * @param EntityManager                         $em
+     * @param AssetsHelper                          $assetsHelper
+     * @param CoreParametersHelper                  $coreParametersHelper
+     * @param IntegrationHelper                     $integrationHelper
+     * @param Router                                $router
+     * @param RequestStack                          $requestStack
+     * @param \Mautic\LeadBundle\Model\DoNotContact $doNotContact
      */
-    public function __construct(MauticFactory $factory, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack)
+    public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
     {
-        $this->factory              = $factory;
+        $this->em                   = $em;
         $this->assetsHelper         = $assetsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->integrationHelper    = $integrationHelper;
         $this->router               = $router;
         $this->request              = $requestStack;
+        $this->doNotContact         = $doNotContact;
     }
 
     /**
@@ -81,14 +88,11 @@ class NotificationHelper
     public function unsubscribe($notification)
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $repo */
-        $repo = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead');
+        $repo = $this->em->getRepository('MauticLeadBundle:Lead');
 
         $lead = $repo->getLeadByEmail($notification);
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->factory->getModel('lead.lead');
-
-        return $leadModel->addDncForLead($lead, 'notification', null, DoNotContact::UNSUBSCRIBED);
+        return $this->doNotContact->addDncForContact($lead->getId(), 'notification', DoNotContact::UNSUBSCRIBED);
     }
 
     public function getHeaderScript()

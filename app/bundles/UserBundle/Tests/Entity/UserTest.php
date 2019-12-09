@@ -26,16 +26,4 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $this->assertFalse($user->isGuest());
     }
-
-    public function testUserIsGuestDeprecatedVariable()
-    {
-        $user = new User(true);
-        $this->assertTrue($user->isGuest);
-    }
-
-    public function testUserIsNotGuestDeprecatedVariable()
-    {
-        $user = new User();
-        $this->assertFAlse($user->isGuest);
-    }
 }

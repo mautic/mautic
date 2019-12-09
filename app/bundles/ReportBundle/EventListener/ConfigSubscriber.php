@@ -14,6 +14,7 @@ namespace Mautic\ReportBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\ReportBundle\Form\Type\ConfigType;
 
 class ConfigSubscriber extends CommonSubscriber
 {
@@ -32,6 +33,7 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'ReportBundle',
             'formAlias'  => 'reportconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticReportBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticReportBundle'),
         ]);
