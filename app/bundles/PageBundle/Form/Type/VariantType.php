@@ -43,19 +43,22 @@ class VariantType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('weight', IntegerType::class, [
-            'label'      => 'mautic.core.ab_test.form.traffic_weight',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
-            ],
-            'constraints' => [
-                new NotBlank(
-                    ['message' => 'mautic.page.variant.weight.notblank']
-                ),
-            ],
-        ]);
+        $builder->add(
+            'weight',
+            IntegerType::class, [
+                'label'      => 'mautic.core.ab_test.form.traffic_weight',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.page.variant.weight.notblank']
+                    ),
+                ],
+            ]
+        );
 
         $abTestWinnerCriteria = $this->pageModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
