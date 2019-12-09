@@ -94,7 +94,7 @@ class PageSubscriber implements EventSubscriberInterface
 
         if ($event->tokensRequested($this->formRegex)) {
             $tokenHelper = new BuilderTokenHelper($this->mauticFactory, 'form');
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id');
         }
     }
 
