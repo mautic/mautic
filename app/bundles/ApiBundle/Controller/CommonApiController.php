@@ -1313,7 +1313,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function setSerializationContext($view)
     {
-        $context = new Context();
+        $context = $view->getContext();
         if (!empty($this->serializerGroups)) {
             $context->setGroups($this->serializerGroups);
         }
