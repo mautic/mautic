@@ -285,7 +285,7 @@ class PageController extends FormController
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         $pageviews = $model->getHitsLineChartData(
             null,

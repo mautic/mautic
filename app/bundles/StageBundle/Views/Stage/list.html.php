@@ -91,7 +91,7 @@ if ('index' == $tmpl) {
                                 ['item' => $item, 'model' => 'stage']
                             ); ?>
                             <?php if ($permissions['stage:stages:edit']): ?>
-                            <a href="<?php echo $view['router']->generate(
+                            <a href="<?php echo $view['router']->url(
                                 'mautic_stage_action',
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
@@ -132,7 +132,7 @@ if ('index' == $tmpl) {
                 'page'       => $page,
                 'limit'      => $limit,
                 'menuLinkId' => 'mautic_stage_index',
-                'baseUrl'    => $view['router']->generate('mautic_stage_index'),
+                'baseUrl'    => $view['router']->url('mautic_stage_index'),
                 'sessionVar' => 'stage',
             ]
         ); ?>

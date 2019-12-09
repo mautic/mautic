@@ -197,7 +197,7 @@ class FormController extends CommonFormController
         );
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);

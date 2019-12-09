@@ -183,7 +183,7 @@ class SmsController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);

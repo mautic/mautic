@@ -251,7 +251,7 @@ trait LeadDetailsTrait
 
         // Audit Log
         /** @var AuditLogModel $auditlogModel */
-        $auditlogModel = $this->getModel('core.auditLog');
+        $auditlogModel = $this->getModel('core.auditlog');
         /** @var AuditLogRepository $repo */
         $repo     = $auditlogModel->getRepository();
         $logCount = $repo->getAuditLogsCount($lead, $filters);

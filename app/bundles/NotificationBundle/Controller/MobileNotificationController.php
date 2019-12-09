@@ -193,7 +193,7 @@ class MobileNotificationController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);

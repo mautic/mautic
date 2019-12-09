@@ -390,7 +390,7 @@ class DynamicContentController extends FormController
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);

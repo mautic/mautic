@@ -181,7 +181,7 @@ class AssetController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditLog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $logs = $this->getModel('core.auditlog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         return $this->delegateView([
             'returnUrl'      => $action,
