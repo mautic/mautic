@@ -15,10 +15,8 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -61,15 +59,20 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $formModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * @param SubmissionModel $formSubmissionModel
      * @param FormModel       $formModel
+     * @param RouterInterface $router
      */
-    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel)
+    public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
     {
         $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
+        $this->router              = $router;
     }
 
     /**

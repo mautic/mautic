@@ -11,25 +11,20 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PluginModel
      */
-    protected $pluginModel;
+    private $pluginModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
      * @param PluginModel $pluginModel
      */
     public function __construct(PluginModel $pluginModel)

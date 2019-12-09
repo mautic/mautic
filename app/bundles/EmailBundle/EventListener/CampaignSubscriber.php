@@ -43,22 +43,22 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @var EmailModel
      */
-    protected $messageQueueModel;
+    private $messageQueueModel;
 
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
      * @var SendEmailToUser

@@ -11,13 +11,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SegmentSubscriber extends CommonSubscriber
+class SegmentSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
@@ -30,8 +30,6 @@ class SegmentSubscriber extends CommonSubscriber
     private $auditLogModel;
 
     /**
-     * SegmentSubscriber constructor.
-     *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      */

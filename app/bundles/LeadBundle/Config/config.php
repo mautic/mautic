@@ -368,29 +368,35 @@ return [
                     'mautic.core.model.auditlog',
                     'mautic.lead.event.dispatcher',
                     'mautic.helper.template.dnc_reason',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'router',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
                 ],
             ],
             'mautic.lead.subscriber.company' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\CompanySubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\CompanySubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.lead.emailbundle.subscriber' => [
-                'class' => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\EmailSubscriber::class,
+                'arguments' => [
+                    'mautic.factory',
+                ],
             ],
             'mautic.lead.formbundle.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\FormSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
                 ],
             ],
             'mautic.lead.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
@@ -398,6 +404,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.lead.model.company',
                     'mautic.campaign.model.campaign',
+                    '%mautic.parameters%',
                 ],
             ],
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [
@@ -416,6 +423,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.lead.model.company_report_data',
                     'mautic.lead.reportbundle.fields_builder',
+                    'translator',
                 ],
             ],
             'mautic.lead.reportbundle.segment_subscriber' => [
@@ -432,43 +440,61 @@ return [
                 ],
             ],
             'mautic.lead.calendarbundle.subscriber' => [
-                'class' => 'Mautic\LeadBundle\EventListener\CalendarSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\CalendarSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                    'translator',
+                    'router',
+                ],
             ],
             'mautic.lead.pointbundle.subscriber' => [
-                'class' => 'Mautic\LeadBundle\EventListener\PointSubscriber',
+                'class' => \Mautic\LeadBundle\EventListener\PointSubscriber::class,
             ],
             'mautic.lead.search.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
-                    'doctrine.orm.entity_manager',
+                    'mautic.email.repository.email',
+                    'translator',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.webhook.subscriber' => [
-                'class'       => \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,
-                'arguments'   => ['mautic.webhook.model.webhook'],
+                'class'     => \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
+                ],
             ],
             'mautic.lead.dashboard.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.list',
+                    'router',
+                    'translator',
                 ],
             ],
             'mautic.lead.maintenance.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\MaintenanceSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\MaintenanceSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'translator',
                 ],
             ],
             'mautic.lead.stats.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.lead.button.subscriber' => [
-                'class' => \Mautic\LeadBundle\EventListener\ButtonSubscriber::class,
+                'class'     => \Mautic\LeadBundle\EventListener\ButtonSubscriber::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                ],
             ],
             'mautic.lead.import.subscriber' => [
                 'class'     => Mautic\LeadBundle\EventListener\ImportSubscriber::class,
@@ -505,7 +531,7 @@ return [
                 ],
             ],
             'mautic.lead.subscriber.segment' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\SegmentSubscriber',
+                'class'     => \Mautic\LeadBundle\EventListener\SegmentSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
@@ -848,6 +874,13 @@ return [
                     \Mautic\LeadBundle\Entity\CompanyLead::class,
                 ],
             ],
+            'mautic.lead.repository.stages_lead_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\StagesChangeLog::class,
+                ],
+            ],
             'mautic.lead.repository.dnc' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
@@ -888,6 +921,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\LeadList::class,
+                ],
+            ],
+            'mautic.lead.repository.points_change_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\PointsChangeLog::class,
                 ],
             ],
             'mautic.lead.repository.merged_records' => [

@@ -57,17 +57,18 @@ return [
     'services' => [
         'events' => [
             'mautic.social.formbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber',
+                'class' => \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
             ],
             'mautic.social.campaignbundle.subscriber' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.social.helper.campaign',
                     'mautic.helper.integration',
+                    'translator',
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber',
+                'class' => \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.social.subscriber.channel' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\EventListener\ChannelSubscriber::class,

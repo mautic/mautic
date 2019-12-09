@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Form\Type\PointActionPageHitType;
 use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
@@ -20,20 +19,16 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class PointSubscriber.
- */
-class PointSubscriber extends CommonSubscriber
+class PointSubscriber implements EventSubscriberInterface
 {
     /**
      * @var PointModel
      */
-    protected $pointModel;
+    private $pointModel;
 
     /**
-     * PointSubscriber constructor.
-     *
      * @param PointModel $pointModel
      */
     public function __construct(PointModel $pointModel)
