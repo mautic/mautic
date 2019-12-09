@@ -63,24 +63,27 @@ class VariantType extends AbstractType
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 
-            $builder->add('winnerCriteria', ChoiceType::class, [
-                'label'      => 'mautic.core.ab_test.form.winner',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'    => 'form-control',
-                    'onchange' => 'Mautic.getAbTestWinnerForm(\'page\', \'page\', this);',
-                ],
-                'expanded'    => false,
-                'multiple'    => false,
-                'choices'     => array_flip($choices),
-                'empty_value' => 'mautic.core.form.chooseone',
-                'constraints' => [
-                    new NotBlank(
-                        ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
-                    ),
-                ],
-                'choices_as_values' => true,
-            ]);
+            $builder->add(
+                'winnerCriteria',
+                ChoiceType::class, [
+                    'label'      => 'mautic.core.ab_test.form.winner',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.getAbTestWinnerForm(\'page\', \'page\', this);',
+                    ],
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'choices'     => $choices,
+                    'empty_value' => 'mautic.core.form.chooseone',
+                    'constraints' => [
+                        new NotBlank(
+                            ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                        ),
+                    ],
+                    'choices_as_values' => true,
+                ]
+            );
 
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
                 $form = $event->getForm();
