@@ -960,14 +960,15 @@ class SubmissionModel extends CommonFormModel
         // not overwrite if value exist
         if (!empty($notOverwriteFields)) {
             $this->logger->debug('FORM: Not overwrite contact fields to process '.implode(',', $notOverwriteFields));
-
-            foreach ($data as $alias=> $value) {
-                if (in_array($alias, $notOverwriteFields) && $value !== '') {
-                    unset($data[$alias]);
+            $profileFields = $lead->getProfileFields();
+            foreach ($notOverwriteFields as $notOverwriteField) {
+                if (isset($data[$notOverwriteField])
+                    && isset($profileFields[$notOverwriteField])
+                    && $profileFields[$notOverwriteField] !== '') {
+                    unset($data[$notOverwriteField]);
                 }
             }
         }
-
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
         // last active time
