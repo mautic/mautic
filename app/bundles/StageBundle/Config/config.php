@@ -76,7 +76,7 @@ return [
                 'class'     => \Mautic\StageBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.lead.repository.stages_lead_log',
-                    'mautic.stage.repository.lead_satage_log',
+                    'mautic.stage.repository.lead_stage_log',
                     'translator',
                     'router',
                 ],
@@ -144,7 +144,7 @@ return [
             ],
         ],
         'repositories' => [
-            'mautic.stage.repository.lead_satage_log' => [
+            'mautic.stage.repository.lead_stage_log' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
