@@ -55,17 +55,12 @@ abstract class AbstractFormFieldHelper
      */
     abstract public function getTypes();
 
-    /**
-     * AbstractFormFieldHelper constructor.
-     */
     public function __construct()
     {
         $this->setTranslationKeyPrefix();
     }
 
     /**
-     * Set translator.
-     *
      * @param TranslatorInterface $translator
      */
     public function setTranslator(TranslatorInterface $translator)
@@ -83,14 +78,14 @@ abstract class AbstractFormFieldHelper
         $choices = [];
 
         foreach ($this->getTypes() as $v => $type) {
-            $choices[$v] = $this->translator->transConditional("mautic.core.type.{$v}", "{$this->translationKeyPrefix}{$v}");
+            $choices[$this->translator->transConditional("mautic.core.type.{$v}", "{$this->translationKeyPrefix}{$v}")] = $v;
         }
 
         foreach ($customFields as $v => $f) {
-            $choices[$v] = $this->translator->trans($f['label']);
+            $choices[$this->translator->trans($f['label'])] = $v;
         }
 
-        natcasesort($choices);
+        ksort($choices);
 
         return $choices;
     }
@@ -100,10 +95,12 @@ abstract class AbstractFormFieldHelper
      *
      * @param      $list
      * @param bool $removeEmpty
+     * @param bool $ignoreNumerical
+     * @param bool $flipArray
      *
      * @return array
      */
-    public static function parseList($list, $removeEmpty = true, $ignoreNumerical = false)
+    public static function parseList($list, $removeEmpty = true, $ignoreNumerical = false, $flipArray = false)
     {
         // Note if this was an array to start and if we need to determine if the keys are sequentially numerical
         // for BC purposes
@@ -136,7 +133,7 @@ abstract class AbstractFormFieldHelper
             $list = array_combine($list, $list);
         }
 
-        $valueFormatting = function ($list) use ($removeEmpty) {
+        $valueFormatting = function ($list) use ($removeEmpty, $flipArray) {
             $choices = [];
             foreach ($list as $val => $label) {
                 if (is_array($label) && isset($label['value'])) {
@@ -149,7 +146,13 @@ abstract class AbstractFormFieldHelper
                     $label = $val;
                 }
                 if (!is_array($label)) {
-                    $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                    $value = trim(html_entity_decode($val, ENT_QUOTES));
+                    $label = trim(html_entity_decode($label, ENT_QUOTES));
+                    if ($flipArray) {
+                        $choices[$label] = $value;
+                    } else {
+                        $choices[$value] = $label;
+                    }
                 }
             }
 

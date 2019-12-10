@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-/**
- * Class CustomFieldRepositoryTrait.
- */
 trait CustomFieldRepositoryTrait
 {
     protected $useDistinctCount = false;

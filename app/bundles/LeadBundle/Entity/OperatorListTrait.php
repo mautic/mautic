@@ -159,7 +159,7 @@ trait OperatorListTrait
             }
         }
 
-        return $choices;
+        return array_flip($choices);
     }
 
     /**

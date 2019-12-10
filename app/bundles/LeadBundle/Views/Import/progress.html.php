@@ -69,14 +69,14 @@ $indexRoute = $object === 'contacts' ? 'mautic_contact_index' : 'mautic_company_
                 <?php if (!$complete): ?>
                     <div>
                         <a class="btn btn-danger" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
-                            ['objectAction' => 'cancel']
+                            'mautic_import_action',
+                            ['objectAction' => 'cancel', 'object' => 'lead']
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.core.form.cancel'); ?>
                         </a>
                         <a class="btn btn-primary" href="<?php echo $view['router']->path(
-                            'mautic_contact_import_action',
-                            ['objectAction' => 'queue']
+                            'mautic_import_action',
+                            ['objectAction' => 'queue', 'object' => 'lead']
                         ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.import.queue.btn'); ?>
                         </a>

@@ -121,7 +121,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $country;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var User
      */
     private $owner;
 
@@ -235,7 +235,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $tags;
 
     /**
-     * @var \Mautic\StageBundle\Entity\Stage
+     * @var Stage
      */
     private $stage;
 
@@ -250,7 +250,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $utmtags;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\FrequencyRule[]
+     * @var FrequencyRule[]
      */
     private $frequencyRules;
 
@@ -1157,21 +1157,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             'comments' => $doNotContact->getComments(),
         ];
 
-        // @deprecated - to be removed in 2.0
-        switch ($doNotContact->getReason()) {
-            case DoNotContact::BOUNCED:
-                $type = 'bounced';
-                break;
-            case DoNotContact::MANUAL:
-                $type = 'manual';
-                break;
-            case DoNotContact::UNSUBSCRIBED:
-            default:
-                $type = 'unsubscribed';
-                break;
-        }
-        $this->changes['dnc_status'] = [$type, $doNotContact->getComments()];
-
         $this->doNotContact[$doNotContact->getChannel()] = $doNotContact;
 
         return $this;
@@ -1187,9 +1172,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             'old_reason' => $doNotContact->getReason(),
             'comments'   => $doNotContact->getComments(),
         ];
-
-        // @deprecated to be removed in 2.0
-        $this->changes['dnc_status'] = ['removed', $doNotContact->getComments()];
 
         $this->doNotContact->removeElement($doNotContact);
     }

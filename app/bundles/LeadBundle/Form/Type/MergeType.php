@@ -13,13 +13,11 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class MergeType.
- */
 class MergeType extends AbstractType
 {
     /**
@@ -30,14 +28,15 @@ class MergeType extends AbstractType
     {
         $builder->add(
             'lead_to_merge',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => $options['leads'],
-                'label'       => 'mautic.lead.merge.select',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => false,
-                'empty_value' => '',
-                'attr'        => [
+                'choices_as_values' => true,
+                'choices'           => $options['leads'],
+                'label'             => 'mautic.lead.merge.select',
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => false,
+                'empty_value'       => '',
+                'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.merge.select.modal.tooltip',
                 ],
@@ -67,9 +66,9 @@ class MergeType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['leads']);
     }
@@ -77,7 +76,7 @@ class MergeType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_merge';
     }

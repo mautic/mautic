@@ -19,9 +19,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChangeOwnerType extends AbstractType
 {
-    /** @var UserModel */
+    /**
+     * @var UserModel
+     */
     private $userModel;
 
+    /**
+     * @param UserModel $userModel
+     */
     public function __construct(UserModel $userModel)
     {
         $this->userModel = $userModel;
@@ -33,12 +38,13 @@ class ChangeOwnerType extends AbstractType
             'owner',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.add_to',
-                'multiple'   => false,
-                'choices'    => $this->userModel->getOwnerListChoices(),
-                'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.batch.add_to',
+                'multiple'          => false,
+                'choices'           => $this->userModel->getOwnerListChoices(),
+                'required'          => true,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 
