@@ -43,7 +43,7 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * @var null
      */
-    private $currentPropertyName = null;
+    private $currentPropertyName;
 
     /**
      * @param ReflectionClass $class
@@ -57,20 +57,24 @@ class ApiMetadataDriver implements DriverInterface
         if ($class->hasMethod('loadApiMetadata')) {
             $this->metadata = new ClassMetadata($class->getName());
 
-            $this->properties     = [];
-            $this->defaultVersion = '1.0';
-            $this->groupPrefix    = '';
+            $class->getMethod('loadApiMetadata')->invoke(null, $this);
 
-            $serializer = $class->getMethod('loadApiMetadata');
-            $serializer->invoke(null, $this);
+            $metadata = $this->metadata;
 
-            $metadata       = $this->metadata;
-            $this->metadata = null;
+            $this->resetDefaults();
 
             return $metadata;
         }
 
         return null;
+    }
+
+    private function resetDefaults()
+    {
+        $this->metadata       = null;
+        $this->properties     = [];
+        $this->defaultVersion = '1.0';
+        $this->groupPrefix    = '';
     }
 
     /**
@@ -154,9 +158,7 @@ class ApiMetadataDriver implements DriverInterface
             $this->properties[$name]->getter = 'get'.ucfirst($name);
         }
 
-        if ($serializedName) {
-            $this->properties[$name]->serializedName = $serializedName;
-        }
+        $this->properties[$name]->serializedName = $serializedName ?? $name;
 
         if (null !== $this->defaultVersion) {
             // Set the default version
