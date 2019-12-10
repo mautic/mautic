@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Helper;
+namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
+use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class UserNotificationHelper
@@ -83,7 +83,7 @@ class UserNotificationHelper
      * @param string $linkText
      *
      * @throws \Doctrine\ORM\ORMException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
     public function writeNotification(
         string $message,

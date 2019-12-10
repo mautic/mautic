@@ -11,16 +11,16 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotSetException;
-use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
+use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotSetException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 
 class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
 {

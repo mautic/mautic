@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
+namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 /**
  * Holds IDs for different types of objects. Can be used for Mautic or integration objects.

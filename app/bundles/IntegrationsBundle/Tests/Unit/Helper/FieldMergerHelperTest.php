@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Helper;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Helper;
 
-use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
-use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
+use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
 class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
 {

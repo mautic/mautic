@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync;
+namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
 use Countable;
 use Iterator;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsDAO implements Iterator, Countable
 {

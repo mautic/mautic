@@ -11,20 +11,20 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\EventListener;
+namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\IntegrationsBundle\Entity\FieldChangeRepository;
-use MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber;
-use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
+use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
+use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
 
 class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
 {

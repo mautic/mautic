@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\IntegrationsBundle\Exception;
+namespace Mautic\IntegrationsBundle\Exception;
 
 class InvalidProviderException extends \Exception
 {

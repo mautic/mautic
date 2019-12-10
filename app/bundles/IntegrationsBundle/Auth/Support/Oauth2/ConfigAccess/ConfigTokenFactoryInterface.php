@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
+namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenFactoryInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
+use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenFactoryInterface;
 
 interface ConfigTokenFactoryInterface extends AuthConfigInterface
 {

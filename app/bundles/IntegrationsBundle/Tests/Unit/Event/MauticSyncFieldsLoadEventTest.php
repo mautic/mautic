@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Event;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Event;
 
-use MauticPlugin\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 
 class MauticSyncFieldsLoadEventTest extends \PHPUnit_Framework_TestCase
 {

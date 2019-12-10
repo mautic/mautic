@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Helper;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
-use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 
 class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
 {

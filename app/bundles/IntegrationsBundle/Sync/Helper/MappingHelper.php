@@ -11,24 +11,24 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
+namespace Mautic\IntegrationsBundle\Sync\Helper;
 
 use Mautic\LeadBundle\Model\FieldModel;
-use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
-use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
+use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
+use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper

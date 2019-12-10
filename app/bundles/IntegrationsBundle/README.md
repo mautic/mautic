@@ -55,11 +55,11 @@ The `--integration-object-id` uses the same format as `--mautic-object-id` but i
 Similarly, you can push specific Mautic contacts to the integration you are developing like the following example. It can be useful if you want to push as a campaign/form/point action.
 
 ```php
-$mauticObjectIds = new \MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO();
+$mauticObjectIds = new \Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO();
 $mauticObjectIds->addObjectId('contact', '12');
 $mauticObjectIds->addObjectId('contact', '13');
 
-$inputOptions = new MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO(
+$inputOptions = new Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO(
     [
         'integration'      => 'Magento',
         'disable-pull'     => true,
@@ -67,7 +67,7 @@ $inputOptions = new MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDA
     ]
 );
 
-/** @var \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncServiceInterface $syncService **/
+/** @var \Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface $syncService **/
 $syncService->processIntegrationSync($inputOptions);
 ```
 

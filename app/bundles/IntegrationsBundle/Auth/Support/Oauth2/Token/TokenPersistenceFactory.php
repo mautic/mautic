@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token;
+namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Token\RawToken;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 
 class TokenPersistenceFactory
 {

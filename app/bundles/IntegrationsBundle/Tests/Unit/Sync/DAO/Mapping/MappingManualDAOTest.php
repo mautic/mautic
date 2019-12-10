@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\DAO\Mapping;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO\Mapping;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 
 class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
 {

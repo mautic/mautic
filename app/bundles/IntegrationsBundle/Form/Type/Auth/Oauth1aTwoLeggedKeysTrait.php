@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Form\Type\Auth;
+namespace Mautic\IntegrationsBundle\Form\Type\Auth;
 
-use MauticPlugin\IntegrationsBundle\Form\Type\NotBlankIfPublishedConstraintTrait;
+use Mautic\IntegrationsBundle\Form\Type\NotBlankIfPublishedConstraintTrait;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 

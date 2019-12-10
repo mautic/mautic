@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\VariableExpresser;
+namespace Mautic\IntegrationsBundle\Sync\VariableExpresser;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 final class VariableExpresserHelper implements VariableExpresserHelperInterface
 {

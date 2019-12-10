@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Helper;
+namespace Mautic\IntegrationsBundle\Helper;
 
-use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 
 class FieldMergerHelper
 {

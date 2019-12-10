@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Entity;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
-use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
 class ObjectMappingTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Handler;
+namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Writer;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class CompanyNotificationHandler implements HandlerInterface
 {
@@ -70,7 +70,7 @@ class CompanyNotificationHandler implements HandlerInterface
      * @param string          $objectDisplayName
      *
      * @throws \Doctrine\ORM\ORMException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
     {

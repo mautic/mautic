@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Controller;
+namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Exception\UnauthorizedException;
-use MauticPlugin\IntegrationsBundle\Helper\AuthIntegrationsHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Exception\UnauthorizedException;
+use Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthController extends CommonController

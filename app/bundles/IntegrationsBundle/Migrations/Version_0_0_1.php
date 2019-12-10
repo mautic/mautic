@@ -11,11 +11,11 @@ declare(strict_types=1);
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace MauticPlugin\IntegrationsBundle\Migrations;
+namespace Mautic\IntegrationsBundle\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
-use MauticPlugin\IntegrationsBundle\Migration\AbstractMigration;
+use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_1 extends AbstractMigration
 {

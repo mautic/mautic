@@ -11,14 +11,14 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Bundle;
+namespace Mautic\IntegrationsBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
 use Exception;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
-use MauticPlugin\IntegrationsBundle\Migration\Engine;
+use Mautic\IntegrationsBundle\Migration\Engine;
 
 /**
  * Base Bundle class which should be extended by addon bundles.

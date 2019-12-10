@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Form\Type;
+namespace Mautic\IntegrationsBundle\Form\Type;
 
-use MauticPlugin\IntegrationsBundle\Exception\InvalidFormOptionException;
-use MauticPlugin\IntegrationsBundle\Helper\FieldFilterHelper;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
+use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

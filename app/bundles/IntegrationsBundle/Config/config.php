@@ -48,7 +48,7 @@ return [
     'services' => [
         'commands' => [
             'mautic.integrations.command.sync' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Command\SyncCommand::class,
+                'class'     => \Mautic\IntegrationsBundle\Command\SyncCommand::class,
                 'arguments' => [
                     'mautic.integrations.sync.service',
                     'mautic.helper.core_parameters',
@@ -58,7 +58,7 @@ return [
         ],
         'events' => [
             'mautic.integrations.subscriber.lead' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\LeadSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.helper.variable_expresser',
@@ -66,41 +66,41 @@ return [
                 ],
             ],
             'mautic.integrations.subscriber.contact_object' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\ContactObjectSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper.contact_object',
                     'router',
                 ],
             ],
             'mautic.integrations.subscriber.company_object' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\CompanyObjectSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\CompanyObjectSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper.company_object',
                     'router',
                 ],
             ],
             'mautic.integrations.subscriber.controller' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\ControllerSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                     'controller_resolver',
                 ],
             ],
             'mautic.integrations.subscriber.ui_contact_integrations_tab' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\UIContactIntegrationsTabSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\UIContactIntegrationsTabSubscriber::class,
                 'arguments' => [
                     'mautic.integrations.repository.object_mapping',
                 ],
             ],
             'mautic.integrations.subscriber.contact_timeline_events' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\TimelineSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\TimelineSubscriber::class,
                 'arguments' => [
                     'mautic.lead.repository.lead_event_log',
                     'translator',
                 ],
             ],
             'mautic.integrations.subscriber.email_subscriber' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\EventListener\EmailSubscriber::class,
+                'class'     => \Mautic\IntegrationsBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
                     'translator',
                     'event_dispatcher',
@@ -112,39 +112,39 @@ return [
         ],
         'forms' => [
             'mautic.integrations.form.config.integration' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType::class,
+                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationConfigType::class,
                 'arguments' => [
                     'mautic.integrations.helper.config_integrations',
                 ],
             ],
             'mautic.integrations.form.config.feature_settings' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationFeatureSettingsType::class,
+                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationFeatureSettingsType::class,
             ],
             'mautic.integrations.form.config.sync_settings' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsType::class,
+                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsType::class,
             ],
             'mautic.integrations.form.config.sync_settings_field_mappings' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
+                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
                 'arguments' => [
                     'monolog.logger.mautic',
                     'translator',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field_directions' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
+                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
             ],
             'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
+                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
                 'arguments' => [
                     'translator',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
                 ],
             ],
             'mautic.integrations.form.config.sync_settings_object_field' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
+                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
             ],
             'mautic.integrations.form.config.feature_settings.activity_list' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Form\Type\ActivityListType::class,
+                'class'     => \Mautic\IntegrationsBundle\Form\Type\ActivityListType::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                 ],
@@ -152,10 +152,10 @@ return [
         ],
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class,
+                'class' => \Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class,
             ],
             'mautic.integrations.helper' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Helper\IntegrationsHelper::class,
                 'arguments' => [
                     'mautic.plugin.integrations.repository.integration',
                     'mautic.integrations.service.encryption',
@@ -163,26 +163,26 @@ return [
                 ],
             ],
             'mautic.integrations.helper.auth_integrations' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Helper\AuthIntegrationsHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Helper\AuthIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
             ],
             'mautic.integrations.helper.sync_integrations' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                     'mautic.integrations.internal.object_provider',
                 ],
             ],
             'mautic.integrations.helper.config_integrations' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],
             ],
             'mautic.integrations.helper.field_validator' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Helper\FieldValidationHelper::class,
                 'arguments' => [
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
                     'translator',
@@ -191,19 +191,19 @@ return [
         ],
         'other' => [
             'mautic.integrations.service.encryption' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Facade\EncryptionService::class,
+                'class'     => \Mautic\IntegrationsBundle\Facade\EncryptionService::class,
                 'arguments' => [
                     'mautic.helper.encryption',
                 ],
             ],
             'mautic.integrations.internal.object_provider' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider::class,
                 'arguments' => [
                     'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.notification.helper.owner_provider' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.integrations.internal.object_provider',
@@ -213,26 +213,26 @@ return [
                 'class' => GuzzleHttp\Client::class,
             ],
             'mautic.integrations.auth_provider.api_key' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory::class,
+                'class' => \Mautic\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory::class,
             ],
             'mautic.integrations.auth_provider.basic_auth' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory::class,
+                'class' => \Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory::class,
             ],
             'mautic.integrations.auth_provider.oauth1atwolegged' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
+                'class' => \Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory::class,
             ],
             'mautic.integrations.auth_provider.oauth2twolegged' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\HttpFactory::class,
+                'class' => \Mautic\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\HttpFactory::class,
             ],
             'mautic.integrations.auth_provider.oauth2threelegged' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class,
+                'class' => \Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class,
             ],
             'mautic.integrations.auth_provider.token_persistence_factory' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory::class,
+                'class'     => \Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory::class,
                 'arguments' => ['mautic.integrations.helper'],
             ],
             'mautic.integrations.token.parser' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Helper\TokenParser::class,
+                'class' => \Mautic\IntegrationsBundle\Helper\TokenParser::class,
             ],
         ],
         'repositories' => [
@@ -240,14 +240,14 @@ return [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \MauticPlugin\IntegrationsBundle\Entity\FieldChange::class,
+                    \Mautic\IntegrationsBundle\Entity\FieldChange::class,
                 ],
             ],
             'mautic.integrations.repository.object_mapping' => [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \MauticPlugin\IntegrationsBundle\Entity\ObjectMapping::class,
+                    \Mautic\IntegrationsBundle\Entity\ObjectMapping::class,
                 ],
             ],
             // Placeholder till the plugin bundle implements this
@@ -261,16 +261,16 @@ return [
         ],
         'sync' => [
             'mautic.sync.logger' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Logger\DebugLogger::class,
                 'arguments' => [
                     'monolog.logger.mautic',
                 ],
             ],
             'mautic.integrations.helper.sync_judge' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
+                'class' => \Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudge::class,
             ],
             'mautic.integrations.helper.contact_object' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.lead',
@@ -281,7 +281,7 @@ return [
                 ],
             ],
             'mautic.integrations.helper.company_object' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper::class,
                 'arguments' => [
                     'mautic.lead.model.company',
                     'mautic.lead.repository.company',
@@ -289,7 +289,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.order_executioner' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderExecutioner::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_mapping',
                     'event_dispatcher',
@@ -297,7 +297,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_helper' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
                     'mautic.integrations.helper.variable_expresser',
@@ -308,11 +308,11 @@ return [
                 ],
             ],
             'mautic.integrations.sync.sync_process.value_helper' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper::class,
                 'arguments' => [],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_builder' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder::class,
                 'arguments' => [
                     'router',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
@@ -320,7 +320,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.full_object_report_builder' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullObjectReportBuilder::class,
                 'arguments' => [
                     'mautic.integrations.sync.data_exchange.mautic.field_builder',
                     'mautic.integrations.internal.object_provider',
@@ -328,7 +328,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.partial_object_report_builder' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\PartialObjectReportBuilder::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
@@ -338,7 +338,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange::class,
                 'arguments' => [
                     'mautic.integrations.repository.field_change',
                     'mautic.integrations.sync.data_exchange.mautic.field_helper',
@@ -349,13 +349,13 @@ return [
                 ],
             ],
             'mautic.integrations.sync.integration_process.object_change_generator' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator::class,
                 'arguments' => [
                     'mautic.integrations.sync.sync_process.value_helper',
                 ],
             ],
             'mautic.integrations.sync.integration_process' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.helper.sync_mapping',
@@ -363,7 +363,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.internal_process.object_change_generator' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_judge',
                     'mautic.integrations.sync.sync_process.value_helper',
@@ -371,14 +371,14 @@ return [
                 ],
             ],
             'mautic.integrations.sync.internal_process' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_date',
                     'mautic.integrations.sync.internal_process.object_change_generator',
                 ],
             ],
             'mautic.integrations.sync.service' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\SyncService\SyncService::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class,
                 'arguments' => [
                     'mautic.integrations.sync.data_exchange.mautic',
                     'mautic.integrations.helper.sync_date',
@@ -395,13 +395,13 @@ return [
                 ],
             ],
             'mautic.integrations.helper.sync_date' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.helper.sync_mapping' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Helper\MappingHelper::class,
                 'arguments' => [
                     'mautic.lead.model.field',
                     'mautic.integrations.repository.object_mapping',
@@ -410,13 +410,13 @@ return [
                 ],
             ],
             'mautic.integrations.sync.helper.relations' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper.sync_mapping',
                 ],
             ],
             'mautic.integrations.sync.notifier' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Notifier::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.handler_container',
                     'mautic.integrations.helper.sync_integrations',
@@ -424,7 +424,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.notification.writer' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Writer::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Writer::class,
                 'arguments' => [
                     'mautic.core.model.notification',
                     'mautic.core.model.auditlog',
@@ -432,10 +432,10 @@ return [
                 ],
             ],
             'mautic.integrations.sync.notification.handler_container' => [
-                'class' => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class,
+                'class' => \Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer::class,
             ],
             'mautic.integrations.sync.notification.handler_company' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.integrations.sync.notification.helper_user_notification',
@@ -444,7 +444,7 @@ return [
                 'tag' => 'mautic.sync.notification_handler',
             ],
             'mautic.integrations.sync.notification.handler_contact' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.lead.repository.lead_event_log',
@@ -454,26 +454,26 @@ return [
                 'tag' => 'mautic.sync.notification_handler',
             ],
             'mautic.integrations.sync.notification.helper_company' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.sync.notification.helper_user' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.sync.notification.helper_route' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper::class,
                 'arguments' => [
                     'mautic.integrations.internal.object_provider',
                     'event_dispatcher',
                 ],
             ],
             'mautic.integrations.sync.notification.helper_user_notification' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.integrations.sync.notification.helper_user',
@@ -483,7 +483,7 @@ return [
                 ],
             ],
             'mautic.integrations.sync.notification.helper_user_summary_notification' => [
-                'class'     => \MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper::class,
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
                     'mautic.integrations.sync.notification.helper_user',

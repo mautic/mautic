@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Logger;
+namespace Mautic\IntegrationsBundle\Sync\Logger;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

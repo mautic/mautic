@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\DAO;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 
 class RelationsDAOTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,15 +11,15 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Auth\Provider\ApiKey;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\ApiKey;
 
 use GuzzleHttp\Exception\ConnectException;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Exception\InvalidCredentialsException;
-use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use Mautic\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\HeaderCredentialsInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\ApiKey\Credentials\ParameterCredentialsInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
+use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {

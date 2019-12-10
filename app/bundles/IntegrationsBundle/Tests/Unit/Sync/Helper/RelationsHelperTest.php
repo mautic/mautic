@@ -11,19 +11,19 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Helper;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class RelationsHelperTest extends \PHPUnit_Framework_TestCase
 {

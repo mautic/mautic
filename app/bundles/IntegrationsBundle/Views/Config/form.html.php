@@ -11,7 +11,7 @@
 
 echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
 
-/** @var \MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
+/** @var \Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
 $activeTab = $activeTab ?: 'details-container';
 ?>
 

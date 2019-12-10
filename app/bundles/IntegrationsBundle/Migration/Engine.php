@@ -11,11 +11,11 @@ declare(strict_types=1);
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace MauticPlugin\IntegrationsBundle\Migration;
+namespace Mautic\IntegrationsBundle\Migration;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use MauticPlugin\IntegrationsBundle\Exception\PathNotFoundException;
+use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
 class Engine
 {

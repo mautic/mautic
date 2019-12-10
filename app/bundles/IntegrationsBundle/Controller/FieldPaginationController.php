@@ -11,15 +11,15 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Controller;
+namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType;
-use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Helper\FieldFilterHelper;
-use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType;
+use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
+use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 

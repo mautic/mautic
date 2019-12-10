@@ -11,16 +11,16 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration;
+namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration;
 
-use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\SyncInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\SyncInterface;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
+use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 
 final class ExampleIntegration extends BasicIntegration implements IntegrationInterface, SyncInterface
 {

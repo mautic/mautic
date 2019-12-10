@@ -11,14 +11,14 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Writer;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Writer;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class UserNotificationHelperTest extends \PHPUnit_Framework_TestCase

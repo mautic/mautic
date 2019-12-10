@@ -11,14 +11,14 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Helper;
+namespace Mautic\IntegrationsBundle\Sync\Helper;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class RelationsHelper
 {
@@ -59,9 +59,9 @@ class RelationsHelper
      * @param ReportDAO        $syncReport
      * @param RelationDAO      $relationObject
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
     private function processRelation(MappingManualDAO $mappingManualDao, ReportDAO $syncReport, RelationDAO $relationObject): void
     {
@@ -107,8 +107,8 @@ class RelationsHelper
      * @return ObjectDAO
      *
      * @throws ObjectNotFoundException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
     private function findInternalObject(MappingManualDAO $mappingManualDao, string $relObjectName, ObjectDAO $objectDao): ObjectDAO
     {
@@ -123,7 +123,7 @@ class RelationsHelper
      * @param RelationDAO $relationObject
      * @param ReportDAO   $syncReport
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException
+     * @throws \Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException
      */
     private function addObjectInternalId(int $relObjectId, string $relInternalType, RelationDAO $relationObject, ReportDAO $syncReport): void
     {

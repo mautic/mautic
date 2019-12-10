@@ -11,16 +11,16 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Notification;
+namespace Mautic\IntegrationsBundle\Sync\Notification;
 
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
+use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 
 class Notifier
 {

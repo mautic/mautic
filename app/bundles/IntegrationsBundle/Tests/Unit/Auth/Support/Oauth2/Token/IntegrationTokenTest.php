@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
+use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 
 class IntegrationTokenTest extends \PHPUnit_Framework_TestCase
 {

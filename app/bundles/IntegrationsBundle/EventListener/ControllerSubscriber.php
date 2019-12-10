@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\EventListener;
+namespace Mautic\IntegrationsBundle\EventListener;
 
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -71,7 +71,7 @@ class ControllerSubscriber implements EventSubscriberInterface
                     [
                         'integration'   => $integrationName,
                         'page'          => $page,
-                        '_controller'   => 'MauticPlugin\IntegrationsBundle\Controller\ConfigController::editAction',
+                        '_controller'   => 'Mautic\IntegrationsBundle\Controller\ConfigController::editAction',
                         '_route_params' => [
                             'integration' => $integrationName,
                             'page'        => $page,

@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\ValueNormalizer;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\ValueNormalizer;
 
 use DateTimeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
 class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 {

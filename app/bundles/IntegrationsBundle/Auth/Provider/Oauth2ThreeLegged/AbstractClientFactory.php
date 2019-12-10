@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
+namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
 use GuzzleHttp\ClientInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
-use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
+use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 /**
  * Factory for building HTTP clients that will sign the requests with Oauth2 headers.
@@ -25,7 +25,7 @@ use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
  *
  * @see https://github.com/kamermans/guzzle-oauth2-subscriber
  *
- * @deprecated; use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory
+ * @deprecated; use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory
  */
 abstract class AbstractClientFactory implements AuthProviderInterface
 {

@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged;
+namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged;
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenPersistenceInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenSignerInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigCredentialsSignerInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenPersistenceInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\TokenSignerInterface;
+use Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigCredentialsSignerInterface;
 
 interface ConfigInterface extends AuthConfigInterface
 {

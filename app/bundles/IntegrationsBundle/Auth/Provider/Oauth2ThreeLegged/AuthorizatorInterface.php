@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
+namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged;
 
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @deprecated; Use Credentials\CredentialsInterface and \MauticPlugin\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface instead
+ * @deprecated; Use Credentials\CredentialsInterface and \Mautic\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface instead
  */
 interface AuthorizatorInterface
 {

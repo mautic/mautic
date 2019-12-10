@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
+namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess;
 
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthConfigInterface;
 
 interface ConfigTokenSignerInterface extends AuthConfigInterface
 {

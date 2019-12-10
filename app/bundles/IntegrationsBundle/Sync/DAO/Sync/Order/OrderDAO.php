@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order;
+namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
-use MauticPlugin\IntegrationsBundle\Entity\ObjectMapping;
-use MauticPlugin\IntegrationsBundle\Exception\UnexpectedValueException;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
+use Mautic\IntegrationsBundle\Exception\UnexpectedValueException;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 
 class OrderDAO
 {

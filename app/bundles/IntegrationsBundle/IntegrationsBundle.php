@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle;
+namespace Mautic\IntegrationsBundle;
 
-use MauticPlugin\IntegrationsBundle\Bundle\AbstractPluginBundle;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\ConfigIntegrationPass;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
-use MauticPlugin\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
+use Mautic\IntegrationsBundle\Bundle\AbstractPluginBundle;
+use Mautic\IntegrationsBundle\DependencyInjection\Compiler\AuthenticationIntegrationPass;
+use Mautic\IntegrationsBundle\DependencyInjection\Compiler\ConfigIntegrationPass;
+use Mautic\IntegrationsBundle\DependencyInjection\Compiler\IntegrationsPass;
+use Mautic\IntegrationsBundle\DependencyInjection\Compiler\SyncIntegrationsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class IntegrationsBundle extends AbstractPluginBundle

@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Report;
+namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class ReportDAO
 {

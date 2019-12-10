@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\ValueNormalizer;
+namespace Mautic\IntegrationsBundle\Sync\ValueNormalizer;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 interface ValueNormalizerInterface
 {

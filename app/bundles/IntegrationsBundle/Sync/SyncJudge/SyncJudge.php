@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\SyncJudge;
+namespace Mautic\IntegrationsBundle\Sync\SyncJudge;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\FuzzyEvidence;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\HardEvidence;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
+use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
+use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\FuzzyEvidence;
+use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\HardEvidence;
 
 final class SyncJudge implements SyncJudgeInterface
 {

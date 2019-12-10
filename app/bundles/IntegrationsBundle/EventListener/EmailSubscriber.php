@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\EventListener;
+namespace Mautic\IntegrationsBundle\EventListener;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -19,11 +19,11 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
-use MauticPlugin\IntegrationsBundle\Entity\ObjectMappingRepository;
-use MauticPlugin\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
-use MauticPlugin\IntegrationsBundle\Helper\TokenParser;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
+use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
+use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
+use Mautic\IntegrationsBundle\Helper\TokenParser;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 

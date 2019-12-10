@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Request;
+namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Request;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 class RequestDAO
 {

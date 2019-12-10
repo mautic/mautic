@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\ApiKey\Credentials;
+namespace Mautic\IntegrationsBundle\Auth\Provider\ApiKey\Credentials;
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface HeaderCredentialsInterface extends AuthCredentialsInterface
 {

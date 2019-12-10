@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\DAO;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class ObjectIdsDAOTest extends \PHPUnit_Framework_TestCase
 {

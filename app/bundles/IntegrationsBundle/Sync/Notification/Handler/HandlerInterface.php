@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Notification\Handler;
+namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 
 interface HandlerInterface
 {

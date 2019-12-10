@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Auth\Provider\BasicAuth;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\BasicAuth;
 
 use GuzzleHttp\Exception\ConnectException;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\CredentialsInterface;
-use MauticPlugin\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory;
-use MauticPlugin\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\CredentialsInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory;
+use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 
 class HttpFactoryTest extends \PHPUnit_Framework_TestCase
 {

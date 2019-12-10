@@ -11,21 +11,21 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\SyncService;
+namespace Mautic\IntegrationsBundle\Sync\SyncService;
 
 use GuzzleHttp\Exception\ClientException;
-use MauticPlugin\IntegrationsBundle\Helper\SyncIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\MappingHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\RelationsHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Helper\SyncDateHelper;
-use MauticPlugin\IntegrationsBundle\Sync\Logger\DebugLogger;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Notifier;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
-use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
-use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
-use MauticPlugin\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
+use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
+use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
+use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
+use Mautic\IntegrationsBundle\Sync\Notification\Notifier;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
+use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
+use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
+use Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -112,7 +112,7 @@ final class SyncService implements SyncServiceInterface
     /**
      * @param InputOptionsDAO $inputOptionsDAO
      *
-     * @throws \MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException
+     * @throws \Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
     public function processIntegrationSync(InputOptionsDAO $inputOptionsDAO): void
     {

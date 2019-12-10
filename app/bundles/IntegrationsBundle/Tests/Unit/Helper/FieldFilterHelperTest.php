@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Helper;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Helper;
 
-use MauticPlugin\IntegrationsBundle\Helper\FieldFilterHelper;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
+use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 
 class FieldFilterHelperTest extends \PHPUnit_Framework_TestCase
 {

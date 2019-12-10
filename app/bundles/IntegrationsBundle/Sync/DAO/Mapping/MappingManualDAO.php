@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\IntegrationsBundle\Sync\DAO\Mapping;
+namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-use MauticPlugin\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
 class MappingManualDAO
 {

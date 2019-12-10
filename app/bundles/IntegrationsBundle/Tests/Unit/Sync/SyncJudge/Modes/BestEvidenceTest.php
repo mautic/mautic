@@ -11,12 +11,12 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\SyncJudge\Modes;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncJudge\Modes;
 
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
-use MauticPlugin\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
-use MauticPlugin\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
+use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
 
 class BestEvidenceTest extends \PHPUnit_Framework_TestCase
 {

@@ -11,11 +11,11 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\Sync\Notification\Handler;
+namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Handler;
 
-use MauticPlugin\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
-use MauticPlugin\IntegrationsBundle\Sync\Notification\Handler\HandlerInterface;
+use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
+use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
+use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerInterface;
 
 class HandlerContainerTest extends \PHPUnit_Framework_TestCase
 {

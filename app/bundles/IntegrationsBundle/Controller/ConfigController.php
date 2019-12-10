@@ -11,26 +11,26 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Controller;
+namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Entity\Integration;
-use MauticPlugin\IntegrationsBundle\Event\ConfigSaveEvent;
-use MauticPlugin\IntegrationsBundle\Event\FormLoadEvent;
-use MauticPlugin\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use MauticPlugin\IntegrationsBundle\Form\Type\IntegrationConfigType;
-use MauticPlugin\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
-use MauticPlugin\IntegrationsBundle\Helper\FieldMergerHelper;
-use MauticPlugin\IntegrationsBundle\Helper\FieldValidationHelper;
-use MauticPlugin\IntegrationsBundle\Integration\BasicIntegration;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthorizeButtonInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
-use MauticPlugin\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
+use Mautic\IntegrationsBundle\Event\FormLoadEvent;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Form\Type\IntegrationConfigType;
+use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
+use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
+use Mautic\IntegrationsBundle\Helper\FieldValidationHelper;
+use Mautic\IntegrationsBundle\Integration\BasicIntegration;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthorizeButtonInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
+use Mautic\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;

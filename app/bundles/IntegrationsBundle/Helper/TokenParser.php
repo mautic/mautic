@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Helper;
+namespace Mautic\IntegrationsBundle\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
+use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 
 class TokenParser
 {

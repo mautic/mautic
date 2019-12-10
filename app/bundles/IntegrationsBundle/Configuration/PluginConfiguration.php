@@ -12,7 +12,7 @@ declare(strict_types=1);
  * @author      Jan Kozak <galvani78@gmail.com>
  */
 
-namespace MauticPlugin\IntegrationsBundle\Configuration;
+namespace Mautic\IntegrationsBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

@@ -11,20 +11,20 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Tests\Unit\EventListener;
+namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectCreateEvent;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectEvent;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectFindEvent;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectOwnerEvent;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectRouteEvent;
-use MauticPlugin\IntegrationsBundle\Event\InternalObjectUpdateEvent;
-use MauticPlugin\IntegrationsBundle\EventListener\ContactObjectSubscriber;
-use MauticPlugin\IntegrationsBundle\IntegrationEvents;
-use MauticPlugin\IntegrationsBundle\Sync\DAO\DateRange;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
-use MauticPlugin\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
+use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
+use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
+use Mautic\IntegrationsBundle\EventListener\ContactObjectSubscriber;
+use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Symfony\Component\Routing\Router;
 
 class ContactObjectSubscriberTest extends \PHPUnit_Framework_TestCase

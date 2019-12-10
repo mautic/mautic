@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Sync\Notification;
+namespace Mautic\IntegrationsBundle\Sync\Notification;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;

@@ -11,9 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
+namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
-use MauticPlugin\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
+use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface RefreshTokenInterface extends AuthCredentialsInterface
 {
