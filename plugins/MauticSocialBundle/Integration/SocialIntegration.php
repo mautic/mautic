@@ -64,7 +64,7 @@ abstract class SocialIntegration extends AbstractIntegration
         Session $session,
         RequestStack $requestStack,
         Router $router,
-        DataCollectorTranslator $translator,
+        TranslatorInterface $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,
