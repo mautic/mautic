@@ -50,7 +50,7 @@ class ObjectDAO
     }
 
     /**
-     * @return null|\DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getChangeDateTime(): ?\DateTimeInterface
     {

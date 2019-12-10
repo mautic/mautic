@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -31,6 +30,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -80,7 +80,7 @@ class ConfigController extends AbstractFormController
         }
 
         // Find the integration
-        /** @var ConfigIntegrationsHelper $integrationsHelper */
+        /* @var ConfigIntegrationsHelper $integrationsHelper */
         $this->integrationsHelper = $this->get('mautic.integrations.helper.config_integrations');
 
         try {

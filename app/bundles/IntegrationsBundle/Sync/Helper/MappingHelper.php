@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
@@ -29,6 +28,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MappingHelper

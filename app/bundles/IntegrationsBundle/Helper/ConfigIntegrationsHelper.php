@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Helper;
 
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
+use Mautic\PluginBundle\Entity\Integration;
 
 class ConfigIntegrationsHelper
 {

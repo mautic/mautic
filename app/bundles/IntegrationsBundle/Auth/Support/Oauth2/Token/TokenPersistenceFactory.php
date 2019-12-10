@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Token\RawToken;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistenceFactory
 {

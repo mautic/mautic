@@ -15,9 +15,9 @@ namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface

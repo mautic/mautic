@@ -18,7 +18,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 interface AccessTokenInterface extends AuthCredentialsInterface
 {
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAccessToken(): ?string;
 

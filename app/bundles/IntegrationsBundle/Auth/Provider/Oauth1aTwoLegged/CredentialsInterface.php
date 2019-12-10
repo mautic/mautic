@@ -23,22 +23,22 @@ interface CredentialsInterface extends AuthCredentialsInterface
     public function getAuthUrl(): string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getConsumerKey(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getConsumerSecret(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getToken(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getTokenSecret(): ?string;
 }

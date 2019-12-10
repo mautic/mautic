@@ -28,12 +28,12 @@ interface CredentialsInterface extends AuthCredentialsInterface
     public function getTokenUrl(): string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getClientId(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getClientSecret(): ?string;
 }

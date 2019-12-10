@@ -23,7 +23,7 @@ interface HeaderCredentialsInterface extends AuthCredentialsInterface
     public function getKeyName(): string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getApiKey(): ?string;
 }

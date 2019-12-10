@@ -32,7 +32,7 @@ class FieldDAO
     private $value;
 
     /**
-     * @var null|\DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     private $changeDateTime = null;
 

@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
@@ -27,6 +25,8 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 

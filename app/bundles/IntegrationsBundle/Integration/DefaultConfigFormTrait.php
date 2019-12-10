@@ -18,7 +18,7 @@ trait DefaultConfigFormTrait
     /**
      * Use the default.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getConfigFormName(): ?string
     {
@@ -28,7 +28,7 @@ trait DefaultConfigFormTrait
     /**
      * Use the default.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getConfigFormContentTemplate(): ?string
     {
@@ -38,7 +38,7 @@ trait DefaultConfigFormTrait
     /**
      * Use the default.
      *
-     * @return null|string
+     * @return string|null
      */
     public function getSyncConfigFormName(): ?string
     {

@@ -36,32 +36,32 @@ interface CredentialsInterface extends AuthCredentialsInterface
     public function getAccessTokenUrl(): string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAuthCallbackUrl(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getClientId(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getClientSecret(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getBearerToken(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAccessToken(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getRequestToken(): ?string;
 }

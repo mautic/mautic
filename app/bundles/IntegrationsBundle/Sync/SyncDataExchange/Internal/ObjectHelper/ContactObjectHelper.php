@@ -14,12 +14,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
-use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
-use Mautic\LeadBundle\Model\FieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
@@ -29,6 +23,12 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 
 class ContactObjectHelper implements ObjectHelperInterface
 {

@@ -14,10 +14,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event as Events;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -26,6 +22,10 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Event as Events;
+use Mautic\LeadBundle\LeadEvents;
 
 class LeadSubscriber extends CommonSubscriber
 {

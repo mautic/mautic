@@ -29,7 +29,7 @@ class SyncIntegrationsHelper
     private $integrations = [];
 
     /**
-     * @var null|array
+     * @var array|null
      */
     private $enabled;
 

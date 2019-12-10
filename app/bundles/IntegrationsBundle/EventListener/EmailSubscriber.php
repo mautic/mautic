@@ -18,12 +18,12 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use Mautic\IntegrationsBundle\Helper\TokenParser;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 

@@ -81,7 +81,7 @@ class FieldChangeRepository extends CommonRepository
      * @param string             $integration
      * @param string             $objectType
      * @param \DateTimeInterface $toDateTime
-     * @param null|int           $afterObjectId
+     * @param int|null           $afterObjectId
      * @param int                $objectCount
      *
      * @return array

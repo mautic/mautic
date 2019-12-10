@@ -16,9 +16,9 @@ namespace Mautic\IntegrationsBundle\Bundle;
 use Doctrine\DBAL\Schema\Schema;
 use Exception;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\IntegrationsBundle\Migration\Engine;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
-use Mautic\IntegrationsBundle\Migration\Engine;
 
 /**
  * Base Bundle class which should be extended by addon bundles.

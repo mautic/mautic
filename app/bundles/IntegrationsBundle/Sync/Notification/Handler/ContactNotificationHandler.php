@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 
 class ContactNotificationHandler implements HandlerInterface
 {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Helper;
 
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\IntegrationsBundle\Event\KeysDecryptionEvent;
 use Mautic\IntegrationsBundle\Event\KeysEncryptionEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Facade\EncryptionService;
 use Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class IntegrationsHelper

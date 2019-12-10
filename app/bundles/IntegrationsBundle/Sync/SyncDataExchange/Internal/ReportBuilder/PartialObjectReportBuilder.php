@@ -171,7 +171,7 @@ class PartialObjectReportBuilder
         }
 
         if (!array_key_exists($objectId, $this->reportObjects[$object])) {
-            /** @var ReportObjectDAO $reportObjectDAO */
+            /* @var ReportObjectDAO $reportObjectDAO */
             $this->reportObjects[$object][$objectId] = $reportObjectDAO = new ReportObjectDAO($object, $objectId);
             $this->syncReport->addObject($reportObjectDAO);
             $reportObjectDAO->setChangeDateTime($modifiedDateTime);

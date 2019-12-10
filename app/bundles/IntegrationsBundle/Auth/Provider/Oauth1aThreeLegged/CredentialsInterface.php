@@ -33,27 +33,27 @@ interface CredentialsInterface extends AuthCredentialsInterface
     public function getAccessTokenUrl(): string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAuthCallbackUrl(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getConsumerId(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getConsumerSecret(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAccessToken(): ?string;
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getRequestToken(): ?string;
 }

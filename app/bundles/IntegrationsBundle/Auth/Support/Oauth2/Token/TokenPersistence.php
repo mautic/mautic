@@ -15,9 +15,9 @@ namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface;
 use kamermans\OAuth2\Token\TokenInterface;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotSetException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Entity\Integration;
 
 class TokenPersistence implements TokenPersistenceInterface
 {
