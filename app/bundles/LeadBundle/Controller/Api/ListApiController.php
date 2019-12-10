@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,8 +43,8 @@ class ListApiController extends CommonApiController
     {
         $lists   = $this->getModel('lead.list')->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['leadListList']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadListList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
