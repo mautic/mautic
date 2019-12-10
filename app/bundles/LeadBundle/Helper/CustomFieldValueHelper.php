@@ -35,7 +35,9 @@ class CustomFieldValueHelper
         if (isset($customFields['core'])) {
             foreach ($customFields as $group => $fields) {
                 foreach ($fields as $alias => $field) {
-                    $customFields[$group][$alias]['normalizedValue'] = self::normalizeValue($field);
+                    if (isset($field['value'])) {
+                        $customFields[$group][$alias]['normalizedValue'] = self::normalizeValue($field);
+                    }
                 }
             }
         } else {
