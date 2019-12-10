@@ -28,7 +28,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
 {
@@ -46,7 +46,7 @@ abstract class SocialIntegration extends AbstractIntegration
      * @param Session                  $session
      * @param RequestStack             $requestStack
      * @param Router                   $router
-     * @param DataCollectorTranslator  $translator
+     * @param TranslatorInterface      $translator
      * @param Logger                   $logger
      * @param EncryptionHelper         $encryptionHelper
      * @param LeadModel                $leadModel
