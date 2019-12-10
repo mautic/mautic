@@ -37,10 +37,10 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_Message $message
-     * @param null                $failedRecipients
+     * @param \Swift_Mime_SimpleMessage $message
+     * @param null                      $failedRecipients
      */
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->message         = $message;
         $this->fromAddresses[] = key($message->getFrom());
@@ -117,5 +117,13 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     public function start()
     {
         // ignore
+    }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
     }
 }

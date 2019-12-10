@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
+use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -97,7 +98,7 @@ class NoteModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadnote', $entity, $options);
+        return $formFactory->create(NoteType::class, $entity, $options);
     }
 
     /**

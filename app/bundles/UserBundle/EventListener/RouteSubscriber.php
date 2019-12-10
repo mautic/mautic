@@ -11,13 +11,28 @@
 
 namespace Mautic\UserBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class RouteSubscriber extends CommonSubscriber
+class RouteSubscriber implements EventSubscriberInterface
 {
+    /**
+     * Core params.
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
+     * @param array $params
+     */
+    public function __construct(array $params)
+    {
+        $this->params = $params;
+    }
+
     public static function getSubscribedEvents()
     {
         return [

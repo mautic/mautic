@@ -15,9 +15,6 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\StageBundle\Model\StageModel;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -52,8 +49,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $stageModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
      * @param StageModel $stageModel
      */
     public function __construct(StageModel $stageModel)

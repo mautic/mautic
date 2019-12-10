@@ -13,11 +13,8 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\UserBundle\Form\Type as FormType;
+use Mautic\UserBundle\Form\Type\ContactType;
 
-/**
- * Class UserController.
- */
 class UserController extends FormController
 {
     /**
@@ -144,7 +141,8 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
+                $formUser          = $this->request->request->get('user', []);
+                $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $encoder           = $this->get('security.encoder_factory')->getEncoder($user);
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -250,8 +248,7 @@ class UserController extends FormController
             ],
         ];
 
-        //user not found
-        if ($user === null) {
+        if (null === $user) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -272,11 +269,13 @@ class UserController extends FormController
         $form   = $model->createForm($user, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && $this->request->getMethod() === 'POST') {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $submittedPassword = $this->request->request->get('user[plainPassword][password]', null, true);
+                $formUser          = $this->request->request->get('user', []);
+                $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $encoder           = $this->get('security.encoder_factory')->getEncoder($user);
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -444,19 +443,21 @@ class UserController extends FormController
         }
 
         $action = $this->generateUrl('mautic_user_action', ['objectAction' => 'contact', 'objectId' => $objectId]);
-        $form   = $this->createForm(new FormType\ContactType(), [], ['action' => $action]);
+        $form   = $this->createForm(ContactType::class, [], ['action' => $action]);
 
         $currentUser = $this->user;
 
         if ($this->request->getMethod() == 'POST') {
-            $formUrl   = $this->request->request->get('contact[returnUrl]', '', true);
-            $returnUrl = ($formUrl) ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
+            $contact   = $this->request->request->get('contact', []);
+            $formUrl   = $contact['returnUrl'] ?? '';
+            $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $subject = InputHelper::clean($form->get('msg_subject')->getData());
                     $body    = InputHelper::clean($form->get('msg_body')->getData());
-                    $message = \Swift_Message::newInstance()
+                    $message = (new \Swift_Message())
                         ->setSubject($subject)
                         ->setFrom($currentUser->getEmail(), $currentUser->getName())
                         ->setTo($user->getEmail(), $user->getName())

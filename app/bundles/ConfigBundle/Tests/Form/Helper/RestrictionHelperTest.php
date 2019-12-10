@@ -44,9 +44,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Class RestrictionHelperTest.
- *
- * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper
+ * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 class RestrictionHelperTest extends TypeTestCase
 {

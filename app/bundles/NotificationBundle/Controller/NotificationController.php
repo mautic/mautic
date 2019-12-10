@@ -11,7 +11,7 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
@@ -19,7 +19,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class NotificationController extends FormController
+class NotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
 
@@ -276,11 +276,11 @@ class NotificationController extends FormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.notification.page', 1);
-        $action = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
-
+        $page         = $session->get('mautic.notification.page', 1);
+        $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
+        $notification = $this->request->request->get('notification', []);
         $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
@@ -291,7 +291,7 @@ class NotificationController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ($method === 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -444,17 +444,18 @@ class NotificationController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('notification[updateSelect]', false, true)
+        $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $notification = $this->request->request->get('notification', []);
+        $updateSelect = $method === 'POST'
+            ? ($notification['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && $method === 'POST') {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -586,7 +587,7 @@ class NotificationController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */

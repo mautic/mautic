@@ -11,41 +11,58 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     private $regex = '{focus=(.*?)}';
 
     /**
      * @var FocusModel
      */
-    protected $model;
+    private $model;
 
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
 
     /**
-     * PageSubscriber constructor.
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * Must be there until BuilderTokenHelper is refactored.
      *
+     * @var MauticFactory
+     */
+    private $factory;
+
+    /**
      * @param FocusModel      $model
      * @param RouterInterface $router
+     * @param CorePermissions $security
+     * @param MauticFactory   $factory
      */
-    public function __construct(FocusModel $model, RouterInterface $router)
-    {
-        $this->router = $router;
-        $this->model  = $model;
+    public function __construct(
+        FocusModel $model,
+        RouterInterface $router,
+        CorePermissions $security,
+        MauticFactory $factory
+    ) {
+        $this->model    = $model;
+        $this->router   = $router;
+        $this->security = $security;
+        $this->factory  = $factory;
     }
 
     /**

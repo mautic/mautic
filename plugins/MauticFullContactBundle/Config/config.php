@@ -32,13 +32,15 @@ return [
     'services' => [
         'events' => [
             'mautic.plugin.fullcontact.button.subscriber' => [
-                'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber',
+                'class'     => \MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.plugin.fullcontact.lead.subscriber' => [
-                'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber',
+                'class'     => \MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.plugin.fullcontact.lookup_helper',
                 ],

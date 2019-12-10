@@ -448,4 +448,12 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
             }
         }
     }
+
+    /**
+     * @return bool
+     */
+    public function ping()
+    {
+        return true;
+    }
 }

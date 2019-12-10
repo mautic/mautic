@@ -69,10 +69,10 @@ return [
     'services' => [
         'events' => [
             'mautic.plugin.pointbundle.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\PointSubscriber',
+                'class' => \Mautic\PluginBundle\EventListener\PointSubscriber::class,
             ],
             'mautic.plugin.formbundle.subscriber' => [
-                'class'       => 'Mautic\PluginBundle\EventListener\FormSubscriber',
+                'class'       => \Mautic\PluginBundle\EventListener\FormSubscriber::class,
                 'methodCalls' => [
                     'setIntegrationHelper' => [
                         'mautic.helper.integration',
@@ -80,7 +80,7 @@ return [
                 ],
             ],
             'mautic.plugin.campaignbundle.subscriber' => [
-                'class'       => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
+                'class'       => \Mautic\PluginBundle\EventListener\CampaignSubscriber::class,
                 'methodCalls' => [
                     'setIntegrationHelper' => [
                         'mautic.helper.integration',
@@ -88,13 +88,16 @@ return [
                 ],
             ],
             'mautic.plugin.leadbundle.subscriber' => [
-                'class'     => 'Mautic\PluginBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\PluginBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.plugin.model.plugin',
                 ],
             ],
             'mautic.plugin.integration.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\IntegrationSubscriber',
+                'class'     => \Mautic\PluginBundle\EventListener\IntegrationSubscriber::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
             ],
         ],
         'forms' => [

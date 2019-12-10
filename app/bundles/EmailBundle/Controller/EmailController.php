@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
@@ -449,20 +450,18 @@ class EmailController extends FormController
 
         $method  = $this->request->getMethod();
         $session = $this->get('session');
+
         if (!$this->get('mautic.security')->isGranted('email:emails:create')) {
             return $this->accessDenied();
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.email.page', 1);
-        $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('emailform[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $page         = $session->get('mautic.email.page', 1);
+        $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
+        $emailForm    = $this->request->request->get('emailform', []);
+        $updateSelect = $method === 'POST'
+            ? ($emailForm['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
             // Force type to template
@@ -473,8 +472,9 @@ class EmailController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ($method === 'POST') {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');
                 if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
@@ -656,14 +656,11 @@ class EmailController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('emailform[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $emailform    = $this->request->request->get('emailform', []);
+        $updateSelect = $method === 'POST'
+            ? ($emailform['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
             // Force type to template
@@ -673,7 +670,7 @@ class EmailController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && $method === 'POST') {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $this->request->request->get('emailform');
@@ -1198,7 +1195,7 @@ class EmailController extends FormController
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);
         $pending  = $model->getPendingLeads($entity, null, true);
-        $form     = $this->get('form.factory')->create('batch_send', [], ['action' => $action]);
+        $form     = $this->get('form.factory')->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $this->request->request->get('complete', false);
 
         if ($this->request->getMethod() == 'POST' && ($complete || $this->isFormValid($form))) {
@@ -1425,66 +1422,6 @@ class EmailController extends FormController
                 'contentTemplate' => 'MauticEmailBundle:Email:recipients.html.php',
             ]
         );
-    }
-
-    /**
-     * Send example email to current user.
-     *
-     * @deprecated 2.5 to be removed in 3.0
-     *
-     * @param $objectId
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function exampleAction($objectId)
-    {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model  = $this->getModel('email');
-        $entity = $model->getEntity($objectId);
-
-        //not found or not allowed
-        if ($entity === null
-            || (!$this->get('mautic.security')->hasEntityAccess(
-                'email:emails:viewown',
-                'email:emails:viewother',
-                $entity->getCreatedBy()
-            ))
-        ) {
-            return $this->viewAction($objectId);
-        }
-
-        // Prepare a fake lead
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->getModel('lead.field');
-        $fields     = $fieldModel->getFieldList(false, false);
-        array_walk(
-            $fields,
-            function (&$field) {
-                $field = "[$field]";
-            }
-        );
-        $fields['id'] = 0;
-
-        // Send to current user
-        $user  = $this->user;
-        $users = [
-            [
-                'id'        => $user->getId(),
-                'firstname' => $user->getFirstName(),
-                'lastname'  => $user->getLastName(),
-                'email'     => $user->getEmail(),
-            ],
-        ];
-
-        // Send to current user
-        $errors = $model->sendSampleEmailToUser($entity, $users, $fields, [], [], false);
-        if (count($errors)) {
-            $this->addFlash(implode('; ', $errors));
-        } else {
-            $this->addFlash('mautic.email.notice.test_sent.success');
-        }
-
-        return $this->viewAction($objectId);
     }
 
     /**
