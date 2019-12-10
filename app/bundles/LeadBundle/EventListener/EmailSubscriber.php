@@ -21,13 +21,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     /**
-     * @deprecated - to be removed in 3.0
-     *
-     * @var string
-     */
-    private static $leadFieldRegex = '{leadfield=(.*?)}';
-
-    /**
      * @var string
      */
     private static $contactFieldRegex = '{contactfield=(.*?)}';
@@ -35,7 +28,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * @var BuilderTokenHelperFactory
      */
-    protected $builderTokenHelperFactory;
+    private $builderTokenHelperFactory;
 
     /**
      * @param BuilderTokenHelperFactory $builderTokenHelperFactory

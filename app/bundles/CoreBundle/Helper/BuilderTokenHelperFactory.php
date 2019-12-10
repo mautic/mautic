@@ -33,9 +33,9 @@ class BuilderTokenHelperFactory
 
     /**
      * @param $modelName
-     * @param null $viewPermissionBase
-     * @param null $bundleName
-     * @param null $langVar
+     * @param string $viewPermissionBase
+     * @param string $bundleName
+     * @param string $langVar
      *
      * @return BuilderTokenHelper
      */

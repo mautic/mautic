@@ -42,12 +42,12 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * @var ContactTracker
      */
-    protected $contactTracker;
+    private $contactTracker;
 
     /**
      * @var BuilderTokenHelperFactory
      */
-    protected $builderTokenHelperFactory;
+    private $builderTokenHelperFactory;
 
     /**
      * BuilderSubscriber constructor.

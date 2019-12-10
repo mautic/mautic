@@ -33,17 +33,17 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var BuilderTokenHelperFactory
      */
-    protected $builderTokenHelperFactory;
+    private $builderTokenHelperFactory;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var CorePermissions
      */
-    protected $security;
+    private $security;
 
     /**
      * PageSubscriber constructor.

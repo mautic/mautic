@@ -111,6 +111,9 @@ return [
                     'mautic.helper.integration',
                     'mautic.page.model.page',
                     'mautic.helper.token_builder.factory',
+                    'translator',
+                    'doctrine.dbal.default_connection',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [

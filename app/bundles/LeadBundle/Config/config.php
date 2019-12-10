@@ -384,7 +384,7 @@ return [
                 ],
             ],
             'mautic.lead.emailbundle.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\EmailSubscriber',
+                'class'     => Mautic\LeadBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
                     'mautic.helper.token_builder.factory',
                 ],

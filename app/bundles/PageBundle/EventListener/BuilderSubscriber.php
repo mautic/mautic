@@ -14,7 +14,6 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use DOMDocument;
 use DOMXPath;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -33,6 +32,7 @@ use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -78,14 +78,9 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $templating;
 
     /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
      * @var BuilderTokenHelperFactory
      */
-    protected $builderTokenHelperFactory;
+    private $builderTokenHelperFactory;
 
     /**
      * @var PageModel
@@ -111,24 +106,30 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * BuilderSubscriber constructor.
      *
-     * @param CorePermissions   $security
-     * @param TokenHelper       $tokenHelper
-     * @param IntegrationHelper $integrationHelper
-     * @param PageModel         $pageModel
-     * @param BuilderTokey      $builderTokenHelperFactory
+     * @param CorePermissions           $security
+     * @param TokenHelper               $tokenHelper
+     * @param IntegrationHelper         $integrationHelper
+     * @param PageModel                 $pageModel
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
     public function __construct(
         CorePermissions $security,
         TokenHelper $tokenHelper,
         IntegrationHelper $integrationHelper,
         PageModel $pageModel,
-        BuilderTokenHelperFactory $builderTokenHelperFactory
+        BuilderTokenHelperFactory $builderTokenHelperFactory,
+        TranslatorInterface $translator,
+        Connection $connection,
+        TemplatingHelper $templating
     ) {
         $this->security                  = $security;
         $this->tokenHelper               = $tokenHelper;
         $this->integrationHelper         = $integrationHelper;
         $this->pageModel                 = $pageModel;
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+        $this->translator                = $translator;
+        $this->connection                = $connection;
+        $this->templating                = $templating;
     }
 
     /**
