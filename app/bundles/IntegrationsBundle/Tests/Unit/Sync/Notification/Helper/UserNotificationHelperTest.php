@@ -19,9 +19,10 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class UserNotificationHelperTest extends \PHPUnit_Framework_TestCase
+class UserNotificationHelperTest extends TestCase
 {
     /**
      * @var Writer|\PHPUnit_Framework_MockObject_MockObject

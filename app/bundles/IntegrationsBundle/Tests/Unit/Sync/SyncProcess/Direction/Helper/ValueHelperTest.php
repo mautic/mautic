@@ -18,8 +18,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
+use PHPUnit\Framework\TestCase;
 
-class ValueHelperTest extends \PHPUnit_Framework_TestCase
+class ValueHelperTest extends TestCase
 {
     public function testExceptionForMissingRequiredIntegrationValue(): void
     {

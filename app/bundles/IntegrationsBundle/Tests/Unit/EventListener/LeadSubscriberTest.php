@@ -13,11 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\CompanyEvent;
-use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
@@ -25,8 +20,14 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\LeadEvents;
+use PHPUnit\Framework\TestCase;
 
-class LeadSubscriberTest extends \PHPUnit_Framework_TestCase
+class LeadSubscriberTest extends TestCase
 {
     private $fieldChangeRepository;
     private $variableExpresserHelper;

@@ -24,8 +24,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
 use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use PHPUnit\Framework\TestCase;
 
-class RelationsHelperTest extends \PHPUnit_Framework_TestCase
+class RelationsHelperTest extends TestCase
 {
     /**
      * @var MappingHelper|\PHPUnit_Framework_MockObject_MockObject

@@ -23,8 +23,9 @@ use Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigTokenPersis
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigTokenSignerInterface;
 use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends \PHPUnit_Framework_TestCase
+class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {

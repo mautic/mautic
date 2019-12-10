@@ -20,8 +20,9 @@ use Mautic\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends \PHPUnit_Framework_TestCase
+class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {

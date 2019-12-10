@@ -21,9 +21,10 @@ use Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class RouteHelperTest extends \PHPUnit_Framework_TestCase
+class RouteHelperTest extends TestCase
 {
     /**
      * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject

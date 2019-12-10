@@ -17,8 +17,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\HardEvidence;
+use PHPUnit\Framework\TestCase;
 
-class HardEvidenceTest extends \PHPUnit_Framework_TestCase
+class HardEvidenceTest extends TestCase
 {
     public function testLeftWinner(): void
     {

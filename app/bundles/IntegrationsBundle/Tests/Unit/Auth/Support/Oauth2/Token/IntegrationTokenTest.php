@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
+use PHPUnit\Framework\TestCase;
 
-class IntegrationTokenTest extends \PHPUnit_Framework_TestCase
+class IntegrationTokenTest extends TestCase
 {
     public function testGetters(): void
     {

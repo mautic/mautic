@@ -15,8 +15,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use PHPUnit\Framework\TestCase;
 
-class ObjectIdsDAOTest extends \PHPUnit_Framework_TestCase
+class ObjectIdsDAOTest extends TestCase
 {
     public function testWorkflow(): void
     {

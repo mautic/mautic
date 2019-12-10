@@ -16,9 +16,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth1aTwoLegged;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends PHPUnit_Framework_TestCase
+class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {

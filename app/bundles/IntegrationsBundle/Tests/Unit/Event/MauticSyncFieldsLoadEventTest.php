@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Event;
 
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
+use PHPUnit\Framework\TestCase;
 
-class MauticSyncFieldsLoadEventTest extends \PHPUnit_Framework_TestCase
+class MauticSyncFieldsLoadEventTest extends TestCase
 {
     public function testWorkflow(): void
     {

@@ -16,8 +16,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Handler;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerInterface;
+use PHPUnit\Framework\TestCase;
 
-class HandlerContainerTest extends \PHPUnit_Framework_TestCase
+class HandlerContainerTest extends TestCase
 {
     public function testExceptionThrownIfIntegrationNotFound(): void
     {

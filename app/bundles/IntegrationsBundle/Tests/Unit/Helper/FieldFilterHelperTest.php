@@ -16,8 +16,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Helper;
 use Mautic\IntegrationsBundle\Helper\FieldFilterHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
+use PHPUnit\Framework\TestCase;
 
-class FieldFilterHelperTest extends \PHPUnit_Framework_TestCase
+class FieldFilterHelperTest extends TestCase
 {
     public function testFieldsFilteredByPage(): void
     {

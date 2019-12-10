@@ -16,8 +16,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO\Mapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
+use PHPUnit\Framework\TestCase;
 
-class MappingManualDAOTest extends \PHPUnit_Framework_TestCase
+class MappingManualDAOTest extends TestCase
 {
     private $integrationName       = 'Test';
     private $integrationObjectName = 'Contact';

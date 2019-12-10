@@ -25,9 +25,10 @@ use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
-class ContactObjectSubscriberTest extends \PHPUnit_Framework_TestCase
+class ContactObjectSubscriberTest extends TestCase
 {
     /**
      * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject

@@ -14,16 +14,17 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInterface;
+use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FieldHelperTest extends \PHPUnit_Framework_TestCase
+class FieldHelperTest extends TestCase
 {
     /**
      * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject

@@ -16,8 +16,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\ValueNormalizer;
 use DateTimeInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
+class ValueNormalizerTest extends TestCase
 {
     public function testNullDateTimeValue(): void
     {

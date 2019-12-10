@@ -15,8 +15,9 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationTokenFactory;
+use PHPUnit\Framework\TestCase;
 
-class IntegrationTokenFactoryTest extends \PHPUnit_Framework_TestCase
+class IntegrationTokenFactoryTest extends TestCase
 {
     public function testTokenGeneratedWithExpires(): void
     {

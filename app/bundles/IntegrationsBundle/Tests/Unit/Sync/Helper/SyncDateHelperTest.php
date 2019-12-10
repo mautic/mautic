@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
+use PHPUnit\Framework\TestCase;
 
-class SyncDateHelperTest extends \PHPUnit_Framework_TestCase
+class SyncDateHelperTest extends TestCase
 {
     /**
      * @var SyncDateHelper|\PHPUnit_Framework_MockObject_MockObject

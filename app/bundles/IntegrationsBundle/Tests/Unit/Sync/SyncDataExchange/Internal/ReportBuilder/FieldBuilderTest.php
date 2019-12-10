@@ -18,10 +18,11 @@ use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
-class FieldBuilderTest extends \PHPUnit_Framework_TestCase
+class FieldBuilderTest extends TestCase
 {
     /**
      * @var Router|\PHPUnit_Framework_MockObject_MockObject

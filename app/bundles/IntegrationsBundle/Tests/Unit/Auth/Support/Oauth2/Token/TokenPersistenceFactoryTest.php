@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Entity\Integration;
+use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceFactoryTest extends \PHPUnit_Framework_TestCase
+class TokenPersistenceFactoryTest extends TestCase
 {
     private $integrationsHelper;
     private $integration;

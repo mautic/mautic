@@ -17,8 +17,9 @@ use GuzzleHttp\Exception\ConnectException;
 use Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\CredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends \PHPUnit_Framework_TestCase
+class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {

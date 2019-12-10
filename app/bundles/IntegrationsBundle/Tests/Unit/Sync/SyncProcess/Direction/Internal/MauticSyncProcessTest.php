@@ -29,8 +29,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\MauticSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Internal\ObjectChangeGenerator;
+use PHPUnit\Framework\TestCase;
 
-class MauticSyncProcessTest extends \PHPUnit_Framework_TestCase
+class MauticSyncProcessTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 

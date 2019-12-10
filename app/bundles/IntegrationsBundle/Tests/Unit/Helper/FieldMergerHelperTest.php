@@ -18,8 +18,9 @@ use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use PHPUnit\Framework\TestCase;
 
-class FieldMergerHelperTest extends \PHPUnit_Framework_TestCase
+class FieldMergerHelperTest extends TestCase
 {
     public function testNonExistingFieldsAreRemoved(): void
     {

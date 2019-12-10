@@ -20,8 +20,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use PHPUnit\Framework\TestCase;
 
-class InputOptionsDAOTest extends \PHPUnit_Framework_TestCase
+class InputOptionsDAOTest extends TestCase
 {
     public function testWorkflowFromCliWithAllValuesSet(): void
     {

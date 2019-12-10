@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
@@ -26,9 +25,11 @@ use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use Mautic\LeadBundle\Model\FieldModel;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MappingHelperTest extends \PHPUnit_Framework_TestCase
+class MappingHelperTest extends TestCase
 {
     /**
      * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject

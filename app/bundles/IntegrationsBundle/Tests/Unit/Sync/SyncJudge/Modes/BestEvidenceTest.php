@@ -17,8 +17,9 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 use Mautic\IntegrationsBundle\Sync\SyncJudge\Modes\BestEvidence;
+use PHPUnit\Framework\TestCase;
 
-class BestEvidenceTest extends \PHPUnit_Framework_TestCase
+class BestEvidenceTest extends TestCase
 {
     public function testLeftWinnerWithCertainChangeDateTime(): void
     {

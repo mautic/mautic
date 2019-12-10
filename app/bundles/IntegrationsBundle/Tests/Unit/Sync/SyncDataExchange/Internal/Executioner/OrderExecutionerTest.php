@@ -23,9 +23,10 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\OrderEx
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrderExecutionerTest extends \PHPUnit_Framework_TestCase
+class OrderExecutionerTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 

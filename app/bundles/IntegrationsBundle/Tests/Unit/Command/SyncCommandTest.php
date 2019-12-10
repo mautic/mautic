@@ -17,6 +17,7 @@ use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -28,7 +29,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-class SyncCommandTest extends \PHPUnit_Framework_TestCase
+class SyncCommandTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 

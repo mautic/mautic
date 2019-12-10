@@ -16,13 +16,14 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Support\Oauth2\Token;
 use kamermans\OAuth2\Token\RawToken;
 use kamermans\OAuth2\Token\RawTokenFactory;
 use kamermans\OAuth2\Token\TokenInterface;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\IntegrationToken;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistence;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotSetException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Mautic\PluginBundle\Entity\Integration;
+use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceTest extends \PHPUnit_Framework_TestCase
+class TokenPersistenceTest extends TestCase
 {
     private $integrationsHelper;
     private $tokenPersistence;

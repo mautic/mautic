@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
+use PHPUnit\Framework\TestCase;
 
-class ObjectMappingTest extends \PHPUnit_Framework_TestCase
+class ObjectMappingTest extends TestCase
 {
     /**
      * @var \DateTime

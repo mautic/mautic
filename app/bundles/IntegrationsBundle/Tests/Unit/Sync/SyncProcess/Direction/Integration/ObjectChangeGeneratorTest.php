@@ -23,8 +23,9 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
+use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends \PHPUnit_Framework_TestCase
+class ObjectChangeGeneratorTest extends TestCase
 {
     /**
      * @var ValueHelper|\PHPUnit_Framework_MockObject_MockObject

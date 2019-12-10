@@ -13,15 +13,16 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal;
 
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
+use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ObjectProviderTest extends \PHPUnit_Framework_TestCase
+class ObjectProviderTest extends TestCase
 {
     /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
