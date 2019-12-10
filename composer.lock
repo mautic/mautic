@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "077c0ba7299a59c3beccbc08401537d8",
+    "content-hash": "d1210e8ce0fa70f0de37b365bab0d7c2",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -11028,6 +11028,47 @@
                 "window"
             ],
             "time": "2017-05-02T12:26:19+00:00"
+        },
+        {
+            "name": "kamermans/guzzle-oauth2-subscriber",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kamermans/guzzle-oauth2-subscriber.git",
+                "reference": "0e484edf9b8b12ec4710f86ba9b0831ccd1f6283"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kamermans/guzzle-oauth2-subscriber/zipball/0e484edf9b8b12ec4710f86ba9b0831ccd1f6283",
+                "reference": "0e484edf9b8b12ec4710f86ba9b0831ccd1f6283",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": ">=4.0",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "kamermans\\OAuth2\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steve Kamerman",
+                    "email": "stevekamerman@gmail.com"
+                }
+            ],
+            "description": "OAuth 2.0 client for Guzzle 4, 5 and 6+",
+            "keywords": [
+                "Guzzle",
+                "oauth"
+            ],
+            "time": "2019-02-26T16:58:01+00:00"
         },
         {
             "name": "liip/functional-test-bundle",

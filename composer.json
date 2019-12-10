@@ -120,7 +120,8 @@
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.15.0",
-        "liip/test-fixtures-bundle": "^1.6"
+        "liip/test-fixtures-bundle": "^1.6",
+        "kamermans/guzzle-oauth2-subscriber": "^1.0"
     },
     "repositories": [
         {
