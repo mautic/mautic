@@ -340,4 +340,12 @@ class FoursquareIntegration extends SocialIntegration
 
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return null;
+    }
 }

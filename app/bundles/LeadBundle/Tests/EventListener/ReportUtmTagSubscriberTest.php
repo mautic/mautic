@@ -139,7 +139,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $reportBuilderEvent->getTables()); //Different order of keys on PHP 5.6.
+        $this->assertSame($expected, $reportBuilderEvent->getTables());
     }
 
     public function testReportGenerateNoJoinedTables()

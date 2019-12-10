@@ -11,6 +11,7 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -83,11 +84,11 @@ class TriggerType extends AbstractType
 
         //add category
         $builder->add(
-          'category',
-          'category',
-          [
-            'bundle' => 'point',
-          ]
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'point',
+            ]
         );
 
         $builder->add(
@@ -124,11 +125,11 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
-          'triggerExistingLeads',
-          YesNoButtonGroupType::class,
-          [
-            'label' => 'mautic.point.trigger.form.existingleads',
-          ]
+            'triggerExistingLeads',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.point.trigger.form.existingleads',
+            ]
         );
 
         if (!empty($options['data']) && $options['data']->getId()) {
@@ -143,12 +144,12 @@ class TriggerType extends AbstractType
         }
 
         $builder->add(
-          'isPublished',
-          YesNoButtonGroupType::class,
-          [
-            'read_only' => $readonly,
-            'data'      => $data,
-          ]
+            'isPublished',
+            YesNoButtonGroupType::class,
+            [
+                'read_only' => $readonly,
+                'data'      => $data,
+            ]
         );
 
         $builder->add(

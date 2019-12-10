@@ -52,11 +52,11 @@ class SendGridApiMessage
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return Mail
      */
-    public function getMessage(\Swift_Mime_Message $message)
+    public function getMessage(\Swift_Mime_SimpleMessage $message)
     {
         $mail = $this->sendGridMailBase->getSendGridMail($message);
 

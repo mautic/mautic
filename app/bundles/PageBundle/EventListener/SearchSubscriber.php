@@ -13,35 +13,50 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserHelper $userHelper
-     * @param PageModel  $pageModel
+     * @var CorePermissions
      */
-    public function __construct(UserHelper $userHelper, PageModel $pageModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @param UserHelper       $userHelper
+     * @param PageModel        $pageModel
+     * @param CorePermissions  $security
+     * @param TemplatingHelper $templating
+     */
+    public function __construct(
+        UserHelper $userHelper,
+        PageModel $pageModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userHelper = $userHelper;
         $this->pageModel  = $pageModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**
@@ -90,13 +105,13 @@ class SearchSubscriber extends CommonSubscriber
                 $pageResults = [];
 
                 foreach ($pages as $page) {
-                    $pageResults[] = $this->templating->renderResponse(
+                    $pageResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPageBundle:SubscribedEvents\Search:global.html.php',
                         ['page' => $page]
                     )->getContent();
                 }
                 if (count($pages) > 5) {
-                    $pageResults[] = $this->templating->renderResponse(
+                    $pageResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticPageBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

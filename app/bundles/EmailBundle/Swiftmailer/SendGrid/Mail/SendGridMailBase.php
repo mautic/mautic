@@ -29,11 +29,11 @@ class SendGridMailBase
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return Mail
      */
-    public function getSendGridMail(\Swift_Mime_Message $message)
+    public function getSendGridMail(\Swift_Mime_SimpleMessage $message)
     {
         $froms       = $message->getFrom();
         $from        = new Email(current($froms), key($froms));
@@ -65,11 +65,11 @@ class SendGridMailBase
     }
 
     /**
-     * @param \Swift_Mime_Message $message
+     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return string
      */
-    private function getContentType(\Swift_Mime_Message $message)
+    private function getContentType(\Swift_Mime_SimpleMessage $message)
     {
         return $message->getContentType() === 'text/plain' ? $message->getContentType() : 'text/html';
     }

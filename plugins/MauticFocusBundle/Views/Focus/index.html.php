@@ -18,7 +18,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => $permissions['plugin:focus:items:create'],
+                'new' => $permissions['focus:items:create'],
             ],
             'routeBase' => 'focus',
         ]

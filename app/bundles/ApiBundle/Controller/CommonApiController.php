@@ -1244,13 +1244,6 @@ class CommonApiController extends FOSRestController implements MauticController
                 'errors' => [
                     $error,
                 ],
-                // @deprecated 2.6.0 to be removed in 3.0
-                'error' => [
-                    'message' => $this->get('translator')->trans($msg, [], 'flashes')
-                        .' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
-                    'code'    => $code,
-                    'details' => $details,
-                ],
             ],
             $code
         );

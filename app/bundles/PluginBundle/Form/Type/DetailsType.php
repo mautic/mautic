@@ -11,6 +11,9 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -27,7 +30,7 @@ class DetailsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('isPublished', 'yesno_button_group');
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $keys          = $options['integration_object']->getRequiredKeyFields();
         $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
@@ -63,7 +66,7 @@ class DetailsType extends AbstractType
             $disabled = false;
             $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
-            $builder->add('authButton', 'standalone_button', [
+            $builder->add('authButton', StandAloneButtonType::class, [
                 'attr' => [
                     'class'   => 'btn btn-success btn-lg',
                     'onclick' => 'Mautic.initiateIntegrationAuthorization()',
@@ -123,7 +126,7 @@ class DetailsType extends AbstractType
 
         $builder->add('in_auth', 'hidden', ['mapped' => false]);
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

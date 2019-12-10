@@ -12,7 +12,6 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
@@ -20,21 +19,19 @@ use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class UploadSubscriber.
- */
-class UploadSubscriber extends CommonSubscriber
+class UploadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
      * @var FileUploadValidator

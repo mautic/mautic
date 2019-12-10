@@ -11,7 +11,7 @@
 
 namespace Mautic\PointBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -46,7 +46,7 @@ class PointType extends AbstractType
     /**
      * PointType constructor.
      *
-     * @param \Symfony\Component\Translation\TranslatorInterface $translator
+     * @param \Symfony\Component\Translation\TranslatorInterface      $translator
      * @param \Mautic\CoreBundle\Security\Permissions\CorePermissions $security
      */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
@@ -78,12 +78,12 @@ class PointType extends AbstractType
         ]);
 
         $builder->add('type', ChoiceType::class, [
-            'choices'     => $options['pointActions']['choices'],
-            'choices_as_values' => true ,
-            'empty_value' => '',
-            'label'       => 'mautic.point.form.type',
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => [
+            'choices'           => $options['pointActions']['choices'],
+            'choices_as_values' => true,
+            'empty_value'       => '',
+            'label'             => 'mautic.point.form.type',
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);',
             ],
@@ -165,9 +165,13 @@ class PointType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
-            'bundle' => 'point',
-        ]);
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'point',
+            ]
+        );
 
         $builder->add('buttons', FormButtonsType::class);
 

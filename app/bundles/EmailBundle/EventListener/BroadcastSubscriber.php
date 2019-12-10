@@ -14,14 +14,10 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BroadcastSubscriber.
- */
 class BroadcastSubscriber implements EventSubscriberInterface
 {
     /**
@@ -40,8 +36,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * BroadcastSubscriber constructor.
-     *
      * @param EmailModel          $emailModel
      * @param EntityManager       $em
      * @param TranslatorInterface $translator

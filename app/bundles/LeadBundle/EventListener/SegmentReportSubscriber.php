@@ -11,13 +11,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SegmentReportSubscriber extends CommonSubscriber
+class SegmentReportSubscriber implements EventSubscriberInterface
 {
     const SEGMENT_MEMBERSHIP = 'segment.membership';
 

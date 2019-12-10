@@ -13,36 +13,39 @@ namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var NotificationHelper
      */
-    protected $notificationHelper;
+    private $notificationHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
-     * BuildJsSubscriber constructor.
-     *
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * @param NotificationHelper $notificationHelper
      * @param IntegrationHelper  $integrationHelper
+     * @param RouterInterface    $router
      */
-    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper)
+    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
     {
         $this->notificationHelper = $notificationHelper;
         $this->integrationHelper  = $integrationHelper;
+        $this->router             = $router;
     }
 
     /**

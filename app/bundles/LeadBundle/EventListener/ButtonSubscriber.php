@@ -13,11 +13,33 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class ButtonSubscriber extends CommonSubscriber
+class ButtonSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param RouterInterface     $router
+     */
+    public function __construct(TranslatorInterface $translator, RouterInterface $router)
+    {
+        $this->translator = $translator;
+        $this->router     = $router;
+    }
+
     public static function getSubscribedEvents()
     {
         return [

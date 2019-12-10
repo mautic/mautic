@@ -20,9 +20,6 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class TokenSubscriber.
- */
 class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
@@ -38,8 +35,6 @@ class TokenSubscriber implements EventSubscriberInterface
     private $primaryCompanyHelper;
 
     /**
-     * TokenSubscriber constructor.
-     *
      * @param EventDispatcherInterface $dispatcher
      * @param PrimaryCompanyHelper     $primaryCompanyHelper
      */

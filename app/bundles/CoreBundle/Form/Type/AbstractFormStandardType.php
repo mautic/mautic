@@ -11,10 +11,12 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -89,7 +91,7 @@ abstract class AbstractFormStandardType extends AbstractType
         if (!$builder->has('category') && method_exists($options['data'], 'getCategory')) {
             $builder->add(
                 'category',
-                'category',
+                CategoryListType::class,
                 [
                     'bundle' => isset($options['category_bundle']) ? $options['category_bundle'] : 'global',
                 ]
@@ -118,7 +120,7 @@ abstract class AbstractFormStandardType extends AbstractType
 
             $builder->add(
                 'isPublished',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'read_only' => $readonly,
                     'data'      => $data,
@@ -128,7 +130,7 @@ abstract class AbstractFormStandardType extends AbstractType
             if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
                 $builder->add(
                     'publishUp',
-                    'datetime',
+                    DateTimeType::class,
                     [
                         'widget'     => 'single_text',
                         'label'      => 'mautic.core.form.publishup',
@@ -137,15 +139,15 @@ abstract class AbstractFormStandardType extends AbstractType
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
                         ],
-                        'format'    => 'yyyy-MM-dd HH:mm',
-                        'required'  => false,
-                        'read_only' => $readonly,
+                        'format'     => 'yyyy-MM-dd HH:mm',
+                        'required'   => false,
+                        'read_only'  => $readonly,
                     ]
                 );
 
                 $builder->add(
                     'publishDown',
-                    'datetime',
+                    DateTimeType::class,
                     [
                         'widget'     => 'single_text',
                         'label'      => 'mautic.core.form.publishdown',
@@ -154,9 +156,9 @@ abstract class AbstractFormStandardType extends AbstractType
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
                         ],
-                        'format'    => 'yyyy-MM-dd HH:mm',
-                        'required'  => false,
-                        'read_only' => $readonly,
+                        'format'     => 'yyyy-MM-dd HH:mm',
+                        'required'   => false,
+                        'read_only'  => $readonly,
                     ]
                 );
             }
@@ -172,7 +174,7 @@ abstract class AbstractFormStandardType extends AbstractType
                     'attr'       => [
                         'class' => 'form-control',
                     ],
-                    'required' => false,
+                    'required'   => false,
                 ]
             );
         }
@@ -182,7 +184,7 @@ abstract class AbstractFormStandardType extends AbstractType
             if (!$builder->has('buttons')) {
                 $builder->add(
                     'buttons',
-                    'form_buttons',
+                    FormButtonsType::class,
                     array_merge(
                         ['apply_text' => false],
                         $buttonOptions
@@ -204,7 +206,7 @@ abstract class AbstractFormStandardType extends AbstractType
         } elseif (!$builder->has('buttons')) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 $buttonOptions
             );
         }

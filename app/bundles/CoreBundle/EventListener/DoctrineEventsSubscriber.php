@@ -21,12 +21,12 @@ use Mautic\CoreBundle\Entity\DeprecatedInterface;
  */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
-    protected $tablePrefix;
+    private $tablePrefix;
 
     /**
      * @var
      */
-    protected $deprecatedEntityTables = [];
+    private $deprecatedEntityTables = [];
 
     /**
      * DoctrineEventsSubscriber constructor.

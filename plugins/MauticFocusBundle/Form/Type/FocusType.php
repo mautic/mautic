@@ -13,7 +13,11 @@ namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -67,7 +71,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
@@ -81,7 +85,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'html_mode',
-            'button_group',
+            ButtonGroupType::class,
             [
                 'label'      => 'mautic.focus.form.html_mode',
                 'label_attr' => ['class' => 'control-label'],
@@ -154,9 +158,9 @@ class FocusType extends AbstractType
         );
 
         if (!empty($options['data']) && $options['data']->getId()) {
-            $readonly = !$this->security->isGranted('plugin:focus:items:publish');
+            $readonly = !$this->security->isGranted('focus:items:publish');
             $data     = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('plugin:focus:items:publish')) {
+        } elseif (!$this->security->isGranted('focus:items:publish')) {
             $readonly = true;
             $data     = false;
         } else {
@@ -166,7 +170,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'isPublished',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'read_only' => $readonly,
                 'data'      => $data,
@@ -243,7 +247,7 @@ class FocusType extends AbstractType
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text'        => false,
                     'pre_extra_buttons' => $customButtons,
@@ -260,7 +264,7 @@ class FocusType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'pre_extra_buttons' => $customButtons,
                 ]

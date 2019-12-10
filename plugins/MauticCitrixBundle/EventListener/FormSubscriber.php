@@ -12,7 +12,8 @@
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -27,15 +28,16 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\PluginEvents;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType;
+use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     use CitrixRegistrationTrait;
     use CitrixStartTrait;
@@ -43,30 +45,57 @@ class FormSubscriber extends CommonSubscriber
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var SubmissionModel
      */
-    protected $submissionModel;
+    private $submissionModel;
 
     /**
      * @var CitrixModel
      */
-    protected $citrixModel;
+    private $citrixModel;
 
     /**
-     * FormSubscriber constructor.
-     *
-     * @param CitrixModel     $citrixModel
-     * @param FormModel       $formModel
-     * @param SubmissionModel $submissionModel
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $citrixModel, FormModel $formModel, SubmissionModel $submissionModel)
-    {
+    private $translator;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
+     *
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @param CitrixModel         $citrixModel
+     * @param FormModel           $formModel
+     * @param SubmissionModel     $submissionModel
+     * @param TranslatorInterface $translator
+     * @param EntityManager       $entityManager
+     * @param TemplatingHelper    $templating
+     */
+    public function __construct(
+        CitrixModel $citrixModel,
+        FormModel $formModel,
+        SubmissionModel $submissionModel,
+        TranslatorInterface $translator,
+        EntityManager $entityManager,
+        TemplatingHelper $templating
+    ) {
         $this->citrixModel     = $citrixModel;
         $this->formModel       = $formModel;
         $this->submissionModel = $submissionModel;
+        $this->translator      = $translator;
+        $this->em              = $entityManager;
+        $this->templating      = $templating;
     }
 
     /**
@@ -231,33 +260,12 @@ class FormSubscriber extends CommonSubscriber
     }
 
     /**
-     * Helper function to debug REST responses.
-     *
-     * @param PluginIntegrationRequestEvent $event
-     */
-    public function onResponse(PluginIntegrationRequestEvent $event)
-    {
-        //        /** @var Response $response */
-//        $response = $event->getResponse();
-//        CitrixHelper::log(
-//            PHP_EOL. //$response->getStatusCode() . ' ' .
-//            print_r($response, true)
-//        );
-    }
-
-    /**
      * Helper function to debug REST requests.
      *
      * @param PluginIntegrationRequestEvent $event
      */
     public function onRequest(PluginIntegrationRequestEvent $event)
     {
-        //        CitrixHelper::log(
-//            PHP_EOL.$event->getMethod().' '.$event->getUrl().' '.
-//            var_export($event->getHeaders(), true).
-//            var_export($event->getParameters(), true)
-//        );
-
         // clean parameter that was breaking the call
         if (preg_match('/\/G2W\/rest\//', $event->getUrl())) {
             $params = $event->getParameters();
@@ -533,7 +541,7 @@ class FormSubscriber extends CommonSubscriber
             // Select field
             $field = [
                 'label'    => 'plugin.citrix.'.$product.'.listfield',
-                'formType' => 'citrix_list',
+                'formType' => CitrixListType::class,
                 'template' => 'MauticCitrixBundle:Field:citrixlist.html.php',
                 'listType' => $product,
             ];
@@ -546,29 +554,31 @@ class FormSubscriber extends CommonSubscriber
             $event->addValidator('plugin.citrix.validate.'.$product, $validator);
 
             // actions
-            if (CitrixProducts::GOTOWEBINAR === $product) {
-                $action = [
-                    'group'           => 'plugin.citrix.form.header',
-                    'description'     => 'plugin.citrix.form.header.webinar',
-                    'label'           => 'plugin.citrix.action.register.webinar',
-                    'formType'        => 'citrix_submit_action',
-                    'formTypeOptions' => [
-                        'attr' => [
-                            'data-product'        => $product,
-                            'data-product-action' => 'register',
+            switch ($product) {
+                case CitrixProducts::GOTOWEBINAR:
+                    $action = [
+                        'group'           => 'plugin.citrix.form.header',
+                        'description'     => 'plugin.citrix.form.header.webinar',
+                        'label'           => 'plugin.citrix.action.register.webinar',
+                        'formType'        => CitrixActionType::class,
+                        'formTypeOptions' => [
+                            'attr' => [
+                                'data-product'        => $product,
+                                'data-product-action' => 'register',
+                            ],
                         ],
-                    ],
-                    'template'  => 'MauticFormBundle:Action:generic.html.php',
-                    'eventName' => CitrixEvents::ON_WEBINAR_REGISTER_ACTION,
-                ];
-                $event->addSubmitAction('plugin.citrix.action.register.webinar', $action);
-            } else {
-                if (CitrixProducts::GOTOMEETING === $product) {
+                        'template'  => 'MauticFormBundle:Action:generic.html.php',
+                        'eventName' => CitrixEvents::ON_WEBINAR_REGISTER_ACTION,
+                    ];
+                    $event->addSubmitAction('plugin.citrix.action.register.webinar', $action);
+                    break;
+
+                case CitrixProducts::GOTOMEETING:
                     $action = [
                         'group'           => 'plugin.citrix.form.header',
                         'description'     => 'plugin.citrix.form.header.meeting',
                         'label'           => 'plugin.citrix.action.start.meeting',
-                        'formType'        => 'citrix_submit_action',
+                        'formType'        => CitrixActionType::class,
                         'template'        => 'MauticFormBundle:Action:generic.html.php',
                         'eventName'       => CitrixEvents::ON_MEETING_START_ACTION,
                         'formTypeOptions' => [
@@ -579,59 +589,62 @@ class FormSubscriber extends CommonSubscriber
                         ],
                     ];
                     $event->addSubmitAction('plugin.citrix.action.start.meeting', $action);
-                } else {
-                    if (CitrixProducts::GOTOTRAINING === $product) {
-                        $action = [
-                            'group'           => 'plugin.citrix.form.header',
-                            'description'     => 'plugin.citrix.form.header.training',
-                            'label'           => 'plugin.citrix.action.register.training',
-                            'formType'        => 'citrix_submit_action',
-                            'template'        => 'MauticFormBundle:Action:generic.html.php',
-                            'eventName'       => CitrixEvents::ON_TRAINING_REGISTER_ACTION,
-                            'formTypeOptions' => [
-                                'attr' => [
-                                    'data-product'        => $product,
-                                    'data-product-action' => 'register',
-                                ],
-                            ],
-                        ];
-                        $event->addSubmitAction('plugin.citrix.action.register.training', $action);
+                    break;
 
-                        $action = [
-                            'group'           => 'plugin.citrix.form.header',
-                            'description'     => 'plugin.citrix.form.header.start.training',
-                            'label'           => 'plugin.citrix.action.start.training',
-                            'formType'        => 'citrix_submit_action',
-                            'template'        => 'MauticFormBundle:Action:generic.html.php',
-                            'eventName'       => CitrixEvents::ON_TRAINING_START_ACTION,
-                            'formTypeOptions' => [
-                                'attr' => [
-                                    'data-product'        => $product,
-                                    'data-product-action' => 'start',
-                                ],
+                case CitrixProducts::GOTOTRAINING:
+                    $action = [
+                        'group'           => 'plugin.citrix.form.header',
+                        'description'     => 'plugin.citrix.form.header.training',
+                        'label'           => 'plugin.citrix.action.register.training',
+                        'formType'        => CitrixActionType::class,
+                        'template'        => 'MauticFormBundle:Action:generic.html.php',
+                        'eventName'       => CitrixEvents::ON_TRAINING_REGISTER_ACTION,
+                        'formTypeOptions' => [
+                            'attr' => [
+                                'data-product'        => $product,
+                                'data-product-action' => 'register',
                             ],
-                        ];
-                        $event->addSubmitAction('plugin.citrix.action.start.training', $action);
-                    } else {
-                        if (CitrixProducts::GOTOASSIST === $product) {
-                            $action = [
-                                'group'           => 'plugin.citrix.form.header',
-                                'description'     => 'plugin.citrix.form.header.assist',
-                                'label'           => 'plugin.citrix.action.screensharing.assist',
-                                'formType'        => 'citrix_submit_action',
-                                'template'        => 'MauticFormBundle:Action:generic.html.php',
-                                'eventName'       => CitrixEvents::ON_ASSIST_REMOTE_ACTION,
-                                'formTypeOptions' => [
-                                    'attr' => [
-                                        'data-product'        => $product,
-                                        'data-product-action' => 'screensharing',
-                                    ],
-                                ],
-                            ];
-                            $event->addSubmitAction('plugin.citrix.action.screensharing.assist', $action);
-                        }
-                    }
-                }
+                        ],
+                    ];
+                    $event->addSubmitAction('plugin.citrix.action.register.training', $action);
+
+                    $action = [
+                        'group'           => 'plugin.citrix.form.header',
+                        'description'     => 'plugin.citrix.form.header.start.training',
+                        'label'           => 'plugin.citrix.action.start.training',
+                        'formType'        => CitrixActionType::class,
+                        'template'        => 'MauticFormBundle:Action:generic.html.php',
+                        'eventName'       => CitrixEvents::ON_TRAINING_START_ACTION,
+                        'formTypeOptions' => [
+                            'attr' => [
+                                'data-product'        => $product,
+                                'data-product-action' => 'start',
+                            ],
+                        ],
+                    ];
+                    $event->addSubmitAction('plugin.citrix.action.start.training', $action);
+                    break;
+
+                case CitrixProducts::GOTOASSIST:
+                    $action = [
+                        'group'           => 'plugin.citrix.form.header',
+                        'description'     => 'plugin.citrix.form.header.assist',
+                        'label'           => 'plugin.citrix.action.screensharing.assist',
+                        'formType'        => CitrixActionType::class,
+                        'template'        => 'MauticFormBundle:Action:generic.html.php',
+                        'eventName'       => CitrixEvents::ON_ASSIST_REMOTE_ACTION,
+                        'formTypeOptions' => [
+                            'attr' => [
+                                'data-product'        => $product,
+                                'data-product-action' => 'screensharing',
+                            ],
+                        ],
+                    ];
+                    $event->addSubmitAction('plugin.citrix.action.screensharing.assist', $action);
+                    break;
+
+                default:
+                    break;
             }
         }
     }

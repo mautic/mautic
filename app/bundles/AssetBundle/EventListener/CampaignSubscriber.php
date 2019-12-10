@@ -13,25 +13,21 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
      * @param EventModel $campaignEventModel
      */
     public function __construct(EventModel $campaignEventModel)
@@ -60,7 +56,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'          => 'mautic.asset.campaign.event.download',
             'description'    => 'mautic.asset.campaign.event.download_descr',
             'eventName'      => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'formType'       => 'campaignevent_assetdownload',
+            'formType'       => CampaignEventAssetDownloadType::class,
             'channel'        => 'asset',
             'channelIdField' => 'assets',
         ];
