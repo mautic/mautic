@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\DataCollectorTranslator;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -66,7 +66,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      * @param Session                  $session
      * @param RequestStack             $requestStack
      * @param Router                   $router
-     * @param DataCollectorTranslator  $translator
+     * @param TranslatorInterface      $translator
      * @param Logger                   $logger
      * @param EncryptionHelper         $encryptionHelper
      * @param LeadModel                $leadModel
@@ -84,7 +84,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         Session $session,
         RequestStack $requestStack,
         Router $router,
-        DataCollectorTranslator $translator,
+        TranslatorInterface $translator,
         Logger $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,
