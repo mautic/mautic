@@ -23,6 +23,11 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * @var string
      */
+    private static $contactFieldRegex = '{contactfield=(.*?)}';
+
+    /**
+     * @var string
+     */
     private $builderTokenHelperFactory;
 
     /**
