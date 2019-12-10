@@ -723,7 +723,7 @@ class ListController extends FormController
         $model    = $this->getModel('lead.list');
         $security = $this->get('mautic.security');
 
-        /** @var \Mautic\LeadBundle\Entity\LeadList $list */
+        /** @var LeadList $list */
         $list = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->get('session')->get('mautic.segment.page', 1);

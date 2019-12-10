@@ -12,37 +12,49 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldToOrderTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * Class FieldType.
- */
 class FieldType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
-    private $em;
 
     /**
-     * @param MauticFactory $factory
+     * @var LeadFieldRepository
      */
-    public function __construct(MauticFactory $factory)
+    private $leadFieldRepository;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param LeadFieldRepository $leadFieldRepository
+     */
+    public function __construct(TranslatorInterface $translator, LeadFieldRepository $leadFieldRepository)
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
+        $this->translator          = $translator;
+        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     /**
@@ -55,7 +67,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.lead.field.label',
                 'label_attr' => ['class' => 'control-label'],
@@ -67,13 +79,14 @@ class FieldType extends AbstractType
 
         $builder->add(
             'group',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    'core'         => 'mautic.lead.field.group.core',
-                    'social'       => 'mautic.lead.field.group.social',
-                    'personal'     => 'mautic.lead.field.group.personal',
-                    'professional' => 'mautic.lead.field.group.professional',
+                'choices_as_values' => true,
+                'choices'           => [
+                    'mautic.lead.field.group.core'         => 'core',
+                    'mautic.lead.field.group.social'       => 'social',
+                    'mautic.lead.field.group.personal'     => 'personal',
+                    'mautic.lead.field.group.professional' => 'professional',
                 ],
                 'attr' => [
                     'class'   => 'form-control',
@@ -95,15 +108,16 @@ class FieldType extends AbstractType
         $fieldHelper->setTranslator($this->translator);
         $builder->add(
             'type',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'     => $fieldHelper->getChoiceList(),
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.lead.field.type',
-                'empty_value' => false,
-                'disabled'    => ($disabled || !$new),
-                'attr'        => [
+                'choices_as_values' => true,
+                'choices'           => $fieldHelper->getChoiceList(),
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.lead.field.type',
+                'empty_value'       => false,
+                'disabled'          => ($disabled || !$new),
+                'attr'              => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateLeadFieldProperties(this.value);',
                 ],
@@ -145,21 +159,22 @@ class FieldType extends AbstractType
         foreach ($listChoices as $listType => $choices) {
             $builder->add(
                 'default_template_'.$listType,
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'    => $choices,
-                    'label'      => 'mautic.core.defaultvalue',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => ['class' => 'form-control not-chosen'],
-                    'required'   => false,
-                    'mapped'     => false,
+                    'choices_as_values' => true,
+                    'choices'           => $choices,
+                    'label'             => 'mautic.core.defaultvalue',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => ['class' => 'form-control not-chosen'],
+                    'required'          => false,
+                    'mapped'            => false,
                 ]
             );
         }
 
         $builder->add(
             'default_template_text',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -171,7 +186,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'default_template_textarea',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -197,7 +212,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'properties',
-            'collection',
+            CollectionType::class,
             [
                 'required'       => false,
                 'allow_add'      => true,
@@ -207,7 +222,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'defaultValue',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -249,16 +264,17 @@ class FieldType extends AbstractType
                         ]
                     );
 
-                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list']) : [];
+                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list'], true, false, true) : [];
                     $form->add(
                         'defaultValue',
-                        'choice',
+                        ChoiceType::class,
                         [
-                            'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label is-chosen'],
-                            'attr'       => ['class' => 'form-control'],
-                            'required'   => false,
-                            'choices'    => $list,
+                            'choices_as_values' => true,
+                            'label'             => 'mautic.core.defaultvalue',
+                            'label_attr'        => ['class' => 'control-label is-chosen'],
+                            'attr'              => ['class' => 'form-control'],
+                            'required'          => false,
+                            'choices'           => $list,
                         ]
                     );
                     break;
@@ -268,13 +284,14 @@ class FieldType extends AbstractType
                 case 'region':
                     $form->add(
                         'defaultValue',
-                        'choice',
+                        ChoiceType::class,
                         [
-                            'choices'    => $listChoices[$type],
-                            'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label'],
-                            'attr'       => ['class' => 'form-control'],
-                            'required'   => false,
+                            'choices_as_values' => true,
+                            'choices'           => $listChoices[$type],
+                            'label'             => 'mautic.core.defaultvalue',
+                            'label_attr'        => ['class' => 'control-label'],
+                            'attr'              => ['class' => 'form-control'],
+                            'required'          => false,
                         ]
                     );
                     break;
@@ -364,7 +381,7 @@ class FieldType extends AbstractType
 
                     $form->add(
                         'defaultValue',
-                        'text',
+                        TextType::class,
                         [
                             'label'      => 'mautic.core.defaultvalue',
                             'label_attr' => ['class' => 'control-label'],
@@ -383,7 +400,7 @@ class FieldType extends AbstractType
                 case 'email':
                     $form->add(
                         'defaultValue',
-                        'text',
+                        TextType::class,
                         [
                             'label'      => 'mautic.core.defaultvalue',
                             'label_attr' => ['class' => 'control-label'],
@@ -422,11 +439,11 @@ class FieldType extends AbstractType
         );
 
         //get order list
-        $transformer = new FieldToOrderTransformer($this->em);
+        $transformer = new FieldToOrderTransformer($this->leadFieldRepository);
         $builder->add(
             $builder->create(
                 'order',
-                'entity',
+                EntityType::class,
                 [
                     'label'         => 'mautic.core.order',
                     'class'         => 'MauticLeadBundle:LeadField',
@@ -444,7 +461,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'alias',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.alias',
                 'label_attr' => ['class' => 'control-label'],
@@ -529,13 +546,13 @@ class FieldType extends AbstractType
 
         $builder->add(
             'object',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
+                'choices_as_values' => true,
+                'choices'           => [
                     'mautic.lead.contact'    => 'lead',
                     'mautic.company.company' => 'company',
                 ],
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.lead.field.object',
@@ -556,13 +573,13 @@ class FieldType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\LeadBundle\Entity\LeadField',
+                'data_class' => LeadField::class,
             ]
         );
     }
@@ -570,7 +587,7 @@ class FieldType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadfield';
     }

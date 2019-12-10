@@ -11,20 +11,23 @@
 
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class LeadListAccessValidator extends ConstraintValidator
 {
     /**
-     * @var MauticFactory
+     * @var ListModel
      */
-    private $factory;
+    private $segmentModel;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @param ListModel $segmentModel
+     */
+    public function __construct(ListModel $segmentModel)
     {
-        $this->factory = $factory;
+        $this->segmentModel = $segmentModel;
     }
 
     /**
@@ -33,10 +36,8 @@ class LeadListAccessValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
-        $listModel = $this->factory->getModel('lead.list');
-        $lists     = $listModel->getUserLists();
-
         if (count($value)) {
+            $lists = $this->segmentModel->getUserLists();
             foreach ($value as $l) {
                 if (!isset($lists[$l->getId()])) {
                     $this->context->addViolation(
