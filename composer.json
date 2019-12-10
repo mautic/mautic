@@ -148,10 +148,7 @@
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist"
     },
     "config": {
-        "bin-dir": "bin",
-        "platform": {
-            "php": "7.2.0"
-        }
+        "bin-dir": "bin"
     },
     "extra": {
         "symfony-app-dir": "app",
