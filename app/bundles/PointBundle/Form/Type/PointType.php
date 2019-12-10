@@ -39,12 +39,15 @@ class PointType extends AbstractType
     private $security;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var \Symfony\Component\Translation\TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param MauticFactory $factory
+     * PointType constructor.
+     *
+     * @param \Symfony\Component\Translation\TranslatorInterface $translator
+     * @param \Mautic\CoreBundle\Security\Permissions\CorePermissions $security
      */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
