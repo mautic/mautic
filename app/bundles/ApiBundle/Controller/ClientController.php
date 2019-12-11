@@ -125,7 +125,7 @@ class ClientController extends FormController
      */
     public function authorizedClientsAction()
     {
-        $me      = $this->get('security.context')->getToken()->getUser();
+        $me      = $this->get('security.token_storage')->getToken()->getUser();
         $clients = $this->getModel('api.client')->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', ['clients' => $clients]);

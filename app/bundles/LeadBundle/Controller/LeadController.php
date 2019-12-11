@@ -245,7 +245,7 @@ class LeadController extends FormController
         $quickForm = $model->createForm($model->getEntity(), $this->get('form.factory'), $action, ['fields' => $fields, 'isShortForm' => true]);
 
         //set the default owner to the currently logged in user
-        $currentUser = $this->get('security.context')->getToken()->getUser();
+        $currentUser = $this->get('security.token_storage')->getToken()->getUser();
         $quickForm->get('owner')->setData($currentUser);
 
         return $this->delegateView(
@@ -526,7 +526,7 @@ class LeadController extends FormController
             }
         } else {
             //set the default owner to the currently logged in user
-            $currentUser = $this->get('security.context')->getToken()->getUser();
+            $currentUser = $this->get('security.token_storage')->getToken()->getUser();
             $form->get('owner')->setData($currentUser);
         }
 

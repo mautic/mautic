@@ -35,7 +35,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
      */
     public function authorizeAction(Request $request)
     {
-        $user = $this->container->get('security.context')->getToken()->getUser();
+        $user = $this->container->get('security.token_storage')->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');

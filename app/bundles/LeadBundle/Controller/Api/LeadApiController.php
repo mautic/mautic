@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -72,8 +71,8 @@ class LeadApiController extends CommonApiController
         $start   = $this->request->query->get('start', null);
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['userList']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['userList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -105,8 +104,8 @@ class LeadApiController extends CommonApiController
         );
 
         $view    = $this->view($fields, Response::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['leadFieldList']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadFieldList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -159,8 +158,8 @@ class LeadApiController extends CommonApiController
             Response::HTTP_OK
         );
 
-        $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadNoteDetails']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -213,8 +212,8 @@ class LeadApiController extends CommonApiController
             Response::HTTP_OK
         );
 
-        $context = SerializationContext::create()->setGroups(['leadDeviceDetails']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadDeviceDetails']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -382,8 +381,8 @@ class LeadApiController extends CommonApiController
         list($events, $serializerGroups) = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
         $view    = $this->view($events);
-        $context = SerializationContext::create()->setGroups($serializerGroups);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups($serializerGroups);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
