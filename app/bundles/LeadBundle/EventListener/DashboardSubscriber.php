@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType;
+use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
@@ -34,11 +36,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'created.leads.in.time' => [
-            'formAlias' => 'lead_dashboard_leads_in_time_widget',
+            'formAlias' => DashboardLeadsInTimeWidgetType::class,
         ],
         'anonymous.vs.identified.leads' => [],
         'lead.lifetime'                 => [
-            'formAlias' => 'lead_dashboard_leads_lifetime_widget',
+            'formAlias' => DashboardLeadsLifetimeWidgetType::class,
         ],
         'map.of.leads'  => [],
         'top.lists'     => [],
@@ -276,19 +278,23 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $items['link'][]       = $listUrl;
                     $items['chartItems'][] = $column;
 
-                    $stages[] = $this->leadListModel->getStagesBarChartData($params['timeUnit'],
+                    $stages[] = $this->leadListModel->getStagesBarChartData(
+                        $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOthers);
+                        $canViewOthers
+                    );
 
-                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData($params['timeUnit'],
+                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData(
+                        $params['timeUnit'],
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
                         $params['filter'],
-                        $canViewOthers);
+                        $canViewOthers
+                    );
                 }
                 $width = 100 / count($lists);
 

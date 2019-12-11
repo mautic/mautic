@@ -22,9 +22,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * LeadRepository.
- */
 class LeadRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait {
@@ -232,7 +229,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // Get entities
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('l')
-            ->from('MauticLeadBundle:Lead', 'l');
+            ->from(Lead::class, 'l');
 
         $q->where(
             $q->expr()->in('l.id', ':ids')
@@ -420,7 +417,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($entity instanceof Lead) {
             $id        = $entity->getId();
-            $companies = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts([$id]);
+            $companies = $this->getEntityManager()->getRepository(Company::class)->getCompaniesForContacts([$id]);
 
             if (!empty($companies[$id])) {
                 $primary = null;
@@ -473,16 +470,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $contactIds      = array_keys($tmpContacts);
 
             if ($withCompanies) {
-                $companies = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts($contactIds);
+                $companies = $this->getEntityManager()->getRepository(Company::class)->getCompaniesForContacts($contactIds);
             }
 
             if ($withPreferences) {
                 /** @var FrequencyRuleRepository $frequencyRepo */
-                $frequencyRepo  = $this->getEntityManager()->getRepository('MauticLeadBundle:FrequencyRule');
+                $frequencyRepo  = $this->getEntityManager()->getRepository(FrequencyRule::class);
                 $frequencyRules = $frequencyRepo->getFrequencyRules(null, $contactIds);
 
                 /** @var DoNotContactRepository $dncRepository */
-                $dncRepository = $this->getEntityManager()->getRepository('MauticLeadBundle:DoNotContact');
+                $dncRepository = $this->getEntityManager()->getRepository(DoNotContact::class);
                 $dncRules      = $dncRepository->getChannelList(null, $contactIds);
             }
 
@@ -807,7 +804,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $imploder = [];
 
                 foreach ($prateek as $key => $value) {
-                    $list       = $this->getEntityManager()->getRepository('MauticLeadBundle:LeadList')->findOneByAlias($value);
+                    $list       = $this->getEntityManager()->getRepository(LeadList::class)->findOneByAlias($value);
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }
 

@@ -176,10 +176,6 @@ class FormTestAbstract extends WebTestCase
             ->method('getFieldListWithProperties')
             ->willReturn($mockLeadField);
 
-        $leadFieldModel->expects($this->any())
-            ->method('getUniqueIdentiferFields')
-            ->willReturn($mockLeadField);
-
         $entityManager->expects($this->any())
             ->method('getRepository')
             ->will(
