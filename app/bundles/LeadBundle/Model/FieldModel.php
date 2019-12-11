@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -152,7 +153,7 @@ class FieldModel extends FormModel
         ],
         'attribution' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'properties' => ['roundmode' => 4, 'scale' => 2],
             'fixed'      => true,
             'listable'   => true,
             'object'     => 'lead',
@@ -260,7 +261,7 @@ class FieldModel extends FormModel
         ],
         'companynumber_of_employees' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 0],
+            'properties' => ['roundmode' => 4, 'scale' => 0],
             'group'      => 'professional',
             'listable'   => true,
             'object'     => 'company',
@@ -273,7 +274,7 @@ class FieldModel extends FormModel
         ],
         'companyannual_revenue' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'properties' => ['roundmode' => 4, 'scale' => 2],
             'listable'   => true,
             'group'      => 'professional',
             'object'     => 'company',
@@ -707,7 +708,7 @@ class FieldModel extends FormModel
      *
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
@@ -719,7 +720,7 @@ class FieldModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadfield', $entity, $options);
+        return $formFactory->create(FieldType::class, $entity, $options);
     }
 
     /**
@@ -958,18 +959,6 @@ class FieldModel extends FormModel
         }
 
         return $leadFields;
-    }
-
-    /**
-     * Retrieves a list of published fields that are unique identifers.
-     *
-     * @deprecated to be removed in 3.0
-     *
-     * @return array
-     */
-    public function getUniqueIdentiferFields($filters = [])
-    {
-        return $this->getUniqueIdentifierFields($filters);
     }
 
     /**

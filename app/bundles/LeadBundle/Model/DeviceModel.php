@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\LeadDeviceEvent;
+use Mautic\LeadBundle\Form\Type\DeviceType;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -99,7 +100,7 @@ class DeviceModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leaddevice', $entity, $options);
+        return $formFactory->create(DeviceType::class, $entity, $options);
     }
 
     /**

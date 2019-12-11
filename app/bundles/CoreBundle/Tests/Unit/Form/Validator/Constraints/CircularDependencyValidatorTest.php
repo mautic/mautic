@@ -117,8 +117,6 @@ class CircularDependencyValidatorTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $mockEntity = $this->createMock(LeadList::class);
-
         $mockEntity1 = $this->createMock(LeadList::class);
         $mockEntity1->expects($this->any())
             ->method('getId')
