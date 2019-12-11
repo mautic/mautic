@@ -53,7 +53,7 @@ class ConfigType extends AbstractType
         $choices    = [];
         $transports = $this->transportChain->getEnabledTransports();
         foreach ($transports as $transportServiceId=>$transport) {
-            $choices[$transportServiceId] = $this->translator->trans($transportServiceId);
+            $choices[$this->translator->trans($transportServiceId)] = $transportServiceId;
         }
 
         $builder->add('sms_transport', ChoiceType::class, [
@@ -63,7 +63,8 @@ class ConfigType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.sms.config.select_default_transport',
             ],
-            'choices'   => $choices,
+            'choices'           => $choices,
+            'choices_as_values' => true,
         ]);
     }
 

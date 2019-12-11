@@ -55,7 +55,7 @@ class FormListType extends AbstractType
                 static $choices;
 
                 if (is_array($choices)) {
-                    return $choices;
+                    return array_flip($choices);
                 }
 
                 $choices = [];
@@ -66,7 +66,7 @@ class FormListType extends AbstractType
                 }
 
                 //sort by language
-                asort($choices);
+                ksort($choices);
 
                 return $choices;
             },
