@@ -388,8 +388,9 @@ class FieldType extends AbstractType
                 'leadField',
                 'choice',
                 [
-                    'choices'     => $options['leadFields'],
-                    'choice_attr' => function ($val, $key, $index) use ($options) {
+                    'choices'           => array_flip($options['leadFields']),
+                    'choices_as_values' => true,
+                    'choice_attr'       => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
                         foreach ($objects as $object) {
                             if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {

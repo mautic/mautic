@@ -28,12 +28,13 @@ class CampaignEventLeadDeviceType extends AbstractType
             'device_type',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.campaign.event.device_type',
-                'label_attr' => ['class' => 'control-label'],
-                'multiple'   => true,
-                'choices'    => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'             => 'mautic.lead.campaign.event.device_type',
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => true,
+                'choices'           => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
+                'choices_as_values' => true,
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
             ]
         );
 
@@ -55,12 +56,13 @@ class CampaignEventLeadDeviceType extends AbstractType
             'device_os',
             ChoiceType::class,
             [
-                'label'      => 'mautic.lead.campaign.event.device_os',
-                'label_attr' => ['class' => 'control-label'],
-                'multiple'   => true,
-                'choices'    => array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())),
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'             => 'mautic.lead.campaign.event.device_os',
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => true,
+                'choices'           => array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())),
+                'choices_as_values' => true,
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
             ]
         );
     }
