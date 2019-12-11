@@ -20,9 +20,6 @@ use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class BeanstalkdSubscriber.
- */
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
 {
     const DELAY_DURATION = 60;
@@ -48,8 +45,6 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
     private $queueService;
 
     /**
-     * BeanstalkdSubscriber constructor.
-     *
      * @param ContainerInterface $container
      * @param QueueService       $queueService
      */

@@ -135,7 +135,8 @@ class MonitoringController extends FormController
 
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
-        $networkType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('monitoring[networkType]', '', true) : '';
+        $monitoring  = $this->request->request->get('monitoring', []);
+        $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : '';
 
         // build the form
         $form = $model->createForm(
@@ -155,8 +156,7 @@ class MonitoringController extends FormController
         if ('POST' == $method) {
             $viewParameters = ['page' => $page];
             $template       = 'MauticSocialBundle:Monitoring:index';
-
-            $valid = false;
+            $valid          = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -290,8 +290,9 @@ class MonitoringController extends FormController
 
         // get the network type from the request on submit. helpful for validation error
         // rebuilds structure of the form when it gets updated on submit
-        $networkType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('monitoring[networkType]', '', true)
-            : $entity->getNetworkType();
+        $method      = $this->request->getMethod();
+        $monitoring  = $this->request->request->get('monitoring', []);
+        $networkType = 'POST' === $method ? ($monitoring['networkType'] ?? '') : $entity->getNetworkType();
 
         // build the form
         $form = $model->createForm(
@@ -306,8 +307,9 @@ class MonitoringController extends FormController
         );
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data

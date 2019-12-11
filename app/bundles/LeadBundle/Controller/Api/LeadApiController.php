@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -53,24 +52,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Get existing duplicated contact based on unique fields and the request data.
-     *
-     * @param array $parameters
-     * @param null  $id
-     *
-     * @return Lead|null
-     *
-     * @deprecated since 2.12.2, to be removed in 3.0.0. Use $model->checkForDuplicateContact directly instead
-     */
-    protected function getExistingLead(array $parameters, $id = null)
-    {
-        $model   = $this->getModel(self::MODEL_ID);
-        $contact = $id ? $model->getEntity($id) : null;
-
-        return $model->checkForDuplicateContact($parameters, $contact);
-    }
-
-    /**
      * Obtains a list of users for lead owner edits.
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -90,8 +71,8 @@ class LeadApiController extends CommonApiController
         $start   = $this->request->query->get('start', null);
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['userList']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['userList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -123,8 +104,8 @@ class LeadApiController extends CommonApiController
         );
 
         $view    = $this->view($fields, Response::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['leadFieldList']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadFieldList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -177,8 +158,8 @@ class LeadApiController extends CommonApiController
             Response::HTTP_OK
         );
 
-        $context = SerializationContext::create()->setGroups(['leadNoteDetails']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadNoteDetails']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -231,8 +212,8 @@ class LeadApiController extends CommonApiController
             Response::HTTP_OK
         );
 
-        $context = SerializationContext::create()->setGroups(['leadDeviceDetails']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadDeviceDetails']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -400,8 +381,8 @@ class LeadApiController extends CommonApiController
         list($events, $serializerGroups) = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
         $view    = $this->view($events);
-        $context = SerializationContext::create()->setGroups($serializerGroups);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups($serializerGroups);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }
@@ -535,35 +516,6 @@ class LeadApiController extends CommonApiController
     public function removeUtmTagsAction($id, $utmid)
     {
         return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
-    }
-
-    /**
-     * Obtains a list of contact events.
-     *
-     * @deprecated 2.10.0 to be removed in 3.0
-     *
-     * @param $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEventsAction($id)
-    {
-        $entity = $this->model->getEntity($id);
-
-        if (null === $entity) {
-            return $this->notFound();
-        }
-
-        if (!$this->checkEntityAccess($entity, 'view')) {
-            return $this->accessDenied();
-        }
-
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
-        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
-        $page    = (int) $this->request->get('page', 1);
-        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
-
-        return $this->handleView($this->view($events));
     }
 
     /**

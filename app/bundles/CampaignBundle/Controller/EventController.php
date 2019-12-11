@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -77,7 +78,7 @@ class EventController extends CommonFormController
         //fire the builder event
         $events = $this->getModel('campaign')->getEvents();
         $form   = $this->get('form.factory')->create(
-            'campaignevent',
+            EventType::class,
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'new']),
@@ -218,19 +219,20 @@ class EventController extends CommonFormController
      */
     public function editAction($objectId)
     {
-        $session    = $this->get('session');
-        $valid      = $cancelled = false;
-        $method     = $this->request->getMethod();
-        $campaignId = 'POST' === $method
-            ? $this->request->request->get('campaignevent[campaignId]', '', true)
+        $session       = $this->get('session');
+        $valid         = $cancelled = false;
+        $method        = $this->request->getMethod();
+        $campaignEvent = $this->request->request->get('campaignevent', []);
+        $campaignId    = 'POST' === $method
+            ? ($campaignEvent['campaignId'] ?? '')
             : $this->request->query->get('campaignId');
         $modifiedEvents = $session->get('mautic.campaign.'.$campaignId.'.events.modified', []);
         $event          = array_key_exists($objectId, $modifiedEvents) ? $modifiedEvents[$objectId] : [];
 
         if ('POST' === $method) {
             $event = array_merge($event, [
-                'anchor'          => $this->request->request->get('campaignevent[anchor]', '', true),
-                'anchorEventType' => $this->request->request->get('campaignevent[anchorEventType]', '', true),
+                'anchor'          => $campaignEvent['anchor'] ?? '',
+                'anchorEventType' => $campaignEvent['anchorEventType'] ?? '',
             ]);
         } else {
             if (!isset($event['anchor'])) {
@@ -279,7 +281,7 @@ class EventController extends CommonFormController
          */
         $supportedEvents = $this->getModel('campaign')->getEvents()[$event['eventType']];
         $form            = $this->get('form.factory')->create(
-            'campaignevent',
+            EventType::class,
             $event,
             [
                 'action'   => $this->generateUrl('mautic_campaignevent_action', ['objectAction' => 'edit', 'objectId' => $objectId]),

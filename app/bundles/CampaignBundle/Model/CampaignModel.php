@@ -20,6 +20,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Form\Type\CampaignType;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
@@ -174,7 +175,7 @@ class CampaignModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('campaign', $entity, $options);
+        return $formFactory->create(CampaignType::class, $entity, $options);
     }
 
     /**
@@ -568,7 +569,7 @@ class CampaignModel extends CommonFormModel
                 $repo             = $this->formModel->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
 
-                $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
+                $forms = $repo->getFormList('', 0, 0, $viewOther, CampaignType::class);
 
                 if ($forms) {
                     foreach ($forms as $form) {

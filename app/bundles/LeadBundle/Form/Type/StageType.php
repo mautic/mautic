@@ -13,8 +13,10 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StageType extends AbstractType
 {
@@ -26,21 +28,19 @@ class StageType extends AbstractType
     {
         $builder->add(
             'addstage',
-            'choice',
+            ChoiceType::class,
             [
-                'label'      => 'mautic.lead.batch.add_to',
-                'multiple'   => false,
-                'choices'    => $options['items'],
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.batch.add_to',
+                'multiple'          => false,
+                'choices'           => $options['items'],
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 
-        $builder->add(
-            'ids',
-            'hidden'
-        );
+        $builder->add('ids', HiddenType::class);
 
         $builder->add(
             'buttons',
@@ -61,9 +61,9 @@ class StageType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             [
@@ -75,7 +75,7 @@ class StageType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_batch_stage';
     }

@@ -16,9 +16,7 @@ use Doctrine\ORM\NoResultException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -28,10 +26,11 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetModel
@@ -187,7 +186,6 @@ class FormSubscriber extends CommonSubscriber
             '%url%' => $url,
         ]);
 
-        /** @var MauticFactory $factory */
         $analytics = $this->analyticsHelper->getCode();
 
         if (!empty($analytics)) {

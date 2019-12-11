@@ -64,14 +64,14 @@ return [
     'services' => [
         'events' => [
             'mautic.asset.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\AssetSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\AssetSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.asset.pointbundle.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\PointSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\PointSubscriber::class,
                 'arguments' => [
                     'mautic.point.model.point',
                 ],
@@ -89,7 +89,7 @@ return [
                 ],
             ],
             'mautic.asset.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.event',
                 ],
@@ -98,39 +98,49 @@ return [
                 'class'     => \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
+                    'mautic.asset.repository.download',
                 ],
             ],
             'mautic.asset.builder.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
                     'mautic.asset.helper.token',
                     'mautic.lead.model.lead',
+                    'mautic.security',
+                    'mautic.factory',
                 ],
             ],
             'mautic.asset.leadbundle.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\LeadSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.asset.model.asset',
+                    'translator',
+                    'router',
+                    'mautic.asset.repository.download',
                 ],
             ],
             'mautic.asset.pagebundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\PageSubscriber',
+                'class' => \Mautic\AssetBundle\EventListener\PageSubscriber::class,
             ],
             'mautic.asset.emailbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\EmailSubscriber',
+                'class' => \Mautic\AssetBundle\EventListener\EmailSubscriber::class,
             ],
             'mautic.asset.configbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.asset.search.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.asset.model.asset',
+                    'mautic.security',
+                    'mautic.helper.user',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.asset.stats.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
@@ -143,9 +153,10 @@ return [
                 ],
             ],
             'mautic.asset.dashboard.subscriber' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.asset.model.asset',
+                    'router',
                 ],
             ],
             'mautic.asset.subscriber.determine_winner' => [
@@ -220,6 +231,13 @@ return [
                 'class'     => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['mautic.asset.model.asset'],
+            ],
+        ],
+        'repositories' => [
+            'mautic.asset.repository.download' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\AssetBundle\Entity\Download::class,
             ],
         ],
     ],

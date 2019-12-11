@@ -130,21 +130,22 @@ class PointController extends AbstractFormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.point.page', 1);
-
-        $actionType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('point[type]', '', true) : '';
-
-        $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
-        $actions = $model->getPointActions();
-        $form    = $model->createForm($entity, $this->get('form.factory'), $action, [
+        $page       = $this->get('session')->get('mautic.point.page', 1);
+        $method     = $this->request->getMethod();
+        $point      = $this->request->request->get('point', []);
+        $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
+        $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
+        $actions    = $model->getPointActions();
+        $form       = $model->createForm($entity, $this->get('form.factory'), $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -261,7 +262,9 @@ class PointController extends AbstractFormController
             return $this->isLocked($postActionVars, $entity, 'point');
         }
 
-        $actionType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('point[type]', '', true) : $entity->getType();
+        $method     = $this->request->getMethod();
+        $point      = $this->request->request->get('point', []);
+        $actionType = 'POST' === $method ? ($point['type'] ?? '') : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $actions = $model->getPointActions();
@@ -271,8 +274,9 @@ class PointController extends AbstractFormController
         ]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data

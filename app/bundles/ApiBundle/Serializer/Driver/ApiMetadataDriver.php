@@ -12,10 +12,13 @@
 namespace Mautic\ApiBundle\Serializer\Driver;
 
 use JMS\Serializer\Metadata\ClassMetadata;
-use JMS\Serializer\Metadata\Driver\PhpDriver;
 use JMS\Serializer\Metadata\PropertyMetadata;
+use Metadata\ClassMetadata as BaseClassMetadata;
+use Metadata\Driver\DriverInterface;
+use ReflectionClass;
+use ReflectionException;
 
-class ApiMetadataDriver extends PhpDriver
+class ApiMetadataDriver implements DriverInterface
 {
     /**
      * @var ClassMetadata
@@ -40,31 +43,38 @@ class ApiMetadataDriver extends PhpDriver
     /**
      * @var null
      */
-    private $currentPropertyName = null;
+    private $currentPropertyName;
 
     /**
-     * @param \ReflectionClass $class
-     * @param string           $file
+     * @param ReflectionClass $class
      *
-     * @return ClassMetadata
+     * @return \Metadata\ClassMetadata
+     *
+     * @throws ReflectionException
      */
-    protected function loadMetadataFromFile(\ReflectionClass $class, $file)
+    public function loadMetadataForClass(ReflectionClass $class): ?BaseClassMetadata
     {
         if ($class->hasMethod('loadApiMetadata')) {
             $this->metadata = new ClassMetadata($class->getName());
 
-            $this->properties     = [];
-            $this->defaultVersion = '1.0';
-            $this->groupPrefix    = '';
+            $class->getMethod('loadApiMetadata')->invoke(null, $this);
 
-            $serializer = $class->getMethod('loadApiMetadata');
-            $serializer->invoke(null, $this);
+            $metadata = $this->metadata;
 
-            $metadata       = $this->metadata;
-            $this->metadata = null;
+            $this->resetDefaults();
 
             return $metadata;
         }
+
+        return null;
+    }
+
+    private function resetDefaults()
+    {
+        $this->metadata       = null;
+        $this->properties     = [];
+        $this->defaultVersion = '1.0';
+        $this->groupPrefix    = '';
     }
 
     /**
@@ -148,9 +158,7 @@ class ApiMetadataDriver extends PhpDriver
             $this->properties[$name]->getter = 'get'.ucfirst($name);
         }
 
-        if ($serializedName) {
-            $this->properties[$name]->serializedName = $serializedName;
-        }
+        $this->properties[$name]->serializedName = $serializedName ?? $name;
 
         if (null !== $this->defaultVersion) {
             // Set the default version

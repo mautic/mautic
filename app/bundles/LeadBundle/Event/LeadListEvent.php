@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 
-/**
- * Class LeadListEvent.
- */
 class LeadListEvent extends CommonEvent
 {
     /**

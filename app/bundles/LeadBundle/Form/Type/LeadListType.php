@@ -11,45 +11,46 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class LeadListType.
- */
 class LeadListType extends AbstractType
 {
-    private $model;
+    /**
+     * @var ListModel
+     */
+    private $segmentModel;
 
     /**
-     * @param MauticFactory $factory
+     * @param ListModel $segmentModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(ListModel $segmentModel)
     {
-        $this->model = $factory->getModel('lead.list');
+        $this->segmentModel = $segmentModel;
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        /** @var \Mautic\LeadBundle\Model\ListModel $model */
-        $model = $this->model;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $lists = (empty($options['global_only'])) ? $model->getUserLists() : $model->getGlobalLists();
-                $lists = (empty($options['preference_center_only'])) ? $lists : $model->getPreferenceCenterLists();
+                'choices_as_values' => true,
+                'choices'           => function (Options $options) {
+                    $lists = (empty($options['global_only'])) ? $this->segmentModel->getUserLists() : $this->segmentModel->getGlobalLists();
+                    $lists = (empty($options['preference_center_only'])) ? $lists : $this->segmentModel->getPreferenceCenterLists();
 
-                $choices = [];
-                foreach ($lists as $l) {
-                    $choices[$l['id']] = $l['name'];
-                }
+                    $choices = [];
+                    foreach ($lists as $l) {
+                        $choices[$l['name']] = $l['id'];
+                    }
 
-                return $choices;
-            },
+                    return $choices;
+                },
             'global_only'            => false,
             'preference_center_only' => false,
             'required'               => false,
@@ -57,17 +58,17 @@ class LeadListType extends AbstractType
     }
 
     /**
-     * @return string|\Symfony\Component\Form\FormTypeInterface|null
+     * @return string|FormTypeInterface|null
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadlist_choices';
     }

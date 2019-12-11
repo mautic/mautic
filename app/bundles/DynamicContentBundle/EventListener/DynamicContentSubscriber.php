@@ -15,8 +15,8 @@ use DOMDocument;
 use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
@@ -33,43 +33,41 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class DynamicContentSubscriber.
- */
-class DynamicContentSubscriber extends CommonSubscriber
+class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
 
     /**
      * @var TrackableModel
      */
-    protected $trackableModel;
+    private $trackableModel;
 
     /**
      * @var PageTokenHelper
      */
-    protected $pageTokenHelper;
+    private $pageTokenHelper;
 
     /**
      * @var AssetTokenHelper
      */
-    protected $assetTokenHelper;
+    private $assetTokenHelper;
 
     /**
      * @var FormTokenHelper
      */
-    protected $formTokenHelper;
+    private $formTokenHelper;
 
     /**
      * @var FocusTokenHelper
      */
-    protected $focusTokenHelper;
+    private $focusTokenHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var LeadModel
@@ -87,8 +85,11 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $dynamicContentModel;
 
     /**
-     * DynamicContentSubscriber constructor.
-     *
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
      * @param TrackableModel       $trackableModel
      * @param PageTokenHelper      $pageTokenHelper
      * @param AssetTokenHelper     $assetTokenHelper
@@ -98,6 +99,7 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @param LeadModel            $leadModel
      * @param DynamicContentHelper $dynamicContentHelper
      * @param DynamicContentModel  $dynamicContentModel
+     * @param CorePermissions      $security
      */
     public function __construct(
         TrackableModel $trackableModel,
@@ -108,7 +110,8 @@ class DynamicContentSubscriber extends CommonSubscriber
         AuditLogModel $auditLogModel,
         LeadModel $leadModel,
         DynamicContentHelper $dynamicContentHelper,
-        DynamicContentModel $dynamicContentModel
+        DynamicContentModel $dynamicContentModel,
+        CorePermissions $security
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -119,6 +122,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->leadModel            = $leadModel;
         $this->dynamicContentHelper = $dynamicContentHelper;
         $this->dynamicContentModel  = $dynamicContentModel;
+        $this->security             = $security;
     }
 
     /**

@@ -142,14 +142,13 @@ class StageController extends AbstractFormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.stage.page', 1);
-
-        $actionType = ('POST' == $this->request->getMethod()) ? $this->request->request->get('stage[type]', '', true)
-            : '';
-
-        $action  = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
-        $actions = $model->getStageActions();
-        $form    = $model->createForm(
+        $page       = $this->get('session')->get('mautic.stage.page', 1);
+        $method     = $this->request->getMethod();
+        $stage      = $this->request->request->get('stage', []);
+        $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
+        $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
+        $actions    = $model->getStageActions();
+        $form       = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,
@@ -161,8 +160,9 @@ class StageController extends AbstractFormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data

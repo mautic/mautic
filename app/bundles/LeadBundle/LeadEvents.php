@@ -572,15 +572,4 @@ final class LeadEvents
      * @var string
      */
     const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
-
-    /**
-     * @deprecated - 2.4 to be removed in 3.0; use Mautic\ChannelBundle\ChannelEvents::ADD_CHANNEL
-     *
-     * The mautic.add_channel event registers communication channels.
-     *
-     * The event listener receives a Mautic\LeadBundle\Event\ChannelEvent instance
-     *
-     * @var string
-     */
-    const ADD_CHANNEL = 'mautic.bc_add_channel';
 }

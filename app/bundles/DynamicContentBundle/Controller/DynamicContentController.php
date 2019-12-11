@@ -131,18 +131,18 @@ class DynamicContentController extends FormController
         }
 
         /** @var \Mautic\DynamicContentBundle\Model\DynamicContentModel $model */
-        $model  = $this->getModel('dynamicContent');
-        $page   = $this->get('session')->get('mautic.dynamicContent.page', 1);
-        $retUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
-        $action = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'new']);
-
-        $updateSelect = ('POST' === $this->request->getMethod())
-            ? $this->request->request->get('dwc[updateSelect]', false, true)
+        $method       = $this->request->getMethod();
+        $model        = $this->getModel('dynamicContent');
+        $page         = $this->get('session')->get('mautic.dynamicContent.page', 1);
+        $retUrl       = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
+        $action       = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'new']);
+        $dwc          = $this->request->request->get('dwc', []);
+        $updateSelect = 'POST' === $method
+            ? ($dwc['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
+        $form         = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
-
-        if ('POST' === $this->request->getMethod()) {
+        if ('POST' === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -276,16 +276,17 @@ class DynamicContentController extends FormController
             return $this->isLocked($postActionVars, $entity, 'dynamicContent');
         }
 
-        $action = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ('POST' === $this->request->getMethod())
-            ? $this->request->request->get('dwc[updateSelect]', false, true)
+        $action       = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $method       = $this->request->getMethod();
+        $dwc          = $this->request->request->get('dwc', []);
+        $updateSelect = 'POST' === $method
+            ? ($dwc['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {

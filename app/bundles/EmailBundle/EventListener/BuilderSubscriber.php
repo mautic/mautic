@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
 use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
@@ -23,56 +23,71 @@ use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @var TrackableModel
      */
-    protected $pageTrackableModel;
+    private $pageTrackableModel;
 
     /**
      * @var RedirectModel
      */
-    protected $pageRedirectModel;
+    private $pageRedirectModel;
 
     /**
-     * BuilderSubscriber constructor.
-     *
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @param CoreParametersHelper $coreParametersHelper
      * @param EmailModel           $emailModel
      * @param TrackableModel       $trackableModel
      * @param RedirectModel        $redirectModel
+     * @param TranslatorInterface  $translator
+     * @param EntityManager        $entityManager
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         EmailModel $emailModel,
         TrackableModel $trackableModel,
-        RedirectModel $redirectModel
+        RedirectModel $redirectModel,
+        TranslatorInterface $translator,
+        EntityManager $entityManager
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->emailModel           = $emailModel;
         $this->pageTrackableModel   = $trackableModel;
         $this->pageRedirectModel    = $redirectModel;
+        $this->translator           = $translator;
+        $this->entityManager        = $entityManager;
     }
 
     /**
@@ -335,7 +350,7 @@ class BuilderSubscriber extends CommonSubscriber
      *
      * @return mixed
      */
-    protected function parseContentForUrls(EmailSendEvent $event, $emailId)
+    private function parseContentForUrls(EmailSendEvent $event, $emailId)
     {
         static $convertedContent = [];
 
@@ -366,8 +381,8 @@ class BuilderSubscriber extends CommonSubscriber
             $convertedContent[$event->getContentHash()] = $trackables;
 
             // Don't need to preserve Trackable or Redirect entities in memory
-            $this->em->clear('Mautic\PageBundle\Entity\Redirect');
-            $this->em->clear('Mautic\PageBundle\Entity\Trackable');
+            $this->entityManager->clear(Redirect::class);
+            $this->entityManager->clear(Trackable::class);
 
             unset($html, $text, $trackables);
         }

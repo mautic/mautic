@@ -1590,22 +1590,6 @@ class MailHelper
     }
 
     /**
-     * Tell the mailer to use batching/tokenized emails if available.  It's up to the function calling to execute flushQueue to send the mail.
-     *
-     * @deprecated 2.1.1 - to be removed in 3.0; use enableQueue() instead
-     *
-     * @param bool $tokenizationEnabled
-     *
-     * @return bool Returns true if batching/tokenization is supported by the mailer
-     */
-    public function useMailerTokenization($tokenizationEnabled = true)
-    {
-        @trigger_error('useMailerTokenization() is now deprecated. Use enableQueue() instead.', E_USER_DEPRECATED);
-
-        $this->enableQueue($tokenizationEnabled);
-    }
-
-    /**
      * Enables queue mode if the transport supports tokenization.
      *
      * @param bool $enabled

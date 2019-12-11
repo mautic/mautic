@@ -13,9 +13,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * Class CompanyLeadRepository.
- */
 class CompanyLeadRepository extends CommonRepository
 {
     /**
@@ -62,10 +59,6 @@ class CompanyLeadRepository extends CommonRepository
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
         ->where('cl.lead_id = :leadId')
         ->setParameter('leadId', $leadId);
-
-        $q->andWhere(
-            $q->expr()->eq('cl.manually_removed', ':false')
-        )->setParameter('false', false, 'boolean');
 
         if ($companyId) {
             $q->andWhere(
@@ -127,7 +120,6 @@ class CompanyLeadRepository extends CommonRepository
         $qb->select('cl.is_primary, cl.lead_id, cl.company_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->where(
-                    $qb->expr()->eq('cl.manually_removed', 0),
                     $qb->expr()->eq('cl.lead_id', ':leadId'),
                     $qb->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('leadId', $leadId)
@@ -147,9 +139,8 @@ class CompanyLeadRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('cl')
-            ->from('MauticLeadBundle:CompanyLead', 'cl')
+            ->from(CompanyLead::class, 'cl')
             ->where(
-                $qb->expr()->eq('cl.manuallyRemoved', 0),
                 $qb->expr()->eq('cl.lead', ':lead')
             )->setParameter('lead', $lead);
 

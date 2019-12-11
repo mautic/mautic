@@ -14,6 +14,7 @@ namespace Mautic\UserBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Event\RoleEvent;
+use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -121,7 +122,7 @@ class RoleModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('role', $entity, $options);
+        return $formFactory->create(RoleType::class, $entity, $options);
     }
 
     /**

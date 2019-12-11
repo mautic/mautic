@@ -77,6 +77,7 @@ return [
             'mautic.webhook.stats.subscriber' => [
                 'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

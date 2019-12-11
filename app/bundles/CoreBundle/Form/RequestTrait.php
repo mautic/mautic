@@ -32,7 +32,7 @@ trait RequestTrait
         // Special handling of some fields
         foreach ($form as $name => $child) {
             if (isset($params[$name])) {
-                $type = $child->getConfig()->getType()->getName();
+                $type = get_class($child->getConfig()->getType());
                 switch ($type) {
                     case YesNoButtonGroupType::class:
                         if (is_object($entity)) {

@@ -55,7 +55,7 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext)
+    public function shouldSkipClass(ClassMetadata $metadata, Context $navigatorContext): bool
     {
         return false;
     }
@@ -63,7 +63,7 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext)
+    public function shouldSkipProperty(PropertyMetadata $property, Context $navigatorContext): bool
     {
         if ($this->path) {
             $path = implode('.', $navigatorContext->getCurrentPath());

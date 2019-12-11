@@ -13,9 +13,10 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CategoryBundle\Entity\Category;
@@ -1077,7 +1078,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     $entity
                 );
             }
-        } elseif (get_class($formResponse) === get_class($entity)) {
+        } elseif (is_object($formResponse) && get_class($formResponse) === get_class($entity)) {
             // Success
             $entities[$key] = $formResponse;
         } elseif (is_array($formResponse) && isset($formResponse['code'], $formResponse['message'])) {
@@ -1308,11 +1309,11 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Set serialization groups and exclusion strategies.
      *
-     * @param \FOS\RestBundle\View\View $view
+     * @param View $view
      */
-    protected function setSerializationContext(&$view)
+    protected function setSerializationContext($view)
     {
-        $context = SerializationContext::create();
+        $context = $view->getContext();
         if (!empty($this->serializerGroups)) {
             $context->setGroups($this->serializerGroups);
         }
@@ -1339,7 +1340,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $context->setSerializeNull(true);
         }
 
-        $view->setSerializationContext($context);
+        $view->setContext($context);
     }
 
     /**

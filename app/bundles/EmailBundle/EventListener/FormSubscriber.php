@@ -12,8 +12,9 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\ORMException;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
+use Mautic\EmailBundle\Form\Type\EmailSendType;
+use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -21,11 +22,9 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
@@ -78,7 +77,7 @@ class FormSubscriber extends CommonSubscriber
             'group'             => 'mautic.email.actions',
             'label'             => 'mautic.email.form.action.sendemail.admin',
             'description'       => 'mautic.email.form.action.sendemail.admin.descr',
-            'formType'          => 'email_submitaction_useremail',
+            'formType'          => FormSubmitActionUserEmailType::class,
             'formTheme'         => 'MauticEmailBundle:FormTheme\EmailSendList',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
@@ -88,7 +87,7 @@ class FormSubscriber extends CommonSubscriber
             'group'           => 'mautic.email.actions',
             'label'           => 'mautic.email.form.action.sendemail.lead',
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
-            'formType'        => 'emailsend_list',
+            'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
             'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
             'eventName'       => FormEvents::ON_EXECUTE_SUBMIT_ACTION,

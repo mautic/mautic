@@ -59,7 +59,7 @@ return [
     'services' => [
         'events' => [
             'mautic.category.subscriber' => [
-                'class'     => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
+                'class'     => \Mautic\CategoryBundle\EventListener\CategorySubscriber::class,
                 'arguments' => [
                     'mautic.helper.bundle',
                     'mautic.helper.ip_lookup',

@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
+use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -161,7 +162,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('company', $entity, $options);
+        return $formFactory->create(CompanyType::class, $entity, $options);
     }
 
     /**
@@ -363,20 +364,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
 
             if (null != $companyLead) {
-                // @deprecated support to be removed in 3.0
-                if ($companyLead->wasManuallyRemoved()) {
-                    $companyLead->setManuallyRemoved(false);
-                    $companyLead->setManuallyAdded(false);
-                    $contactAdded     = true;
-                    $persistCompany[] = $companyLead;
-                    $dispatchEvents[] = $companyId;
-                    $companyName      = $companyLeadAdd[$companyId]->getName();
-                } else {
-                    // Detach from Doctrine
-                    $this->em->detach($companyLead);
+                // Detach from Doctrine
+                $this->em->detach($companyLead);
 
-                    continue;
-                }
+                continue;
             } else {
                 $companyLead = new CompanyLead();
                 $companyLead->setCompany($companyLeadAdd[$companyId]);

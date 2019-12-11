@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Form\Type;
 
+use Mautic\EmailBundle\Form\Type\EmailListType;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
@@ -118,7 +119,7 @@ class CitrixCampaignActionType extends AbstractType
                 $defaultOptions = array_merge($defaultOptions, $options['list_options']);
             }
 
-            $builder->add('template', 'email_list', $defaultOptions);
+            $builder->add('template', EmailListType::class, $defaultOptions);
         }
     }
 

@@ -53,7 +53,7 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
      *
      * @throws \Exception
      */
-    protected function getAuthorization(array $parameters)
+    private function getAuthorization(array $parameters)
     {
         if (!isset($parameters['client_id']) || empty($parameters['client_id'])) {
             throw new \Exception('No client ID given.', 1554211764);

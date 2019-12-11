@@ -12,27 +12,26 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var LeadRepository
@@ -45,16 +44,40 @@ class SearchSubscriber extends CommonSubscriber
     private $emailRepository;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param LeadModel     $leadModel
-     * @param EntityManager $entityManager
+     * @var TranslatorInterface
      */
-    public function __construct(LeadModel $leadModel, EntityManager $entityManager)
-    {
+    private $translator;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    /**
+     * @param LeadModel           $leadModel
+     * @param EmailRepository     $emailRepository
+     * @param TranslatorInterface $translator
+     * @param CorePermissions     $security
+     * @param TemplatingHelper    $templating
+     */
+    public function __construct(
+        LeadModel $leadModel,
+        EmailRepository $emailRepository,
+        TranslatorInterface $translator,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->leadModel       = $leadModel;
         $this->leadRepo        = $leadModel->getRepository();
-        $this->emailRepository = $entityManager->getRepository(Email::class);
+        $this->emailRepository = $emailRepository;
+        $this->translator      = $translator;
+        $this->security        = $security;
+        $this->templating      = $templating;
     }
 
     /**
@@ -113,14 +136,14 @@ class SearchSubscriber extends CommonSubscriber
                 $leadResults = [];
 
                 foreach ($leads as $lead) {
-                    $leadResults[] = $this->templating->renderResponse(
+                    $leadResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticLeadBundle:SubscribedEvents\Search:global.html.php',
                         ['lead' => $lead]
                     )->getContent();
                 }
 
                 if ($results['count'] > 5) {
-                    $leadResults[] = $this->templating->renderResponse(
+                    $leadResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticLeadBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

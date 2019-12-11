@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class EmailOpenType.
- */
 class EmailClickDecisionType extends AbstractType
 {
     /**
@@ -41,7 +38,7 @@ class EmailClickDecisionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_click_decision';
     }

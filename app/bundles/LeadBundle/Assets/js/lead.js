@@ -665,7 +665,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     var operators = filterOption.data('field-operators');
     mQuery('#' + filterIdBase + 'operator').html('');
-    mQuery.each(operators, function (value, label) {
+    mQuery.each(operators, function (label, value) {
         var newOption = mQuery('<option/>').val(value).text(label);
         newOption.appendTo(mQuery('#' + filterIdBase + 'operator'));
     });

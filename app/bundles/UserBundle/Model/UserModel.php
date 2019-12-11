@@ -13,20 +13,19 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
 use Mautic\UserBundle\Event\StatusChangeEvent;
 use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-/**
- * Class UserModel.
- */
 class UserModel extends FormModel
 {
     /**
@@ -40,8 +39,6 @@ class UserModel extends FormModel
     private $userTokenService;
 
     /**
-     * UserModel constructor.
-     *
      * @param MailHelper                $mailHelper
      * @param UserTokenServiceInterface $userTokenService
      */
@@ -49,8 +46,8 @@ class UserModel extends FormModel
         MailHelper $mailHelper,
         UserTokenServiceInterface $userTokenService
     ) {
-        $this->mailHelper          = $mailHelper;
-        $this->userTokenService    = $userTokenService;
+        $this->mailHelper       = $mailHelper;
+        $this->userTokenService = $userTokenService;
     }
 
     /**
@@ -152,7 +149,7 @@ class UserModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('user', $entity, $options);
+        return $formFactory->create(UserType::class, $entity, $options);
     }
 
     /**
@@ -246,13 +243,13 @@ class UserModel extends FormModel
         $results = [];
         switch ($type) {
             case 'role':
-                $results = $this->em->getRepository('MauticUserBundle:Role')->getRoleList($filter, $limit);
+                $results = $this->em->getRepository(Role::class)->getRoleList($filter, $limit);
                 break;
             case 'user':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getUserList($filter, $limit);
+                $results = $this->em->getRepository(User::class)->getUserList($filter, $limit);
                 break;
             case 'position':
-                $results = $this->em->getRepository('MauticUserBundle:User')->getPositionList($filter, $limit);
+                $results = $this->em->getRepository(User::class)->getPositionList($filter, $limit);
                 break;
         }
 

@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Tests\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
@@ -21,39 +22,50 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var CorePermissions|\PHPUnit_Framework_MockObject_MockObject
      */
     private $security;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $entityManager;
+
+    /**
+     * @var User|\PHPUnit_Framework_MockObject_MockObject
      */
     private $user;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var CommonRepository|\PHPUnit_Framework_MockObject_MockObject
      */
     private $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var StatsEvent|\PHPUnit_Framework_MockObject_MockObject
      */
     private $statsEvent;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var CommonStatsSubscriber|\PHPUnit_Framework_MockObject_MockObject
      */
     private $subscirber;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->security   = $this->createMock(CorePermissions::class);
-        $this->user       = $this->createMock(User::class);
-        $this->repository = $this->createMock(CommonRepository::class);
-        $this->statsEvent = $this->createMock(StatsEvent::class);
-        $this->subscirber = $this->getMockForAbstractClass(CommonStatsSubscriber::class);
-        $this->subscirber->setSecurity($this->security);
+        $this->security      = $this->createMock(CorePermissions::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->user          = $this->createMock(User::class);
+        $this->repository    = $this->createMock(CommonRepository::class);
+        $this->statsEvent    = $this->createMock(StatsEvent::class);
+        $this->subscirber    = $this->getMockForAbstractClass(
+            CommonStatsSubscriber::class,
+            [
+                $this->security,
+                $this->entityManager,
+            ]
+        );
     }
 
     public function testOnStatsFetchForRestrictedUsers()

@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -20,21 +19,29 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType;
+use Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact;
+use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
+use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
+use Mautic\LeadBundle\Form\Type\ListActionType;
+use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
+<<<<<<< HEAD
      * @var LeadModel
+=======
+     * @param EmailModel $emailModel
+>>>>>>> 3.x
      */
     protected $leadModel;
 
@@ -91,7 +98,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
-            'formType'    => 'lead_submitaction_pointschange',
+            'formType'    => FormSubmitActionPointsChangeType::class,
             'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
@@ -100,7 +107,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.changelist',
             'description' => 'mautic.lead.lead.events.changelist_descr',
-            'formType'    => 'leadlist_action',
+            'formType'    => ListActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
@@ -108,16 +115,15 @@ class FormSubscriber extends CommonSubscriber
             'group'             => 'mautic.lead.lead.submitaction',
             'label'             => 'mautic.lead.lead.events.changetags',
             'description'       => 'mautic.lead.lead.events.changetags_descr',
-            'formType'          => 'modify_lead_tags',
+            'formType'          => ModifyLeadTagsType::class,
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.addutmtags',
             'description' => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'    => 'lead_action_addutmtags',
+            'formType'    => ActionAddUtmTagsType::class,
             'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
@@ -126,7 +132,7 @@ class FormSubscriber extends CommonSubscriber
             'group'             => 'mautic.lead.lead.submitaction',
             'label'             => 'mautic.lead.lead.events.removedonotcontact',
             'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
-            'formType'          => 'lead_action_removedonotcontact',
+            'formType'          => ActionRemoveDoNotContact::class,
             'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
@@ -136,7 +142,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.changecompanyscore',
             'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
-            'formType'    => 'scorecontactscompanies_action',
+            'formType'    => CompanyChangeScoreActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }

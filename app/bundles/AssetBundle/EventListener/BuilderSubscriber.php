@@ -13,44 +13,55 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class BuilderSubscriber.
- */
-class BuilderSubscriber extends CommonSubscriber
+class BuilderSubscriber implements EventSubscriberInterface
 {
     /**
      * @var string
      */
-    protected $assetToken = '{assetlink=(.*?)}';
+    private $assetToken = '{assetlink=(.*?)}';
 
     /**
      * @var TokenHelper
      */
-    protected $tokenHelper;
+    private $tokenHelper;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
-     * BuilderSubscriber constructor.
-     *
-     * @param TokenHelper $tokenHelper
-     * @param LeadModel   $leadModel
+     * @var CorePermissions
      */
-    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel)
+    private $security;
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
+
+    /**
+     * @param TokenHelper     $tokenHelper
+     * @param LeadModel       $leadModel
+     * @param CorePermissions $security
+     * @param MauticFactory   $factory
+     */
+    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel, CorePermissions $security, MauticFactory $factory)
     {
         $this->tokenHelper = $tokenHelper;
         $this->leadModel   = $leadModel;
+        $this->security    = $security;
+        $this->factory     = $factory; // Temporary. @see https://github.com/mautic/mautic/issues/8088
     }
 
     /**
