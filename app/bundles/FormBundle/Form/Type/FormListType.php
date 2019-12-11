@@ -11,10 +11,14 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class PointActionFormSubmitType.
@@ -22,20 +26,26 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class FormListType extends AbstractType
 {
     private $viewOther;
+
+    /**
+     * @var FormRepository
+     */
     private $repo;
 
     /**
-     * @param MauticFactory $factory
+     * @param CorePermissions $security
+     * @param FormModel       $model
+     * @param UserHelper      $userHelper
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
     {
-        $this->viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
-        $this->repo      = $factory->getModel('form')->getRepository();
+        $this->viewOther = $security->isGranted('form:forms:viewother');
+        $this->repo      = $model->getRepository();
 
-        $this->repo->setCurrentUser($factory->getUser());
+        $this->repo->setCurrentUser($userHelper->getUser());
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $viewOther = $this->viewOther;
         $repo      = $this->repo;
@@ -67,13 +77,13 @@ class FormListType extends AbstractType
             'form_type'         => null,
         ]);
 
-        $resolver->setOptional(['form_type']);
+        $resolver->setDefined(['form_type']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_list';
     }
@@ -83,6 +93,6 @@ class FormListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

@@ -11,8 +11,10 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -23,11 +25,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CampaignEventFormFieldValueType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var FormModel
+     */
+    private $model;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(FormModel $model)
     {
-        $this->factory = $factory;
+        $this->model = $model;
     }
 
     /**
@@ -37,7 +42,7 @@ class CampaignEventFormFieldValueType extends AbstractType
     {
         $builder->add(
             'form',
-            'form_list',
+            FormListType::class,
             [
                 'label'       => 'mautic.form.campaign.event.forms',
                 'label_attr'  => ['class' => 'control-label'],
@@ -57,8 +62,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             ]
         );
 
-        $formModel = $this->factory->getModel('form.form');
-        $operators = $formModel->getFilterExpressionFunctions();
+        $operators = $this->model->getFilterExpressionFunctions();
         $choices   = [];
 
         foreach ($operators as $key => $operator) {
@@ -67,17 +71,15 @@ class CampaignEventFormFieldValueType extends AbstractType
 
         $builder->add(
             'operator',
-            'choice',
+            ChoiceType::class,
             [
                 'choices'           => $choices,
                 'choices_as_values' => true,
             ]
         );
 
-        $ff = $builder->getFormFactory();
-
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) use ($formModel) {
+        $func = function (FormEvent $e) {
             $data    = $e->getData();
             $form    = $e->getForm();
             $fields  = [];
@@ -90,7 +92,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             if (empty($data['form'])) {
                 $fields['Select form first'] = 0;
             } else {
-                $formEntity = $formModel->getEntity($data['form']);
+                $formEntity = $this->model->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
 
                 foreach ($formFields as $field) {
@@ -102,7 +104,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                         if (!empty($properties['list']['list'])) {
                             $list = $properties['list']['list'];
                         } elseif (!empty($properties['optionlist']['list'])) {
-                            $list =$properties['optionlist']['list'];
+                            $list = $properties['optionlist']['list'];
                         }
 
                         if (!empty($list)) {
@@ -112,8 +114,8 @@ class CampaignEventFormFieldValueType extends AbstractType
                                     //The select box needs values to be [value] => label format so make sure we have that style then put it in
                                     $options[$field->getAlias()][$option['value']] = $option['label'];
                                 } elseif (is_array($option)) {
-                                    foreach ($option as $optgroup => $option) {
-                                        $options[$field->getAlias()][$option] = $option;
+                                    foreach ($option as $optgroup => $opt) {
+                                        $options[$field->getAlias()][$opt] = $opt;
                                     }
                                 } elseif (!is_array($option)) {
                                     //Kept here for BC
@@ -127,7 +129,7 @@ class CampaignEventFormFieldValueType extends AbstractType
 
             $form->add(
                 'field',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'           => $fields,
                     'choices_as_values' => true,
@@ -148,7 +150,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             if (empty($data['field']) || empty($options[$data['field']])) {
                 $form->add(
                     'value',
-                    'text',
+                    TextType::class,
                     [
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
@@ -166,13 +168,14 @@ class CampaignEventFormFieldValueType extends AbstractType
             } else {
                 $form->add(
                     'value',
-                    'choice',
+                    ChoiceType::class,
                     [
-                        'choices'           => array_flip($options[$data['field']]),
-                        'choices_as_values' => true,
-                        'label'             => 'mautic.form.field.form.value',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => [
+                        'choices'    => $options[$data['field']],
+                        // specifically leaving off choices_as_values here
+                        // as the $key === $value
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
                             'class' => 'form-control not-chosen',
                         ],
                         'required'    => true,
@@ -194,7 +197,7 @@ class CampaignEventFormFieldValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_form_field_value';
     }

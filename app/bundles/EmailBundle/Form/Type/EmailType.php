@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\StageBundle\Model\StageModel;
@@ -291,7 +292,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'unsubscribeForm',
-                'form_list',
+                FormListType::class,
                 [
                     'label'      => 'mautic.email.form.unsubscribeform',
                     'label_attr' => ['class' => 'control-label'],

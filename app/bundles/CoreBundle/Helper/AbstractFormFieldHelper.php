@@ -41,7 +41,7 @@ abstract class AbstractFormFieldHelper
     protected $translationKeyPrefix;
 
     /**
-     * @var
+     * @var TranslatorInterface
      */
     protected $translator;
 
