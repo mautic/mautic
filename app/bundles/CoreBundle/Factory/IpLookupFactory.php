@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 class IpLookupFactory
 {
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 

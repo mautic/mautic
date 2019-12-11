@@ -107,23 +107,16 @@ class PathsHelper
                 break;
 
             case 'cache':
+                return $this->kernelCacheDir;
             case 'logs':
+                return $this->kernelLogsDir;
             case 'temporary':
             case 'tmp':
-                //these are absolute regardless as they are configurable
-                if ('cache' === $name) {
-                    return $this->kernelCacheDir;
-                } elseif ('logs' === $name) {
-                    return $this->kernelLogsDir;
-                } else {
-                    if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
-                        mkdir($this->temporaryDir, 0755, true);
-                    }
-
-                    return $this->temporaryDir;
+                if (!is_dir($this->temporaryDir) && !file_exists($this->temporaryDir) && is_writable($this->temporaryDir)) {
+                    mkdir($this->temporaryDir, 0755, true);
                 }
 
-                // no break
+                return $this->temporaryDir;
             case 'images':
                 $path = $this->imagePath;
                 break;
