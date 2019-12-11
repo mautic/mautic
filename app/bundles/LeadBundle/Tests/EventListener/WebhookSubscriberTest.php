@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
@@ -26,14 +25,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testNewContactEventIsFiredWhenIdentified()
     {
         $dispatcher = new EventDispatcher();
-
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockModel = $this->getMockBuilder(WebhookModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockModel  = $this->createMock(WebhookModel::class);
 
         $mockModel->expects($this->once())
             ->method('queueWebhooksByType')
@@ -46,7 +38,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $webhookSubscriber = new WebhookSubscriber($mockModel);
-        $webhookSubscriber->setFactory($mockFactory);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -60,14 +51,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testUpdateContactEventIsFiredWhenUpdatedButWithoutDateIdentified()
     {
         $dispatcher = new EventDispatcher();
-
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockModel = $this->getMockBuilder(WebhookModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockModel  = $this->createMock(WebhookModel::class);
 
         $mockModel->expects($this->once())
             ->method('queueWebhooksByType')
@@ -80,7 +64,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $webhookSubscriber = new WebhookSubscriber($mockModel);
-        $webhookSubscriber->setFactory($mockFactory);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -95,20 +78,12 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testWebhookIsNotDeliveredIfContactIsAVisitor()
     {
         $dispatcher = new EventDispatcher();
-
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockModel = $this->getMockBuilder(WebhookModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockModel  = $this->createMock(WebhookModel::class);
 
         $mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
         $webhookSubscriber = new WebhookSubscriber($mockModel);
-        $webhookSubscriber->setFactory($mockFactory);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
@@ -123,10 +98,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testChannelChangeIsPickedUpByWebhook()
     {
         $dispatcher = new EventDispatcher();
-
-        $mockFactory = $this->getMockBuilder(MauticFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $mockModel = $this->getMockBuilder(WebhookModel::class)
             ->disableOriginalConstructor()
@@ -156,7 +127,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $webhookSubscriber = new WebhookSubscriber($mockModel);
-        $webhookSubscriber->setFactory($mockFactory);
 
         $dispatcher->addSubscriber($webhookSubscriber);
 

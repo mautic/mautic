@@ -424,17 +424,7 @@ class PublicController extends CommonFormController
 
         $isCallbackInterface = $currentTransport instanceof InterfaceCallbackTransport || $currentTransport instanceof CallbackTransportInterface;
         if ($isCallbackInterface && $currentTransport->getCallbackPath() == $transport) {
-            // @deprecated support to be removed in 3.0
-            if ($currentTransport instanceof InterfaceCallbackTransport) {
-                $response = $currentTransport->handleCallbackResponse($this->request, $this->factory);
-
-                if (is_array($response)) {
-                    /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-                    $model = $this->getModel('email');
-
-                    $model->processMailerCallback($response);
-                }
-            } elseif ($currentTransport instanceof CallbackTransportInterface) {
+            if ($currentTransport instanceof CallbackTransportInterface) {
                 $event = new TransportWebhookEvent($currentTransport, $this->request);
                 $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
             }

@@ -13,12 +13,10 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class LeadCategoryType.
- */
 class LeadCategoryType extends AbstractType
 {
     private $categoryModel;
@@ -32,18 +30,18 @@ class LeadCategoryType extends AbstractType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model = $this->categoryModel;
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($model) {
-                $categories = $model->getLookupResults('global');
+            'choices_as_values' => true,
+            'choices'           => function (Options $options) {
+                $categories = $this->categoryModel->getLookupResults('global');
+                $choices    = [];
 
-                $choices = [];
                 foreach ($categories as $cat) {
-                    $choices[$cat['id']] = $cat['title'];
+                    $choices[$cat['title']] = $cat['id'];
                 }
 
                 return $choices;
@@ -58,13 +56,13 @@ class LeadCategoryType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'leadcategory_choices';
     }

@@ -13,13 +13,27 @@ namespace Mautic\FormBundle\EventListener;
 
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\TelType;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class FormValidationSubscriber extends CommonSubscriber
+class FormValidationSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * {@inheritdoc}
      */

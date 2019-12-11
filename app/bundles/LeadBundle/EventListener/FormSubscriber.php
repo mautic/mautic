@@ -11,26 +11,27 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType;
+use Mautic\LeadBundle\Form\Type\ActionRemoveDoNotContact;
+use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
+use Mautic\LeadBundle\Form\Type\FormSubmitActionPointsChangeType;
+use Mautic\LeadBundle\Form\Type\ListActionType;
+use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
-     * FormSubscriber constructor.
-     *
      * @param EmailModel $emailModel
      */
     public function __construct(EmailModel $emailModel)
@@ -61,7 +62,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
-            'formType'    => 'lead_submitaction_pointschange',
+            'formType'    => FormSubmitActionPointsChangeType::class,
             'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
             'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::changePoints',
         ];
@@ -72,7 +73,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.changelist',
             'description' => 'mautic.lead.lead.events.changelist_descr',
-            'formType'    => 'leadlist_action',
+            'formType'    => ListActionType::class,
             'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::changeLists',
         ];
         $event->addSubmitAction('lead.changelist', $action);
@@ -82,7 +83,7 @@ class FormSubscriber extends CommonSubscriber
             'group'             => 'mautic.lead.lead.submitaction',
             'label'             => 'mautic.lead.lead.events.changetags',
             'description'       => 'mautic.lead.lead.events.changetags_descr',
-            'formType'          => 'modify_lead_tags',
+            'formType'          => ModifyLeadTagsType::class,
             'callback'          => '\Mautic\LeadBundle\Helper\EventHelper::updateTags',
             'allowCampaignForm' => true,
         ];
@@ -93,7 +94,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.addutmtags',
             'description' => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'    => 'lead_action_addutmtags',
+            'formType'    => ActionAddUtmTagsType::class,
             'formTheme'   => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
             'callback'    => '\Mautic\LeadBundle\Helper\EventHelper::addUtmTags',
         ];
@@ -104,7 +105,7 @@ class FormSubscriber extends CommonSubscriber
             'group'             => 'mautic.lead.lead.submitaction',
             'label'             => 'mautic.lead.lead.events.removedonotcontact',
             'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
-            'formType'          => 'lead_action_removedonotcontact',
+            'formType'          => ActionRemoveDoNotContact::class,
             'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
             'eventName'         => LeadEvents::FORM_SUBMIT_REMOVE_DO_NO_CONTACT,
             'allowCampaignForm' => true,
@@ -116,7 +117,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.lead.lead.submitaction',
             'label'       => 'mautic.lead.lead.events.changecompanyscore',
             'description' => 'mautic.lead.lead.events.changecompanyscore_descr',
-            'formType'    => 'scorecontactscompanies_action',
+            'formType'    => CompanyChangeScoreActionType::class,
             'callback'    => '\Mautic\LeadBundle\Helper\FormEventHelper::scoreContactsCompanies',
         ];
         $event->addSubmitAction('lead.scorecontactscompanies', $action);

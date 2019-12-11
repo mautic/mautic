@@ -167,12 +167,11 @@ class FocusController extends FormController
      */
     protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $updateSelect = ('POST' == $this->request->getMethod())
-            ? $this->request->request->get('focus[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $focus        = $this->request->request->get('focus', []);
+        $updateSelect = 'POST' === $this->request->getMethod()
+            ? ($focus['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
+
         if ($updateSelect) {
             switch ($action) {
                 case 'new':
@@ -199,12 +198,11 @@ class FocusController extends FormController
      */
     protected function getEntityFormOptions()
     {
-        $updateSelect = ('POST' == $this->request->getMethod())
-            ? $this->request->request->get('focus[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $focus        = $this->request->request->get('focus', []);
+        $updateSelect = 'POST' === $this->request->getMethod()
+            ? ($focus['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
+
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
         }

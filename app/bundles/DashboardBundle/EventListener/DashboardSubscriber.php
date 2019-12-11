@@ -11,16 +11,13 @@
 
 namespace Mautic\DashboardBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class DashboardSubscriber.
- */
-class DashboardSubscriber extends CommonSubscriber
+class DashboardSubscriber implements EventSubscriberInterface
 {
     /**
      * Define the name of the bundle/category of the widget(s).

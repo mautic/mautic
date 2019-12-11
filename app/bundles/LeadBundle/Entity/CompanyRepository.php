@@ -236,10 +236,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         $q->where(
-            $q->expr()->in('cl.company_id', $companyIds),
-            $q->expr()->eq('cl.manually_removed', ':false')
+            $q->expr()->in('cl.company_id', $companyIds)
         )
-            ->setParameter('false', false, 'boolean')
             ->groupBy('cl.company_id');
 
         $result = $q->execute()->fetchAll();
@@ -320,7 +318,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
                 $qb->expr()->andX(
-                    $qb->expr()->eq('l.manually_removed', 0),
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )

@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 
@@ -77,7 +78,7 @@ trait FrequencyRuleTrait
         }
         /** @var Form $form */
         $form = $this->get('form.factory')->create(
-            'lead_contact_frequency_rules',
+            ContactFrequencyType::class,
             $data,
             [
                 'action'                   => $action,

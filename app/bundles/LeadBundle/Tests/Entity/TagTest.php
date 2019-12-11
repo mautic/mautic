@@ -22,9 +22,6 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('tagA', $entity->getTag());
     }
 
-    /**
-     * @deprecated as the setter is deprecated
-     */
     public function testSetTagBySetter()
     {
         $entity = new Tag();

@@ -53,24 +53,6 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * Get existing duplicated contact based on unique fields and the request data.
-     *
-     * @param array $parameters
-     * @param null  $id
-     *
-     * @return Lead|null
-     *
-     * @deprecated since 2.12.2, to be removed in 3.0.0. Use $model->checkForDuplicateContact directly instead
-     */
-    protected function getExistingLead(array $parameters, $id = null)
-    {
-        $model   = $this->getModel(self::MODEL_ID);
-        $contact = $id ? $model->getEntity($id) : null;
-
-        return $model->checkForDuplicateContact($parameters, $contact);
-    }
-
-    /**
      * Obtains a list of users for lead owner edits.
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -535,35 +517,6 @@ class LeadApiController extends CommonApiController
     public function removeUtmTagsAction($id, $utmid)
     {
         return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
-    }
-
-    /**
-     * Obtains a list of contact events.
-     *
-     * @deprecated 2.10.0 to be removed in 3.0
-     *
-     * @param $id
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEventsAction($id)
-    {
-        $entity = $this->model->getEntity($id);
-
-        if (null === $entity) {
-            return $this->notFound();
-        }
-
-        if (!$this->checkEntityAccess($entity, 'view')) {
-            return $this->accessDenied();
-        }
-
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
-        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
-        $page    = (int) $this->request->get('page', 1);
-        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
-
-        return $this->handleView($this->view($events));
     }
 
     /**

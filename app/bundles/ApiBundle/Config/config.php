@@ -99,24 +99,27 @@ return [
     'services' => [
         'events' => [
             'mautic.api.subscriber' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\ApiSubscriber',
+                'class'     => \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
                     'mautic.core.model.auditlog',
+                    'translator',
                 ],
             ],
             'mautic.api.configbundle.subscriber' => [
-                'class' => 'Mautic\ApiBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.api.search.subscriber' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\ApiBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.api.model.client',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.api.rate_limit_generate_key.subscriber' => [
-              'class'     => 'Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber',
+              'class'     => \Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber::class,
               'arguments' => [
                 'mautic.helper.core_parameters',
               ],

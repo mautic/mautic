@@ -25,7 +25,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
     /**
      * @var Logger
      */
-    protected $logger;
+    private $logger;
 
     /**
      * DoctrineSubscriber constructor.

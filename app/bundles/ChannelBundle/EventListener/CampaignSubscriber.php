@@ -28,15 +28,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var MessageModel
      */
-    protected $messageModel;
+    private $messageModel;
 
     /**
      * @var ActionDispatcher
@@ -76,7 +73,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    protected $messageChannels = [];
+    private $messageChannels = [];
 
     /**
      * CampaignSubscriber constructor.
@@ -215,7 +212,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    protected function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
+    private function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);

@@ -107,15 +107,19 @@ class MonitoringType extends AbstractType
             );
         }
 
-        $builder->add('lists', 'leadlist_choices', [
-            'label'      => 'mautic.lead.lead.events.addtolists',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class' => 'form-control',
-            ],
-            'multiple' => true,
-            'expanded' => false,
-        ]);
+        $builder->add(
+            'lists',
+            LeadListType::class,
+            [
+                'label'      => 'mautic.lead.lead.events.addtolists',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'multiple' => true,
+                'expanded' => false,
+            ]
+        );
 
         //add category
         $builder->add('category', CategoryListType::class, [

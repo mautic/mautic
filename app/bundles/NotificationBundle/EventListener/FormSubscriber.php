@@ -12,7 +12,6 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
@@ -20,53 +19,59 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var NotificationModel
      */
-    protected $notificationModel;
+    private $notificationModel;
 
     /**
      * @var AbstractNotificationApi
      */
-    protected $notificationApi;
+    private $notificationApi;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IntegrationHelper       $integrationHelper
-     * @param LeadModel               $leadModel
-     * @param NotificationModel       $notificationModel
-     * @param AbstractNotificationApi $notificationApi
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @param IntegrationHelper        $integrationHelper
+     * @param LeadModel                $leadModel
+     * @param NotificationModel        $notificationModel
+     * @param AbstractNotificationApi  $notificationApi
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
-        AbstractNotificationApi $notificationApi
+        AbstractNotificationApi $notificationApi,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->integrationHelper = $integrationHelper;
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi   = $notificationApi;
+        $this->dispatcher        = $dispatcher;
     }
 
     /**
@@ -89,7 +94,7 @@ class FormSubscriber extends CommonSubscriber
             'group'       => 'mautic.notification.actions',
             'description' => 'mautic.notification.actions.mobile_tooltip',
             'label'       => 'mautic.notification.actions.send_mobile_notification',
-            'formType'    => 'notification_list',
+            'formType'    => NotificationListType::class,
             'formTheme'   => 'MauticNotificationBundle:FormTheme\NotificationSendList',
             'eventName'   => NotificationEvents::NOTIFICATION_ON_FORM_ACTION_SEND,
         ];

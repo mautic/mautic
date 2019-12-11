@@ -22,12 +22,15 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -37,10 +40,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ListModel
- * {@inheritdoc}
- */
 class ListModel extends FormModel
 {
     use OperatorListTrait;
@@ -56,14 +55,12 @@ class ListModel extends FormModel
     private $leadSegmentService;
 
     /**
-     * ListModel constructor.
-     *
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment)
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegmentService)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadSegmentService   = $leadSegment;
+        $this->leadSegmentService   = $leadSegmentService;
     }
 
     /**
@@ -76,15 +73,12 @@ class ListModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\LeadBundle\Entity\LeadListRepository
-     *
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @return LeadListRepository
      */
     public function getRepository()
     {
-        /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repo */
-        $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
+        /** @var LeadListRepository $repo */
+        $repo = $this->em->getRepository(LeadList::class);
 
         $repo->setDispatcher($this->dispatcher);
         $repo->setTranslator($this->translator);
@@ -95,11 +89,11 @@ class ListModel extends FormModel
     /**
      * Returns the repository for the table that houses the leads associated with a list.
      *
-     * @return \Mautic\LeadBundle\Entity\ListLeadRepository
+     * @return ListLeadRepository
      */
     public function getListLeadRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:ListLead');
+        return $this->em->getRepository(ListLead::class);
     }
 
     /**
@@ -178,7 +172,7 @@ class ListModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadlist', $entity, $options);
+        return $formFactory->create(ListType::class, $entity, $options);
     }
 
     /**
@@ -771,7 +765,7 @@ class ListModel extends FormModel
         }
 
         //get list of custom fields
-        $fields = $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities(
+        $fields = $this->em->getRepository(LeadField::class)->getEntities(
             [
                 'filter' => [
                     'where'         => [
@@ -836,11 +830,9 @@ class ListModel extends FormModel
      */
     public function getUserLists($alias = '')
     {
-        $user = (!$this->security->isGranted('lead:lists:viewother')) ?
-            $this->userHelper->getUser() : false;
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists($user, $alias);
+        $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : false;
 
-        return $lists;
+        return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
     }
 
     /**
@@ -850,9 +842,7 @@ class ListModel extends FormModel
      */
     public function getGlobalLists()
     {
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getGlobalLists();
-
-        return $lists;
+        return $this->em->getRepository(LeadList::class)->getGlobalLists();
     }
 
     /**
@@ -862,9 +852,7 @@ class ListModel extends FormModel
      */
     public function getPreferenceCenterLists()
     {
-        $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getPreferenceCenterList();
-
-        return $lists;
+        return $this->em->getRepository(LeadList::class)->getPreferenceCenterList();
     }
 
     /**
@@ -876,10 +864,7 @@ class ListModel extends FormModel
      */
     public function getVersionNew(LeadList $entity)
     {
-        $id       = $entity->getId();
-        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
-        $dtHelper = new DateTimeHelper();
-
+        $dtHelper      = new DateTimeHelper();
         $batchLimiters = [
             'dateTime' => $dtHelper->toUtcString(),
         ];
@@ -894,27 +879,16 @@ class ListModel extends FormModel
      */
     public function getVersionOld(LeadList $entity)
     {
-        $id       = $entity->getId();
-        $list     = ['id' => $id, 'filters' => $entity->getFilters()];
-        $dtHelper = new DateTimeHelper();
-
         $batchLimiters = [
-            'dateTime' => $dtHelper->toUtcString(),
+            'dateTime' => (new DateTimeHelper())->toUtcString(),
         ];
 
-        $newLeadsCount = $this->getLeadsByList(
-            $list,
-            true,
-            [
-                'countOnly'     => true,
-                'newOnly'       => true,
-                'batchLimiters' => $batchLimiters,
-            ]
+        $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount(
+            $entity,
+            $batchLimiters
         );
 
-        $return = array_shift($newLeadsCount);
-
-        return $return;
+        return array_shift($newLeadsCount);
     }
 
     /**
@@ -1207,7 +1181,7 @@ class ListModel extends FormModel
                     ]
                 );
             } else {
-                $listLead = $this->em->getReference('MauticLeadBundle:ListLead',
+                $listLead = $this->em->getReference(ListLead::class,
                     [
                         'lead' => $leadId,
                         'list' => $listId,
@@ -1245,7 +1219,7 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear('Mautic\LeadBundle\Entity\ListLead');
+        $this->em->clear(ListLead::class);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -1277,7 +1251,7 @@ class ListModel extends FormModel
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $this->em->getReference(Lead::class, $leadId);
         } else {
             $leadId = $lead->getId();
         }
@@ -1336,7 +1310,7 @@ class ListModel extends FormModel
                     'lead' => $lead,
                     'list' => $this->leadChangeLists[$listId],
                 ]) :
-                $this->em->getReference('MauticLeadBundle:ListLead', [
+                $this->em->getReference(ListLead::class, [
                     'lead' => $leadId,
                     'list' => $listId,
                 ]);
@@ -1369,7 +1343,7 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear('Mautic\LeadBundle\Entity\ListLead');
+        $this->em->clear(ListLead::class);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -1384,22 +1358,6 @@ class ListModel extends FormModel
         }
 
         unset($lead, $deleteLists, $persistLists, $lists);
-    }
-
-    /**
-     * @deprecated in 2.14, to be removed in Mautic 3 - Use methods in the ContactSegmentService class
-     *
-     * @param       $lists
-     * @param bool  $idOnly
-     * @param array $args
-     *
-     * @return array
-     */
-    public function getLeadsByList($lists, $idOnly = false, array $args = [])
-    {
-        $args['idOnly'] = $idOnly;
-
-        return $this->getRepository()->getLeadsByList($lists, $args, $this->logger);
     }
 
     /**
@@ -1426,14 +1384,14 @@ class ListModel extends FormModel
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int    $limit
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
+     * @param int       $limit
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param bool      $canViewOthers
      *
      * @return array
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $filters = [])
+    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $canViewOthers = true)
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -1445,18 +1403,15 @@ class ListModel extends FormModel
             ->groupBy('ll.id')
             ->setMaxResults($limit);
 
-        if (!empty($options['canViewOthers'])) {
+        if (!$canViewOthers) {
             $q->andWhere('ll.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -1469,7 +1424,7 @@ class ListModel extends FormModel
      *
      * @return array
      */
-    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $filters, $segments)
+    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments)
     {
         if (!empty($segments)) {
             $segmentlist = "'".implode("','", $segments)."'";
@@ -1496,7 +1451,7 @@ class ListModel extends FormModel
         if (!empty($dateTo)) {
             $q->andWhere("l.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
         }
-        if (!empty($options['canViewOthers'])) {
+        if (!$canViewOthers) {
             $q->andWhere('ll.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
@@ -1508,7 +1463,7 @@ class ListModel extends FormModel
             $qAll->select('COUNT(t.date_added) AS leads, 0 as id, "All Contacts" as name, "" as alias')
                 ->from(MAUTIC_TABLE_PREFIX.'leads', 't');
 
-            if (!empty($options['canViewOthers'])) {
+            if (!$canViewOthers) {
                 $qAll->andWhere('ll.created_by = :userId')
                     ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
@@ -1531,7 +1486,7 @@ class ListModel extends FormModel
      * @param \DateTime $dateTo
      * @param           $dateFormat
      * @param           $filter
-     * @param           $canViewOthers
+     * @param bool      $canViewOthers
      * @param           $listName
      *
      * @return array
@@ -1549,10 +1504,8 @@ class ListModel extends FormModel
             unset($filter['flag']);
         }
 
-        $allLists = $query->getCountQuery('leads', 'id', 'date_added', null);
-
-        $lists = $query->count('leads', 'id', 'date_added', $filter, null);
-
+        $allLists   = $query->getCountQuery('leads', 'id', 'date_added', null);
+        $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
 
@@ -1574,10 +1527,11 @@ class ListModel extends FormModel
      * @param \DateTime $dateTo
      * @param null      $dateFormat
      * @param array     $filter
+     * @param bool      $canViewOthers
      *
      * @return array
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1603,7 +1557,7 @@ class ListModel extends FormModel
 
         $q->groupBy('s.name');
 
-        if (!empty($options['canViewOthers'])) {
+        if (!$canViewOthers) {
             $q->andWhere('s.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
@@ -1611,7 +1565,6 @@ class ListModel extends FormModel
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $result) {
-            $percentage       = $result['leads'];
             $data['labels'][] = substr($result['stage'], 0, 12);
             $data['values'][] = $result['leads'];
         }
@@ -1623,20 +1576,16 @@ class ListModel extends FormModel
             'data'  => $data['values'],
         ];
 
-        $chart = new BarChart($data['labels']);
-
-        $datasetId  = count($data['values']);
+        $chart      = new BarChart($data['labels']);
         $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
-        $chartData = [
+        return [
             'labels'   => $data['labels'],
             'datasets' => $datasets,
             'options'  => [
                 'xAxes' => $data['xAxes'],
                 'yAxes' => $data['yAxes'],
             ], ];
-
-        return $chartData;
     }
 
     /**
@@ -1645,10 +1594,11 @@ class ListModel extends FormModel
      * @param \DateTime $dateTo
      * @param null      $dateFormat
      * @param array     $filter
+     * @param bool      $canViewOthers
      *
      * @return array
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true)
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1675,7 +1625,7 @@ class ListModel extends FormModel
 
         $q->groupBy('ds.device');
 
-        if (!empty($options['canViewOthers'])) {
+        if (!$canViewOthers) {
             $q->andWhere('l.created_by = :userId')
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
@@ -1695,11 +1645,10 @@ class ListModel extends FormModel
             'data'  => $data['values'],
         ];
 
-        $chart = new BarChart($data['labels']);
-
+        $chart      = new BarChart($data['labels']);
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
 
-        $chartData = [
+        return [
             'labels'   => $data['labels'],
             'datasets' => $datasets,
             'options'  => [
@@ -1707,8 +1656,6 @@ class ListModel extends FormModel
                 'yAxes' => $data['yAxes'],
             ],
         ];
-
-        return $chartData;
     }
 
     /**
@@ -1741,9 +1688,7 @@ class ListModel extends FormModel
      */
     public function isFieldUsed(LeadField $field)
     {
-        $segments = $this->getFieldSegments($field);
-
-        return 0 < $segments->count();
+        return 0 < $this->getFieldSegments($field)->count();
     }
 
     public function getFieldSegments(LeadField $field)
@@ -1751,8 +1696,7 @@ class ListModel extends FormModel
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
         $likeContent = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
-
-        $filter = [
+        $filter      = [
             'force'  => [
                 ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $likeContent],
             ],
@@ -1770,10 +1714,8 @@ class ListModel extends FormModel
      */
     public function getSegmentsWithDependenciesOnSegment($segmentId)
     {
-        $page  = 1;
-        $limit = 1000;
-        $start = 0;
-
+        $limit  = 1000;
+        $start  = 0;
         $filter = [
             'force'  => [
                 ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],

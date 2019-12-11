@@ -18,12 +18,10 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
@@ -39,6 +37,7 @@ class AjaxController extends CommonAjaxController
         return $this->getAbTestForm(
             $request,
             'email',
+            AbTestPropertiesType::class,
             'email_abtest_settings',
             'emailform',
             'MauticEmailBundle:AbTest:form.html.php',

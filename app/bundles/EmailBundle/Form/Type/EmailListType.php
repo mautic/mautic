@@ -16,9 +16,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class EmailListType.
- */
 class EmailListType extends AbstractType
 {
     /**
@@ -72,7 +69,7 @@ class EmailListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_list';
     }

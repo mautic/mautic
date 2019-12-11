@@ -144,8 +144,8 @@ class ImportModel extends FormModel
     public function generateLink(Import $import)
     {
         return '<a href="'.$this->router->generate(
-            'mautic_contact_import_action',
-            ['objectAction' => 'view', 'objectId' => $import->getId()]
+            'mautic_import_action',
+            ['objectAction' => 'view', 'object' => 'lead', 'objectId' => $import->getId()]
         ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>';
     }
 
@@ -184,29 +184,6 @@ class ImportModel extends FormModel
         }
 
         $this->saveEntities($imports);
-    }
-
-    /**
-     * Start import. This is meant for the CLI command since it will import
-     * the whole file at once.
-     *
-     * @deprecated in 2.13.0. To be removed in 3.0.0. Use beginImport instead
-     *
-     * @param Import   $import
-     * @param Progress $progress
-     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
-     *
-     * @return bool
-     */
-    public function startImport(Import $import, Progress $progress, $limit = 0)
-    {
-        try {
-            return $this->beginImport($import, $progress, $limit);
-        } catch (\Exception $e) {
-            $this->logDebug($e->getMessage());
-
-            return false;
-        }
     }
 
     /**

@@ -15,9 +15,6 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\PointBundle\Model\PointModel;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -52,8 +49,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $pointModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
      * @param PointModel $pointModel
      */
     public function __construct(PointModel $pointModel)
