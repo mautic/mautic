@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
+use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -43,6 +44,7 @@ class WebhookSubscriber implements EventSubscriberInterface
             LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
             LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
             LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
+            LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
         ];
     }
 
@@ -93,6 +95,15 @@ class WebhookSubscriber implements EventSubscriberInterface
             [
                 'label'       => 'mautic.lead.webhook.event.lead.dnc',
                 'description' => 'mautic.lead.webhook.event.lead.dnc_desc',
+            ]
+        );
+
+        // add checkbox to the webhook form for new leads
+        $event->addEvent(
+            LeadEvents::LEAD_COMPANY_CHANGE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.company.change',
+                'description' => 'mautic.lead.webhook.event.lead.company.change.desc',
             ]
         );
     }
@@ -179,5 +190,28 @@ class WebhookSubscriber implements EventSubscriberInterface
                 'tagList',
             ]
         );
+    }
+
+    /**
+     * @param LeadChangeCompanyEvent $event
+     */
+    public function onLeadCompanyChange(LeadChangeCompanyEvent $event)
+    {
+        $leads = $event->getLeads();
+        if (empty($leads)) {
+            $leads = [$event->getLead()];
+        }
+        foreach ($leads as $lead) {
+            $this->webhookModel->queueWebhooksByType(
+                LeadEvents::LEAD_COMPANY_CHANGE,
+                [
+                    'added'    => $event->wasAdded(),
+                    'contact'  => $lead,
+                    'company'  => $event->getCompany(),
+                ],
+                [
+                ]
+            );
+        }
     }
 }
