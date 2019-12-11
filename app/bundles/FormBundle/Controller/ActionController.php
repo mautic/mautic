@@ -171,7 +171,7 @@ class ActionController extends CommonFormController
                 return $this->modalAccessDenied();
             }
 
-            $form = $this->get('form.factory')->create('formaction', $formAction, [
+            $form = $this->get('form.factory')->create(ActionType::class, $formAction, [
                 'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 'settings' => $formAction['settings'],
                 'formId'   => $formId,
