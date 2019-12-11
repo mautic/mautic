@@ -37,7 +37,7 @@ class AuthorizeController extends Controller
         $oauth_token    = $request->get('oauth_token', null);
         $oauth_callback = $request->get('oauth_callback', null);
 
-        $securityContext = $this->container->get('security.context');
+        $securityContext = $this->container->get('security.token_storage');
         $tokenProvider   = $this->container->get('bazinga.oauth.provider.token_provider');
 
         $user = $securityContext->getToken()->getUser();

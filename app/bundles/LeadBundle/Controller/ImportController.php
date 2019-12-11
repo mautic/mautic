@@ -14,6 +14,8 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Form\Type\LeadImportFieldType;
+use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Exception\LogicException;
@@ -194,7 +196,7 @@ class ImportController extends FormController
                     $this->resetImport($fullPath);
                 }
 
-                $form = $this->get('form.factory')->create('lead_import', [], ['action' => $action]);
+                $form = $this->get('form.factory')->create(LeadImportType::class, [], ['action' => $action]);
                 break;
             case self::STEP_MATCH_FIELDS:
 
@@ -206,7 +208,7 @@ class ImportController extends FormController
 
                 try {
                     $form = $this->get('form.factory')->create(
-                        'lead_field_import',
+                        LeadImportFieldType::class,
                         [],
                         [
                             'object'           => $object,

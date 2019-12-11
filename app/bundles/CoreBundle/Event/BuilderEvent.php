@@ -143,7 +143,7 @@ class BuilderEvent extends Event
 
         $choices = [];
         foreach ($this->abTestWinnerCriteria as $k => $c) {
-            $choices[$c['group']][$k] = $c['label'];
+            $choices[$c['group']][$c['label']] = $k;
         }
         $array['choices'] = $choices;
 

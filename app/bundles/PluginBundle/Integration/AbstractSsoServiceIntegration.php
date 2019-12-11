@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
@@ -161,7 +162,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
 
             $builder->add(
                 'new_user_role',
-                'role_list',
+                RoleListType::class,
                 [
                     'label'      => 'mautic.integration.sso.new_user_role',
                     'label_attr' => ['class' => 'control-label'],

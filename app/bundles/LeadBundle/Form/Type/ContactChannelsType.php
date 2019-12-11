@@ -6,7 +6,10 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,7 +29,6 @@ class ContactChannelsType extends AbstractType
     }
 
     /**
-     * @see AbstractType::buildForm()
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -37,10 +39,10 @@ class ContactChannelsType extends AbstractType
 
         $builder->add(
             'subscribed_channels',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'           => $options['channels'],
                 'choices_as_values' => true,
+                'choices'           => $options['channels'],
                 'expanded'          => true,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
@@ -53,10 +55,10 @@ class ContactChannelsType extends AbstractType
         if (!$options['public_view'] || $showContactPreferredChannels) {
             $builder->add(
                 'preferred_channel',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'           => $options['channels'],
                     'choices_as_values' => true,
+                    'choices'           => $options['channels'],
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.lead.list.frequency.preferred.channel',
@@ -78,9 +80,9 @@ class ContactChannelsType extends AbstractType
 
                 $builder->add(
                     'frequency_number_'.$channel,
-                    'integer',
+                    IntegerType::class,
                     [
-                        'precision'  => 0,
+                        'scale'      => 0,
                         'label'      => 'mautic.lead.list.frequency.number',
                         'label_attr' => ['class' => 'text-muted fw-n label1'],
                         'attr'       => array_merge(
@@ -95,12 +97,13 @@ class ContactChannelsType extends AbstractType
 
                 $builder->add(
                     'frequency_time_'.$channel,
-                    'choice',
+                    ChoiceType::class,
                     [
-                        'choices' => [
-                            FrequencyRule::TIME_DAY   => 'mautic.core.time.days',
-                            FrequencyRule::TIME_WEEK  => 'mautic.core.time.weeks',
-                            FrequencyRule::TIME_MONTH => 'mautic.core.time.months',
+                        'choices_as_values' => true,
+                        'choices'           => [
+                            'mautic.core.time.days'   => FrequencyRule::TIME_DAY,
+                            'mautic.core.time.weeks'  => FrequencyRule::TIME_WEEK,
+                            'mautic.core.time.months' => FrequencyRule::TIME_MONTH,
                         ],
                         'label'      => 'mautic.lead.list.frequency.times',
                         'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],
@@ -166,7 +169,7 @@ class ContactChannelsType extends AbstractType
         if (isset($options['save_button']) && true === $options['save_button']) {
             $builder->add(
                 'ids',
-                'hidden'
+                HiddenType::class
             );
 
             $builder->add(
@@ -189,7 +192,6 @@ class ContactChannelsType extends AbstractType
     }
 
     /**
-     * @see AbstractType::configureOptions()
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)

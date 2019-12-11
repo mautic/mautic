@@ -45,11 +45,6 @@ return [
         ],
     ],
     'services' => [
-        'events' => [
-            // 'mautic.dashboard.subscriber' => array(
-            //     'class' => 'Mautic\DashboardBundle\EventListener\DashboardSubscriber'
-            // ),
-        ],
         'forms' => [
             'mautic.dashboard.form.type.widget' => [
                 'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',

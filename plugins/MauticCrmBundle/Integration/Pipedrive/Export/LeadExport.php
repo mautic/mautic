@@ -167,8 +167,7 @@ class LeadExport extends AbstractPipedrive
     private function getLeadIntegrationCompanyId(Lead $lead)
     {
         $leadCompanies = $this->em->getRepository(CompanyLead::class)->findBy([
-            'lead'            => $lead,
-            'manuallyRemoved' => false,
+            'lead' => $lead,
         ]);
 
         if (!$leadCompanies) {

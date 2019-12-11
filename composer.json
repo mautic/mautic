@@ -16,6 +16,8 @@
     },
     "require": {
         "php": ">=7.2.21 <7.3",
+        "ext-zlib": "^7.2",
+        "ext-zip": "^1.15",
 
         "symfony/console": "~3.4.0",
         "symfony/debug": "~3.4.0",
@@ -103,7 +105,8 @@
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
         "noxlogic/ratelimit-bundle": "^1.11",
-        "knplabs/knp-menu-bundle": "^2.0"
+        "knplabs/knp-menu-bundle": "^2.0",
+        "guzzlehttp/oauth-subscriber": "^0.3.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
@@ -119,7 +122,8 @@
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.15.0",
-        "liip/test-fixtures-bundle": "^1.6"
+        "liip/test-fixtures-bundle": "^1.6",
+        "kamermans/guzzle-oauth2-subscriber": "^1.0"
     },
     "repositories": [
         {
@@ -147,10 +151,7 @@
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist"
     },
     "config": {
-        "bin-dir": "bin",
-        "platform": {
-            "php": "7.2.0"
-        }
+        "bin-dir": "bin"
     },
     "extra": {
         "symfony-app-dir": "app",

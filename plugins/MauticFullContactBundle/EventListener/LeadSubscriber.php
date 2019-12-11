@@ -11,22 +11,20 @@
 
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LookupHelper
      */
-    protected $lookupHelper;
+    private $lookupHelper;
 
     /**
-     * LeadSubscriber constructor.
-     *
      * @param LookupHelper $lookupHelper
      */
     public function __construct(LookupHelper $lookupHelper)

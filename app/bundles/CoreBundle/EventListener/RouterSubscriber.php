@@ -49,8 +49,6 @@ class RouterSubscriber implements EventSubscriberInterface
     private $httpPort;
 
     /**
-     * RouterSubscriber constructor.
-     *
      * @param RouterInterface $router
      * @param string|null     $scheme
      * @param string|null     $host

@@ -14,10 +14,8 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -55,13 +53,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $assetModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var RouterInterface
      */
-    public function __construct(AssetModel $assetModel)
+    protected $router;
+
+    /**
+     * @param AssetModel      $assetModel
+     * @param RouterInterface $router
+     */
+    public function __construct(AssetModel $assetModel, RouterInterface $router)
     {
         $this->assetModel = $assetModel;
+        $this->router     = $router;
     }
 
     /**
@@ -99,7 +102,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
         if ('unique.vs.repetitive.downloads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model  = $this->factory->getModel('asset');
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,

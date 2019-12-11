@@ -11,15 +11,12 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class ListApiController.
- */
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -27,7 +24,7 @@ class ListApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel('lead.list');
-        $this->entityClass      = 'Mautic\LeadBundle\Entity\LeadList';
+        $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress'];
@@ -44,8 +41,8 @@ class ListApiController extends CommonApiController
     {
         $lists   = $this->getModel('lead.list')->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
-        $context = SerializationContext::create()->setGroups(['leadListList']);
-        $view->setSerializationContext($context);
+        $context = $view->getContext()->setGroups(['leadListList']);
+        $view->setContext($context);
 
         return $this->handleView($view);
     }

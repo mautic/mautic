@@ -17,9 +17,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class MergeType.
- */
 class ContactFrequencyType extends AbstractType
 {
     /**
@@ -28,8 +25,6 @@ class ContactFrequencyType extends AbstractType
     protected $coreParametersHelper;
 
     /**
-     * ContactFrequencyType constructor.
-     *
      * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
@@ -62,7 +57,7 @@ class ContactFrequencyType extends AbstractType
         if (!$options['public_view']) {
             $builder->add(
                 'lead_lists',
-                'leadlist_choices',
+                LeadListType::class,
                 [
                     'label'      => 'mautic.lead.form.list',
                     'label_attr' => ['class' => 'control-label'],
@@ -74,7 +69,7 @@ class ContactFrequencyType extends AbstractType
         } elseif ($showContactSegments) {
             $builder->add(
                 'lead_lists',
-                'leadlist_choices',
+                LeadListType::class,
                 [
                     'preference_center_only' => $options['preference_center_only'],
                     'label'                  => 'mautic.lead.form.list',
@@ -89,7 +84,7 @@ class ContactFrequencyType extends AbstractType
         if (!$options['public_view'] || $showContactCategories) {
             $builder->add(
                 'global_categories',
-                'leadcategory_choices',
+                LeadCategoryType::class,
                 [
                     'label'      => 'mautic.lead.form.categories',
                     'label_attr' => ['class' => 'control-label'],
@@ -135,7 +130,7 @@ class ContactFrequencyType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_contact_frequency_rules';
     }

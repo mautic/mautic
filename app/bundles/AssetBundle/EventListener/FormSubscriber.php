@@ -12,11 +12,11 @@
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array

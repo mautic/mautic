@@ -37,6 +37,7 @@ use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
+use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -361,7 +362,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('emailform', $entity, $options);
+        return $formFactory->create(EmailType::class, $entity, $options);
     }
 
     /**
@@ -1456,7 +1457,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $useSettings['slots'])
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
@@ -1757,87 +1758,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $reason,
                 $flush
             );
-        }
-
-        return $dnc;
-    }
-
-    /**
-     * Processes the callback response from a mailer for bounces and unsubscribes.
-     *
-     * @deprecated 2.13.0 to be removed in 3.0; use TransportWebhook::processCallback() instead
-     *
-     * @param array $response
-     *
-     * @return array|void
-     */
-    public function processMailerCallback(array $response)
-    {
-        if (empty($response)) {
-            return;
-        }
-
-        $statRepo = $this->getStatRepository();
-        $alias    = $statRepo->getTableAlias();
-        if (!empty($alias)) {
-            $alias .= '.';
-        }
-
-        // Keep track to prevent duplicates before flushing
-        $emails = [];
-        $dnc    = [];
-
-        foreach ($response as $type => $entries) {
-            if (!empty($entries['hashIds'])) {
-                $stats = $statRepo->getEntities(
-                    [
-                        'filter' => [
-                            'force' => [
-                                [
-                                    'column' => $alias.'trackingHash',
-                                    'expr'   => 'in',
-                                    'value'  => array_keys($entries['hashIds']),
-                                ],
-                            ],
-                        ],
-                    ]
-                );
-
-                /** @var \Mautic\EmailBundle\Entity\Stat $s */
-                foreach ($stats as $s) {
-                    $reason = $entries['hashIds'][$s->getTrackingHash()];
-                    if ($this->translator->hasId('mautic.email.bounce.reason.'.$reason)) {
-                        $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
-                    }
-
-                    $dnc[] = $this->setDoNotContact($s, $reason, $type);
-
-                    $s->setIsFailed(true);
-                    $this->em->persist($s);
-                }
-            }
-
-            if (!empty($entries['emails'])) {
-                foreach ($entries['emails'] as $email => $reason) {
-                    if (in_array($email, $emails)) {
-                        continue;
-                    }
-                    $emails[] = $email;
-
-                    $leadId = null;
-                    if (is_array($reason)) {
-                        // Includes a lead ID
-                        $leadId = $reason['leadId'];
-                        $reason = $reason['reason'];
-                    }
-
-                    if ($this->translator->hasId('mautic.email.bounce.reason.'.$reason)) {
-                        $reason = $this->translator->trans('mautic.email.bounce.reason.'.$reason);
-                    }
-
-                    $dnc = array_merge($dnc, $this->setEmailDoNotContact($email, $type, $reason, true, $leadId));
-                }
-            }
         }
 
         return $dnc;
@@ -2265,18 +2185,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         );
 
         return $upcomingEmails;
-    }
-
-    /**
-     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
-     *
-     * @param Email $entity
-     *
-     * @return array
-     */
-    public function getVariants(Email $entity)
-    {
-        return $entity->getVariants();
     }
 
     /**

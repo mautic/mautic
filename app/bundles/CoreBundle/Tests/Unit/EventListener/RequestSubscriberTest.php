@@ -70,9 +70,11 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getTemplating')
             ->willReturn($this->createMock(DelegatingEngine::class));
 
-        $this->subscriber = new RequestSubscriber($csrfTokenManagerMock);
-        $this->subscriber->setTranslator($this->createMock(TranslatorInterface::class));
-        $this->subscriber->setTemplating($templatingHelper);
+        $this->subscriber = new RequestSubscriber(
+            $csrfTokenManagerMock,
+            $this->createMock(TranslatorInterface::class),
+            $templatingHelper
+        );
     }
 
     public function testTheValidateCsrfTokenForAjaxPostMethodAsRegularPost()

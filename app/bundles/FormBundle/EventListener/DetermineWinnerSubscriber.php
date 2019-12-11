@@ -11,9 +11,9 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -21,9 +21,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EntityManager
+     * @var SubmissionRepository
      */
-    private $em;
+    private $submissionRepository;
 
     /**
      * @var TranslatorInterface
@@ -31,13 +31,13 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
+     * @param SubmissionRepository $submissionRepository
+     * @param TranslatorInterface  $translator
      */
-    public function __construct(EntityManager $em, TranslatorInterface $translator)
+    public function __construct(SubmissionRepository $submissionRepository, TranslatorInterface $translator)
     {
-        $this->em         = $em;
-        $this->translator = $translator;
+        $this->submissionRepository = $submissionRepository;
+        $this->translator           = $translator;
     }
 
     /**
@@ -57,7 +57,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
     {
-        $repo       = $this->em->getRepository('MauticFormBundle:Submission');
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
@@ -77,15 +76,14 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
         $startDate = $parent->getVariantStartDate();
         if (null != $startDate && !empty($ids)) {
-            $counts = ('page' == $type) ? $repo->getSubmissionCountsByPage($ids, $startDate) : $repo->getSubmissionCountsByEmail($ids, $startDate);
+            $counts = ('page' == $type) ? $this->submissionRepository->getSubmissionCountsByPage($ids, $startDate) : $this->submissionRepository->getSubmissionCountsByEmail($ids, $startDate);
 
-            $translator = $this->translator;
             if ($counts) {
                 $submissions = $support = $data = [];
                 $hasResults  = [];
 
-                $submissionLabel = $translator->trans('mautic.form.abtest.label.submissions');
-                $hitLabel        = ('page' == $type) ? $translator->trans('mautic.form.abtest.label.hits') : $translator->trans('mautic.form.abtest.label.sentemils');
+                $submissionLabel = $this->translator->trans('mautic.form.abtest.label.submissions');
+                $hitLabel        = ('page' == $type) ? $this->translator->trans('mautic.form.abtest.label.hits') : $this->translator->trans('mautic.form.abtest.label.sentemils');
 
                 foreach ($counts as $stats) {
                     $submissionRate            = ($stats['total']) ? round(($stats['count'] / $stats['total']) * 100, 2) : 0;
@@ -116,7 +114,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
                 //set max for scales
                 $maxes = [];
-                foreach ($support['data'] as $label => $data) {
+                foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);

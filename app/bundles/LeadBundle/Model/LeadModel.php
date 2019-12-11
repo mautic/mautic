@@ -48,6 +48,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\CategoryChangeEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Form\Type\LeadType;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -416,7 +417,7 @@ class LeadModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('lead', $entity, $options);
+        return $formFactory->create(LeadType::class, $entity, $options);
     }
 
     /**
@@ -926,20 +927,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the lead from request (ct/clickthrough) and handles auto merging of lead data from request parameters.
-     *
-     * @deprecated - here till all lead methods are converted to contact methods; preferably use getContactFromRequest instead
-     *
-     * @param array $queryFields
-     *
-     * @return array|Lead|null
-     */
-    public function getLeadFromRequest(array $queryFields = [])
-    {
-        return $this->getContactFromRequest($queryFields);
-    }
-
-    /**
      * Get the contat from request (ct/clickthrough) and handles auto merging of contact data from request parameters.
      *
      * @param array $queryFields
@@ -1042,7 +1029,7 @@ class LeadModel extends FormModel
      */
     public function getLists(Lead $lead, $forLists = false, $arrayHydration = false, $isPublic = false, $isPreferenceCenter = false)
     {
-        $repo = $this->em->getRepository('MauticLeadBundle:LeadList');
+        $repo = $this->em->getRepository(LeadList::class);
 
         return $repo->getLeadLists($lead->getId(), $forLists, $arrayHydration, $isPublic, $isPreferenceCenter);
     }
@@ -1328,26 +1315,6 @@ class LeadModel extends FormModel
         }
 
         return $leadCategoryList;
-    }
-
-    /**
-     * @param array        $fields
-     * @param array        $data
-     * @param null         $owner
-     * @param null         $list
-     * @param null         $tags
-     * @param bool         $persist
-     * @param LeadEventLog $eventLog
-     *
-     * @return bool|null
-     *
-     * @throws \Exception
-     *
-     * @deprecated 2.10.0 To be removed in 3.0. Use `import` instead
-     */
-    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
-    {
-        return $this->import($fields, $data, $owner, $list, $tags, $persist, $eventLog);
     }
 
     /**
@@ -1732,7 +1699,7 @@ class LeadModel extends FormModel
 
         // Fix up known synonym/mismatch field names
         foreach ($synonyms as $expected => $replace) {
-            if (key_exists($expected, $params) && !isset($params[$replace])) {
+            if (array_key_exists($expected, $params) && !isset($params[$replace])) {
                 // add expected key name
                 $params[$replace] = $params[$expected];
             }
@@ -2670,28 +2637,6 @@ class LeadModel extends FormModel
         }
 
         return false;
-    }
-
-    /**
-     * @param bool $forceRegeneration
-     *
-     * @deprecated 2.13.0 to be removed in 3.0; use the DeviceTrackingService
-     */
-    public function getTrackingCookie($forceRegeneration = false)
-    {
-        @trigger_error('getTrackingCookie is deprecated and will be removed in 3.0; Use the ContactTracker::getTrackingId instead', E_USER_DEPRECATED);
-
-        return [$this->contactTracker->getTrackingId(), false];
-    }
-
-    /**
-     * @param $leadId
-     *
-     * @deprecated 2.13.0 to be removed in 3.0
-     */
-    public function setLeadCookie($leadId)
-    {
-        // No longer used
     }
 
     /**

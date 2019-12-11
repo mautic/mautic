@@ -14,12 +14,10 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class CompanyController.
- */
 class CompanyController extends FormController
 {
     /**
@@ -147,17 +145,14 @@ class CompanyController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.company.page', 1);
-
-        $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
-
+        $page         = $this->get('session')->get('mautic.company.page', 1);
+        $method       = $this->request->getMethod();
+        $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
+        $company      = $this->request->request->get('company', []);
         $updateSelect = InputHelper::clean(
-            ('POST' == $this->request->getMethod())
-                ? $this->request->request->get('company[updateSelect]', false, true)
-                : $this->request->get(
-                'updateSelect',
-                false
-            )
+            'POST' === $method
+                ? ($company['updateSelect'] ?? false)
+                : $this->request->get('updateSelect', false)
         );
 
         $fields = $this->getModel('lead.field')->getPublishedFieldArrays('company');
@@ -327,12 +322,11 @@ class CompanyController extends FormController
         }
 
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $updateSelect = ('POST' == $this->request->getMethod())
-            ? $this->request->request->get('company[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $method       = $this->request->getMethod();
+        $company      = $this->request->request->get('company', []);
+        $updateSelect = 'POST' === $method
+            ? ($company['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
 
         $fields = $this->getModel('lead.field')->getPublishedFieldArrays('company');
         $form   = $model->createForm(
@@ -343,8 +337,9 @@ class CompanyController extends FormController
         );
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $data = $this->request->request->get('company');
@@ -664,7 +659,7 @@ class CompanyController extends FormController
         $action = $this->generateUrl('mautic_company_action', ['objectAction' => 'merge', 'objectId' => $secondaryCompany->getId()]);
 
         $form = $this->get('form.factory')->create(
-            'company_merge',
+            CompanyMergeType::class,
             [],
             [
                 'action'      => $action,

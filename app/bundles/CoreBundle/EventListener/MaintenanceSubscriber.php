@@ -15,16 +15,15 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class MaintenanceSubscriber.
- */
-class MaintenanceSubscriber extends CommonSubscriber
+class MaintenanceSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var UserTokenRepositoryInterface
@@ -32,15 +31,23 @@ class MaintenanceSubscriber extends CommonSubscriber
     private $userTokenRepository;
 
     /**
-     * MaintenanceSubscriber constructor.
-     *
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param Connection                   $db
      * @param UserTokenRepositoryInterface $userTokenRepository
+     * @param TranslatorInterface          $translator
      */
-    public function __construct(Connection $db, UserTokenRepositoryInterface $userTokenRepository)
-    {
+    public function __construct(
+        Connection $db,
+        UserTokenRepositoryInterface $userTokenRepository,
+        TranslatorInterface $translator
+    ) {
         $this->db                  = $db;
         $this->userTokenRepository = $userTokenRepository;
+        $this->translator          = $translator;
     }
 
     /**
