@@ -10,7 +10,6 @@
  */
 
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
-use Mautic\FormBundle\EventListener\CalendarSubscriber;
 use Mautic\FormBundle\EventListener\CampaignSubscriber;
 use Mautic\FormBundle\EventListener\DashboardSubscriber;
 use Mautic\FormBundle\EventListener\EmailSubscriber;
