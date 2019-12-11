@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class FormFieldHelper extends AbstractFormFieldHelper
 {
     /**
-     * @var ValidatorInterface|\Symfony\Component\Validator\ValidatorInterface
+     * @var ValidatorInterface
      */
     private $validator;
 

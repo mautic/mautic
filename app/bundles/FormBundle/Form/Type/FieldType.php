@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -557,7 +557,7 @@ class FieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -565,7 +565,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $resolver->setOptional(['customParameters', 'leadFieldProperties']);
+        $resolver->setDefined(['customParameters', 'leadFieldProperties']);
 
         $resolver->setRequired(['leadFields']);
     }

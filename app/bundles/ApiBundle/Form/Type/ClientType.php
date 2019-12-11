@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class ClientType.
@@ -36,12 +36,12 @@ use Symfony\Component\Validator\ValidatorInterface;
 class ClientType extends AbstractType
 {
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @var \Symfony\Component\Validator\Validator
+     * @var ValidatorInterface
      */
     private $validator;
 
@@ -51,7 +51,7 @@ class ClientType extends AbstractType
     private $apiMode;
 
     /**
-     * @var \Symfony\Component\Routing\RouterInterface
+     * @var RouterInterface
      */
     private $router;
 
