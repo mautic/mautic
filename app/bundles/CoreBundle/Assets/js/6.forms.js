@@ -265,7 +265,7 @@ Mautic.initializeFormFieldVisibilitySwitcher = function (formName)
 {
     Mautic.switchFormFieldVisibilty(formName);
 
-    mQuery('form[name="'+formName+'"]').change(function() {
+    mQuery('form[name="'+formName+'"]').on('change', function() {
         Mautic.switchFormFieldVisibilty(formName);
     });
 };
