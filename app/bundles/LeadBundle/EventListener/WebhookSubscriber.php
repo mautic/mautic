@@ -50,7 +50,7 @@ class WebhookSubscriber extends CommonSubscriber
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
+            LeadEvents::ON_LEAD_DETACH               => ['onLeadNewUpdate', 0],
             LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
             LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
             LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
