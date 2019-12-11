@@ -724,7 +724,7 @@ class FormController extends CommonFormController
                     //submit button found
                     $submitButton = true;
                 }
-                if ($formField->getType() !== 'button' && !isset($availableFields[$formField->getType()])) {
+                if ($formField->getType() !== 'button' && !in_array($formField->getType(), $availableFields)) {
                     continue;
                 }
 
