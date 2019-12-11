@@ -475,7 +475,7 @@ class FieldType extends AbstractType
                 case 'freetext':
                     $builder->add(
                         'properties',
-                        'formfield_text',
+                        FormFieldTextType::class,
                         [
                             'required' => false,
                             'label'    => false,
@@ -487,7 +487,7 @@ class FieldType extends AbstractType
                 case 'freehtml':
                     $builder->add(
                         'properties',
-                        'formfield_html',
+                        FormFieldHTMLType::class,
                         [
                             'required' => false,
                             'label'    => false,

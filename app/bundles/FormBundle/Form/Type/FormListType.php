@@ -14,7 +14,7 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class PointActionFormSubmitType.
@@ -35,7 +35,7 @@ class FormListType extends AbstractType
         $this->repo->setCurrentUser($factory->getUser());
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $viewOther = $this->viewOther;
         $repo      = $this->repo;
@@ -66,13 +66,13 @@ class FormListType extends AbstractType
             'form_type'   => null,
         ]);
 
-        $resolver->setOptional(['form_type']);
+        $resolver->setDefined(['form_type']);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_list';
     }

@@ -14,8 +14,9 @@ namespace Mautic\FormBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ActionType.
@@ -63,7 +64,7 @@ class ActionType extends AbstractType
         }
         $builder->add('properties', $formType, $formTypeOptions);
 
-        $builder->add('type', 'hidden');
+        $builder->add('type', HiddenType::class);
 
         $update = !empty($properties);
         if (!empty($update)) {
@@ -95,7 +96,7 @@ class ActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'settings' => false,
@@ -107,7 +108,7 @@ class ActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formaction';
     }

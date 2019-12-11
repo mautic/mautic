@@ -37,7 +37,7 @@ class CampaignEventFormFieldValueType extends AbstractType
     {
         $builder->add(
             'form',
-            'form_list',
+            FormListType::class,
             [
                 'label'       => 'mautic.form.campaign.event.forms',
                 'label_attr'  => ['class' => 'control-label'],
