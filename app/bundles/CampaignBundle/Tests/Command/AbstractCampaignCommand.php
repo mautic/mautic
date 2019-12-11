@@ -39,7 +39,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp()
     {
         // Everything needs to happen anonymously
         $this->defaultClientServer = $this->clientServer;

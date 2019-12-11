@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
@@ -120,7 +121,7 @@ class ConstantContactType extends AbstractType
             $fields = $object->getFormLeadFields();
 
             list($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
-            $builder->add('leadFields', 'integration_fields', [
+            $builder->add('leadFields', FieldsType::class, [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
                 'mautic_fields'        => $leadFields,
