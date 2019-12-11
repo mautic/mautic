@@ -32,13 +32,13 @@ return [
         ],
         'forms' => [
             'mautic.form.type.queueconfig' => [
-                'class'     => 'Mautic\QueueBundle\Form\Type\ConfigType',
+                'class'     => \Mautic\QueueBundle\Form\Type\ConfigType::class,
                 'arguments' => 'event_dispatcher',
             ],
         ],
         'other' => [
             'mautic.queue.service' => [
-                'class'     => 'Mautic\QueueBundle\Queue\QueueService',
+                'class'     => \Mautic\QueueBundle\Queue\QueueService::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
@@ -46,7 +46,7 @@ return [
                 ],
             ],
             'mautic.queue.helper.rabbitmq_consumer' => [
-                'class'     => 'Mautic\QueueBundle\Helper\RabbitMqConsumer',
+                'class'     => \Mautic\QueueBundle\Helper\RabbitMqConsumer::class,
                 'arguments' => 'mautic.queue.service',
             ],
         ],
