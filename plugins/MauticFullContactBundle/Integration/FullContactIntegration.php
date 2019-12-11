@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -85,7 +86,7 @@ class FullContactIntegration extends AbstractIntegration
 
             $builder->add(
                 'auto_update',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.fullcontact.auto_update',
                     'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,

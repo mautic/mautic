@@ -289,7 +289,7 @@ class MauticCoreExtension extends Extension
                 'Mautic\CoreBundle\Menu\MenuRenderer',
                 [
                     new Reference('knp_menu.matcher'),
-                    new Reference('mautic.factory'),
+                    new Reference('mautic.helper.templating'),
                     '%kernel.charset%',
                     $options,
                 ]

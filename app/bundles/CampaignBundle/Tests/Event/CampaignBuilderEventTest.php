@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Tests\Event;
 
+use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
@@ -45,8 +46,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
     public function testEventDecisionSort()
     {
-        $decisionKey = 'email.open';
-        $decision    = [
+        $decision = [
             'label'                  => 'mautic.email.campaign.event.open',
             'description'            => 'mautic.email.campaign.event.open_descr',
             'eventName'              => 'mautic.email.on_campaign_trigger_decision',
@@ -80,8 +80,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
     public function testEventConditionSort()
     {
-        $conditionKey = 'form.field_value';
-        $condition    = [
+        $condition = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
             'formType'    => CampaignEventFormFieldValueType::class,
@@ -110,13 +109,12 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
     public function testEventActionSort()
     {
-        $actionKey = 'asset.download';
-        $action    = [
+        $action = [
             'group'       => 'mautic.asset.actions',
             'label'       => 'mautic.asset.point.action.download',
             'description' => 'mautic.asset.point.action.download_descr',
             'callback'    => ['\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'],
-            'formType'    => 'pointaction_assetdownload',
+            'formType'    => PointActionAssetDownloadType::class,
         ];
         $event = $this->initEvent();
 

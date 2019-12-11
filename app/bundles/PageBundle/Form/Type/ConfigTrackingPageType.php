@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -25,7 +26,7 @@ class ConfigTrackingPageType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('track_by_tracking_url', 'yesno_button_group', [
+        $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.config.form.track.by.tracking.url',
             'data'  => isset($options['data']['track_by_tracking_url']) ? (bool) $options['data']['track_by_tracking_url'] : true,
             'attr'  => [
@@ -33,7 +34,7 @@ class ConfigTrackingPageType extends AbstractType
             ],
         ]);
 
-        $builder->add('track_by_fingerprint', 'yesno_button_group', [
+        $builder->add('track_by_fingerprint', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.config.form.track.by.fingerprint',
             'data'  => isset($options['data']['track_by_fingerprint']) ? (bool) $options['data']['track_by_fingerprint'] : false,
             'attr'  => [
@@ -43,7 +44,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'anonymize_ip',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.anonymize_ip',
                 'data'  => (bool) $options['data']['anonymize_ip'],
@@ -55,7 +56,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'track_contact_by_ip',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.track_contact_by_ip',
                 'data'  => isset($options['data']['track_contact_by_ip']) ? (bool) $options['data']['track_contact_by_ip'] : false,
@@ -80,7 +81,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'facebook_pixel_trackingpage_enabled',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.trackingpage.enabled',
                 'data'  => (bool) $options['data']['facebook_pixel_trackingpage_enabled'],
@@ -89,7 +90,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'facebook_pixel_landingpage_enabled',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.landingpage.enabled',
                 'data'  => (bool) $options['data']['facebook_pixel_landingpage_enabled'],
@@ -110,7 +111,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'google_analytics_trackingpage_enabled',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.trackingpage.enabled',
                 'data'  => (bool) $options['data']['google_analytics_trackingpage_enabled'],
@@ -119,7 +120,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'google_analytics_landingpage_enabled',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.landingpage.enabled',
                 'data'  => (bool) $options['data']['google_analytics_landingpage_enabled'],
@@ -128,7 +129,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'google_analytics_anonymize_ip',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.tracking.anonymize.ip.enabled',
                 'data'  => (bool) (isset($options['data']['google_analytics_anonymize_ip']) ? $options['data']['google_analytics_anonymize_ip'] : false),

@@ -151,11 +151,12 @@ class ActionController extends CommonFormController
     {
         $session    = $this->get('session');
         $method     = $this->request->getMethod();
-        $formId     = ($method == 'POST') ? $this->request->request->get('formaction[formId]', '', true) : $this->request->query->get('formId');
+        $formaction = $this->request->request->get('formaction', []);
+        $formId     = $method === 'POST' ? ($formaction['formId'] ?? '') : $this->request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
         $valid      = $cancelled      = false;
-        $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
+        $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
         if ($formAction !== null) {
             $actionType             = $formAction['type'];

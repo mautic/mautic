@@ -40,24 +40,25 @@ return [
     'services' => [
         'events' => [
             'mautic_integration.pipedrive.lead.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
+                'class'     => \MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic_integration.pipedrive.export.lead',
                 ],
             ],
             'mautic_integration.pipedrive.company.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\CompanySubscriber',
+                'class'     => \MauticPlugin\MauticCrmBundle\EventListener\CompanySubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic_integration.pipedrive.export.company',
                 ],
             ],
             'mautic.integration.leadbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadListSubscriber',
+                'class'     => \MauticPlugin\MauticCrmBundle\EventListener\LeadListSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
                     'mautic.lead.model.list',
+                    'translator',
                 ],
             ],
         ],
@@ -148,7 +149,6 @@ return [
         'forms' => [
             'mautic.form.type.connectwise.campaignaction' => [
                 'class' => MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType::class,
-                'alias' => 'integration_campaign_task',
             ],
         ],
     ],

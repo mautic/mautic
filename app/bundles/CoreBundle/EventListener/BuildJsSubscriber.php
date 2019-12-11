@@ -13,11 +13,9 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -319,11 +317,6 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
         }
     }
 });
-
-// @deprecated 2.6.0; to be removed in 3.0
-MauticJS.pixelLoaded = function(f) {
-    MauticJS.onFirstEventDelivery(f);
-}
 
 /**
 * Check if a DOM tracking pixel is present

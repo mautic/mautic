@@ -22,9 +22,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -38,9 +35,8 @@ class ConfigType extends AbstractType
     protected $translator;
 
     /**
-     * ConfigType constructor.
-     *
      * @param CoreParametersHelper $parametersHelper
+     * @param TranslatorInterface  $translator
      */
     public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {
@@ -189,7 +185,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'saml_idp_default_role',
-            'role_list',
+            RoleListType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.default_role',
                 'label_attr' => ['class' => 'control-label'],
@@ -217,7 +213,7 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'userconfig';
     }

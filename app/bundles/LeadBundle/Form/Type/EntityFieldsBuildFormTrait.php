@@ -11,9 +11,12 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\TelType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -67,11 +70,11 @@ trait EntityFieldsBuildFormTrait
 
             switch ($type) {
                 case 'number':
-                    if (empty($properties['precision'])) {
-                        $properties['precision'] = null;
+                    if (empty($properties['scale'])) {
+                        $properties['scale'] = null;
                     } //ensure default locale is used
                     else {
-                        $properties['precision'] = (int) $properties['precision'];
+                        $properties['scale'] = (int) $properties['scale'];
                     }
 
                     if ('' === $value) {
@@ -90,7 +93,7 @@ trait EntityFieldsBuildFormTrait
                             'data'          => (null !== $value) ? (float) $value : $value,
                             'mapped'        => $mapped,
                             'constraints'   => $constraints,
-                            'precision'     => $properties['precision'],
+                            'scale'         => $properties['scale'],
                             'rounding_mode' => isset($properties['roundmode']) ? (int) $properties['roundmode'] : 0,
                         ]
                     );
@@ -174,25 +177,26 @@ trait EntityFieldsBuildFormTrait
                     }
 
                     $typeProperties = [
-                        'required'    => $required,
-                        'label'       => $field['label'],
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => $attr,
-                        'mapped'      => $mapped,
-                        'multiple'    => false,
-                        'constraints' => $constraints,
+                        'required'          => $required,
+                        'label'             => $field['label'],
+                        'label_attr'        => ['class' => 'control-label'],
+                        'attr'              => $attr,
+                        'mapped'            => $mapped,
+                        'multiple'          => false,
+                        'constraints'       => $constraints,
+                        'choices_as_values' => true,
                     ];
 
-                    $choiceType = 'choice';
+                    $choiceType = ChoiceType::class;
                     $emptyValue = '';
                     if (in_array($type, ['select', 'multiselect']) && !empty($properties['list'])) {
-                        $typeProperties['choices']      = FormFieldHelper::parseList($properties['list']);
+                        $typeProperties['choices']      = FormFieldHelper::parseList($properties['list'], true, false, true);
                         $typeProperties['expanded']     = false;
                         $typeProperties['multiple']     = ('multiselect' === $type);
                         $cleaningRules[$field['alias']] = 'raw';
                     }
                     if ($type == 'boolean' && !empty($properties['yes']) && !empty($properties['no'])) {
-                        $choiceType                  = 'yesno_button_group';
+                        $choiceType                  = YesNoButtonGroupType::class;
                         $typeProperties['expanded']  = true;
                         $typeProperties['yes_label'] = $properties['yes'];
                         $typeProperties['no_label']  = $properties['no'];
@@ -232,14 +236,15 @@ trait EntityFieldsBuildFormTrait
 
                     $builder->add(
                         $alias,
-                        'choice',
+                        ChoiceType::class,
                         [
-                            'choices'    => $choices,
-                            'required'   => $required,
-                            'label'      => $field['label'],
-                            'label_attr' => ['class' => 'control-label'],
-                            'data'       => $value,
-                            'attr'       => [
+                            'choices_as_values' => true,
+                            'choices'           => $choices,
+                            'required'          => $required,
+                            'label'             => $field['label'],
+                            'label_attr'        => ['class' => 'control-label'],
+                            'data'              => $value,
+                            'attr'              => [
                                 'class'            => 'form-control',
                                 'data-placeholder' => $field['label'],
                             ],
@@ -279,6 +284,10 @@ trait EntityFieldsBuildFormTrait
                             if ($type == 'multiselect') {
                                 $constraints[] = new Length(['max' => 255]);
                             }
+                            break;
+                        case 'tel':
+                            $type = TelType::class;
+                        break;
                     }
 
                     $builder->add(

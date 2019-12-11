@@ -11,6 +11,8 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -86,9 +88,13 @@ class FormType extends AbstractType
         ]);
 
         //add category
-        $builder->add('category', 'category', [
-            'bundle' => 'form',
-        ]);
+        $builder->add(
+            'category',
+            CategoryListType::class,
+            [
+                'bundle' => 'form',
+            ]
+        );
 
         $builder->add('template', ThemeListType::class, [
             'feature'     => 'form',

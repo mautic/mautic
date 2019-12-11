@@ -18,15 +18,16 @@ trait VariantAjaxControllerTrait
 {
     /**
      * @param Request $request
-     * @param         $modelName
-     * @param         $abSettingsFormName
-     * @param         $parentFormName
-     * @param         $abFormTemplate
+     * @param string  $modelName
+     * @param string  $abSettingsFormName
+     * @param string  $abSettingsFormBlockPrefix
+     * @param string  $parentFormName
+     * @param string  $abFormTemplate
      * @param array   $formThemes
      *
      * @return mixed
      */
-    private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $parentFormName, $abFormTemplate, $formThemes = [])
+    private function getAbTestForm(Request $request, $modelName, $abSettingsFormName, $abSettingsFormBlockPrefix, $parentFormName, $abFormTemplate, $formThemes = [])
     {
         $dataArray = [
             'success' => 0,
@@ -63,9 +64,9 @@ trait VariantAjaxControllerTrait
 
                 $html = str_replace(
                     [
-                        "{$abSettingsFormName}[",
-                        "{$abSettingsFormName}_",
-                        $abSettingsFormName,
+                        "{$abSettingsFormBlockPrefix}[",
+                        "{$abSettingsFormBlockPrefix}_",
+                        $abSettingsFormBlockPrefix,
                     ],
                     [
                         "{$parentFormName}[variantSettings][",

@@ -188,8 +188,9 @@ class TriggerController extends FormController
             $entity = $model->getEntity();
         }
 
-        $session   = $this->get('session');
-        $sessionId = $this->request->request->get('pointtrigger[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
+        $session      = $this->get('session');
+        $pointTrigger = $this->request->request->get('pointtrigger', []);
+        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
 
         if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
             return $this->accessDenied();

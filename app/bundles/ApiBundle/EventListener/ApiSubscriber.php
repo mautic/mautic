@@ -13,49 +13,56 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event as Events;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class ApiSubscriber.
- */
-class ApiSubscriber extends CommonSubscriber
+class ApiSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
-     * ApiSubscriber constructor.
-     *
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param IpLookupHelper       $ipLookupHelper
      * @param CoreParametersHelper $coreParametersHelper
      * @param AuditLogModel        $auditLogModel
+     * @param TranslatorInterface  $translator
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper, AuditLogModel $auditLogModel)
-    {
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        CoreParametersHelper $coreParametersHelper,
+        AuditLogModel $auditLogModel,
+        TranslatorInterface $translator
+    ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->auditLogModel        = $auditLogModel;
+        $this->translator           = $translator;
     }
 
     /**
@@ -75,6 +82,8 @@ class ApiSubscriber extends CommonSubscriber
      * Check for API requests and throw denied access if API is disabled.
      *
      * @param GetResponseEvent $event
+     *
+     * @throws AccessDeniedHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
@@ -83,7 +92,6 @@ class ApiSubscriber extends CommonSubscriber
         }
 
         $apiEnabled   = $this->coreParametersHelper->getParameter('api_enabled');
-        $request      = $event->getRequest();
         $isApiRequest = $this->isApiRequest($event);
 
         if ($isApiRequest && !$apiEnabled) {
@@ -150,9 +158,6 @@ class ApiSubscriber extends CommonSubscriber
                                         'type'    => $type,
                                     ],
                                 ],
-                                // @deprecated 2.6.0 to be removed in 3.0
-                                'error'             => $data['error'],
-                                'error_description' => $message.' (`error` and `error_description` are deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
                             ],
                             $statusCode
                         );

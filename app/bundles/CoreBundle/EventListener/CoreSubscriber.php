@@ -16,16 +16,21 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
@@ -33,46 +38,76 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CoreSubscriber.
- */
-class CoreSubscriber extends CommonSubscriber
+class CoreSubscriber implements EventSubscriberInterface
 {
     /**
      * @var BundleHelper
      */
-    protected $bundleHelper;
+    private $bundleHelper;
 
     /**
      * @var MenuHelper
      */
-    protected $menuHelper;
+    private $menuHelper;
 
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var SecurityContext
      */
-    protected $securityContext;
+    private $securityContext;
 
     /**
      * @var UserModel
      */
-    protected $userModel;
+    private $userModel;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var FormRepository
+     */
+    private $formRepository;
+
+    /**
+     * System parameters.
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
+     * @var MauticFactory
+     */
+    private $factory;
 
     public function __construct(
         BundleHelper $bundleHelper,
@@ -81,7 +116,13 @@ class CoreSubscriber extends CommonSubscriber
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
         SecurityContext $securityContext,
-        UserModel $userModel
+        UserModel $userModel,
+        EventDispatcherInterface $dispatcher,
+        TranslatorInterface $translator,
+        RequestStack $requestStack,
+        FormRepository $formRepository,
+        array $params,
+        MauticFactory $factory
     ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
@@ -90,6 +131,12 @@ class CoreSubscriber extends CommonSubscriber
         $this->securityContext      = $securityContext;
         $this->userModel            = $userModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->dispatcher           = $dispatcher;
+        $this->translator           = $translator;
+        $this->requestStack         = $requestStack;
+        $this->formRepository       = $formRepository;
+        $this->params               = $params;
+        $this->factory              = $factory;
     }
 
     /**
@@ -120,8 +167,7 @@ class CoreSubscriber extends CommonSubscriber
             return;
         }
 
-        $list = $this->em->getRepository('MauticFormBundle:Form')->getSimpleList();
-
+        $list        = $this->formRepository->getSimpleList();
         $mauticForms = json_encode($list, JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
 
         $this->assetsHelper->addScriptDeclaration("var mauticForms = {$mauticForms};");
@@ -139,7 +185,6 @@ class CoreSubscriber extends CommonSubscriber
         }
 
         $session = $event->getRequest()->getSession();
-
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
             $user = $event->getAuthenticationToken()->getUser();
 
@@ -378,7 +423,7 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onFetchIcons(IconEvent $event)
     {
-        $session = $this->request->getSession();
+        $session = $this->requestStack->getCurrentRequest()->getSession();
         $icons   = $session->get('mautic.menu.icons', []);
 
         if (empty($icons)) {

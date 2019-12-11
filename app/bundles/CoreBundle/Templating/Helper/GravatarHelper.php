@@ -11,9 +11,11 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -32,7 +34,7 @@ class GravatarHelper extends Helper
     private $devHosts = [];
 
     /**
-     * @var
+     * @var string
      */
     private $imageDir;
 
@@ -47,21 +49,32 @@ class GravatarHelper extends Helper
     private $avatarHelper;
 
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
-     * @param MauticFactory $factory
+     * GravatarHelper constructor.
+     *
+     * @param PathsHelper          $pathsHelper
+     * @param AssetsHelper         $assetHelper
+     * @param AvatarHelper         $avatarHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param RequestStack         $requestStack
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->devMode      = $factory->getEnvironment() == 'dev';
-        $this->imageDir     = $factory->getSystemPath('images');
-        $this->assetHelper  = $factory->getHelper('template.assets');
-        $this->avatarHelper = $factory->getHelper('template.avatar');
-        $this->request      = $factory->getRequest();
-        $this->devHosts     = (array) $factory->getParameter('dev_hosts');
+    public function __construct(
+        PathsHelper $pathsHelper,
+        AssetsHelper $assetHelper,
+        AvatarHelper $avatarHelper,
+        CoreParametersHelper $coreParametersHelper,
+        RequestStack $requestStack
+    ) {
+        $this->devMode      = MAUTIC_ENV === 'dev';
+        $this->imageDir     = $pathsHelper->getSystemPath('images');
+        $this->assetHelper  = $assetHelper;
+        $this->avatarHelper = $avatarHelper;
+        $this->requestStack = $requestStack;
+        $this->devHosts     = (array) $coreParametersHelper->getParameter('dev_hosts');
     }
 
     /**
@@ -73,9 +86,18 @@ class GravatarHelper extends Helper
      */
     public function getImage($email, $size = '250', $default = null)
     {
-        $localDefault = ($this->devMode || in_array($this->request->getClientIp(), array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1']))) ?
-            'https://www.mautic.org/media/images/default_avatar.png' :
+        $request      = $this->requestStack->getCurrentRequest();
+        $localDefault = ($this->devMode
+            || ($request
+                && in_array(
+                    $request->getClientIp(),
+                    array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1'])
+                )))
+            ?
+            'https://www.mautic.org/media/images/default_avatar.png'
+            :
             $this->avatarHelper->getDefaultAvatar(true);
+
         $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
 
         if ($default === null) {

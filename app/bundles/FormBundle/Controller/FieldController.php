@@ -188,11 +188,12 @@ class FieldController extends CommonFormController
     {
         $session   = $this->get('session');
         $method    = $this->request->getMethod();
-        $formId    = ($method == 'POST') ? $this->request->request->get('formfield[formId]', '', true) : $this->request->query->get('formId');
+        $formfield = $this->request->request->get('formfield', []);
+        $formId    = $method === 'POST' ? ($formfield['formId'] ?? '') : $this->request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
-        $valid     = $cancelled     = false;
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : [];
+        $valid     = $cancelled = false;
+        $formField = array_key_exists($objectId, $fields) ? $fields[$objectId] : [];
 
         if ($formField !== null) {
             $fieldType = $formField['type'];
