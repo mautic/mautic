@@ -1045,8 +1045,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     '6.x/community' => '6',
                     '7.x'           => '7',
                 ],
-                'label'       => 'mautic.sugarcrm.form.version',
-                'constraints' => [
+                'choices_as_values' => true,
+                'label'             => 'mautic.sugarcrm.form.version',
+                'constraints'       => [
                     new NotBlank([
                         'message' => 'mautic.core.value.required',
                     ]),

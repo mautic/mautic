@@ -86,17 +86,18 @@ class CategoryListType extends AbstractType
                 $categories = $this->model->getLookupResults($options['bundle'], '', 0);
                 $choices = [];
                 foreach ($categories as $l) {
-                    $choices[$l['id']] = $l['title'];
+                    $choices[$l['title']] = $l['id'];
                 }
-                $choices['new'] = $createNew;
+                $choices[$createNew] = 'new';
 
                 return $choices;
             },
-            'label'       => 'mautic.core.category',
-            'label_attr'  => ['class' => 'control-label'],
-            'multiple'    => false,
-            'empty_value' => 'mautic.core.form.uncategorized',
-            'attr'        => function (Options $options) {
+            'choices_as_values' => true,
+            'label'             => 'mautic.core.category',
+            'label_attr'        => ['class' => 'control-label'],
+            'multiple'          => false,
+            'empty_value'       => 'mautic.core.form.uncategorized',
+            'attr'              => function (Options $options) {
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',

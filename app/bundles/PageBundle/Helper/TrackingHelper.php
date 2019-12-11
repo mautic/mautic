@@ -68,7 +68,7 @@ class TrackingHelper
         $result = [];
         foreach ($keys as $key => $service) {
             if (($id = $this->coreParametersHelper->getParameter($key.'_id'))) {
-                $result[$key] = $service;
+                $result[$service] = $key;
             }
         }
 

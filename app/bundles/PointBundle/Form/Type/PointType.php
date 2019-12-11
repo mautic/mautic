@@ -68,11 +68,12 @@ class PointType extends AbstractType
         ]);
 
         $builder->add('type', 'choice', [
-            'choices'     => $options['pointActions']['choices'],
-            'empty_value' => '',
-            'label'       => 'mautic.point.form.type',
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => [
+            'choices'           => array_flip($options['pointActions']['choices']),
+            'choices_as_values' => true,
+            'empty_value'       => '',
+            'label'             => 'mautic.point.form.type',
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);',
             ],

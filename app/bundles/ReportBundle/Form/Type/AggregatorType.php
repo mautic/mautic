@@ -37,33 +37,35 @@ class AggregatorType extends AbstractType
         // function
         $builder->add('function', 'choice', [
             'choices' => [
-                'COUNT' => $this->translator->trans('mautic.report.report.label.aggregators.count'),
-                'AVG'   => $this->translator->trans('mautic.report.report.label.aggregators.avg'),
-                'SUM'   => $this->translator->trans('mautic.report.report.label.aggregators.sum'),
-                'MIN'   => $this->translator->trans('mautic.report.report.label.aggregators.min'),
-                'MAX'   => $this->translator->trans('mautic.report.report.label.aggregators.max'),
+                $this->translator->trans('mautic.report.report.label.aggregators.count') => 'COUNT',
+                $this->translator->trans('mautic.report.report.label.aggregators.avg')   => 'AVG',
+                $this->translator->trans('mautic.report.report.label.aggregators.sum')   => 'SUM',
+                $this->translator->trans('mautic.report.report.label.aggregators.min')   => 'MIN',
+                $this->translator->trans('mautic.report.report.label.aggregators.max')   => 'MAX',
             ],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.function',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => false,
+            'label'             => 'mautic.report.function',
+            'label_attr'        => ['class' => 'control-label'],
+            'empty_value'       => false,
+            'required'          => false,
+            'attr'              => [
                 'class' => 'form-control not-chosen',
             ],
         ]);
 
         // Build a list of columns
         $builder->add('column', 'choice', [
-            'choices'     => $options['columnList'],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
+            'choices'           => array_flip($options['columnList']),
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => false,
+            'label'             => 'mautic.report.report.label.filtercolumn',
+            'label_attr'        => ['class' => 'control-label'],
+            'empty_value'       => false,
+            'required'          => false,
+            'attr'              => [
                 'class' => 'form-control filter-columns',
             ],
         ]);

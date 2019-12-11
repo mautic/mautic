@@ -173,13 +173,14 @@ class FormType extends AbstractType
 
         $builder->add('postAction', 'choice', [
             'choices' => [
-                'return'   => 'mautic.form.form.postaction.return',
-                'redirect' => 'mautic.form.form.postaction.redirect',
-                'message'  => 'mautic.form.form.postaction.message',
+                'mautic.form.form.postaction.return'   => 'return',
+                'mautic.form.form.postaction.redirect' => 'redirect',
+                'mautic.form.form.postaction.message'  => 'message',
             ],
-            'label'      => 'mautic.form.form.postaction',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
+            'choices_as_values' => true,
+            'label'             => 'mautic.form.form.postaction',
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
             ],

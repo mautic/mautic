@@ -62,14 +62,15 @@ class CampaignEventFormFieldValueType extends AbstractType
         $choices   = [];
 
         foreach ($operators as $key => $operator) {
-            $choices[$key] = $operator['label'];
+            $choices[$operator['label']] = $key;
         }
 
         $builder->add(
             'operator',
             'choice',
             [
-                'choices' => $choices,
+                'choices'           => $choices,
+                'choices_as_values' => true,
             ]
         );
 
@@ -87,14 +88,14 @@ class CampaignEventFormFieldValueType extends AbstractType
             }
 
             if (empty($data['form'])) {
-                $fields[] = 'Select form first';
+                $fields['Select form first'] = 0;
             } else {
                 $formEntity = $formModel->getEntity($data['form']);
                 $formFields = $formEntity->getFields();
 
                 foreach ($formFields as $field) {
                     if ($field->getType() != 'button') {
-                        $fields[$field->getAlias()]  = $field->getLabel();
+                        $fields[$field->getLabel()]  = $field->getAlias();
                         $options[$field->getAlias()] = [];
                         $properties                  = $field->getProperties();
                         $list                        = [];
@@ -128,8 +129,9 @@ class CampaignEventFormFieldValueType extends AbstractType
                 'field',
                 'choice',
                 [
-                    'choices' => $fields,
-                    'attr'    => [
+                    'choices'           => $fields,
+                    'choices_as_values' => true,
+                    'attr'              => [
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
                     ],

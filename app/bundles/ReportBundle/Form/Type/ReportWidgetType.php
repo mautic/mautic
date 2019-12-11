@@ -52,7 +52,7 @@ class ReportWidgetType extends AbstractType
 
                 foreach ($graphs as $graph) {
                     $graphValue                            = $report['id'].':'.$graph;
-                    $choices[$report['name']][$graphValue] = $graph;
+                    $choices[$graph]                       = [$report['name'] => $graphValue];
                 }
             }
         }
@@ -62,14 +62,15 @@ class ReportWidgetType extends AbstractType
             'graph',
             'choice',
             [
-                'choices'     => $choices,
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.report.report.form.choose_graphs',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.form.choose_graphs',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'required'          => false,
+                'attr'              => [
                     'class' => 'form-control',
                 ],
             ]

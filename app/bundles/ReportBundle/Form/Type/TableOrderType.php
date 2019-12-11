@@ -40,14 +40,15 @@ class TableOrderType extends AbstractType
     {
         // Build a list of columns
         $builder->add('column', 'choice', [
-            'choices'     => $options['columnList'],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
+            'choices'           => array_flip($options['columnList']),
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => false,
+            'label'             => 'mautic.report.report.label.filtercolumn',
+            'label_attr'        => ['class' => 'control-label'],
+            'empty_value'       => false,
+            'required'          => false,
+            'attr'              => [
                 'class' => 'form-control',
             ],
         ]);
@@ -55,16 +56,17 @@ class TableOrderType extends AbstractType
         // Direction
         $builder->add('direction', 'choice', [
             'choices' => [
-                'ASC'  => $this->translator->trans('mautic.report.report.label.tableorder_dir.asc'),
-                'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc'),
+                $this->translator->trans('mautic.report.report.label.tableorder_dir.asc')  => 'ASC',
+                $this->translator->trans('mautic.report.report.label.tableorder_dir.desc') => 'DESC',
             ],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.core.order',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => false,
+            'label'             => 'mautic.core.order',
+            'label_attr'        => ['class' => 'control-label'],
+            'empty_value'       => false,
+            'required'          => false,
+            'attr'              => [
                 'class' => 'form-control not-chosen',
             ],
         ]);

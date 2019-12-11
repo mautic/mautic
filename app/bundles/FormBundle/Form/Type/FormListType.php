@@ -45,25 +45,26 @@ class FormListType extends AbstractType
                 static $choices;
 
                 if (is_array($choices)) {
-                    return $choices;
+                    return array_flip($choices);
                 }
 
                 $choices = [];
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type']);
                 foreach ($forms as $form) {
-                    $choices[$form['id']] = $form['name'];
+                    $choices[$form['name']] = $form['id'];
                 }
 
                 //sort by language
-                asort($choices);
+                ksort($choices);
 
                 return $choices;
             },
-            'expanded'    => false,
-            'multiple'    => true,
-            'empty_value' => false,
-            'form_type'   => null,
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => true,
+            'empty_value'       => false,
+            'form_type'         => null,
         ]);
 
         $resolver->setOptional(['form_type']);

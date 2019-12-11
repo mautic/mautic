@@ -68,11 +68,12 @@ class VariantType extends AbstractType
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.getAbTestWinnerForm(\'page\', \'page\', this);',
                 ],
-                'expanded'    => false,
-                'multiple'    => false,
-                'choices'     => $choices,
-                'empty_value' => 'mautic.core.form.chooseone',
-                'constraints' => [
+                'expanded'          => false,
+                'multiple'          => false,
+                'choices'           => array_flip($choices),
+                'choices_as_values' => true,
+                'empty_value'       => 'mautic.core.form.chooseone',
+                'constraints'       => [
                     new NotBlank(
                         ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
                     ),

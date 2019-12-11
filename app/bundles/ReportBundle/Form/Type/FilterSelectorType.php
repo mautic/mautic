@@ -36,14 +36,15 @@ class FilterSelectorType extends AbstractType
             'column',
             'choice',
             [
-                'choices'     => $options['filterList'],
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.report.report.label.filtercolumn',
-                'label_attr'  => ['class' => 'control-label filter-column'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
+                'choices'           => array_flip($options['filterList']),
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.label.filtercolumn',
+                'label_attr'        => ['class' => 'control-label filter-column'],
+                'empty_value'       => false,
+                'required'          => false,
+                'attr'              => [
                     'class' => 'form-control filter-columns',
                 ],
             ]
@@ -61,14 +62,15 @@ class FilterSelectorType extends AbstractType
                 'condition',
                 'choice',
                 [
-                    'choices'     => $choices,
-                    'expanded'    => false,
-                    'multiple'    => false,
-                    'label'       => 'mautic.report.report.label.filtercondition',
-                    'label_attr'  => ['class' => 'control-label filter-condition'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices'           => array_flip($choices),
+                    'choices_as_values' => true,
+                    'expanded'          => false,
+                    'multiple'          => false,
+                    'label'             => 'mautic.report.report.label.filtercondition',
+                    'label_attr'        => ['class' => 'control-label filter-condition'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'class' => 'form-control not-chosen',
                     ],
                 ]
@@ -100,10 +102,11 @@ class FilterSelectorType extends AbstractType
                 'attr'       => ['class' => 'form-control filter-glue not-chosen'],
                 'required'   => false,
                 'choices'    => [
-                    'and' => 'mautic.report.report.glue.choice.and',
-                    'or'  => 'mautic.report.report.glue.choice.or',
+                    'mautic.report.report.glue.choice.and' => 'and',
+                    'mautic.report.report.glue.choice.or'  => 'or',
                 ],
-                'placeholder' => false,
+                'choices_as_values' => true,
+                'placeholder'       => false,
             ]
         );
 
