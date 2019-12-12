@@ -31,6 +31,14 @@ class DoctrineStep implements StepInterface
     public $host = 'localhost';
 
     /**
+     * Database table prefix.
+     * Required in step.
+     *
+     * @var string
+     */
+    public $table_prefix;
+
+    /**
      * Database connection port.
      */
     public $port = 3306;
@@ -51,6 +59,22 @@ class DoctrineStep implements StepInterface
      * @var string
      */
     public $password;
+
+    /**
+     * Backup tables if they exist; otherwise drop them.
+     * Required in step.
+     *
+     * @var bool
+     */
+    public $backup_tables = true;
+
+    /**
+     * Prefix for backup tables.
+     * Required in step.
+     *
+     * @var string
+     */
+    public $backup_prefix = 'bak_';
 
     /**
      * @param Configurator $configurator
