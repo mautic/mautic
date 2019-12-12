@@ -13,6 +13,9 @@ namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -54,6 +57,8 @@ class InstallController extends CommonController
      * @param int $index The step number to process
      *
      * @return JsonResponse|Response
+     *
+     * @throws DBALException
      */
     public function stepAction($index = 0)
     {
@@ -327,7 +332,7 @@ class InstallController extends CommonController
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
+        /** @var Configurator $configurator */
         $params = $this->configurator->getParameters();
 
         // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
@@ -374,8 +379,8 @@ class InstallController extends CommonController
      *
      * @param array $data
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     private function createAdminUserStep($data)
     {
