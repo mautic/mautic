@@ -100,7 +100,7 @@ class RestrictionHelper
 
                 $parentType->add(
                     $childType->getName(),
-                    get_class($childType->getConfig()->getType()),
+                    get_class($childType->getConfig()->getType()->getInnerType()),
                     $fieldOptions
                 );
                 break;
