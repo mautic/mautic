@@ -32,15 +32,19 @@ class BuilderTokenHelperFactory
     }
 
     /**
-     * @param $modelName
-     * @param string $viewPermissionBase
-     * @param string $bundleName
-     * @param string $langVar
+     * @param string      $modelName
+     * @param string|null $viewPermissionBase
+     * @param string|null $bundleName
+     * @param string|null $langVar
      *
      * @return BuilderTokenHelper
      */
-    public function getBuilderTokenHelper($modelName, $viewPermissionBase = null, $bundleName = null, $langVar = null)
-    {
+    public function getBuilderTokenHelper(
+        string $modelName,
+        ?string $viewPermissionBase = null,
+        ?string $bundleName = null,
+        ?string $langVar = null
+    ): BuilderTokenHelper {
         $builderTokenHelper = new BuilderTokenHelper($this->security, $this->entityManager, $this->connection, $this->userHelper);
         $builderTokenHelper->configure($modelName, $viewPermissionBase, $bundleName, $langVar);
 

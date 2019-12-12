@@ -55,13 +55,17 @@ class BuilderTokenHelper
     /**
      * This method must be called before the BuilderTokenHelper can be used.
      *
-     * @param $modelName
-     * @param null $viewPermissionBase
-     * @param null $bundleName
-     * @param null $langVar
+     * @param string      $modelName
+     * @param string|null $viewPermissionBase
+     * @param string|null $bundleName
+     * @param string|null $langVar
      */
-    public function configure($modelName, $viewPermissionBase = null, $bundleName = null, $langVar = null)
-    {
+    public function configure(
+        string $modelName,
+        ?string $viewPermissionBase = null,
+        ?string $bundleName = null,
+        ?string $langVar = null
+    ): void {
         $this->modelName          = $modelName;
         $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
@@ -83,19 +87,19 @@ class BuilderTokenHelper
      * @param string              $valueColumn The column that houses the value
      * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
-     * @throws \Exception
+     * @throws \BadMethodCallException
      *
      * @return array|void
      */
     public function getTokens(
-        $tokenRegex,
-        $filter = '',
-        $labelColumn = 'name',
-        $valueColumn = 'id',
+        string $tokenRegex,
+        string $filter = '',
+        string $labelColumn = 'name',
+        string $valueColumn = 'id',
         CompositeExpression $expr = null
-    ) {
+    ): array {
         if (!$this->isConfigured) {
-            throw new \Exception('You must call the "configure" method of this class first.');
+            throw new \BadMethodCallException('You must call the "'.get_class($this).'"::configure method of this class first.');
         }
 
         //set some permissions
