@@ -196,7 +196,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                'placeholder' => 'mautic.user.user.form.defaulttimezone',
             ]
         );
 
@@ -212,7 +212,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaultlocale',
+                'placeholder' => 'mautic.user.user.form.defaultlocale',
             ]
         );
 

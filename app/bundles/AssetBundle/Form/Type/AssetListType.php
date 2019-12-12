@@ -58,7 +58,7 @@ class AssetListType extends AbstractType
         $resolver->setDefaults([
             'choices'           => $this->getAssetChoices(),
             'choices_as_values' => true,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'expanded'          => false,
             'multiple'          => true,
             'required'          => false,

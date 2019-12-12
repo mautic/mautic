@@ -95,7 +95,7 @@ class FieldType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.group',
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'disabled'    => $disabled,
             ]
@@ -115,7 +115,7 @@ class FieldType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.lead.field.type',
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'disabled'          => ($disabled || !$new),
                 'attr'              => [
                     'class'    => 'form-control',
@@ -206,7 +206,7 @@ class FieldType extends AbstractType
                 'required'    => false,
                 'mapped'      => false,
                 'data'        => '',
-                'empty_value' => ' x ',
+                'placeholder' => ' x ',
             ]
         );
 
@@ -322,7 +322,7 @@ class FieldType extends AbstractType
                             'data'        => $value,
                             'no_label'    => $noLabel,
                             'yes_label'   => $yesLabel,
-                            'empty_value' => ' x ',
+                            'placeholder' => ' x ',
                         ]
                     );
                     break;
@@ -556,7 +556,7 @@ class FieldType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.lead.field.object',
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'attr'              => [
                     'class' => 'form-control',
                 ],

@@ -134,7 +134,7 @@ class ConfigType extends AbstractType
                     'data-placeholder' => $this->translator->trans('mautic.core.config.form.webroot.dashboard'),
                 ],
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );
@@ -211,7 +211,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -307,7 +307,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
                 ],
                 'required'          => false,
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -322,7 +322,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.timezone.tooltip',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                'placeholder' => 'mautic.user.user.form.defaulttimezone',
                 'required'    => false,
             ]
         );
@@ -455,7 +455,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
                 ],
                 'required'          => false,
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -590,7 +590,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 

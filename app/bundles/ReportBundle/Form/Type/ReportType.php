@@ -143,7 +143,7 @@ class ReportType extends AbstractType
                     'multiple'    => false,
                     'label'       => 'mautic.report.report.form.source',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'attr'        => [
                         'class'    => 'form-control',
@@ -358,7 +358,7 @@ class ReportType extends AbstractType
                     'multiple'    => false,
                     'label'       => 'mautic.report.schedule.every',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'attr'        => [
                         'class'                => 'form-control',
@@ -376,7 +376,7 @@ class ReportType extends AbstractType
                     'multiple'    => false,
                     'label'       => 'mautic.report.schedule.day',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'attr'        => [
                         'class'                => 'form-control',
@@ -394,7 +394,7 @@ class ReportType extends AbstractType
                     'multiple'    => false,
                     'label'       => 'mautic.report.schedule.month_frequency',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'attr'        => [
                         'class'                => 'form-control',

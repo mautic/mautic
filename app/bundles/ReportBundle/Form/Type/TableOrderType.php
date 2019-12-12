@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -45,7 +46,7 @@ class TableOrderType extends AbstractType
             'multiple'    => false,
             'label'       => 'mautic.report.report.label.filtercolumn',
             'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
+            'placeholder' => false,
             'required'    => false,
             'attr'        => [
                 'class' => 'form-control',
@@ -53,16 +54,16 @@ class TableOrderType extends AbstractType
         ]);
 
         // Direction
-        $builder->add('direction', 'choice', [
+        $builder->add('direction', ChoiceType::class, [
             'choices' => [
-                'ASC'  => $this->translator->trans('mautic.report.report.label.tableorder_dir.asc'),
-                'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc'),
+                  $this->translator->trans('mautic.report.report.label.tableorder_dir.asc') => 'ASC',
+                 $this->translator->trans('mautic.report.report.label.tableorder_dir.desc') => 'DESC',
             ],
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.core.order',
             'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
+            'placeholder' => false,
             'required'    => false,
             'attr'        => [
                 'class' => 'form-control not-chosen',

@@ -69,7 +69,7 @@ class PointType extends AbstractType
 
         $builder->add('type', 'choice', [
             'choices'     => $options['pointActions']['choices'],
-            'empty_value' => '',
+            'placeholder' => '',
             'label'       => 'mautic.point.form.type',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => [

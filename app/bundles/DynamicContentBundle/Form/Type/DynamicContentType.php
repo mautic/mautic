@@ -243,7 +243,7 @@ class DynamicContentType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => 'mautic.core.form.translation_parent.empty',
+                    'placeholder' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
                     'ignore_ids'  => [(int) $options['data']->getId()],
                 ]
