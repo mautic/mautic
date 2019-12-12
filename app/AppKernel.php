@@ -179,6 +179,7 @@ class AppKernel extends Kernel
             new Mautic\EmailBundle\MauticEmailBundle(),
             new Mautic\FormBundle\MauticFormBundle(),
             new Mautic\InstallBundle\MauticInstallBundle(),
+            new Mautic\IntegrationsBundle\IntegrationsBundle(),
             new Mautic\LeadBundle\MauticLeadBundle(),
             new Mautic\NotificationBundle\MauticNotificationBundle(),
             new Mautic\PageBundle\MauticPageBundle(),
