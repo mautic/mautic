@@ -16,9 +16,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Check Form Type.
- */
 class CheckStepType extends AbstractType
 {
     /**

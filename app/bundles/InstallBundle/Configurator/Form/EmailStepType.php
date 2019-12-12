@@ -14,7 +14,6 @@ namespace Mautic\InstallBundle\Configurator\Form;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -24,9 +23,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Email Form Type.
- */
 class EmailStepType extends AbstractType
 {
     /**
@@ -87,19 +83,21 @@ class EmailStepType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.transport.mandrill' => 'mautic.email.config.mailer_transport.mandrill',
-                    'mautic.transport.mailjet'  => 'mautic.email.config.mailer_transport.mailjet',
-                    'mautic.transport.sendgrid' => 'mautic.email.config.mailer_transport.sendgrid',
-                    'mautic.transport.amazon'   => 'mautic.email.config.mailer_transport.amazon',
-                    'mautic.transport.postmark' => 'mautic.email.config.mailer_transport.postmark',
-                    'gmail'                     => 'mautic.email.config.mailer_transport.gmail',
-                    'smtp'                      => 'mautic.email.config.mailer_transport.smtp',
-                    'sendmail'                  => 'mautic.email.config.mailer_transport.sendmail',
+                    'mautic.email.config.mailer_transport.mail'     => 'mail',
+                    'mautic.email.config.mailer_transport.mandrill' => 'mautic.transport.mandrill',
+                    'mautic.email.config.mailer_transport.mailjet'  => 'mautic.transport.mailjet',
+                    'mautic.email.config.mailer_transport.sendgrid' => 'mautic.transport.sendgrid',
+                    'mautic.email.config.mailer_transport.amazon'   => 'mautic.transport.amazon',
+                    'mautic.email.config.mailer_transport.postmark' => 'mautic.transport.postmark',
+                    'mautic.email.config.mailer_transport.gmail'    => 'gmail',
+                    'mautic.email.config.mailer_transport.smtp'     => 'smtp',
+                    'mautic.email.config.mailer_transport.sendmail' => 'sendmail',
                 ],
-                'label'       => 'mautic.install.form.email.transport',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'attr'        => [
+                'choices_as_values' => true,
+                'label'             => 'mautic.install.form.email.transport',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'attr'              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.install.form.email.transport_descr',
                     'onchange' => 'MauticInstaller.toggleTransportDetails(this.value);',
@@ -160,9 +158,10 @@ class EmailStepType extends AbstractType
             'mailer_encryption',
             ButtonGroupType::class,
             [
-                'choice_list' => new ArrayChoiceList(
-                    ['tls'=>'mautic.email.config.mailer_encryption.tls', 'ssl'=>'mautic.email.config.mailer_encryption.ssl']
-                ),
+                'choices' => [
+                    'mautic.email.config.mailer_encryption.tls' => 'tls',
+                    'mautic.email.config.mailer_encryption.ssl' => 'ssl',
+                ],
                 'label'       => 'mautic.install.form.email.encryption',
                 'expanded'    => true,
                 'empty_value' => 'mautic.install.form.none',
@@ -171,15 +170,13 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_auth_mode',
-            'choice',
+            ChoiceType::class,
             [
-                'choice_list' => new ArrayChoiceList(
-                    [
-                        'plain'   => 'mautic.email.config.mailer_auth_mode.plain',
-                        'login'   => 'mautic.email.config.mailer_auth_mode.login',
-                        'cram-md5'=> 'mautic.email.config.mailer_auth_mode.cram-md5',
-                    ]
-                ),
+                'choices' => [
+                    'plain'    => 'mautic.email.config.mailer_auth_mode.plain',
+                    'login'    => 'mautic.email.config.mailer_auth_mode.login',
+                    'cram-md5' => 'mautic.email.config.mailer_auth_mode.cram-md5',
+                ],
                 'label'       => 'mautic.install.form.email.auth_mode',
                 'label_attr'  => ['class' => 'control-label'],
                 'empty_value' => 'mautic.install.form.none',
@@ -194,10 +191,10 @@ class EmailStepType extends AbstractType
             'mailer_spool_type',
             ButtonGroupType::class,
             [
-                'choice_list' => new ArrayChoiceList(
-                    ['memory'=> 'mautic.email.config.mailer_spool_type.memory',
-                      'file' => 'mautic.email.config.mailer_spool_type.file', ]
-                ),
+                'choices' => [
+                    'mautic.email.config.mailer_spool_type.memory' => 'memory',
+                    'mautic.email.config.mailer_spool_type.file'   => 'file',
+                ],
                 'label'       => 'mautic.install.form.email.spool_type',
                 'expanded'    => true,
                 'empty_value' => false,

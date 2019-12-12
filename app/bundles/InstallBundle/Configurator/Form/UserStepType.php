@@ -20,13 +20,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * User Form Type.
- */
 class UserStepType extends AbstractType
 {
     /**
-     * @var
+     * @var Session
      */
     private $session;
 
