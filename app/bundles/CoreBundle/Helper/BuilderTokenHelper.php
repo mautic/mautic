@@ -97,7 +97,7 @@ class BuilderTokenHelper
         string $labelColumn = 'name',
         string $valueColumn = 'id',
         CompositeExpression $expr = null
-    ): ?array {
+    ) {
         if (!$this->isConfigured) {
             throw new \BadMethodCallException('You must call the "'.get_class($this).'"::configure method of this class first.');
         }
