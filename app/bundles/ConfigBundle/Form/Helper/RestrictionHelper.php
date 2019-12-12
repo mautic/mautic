@@ -76,7 +76,6 @@ class RestrictionHelper
     }
 
     /**
-     * @param string        $fieldName
      * @param FormInterface $childType
      * @param FormInterface $parentType
      */
@@ -101,7 +100,7 @@ class RestrictionHelper
 
                 $parentType->add(
                     $childType->getName(),
-                    $childType->getConfig()->getType()->getName(),
+                    get_class($childType->getConfig()->getType()),
                     $fieldOptions
                 );
                 break;
