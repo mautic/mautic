@@ -19,6 +19,7 @@
         "ext-zlib": "^7.2",
         "ext-zip": "^1.15",
         "ext-imap": "*",
+        "ext-json": "*",
 
         "symfony/console": "~3.4.0",
         "symfony/debug": "~3.4.0",
