@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -18,7 +19,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ReportBundle\Entity\Report;
 
-class LoadReportData extends AbstractFixture implements OrderedFixtureInterface
+class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @param ObjectManager $manager

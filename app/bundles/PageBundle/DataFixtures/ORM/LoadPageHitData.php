@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -19,7 +20,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @var PageModel

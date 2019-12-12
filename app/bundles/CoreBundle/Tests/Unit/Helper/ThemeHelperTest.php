@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Mautic\CoreBundle\Templating\TemplateReference;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -25,22 +26,22 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ThemeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var PathsHelper|MockObject
      */
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var TemplatingHelper|MockObject
      */
     private $templatingHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|MockObject
      */
     private $coreParameterHelper;
 

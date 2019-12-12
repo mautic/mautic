@@ -11,6 +11,7 @@
 
 namespace Mautic\FormBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -19,7 +20,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\PageBundle\Model\PageModel;
 
-class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface
+class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @var PageModel

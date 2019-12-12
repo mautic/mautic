@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -18,7 +19,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
+class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @var CompanyModel

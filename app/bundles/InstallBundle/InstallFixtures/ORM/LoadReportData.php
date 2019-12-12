@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -23,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Class LoadReportData.
  */
-class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadReportData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, ORMFixtureInterface
 {
     /**
      * @var ContainerInterface

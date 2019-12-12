@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -19,7 +20,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 
-class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
+class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @var EmailModel

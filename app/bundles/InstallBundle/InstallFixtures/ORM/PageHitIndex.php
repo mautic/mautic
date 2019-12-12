@@ -2,6 +2,7 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -12,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * creates pagehit url prefix index. Cannot be done in the entity itself because doctrine
  * doesn't support prefix indexes :(
  */
-class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, ORMFixtureInterface
 {
     private $container;
 

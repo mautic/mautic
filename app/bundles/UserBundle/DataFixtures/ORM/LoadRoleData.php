@@ -11,13 +11,14 @@
 
 namespace Mautic\UserBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 
-class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
+class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @var RoleModel

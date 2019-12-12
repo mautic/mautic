@@ -11,12 +11,13 @@
 
 namespace Mautic\LeadBundle\Tests\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\PageBundle\Entity\Hit;
 
-class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
+class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface, ORMFixtureInterface
 {
     /**
      * @param ObjectManager $manager
