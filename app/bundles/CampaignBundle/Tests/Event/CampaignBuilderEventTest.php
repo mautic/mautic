@@ -15,6 +15,7 @@ use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
 class CampaignBuilderEventTest extends CampaignTestAbstract
 {
@@ -82,7 +83,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         $condition = [
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
-            'formType'    => 'campaignevent_form_field_value',
+            'formType'    => CampaignEventFormFieldValueType::class,
             'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
             'eventName'   => 'mautic.form.on_campaign_trigger_condition',
         ];

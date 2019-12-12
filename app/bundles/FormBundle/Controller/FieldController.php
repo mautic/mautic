@@ -47,7 +47,7 @@ class FieldController extends CommonFormController
             ];
         }
 
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->getModel('form')->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
@@ -350,7 +350,7 @@ class FieldController extends CommonFormController
 
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
-        if ('POST' == $this->request->getMethod() && null !== $formField) {
+        if ('POST' === $this->request->getMethod() && null !== $formField) {
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
 
             // Allow to select the lead field from the delete field again

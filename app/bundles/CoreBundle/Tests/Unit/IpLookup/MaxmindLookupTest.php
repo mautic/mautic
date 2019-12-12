@@ -25,7 +25,7 @@ class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     protected $mockHttp;
 
-    public function setUp()
+    protected function setUp()
     {
         // Mock http connector
         $this->mockHttp = $this->getMockBuilder('Joomla\Http\Http')

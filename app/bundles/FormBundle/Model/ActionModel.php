@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Form\Type\ActionType;
 
 /**
  * Class ActionModel.
@@ -69,6 +70,6 @@ class ActionModel extends CommonFormModel
             $options['formId'] = $entity->getForm()->getId();
         }
 
-        return $formFactory->create('formaction', $entity->convertToArray(), $options);
+        return $formFactory->create(ActionType::class, $entity->convertToArray(), $options);
     }
 }

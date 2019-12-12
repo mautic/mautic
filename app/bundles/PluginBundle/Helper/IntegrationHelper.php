@@ -12,7 +12,6 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -66,13 +65,6 @@ class IntegrationHelper
      */
     protected $pluginModel;
 
-    /**
-     * @deprecated 2.8.2 To be removed in 3.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     private $integrations = [];
 
     private $available = [];
@@ -82,8 +74,6 @@ class IntegrationHelper
     private $byPlugin = [];
 
     /**
-     * IntegrationHelper constructor.
-     *
      * @param Kernel               $kernel
      * @param EntityManager        $em
      * @param PathsHelper          $pathsHelper
@@ -91,9 +81,18 @@ class IntegrationHelper
      * @param CoreParametersHelper $coreParametersHelper
      * @param TemplatingHelper     $templatingHelper
      * @param PluginModel          $pluginModel
+     *
+     * @throws \Exception
      */
-    public function __construct(Kernel $kernel, EntityManager $em, PathsHelper $pathsHelper, BundleHelper $bundleHelper, CoreParametersHelper $coreParametersHelper, TemplatingHelper $templatingHelper, PluginModel $pluginModel)
-    {
+    public function __construct(
+        Kernel $kernel,
+        EntityManager $em,
+        PathsHelper $pathsHelper,
+        BundleHelper $bundleHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TemplatingHelper $templatingHelper,
+        PluginModel $pluginModel
+    ) {
         $this->container            = $kernel->getContainer();
         $this->em                   = $em;
         $this->pathsHelper          = $pathsHelper;
@@ -101,7 +100,6 @@ class IntegrationHelper
         $this->pluginModel          = $pluginModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->templatingHelper     = $templatingHelper;
-        $this->factory              = $this->container->get('mautic.factory');
     }
 
     /**
@@ -114,6 +112,8 @@ class IntegrationHelper
      * @param bool|false   $publishedOnly
      *
      * @return mixed
+     *
+     * @throws \Doctrine\ORM\ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false)
     {
@@ -178,30 +178,6 @@ class IntegrationHelper
                                 $newIntegrations[] = $newIntegration;
 
                                 unset($newIntegration);
-                            } else {
-                                /**
-                                 * @deprecated: 2.8.2 To be removed in 3.0
-                                 *            This keeps BC for 3rd party plugins
-                                 */
-                                $class    = '\\MauticPlugin\\'.$pluginNamespace.'\\Integration\\'.$integrationName.'Integration';
-                                $refClass = new \ReflectionClass($class);
-
-                                if ($refClass->isInstantiable()) {
-                                    $this->integrations[$integrationName] = new $class($this->factory);
-                                    $features                             = $this->integrations[$integrationName]->getSupportedFeatures();
-
-                                    $newIntegration->setSupportedFeatures($features);
-
-                                    // Go ahead and stash it since it's built already
-                                    $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
-
-                                    $newIntegrations[] = $newIntegration;
-
-                                    unset($newIntegration);
-                                } else {
-                                    // Something is bad so ignore
-                                    continue;
-                                }
                             }
                         }
 
@@ -334,27 +310,12 @@ class IntegrationHelper
                 if ($this->container->has($integrationContainerKey)) {
                     $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
                     $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
-                } else {
-                    /**
-                     * @deprecated: 2.8.2 To be removed in 3.0
-                     *            This keeps BC for 3rd party plugins
-                     */
-                    $rootNamespace = $integration['isPlugin'] ? '\\MauticPlugin\\' : '\\Mautic\\';
-                    $class         = $rootNamespace.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
-                    $refClass      = new \ReflectionClass($class);
-
-                    if ($refClass->isInstantiable()) {
-                        $this->integrations[$integrationName] = new $class($this->factory);
-
-                        $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
-                    } else {
-                        // Something is bad so ignore
-                        continue;
-                    }
                 }
             }
 
-            $returnServices[$integrationName] = $this->integrations[$integrationName];
+            if (isset($this->integrations[$integrationName])) {
+                $returnServices[$integrationName] = $this->integrations[$integrationName];
+            }
         }
 
         foreach ($returnServices as $key => $value) {

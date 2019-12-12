@@ -11,10 +11,24 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\Form\Form;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class SocialIntegration extends AbstractIntegration
 {
@@ -26,11 +40,60 @@ abstract class SocialIntegration extends AbstractIntegration
     protected $integrationHelper;
 
     /**
-     * @param IntegrationHelper $integrationHelper
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param CacheStorageHelper       $cacheStorageHelper
+     * @param EntityManager            $entityManager
+     * @param Session                  $session
+     * @param RequestStack             $requestStack
+     * @param Router                   $router
+     * @param TranslatorInterface      $translator
+     * @param Logger                   $logger
+     * @param EncryptionHelper         $encryptionHelper
+     * @param LeadModel                $leadModel
+     * @param CompanyModel             $companyModel
+     * @param PathsHelper              $pathsHelper
+     * @param NotificationModel        $notificationModel
+     * @param FieldModel               $fieldModel
+     * @param IntegrationEntityModel   $integrationEntityModel
+     * @param IntegrationHelper        $integrationHelper
      */
-    public function setIntegrationHelper(IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        CacheStorageHelper $cacheStorageHelper,
+        EntityManager $entityManager,
+        Session $session,
+        RequestStack $requestStack,
+        Router $router,
+        TranslatorInterface $translator,
+        Logger $logger,
+        EncryptionHelper $encryptionHelper,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        PathsHelper $pathsHelper,
+        NotificationModel $notificationModel,
+        FieldModel $fieldModel,
+        IntegrationEntityModel $integrationEntityModel,
+        IntegrationHelper $integrationHelper
+    ) {
         $this->integrationHelper = $integrationHelper;
+
+        parent::__construct(
+            $eventDispatcher,
+            $cacheStorageHelper,
+            $entityManager,
+            $session,
+            $requestStack,
+            $router,
+            $translator,
+            $logger,
+            $encryptionHelper,
+            $leadModel,
+            $companyModel,
+            $pathsHelper,
+            $notificationModel,
+            $fieldModel,
+            $integrationEntityModel
+        );
     }
 
     /**

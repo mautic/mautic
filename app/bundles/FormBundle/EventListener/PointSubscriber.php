@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\FormBundle\Event\SubmissionEvent;
+use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
@@ -54,7 +55,7 @@ class PointSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.form.point.action.submit',
             'description' => 'mautic.form.point.action.submit_descr',
             'callback'    => ['\\Mautic\\FormBundle\\Helper\\PointActionHelper', 'validateFormSubmit'],
-            'formType'    => 'pointaction_formsubmit',
+            'formType'    => PointActionFormSubmitType::class,
         ];
 
         $event->addAction('form.submit', $action);
