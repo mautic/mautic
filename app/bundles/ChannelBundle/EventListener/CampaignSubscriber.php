@@ -28,15 +28,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var MessageModel
      */
-    protected $messageModel;
+    private $messageModel;
 
     /**
      * @var ActionDispatcher
@@ -76,7 +73,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    protected $messageChannels = [];
+    private $messageChannels = [];
 
     /**
      * CampaignSubscriber constructor.
@@ -128,7 +125,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $action = [
             'label'                  => 'mautic.channel.message.send.marketing.message',
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
-            'eventName'              => ChannelEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => 'message_send',
             'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend',
@@ -216,7 +212,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    protected function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
+    private function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);

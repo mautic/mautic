@@ -13,13 +13,11 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\UserBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/**
- * Class ConfigSubscriber.
- */
-class ConfigSubscriber extends CommonSubscriber
+class ConfigSubscriber implements EventSubscriberInterface
 {
     private $fileFields = ['saml_idp_metadata', 'saml_idp_own_certificate', 'saml_idp_own_private_key'];
 
@@ -40,14 +38,15 @@ class ConfigSubscriber extends CommonSubscriber
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addFileFields($this->fileFields)
-              ->addForm(
-                  [
-                      'bundle'     => 'UserBundle',
-                      'formAlias'  => 'userconfig',
-                      'formTheme'  => 'MauticUserBundle:FormTheme\Config',
-                      'parameters' => $event->getParametersFromConfig('MauticUserBundle'),
-                  ]
-              );
+            ->addForm(
+            [
+                'bundle'     => 'UserBundle',
+                'formAlias'  => 'userconfig',
+                'formType'   => ConfigType::class,
+                'formTheme'  => 'MauticUserBundle:FormTheme\Config',
+                'parameters' => $event->getParametersFromConfig('MauticUserBundle'),
+            ]
+        );
     }
 
     /**
@@ -55,7 +54,7 @@ class ConfigSubscriber extends CommonSubscriber
      */
     public function onConfigSave(ConfigEvent $event)
     {
-        $data = $event->getConfig('userconfig');
+        $data = $event->getConfig(ConfigType::class);
 
         foreach ($this->fileFields as $field) {
             if (isset($data[$field]) && $data[$field] instanceof UploadedFile) {
@@ -83,7 +82,7 @@ class ConfigSubscriber extends CommonSubscriber
             }
         }
 
-        $event->setConfig($data, 'userconfig');
+        $event->setConfig($data, ConfigType::class);
     }
 
     /**
@@ -91,7 +90,7 @@ class ConfigSubscriber extends CommonSubscriber
      *
      * @return bool
      */
-    protected function validateXml($content)
+    private function validateXml($content)
     {
         $valid = true;
 

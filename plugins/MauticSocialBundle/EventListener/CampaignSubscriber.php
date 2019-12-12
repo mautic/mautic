@@ -14,33 +14,43 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CampaignEventHelper
      */
-    protected $campaignEventHelper;
+    private $campaignEventHelper;
 
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
     /**
-     * CampaignSubscriber constructor.
-     *
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param CampaignEventHelper $campaignEventHelper
      * @param IntegrationHelper   $helper
+     * @param TranslatorInterface $translator
      */
-    public function __construct(CampaignEventHelper $campaignEventHelper, IntegrationHelper $integrationHelper)
-    {
+    public function __construct(
+        CampaignEventHelper $campaignEventHelper,
+        IntegrationHelper $integrationHelper,
+        TranslatorInterface $translator
+    ) {
         $this->campaignEventHelper = $campaignEventHelper;
         $this->integrationHelper   = $integrationHelper;
+        $this->translator          = $translator;
     }
 
     /**
@@ -66,7 +76,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'description'     => 'mautic.social.twitter.tweet.event.open_desc',
                 'eventName'       => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_channelId'],
-                'formType'        => 'tweetsend_list',
+                'formType'        => TweetSendType::class,
                 'channel'         => 'social.tweet',
                 'channelIdField'  => 'channelId',
             ];

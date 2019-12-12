@@ -11,28 +11,32 @@
 
 namespace Mautic\PluginBundle\Tests\Integration;
 
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
-class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
+class AbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testPopulatedLeadDataReturnsIntAndNotDncEntityForMauticContactIsContactableByEmail()
     {
         $integration = $this->getMockBuilder(AbstractIntegration::class)
-            ->disableOriginalConstructor()
+            ->setConstructorArgs([
+                $this->dispatcher,
+                $this->cache,
+                $this->em,
+                $this->session,
+                $this->request,
+                $this->router,
+                $this->translator,
+                $this->logger,
+                $this->encryptionHelper,
+                $this->leadModel,
+                $this->companyModel,
+                $this->pathsHelper,
+                $this->notificationModel,
+                $this->fieldModel,
+                $this->integrationEntityModel,
+            ])
             ->setMethodsExcept(['convertLeadFieldKey', 'getLeadDoNotContact', 'populateLeadData', 'setTranslator', 'setLeadModel'])
             ->getMock();
-
-        $translator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $integration->setTranslator($translator);
-
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $integration->setLeadModel($leadModel);
 
         $config = [
             'leadFields' => [

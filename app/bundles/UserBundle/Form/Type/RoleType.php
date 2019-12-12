@@ -13,13 +13,16 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\UserBundle\Entity\Role;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Valid;
 
-/**
- * Class RoleType.
- */
 class RoleType extends AbstractType
 {
     /**
@@ -30,20 +33,28 @@ class RoleType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
 
-        $builder->add('name', 'text', [
-            'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'name',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
+        );
 
-        $builder->add('description', 'textarea', [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control editor'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('isAdmin', 'yesno_button_group', [
+        $builder->add('isAdmin', YesNoButtonGroupType::class, [
             'label' => 'mautic.user.role.form.isadmin',
             'attr'  => [
                 'onchange' => 'Mautic.togglePermissionVisibility();',
@@ -55,7 +66,9 @@ class RoleType extends AbstractType
         $hidden = ($options['data']->isAdmin()) ? ' hide' : '';
 
         $builder->add(
-            'permissions', 'permissions', [
+            'permissions',
+            PermissionsType::class,
+            [
                 'label'    => 'mautic.user.role.permissions',
                 'mapped'   => false, //we'll have to manually build the permissions for persisting
                 'required' => false,
@@ -66,7 +79,7 @@ class RoleType extends AbstractType
             ]
         );
 
-        $builder->add('buttons', 'form_buttons');
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -76,19 +89,19 @@ class RoleType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'         => 'Mautic\UserBundle\Entity\Role',
-            'cascade_validation' => true,
-            'permissionsConfig'  => [],
+            'data_class'        => Role::class,
+            'constraints'       => [new Valid()],
+            'permissionsConfig' => [],
         ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'role';
     }

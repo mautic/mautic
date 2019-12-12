@@ -97,7 +97,7 @@ class FocusModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:focus:items';
+        return 'focus:items';
     }
 
     /**

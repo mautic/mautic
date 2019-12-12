@@ -81,7 +81,7 @@ class LeadList extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_lists')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\LeadListRepository');
+            ->setCustomRepositoryClass(LeadListRepository::class);
 
         $builder->addIdColumns();
 

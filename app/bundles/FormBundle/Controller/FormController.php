@@ -12,9 +12,11 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -201,7 +203,7 @@ class FormController extends CommonFormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Submission stats per time period
         $timeStats = $this->getModel('form.submission')->getSubmissionsLineChartData(
@@ -283,9 +285,9 @@ class FormController extends CommonFormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.form.page', 1);
-
-        $sessionId = $this->request->request->get('mauticform[sessionId]', 'mautic_'.sha1(uniqid(mt_rand(), true)), true);
+        $page       = $this->get('session')->get('mautic.form.page', 1);
+        $mauticform = $this->request->request->get('mauticform', []);
+        $sessionId  = $mauticform['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
 
         //set added/updated fields
         $modifiedFields = $session->get('mautic.form.'.$sessionId.'.fields.modified', []);
@@ -433,6 +435,7 @@ class FormController extends CommonFormController
         //fire the form builder event
         $customComponents = $model->getCustomComponents($sessionId);
 
+        /** @var FormFieldHelper $fieldHelper */
         $fieldHelper = $this->get('mautic.helper.form.field_helper');
 
         return $this->delegateView(
@@ -721,7 +724,7 @@ class FormController extends CommonFormController
                     //submit button found
                     $submitButton = true;
                 }
-                if ($formField->getType() !== 'button' && !isset($availableFields[$formField->getType()])) {
+                if ($formField->getType() !== 'button' && !in_array($formField->getType(), $availableFields)) {
                     continue;
                 }
 

@@ -15,44 +15,50 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
+use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var DynamicContentModel
      */
-    protected $dynamicContentModel;
+    private $dynamicContentModel;
 
     /**
      * @var Session
      */
-    protected $session;
+    private $session;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param LeadModel           $leadModel
-     * @param DynamicContentModel $dynamicContentModel
+     * @var EventDispatcherInterface
      */
-    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session)
+    private $dispatcher;
+
+    /**
+     * @param LeadModel                $leadModel
+     * @param DynamicContentModel      $dynamicContentModel
+     * @param Session                  $session
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
     {
         $this->leadModel           = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;
         $this->session             = $session;
+        $this->dispatcher          = $dispatcher;
     }
 
     /**
@@ -75,7 +81,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'label'                  => 'mautic.dynamicContent.campaign.send_dwc',
                 'description'            => 'mautic.dynamicContent.campaign.send_dwc.tooltip',
                 'eventName'              => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formType'               => 'dwcsend_list',
+                'formType'               => DynamicContentSendType::class,
                 'formTypeOptions'        => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme'              => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
                 'timelineTemplate'       => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
@@ -101,7 +107,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'label'           => 'mautic.dynamicContent.campaign.decision_dwc',
                 'description'     => 'mautic.dynamicContent.campaign.decision_dwc.tooltip',
                 'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                'formType'        => 'dwcdecision_list',
+                'formType'        => DynamicContentDecisionType::class,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
                 'channel'         => 'dynamicContent',

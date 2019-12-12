@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\PluginRepository;
@@ -36,14 +35,9 @@ class ConfigFormTest extends KernelTestCase
 
     public function testConfigForm()
     {
-        $plugins        = $this->getIntegrationObject()->getIntegrationObjects();
-        $mockTranslator = $this->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
         foreach ($plugins as $name => $s) {
-            $s->setTranslator($mockTranslator);
-
             $featureSettings = $s->getFormSettings();
 
             $this->assertArrayHasKey('requires_callback', $featureSettings);

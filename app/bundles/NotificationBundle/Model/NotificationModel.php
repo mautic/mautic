@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Event\NotificationEvent;
+use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
+use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -130,7 +132,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        $type = strpos($action, 'mobile_') !== false ? 'mobile_notification' : 'notification';
+        $type = strpos($action, 'mobile_') !== false ? MobileNotificationType::class : NotificationType::class;
 
         return $formFactory->create($type, $entity, $options);
     }

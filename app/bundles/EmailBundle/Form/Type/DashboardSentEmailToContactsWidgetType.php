@@ -2,12 +2,12 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CampaignBundle\Form\Type\CampaignListType;
+use Mautic\LeadBundle\Form\Type\CompanyListType;
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardSentEmailToContactsWidgetType.
- */
 class DashboardSentEmailToContactsWidgetType extends AbstractType
 {
     /**
@@ -18,7 +18,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
     {
         $builder->add(
             'companyId',
-            'company_list',
+            CompanyListType::class,
             [
                 'label'       => 'mautic.email.companyId.filter',
                 'label_attr'  => ['class' => 'control-label'],
@@ -32,7 +32,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
 
         $builder->add(
             'campaignId',
-            'campaign_list',
+            CampaignListType::class,
             [
                 'label'       => 'mautic.email.campaignId.filter',
                 'label_attr'  => ['class' => 'control-label'],
@@ -46,7 +46,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
 
         $builder->add(
             'segmentId',
-            'leadlist_choices',
+            LeadListType::class,
             [
                 'label'      => 'mautic.email.segmentId.filter',
                 'label_attr' => ['class' => 'control-label'],
@@ -60,7 +60,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'email_dashboard_sent_email_to_contacts_widget';
     }

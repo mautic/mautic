@@ -15,7 +15,6 @@ namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
@@ -202,7 +201,7 @@ class MauticWebTestCase extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp()
     {
         static::$kernel = static::createKernel();
         static::$kernel->boot();

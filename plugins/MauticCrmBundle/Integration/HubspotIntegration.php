@@ -12,13 +12,29 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
+use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class HubspotIntegration.
@@ -35,13 +51,60 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * HubspotIntegration constructor.
      *
-     * @param UserHelper $userHelper
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param CacheStorageHelper       $cacheStorageHelper
+     * @param EntityManager            $entityManager
+     * @param Session                  $session
+     * @param RequestStack             $requestStack
+     * @param Router                   $router
+     * @param TranslatorInterface      $translator
+     * @param Logger                   $logger
+     * @param EncryptionHelper         $encryptionHelper
+     * @param LeadModel                $leadModel
+     * @param CompanyModel             $companyModel
+     * @param PathsHelper              $pathsHelper
+     * @param NotificationModel        $notificationModel
+     * @param FieldModel               $fieldModel
+     * @param IntegrationEntityModel   $integrationEntityModel
+     * @param UserHelper               $userHelper
      */
-    public function __construct(UserHelper $userHelper)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        CacheStorageHelper $cacheStorageHelper,
+        EntityManager $entityManager,
+        Session $session,
+        RequestStack $requestStack,
+        Router $router,
+        TranslatorInterface $translator,
+        Logger $logger,
+        EncryptionHelper $encryptionHelper,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        PathsHelper $pathsHelper,
+        NotificationModel $notificationModel,
+        FieldModel $fieldModel,
+        IntegrationEntityModel $integrationEntityModel,
+        UserHelper $userHelper
+    ) {
         $this->userHelper = $userHelper;
 
-        parent::__construct();
+        parent::__construct(
+            $eventDispatcher,
+            $cacheStorageHelper,
+            $entityManager,
+            $session,
+            $requestStack,
+            $router,
+            $translator,
+            $logger,
+            $encryptionHelper,
+            $leadModel,
+            $companyModel,
+            $pathsHelper,
+            $notificationModel,
+            $fieldModel,
+            $integrationEntityModel
+        );
     }
 
     /**
@@ -272,18 +335,19 @@ class HubspotIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'contacts' => 'mautic.hubspot.object.contact',
-                        'company'  => 'mautic.hubspot.object.company',
+                        'mautic.hubspot.object.contact' => 'contacts',
+                        'mautic.hubspot.object.company' => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }

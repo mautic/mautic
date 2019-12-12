@@ -274,7 +274,7 @@ class MobileNotificationDetailsType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'mobile_notification_details';
     }

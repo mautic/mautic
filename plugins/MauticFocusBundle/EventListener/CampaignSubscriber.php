@@ -12,42 +12,39 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EventModel
      */
-    protected $campaignEventModel;
+    private $campaignEventModel;
 
     /**
      * @var FocusModel
      */
-    protected $focusModel;
+    private $focusModel;
 
     /**
      * @var TrackingHelper
      */
-    protected $trackingHelper;
+    private $trackingHelper;
 
     /**
      * @var RouterInterface
      */
-    protected $router;
+    private $router;
 
     /**
-     * CampaignSubscriber constructor.
-     *
      * @param EventModel      $eventModel
      * @param FocusModel      $focusModel
      * @param TrackingHelper  $trackingHelper

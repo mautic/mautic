@@ -11,33 +11,57 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     private $formRegex = '{form=(.*?)}';
 
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
-     * PageSubscriber constructor.
-     *
-     * @param FormModel $formModel
+     * @var TranslatorInterface
      */
-    public function __construct(FormModel $formModel)
-    {
-        $this->formModel = $formModel;
+    private $translator;
+
+    /**
+     * @var CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var MauticFactory
+     */
+    private $mauticFactory;
+
+    /**
+     * @param FormModel           $formModel
+     * @param TranslatorInterface $translator
+     * @param CorePermissions     $security
+     * @param MauticFactory       $mauticFactory
+     */
+    public function __construct(
+        FormModel $formModel,
+        TranslatorInterface $translator,
+        CorePermissions $security,
+        MauticFactory $mauticFactory
+    ) {
+        $this->formModel     = $formModel;
+        $this->translator    = $translator;
+        $this->security      = $security;
+        $this->mauticFactory = $mauticFactory;
     }
 
     /**
@@ -63,14 +87,14 @@ class PageSubscriber extends CommonSubscriber
             $formSubmissions = [
                 'group'    => 'mautic.form.abtest.criteria',
                 'label'    => 'mautic.form.abtest.criteria.submissions',
-                'callback' => '\Mautic\FormBundle\Helper\AbTestHelper::determineSubmissionWinner',
+                'event'    => FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
             ];
             $event->addAbTestWinnerCriteria('form.submissions', $formSubmissions);
         }
 
         if ($event->tokensRequested($this->formRegex)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
+            $tokenHelper = new BuilderTokenHelper($this->mauticFactory, 'form');
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id');
         }
     }
 

@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\Configurator\Form;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -157,7 +158,7 @@ class UserStepType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'pre_extra_buttons' => [
                     [

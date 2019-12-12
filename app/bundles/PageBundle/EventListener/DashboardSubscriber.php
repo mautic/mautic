@@ -13,11 +13,10 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -34,7 +33,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'page.hits.in.time' => [
-            'formAlias' => 'page_dashboard_hits_in_time_widget',
+            'formAlias' => DashboardHitsInTimeWidgetType::class,
         ],
         'unique.vs.returning.leads' => [],
         'dwell.times'               => [],
@@ -59,13 +58,18 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $pageModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param PageModel $pageModel
+     * @var RouterInterface
      */
-    public function __construct(PageModel $pageModel)
+    protected $router;
+
+    /**
+     * @param PageModel       $pageModel
+     * @param RouterInterface $router
+     */
+    public function __construct(PageModel $pageModel, RouterInterface $router)
     {
         $this->pageModel = $pageModel;
+        $this->router    = $router;
     }
 
     /**

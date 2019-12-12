@@ -45,7 +45,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
-    public function setUp()
+    protected function setUp()
     {
         \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
 
@@ -173,6 +173,18 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function getCsrfToken($intention)
     {
         return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention);
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function createAjaxHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post')->getValue(),
+        ];
     }
 
     /**

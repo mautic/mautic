@@ -23,7 +23,8 @@ class SendGridMailPersonalizationTest extends \PHPUnit_Framework_TestCase
     {
         $sendGridMailPersonalization = new SendGridMailPersonalization();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $message->expects($this->never())

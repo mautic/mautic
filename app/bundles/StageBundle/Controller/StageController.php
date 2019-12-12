@@ -11,7 +11,7 @@
 
 namespace Mautic\StageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class StageController.
  */
-class StageController extends FormController
+class StageController extends AbstractFormController
 {
     /**
      * @param int $page
@@ -142,14 +142,13 @@ class StageController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.stage.page', 1);
-
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('stage[type]', '', true)
-            : '';
-
-        $action  = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
-        $actions = $model->getStageActions();
-        $form    = $model->createForm(
+        $page       = $this->get('session')->get('mautic.stage.page', 1);
+        $method     = $this->request->getMethod();
+        $stage      = $this->request->request->get('stage', []);
+        $actionType = $method === 'POST' ? ($stage['type'] ?? '') : '';
+        $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
+        $actions    = $model->getStageActions();
+        $form       = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,
@@ -161,8 +160,9 @@ class StageController extends FormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -272,7 +272,7 @@ class StageController extends FormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,

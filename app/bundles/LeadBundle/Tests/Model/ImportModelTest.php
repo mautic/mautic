@@ -148,39 +148,6 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertTrue($result);
     }
 
-    public function testStartImportWhenParallelLimitHit()
-    {
-        $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit', 'logDebug'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $model->method('checkParallelImportLimit')
-            ->will($this->returnValue(false));
-
-        $model->expects($this->once())
-            ->method('getParallelImportLimit')
-            ->will($this->returnValue(1));
-
-        $model->expects($this->exactly(2))
-            ->method('logDebug');
-
-        $model->setTranslator($this->getTranslatorMock());
-
-        $entity = $this->initImportEntity(['canProceed']);
-
-        $entity->method('canProceed')
-            ->will($this->returnValue(true));
-
-        $result = $model->startImport($entity, new Progress());
-
-        $this->assertFalse($result);
-        $this->assertEquals(0, $entity->getProgressPercentage());
-        $this->assertSame(0, $entity->getInsertedCount());
-        $this->assertSame(0, $entity->getIgnoredCount());
-        $this->assertSame(Import::DELAYED, $entity->getStatus());
-    }
-
     public function testBeginImportWhenParallelLimitHit()
     {
         $model = $this->getMockBuilder(ImportModel::class)
@@ -215,40 +182,6 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertSame(Import::DELAYED, $entity->getStatus());
 
         $model->expects($this->never())->method('saveEntity');
-    }
-
-    public function testStartImportWhenDatabaseException()
-    {
-        $model = $this->getMockBuilder(ImportModel::class)
-            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $model->expects($this->once())
-            ->method('checkParallelImportLimit')
-            ->will($this->returnValue(true));
-
-        $model->expects($this->exactly(2))
-            ->method('logDebug');
-
-        $model->expects($this->once())
-            ->method('process')
-            ->will($this->throwException(new ORMException()));
-
-        $model->setTranslator($this->getTranslatorMock());
-
-        $entity = $this->initImportEntity(['canProceed']);
-
-        $entity->method('canProceed')
-            ->will($this->returnValue(true));
-
-        $result = $model->startImport($entity, new Progress());
-
-        $this->assertFalse($result);
-        $this->assertEquals(0, $entity->getProgressPercentage());
-        $this->assertSame(0, $entity->getInsertedCount());
-        $this->assertSame(0, $entity->getIgnoredCount());
-        $this->assertSame(Import::DELAYED, $entity->getStatus());
     }
 
     public function testBeginImportWhenDatabaseException()

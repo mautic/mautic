@@ -11,8 +11,10 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -22,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class PreferenceCenterListType extends AbstractType
 {
     /**
-     * @var \Mautic\PageBundle\Model\PageModel
+     * @var PageModel
      */
     private $model;
 
@@ -32,12 +34,13 @@ class PreferenceCenterListType extends AbstractType
     private $canViewOther = false;
 
     /**
-     * @param MauticFactory $factory
+     * @param PageModel       $pageModel
+     * @param CorePermissions $corePermissions
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
     {
-        $this->model        = $factory->getModel('page');
-        $this->canViewOther = $factory->getSecurity()->isGranted('page:pages:viewother');
+        $this->model        = $pageModel;
+        $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
     }
 
     /**
@@ -55,11 +58,11 @@ class PreferenceCenterListType extends AbstractType
                     $pages = $model->getRepository()->getPageList('', 0, 0, $canViewOther, $options['top_level'], $options['ignore_ids'], ['isPreferenceCenter']);
                     foreach ($pages as $page) {
                         if ($page['isPreferenceCenter']) {
-                            $choices[$page['language']][$page['id']] = "{$page['title']} ({$page['id']})";
+                            $choices[$page['language']]["{$page['title']} ({$page['id']})"] = $page['id'];
                         }
                     }
 
-                    //sort by language
+                    // sort by language
                     ksort($choices);
 
                     foreach ($choices as $lang => &$pages) {
@@ -68,12 +71,13 @@ class PreferenceCenterListType extends AbstractType
 
                     return $choices;
                 },
-                'empty_value' => false,
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'top_level'   => 'variant',
-                'ignore_ids'  => [],
+                'empty_value'       => false,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'top_level'         => 'variant',
+                'ignore_ids'        => [],
+                'choices_as_values' => true,
             ]
         );
 
@@ -83,7 +87,7 @@ class PreferenceCenterListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'preference_center_list';
     }
@@ -93,6 +97,6 @@ class PreferenceCenterListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

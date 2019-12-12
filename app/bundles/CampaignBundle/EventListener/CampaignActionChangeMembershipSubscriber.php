@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -65,7 +66,7 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
             [
                 'label'           => 'mautic.campaign.event.addremovelead',
                 'description'     => 'mautic.campaign.event.addremovelead_descr',
-                'formType'        => 'campaignevent_addremovelead',
+                'formType'        => CampaignEventAddRemoveLeadType::class,
                 'formTypeOptions' => [
                     'include_this' => true,
                 ],

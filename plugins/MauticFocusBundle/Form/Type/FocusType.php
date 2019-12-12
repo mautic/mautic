@@ -164,9 +164,9 @@ class FocusType extends AbstractType
         );
 
         if (!empty($options['data']) && $options['data']->getId()) {
-            $readonly = !$this->security->isGranted('plugin:focus:items:publish');
+            $readonly = !$this->security->isGranted('focus:items:publish');
             $data     = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('plugin:focus:items:publish')) {
+        } elseif (!$this->security->isGranted('focus:items:publish')) {
             $readonly = true;
             $data     = false;
         } else {

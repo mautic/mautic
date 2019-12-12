@@ -11,9 +11,11 @@
 
 namespace Mautic\StageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class UserListType.
@@ -23,11 +25,11 @@ class StageListType extends AbstractType
     private $choices = [];
 
     /**
-     * @param MauticFactory $factory
+     * @param StageModel $model
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(StageModel $model)
     {
-        $choices = $factory->getModel('stage')->getRepository()->getEntities([
+        $choices = $model->getRepository()->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -39,8 +41,9 @@ class StageListType extends AbstractType
             ],
         ]);
 
+        /** @var Stage $choice */
         foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+            $this->choices[$choice->getName()] = $choice->getId();
         }
 
         //sort by language
@@ -50,28 +53,28 @@ class StageListType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices'     => $this->choices,
-            'empty_value' => false,
-            'expanded'    => false,
-            'multiple'    => true,
-            'required'    => false,
-            'empty_value' => 'mautic.core.form.chooseone',
+            'choices'           => $this->choices,
+            'expanded'          => false,
+            'multiple'          => true,
+            'required'          => false,
+            'empty_value'       => 'mautic.core.form.chooseone',
+            'choices_as_values' => true,
         ]);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'stage_list';
     }
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Form\Type\ActionType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -55,7 +56,7 @@ class ActionController extends CommonFormController
 
         //fire the form builder event
         $customComponents = $this->getModel('form.form')->getCustomComponents();
-        $form             = $this->get('form.factory')->create('formaction', $formAction, [
+        $form             = $this->get('form.factory')->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
             'formId'   => $formId,
@@ -150,11 +151,12 @@ class ActionController extends CommonFormController
     {
         $session    = $this->get('session');
         $method     = $this->request->getMethod();
-        $formId     = ($method == 'POST') ? $this->request->request->get('formaction[formId]', '', true) : $this->request->query->get('formId');
+        $formaction = $this->request->request->get('formaction', []);
+        $formId     = $method === 'POST' ? ($formaction['formId'] ?? '') : $this->request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
         $valid      = $cancelled      = false;
-        $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
+        $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
         if ($formAction !== null) {
             $actionType             = $formAction['type'];
@@ -169,7 +171,7 @@ class ActionController extends CommonFormController
                 return $this->modalAccessDenied();
             }
 
-            $form = $this->get('form.factory')->create('formaction', $formAction, [
+            $form = $this->get('form.factory')->create(ActionType::class, $formAction, [
                 'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 'settings' => $formAction['settings'],
                 'formId'   => $formId,

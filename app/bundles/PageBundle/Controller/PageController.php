@@ -14,6 +14,9 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Form\Type\BuilderSectionType;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -260,41 +263,26 @@ class PageController extends FormController
                 $testSettings = $criteria['criteria'][$lastCriteria];
 
                 $args = [
-                    'factory'    => $this->factory,
                     'page'       => $activePage,
                     'parent'     => $parent,
                     'children'   => $children,
                     'properties' => $properties,
                 ];
 
-                //execute the callback
-                if (is_callable($testSettings['callback'])) {
-                    if (is_array($testSettings['callback'])) {
-                        $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
-                    } elseif (strpos($testSettings['callback'], '::') !== false) {
-                        $parts      = explode('::', $testSettings['callback']);
-                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                    } else {
-                        $reflection = new \ReflectionMethod(null, $testSettings['callback']);
-                    }
+                $event = new DetermineWinnerEvent($args);
+                $this->dispatcher->dispatch(
+                    $testSettings['event'],
+                    $event
+                );
 
-                    $pass = [];
-                    foreach ($reflection->getParameters() as $param) {
-                        if (isset($args[$param->getName()])) {
-                            $pass[] = $args[$param->getName()];
-                        } else {
-                            $pass[] = null;
-                        }
-                    }
-                    $abTestResults = $reflection->invokeArgs($this, $pass);
-                }
+                $abTestResults = $event->getAbTestResults();
             }
         }
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_page_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Audit Log
         $logs = $this->getModel('core.auditLog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
@@ -447,7 +435,7 @@ class PageController extends FormController
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->get('form.factory')->create('builder_section');
+        $sectionForm = $this->get('form.factory')->create(BuilderSectionType::class);
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -606,7 +594,7 @@ class PageController extends FormController
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
-        $sectionForm = $this->get('form.factory')->create('builder_section');
+        $sectionForm = $this->get('form.factory')->create(BuilderSectionType::class);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -1015,79 +1003,7 @@ class PageController extends FormController
 
             $value = isset($content[$slot]) ? $content[$slot] : '';
 
-            if ($slotConfig['type'] == 'slideshow') {
-                if (isset($content[$slot])) {
-                    $options = json_decode($content[$slot], true);
-                } else {
-                    $options = [
-                        'width'            => '100%',
-                        'height'           => '250px',
-                        'background_color' => 'transparent',
-                        'arrow_navigation' => false,
-                        'dot_navigation'   => true,
-                        'interval'         => 5000,
-                        'pause'            => 'hover',
-                        'wrap'             => true,
-                        'keyboard'         => true,
-                    ];
-                }
-
-                // Create sample slides for first time or if all slides were deleted
-                if (empty($options['slides'])) {
-                    $options['slides'] = [
-                        [
-                            'order'            => 0,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_lb200.png'),
-                            'captionheader'    => 'Caption 1',
-                        ],
-                        [
-                            'order'            => 1,
-                            'background-image' => $assetsHelper->getUrl('media/images/mautic_logo_db200.png'),
-                            'captionheader'    => 'Caption 2',
-                        ],
-                    ];
-                }
-
-                // Order slides
-                usort(
-                    $options['slides'],
-                    function ($a, $b) {
-                        return strcmp($a['order'], $b['order']);
-                    }
-                );
-
-                $options['slot']   = $slot;
-                $options['public'] = false;
-
-                // create config form
-                $options['configForm'] = $formFactory->createNamedBuilder(
-                    null,
-                    'slideshow_config',
-                    [],
-                    ['data' => $options]
-                )->getForm()->createView();
-
-                // create slide config forms
-                foreach ($options['slides'] as $key => &$slide) {
-                    $slide['key']  = $key;
-                    $slide['slot'] = $slot;
-                    $slide['form'] = $formFactory->createNamedBuilder(
-                        null,
-                        'slideshow_slide_config',
-                        [],
-                        ['data' => $slide]
-                    )->getForm()->createView();
-                }
-
-                $renderingEngine = $this->get('templating');
-
-                if (method_exists($renderingEngine, 'getEngine')) {
-                    $renderingEngine->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
-                }
-                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
-            } else {
-                $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
-            }
+            $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
         }
 
         $slotsHelper->start('builder'); ?>

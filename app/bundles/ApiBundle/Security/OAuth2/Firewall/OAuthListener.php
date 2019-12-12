@@ -11,7 +11,6 @@
 
 namespace Mautic\ApiBundle\Security\OAuth2\Firewall;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
@@ -19,19 +18,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class OAuthListener extends \FOS\OAuthServerBundle\Security\Firewall\OAuthListener
 {
-    /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * {@inheritdoc}
      */

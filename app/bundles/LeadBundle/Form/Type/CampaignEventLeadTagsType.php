@@ -15,13 +15,16 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignEventLeadTagsType.
- */
 class CampaignEventLeadTagsType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @param TranslatorInterface $translator
+     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -34,7 +37,7 @@ class CampaignEventLeadTagsType extends AbstractType
     {
         $builder->add(
             'tags',
-            'lead_tag',
+            TagType::class,
             [
                 'add_transformer' => true,
                 'by_reference'    => false,
@@ -51,7 +54,7 @@ class CampaignEventLeadTagsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_lead_tags';
     }

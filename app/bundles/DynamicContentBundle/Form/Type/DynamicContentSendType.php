@@ -12,8 +12,9 @@
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -45,7 +46,7 @@ class DynamicContentSendType extends AbstractType
     {
         $builder->add(
             'dynamicContent',
-            'dwc_list',
+            DynamicContentListType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.selectDynamicContents',
                 'label_attr' => ['class' => 'control-label'],
@@ -75,7 +76,7 @@ class DynamicContentSendType extends AbstractType
 
             $builder->add(
                 'newDynamicContentButton',
-                'button',
+                ButtonType::class,
                 [
                     'label' => 'mautic.dynamicContent.send.new.dynamicContent',
                     'attr'  => [
@@ -104,7 +105,7 @@ class DynamicContentSendType extends AbstractType
 
             $builder->add(
                 'editDynamicContentButton',
-                'button',
+                ButtonType::class,
                 [
                     'label' => 'mautic.dynamicContent.send.edit.dynamicContent',
                     'attr'  => [
@@ -118,15 +119,15 @@ class DynamicContentSendType extends AbstractType
         }
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['update_select']);
+        $resolver->setDefined(['update_select']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dwcsend_list';
     }

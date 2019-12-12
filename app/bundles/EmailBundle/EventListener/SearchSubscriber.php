@@ -13,35 +13,44 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
      * @var UserHelper
      */
-    protected $userHelper;
+    private $userHelper;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserHelper $userHelper
-     * @param EmailModel $emailModel
+     * @var CorePermissions
      */
-    public function __construct(UserHelper $userHelper, EmailModel $emailModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        UserHelper $userHelper,
+        EmailModel $emailModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userHelper = $userHelper;
         $this->emailModel = $emailModel;
+        $this->security   = $security;
+        $this->templating = $templating;
     }
 
     /**
@@ -89,13 +98,13 @@ class SearchSubscriber extends CommonSubscriber
                 $emailResults = [];
 
                 foreach ($emails as $email) {
-                    $emailResults[] = $this->templating->renderResponse(
+                    $emailResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
                         ['email' => $email]
                     )->getContent();
                 }
                 if (count($emails) > 5) {
-                    $emailResults[] = $this->templating->renderResponse(
+                    $emailResults[] = $this->templating->getTemplating()->renderResponse(
                         'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
                         [
                             'showMore'     => true,

@@ -13,28 +13,37 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
- * Class EnvironmentSubscriber.
- */
-class EnvironmentSubscriber extends CommonSubscriber
+class EnvironmentSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CookieHelper
      */
-    protected $cookieHelper;
+    private $cookieHelper;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
-    public function __construct(CookieHelper $cookieHelper)
+    /**
+     * System params.
+     *
+     * @var array
+     */
+    private $params;
+
+    /**
+     * @param CookieHelper $cookieHelper
+     * @param array        $params
+     */
+    public function __construct(CookieHelper $cookieHelper, array $params)
     {
         $this->cookieHelper = $cookieHelper;
+        $this->params       = $params;
     }
 
     /**

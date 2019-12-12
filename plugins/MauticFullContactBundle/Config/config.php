@@ -32,13 +32,15 @@ return [
     'services' => [
         'events' => [
             'mautic.plugin.fullcontact.button.subscriber' => [
-                'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber',
+                'class'     => \MauticPlugin\MauticFullContactBundle\EventListener\ButtonSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
+                    'translator',
+                    'router',
                 ],
             ],
             'mautic.plugin.fullcontact.lead.subscriber' => [
-                'class'     => 'MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber',
+                'class'     => \MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
                     'mautic.plugin.fullcontact.lookup_helper',
                 ],
@@ -46,12 +48,10 @@ return [
         ],
         'forms' => [
             'mautic.form.type.fullcontact_lookup' => [
-                'class' => 'MauticPlugin\MauticFullContactBundle\Form\Type\LookupType',
-                'alias' => 'fullcontact_lookup',
+                'class' => \MauticPlugin\MauticFullContactBundle\Form\Type\LookupType::class,
             ],
             'mautic.form.type.fullcontact_batch_lookup' => [
-                'class' => 'MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType',
-                'alias' => 'fullcontact_batch_lookup',
+                'class' => \MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType::class,
             ],
         ],
         'others' => [
@@ -71,6 +71,21 @@ return [
             'mautic.integration.fullcontact' => [
                 'class'     => \MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
                 'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
                 ],
             ],
         ],

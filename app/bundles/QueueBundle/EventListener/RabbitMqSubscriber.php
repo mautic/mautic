@@ -17,9 +17,6 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class RabbitMqSubscriber.
- */
 class RabbitMqSubscriber extends AbstractQueueSubscriber
 {
     /**
@@ -38,8 +35,6 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
     private $container;
 
     /**
-     * RabbitMqSubscriber constructor.
-     *
      * @param ContainerInterface $container
      */
     public function __construct(ContainerInterface $container)

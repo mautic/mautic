@@ -54,26 +54,29 @@ return [
     'services' => [
         'events' => [
             'mautic.focus.subscriber.form_bundle' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\FormSubscriber',
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.focus.model.focus',
                 ],
             ],
             'mautic.focus.subscriber.page_bundle' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber',
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
+                    'mautic.security',
+                    'mautic.factory',
                 ],
             ],
             'mautic.focus.subscriber.stat' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber::class,
                 'arguments' => [
                     'mautic.focus.model.focus',
+                    'request_stack',
                 ],
             ],
             'mautic.focus.subscriber.focus' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber',
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber::class,
                 'arguments' => [
                     'router',
                     'mautic.helper.ip_lookup',
@@ -81,18 +84,19 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
-                    'mautic.form.helper.token',
                     'mautic.focus.model.focus',
+                    'request_stack',
                 ],
             ],
             'mautic.focus.stats.subscriber' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.focus.campaignbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber',
+                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.focus.model.focus',
@@ -143,7 +147,7 @@ return [
         'main' => [
             'mautic.focus' => [
                 'route'    => 'mautic_focus_index',
-                'access'   => 'plugin:focus:items:view',
+                'access'   => 'focus:items:view',
                 'parent'   => 'mautic.core.channels',
                 'priority' => 10,
             ],

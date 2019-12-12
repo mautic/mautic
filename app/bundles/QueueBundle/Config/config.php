@@ -13,18 +13,18 @@ return [
     'services' => [
         'events' => [
             'mautic.queue.rabbitmq.subscriber' => [
-                'class'     => 'Mautic\QueueBundle\EventListener\RabbitMqSubscriber',
+                'class'     => \Mautic\QueueBundle\EventListener\RabbitMqSubscriber::class,
                 'arguments' => 'service_container',
             ],
             'mautic.queue.beanstalkd.subscriber' => [
-                'class'     => 'Mautic\QueueBundle\EventListener\BeanstalkdSubscriber',
+                'class'     => \Mautic\QueueBundle\EventListener\BeanstalkdSubscriber::class,
                 'arguments' => [
                     'service_container',
                     'mautic.queue.service',
                 ],
             ],
             'mautic.queue.configbundle.subscriber' => [
-                'class'     => 'Mautic\QueueBundle\EventListener\ConfigSubscriber',
+                'class'     => \Mautic\QueueBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
@@ -32,14 +32,13 @@ return [
         ],
         'forms' => [
             'mautic.form.type.queueconfig' => [
-                'class'     => 'Mautic\QueueBundle\Form\Type\ConfigType',
+                'class'     => \Mautic\QueueBundle\Form\Type\ConfigType::class,
                 'arguments' => 'event_dispatcher',
-                'alias'     => 'queueconfig',
             ],
         ],
         'other' => [
             'mautic.queue.service' => [
-                'class'     => 'Mautic\QueueBundle\Queue\QueueService',
+                'class'     => \Mautic\QueueBundle\Queue\QueueService::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
@@ -47,7 +46,7 @@ return [
                 ],
             ],
             'mautic.queue.helper.rabbitmq_consumer' => [
-                'class'     => 'Mautic\QueueBundle\Helper\RabbitMqConsumer',
+                'class'     => \Mautic\QueueBundle\Helper\RabbitMqConsumer::class,
                 'arguments' => 'mautic.queue.service',
             ],
         ],

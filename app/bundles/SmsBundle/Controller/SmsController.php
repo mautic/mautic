@@ -12,6 +12,7 @@
 namespace Mautic\SmsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
@@ -187,7 +188,7 @@ class SmsController extends FormController
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
@@ -262,11 +263,11 @@ class SmsController extends FormController
         }
 
         //set the page we came from
-        $page   = $session->get('mautic.sms.page', 1);
-        $action = $this->generateUrl('mautic_sms_action', ['objectAction' => 'new']);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('sms[updateSelect]', false, true)
+        $page         = $session->get('mautic.sms.page', 1);
+        $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'new']);
+        $sms          = $this->request->request->get('sms', []);
+        $updateSelect = $method === 'POST'
+            ? ($sms['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         if ($updateSelect) {
@@ -430,10 +431,10 @@ class SmsController extends FormController
         }
 
         //Create the form
-        $action = $this->generateUrl('mautic_sms_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-
-        $updateSelect = ($method == 'POST')
-            ? $this->request->request->get('sms[updateSelect]', false, true)
+        $action       = $this->generateUrl('mautic_sms_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $sms          = $this->request->request->get('sms', []);
+        $updateSelect = $method === 'POST'
+            ? ($sms['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
