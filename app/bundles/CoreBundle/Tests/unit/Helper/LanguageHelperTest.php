@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Monolog\Logger;
 use Symfony\Component\Filesystem\Filesystem;
 
-class LanguageHelperTest extends \PHPUnit_Framework_TestCase
+class LanguageHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject

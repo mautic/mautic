@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Tests\Helper\Language;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Symfony\Component\Filesystem\Filesystem;
 
-class InstallerTest extends \PHPUnit_Framework_TestCase
+class InstallerTest extends \PHPUnit\Framework\TestCase
 {
     public function testInstaller()
     {
