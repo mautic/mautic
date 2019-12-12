@@ -1,10 +1,10 @@
 <?php
 
-/*
+/**
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -17,50 +17,82 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class EmailStep implements StepInterface
 {
-    /*
-     * From name for email sent from Mautic
+    /**
+     * From name for email sent from Mautic.
      *
      * @var string
      */
     public $mailer_from_name;
 
-    /*
-     * From email sent from Mautic
+    /**
+     * From email sent from Mautic.
      *
      * @var string
      */
     public $mailer_from_email;
 
-    /*
-     * Mail transport
+    /**
+     * Mail transport.
      *
      * @var string
      */
     public $mailer_transport = 'mail';
 
-    /*
-     * SMTP password
+    /**
+     * SMTP host
+     * Required in step.
+     *
+     * @var string
+     */
+    public $mailer_host;
+
+    /**
+     * SMTP port
+     * Required in step.
+     *
+     * @var string
+     */
+    public $mailer_port;
+
+    /**
+     * SMTP username
+     * Required in step.
+     *
+     * @var string
+     */
+    public $mailer_user;
+
+    /**
+     * SMTP password.
      *
      * @var string
      */
     public $mailer_password;
 
-    /*
+    /**
      * SMTP encryption
+     * Required in step.
      *
      * @var string
      */
     public $mailer_encryption; // null|tls|ssl
 
     /*
-     * Spool mode
+     * SMTP auth mode
+     *
+     * @var string
+     */
+    public $mailer_auth_mode; //  null|plain|login|cram-md5
+
+    /**
+     * Spool mode.
      *
      * @var string
      */
     public $mailer_spool_type = 'memory'; // file|memory
 
-    /*
-     * Spool path
+    /**
+     * Spool path.
      *
      * @var string
      */
