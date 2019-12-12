@@ -39,6 +39,22 @@ class CheckStep implements StepInterface
     private $openSSLCipher;
 
     /**
+     * Absolute path to cache directory.
+     * Required in step.
+     *
+     * @var string
+     */
+    public $cache_path = '%kernel.root_dir%/cache';
+
+    /**
+     * Absolute path to log directory.
+     * Required in step.
+     *
+     * @var string
+     */
+    public $log_path = '%kernel.root_dir%/logs';
+
+    /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
      *
      * @var string
