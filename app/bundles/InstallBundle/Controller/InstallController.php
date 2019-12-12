@@ -24,11 +24,10 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * InstallController.
- */
 class InstallController extends CommonController
 {
     const CHECK_STEP    = 0;
@@ -54,7 +53,7 @@ class InstallController extends CommonController
      *
      * @param int $index The step number to process
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function stepAction($index = 0)
     {
@@ -258,7 +257,9 @@ class InstallController extends CommonController
     /**
      * Controller action for the final step.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
+     *
+     * @throws \Exception
      */
     public function finalAction()
     {
@@ -341,8 +342,6 @@ class InstallController extends CommonController
 
     /**
      * Installs data fixtures for the application.
-     *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     private function installDatabaseFixtures()
     {
@@ -375,7 +374,8 @@ class InstallController extends CommonController
      *
      * @param array $data
      *
-     * @return array|bool
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
     private function createAdminUserStep($data)
     {
