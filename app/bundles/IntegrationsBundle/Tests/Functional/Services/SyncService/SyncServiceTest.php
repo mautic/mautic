@@ -19,6 +19,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\PluginBundle\Entity\Integration;
 
 class SyncServiceTest extends MauticMysqlTestCase
@@ -28,7 +29,7 @@ class SyncServiceTest extends MauticMysqlTestCase
         parent::setUp();
 
         // Populate contacts
-        $this->installDatabaseFixtures([dirname(__DIR__).'/../../../../../app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
+        $this->installDatabaseFixtures([LoadLeadData::class]);
     }
 
     public function testSync(): void

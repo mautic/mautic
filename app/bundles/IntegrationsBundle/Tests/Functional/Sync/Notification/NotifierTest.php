@@ -23,6 +23,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
+use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 
 class NotifierTest extends MauticMysqlTestCase
 {
@@ -31,7 +32,7 @@ class NotifierTest extends MauticMysqlTestCase
         parent::setUp();
 
         // Populate contacts
-        $this->installDatabaseFixtures([dirname(__DIR__).'/../../../../../app/bundles/LeadBundle/DataFixtures/ORM/LoadLeadData.php']);
+        $this->installDatabaseFixtures([LoadLeadData::class]);
     }
 
     public function testNotifications(): void
