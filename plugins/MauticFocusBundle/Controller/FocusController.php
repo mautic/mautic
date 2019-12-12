@@ -11,39 +11,33 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use DateTime;
-use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class FocusController.
  */
-class FocusController extends AbstractStandardFormController
+class FocusController extends FormController
 {
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    public function __construct()
     {
-        return 'MauticFocusBundle:Focus';
-    }
-
-    /**
-     * @return string
-     */
-    protected function getModelName()
-    {
-        return 'focus';
+        $this->setStandardParameters(
+            'focus',
+            'focus:items',
+            'mautic_focus',
+            'mautic_focus',
+            'mautic.focus',
+            'MauticFocusBundle:Focus',
+            null,
+            'focus'
+        );
     }
 
     /**
      * @param int $page
      *
-     * @return JsonResponse|RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -53,7 +47,7 @@ class FocusController extends AbstractStandardFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function newAction()
     {
@@ -66,7 +60,7 @@ class FocusController extends AbstractStandardFormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -78,7 +72,7 @@ class FocusController extends AbstractStandardFormController
      *
      * @param $objectId
      *
-     * @return array|JsonResponse|RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function viewAction($objectId)
     {
@@ -90,7 +84,7 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -102,7 +96,7 @@ class FocusController extends AbstractStandardFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -112,7 +106,7 @@ class FocusController extends AbstractStandardFormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse|RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -120,23 +114,19 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
-     *
-     * @return array
-     *
-     * @throws \Exception
+     * @param $args
+     * @param $view
      */
-    public function getViewArguments(array $args, $action)
+    public function customizeViewArguments($args, $view)
     {
-        if ($action == 'view') {
-            /** @var Focus $item */
+        if ($view == 'view') {
+            /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $item */
             $item = $args['viewParameters']['item'];
 
             // For line graphs in the view
             $dateRangeValues = $this->request->get('daterange', []);
             $dateRangeForm   = $this->get('form.factory')->create(
-                'daterange',
+                DateRangeType::class,
                 $dateRangeValues,
                 [
                     'action' => $this->generateUrl(
@@ -149,13 +139,13 @@ class FocusController extends AbstractStandardFormController
                 ]
             );
 
-            /** @var FocusModel $model */
+            /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
             $model = $this->getModel('focus');
             $stats = $model->getStats(
                 $item,
                 null,
-                new DateTime($dateRangeForm->get('date_from')->getData()),
-                new DateTime($dateRangeForm->get('date_to')->getData())
+                new \DateTime($dateRangeForm->get('date_from')->getData()),
+                new \DateTime($dateRangeForm->get('date_to')->getData())
             );
 
             $args['viewParameters']['stats']         = $stats;
@@ -177,12 +167,11 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $updateSelect = ($this->request->getMethod() == 'POST')
-            ? $this->request->request->get('focus[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $focus        = $this->request->request->get('focus', []);
+        $updateSelect = $this->request->getMethod() === 'POST'
+            ? ($focus['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
+
         if ($updateSelect) {
             switch ($action) {
                 case 'new':
@@ -209,12 +198,11 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getEntityFormOptions()
     {
-        $updateSelect = ($this->request->getMethod() == 'POST')
-            ? $this->request->request->get('focus[updateSelect]', false, true)
-            : $this->request->get(
-                'updateSelect',
-                false
-            );
+        $focus        = $this->request->request->get('focus', []);
+        $updateSelect = $this->request->getMethod() === 'POST'
+            ? ($focus['updateSelect'] ?? false)
+            : $this->request->get('updateSelect', false);
+
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
         }
