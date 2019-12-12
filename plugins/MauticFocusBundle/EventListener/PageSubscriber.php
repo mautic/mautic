@@ -42,7 +42,7 @@ class PageSubscriber implements EventSubscriberInterface
     /**
      * @var BuilderTokenHelperFactory
      */
-    protected $builderTokenHelperFactory;
+    private $builderTokenHelperFactory;
 
     /**
      * PageSubscriber constructor.
