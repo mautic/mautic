@@ -36,7 +36,9 @@ class CheckStep implements StepInterface
      */
     private $kernelRoot;
 
-    /** @var OpenSSLCipher */
+    /**
+     * @var OpenSSLCipher
+     */
     private $openSSLCipher;
 
     /**
