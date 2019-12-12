@@ -26,6 +26,8 @@ class ConfigSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     /**
+     * ConfigSubscriber constructor.
+     *
      * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)

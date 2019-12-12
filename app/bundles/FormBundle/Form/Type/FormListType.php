@@ -11,8 +11,12 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -22,17 +26,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FormListType extends AbstractType
 {
     private $viewOther;
+
+    /**
+     * @var FormRepository
+     */
     private $repo;
 
     /**
-     * @param MauticFactory $factory
+     * @param CorePermissions $security
+     * @param FormModel       $model
+     * @param UserHelper      $userHelper
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
     {
-        $this->viewOther = $factory->getSecurity()->isGranted('form:forms:viewother');
-        $this->repo      = $factory->getModel('form')->getRepository();
+        $this->viewOther = $security->isGranted('form:forms:viewother');
+        $this->repo      = $model->getRepository();
 
-        $this->repo->setCurrentUser($factory->getUser());
+        $this->repo->setCurrentUser($userHelper->getUser());
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -52,7 +62,7 @@ class FormListType extends AbstractType
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, $options['form_type']);
                 foreach ($forms as $form) {
-                    $choices[$form['id']] = $form['name'];
+                    $choices[$form['name']] = $form['id'];
                 }
 
                 //sort by language
@@ -60,10 +70,11 @@ class FormListType extends AbstractType
 
                 return $choices;
             },
-            'expanded'    => false,
-            'multiple'    => true,
-            'empty_value' => false,
-            'form_type'   => null,
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => true,
+            'empty_value'       => false,
+            'form_type'         => null,
         ]);
 
         $resolver->setDefined(['form_type']);
@@ -82,6 +93,6 @@ class FormListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

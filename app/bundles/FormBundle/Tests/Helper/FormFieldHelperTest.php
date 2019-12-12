@@ -14,7 +14,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected $fixture;
 
-    public function setUp()
+    protected function setUp()
     {
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
             ->disableOriginalConstructor()

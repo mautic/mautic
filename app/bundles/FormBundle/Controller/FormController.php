@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
@@ -434,6 +435,7 @@ class FormController extends CommonFormController
         //fire the form builder event
         $customComponents = $model->getCustomComponents($sessionId);
 
+        /** @var FormFieldHelper $fieldHelper */
         $fieldHelper = $this->get('mautic.helper.form.field_helper');
 
         return $this->delegateView(
@@ -722,7 +724,7 @@ class FormController extends CommonFormController
                     //submit button found
                     $submitButton = true;
                 }
-                if ('button' !== $formField->getType() && !isset($availableFields[$formField->getType()])) {
+                if ('button' !== $formField->getType() && !in_array($formField->getType(), $availableFields)) {
                     continue;
                 }
 

@@ -44,7 +44,7 @@ class TransportChainTest extends AbstractMauticTestCase
         return $method->invokeArgs($object, $parameters);
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

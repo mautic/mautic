@@ -16,6 +16,10 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -153,7 +157,7 @@ class FieldType extends AbstractType
         // Build form fields
         $builder->add(
             'label',
-            'text',
+            TextType::class,
             [
                 'label'       => !empty($labelText) ? $labelText : 'mautic.form.field.form.label',
                 'label_attr'  => ['class' => 'control-label'],
@@ -169,7 +173,7 @@ class FieldType extends AbstractType
         if ($allowCustomAlias) {
             $builder->add(
                 'alias',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.alias',
                     'label_attr' => ['class' => 'control-label'],
@@ -198,7 +202,7 @@ class FieldType extends AbstractType
         if ($addDefaultValue) {
             $builder->add(
                 'defaultValue',
-                ('textarea' == $type) ? 'textarea' : 'text',
+                ('textarea' == $type) ? TextareaType::class : TextType::class,
                 [
                     'label'      => 'mautic.core.defaultvalue',
                     'label_attr' => ['class' => 'control-label'],
@@ -211,7 +215,7 @@ class FieldType extends AbstractType
         if ($addHelpMessage) {
             $builder->add(
                 'helpMessage',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.helpmessage',
                     'label_attr' => ['class' => 'control-label'],
@@ -237,7 +241,7 @@ class FieldType extends AbstractType
 
             $builder->add(
                 'validationMessage',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.validationmsg',
                     'label_attr' => ['class' => 'control-label'],
@@ -254,7 +258,7 @@ class FieldType extends AbstractType
         if ($addLabelAttributes) {
             $builder->add(
                 'labelAttributes',
-                'text',
+                TextType::class,
                 [
                     'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
                     'label_attr' => ['class' => 'control-label'],
@@ -271,7 +275,7 @@ class FieldType extends AbstractType
         if ($addInputAttributes) {
             $builder->add(
                 'inputAttributes',
-                'text',
+                TextType::class,
                 [
                     'label'      => (!empty($inputAttributesText)) ? $inputAttributesText : 'mautic.form.field.form.inputattr',
                     'label_attr' => ['class' => 'control-label'],
@@ -288,7 +292,7 @@ class FieldType extends AbstractType
         if ($addContainerAttributes) {
             $builder->add(
                 'containerAttributes',
-                'text',
+                TextType::class,
                 [
                     'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
                     'label_attr' => ['class' => 'control-label'],
@@ -335,7 +339,7 @@ class FieldType extends AbstractType
 
             $builder->add(
                 'showAfterXSubmissions',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.form.field.form.show.after.x.submissions',
                     'label_attr' => ['class' => 'control-label'],
@@ -386,10 +390,11 @@ class FieldType extends AbstractType
 
             $builder->add(
                 'leadField',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'     => $options['leadFields'],
-                    'choice_attr' => function ($val, $key, $index) use ($options) {
+                    'choices'           => $options['leadFields'],
+                    'choices_as_values' => true,
+                    'choice_attr'       => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
                         foreach ($objects as $object) {
                             if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
@@ -411,7 +416,7 @@ class FieldType extends AbstractType
             );
         }
 
-        $builder->add('type', 'hidden');
+        $builder->add('type', HiddenType::class);
 
         $update = (!empty($options['data']['id'])) ? true : false;
         if (!empty($update)) {
@@ -435,7 +440,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'formId',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
@@ -452,7 +457,7 @@ class FieldType extends AbstractType
                 case 'country':
                     $builder->add(
                         'properties',
-                        'formfield_select',
+                        FormFieldSelectType::class,
                         [
                             'field_type' => $type,
                             'label'      => false,
@@ -465,7 +470,7 @@ class FieldType extends AbstractType
                 case 'radiogrp':
                     $builder->add(
                         'properties',
-                        'formfield_group',
+                        FormFieldGroupType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
@@ -504,7 +509,7 @@ class FieldType extends AbstractType
                 case 'tel':
                     $builder->add(
                         'properties',
-                        'formfield_placeholder',
+                        FormFieldPlaceholderType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
@@ -514,7 +519,7 @@ class FieldType extends AbstractType
                 case 'captcha':
                     $builder->add(
                         'properties',
-                        'formfield_captcha',
+                        FormFieldCaptchaType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
@@ -573,7 +578,7 @@ class FieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formfield';
     }
