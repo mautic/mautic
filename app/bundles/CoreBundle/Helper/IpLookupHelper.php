@@ -224,7 +224,11 @@ class IpLookupHelper
      */
     public function getIpDetails($ip)
     {
-        return $this->ipLookup->setIpAddress($ip)->getDetails();
+        if ($this->ipLookup) {
+            return $this->ipLookup->setIpAddress($ip)->getDetails();
+        }
+
+        return [];
     }
 
     /**
