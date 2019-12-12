@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
