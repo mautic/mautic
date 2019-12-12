@@ -14,6 +14,7 @@ namespace Mautic\PointBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -61,7 +62,7 @@ class TriggerEventType extends AbstractType
             $builder->add('properties', $options['settings']['formType'], $formTypeOptions);
         }
 
-        $builder->add('type', 'hidden');
+        $builder->add('type', HiddenType::class);
 
         $update = !empty($properties);
         if (!empty($update)) {
@@ -79,7 +80,7 @@ class TriggerEventType extends AbstractType
             'container_class' => 'bottom-form-buttons',
         ]);
 
-        $builder->add('triggerId', 'hidden', [
+        $builder->add('triggerId', HiddenType::class, [
             'mapped' => false,
         ]);
 

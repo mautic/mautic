@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -178,7 +179,7 @@ class TriggerType extends AbstractType
 
         $builder->add(
             'sessionId',
-            'hidden',
+            HiddenType::class,
             [
                 'mapped' => false,
             ]
