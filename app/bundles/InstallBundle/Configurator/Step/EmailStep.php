@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\EmailStepType;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Email Step.
- */
 class EmailStep implements StepInterface
 {
     /*
@@ -42,27 +39,6 @@ class EmailStep implements StepInterface
     public $mailer_transport = 'mail';
 
     /*
-     * SMTP host
-     *
-     * @var string
-     */
-    public $mailer_host;
-
-    /*
-     * SMTP port
-     *
-     * @var string
-     */
-    public $mailer_port;
-
-    /*
-     * SMTP username
-     *
-     * @var string
-     */
-    public $mailer_user;
-
-    /*
      * SMTP password
      *
      * @var string
@@ -75,13 +51,6 @@ class EmailStep implements StepInterface
      * @var string
      */
     public $mailer_encryption; // null|tls|ssl
-
-    /*
-     * SMTP auth mode
-     *
-     * @var string
-     */
-    public $mailer_auth_mode; //  null|plain|login|cram-md5
 
     /*
      * Spool mode

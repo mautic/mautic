@@ -17,9 +17,6 @@ use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Check Step.
- */
 class CheckStep implements StepInterface
 {
     /**
@@ -42,20 +39,6 @@ class CheckStep implements StepInterface
     private $openSSLCipher;
 
     /**
-     * Absolute path to cache directory.
-     *
-     * @var string
-     */
-    public $cache_path = '%kernel.root_dir%/cache';
-
-    /**
-     * Absolute path to log directory.
-     *
-     * @var string
-     */
-    public $log_path = '%kernel.root_dir%/logs';
-
-    /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
      *
      * @var string
@@ -63,15 +46,6 @@ class CheckStep implements StepInterface
     public $site_url;
 
     /**
-     * Set the name of the source that installed Mautic.
-     *
-     * @var string
-     */
-    public $install_source = 'Mautic';
-
-    /**
-     * Constructor.
-     *
      * @param Configurator  $configurator  Configurator service
      * @param string        $kernelRoot    Kernel root path
      * @param RequestStack  $requestStack  Request stack

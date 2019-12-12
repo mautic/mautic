@@ -16,8 +16,6 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\InstallBundle\Configurator\Form\DoctrineStepType;
 
 /**
- * Doctrine Step.
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DoctrineStep implements StepInterface
@@ -31,13 +29,6 @@ class DoctrineStep implements StepInterface
      * Database host.
      */
     public $host = 'localhost';
-
-    /**
-     * Database table prefix.
-     *
-     * @var string
-     */
-    public $table_prefix;
 
     /**
      * Database connection port.
@@ -62,27 +53,6 @@ class DoctrineStep implements StepInterface
     public $password;
 
     /**
-     * Backup tables if they exist; otherwise drop them.
-     *
-     * @var bool
-     */
-    public $backup_tables = true;
-
-    /**
-     * Prefix for backup tables.
-     *
-     * @var string
-     */
-    public $backup_prefix = 'bak_';
-
-    /**
-     * @var
-     */
-    public $server_version = '5.5';
-
-    /**
-     * Constructor.
-     *
      * @param Configurator $configurator
      */
     public function __construct(Configurator $configurator)
@@ -156,16 +126,6 @@ class DoctrineStep implements StepInterface
     }
 
     /**
-     * Return the key values of the available driver array.
-     *
-     * @return array
-     */
-    public static function getDriverKeys()
-    {
-        return array_keys(static::getDrivers());
-    }
-
-    /**
      * Fetches the available database drivers for the environment.
      *
      * @return array
@@ -175,13 +135,6 @@ class DoctrineStep implements StepInterface
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
             'mysqli'    => 'MySQLi',
-            //'pdo_pgsql' => 'PostgreSQL',
-            //'pdo_sqlite' => 'SQLite',
-            //'pdo_sqlsrv' => 'SQL Server',
-            //'pdo_oci'    => 'Oracle (PDO)',
-            //'pdo_ibm'    => 'IBM DB2 (PDO)',
-            //'oci8'       => 'Oracle (native)',
-            //'ibm_db2'    => 'IBM DB2 (native)',
         ];
 
         $supported = [];
