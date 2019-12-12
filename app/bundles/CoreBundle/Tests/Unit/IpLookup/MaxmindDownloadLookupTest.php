@@ -18,10 +18,12 @@ use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
  */
 class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     public function testDownloadDataStore()
     {
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup(null, null, $this->cacheDir);
 
         $result = $ipService->downloadRemoteDataStore();
 
@@ -31,7 +33,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
     public function testIpLookupSuccessful()
     {
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup(null, null, $this->cacheDir);
 
         $details = $ipService->setIpAddress('52.52.118.192')->getDetails();
 

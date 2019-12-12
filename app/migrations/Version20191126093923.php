@@ -10,8 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -22,22 +23,22 @@ class Version20191126093923 extends AbstractMauticMigration
     /**
      * @param Schema $schema
      *
-     * @throws SkipMigrationException
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SkipMigration
+     * @throws SchemaException
      */
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema): void
     {
         $table = $schema->getTable($this->prefix.'companies_leads');
 
         if (!$table->hasColumn('manually_added')) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigration('Schema includes this migration');
         }
     }
 
     /**
      * @param Schema $schema
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE {$this->prefix}companies_leads DROP manually_added");
         $this->addSql("ALTER TABLE {$this->prefix}companies_leads DROP manually_removed");

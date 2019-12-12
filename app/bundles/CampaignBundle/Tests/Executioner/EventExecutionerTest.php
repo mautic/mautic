@@ -35,6 +35,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use Psr\Log\LoggerInterface;
 
 class EventExecutionerTest extends \PHPUnit\Framework\TestCase
@@ -85,12 +86,12 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
     private $leadRepository;
 
     /**
-     * @var EventRepository|\PHPUnit_Framework_MockObject_MockBuilder
+     * @var EventRepository|MockBuilder
      */
     private $eventRepository;
 
     /**
-     * @var Translator|\PHPUnit_Framework_MockObject_MockBuilder
+     * @var Translator|MockBuilder
      */
     private $translator;
 
