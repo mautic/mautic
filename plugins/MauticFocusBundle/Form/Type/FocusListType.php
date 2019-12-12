@@ -41,7 +41,7 @@ class FocusListType extends AbstractType
 
                     $list = $this->repo->getFocusList($options['data']);
                     foreach ($list as $row) {
-                        $choices[$row['id']] = $row['name'];
+                        $choices[$row['name']] = $row['id'];
                     }
 
                     //sort by language

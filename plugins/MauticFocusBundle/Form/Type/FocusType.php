@@ -107,7 +107,6 @@ class FocusType extends AbstractType
                     'mautic.focus.form.editor' => 'editor',
                     'mautic.focus.form.html'   => 'html',
                 ],
-                'choices_as_values' => true,
             ]
         );
 
