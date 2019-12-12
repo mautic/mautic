@@ -22,9 +22,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class LeadFieldData.
- */
 class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
     /**
@@ -42,6 +39,8 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
 
     /**
      * @param ObjectManager $manager
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function load(ObjectManager $manager)
     {
@@ -51,7 +50,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $translator   = $this->container->get('translator');
         $indexesToAdd = [];
         foreach ($fieldGroups as $object => $fields) {
-            if ($object == 'company') {
+            if ($object === 'company') {
                 /** @var ColumnSchemaHelper $schema */
                 $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'companies');
             } else {
@@ -102,7 +101,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         }
 
         foreach ($indexesToAdd as $object => $indexes) {
-            if ($object == 'company') {
+            if ($object === 'company') {
                 /** @var IndexSchemaHelper $indexHelper */
                 $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'companies');
             } else {
@@ -112,11 +111,11 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
 
             foreach ($indexes as $name => $field) {
                 $type = (isset($field['type'])) ? $field['type'] : 'text';
-                if ('textarea' != $type) {
+                if ('textarea' !== $type) {
                     $indexHelper->addIndex([$name], $name.'_search');
                 }
             }
-            if ($object == 'lead') {
+            if ($object === 'lead') {
                 // Add an attribution index
                 $indexHelper->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
                 //Add date added and country index
