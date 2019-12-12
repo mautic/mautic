@@ -7,6 +7,8 @@ use Mautic\CoreBundle\Test\DoctrineExtensions\TablePrefix;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
+use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
