@@ -28,32 +28,33 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadModel|MockObject
      */
     private $model;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|MockObject
      */
     private $repository;
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|MockObject
      */
     private $connection;
 
     /**
-     * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldModel|MockObject
      */
     private $fieldModel;
 
     /**
-     * @var DoNotContact|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoNotContact|MockObject
      */
     private $doNotContactModel;
 
@@ -147,7 +148,7 @@ class ContactObjectHelperTest extends TestCase
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with(
-                'SELECT c.companyname FROM companies c WHERE c.id = :id',
+                sprintf('SELECT c.companyname FROM %scompanies c WHERE c.id = :id', MAUTIC_TABLE_PREFIX),
                 ['id' => $companyId]
             )
             ->willReturn($statement);

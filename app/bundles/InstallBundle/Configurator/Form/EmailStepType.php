@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -31,7 +32,7 @@ class EmailStepType extends AbstractType
     {
         $builder->add(
             'mailer_from_name',
-            'text',
+            TextType::class,
             [
                 'label'      => false,
                 'label_attr' => ['class' => 'control-label'],
@@ -104,7 +105,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.email.mailer_host',
                 'label_attr' => ['class' => 'control-label'],
@@ -116,7 +117,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.email.mailer_port',
                 'label_attr' => ['class' => 'control-label'],
@@ -128,7 +129,7 @@ class EmailStepType extends AbstractType
 
         $builder->add(
             'mailer_user',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.username',
                 'label_attr' => ['class' => 'control-label'],

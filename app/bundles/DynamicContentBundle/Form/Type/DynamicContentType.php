@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -104,7 +105,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -114,7 +115,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'slotName',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],

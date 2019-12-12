@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 
@@ -57,7 +58,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -68,7 +69,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -79,7 +80,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -90,7 +91,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'table_prefix',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.table.prefix',
                 'label_attr' => ['class' => 'control-label'],
@@ -101,7 +102,7 @@ class DoctrineStepType extends AbstractType
 
         $builder->add(
             'user',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.install.form.database.user',
                 'label_attr' => ['class' => 'control-label'],
