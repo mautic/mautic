@@ -32,7 +32,8 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $event->addForm([
             'bundle'     => 'ReportBundle',
-            'formAlias'  => ConfigType::class,
+            'formAlias'  => 'reportconfig',
+            'formType'   => ConfigType::class,
             'formTheme'  => 'MauticReportBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticReportBundle'),
         ]);
