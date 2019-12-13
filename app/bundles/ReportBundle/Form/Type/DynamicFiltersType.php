@@ -14,12 +14,13 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DynamicFiltersType.
- */
 class DynamicFiltersType extends AbstractType
 {
     /**
@@ -61,14 +62,14 @@ class DynamicFiltersType extends AbstractType
                         }
                         break;
                     case 'date':
-                        $type           = 'date';
+                        $type           = DateType::class;
                         $args['input']  = 'string';
                         $args['widget'] = 'single_text';
                         $args['format'] = 'y-MM-dd';
                         $args['attr']['class'] .= ' datepicker';
                         break;
                     case 'datetime':
-                        $type           = 'datetime';
+                        $type           = DateTimeType::class;
                         $args['input']  = 'string';
                         $args['widget'] = 'single_text';
                         $args['format'] = 'y-MM-dd HH:mm:ss';
@@ -76,11 +77,12 @@ class DynamicFiltersType extends AbstractType
                         break;
                     case 'multiselect':
                     case 'select':
-                        $type            = 'choice';
-                        $args['choices'] = $definition['list'];
+                        $type                      = ChoiceType::class;
+                        $args['choices_as_values'] = true;
+                        $args['choices']           = array_flip($definition['list']);
                         break;
                     default:
-                        $type = 'text';
+                        $type = TextType::class;
                         break;
                 }
 
@@ -92,7 +94,7 @@ class DynamicFiltersType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'report_dynamicfilters';
     }
@@ -100,7 +102,7 @@ class DynamicFiltersType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
