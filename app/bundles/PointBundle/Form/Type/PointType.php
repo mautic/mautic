@@ -36,7 +36,7 @@ class PointType extends AbstractType
     private $security;
 
     /**
-     * @var \TranslatorInterface
+     * @var TranslatorInterface
      */
     private $translator;
 

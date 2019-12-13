@@ -14,14 +14,12 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Point.
- */
 class Point extends FormEntity
 {
     /**
@@ -75,7 +73,7 @@ class Point extends FormEntity
     private $log;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var Category
      **/
     private $category;
 
@@ -86,9 +84,6 @@ class Point extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->log = new ArrayCollection();
@@ -178,8 +173,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -188,11 +181,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
      *
-     * @return Action
+     * @return self
      */
     public function setProperties($properties)
     {
@@ -204,8 +195,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -214,11 +203,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      *
-     * @return Action
+     * @return self
      */
     public function setType($type)
     {
@@ -229,8 +216,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -247,11 +232,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
-     * @return Action
+     * @return self
      */
     public function setDescription($description)
     {
@@ -262,8 +245,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -272,11 +253,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
-     * @return Action
+     * @return self
      */
     public function setName($name)
     {
@@ -287,8 +266,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -297,11 +274,9 @@ class Point extends FormEntity
     }
 
     /**
-     * Add log.
-     *
      * @param LeadPointLog $log
      *
-     * @return Log
+     * @return self
      */
     public function addLog(LeadPointLog $log)
     {
@@ -311,8 +286,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Remove log.
-     *
      * @param LeadPointLog $log
      */
     public function removeLog(LeadPointLog $log)
@@ -321,8 +294,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get log.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLog()
@@ -331,8 +302,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      *
      * @return Point
@@ -346,8 +315,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTime
      */
     public function getPublishUp()
@@ -356,8 +323,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      *
      * @return Point
@@ -371,8 +336,6 @@ class Point extends FormEntity
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTime
      */
     public function getPublishDown()

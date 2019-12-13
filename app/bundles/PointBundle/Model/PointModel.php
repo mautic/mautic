@@ -321,7 +321,7 @@ class PointModel extends CommonFormModel
     /**
      * Get line chart data of points.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
