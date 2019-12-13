@@ -20,9 +20,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class TriggerEventType.
- */
 class TriggerEventType extends AbstractType
 {
     /**
@@ -32,19 +29,27 @@ class TriggerEventType extends AbstractType
     {
         $masks = ['description' => 'html'];
 
-        $builder->add('name', TextType::class, [
-            'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'name',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('description', TextareaType::class, [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control editor'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
+                'required'   => false,
+            ]
+        );
 
         if (!empty($options['settings']['formType'])) {
             $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
@@ -75,16 +80,24 @@ class TriggerEventType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', FormButtonsType::class, [
-            'save_text'       => $btnValue,
-            'save_icon'       => $btnIcon,
-            'apply_text'      => false,
-            'container_class' => 'bottom-form-buttons',
-        ]);
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'save_text'       => $btnValue,
+                'save_icon'       => $btnIcon,
+                'apply_text'      => false,
+                'container_class' => 'bottom-form-buttons',
+            ]
+        );
 
-        $builder->add('triggerId', HiddenType::class, [
-            'mapped' => false,
-        ]);
+        $builder->add(
+            'triggerId',
+            HiddenType::class,
+            [
+                'mapped' => false,
+            ]
+        );
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
@@ -98,10 +111,7 @@ class TriggerEventType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'settings' => false,
-        ]);
-
+        $resolver->setDefaults(['settings' => false]);
         $resolver->setRequired(['settings']);
     }
 

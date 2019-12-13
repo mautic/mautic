@@ -24,24 +24,28 @@ class GenericPointSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['delta'])) ? 0 : (int) $options['data']['delta'];
-        $builder->add('delta', NumberType::class, [
-            'label'      => 'mautic.point.action.delta',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.point.action.delta.help',
+        $builder->add(
+            'delta',
+            NumberType::class,
+            [
+                'label'      => 'mautic.point.action.delta',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.point.action.delta.help',
+                    ],
+                'scale'       => 0,
+                'data'        => $default,
+                'constraints' => [
+                    new NotEqualTo(
+                        [
+                            'value'   => '0',
+                            'message' => 'mautic.core.required.value',
+                        ]
+                    ),
                 ],
-            'scale'       => 0,
-            'data'        => $default,
-            'constraints' => [
-                new NotEqualTo(
-                    [
-                        'value'   => '0',
-                        'message' => 'mautic.core.required.value',
-                    ]
-                ),
-            ],
-        ]);
+            ]
+        );
     }
 
     /**
