@@ -53,7 +53,7 @@ return [
         ],
         'other' => [
             'mautic.install.configurator.step.check' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
                     '%kernel.root_dir%',
@@ -66,7 +66,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.doctrine' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
                 'arguments' => [
                     'mautic.configurator',
                 ],
@@ -76,7 +76,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.email' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\EmailStep::class,
                 'arguments' => [
                     'session',
                 ],
@@ -86,7 +86,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.user' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\UserStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'arguments' => [
                     'session',
                 ],

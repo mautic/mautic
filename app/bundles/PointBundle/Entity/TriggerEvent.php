@@ -16,9 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class TriggerEvent.
- */
 class TriggerEvent
 {
     /**
@@ -66,9 +63,6 @@ class TriggerEvent
      */
     private $changes;
 
-    /**
-     * Construct.
-     */
     public function __construct()
     {
         $this->log = new ArrayCollection();
@@ -151,8 +145,6 @@ class TriggerEvent
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -161,8 +153,6 @@ class TriggerEvent
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
      *
      * @return TriggerEvent
@@ -177,8 +167,6 @@ class TriggerEvent
     }
 
     /**
-     * Get order.
-     *
      * @return int
      */
     public function getOrder()
@@ -187,8 +175,6 @@ class TriggerEvent
     }
 
     /**
-     * Set properties.
-     *
      * @param array $properties
      *
      * @return TriggerEvent
@@ -203,8 +189,6 @@ class TriggerEvent
     }
 
     /**
-     * Get properties.
-     *
      * @return array
      */
     public function getProperties()
@@ -213,11 +197,9 @@ class TriggerEvent
     }
 
     /**
-     * Set trigger.
-     *
      * @param Trigger $trigger
      *
-     * @return TriggerTriggerEvent
+     * @return self
      */
     public function setTrigger(Trigger $trigger)
     {
@@ -227,8 +209,6 @@ class TriggerEvent
     }
 
     /**
-     * Get trigger.
-     *
      * @return Trigger
      */
     public function getTrigger()
@@ -237,8 +217,6 @@ class TriggerEvent
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      *
      * @return TriggerEvent
@@ -252,8 +230,6 @@ class TriggerEvent
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -270,8 +246,6 @@ class TriggerEvent
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return TriggerEvent
@@ -285,8 +259,6 @@ class TriggerEvent
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -295,8 +267,6 @@ class TriggerEvent
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return TriggerEvent
@@ -310,8 +280,6 @@ class TriggerEvent
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -320,11 +288,9 @@ class TriggerEvent
     }
 
     /**
-     * Add log.
-     *
      * @param LeadTriggerLog $log
      *
-     * @return Log
+     * @return self
      */
     public function addLog(LeadTriggerLog $log)
     {
@@ -334,8 +300,6 @@ class TriggerEvent
     }
 
     /**
-     * Remove log.
-     *
      * @param LeadTriggerLog $log
      */
     public function removeLog(LeadTriggerLog $log)
@@ -344,8 +308,6 @@ class TriggerEvent
     }
 
     /**
-     * Get log.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getLog()
