@@ -30,6 +30,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 class InstallController extends CommonController
 {
@@ -399,7 +400,7 @@ class InstallController extends CommonController
             $user = new User();
         }
 
-        /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
+        /** @var PasswordEncoderInterface $encoder */
         $encoder = $this->get('security.encoder_factory')->getEncoder($user);
 
         $user->setFirstName($data->firstname);
