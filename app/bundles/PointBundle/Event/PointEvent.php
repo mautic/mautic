@@ -14,9 +14,6 @@ namespace Mautic\PointBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PointBundle\Entity\Point;
 
-/**
- * Class PointEvent.
- */
 class PointEvent extends CommonEvent
 {
     /**
@@ -30,8 +27,6 @@ class PointEvent extends CommonEvent
     }
 
     /**
-     * Returns the Point entity.
-     *
      * @return Point
      */
     public function getPoint()
@@ -40,8 +35,6 @@ class PointEvent extends CommonEvent
     }
 
     /**
-     * Sets the Point entity.
-     *
      * @param Point $point
      */
     public function setPoint(Point $point)
