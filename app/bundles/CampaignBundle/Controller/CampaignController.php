@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -449,7 +450,8 @@ class CampaignController extends AbstractStandardFormController
         } elseif ('new' === $action && empty($sessionId)) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->request->request->has('campaign')) {
-                $sessionId = $this->request->request->get('campaign[sessionId]', $sessionId, true);
+                $campaign  = $this->request->request->get('campaign', []);
+                $sessionId = $campaign['sessionId'] ?? $sessionId;
             }
         } elseif ('edit' === $action) {
             $sessionId = $campaign->getId();
@@ -677,7 +679,7 @@ class CampaignController extends AbstractStandardFormController
                 // Init the date range filter form
                 $dateRangeValues = $this->request->get('daterange', []);
                 $action          = $this->generateUrl('mautic_campaign_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-                $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+                $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
                 /** @var LeadEventLogRepository $eventLogRepo */
                 $eventLogRepo             = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');

@@ -27,7 +27,7 @@ class MaintenanceSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     private $subscriber;
 
-    public function setUp()
+    protected function setUp()
     {
         $connection          = $this->createMock(Connection::class);
         $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);

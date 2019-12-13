@@ -77,24 +77,26 @@ return [
     'services' => [
         'events' => [
             'mautic.report.configbundle.subscriber' => [
-                'class' => 'Mautic\ReportBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.report.search.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\SearchSubscriber',
+                'class'     => \Mautic\ReportBundle\EventListener\SearchSubscriber::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.report.model.report',
+                    'mautic.security',
+                    'mautic.helper.templating',
                 ],
             ],
             'mautic.report.report.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\ReportBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.report.dashboard.subscriber' => [
-                'class'     => 'Mautic\ReportBundle\EventListener\DashboardSubscriber',
+                'class'     => \Mautic\ReportBundle\EventListener\DashboardSubscriber::class,
                 'arguments' => [
                     'mautic.report.model.report',
                     'mautic.security',

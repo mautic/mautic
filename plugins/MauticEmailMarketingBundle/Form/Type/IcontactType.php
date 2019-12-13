@@ -11,15 +11,18 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Form\Type\FieldsType;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ConstantContactType.
@@ -27,9 +30,12 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class IcontactType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var IntegrationHelper
      */
-    private $factory;
+    private $integrationHelper;
+
+    /** @var PluginModel */
+    private $pluginModel;
 
     /**
      * @var Session
@@ -41,9 +47,10 @@ class IcontactType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(IntegrationHelper $integrationHelper, PluginModel $pluginModel, Session $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory              = $factory;
+        $this->integrationHelper    = $integrationHelper;
+        $this->pluginModel          = $pluginModel;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
     }
@@ -54,11 +61,8 @@ class IcontactType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-        $helper = $this->factory->getHelper('integration');
-
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration $object */
-        $object          = $helper->getIntegrationObject('Icontact');
+        $object          = $this->integrationHelper->getIntegrationObject('Icontact');
         $integrationName = $object->getName();
         $session         = $this->session;
         $limit           = $session->get(
@@ -85,11 +89,12 @@ class IcontactType extends AbstractType
             $page    = 1;
         }
 
-        $builder->add('list', 'choice', [
-            'choices'  => $choices,
-            'label'    => 'mautic.emailmarketing.list',
-            'required' => false,
-            'attr'     => [
+        $builder->add('list', ChoiceType::class, [
+            'choices'           => array_flip($choices), // Choice type expects labels as keys
+            'choices_as_values' => true,
+            'label'             => 'mautic.emailmarketing.list',
+            'required'          => false,
+            'attr'              => [
                 'tooltip' => 'mautic.emailmarketing.list.tooltip',
             ],
         ]);
@@ -105,12 +110,12 @@ class IcontactType extends AbstractType
         }
 
         if (isset($options['form_area']) && $options['form_area'] == 'integration') {
-            $leadFields = $this->factory->getModel('plugin')->getLeadFields();
+            $leadFields = $this->pluginModel->getLeadFields();
 
             $fields = $object->getFormLeadFields();
 
             list($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
-            $builder->add('leadFields', 'integration_fields', [
+            $builder->add('leadFields', FieldsType::class, [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
                 'mautic_fields'        => $leadFields,
@@ -130,15 +135,15 @@ class IcontactType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(['form_area']);
+        $resolver->setDefined(['form_area']);
     }
 
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'emailmarketing_icontact';
     }

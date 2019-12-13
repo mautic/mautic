@@ -13,14 +13,14 @@ return [
     'services' => [
         'events' => [
             'mautic.sms.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\SmsBundle\EventListener\CampaignSubscriber',
+                'class'     => \Mautic\SmsBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.sms.model.sms',
                     'mautic.sms.transport_chain',
                 ],
             ],
             'mautic.sms.smsbundle.subscriber' => [
-                'class'     => 'Mautic\SmsBundle\EventListener\SmsSubscriber',
+                'class'     => \Mautic\SmsBundle\EventListener\SmsSubscriber::class,
                 'arguments' => [
                     'mautic.core.model.auditlog',
                     'mautic.page.model.trackable',
@@ -44,6 +44,7 @@ return [
             'mautic.sms.stats.subscriber' => [
                 'class'     => \Mautic\SmsBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],
@@ -59,38 +60,33 @@ return [
         ],
         'forms' => [
             'mautic.form.type.sms' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'sms',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
             ],
             'mautic.form.type.smsconfig' => [
-                'class' => 'Mautic\SmsBundle\Form\Type\ConfigType',
-                'alias' => 'smsconfig',
+                'class' => \Mautic\SmsBundle\Form\Type\ConfigType::class,
             ],
             'mautic.form.type.smssend_list' => [
-                'class'     => 'Mautic\SmsBundle\Form\Type\SmsSendType',
+                'class'     => \Mautic\SmsBundle\Form\Type\SmsSendType::class,
                 'arguments' => 'router',
-                'alias'     => 'smssend_list',
             ],
             'mautic.form.type.sms_list' => [
-                'class' => 'Mautic\SmsBundle\Form\Type\SmsListType',
-                'alias' => 'sms_list',
+                'class' => \Mautic\SmsBundle\Form\Type\SmsListType::class,
             ],
             'mautic.form.type.sms.config.form' => [
                 'class'     => \Mautic\SmsBundle\Form\Type\ConfigType::class,
-                'alias'     => 'smsconfig',
                 'arguments' => ['mautic.sms.transport_chain', 'translator'],
             ],
         ],
         'helpers' => [
             'mautic.helper.sms' => [
-                'class'     => 'Mautic\SmsBundle\Helper\SmsHelper',
+                'class'     => \Mautic\SmsBundle\Helper\SmsHelper::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                     'mautic.helper.phone_number',
                     'mautic.sms.model.sms',
                     'mautic.helper.integration',
+                    'mautic.lead.model.dnc',
                 ],
                 'alias' => 'sms_helper',
             ],
@@ -141,7 +137,24 @@ return [
         ],
         'integrations' => [
             'mautic.integration.twilio' => [
-                'class' => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
+                'class'     => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'mautic.helper.cache_storage',
+                    'doctrine.orm.entity_manager',
+                    'session',
+                    'request_stack',
+                    'router',
+                    'translator',
+                    'logger',
+                    'mautic.helper.encryption',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.helper.paths',
+                    'mautic.core.model.notification',
+                    'mautic.lead.model.field',
+                    'mautic.plugin.model.integration_entity',
+                ],
             ],
         ],
         'repositories' => [

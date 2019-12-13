@@ -11,14 +11,12 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @return array
@@ -42,7 +40,7 @@ class FormSubscriber extends CommonSubscriber
             'group'              => 'mautic.asset.actions',
             'label'              => 'mautic.asset.asset.submitaction.downloadfile',
             'description'        => 'mautic.asset.asset.submitaction.downloadfile_descr',
-            'formType'           => 'asset_submitaction_downloadfile',
+            'formType'           => FormSubmitActionDownloadFileType::class,
             'formTypeCleanMasks' => ['message' => 'html'],
             'callback'           => '\Mautic\AssetBundle\Helper\FormSubmitHelper::onFormSubmit',
             'allowCampaignForm'  => true,

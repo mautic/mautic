@@ -29,6 +29,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\ResultsPaginator;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -547,18 +548,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'sandbox',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'sandbox' => 'mautic.salesforce.sandbox',
+                        'mautic.salesforce.sandbox' => 'sandbox',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.salesforce.form.sandbox',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.salesforce.form.sandbox',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -566,69 +568,73 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateOwner',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateOwner' => 'mautic.salesforce.updateOwner',
+                        'mautic.salesforce.updateOwner' => 'updateOwner',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.salesforce.form.updateOwner',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.salesforce.form.updateOwner',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
             );
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integrations.form.blanks',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.integrations.form.blanks',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
             $builder->add(
                 'updateDncByDate',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateDncByDate' => 'mautic.integrations.update.dnc.by.date',
+                        'mautic.integrations.update.dnc.by.date' => 'updateDncByDate',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integrations.form.update.dnc.by.date.label',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.integrations.form.update.dnc.by.date.label',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'Lead'     => 'mautic.salesforce.object.lead',
-                        'Contact'  => 'mautic.salesforce.object.contact',
-                        'company'  => 'mautic.salesforce.object.company',
-                        'Activity' => 'mautic.salesforce.object.activity',
+                        'mautic.salesforce.object.lead'     => 'Lead',
+                        'mautic.salesforce.object.contact'  => 'Contact',
+                        'mautic.salesforce.object.company'  => 'company',
+                        'mautic.salesforce.object.activity' => 'Activity',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.salesforce.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.salesforce.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
@@ -636,9 +642,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'    => $this->leadModel->getEngagementTypes(),
-                    'label'      => 'mautic.salesforce.form.activity_included_events',
-                    'label_attr' => [
+                    'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
+                    'choices_as_values' => true,
+                    'label'             => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr'        => [
                         'class'       => 'control-label',
                         'data-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
@@ -651,7 +658,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'namespace',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.salesforce.form.namespace_prefix',
                     'label_attr' => ['class' => 'control-label'],
@@ -2588,17 +2595,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function amendLeadDataBeforePush(&$mappedData)
     {
         $mappedData = StateValidationHelper::validate($mappedData);
-    }
-
-    /**
-     * @param array $fields
-     *
-     * @return array
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public function amendToSfFields($fields)
-    {
     }
 
     /**

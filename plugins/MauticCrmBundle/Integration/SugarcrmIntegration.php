@@ -11,15 +11,31 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use Monolog\Logger;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -44,12 +60,60 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * SugarcrmIntegration constructor.
      *
-     * @param DoNotContact $doNotContactModel
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param CacheStorageHelper       $cacheStorageHelper
+     * @param EntityManager            $entityManager
+     * @param Session                  $session
+     * @param RequestStack             $requestStack
+     * @param Router                   $router
+     * @param TranslatorInterface      $translator
+     * @param Logger                   $logger
+     * @param EncryptionHelper         $encryptionHelper
+     * @param LeadModel                $leadModel
+     * @param CompanyModel             $companyModel
+     * @param PathsHelper              $pathsHelper
+     * @param NotificationModel        $notificationModel
+     * @param FieldModel               $fieldModel
+     * @param IntegrationEntityModel   $integrationEntityModel
+     * @param DoNotContact             $doNotContactModel
      */
-    public function __construct(DoNotContact $doNotContactModel)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        CacheStorageHelper $cacheStorageHelper,
+        EntityManager $entityManager,
+        Session $session,
+        RequestStack $requestStack,
+        Router $router,
+        TranslatorInterface $translator,
+        Logger $logger,
+        EncryptionHelper $encryptionHelper,
+        LeadModel $leadModel,
+        CompanyModel $companyModel,
+        PathsHelper $pathsHelper,
+        NotificationModel $notificationModel,
+        FieldModel $fieldModel,
+        IntegrationEntityModel $integrationEntityModel,
+        DoNotContact $doNotContactModel
+    ) {
         $this->doNotContactModel = $doNotContactModel;
-        parent::__construct();
+
+        parent::__construct(
+            $eventDispatcher,
+            $cacheStorageHelper,
+            $entityManager,
+            $session,
+            $requestStack,
+            $router,
+            $translator,
+            $logger,
+            $encryptionHelper,
+            $leadModel,
+            $companyModel,
+            $pathsHelper,
+            $notificationModel,
+            $fieldModel,
+            $integrationEntityModel
+        );
     }
 
     /**
@@ -976,10 +1040,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function appendToForm(&$builder, $data, $formArea)
     {
         if ($formArea == 'keys') {
-            $builder->add('version', 'button_group', [
+            $builder->add('version', ButtonGroupType::class, [
                 'choices' => [
-                    '6' => '6.x/community',
-                    '7' => '7.x',
+                    '6.x/community' => '6',
+                    '7.x'           => '7',
                 ],
                 'label'       => 'mautic.sugarcrm.form.version',
                 'constraints' => [
@@ -993,18 +1057,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'updateOwner',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateOwner' => 'mautic.sugarcrm.updateOwner',
+                        'mautic.sugarcrm.updateOwner' => 'updateOwner',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.sugarcrm.form.updateOwner',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.sugarcrm.form.updateOwner',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -1012,18 +1077,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateDnc',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateDnc' => 'mautic.sugarcrm.updateDnc',
+                        'mautic.sugarcrm.updateDnc' => 'updateDnc',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.sugarcrm.form.updateDnc',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.sugarcrm.form.updateDnc',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
+                    'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
                     ],
                 ]
@@ -1031,35 +1097,37 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integrations.form.blanks',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.integrations.form.blanks',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'Leads'    => 'mautic.sugarcrm.object.lead',
-                        'Contacts' => 'mautic.sugarcrm.object.contact',
-                        'company'  => 'mautic.sugarcrm.object.company',
+                        'mautic.sugarcrm.object.lead'    => 'Leads',
+                        'mautic.sugarcrm.object.contact' => 'Contacts',
+                        'mautic.sugarcrm.object.company' => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.sugarcrm.form.objects_to_pull_from',
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.sugarcrm.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
@@ -1067,9 +1135,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 'activityEvents',
                 ChoiceType::class,
                 [
-                    'choices'    => $this->leadModel->getEngagementTypes(),
-                    'label'      => 'mautic.salesforce.form.activity_included_events',
-                    'label_attr' => [
+                    'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
+                    'choices_as_values' => true,
+                    'label'             => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr'        => [
                         'class'       => 'control-label',
                         'data-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
@@ -1564,17 +1633,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $fields
-     *
-     * @return array
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public function amendToSfFields($fields)
-    {
-    }
-
-    /**
      * @param array $lead
      */
     protected function getOwnerEmail($lead)
@@ -1721,7 +1779,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
-                    $error = 'Uknown status code '.$item['httpStatusCode'];
+                    $error = 'Unknown status code '.$item['httpStatusCode'];
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));
                 }
             }

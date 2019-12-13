@@ -81,7 +81,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'number' => [
             'properties' => [
                 'roundmode' => [],
-                'precision' => [],
+                'scale'     => [],
             ],
         ],
         'tel' => [
@@ -161,9 +161,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $countryJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/countries.json');
         $countries   = json_decode($countryJson);
 
-        $choices = array_combine($countries, $countries);
-
-        return $choices;
+        return  array_combine($countries, $countries);
     }
 
     /**
@@ -173,8 +171,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $regionJson = file_get_contents(__DIR__.'/../../CoreBundle/Assets/json/regions.json');
         $regions    = json_decode($regionJson);
+        $choices    = [];
 
-        $choices = [];
         foreach ($regions as $country => &$regionGroup) {
             $choices[$country] = array_combine($regionGroup, $regionGroup);
         }
@@ -209,7 +207,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $name   = $parts[0];
                 }
 
-                $timezones[$region][$timezone] = str_replace('_', ' ', $name);
+                $timezones[$region][str_replace('_', ' ', $name)] = $timezone;
             }
         }
 
@@ -223,7 +221,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      */
     public static function getLocaleChoices()
     {
-        return Intl::getLocaleBundle()->getLocaleNames();
+        return array_flip(Intl::getLocaleBundle()->getLocaleNames());
     }
 
     /**
@@ -233,13 +231,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
      */
     public function getDateChoices()
     {
-        $options = [
-            'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
-            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
-            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
-            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
+        return [
+            $this->translator->trans('mautic.campaign.event.timed.choice.anniversary') => 'anniversary',
+            $this->translator->trans('mautic.campaign.event.timed.choice.today')       => '+P0D',
+            $this->translator->trans('mautic.campaign.event.timed.choice.yesterday')   => '-P1D',
+            $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow')    => '+P1D',
         ];
-
-        return $options;
     }
 }

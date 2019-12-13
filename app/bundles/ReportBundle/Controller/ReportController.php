@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
@@ -611,7 +612,7 @@ class ReportController extends FormController
             $dateRangeValues['date_to'] = $toDate;
         }
 
-        $dateRangeForm = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         if ($this->request->getMethod() == 'POST' && $this->request->request->has('daterange')) {
             if ($this->isFormValid($dateRangeForm)) {
                 $to                         = new \DateTime($dateRangeForm['date_to']->getData());

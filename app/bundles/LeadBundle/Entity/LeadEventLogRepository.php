@@ -15,9 +15,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * Class LeadEventLogRepository.
- */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -161,42 +158,5 @@ class LeadEventLogRepository extends CommonRepository
     public function getTableAlias()
     {
         return 'lel';
-    }
-
-    /**
-     * Loads data for specified lead events.
-     *
-     * @deprecated 2.14.1 to be removed in 3.0; use getEvents() instead
-     *
-     * @param string    $bundle
-     * @param string    $object
-     * @param Lead|null $lead
-     * @param array     $options
-     *
-     * @return array
-     */
-    public function getEventsByLead($bundle, $object, Lead $lead = null, array $options = [])
-    {
-        trigger_error('LeadEventLogRepository::getEventsByLead is deprecated. Use LeadEventLogRepository::getEvents instead', E_USER_DEPRECATED);
-
-        return $this->getEvents($lead, $bundle, $object, null, $options);
-    }
-
-    /**
-     * Loads data for specified lead events by action.
-     *
-     * @deprecated 2.14.1 to be removed in 3.0; use getEvents() instead
-     *
-     * @param           $action
-     * @param Lead|null $lead
-     * @param array     $options
-     *
-     * @return array
-     */
-    public function getEventsByAction($action, Lead $lead = null, array $options = [])
-    {
-        trigger_error('LeadEventLogRepository::getEventsByAction is deprecated. Use LeadEventLogRepository::getEvents instead', E_USER_DEPRECATED);
-
-        return $this->getEvents($lead, null, null, $action, $options);
     }
 }

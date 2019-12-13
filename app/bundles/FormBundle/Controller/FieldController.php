@@ -47,7 +47,7 @@ class FieldController extends CommonFormController
             ];
         }
 
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customComponents = $this->getModel('form')->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
@@ -188,11 +188,12 @@ class FieldController extends CommonFormController
     {
         $session   = $this->get('session');
         $method    = $this->request->getMethod();
-        $formId    = ($method == 'POST') ? $this->request->request->get('formfield[formId]', '', true) : $this->request->query->get('formId');
+        $formfield = $this->request->request->get('formfield', []);
+        $formId    = $method === 'POST' ? ($formfield['formId'] ?? '') : $this->request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
-        $valid     = $cancelled     = false;
-        $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : [];
+        $valid     = $cancelled = false;
+        $formField = array_key_exists($objectId, $fields) ? $fields[$objectId] : [];
 
         if ($formField !== null) {
             $fieldType = $formField['type'];
@@ -349,7 +350,7 @@ class FieldController extends CommonFormController
 
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;
 
-        if ($this->request->getMethod() == 'POST' && $formField !== null) {
+        if ($this->request->getMethod() === 'POST' && $formField !== null) {
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
 
             // Allow to select the lead field from the delete field again

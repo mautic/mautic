@@ -71,7 +71,7 @@ if (!isset($inBuilder)) {
                                 <div class="available-fields mb-md col-sm-4">
                                     <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
                                         <option value=""></option>
-                                        <?php foreach ($fields as $fieldType => $field): ?>
+                                        <?php foreach ($fields as $field => $fieldType): ?>
 
                                             <option data-toggle="ajaxmodal"
                                                     data-target="#formComponentModal"

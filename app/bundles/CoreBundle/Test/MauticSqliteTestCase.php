@@ -8,7 +8,7 @@ use Mautic\InstallBundle\Helper\SchemaHelper;
 
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

@@ -11,10 +11,10 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\LeadBundle\Form\Type\BatchType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -86,14 +86,14 @@ class BatchContactController extends AbstractFormController
         $items = [];
 
         foreach ($rows as $category) {
-            $items[$category['id']] = $category['title'];
+            $items[$category['title']] = $category['id'];
         }
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'form' => $this->createForm(
-                        'lead_batch',
+                        BatchType::class,
                         [],
                         [
                             'items'  => $items,

@@ -22,7 +22,7 @@ class PageControllerTest extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->db     = $this->container->get('doctrine.dbal.default_connection');

@@ -19,6 +19,12 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Form\Type\DncType;
+use Mautic\LeadBundle\Form\Type\EmailType;
+use Mautic\LeadBundle\Form\Type\MergeType;
+use Mautic\LeadBundle\Form\Type\OwnerType;
+use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -728,7 +734,8 @@ class LeadController extends FormController
      */
     private function uploadAvatar(Lead $lead)
     {
-        $file      = $this->request->files->get('lead[custom_avatar]', null, true);
+        $lead      = $this->request->files->get('lead', []);
+        $file      = $lead['custom_avatar'] ?? null;
         $avatarDir = $this->get('mautic.helper.template.avatar')->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {
@@ -821,13 +828,13 @@ class LeadController extends FormController
 
         $leadChoices = [];
         foreach ($leads as $l) {
-            $leadChoices[$l->getId()] = $l->getPrimaryIdentifier();
+            $leadChoices[$l->getPrimaryIdentifier()] = $l->getId();
         }
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'merge', 'objectId' => $mainLead->getId()]);
 
         $form = $this->get('form.factory')->create(
-            'lead_merge',
+            MergeType::class,
             [],
             [
                 'action' => $action,
@@ -1321,7 +1328,7 @@ class LeadController extends FormController
             );
         $email  = ['list' => $inList];
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
-        $form   = $this->get('form.factory')->create('lead_quickemail', $email, ['action' => $action]);
+        $form   = $this->get('form.factory')->create(EmailType::class, $email, ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
@@ -1537,7 +1544,7 @@ class LeadController extends FormController
             $campaigns = $campaignModel->getPublishedCampaigns(true);
             $items     = [];
             foreach ($campaigns as $campaign) {
-                $items[$campaign['id']] = $campaign['name'];
+                $items[$campaign['name']] = $campaign['id'];
             }
 
             $route = $this->generateUrl(
@@ -1551,7 +1558,7 @@ class LeadController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_batch',
+                            BatchType::class,
                             [],
                             [
                                 'items'  => $items,
@@ -1643,7 +1650,7 @@ class LeadController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_batch_dnc',
+                            DncType::class,
                             [],
                             [
                                 'action' => $route,
@@ -1735,7 +1742,7 @@ class LeadController extends FormController
             $stages = $model->getUserStages();
             $items  = [];
             foreach ($stages as $stage) {
-                $items[$stage['id']] = $stage['name'];
+                $items[$stage['name']] = $stage['id'];
             }
 
             $route = $this->generateUrl(
@@ -1749,7 +1756,7 @@ class LeadController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_batch_stage',
+                            StageType::class,
                             [],
                             [
                                 'items'  => $items,
@@ -1832,7 +1839,7 @@ class LeadController extends FormController
             $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
             $items = [];
             foreach ($users as $user) {
-                $items[$user['id']] = $user['firstName'].' '.$user['lastName'];
+                $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
             }
 
             $route = $this->generateUrl(
@@ -1846,7 +1853,7 @@ class LeadController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_batch_owner',
+                            OwnerType::class,
                             [],
                             [
                                 'items'  => $items,

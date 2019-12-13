@@ -25,6 +25,7 @@ use MauticPlugin\MauticCrmBundle\Api\ZohoApi;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -612,35 +613,37 @@ class ZohoIntegration extends CrmAbstractIntegration
         if ($formArea == 'features') {
             $builder->add(
                 'updateBlanks',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.integrations.blanks',
+                        'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integrations.form.blanks',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.integrations.form.blanks',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }
         if ($formArea === 'keys') {
             $builder->add(
                 'datacenter',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'zoho.com'    => 'mautic.plugin.zoho.zone_us',
-                        'zoho.eu'     => 'mautic.plugin.zoho.zone_europe',
-                        'zoho.co.jp'  => 'mautic.plugin.zoho.zone_japan',
-                        'zoho.com.cn' => 'mautic.plugin.zoho.zone_china',
+                        'mautic.plugin.zoho.zone_us'     => 'zoho.com',
+                        'mautic.plugin.zoho.zone_europe' => 'zoho.eu',
+                        'mautic.plugin.zoho.zone_japan'  => 'zoho.co.jp',
+                        'mautic.plugin.zoho.zone_china'  => 'zoho.com.cn',
                     ],
-                    'label'       => 'mautic.plugin.zoho.zone_select',
-                    'empty_value' => false,
-                    'required'    => true,
-                    'attr'        => [
+                    'choices_as_values' => true,
+                    'label'             => 'mautic.plugin.zoho.zone_select',
+                    'empty_value'       => false,
+                    'required'          => true,
+                    'attr'              => [
                         'tooltip' => 'mautic.plugin.zoho.zone.tooltip',
                     ],
                 ]
@@ -648,19 +651,20 @@ class ZohoIntegration extends CrmAbstractIntegration
         } elseif ('features' === $formArea) {
             $builder->add(
                 'objects',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => [
-                        'Leads'    => 'mautic.zoho.object.lead',
-                        'Contacts' => 'mautic.zoho.object.contact',
-                        'company'  => 'mautic.zoho.object.account',
+                        'mautic.zoho.object.lead'    => 'Leads',
+                        'mautic.zoho.object.contact' => 'Contacts',
+                        'mautic.zoho.object.account' => 'company',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Zoho']),
-                    'label_attr'  => ['class' => ''],
-                    'empty_value' => false,
-                    'required'    => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Zoho']),
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }

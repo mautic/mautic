@@ -12,9 +12,13 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ActionType.
@@ -28,14 +32,14 @@ class ActionType extends AbstractType
     {
         $masks = ['description' => 'html'];
 
-        $builder->add('name', 'text', [
+        $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'required'   => false,
         ]);
 
-        $builder->add('description', 'textarea', [
+        $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control editor'],
@@ -62,7 +66,7 @@ class ActionType extends AbstractType
         }
         $builder->add('properties', $formType, $formTypeOptions);
 
-        $builder->add('type', 'hidden');
+        $builder->add('type', HiddenType::class);
 
         $update = !empty($properties);
         if (!empty($update)) {
@@ -73,14 +77,14 @@ class ActionType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', 'form_buttons', [
+        $builder->add('buttons', FormButtonsType::class, [
             'save_text'       => $btnValue,
             'save_icon'       => $btnIcon,
             'apply_text'      => false,
             'container_class' => 'bottom-form-buttons',
         ]);
 
-        $builder->add('formId', 'hidden', [
+        $builder->add('formId', HiddenType::class, [
             'mapped' => false,
         ]);
 
@@ -94,7 +98,7 @@ class ActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'settings' => false,
@@ -106,7 +110,7 @@ class ActionType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formaction';
     }

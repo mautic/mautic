@@ -25,6 +25,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -96,7 +97,7 @@ class FocusModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:focus:items';
+        return 'focus:items';
     }
 
     /**
@@ -119,7 +120,7 @@ class FocusModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('focus', $entity, $options);
+        return $formFactory->create(FocusType::class, $entity, $options);
     }
 
     /**

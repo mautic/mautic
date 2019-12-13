@@ -11,12 +11,23 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\FormBundle\Form\Type\FormListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusType extends AbstractType
 {
@@ -46,7 +57,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -56,7 +67,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
@@ -67,7 +78,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'utmTags',
-            'utm_tags',
+            EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
@@ -81,7 +92,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'html_mode',
-            'button_group',
+            ButtonGroupType::class,
             [
                 'label'      => 'mautic.focus.form.html_mode',
                 'label_attr' => ['class' => 'control-label'],
@@ -96,13 +107,12 @@ class FocusType extends AbstractType
                     'mautic.focus.form.editor' => 'editor',
                     'mautic.focus.form.html'   => 'html',
                 ],
-                'choices_as_values' => true,
             ]
         );
 
         $builder->add(
             'editor',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.focus.form.editor',
                 'label_attr' => ['class' => 'control-label'],
@@ -116,7 +126,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'html',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.focus.form.html',
                 'label_attr' => ['class' => 'control-label'],
@@ -132,7 +142,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'website',
-            'url',
+            UrlType::class,
             [
                 'label'      => 'mautic.focus.form.website',
                 'label_attr' => ['class' => 'control-label'],
@@ -147,16 +157,16 @@ class FocusType extends AbstractType
         //add category
         $builder->add(
             'category',
-            'category',
+            CategoryListType::class,
             [
                 'bundle' => 'plugin:focus',
             ]
         );
 
         if (!empty($options['data']) && $options['data']->getId()) {
-            $readonly = !$this->security->isGranted('plugin:focus:items:publish');
+            $readonly = !$this->security->isGranted('focus:items:publish');
             $data     = $options['data']->isPublished(false);
-        } elseif (!$this->security->isGranted('plugin:focus:items:publish')) {
+        } elseif (!$this->security->isGranted('focus:items:publish')) {
             $readonly = true;
             $data     = false;
         } else {
@@ -166,7 +176,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'isPublished',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'read_only' => $readonly,
                 'data'      => $data,
@@ -175,7 +185,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'publishUp',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishup',
@@ -191,7 +201,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'publishDown',
-            'datetime',
+            DateTimeType::class,
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -205,15 +215,15 @@ class FocusType extends AbstractType
             ]
         );
 
-        $builder->add('properties', 'focus_entity_properties', ['data' => $options['data']->getProperties()]);
+        $builder->add('properties', PropertiesType::class, ['data' => $options['data']->getProperties()]);
 
         // Will be managed by JS
-        $builder->add('type', 'hidden');
-        $builder->add('style', 'hidden');
+        $builder->add('type', HiddenType::class);
+        $builder->add('style', HiddenType::class);
 
         $builder->add(
             'form',
-            'form_list',
+            FormListType::class,
             [
                 'label'       => 'mautic.focus.form.choose_form',
                 'multiple'    => false,
@@ -243,7 +253,7 @@ class FocusType extends AbstractType
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text'        => false,
                     'pre_extra_buttons' => $customButtons,
@@ -251,7 +261,7 @@ class FocusType extends AbstractType
             );
             $builder->add(
                 'updateSelect',
-                'hidden',
+                HiddenType::class,
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -260,7 +270,7 @@ class FocusType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'pre_extra_buttons' => $customButtons,
                 ]
@@ -271,7 +281,7 @@ class FocusType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -284,7 +294,7 @@ class FocusType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus';
     }

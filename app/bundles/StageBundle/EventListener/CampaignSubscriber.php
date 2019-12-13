@@ -14,30 +14,26 @@ namespace Mautic\StageBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var StageModel
      */
-    protected $stageModel;
+    private $stageModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
      * @param LeadModel  $leadModel
      * @param StageModel $stageModel
      */
@@ -67,7 +63,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.stage.campaign.event.change',
             'description' => 'mautic.stage.campaign.event.change_descr',
             'eventName'   => StageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => 'stageaction_change',
+            'formType'    => StageActionChangeType::class,
             'formTheme'   => 'MauticStageBundle:FormTheme\StageActionChange',
         ];
         $event->addAction('stage.change', $action);

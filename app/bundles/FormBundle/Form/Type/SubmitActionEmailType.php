@@ -135,7 +135,7 @@ class SubmitActionEmailType extends AbstractType
         $default = isset($options['data']['set_replyto']) ? $options['data']['set_replyto'] : true;
         $builder->add(
             'set_replyto',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.action.sendemail.setreplyto',
                 'data'  => $default,
@@ -176,7 +176,7 @@ class SubmitActionEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';
     }

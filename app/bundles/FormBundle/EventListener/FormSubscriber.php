@@ -14,57 +14,76 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
+use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormSubscriber.
- */
-class FormSubscriber extends CommonSubscriber
+class FormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var MailHelper
      */
-    protected $mailer;
+    private $mailer;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
-     * FormSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     * @param MailHelper     $mailer
+     * @var TranslatorInterface
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer, CoreParametersHelper $coreParametersHelper)
-    {
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param MailHelper           $mailer
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param TranslatorInterface  $translator
+     * @param RouterInterface      $router
+     */
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        MailHelper $mailer,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator,
+        RouterInterface $router
+    ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->auditLogModel        = $auditLogModel;
         $this->mailer               = $mailer->getMailer();
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
+        $this->router               = $router;
     }
 
     /**
@@ -134,7 +153,7 @@ class FormSubscriber extends CommonSubscriber
             'group'              => 'mautic.email.actions',
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
-            'formType'           => 'form_submitaction_sendemail',
+            'formType'           => SubmitActionEmailType::class,
             'formTheme'          => 'MauticFormBundle:FormTheme\SubmitAction',
             'formTypeCleanMasks' => [
                 'message' => 'html',

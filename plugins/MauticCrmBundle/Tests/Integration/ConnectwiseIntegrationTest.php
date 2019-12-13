@@ -12,10 +12,11 @@
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
-class ConnectwiseIntegrationTest extends \PHPUnit_Framework_TestCase
+class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 {
     use DataGeneratorTrait;
 
@@ -75,8 +76,28 @@ class ConnectwiseIntegrationTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
+        $integrationEntityModel = $this->getMockBuilder(IntegrationEntityModel::class)
             ->disableOriginalConstructor()
+            ->getMock();
+
+        $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
+            ->setConstructorArgs([
+                $this->dispatcher,
+                $this->cache,
+                $this->em,
+                $this->session,
+                $this->request,
+                $this->router,
+                $this->translator,
+                $this->logger,
+                $this->encryptionHelper,
+                $this->leadModel,
+                $this->companyModel,
+                $this->pathsHelper,
+                $this->notificationModel,
+                $this->fieldModel,
+                $integrationEntityModel,
+            ])
             ->setMethodsExcept(['getCampaignMembers', 'getRecordList', 'setIntegrationEntityModel'])
             ->getMock();
 
@@ -87,11 +108,6 @@ class ConnectwiseIntegrationTest extends \PHPUnit_Framework_TestCase
         $integration
             ->method('getApiHelper')
             ->willReturn($apiHelper);
-
-        $integrationEntityModel = $this->getMockBuilder(IntegrationEntityModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $integration->setIntegrationEntityModel($integrationEntityModel);
 
         $integration->getCampaignMembers(1);
     }

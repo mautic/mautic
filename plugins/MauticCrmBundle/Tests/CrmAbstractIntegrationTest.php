@@ -13,11 +13,10 @@ namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
-use Symfony\Component\HttpFoundation\Session\Session;
 
-class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
+class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testFieldMatchingPriority()
     {
@@ -63,33 +62,18 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testCompanyDataIsMappedForNewCompanies()
     {
-        $integration = $this->getMockBuilder(StubIntegration::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
-            ->getMock();
-
         $data = [
             'custom_company_name' => 'Some Business',
             'some_custom_field'   => 'some value',
         ];
 
-        $integration->expects($this->once())
-            ->method('populateMauticLeadData')
-            ->willReturn($data);
-
-        $fieldModel = $this->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $session = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $emailValidator = $this->getMockBuilder(EmailValidator::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->setMethodsExcept(['setFieldValues'])
-            ->setConstructorArgs([$fieldModel, $session, $emailValidator])
+            ->setConstructorArgs([$this->fieldModel, $this->session, $emailValidator])
             ->getMock();
         $companyModel->expects($this->once())
             ->method('organizeFieldsByGroup')
@@ -109,9 +93,31 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ]);
-        $integration->setCompanyModel($companyModel);
 
-        $integration->setFieldModel($fieldModel);
+        $integration = $this->getMockBuilder(StubIntegration::class)
+            ->setConstructorArgs([
+                $this->dispatcher,
+                $this->cache,
+                $this->em,
+                $this->session,
+                $this->request,
+                $this->router,
+                $this->translator,
+                $this->logger,
+                $this->encryptionHelper,
+                $this->leadModel,
+                $companyModel,
+                $this->pathsHelper,
+                $this->notificationModel,
+                $this->fieldModel,
+                $this->integrationEntityModel,
+            ])
+            ->setMethodsExcept(['getMauticCompany', 'setCompanyModel', 'setFieldModel', 'hydrateCompanyName'])
+            ->getMock();
+
+        $integration->expects($this->once())
+            ->method('populateMauticLeadData')
+            ->willReturn($data);
 
         $company = $integration->getMauticCompany($data);
 

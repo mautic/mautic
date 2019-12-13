@@ -38,6 +38,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
@@ -269,17 +270,17 @@ class PageModel extends FormModel
             throw new MethodNotAllowedHttpException(['Page']);
         }
 
-        $formName = 'page';
+        $formClass = PageType::class;
 
         if (!empty($options['formName'])) {
-            $formName = $options['formName'];
+            $formClass = $options['formName'];
         }
 
         if (!empty($action)) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create($formName, $entity, $options);
+        return $formFactory->create($formClass, $entity, $options);
     }
 
     /**
@@ -725,19 +726,19 @@ class PageModel extends FormModel
                 $utmTags->setRemoteHost($hit->getRemoteHost());
                 $utmTags->setLead($lead);
 
-                if (key_exists('utm_campaign', $query)) {
+                if (array_key_exists('utm_campaign', $query)) {
                     $utmTags->setUtmCampaign($query['utm_campaign']);
                 }
-                if (key_exists('utm_term', $query)) {
+                if (array_key_exists('utm_term', $query)) {
                     $utmTags->setUtmTerm($query['utm_term']);
                 }
-                if (key_exists('utm_content', $query)) {
+                if (array_key_exists('utm_content', $query)) {
                     $utmTags->setUtmContent($query['utm_content']);
                 }
-                if (key_exists('utm_medium', $query)) {
+                if (array_key_exists('utm_medium', $query)) {
                     $utmTags->setUtmMedium($query['utm_medium']);
                 }
-                if (key_exists('utm_source', $query)) {
+                if (array_key_exists('utm_source', $query)) {
                     $utmTags->setUtmSource($query['utm_source']);
                 }
 
@@ -922,8 +923,7 @@ class PageModel extends FormModel
             $this->limitQueryToCreator($returnQ);
         }
 
-        $all = $query->fetchCount($allQ);
-//        $unique    = $query->fetchCount($uniqueQ);
+        $all       = $query->fetchCount($allQ);
         $returning = $query->fetchCount($returnQ);
         $unique    = $all - $returning;
         $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
@@ -1004,7 +1004,6 @@ class PageModel extends FormModel
         foreach ($results as $result) {
             $label = empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'];
 
-            // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
             $chart->setDataset($label, $result['count']);
         }
 
@@ -1198,27 +1197,6 @@ class PageModel extends FormModel
         }
 
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
-    }
-
-    /**
-     * @deprecated 2.13.0; no longer used
-     *
-     * @param $trackByFingerprint
-     */
-    public function setTrackByFingerprint($trackByFingerprint)
-    {
-    }
-
-    /**
-     * @deprecated 2.1 - use $entity->getVariants() instead; to be removed in 3.0
-     *
-     * @param Page $entity
-     *
-     * @return array
-     */
-    public function getVariants(Page $entity)
-    {
-        return $entity->getVariants();
     }
 
     /*

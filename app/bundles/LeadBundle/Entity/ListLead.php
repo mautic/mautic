@@ -14,9 +14,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class ListLead.
- */
 class ListLead
 {
     /**
@@ -52,7 +49,7 @@ class ListLead
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('lead_lists_leads')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\ListLeadRepository');
+            ->setCustomRepositoryClass(ListLeadRepository::class);
 
         $builder->createManyToOne('list', 'LeadList')
             ->isPrimaryKey()
