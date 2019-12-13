@@ -16,9 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 
-/**
- * Class GenericPointSettingsType.
- */
 class GenericPointSettingsType extends AbstractType
 {
     /**
@@ -34,7 +31,7 @@ class GenericPointSettingsType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.point.action.delta.help',
                 ],
-            'precision'   => 0,
+            'scale'       => 0,
             'data'        => $default,
             'constraints' => [
                 new NotEqualTo(
