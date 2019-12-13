@@ -128,10 +128,6 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.timezone.not.supported';
         }
 
-        if (get_magic_quotes_gpc()) {
-            $messages[] = 'mautic.install.magic_quotes_enabled';
-        }
-
         if (
             version_compare(PHP_VERSION, '5.6.0', '>=')
             &&
