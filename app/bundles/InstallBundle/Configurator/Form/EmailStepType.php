@@ -83,7 +83,6 @@ class EmailStepType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.email.config.mailer_transport.mail'     => 'mail',
                     'mautic.email.config.mailer_transport.mandrill' => 'mautic.transport.mandrill',
                     'mautic.email.config.mailer_transport.mailjet'  => 'mautic.transport.mailjet',
                     'mautic.email.config.mailer_transport.sendgrid' => 'mautic.transport.sendgrid',
