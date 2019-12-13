@@ -330,7 +330,7 @@ Mautic.switchFormFieldVisibilty = function (formName) {
     // find all fields to show
     form.find('[data-show-on]').each(function(index, el) {
         var field = mQuery(el);
-        var showOn = jQuery.parseJSON(field.attr('data-show-on'));
+        var showOn = JSON.parse(field.attr('data-show-on'));
 
         mQuery.each(showOn, function(fieldId, condition) {
             var fieldParts = getFieldParts(fieldId);
