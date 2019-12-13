@@ -11,6 +11,7 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -25,9 +26,6 @@ use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TriggerModel.
- */
 class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];
@@ -48,17 +46,24 @@ class TriggerModel extends CommonFormModel
     protected $pointTriggerEventModel;
 
     /**
-     * EventModel constructor.
+     * @deprecated https://github.com/mautic/mautic/issues/8229
      *
+     * @var MauticFactory
+     */
+    protected $mauticFactory;
+
+    /**
      * @param IpLookupHelper    $ipLookupHelper
      * @param LeadModel         $leadModel
      * @param TriggerEventModel $pointTriggerEventModel
+     * @param MauticFactory     $mauticFactory
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel, MauticFactory $mauticFactory)
     {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
+        $this->mauticFactory          = $mauticFactory;
     }
 
     /**
@@ -367,7 +372,7 @@ class TriggerModel extends CommonFormModel
         $args = [
           'event'   => $event,
           'lead'    => $lead,
-          'factory' => '',
+          'factory' => $this->mauticFactory,
           'config'  => $event['properties'],
         ];
 

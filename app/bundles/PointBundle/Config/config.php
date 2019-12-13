@@ -177,6 +177,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.point.model.triggerevent',
+                    'mautic.factory',
                 ],
             ],
         ],
