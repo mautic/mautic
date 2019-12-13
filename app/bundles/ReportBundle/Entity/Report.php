@@ -24,9 +24,6 @@ use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Report.
- */
 class Report extends FormEntity implements SchedulerInterface
 {
     /**
