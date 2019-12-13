@@ -106,41 +106,22 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.focus.form.type.color' => [
-                'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\ColorType',
-                'alias' => 'focus_color',
-            ],
-            'mautic.focus.form.type.content' => [
-                'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\ContentType',
-                'alias' => 'focus_content',
-            ],
             'mautic.focus.form.type.focus' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusType',
-                'alias'     => 'focus',
+                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusType::class,
                 'arguments' => 'mautic.security',
             ],
-            'mautic.focus.form.type.entity_properties' => [
-                'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\PropertiesType',
-                'alias' => 'focus_entity_properties',
-            ],
-            'mautic.focus.form.type.properties' => [
-                'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusPropertiesType',
-                'alias' => 'focus_properties',
-            ],
             'mautic.focus.form.type.focusshow_list' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType',
+                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType::class,
                 'arguments' => 'router',
-                'alias'     => 'focusshow_list',
             ],
             'mautic.focus.form.type.focus_list' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusListType',
+                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusListType::class,
                 'arguments' => 'mautic.focus.model.focus',
-                'alias'     => 'focus_list',
             ],
         ],
         'models' => [
             'mautic.focus.model.focus' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\Model\FocusModel',
+                'class'     => \MauticPlugin\MauticFocusBundle\Model\FocusModel::class,
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
@@ -153,7 +134,7 @@ return [
         ],
         'other' => [
             'mautic.focus.helper.token' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\Helper\TokenHelper',
+                'class'     => \MauticPlugin\MauticFocusBundle\Helper\TokenHelper::class,
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
