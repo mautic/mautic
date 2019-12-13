@@ -12,7 +12,7 @@ ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
 define('MAUTIC_MINIMUM_PHP', '5.6.19');
-define('MAUTIC_MAXIMUM_PHP', '7.2.999');
+define('MAUTIC_MAXIMUM_PHP', '7.3.999');
 
 // Are we running the minimum version?
 if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {
@@ -29,7 +29,7 @@ if (version_compare(PHP_VERSION, MAUTIC_MAXIMUM_PHP, 'gt')) {
 $standalone = (int) getVar('standalone', 0);
 $task       = getVar('task');
 
-define('IN_CLI', php_sapi_name() === 'cli');
+define('IN_CLI', 'cli' === php_sapi_name());
 define('MAUTIC_ROOT', (IN_CLI || $standalone || empty($task)) ? __DIR__ : dirname(__DIR__));
 define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT.'/upgrade_errors.txt');
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT.'/app');
@@ -88,7 +88,7 @@ $status = ['complete' => false, 'error' => false, 'updateState' => $state, 'step
 if (!IN_CLI) {
     $request         = explode('?', $_SERVER['REQUEST_URI'])[0];
     $url             = "//{$_SERVER['HTTP_HOST']}{$request}";
-    $isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
+    $isSSL           = (!empty($_SERVER['HTTPS']) && 'off' != $_SERVER['HTTPS']);
     $cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
     $cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
     $cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
@@ -102,6 +102,7 @@ if (!IN_CLI) {
         case '':
             html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take serveral minutes.</strong></div>");
 
+            // no break
         case 'startUpgrade':
             $nextTask = 'fetchUpdates';
             break;
@@ -135,7 +136,7 @@ if (!IN_CLI) {
                 }
                 $nextTask = 'moveBundles';
                 $query    = 'count='.$state['refresh_count'].'&';
-                $state['refresh_count'] += 1;
+                ++$state['refresh_count'];
             } else {
                 $nextTask = 'moveCore';
                 unset($state['refresh_count']);
@@ -157,7 +158,7 @@ if (!IN_CLI) {
                 }
                 $nextTask = 'moveVendors';
                 $query    = 'count='.$state['refresh_count'].'&';
-                $state['refresh_count'] += 1;
+                ++$state['refresh_count'];
             } else {
                 $nextTask = 'clearCache';
                 unset($state['refresh_count']);
@@ -441,7 +442,7 @@ function extract_package($version)
     $zipper  = new \ZipArchive();
     $archive = $zipper->open($zipFile);
 
-    if ($archive !== true) {
+    if (true !== $archive) {
         return [false, 'Could not open or read update package.'];
     }
 
@@ -517,7 +518,7 @@ function run_symfony_command($command, array $args)
 
     unset($input, $output);
 
-    return $exitCode === 0;
+    return 0 === $exitCode;
 }
 
 /**
@@ -607,16 +608,16 @@ function copy_directory($src, $dest)
     }
 
     // Walk through the directory copying files and recursing into folders.
-    while (($file = readdir($dh)) !== false) {
+    while (false !== ($file = readdir($dh))) {
         $sfid = $src.'/'.$file;
         $dfid = $dest.'/'.$file;
 
         switch (filetype($sfid)) {
             case 'dir':
-                if ($file != '.' && $file != '..') {
+                if ('.' != $file && '..' != $file) {
                     $ret = copy_directory($sfid, $dfid);
 
-                    if ($ret !== true) {
+                    if (true !== $ret) {
                         if (is_array($ret)) {
                             $errorLog += $ret;
                         } else {
@@ -691,7 +692,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
 
                     $result = copy_directory($src, $dest);
 
-                    if ($result !== true) {
+                    if (true !== $result) {
                         if (is_array($result)) {
                             $errorLog += $result;
                         } else {
@@ -719,7 +720,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
 
         $status['updateState']['pluginComplete'] = true;
 
-        if ($maxCount != -1) {
+        if (-1 != $maxCount) {
             // Finished with plugins, get a response back to the app so we can iterate to the next part
             return $status;
         }
@@ -744,7 +745,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
                 // Exit the loop if the count has reached 5
-                if ($maxCount != -1 && $count === $maxCount) {
+                if (-1 != $maxCount && $count === $maxCount) {
                     $completed = false;
                     break;
                 }
@@ -761,7 +762,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
 
                     $result = copy_directory($src, $dest);
 
-                    if ($result !== true) {
+                    if (true !== $result) {
                         if (is_array($result)) {
                             $errorLog += $result;
                         } else {
@@ -933,7 +934,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
                 // Exit the loop if the count has reached 5
-                if ($maxCount != -1 && $count === $maxCount) {
+                if (-1 != $maxCount && $count === $maxCount) {
                     $completed = false;
                     break;
                 }
@@ -953,7 +954,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
 
                     $result = copy_directory($src, $dest);
 
-                    if ($result !== true) {
+                    if (true !== $result) {
                         if (is_array($result)) {
                             $errorLog += $result;
                         } else {
@@ -1005,7 +1006,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
         /** @var DirectoryIterator $directory */
         foreach ($iterator as $directory) {
             // Exit the loop if the count has reached 5
-            if ($maxCount != -1 && $count === $maxCount) {
+            if (-1 != $maxCount && $count === $maxCount) {
                 $completed = false;
                 break;
             }
@@ -1025,7 +1026,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
 
                 $result = copy_directory($src, $dest);
 
-                if ($result !== true) {
+                if (true !== $result) {
                     if (is_array($result)) {
                         $errorLog += $result;
                     } else {
@@ -1145,7 +1146,7 @@ function copy_directories($dir, &$errorLog, $createDest = true)
 
             $result = copy_directory($src, $dest);
 
-            if ($result !== true) {
+            if (true !== $result) {
                 if (is_array($result)) {
                     $errorLog += $result;
                 } else {
@@ -1196,7 +1197,7 @@ function process_error_log(array $errorLog)
 function recursive_remove_directory($directory)
 {
     // if the path has a slash at the end we remove it here
-    if (substr($directory, -1) == '/') {
+    if ('/' == substr($directory, -1)) {
         $directory = substr($directory, 0, -1);
     }
 
@@ -1218,7 +1219,7 @@ function recursive_remove_directory($directory)
         while (false !== ($item = readdir($handle))) {
             // if the filepointer is not the current directory
             // or the parent directory
-            if ($item != '.' && $item != '..') {
+            if ('.' != $item && '..' != $item) {
                 // we build the new path to delete
                 $path = $directory.'/'.$item;
                 // if the new path is a directory

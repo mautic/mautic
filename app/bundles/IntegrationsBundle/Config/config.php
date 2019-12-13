@@ -14,7 +14,6 @@ declare(strict_types=1);
 return [
     'name'        => 'Integrations',
     'description' => 'Adds support for plugin integrations',
-    'version'     => '0.0.1',
     'author'      => 'Mautic, Inc.',
     'routes'      => [
         'main' => [
@@ -40,10 +39,6 @@ return [
                 'controller' => 'IntegrationsBundle:Auth:callback',
             ],
         ],
-        'api' => [
-        ],
-    ],
-    'menu' => [
     ],
     'services' => [
         'commands' => [
