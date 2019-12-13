@@ -11,8 +11,10 @@
 
 namespace Mautic\CoreBundle\Doctrine;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -53,9 +55,10 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * @param Schema $schema
      *
-     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     * @throws DBALException
+     * @throws AbortMigration
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $platform = $this->connection->getDatabasePlatform()->getName();
 
@@ -72,15 +75,17 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * @param Schema $schema
      *
-     * @throws \Doctrine\DBAL\Migrations\AbortMigrationException
+     * @throws AbortMigration
      */
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         // Not supported
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws DBALException
      */
     public function setContainer(ContainerInterface $container = null)
     {

@@ -18,6 +18,7 @@
         "php": ">=7.2.21 <7.3",
         "ext-zlib": "^7.2",
         "ext-zip": "^1.15",
+        "ext-imap": "*",
 
         "symfony/console": "~3.4.0",
         "symfony/debug": "~3.4.0",

@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\FormBundle\Form\Type\FormListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -217,7 +218,7 @@ class FocusType extends AbstractType
 
         $builder->add(
             'form',
-            'form_list',
+            FormListType::class,
             [
                 'label'       => 'mautic.focus.form.choose_form',
                 'multiple'    => false,

@@ -15,6 +15,7 @@ use Mautic\QueueBundle\Event\QueueConfigEvent;
 use Mautic\QueueBundle\QueueEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigType extends AbstractType
@@ -46,13 +47,14 @@ class ConfigType extends AbstractType
         $protocolChoices = array_merge(['' => 'mautic.queue.config.protocol.disabled'], $event->getProtocolChoices());
         $builder->add(
             'queue_protocol',
-            'choice',
+            ChoiceType::class,
             [
-                'label'      => 'mautic.queue.config.protocol',
-                'label_attr' => ['class' => 'control-label'],
-                'data'       => $options['data']['queue_protocol'],
-                'choices'    => $protocolChoices,
-                'attr'       => [
+                'label'               => 'mautic.queue.config.protocol',
+                'label_attr'          => ['class' => 'control-label'],
+                'data'                => $options['data']['queue_protocol'],
+                'choices'             => array_flip($protocolChoices),
+                'choices_as_values'   => true,
+                'attr'                => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.queue.config.protocol.tooltip',
                 ],
@@ -68,8 +70,8 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
-        return 'queueconfig';
+        return self::class;
     }
 }

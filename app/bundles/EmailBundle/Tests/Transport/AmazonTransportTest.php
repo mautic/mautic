@@ -32,7 +32,7 @@ class AmazonTransportTest extends \PHPUnit\Framework\TestCase
      */
     private $translator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->logger = $this->getMockBuilder(Logger::class)
             ->disableOriginalConstructor()

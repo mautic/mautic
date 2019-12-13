@@ -176,7 +176,7 @@ class EmailSendEvent extends CommonEvent
      *
      * @param $replaceTokens
      *
-     * @return array
+     * @return string
      */
     public function getContent($replaceTokens = false)
     {

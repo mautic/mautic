@@ -176,7 +176,7 @@ class SubmitActionEmailType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'form_submitaction_sendemail';
     }

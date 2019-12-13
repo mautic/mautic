@@ -22,10 +22,11 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SearchSubscriberTest extends \PHPUnit_Framework_TestCase
+class SearchSubscriberTest extends TestCase
 {
     /**
      * Tests emailread search command.

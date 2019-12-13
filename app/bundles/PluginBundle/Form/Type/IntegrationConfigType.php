@@ -12,8 +12,9 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class IntegrationConfigType.
@@ -32,14 +33,15 @@ class IntegrationConfigType extends AbstractType
         if (!empty($options['campaigns'])) {
             $builder->add(
                 'campaigns',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices' => $options['campaigns'],
+                    'choices' => array_flip($options['campaigns']),
                     'attr'    => [
                         'class' => 'form-control', 'onchange' => 'Mautic.getIntegrationCampaignStatus(this);', ],
-                    'label'       => 'mautic.plugin.integration.campaigns',
-                    'empty_value' => 'mautic.plugin.config.campaign.member.chooseone',
-                    'required'    => false,
+                    'label'             => 'mautic.plugin.integration.campaigns',
+                    'empty_value'       => 'mautic.plugin.config.campaign.member.chooseone',
+                    'required'          => false,
+                    'choices_as_values' => true,
                 ]
             );
         }
@@ -48,7 +50,7 @@ class IntegrationConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['integration']);
         $resolver->setDefaults([
@@ -60,7 +62,7 @@ class IntegrationConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_config';
     }

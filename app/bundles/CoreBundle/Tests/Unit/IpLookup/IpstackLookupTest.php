@@ -18,6 +18,8 @@ use Mautic\CoreBundle\IpLookup\IpstackLookup;
  */
 class IpstackLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     public function testIpLookupSuccessful()
     {
         // Mock http connector
@@ -35,7 +37,7 @@ class IpstackLookupTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new IpstackLookup('mockApiToken', null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new IpstackLookup('mockApiToken', null, $this->cacheDir, null, $mockHttp);
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 

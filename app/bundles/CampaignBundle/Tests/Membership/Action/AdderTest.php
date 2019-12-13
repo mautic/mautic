@@ -31,7 +31,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
      */
     private $leadEventLogRepository;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);

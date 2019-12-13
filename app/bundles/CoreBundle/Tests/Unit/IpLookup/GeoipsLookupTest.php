@@ -18,6 +18,8 @@ use Mautic\CoreBundle\IpLookup\GeoipsLookup;
  */
 class GeoipsLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     public function testIpLookupSuccessful()
     {
         // Mock http connector
@@ -35,7 +37,7 @@ class GeoipsLookupTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new GeoipsLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new GeoipsLookup(null, null, $this->cacheDir, null, $mockHttp);
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 

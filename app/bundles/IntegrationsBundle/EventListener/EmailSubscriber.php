@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -25,6 +24,7 @@ use Mautic\IntegrationsBundle\Helper\TokenParser;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -33,7 +33,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * Class EmailSubscriber
  */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TranslatorInterface

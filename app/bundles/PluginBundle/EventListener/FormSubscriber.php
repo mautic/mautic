@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
@@ -43,7 +44,7 @@ class FormSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.plugin.actions',
             'description' => 'mautic.plugin.actions.tooltip',
             'label'       => 'mautic.plugin.actions.push_lead',
-            'formType'    => 'integration_list',
+            'formType'    => IntegrationsListType::class,
             'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);

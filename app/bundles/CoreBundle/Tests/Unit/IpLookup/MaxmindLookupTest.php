@@ -23,9 +23,11 @@ use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
  */
 class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     protected $mockHttp;
 
-    public function setUp()
+    protected function setUp()
     {
         // Mock http connector
         $this->mockHttp = $this->getMockBuilder('Joomla\Http\Http')
@@ -164,7 +166,7 @@ RESPONSE;
 
     public function testCountryIpLookupSuccessful()
     {
-        $ipService = new MaxmindCountryLookup(null, null, __DIR__.'/../../../../cache/test', null, $this->mockHttp);
+        $ipService = new MaxmindCountryLookup(null, null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -173,7 +175,7 @@ RESPONSE;
 
     public function testOmniIpLookupSuccessful()
     {
-        $ipService = new MaxmindOmniLookup(null, null, __DIR__.'/../../../../cache/test', null, $this->mockHttp);
+        $ipService = new MaxmindOmniLookup(null, null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -182,7 +184,7 @@ RESPONSE;
 
     public function testPrecisionIpLookupSuccessful()
     {
-        $ipService = new MaxmindPrecisionLookup(null, null, __DIR__.'/../../../../cache/test', null, $this->mockHttp);
+        $ipService = new MaxmindPrecisionLookup(null, null, $this->cacheDir, null, $this->mockHttp);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 

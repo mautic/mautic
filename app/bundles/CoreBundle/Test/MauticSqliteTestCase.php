@@ -10,7 +10,7 @@ use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 
 abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

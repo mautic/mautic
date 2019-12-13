@@ -22,6 +22,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
+use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
@@ -165,7 +166,7 @@ class FormModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('mauticform', $entity, $options);
+        return $formFactory->create(FormType::class, $entity, $options);
     }
 
     /**

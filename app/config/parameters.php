@@ -32,9 +32,9 @@ $extractLocales = function ($dir) use (&$locales) {
     $locale = $dir->getFilename();
 
     // Check config
-    $configFile = $dir->getRealpath().'/config.php';
+    $configFile = $dir->getRealpath().'/config.json';
     if (file_exists($configFile)) {
-        $config           = include $configFile;
+        $config           = json_decode(file_get_contents($configFile), true);
         $locales[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
     }
 };

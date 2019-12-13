@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\Form\AbstractType;
@@ -146,7 +147,7 @@ class MailchimpType extends AbstractType
                 }
 
                 list($specialInstructions) = $mailchimp->getFormNotes('leadfield_match');
-                $form->add('leadFields', 'integration_fields', [
+                $form->add('leadFields', FieldsType::class, [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
                     'mautic_fields'        => $leadFields,

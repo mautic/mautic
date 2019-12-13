@@ -24,7 +24,7 @@ class FocusController extends FormController
     {
         $this->setStandardParameters(
             'focus',
-            'plugin:focus:items',
+            'focus:items',
             'mautic_focus',
             'mautic_focus',
             'mautic.focus',
