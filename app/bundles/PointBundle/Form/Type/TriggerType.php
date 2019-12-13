@@ -12,7 +12,6 @@
 namespace Mautic\PointBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -29,23 +28,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class TriggerType.
- */
 class TriggerType extends AbstractType
 {
     /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @var CorePermissions
      */
     private $security;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
-     * @param MauticFactory $factory
+     * @param TranslatorInterface $translator
+     * @param CorePermissions     $security
      */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
@@ -62,27 +59,26 @@ class TriggerType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
         $builder->add(
-          'name',
-          TextType::class,
-          [
-            'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-          ]
+            'name',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+            ]
         );
 
         $builder->add(
-          'description',
-          TextareaType::class,
-          [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control editor'],
-            'required'   => false,
-          ]
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
+                'required'   => false,
+            ]
         );
 
-        //add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -92,36 +88,36 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
-          'points',
-          NumberType::class,
-          [
-            'label'      => 'mautic.point.trigger.form.points',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-              'class'   => 'form-control',
-              'tooltip' => 'mautic.point.trigger.form.points_descr',
-            ],
-            'required' => false,
-          ]
+            'points',
+            NumberType::class,
+            [
+                'label'      => 'mautic.point.trigger.form.points',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.trigger.form.points_descr',
+                ],
+                'required' => false,
+            ]
         );
 
         $color = $options['data']->getColor();
 
         $builder->add(
-          'color',
-          TextType::class,
-          [
-            'label'      => 'mautic.point.trigger.form.color',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-              'class'       => 'form-control',
-              'data-toggle' => 'color',
-              'tooltip'     => 'mautic.point.trigger.form.color_descr',
-            ],
-            'required'   => false,
-            'data'       => (!empty($color)) ? $color : 'a0acb8',
-            'empty_data' => 'a0acb8',
-          ]
+            'color',
+            TextType::class,
+            [
+                'label'      => 'mautic.point.trigger.form.color',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'color',
+                    'tooltip'     => 'mautic.point.trigger.form.color_descr',
+                ],
+                'required'   => false,
+                'data'       => (!empty($color)) ? $color : 'a0acb8',
+                'empty_data' => 'a0acb8',
+            ]
         );
 
         $builder->add(
@@ -153,48 +149,46 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
-          'publishUp',
-          'datetime',
-          [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishup',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-              'class'       => 'form-control',
-              'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-          ]
+            'publishUp',
+            DateTimeType::class,
+            [
+                'widget'         => 'single_text',
+                'label'          => 'mautic.core.form.publishup',
+                'label_attr'     => ['class' => 'control-label'],
+                    'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'datetime',
+                ],
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
+            ]
         );
 
         $builder->add(
-          'publishDown',
-          DateTimeType::class,
-          [
-            'widget'     => 'single_text',
-            'label'      => 'mautic.core.form.publishdown',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-              'class'       => 'form-control',
-              'data-toggle' => 'datetime',
-            ],
-            'format'   => 'yyyy-MM-dd HH:mm',
-            'required' => false,
-          ]
+            'publishDown',
+            DateTimeType::class,
+            [
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishdown',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'       => 'form-control',
+                    'data-toggle' => 'datetime',
+                ],
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
+            ]
         );
 
         $builder->add(
-          'sessionId',
-          HiddenType::class,
-          [
-            'mapped' => false,
-          ]
+            'sessionId',
+            HiddenType::class,
+            [
+                'mapped' => false,
+            ]
         );
 
-        $builder->add('buttons',
-          FormButtonsType::class
-        );
+        $builder->add('buttons', FormButtonsType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
@@ -207,9 +201,9 @@ class TriggerType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
-          [
-            'data_class' => Trigger::class,
-          ]
+            [
+                'data_class' => Trigger::class,
+            ]
         );
     }
 
