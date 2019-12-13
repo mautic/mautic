@@ -47,6 +47,7 @@ class FeatureSettingsType extends AbstractType
      *
      * @param Session              $session
      * @param CoreParametersHelper $coreParametersHelper
+     * @param LoggerInterface      $logger
      */
     public function __construct(
         Session $session,
@@ -120,7 +121,7 @@ class FeatureSettingsType extends AbstractType
 
             $form->add(
                 'leadFields',
-                'integration_fields',
+                FieldsType::class,
                 [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
@@ -140,7 +141,7 @@ class FeatureSettingsType extends AbstractType
             if (!empty($integrationCompanyFields)) {
                 $form->add(
                     'companyFields',
-                    'integration_company_fields',
+                    CompanyFieldsType::class,
                     [
                         'label'                => 'mautic.integration.companyfield_matches',
                         'required'             => true,
@@ -190,7 +191,7 @@ class FeatureSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_featuresettings';
     }

@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\Plugin;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
@@ -19,7 +20,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -225,6 +226,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
 
     protected function getIntegrationObject()
     {
+        /** @var IntegrationHelper $integrationHelper */
         $integrationHelper = $this->container->get('mautic.helper.integration');
 
         /** @var Integration $integration */

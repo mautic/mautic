@@ -86,7 +86,7 @@ class Plugin extends CommonEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugins')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\PluginRepository')
+            ->setCustomRepositoryClass(PluginRepository::class)
             ->addUniqueConstraint(['bundle'], 'unique_bundle');
 
         $builder->addIdColumns();

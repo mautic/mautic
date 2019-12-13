@@ -118,7 +118,6 @@ return [
         'forms' => [
             'mautic.form.type.reportconfig' => [
                 'class'     => \Mautic\ReportBundle\Form\Type\ConfigType::class,
-                'alias'     => 'reportconfig',
             ],
             'mautic.form.type.report' => [
                 'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
@@ -128,36 +127,31 @@ return [
                 ],
             ],
             'mautic.form.type.filter_selector' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\FilterSelectorType',
-                'alias' => 'filter_selector',
+                'class' => \Mautic\ReportBundle\Form\Type\FilterSelectorType::class,
             ],
             'mautic.form.type.table_order' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\TableOrderType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'table_order',
+                'class'     => \Mautic\ReportBundle\Form\Type\TableOrderType::class,
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.report_filters' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
                 'arguments' => 'mautic.factory',
-                'alias'     => 'report_filters',
             ],
             'mautic.form.type.report_dynamic_filters' => [
                 'class' => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
-                'alias' => 'report_dynamicfilters',
             ],
             'mautic.form.type.report_widget' => [
                 'class'     => 'Mautic\ReportBundle\Form\Type\ReportWidgetType',
-                'alias'     => 'report_widget',
                 'arguments' => 'mautic.report.model.report',
             ],
             'mautic.form.type.aggregator' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\AggregatorType',
-                'alias'     => 'aggregator',
+                'class'     => \Mautic\ReportBundle\Form\Type\AggregatorType::class,
                 'arguments' => 'translator',
             ],
             'mautic.form.type.report.settings' => [
                 'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
-                'alias' => 'report_settings',
             ],
         ],
         'helpers' => [

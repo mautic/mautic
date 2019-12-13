@@ -13,7 +13,7 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

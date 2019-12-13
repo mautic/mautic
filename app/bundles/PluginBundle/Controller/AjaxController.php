@@ -13,6 +13,10 @@ namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
+use Mautic\PluginBundle\Form\Type\FieldsType;
+use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
+use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -79,7 +83,7 @@ class AjaxController extends CommonAjaxController
                     $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
-                    $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
+                    $formType           = $isLead ? FieldsType::class : CompanyFieldsType::class;
                     $form               = $this->createForm(
                         $formType,
                         isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
@@ -131,36 +135,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * Get the HTML for list of fields.
-     *
-     * @deprecated 2.8.0 to be removed in 3.0
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getIntegrationLeadFieldsAction(Request $request)
-    {
-        $request->attributes->set('object', 'lead');
-
-        return $this->getIntegrationFieldsAction($request);
-    }
-
-    /**
-     * Get the HTML for list of fields.
-     *
-     * @deprecated 2.8.0 to be removed in 3.0
-     *
-     * @param Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    protected function getIntegrationCompanyFieldsAction(Request $request)
-    {
-        $request->attributes->set('object', 'company');
-
-        return $this->getIntegrationFieldsAction($request);
-    }
-
-    /**
      * Get the HTML for integration properties.
      *
      * @param Request $request
@@ -191,7 +165,7 @@ class AjaxController extends CommonAjaxController
                         }
                     }
                 }
-                $form = $this->createForm('integration_config', $defaults, [
+                $form = $this->createForm(IntegrationConfigType::class, $defaults, [
                     'integration'     => $object,
                     'csrf_protection' => false,
                     'campaigns'       => $data,
@@ -246,7 +220,7 @@ class AjaxController extends CommonAjaxController
                         }
                     }
                 }
-                $form = $this->createForm('integration_campaign_status', $statusData, [
+                $form = $this->createForm(IntegrationCampaignsType::class, $statusData, [
                     'csrf_protection'       => false,
                     'campaignContactStatus' => $statusData,
                 ]);
