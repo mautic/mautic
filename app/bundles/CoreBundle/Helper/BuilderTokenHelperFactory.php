@@ -13,12 +13,6 @@ class BuilderTokenHelperFactory
     private $connection;
     private $userHelper;
 
-    /**
-     * @param CorePermissions $security
-     * @param EntityManager   $entityManager
-     * @param Connection      $connection
-     * @param UserHelper      $userHelper
-     */
     public function __construct(
         CorePermissions $security,
         EntityManager $entityManager,
@@ -31,14 +25,6 @@ class BuilderTokenHelperFactory
         $this->userHelper    = $userHelper;
     }
 
-    /**
-     * @param string      $modelName
-     * @param string|null $viewPermissionBase
-     * @param string|null $bundleName
-     * @param string|null $langVar
-     *
-     * @return BuilderTokenHelper
-     */
     public function getBuilderTokenHelper(
         string $modelName,
         ?string $viewPermissionBase = null,
