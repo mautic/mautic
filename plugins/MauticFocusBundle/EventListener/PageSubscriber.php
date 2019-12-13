@@ -45,8 +45,6 @@ class PageSubscriber implements EventSubscriberInterface
     private $builderTokenHelperFactory;
 
     /**
-     * PageSubscriber constructor.
-     *
      * @param CorePermissions           $security
      * @param FocusModel                $model
      * @param RouterInterface           $router

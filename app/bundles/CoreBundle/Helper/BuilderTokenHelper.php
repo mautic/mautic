@@ -30,9 +30,9 @@ class BuilderTokenHelper
 
     protected $permissionSet;
     protected $modelName;
-    protected $viewPermissionBase = null;
-    protected $langVar            = null;
-    protected $bundleName         = null;
+    protected $viewPermissionBase;
+    protected $langVar;
+    protected $bundleName;
 
     /**
      * @param CorePermissions $security
@@ -92,10 +92,10 @@ class BuilderTokenHelper
      * @return array|void
      */
     public function getTokens(
-        string $tokenRegex,
-        string $filter = '',
-        string $labelColumn = 'name',
-        string $valueColumn = 'id',
+        $tokenRegex,
+        $filter = '',
+        $labelColumn = 'name',
+        $valueColumn = 'id',
         CompositeExpression $expr = null
     ) {
         if (!$this->isConfigured) {
