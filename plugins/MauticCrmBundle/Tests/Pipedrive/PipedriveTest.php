@@ -23,12 +23,17 @@ abstract class PipedriveTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $GLOBALS['requests'] = [];
+        // Simulate request.
+        $GLOBALS['requests']        = [];
+        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+        $_SERVER['SERVER_PORT']     = 80;
+        $_SERVER['SERVER_NAME']     = 'www.example.com';
+        $_SERVER['REQUEST_URI']     = '/index.php';
     }
 
     public function tearDown()
     {
-        unset($GLOBALS['requests']);
+        unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
         parent::tearDown();
     }
