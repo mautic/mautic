@@ -17,9 +17,6 @@ use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Check Step.
- */
 class CheckStep implements StepInterface
 {
     /**
@@ -36,11 +33,14 @@ class CheckStep implements StepInterface
      */
     private $kernelRoot;
 
-    /** @var OpenSSLCipher */
+    /**
+     * @var OpenSSLCipher
+     */
     private $openSSLCipher;
 
     /**
      * Absolute path to cache directory.
+     * Required in step.
      *
      * @var string
      */
@@ -48,6 +48,7 @@ class CheckStep implements StepInterface
 
     /**
      * Absolute path to log directory.
+     * Required in step.
      *
      * @var string
      */
@@ -61,15 +62,6 @@ class CheckStep implements StepInterface
     public $site_url;
 
     /**
-     * Set the name of the source that installed Mautic.
-     *
-     * @var string
-     */
-    public $install_source = 'Mautic';
-
-    /**
-     * Constructor.
-     *
      * @param Configurator  $configurator  Configurator service
      * @param string        $kernelRoot    Kernel root path
      * @param RequestStack  $requestStack  Request stack
@@ -134,10 +126,6 @@ class CheckStep implements StepInterface
 
         if (!isset($timezones[date_default_timezone_get()])) {
             $messages[] = 'mautic.install.timezone.not.supported';
-        }
-
-        if (get_magic_quotes_gpc()) {
-            $messages[] = 'mautic.install.magic_quotes_enabled';
         }
 
         if (!function_exists('json_encode')) {

@@ -11,18 +11,21 @@
 
 namespace Mautic\InstallBundle\Helper;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
 
 class SchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     protected $db;
 
@@ -42,9 +45,9 @@ class SchemaHelper
     protected $dbParams = [];
 
     /**
-     * SchemaHelper constructor.
-     *
      * @param array $dbParams
+     *
+     * @throws DBALException
      */
     public function __construct(array $dbParams)
     {
@@ -105,9 +108,9 @@ class SchemaHelper
     }
 
     /**
-     * @param $dbName
+     * @return bool
      *
-     * @return array
+     * @throws DBALException
      */
     public function createDatabase()
     {
@@ -140,9 +143,10 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @param object $originalData
-     *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
+     *
+     * @throws DBALException
+     * @throws ORMException
      */
     public function installSchema()
     {
@@ -209,7 +213,7 @@ class SchemaHelper
      *
      * @return array
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
     {
@@ -307,10 +311,10 @@ class SchemaHelper
     }
 
     /**
-     * @param $applicableSequences
      * @param $tables
+     * @param $mauticTables
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @return array
      */
     protected function dropExistingSchema($tables, $mauticTables)
     {

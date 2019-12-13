@@ -9,18 +9,27 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /*
- * creates pagehit url prefix index. Cannot be done in the entity itself because doctrine
+ * Creates pagehit url prefix index. Cannot be done in the entity itself because doctrine
  * doesn't support prefix indexes :(
  */
 class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
     private $container;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
+    /**
+     * @param ObjectManager $manager
+     */
     public function load(ObjectManager $manager)
     {
         $prefix = $this->container->getParameter('mautic.db_table_prefix');
@@ -28,6 +37,9 @@ class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, C
         $manager->flush();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getOrder()
     {
         return 99;
