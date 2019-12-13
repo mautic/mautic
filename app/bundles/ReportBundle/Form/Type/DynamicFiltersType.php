@@ -21,9 +21,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DynamicFiltersType.
- */
 class DynamicFiltersType extends AbstractType
 {
     /**
@@ -80,8 +77,9 @@ class DynamicFiltersType extends AbstractType
                         break;
                     case 'multiselect':
                     case 'select':
-                        $type            = ChoiceType::class;
-                        $args['choices'] = $definition['list'];
+                        $type                      = ChoiceType::class;
+                        $args['choices_as_values'] = true;
+                        $args['choices']           = array_flip($definition['list']);
                         break;
                     default:
                         $type = TextType::class;

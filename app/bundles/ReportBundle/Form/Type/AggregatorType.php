@@ -19,9 +19,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AggregatorType.
- */
 class AggregatorType extends AbstractType
 {
     /**
@@ -39,39 +36,48 @@ class AggregatorType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // function
-        $builder->add('function', ChoiceType::class, [
-            'choices' => [
-                'COUNT' => $this->translator->trans('mautic.report.report.label.aggregators.count'),
-                'AVG'   => $this->translator->trans('mautic.report.report.label.aggregators.avg'),
-                'SUM'   => $this->translator->trans('mautic.report.report.label.aggregators.sum'),
-                'MIN'   => $this->translator->trans('mautic.report.report.label.aggregators.min'),
-                'MAX'   => $this->translator->trans('mautic.report.report.label.aggregators.max'),
-            ],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.function',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control not-chosen',
-            ],
-        ]);
+        $builder->add(
+            'function',
+            ChoiceType::class,
+            [
+                'choices_as_values' => true,
+                'choices'           => [
+                    $this->translator->trans('mautic.report.report.label.aggregators.count') => 'COUNT',
+                    $this->translator->trans('mautic.report.report.label.aggregators.avg')   => 'AVG',
+                    $this->translator->trans('mautic.report.report.label.aggregators.sum')   => 'SUM',
+                    $this->translator->trans('mautic.report.report.label.aggregators.min')   => 'MIN',
+                    $this->translator->trans('mautic.report.report.label.aggregators.max')   => 'MAX',
+                ],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.report.function',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class' => 'form-control not-chosen',
+                ],
+            ]
+        );
 
         // Build a list of columns
-        $builder->add('column', ChoiceType::class, [
-            'choices'     => $options['columnList'],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control filter-columns',
-            ],
-        ]);
+        $builder->add(
+            'column',
+            ChoiceType::class,
+            [
+                'choices_as_values' => true,
+                'choices'           => array_flip($options['columnList']),
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.label.filtercolumn',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'required'          => false,
+                'attr'              => [
+                    'class' => 'form-control filter-columns',
+                ],
+            ]
+        );
     }
 
     /**

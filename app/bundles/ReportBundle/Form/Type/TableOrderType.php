@@ -19,9 +19,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FilterSelectorType.
- */
 class TableOrderType extends AbstractType
 {
     /**
@@ -40,35 +37,45 @@ class TableOrderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Build a list of columns
-        $builder->add('column', ChoiceType::class, [
-            'choices'     => $options['columnList'],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.report.report.label.filtercolumn',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control',
-            ],
-        ]);
+        $builder->add(
+            'column',
+            ChoiceType::class,
+            [
+                'choices_as_values' => true,
+                'choices'           => array_flip($options['columnList']),
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.label.filtercolumn',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'required'          => false,
+                'attr'              => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
 
         // Direction
-        $builder->add('direction', ChoiceType::class, [
-            'choices' => [
-                'ASC'  => $this->translator->trans('mautic.report.report.label.tableorder_dir.asc'),
-                'DESC' => $this->translator->trans('mautic.report.report.label.tableorder_dir.desc'),
-            ],
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.core.order',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control not-chosen',
-            ],
-        ]);
+        $builder->add(
+            'direction',
+            ChoiceType::class,
+            [
+                'choices_as_values' => true,
+                'choices'           => [
+                    $this->translator->trans('mautic.report.report.label.tableorder_dir.asc')  => 'ASC',
+                    $this->translator->trans('mautic.report.report.label.tableorder_dir.desc') => 'DESC',
+                ],
+                'expanded'    => false,
+                'multiple'    => false,
+                'label'       => 'mautic.core.order',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+                'attr'        => [
+                    'class' => 'form-control not-chosen',
+                ],
+            ]
+        );
     }
 
     /**

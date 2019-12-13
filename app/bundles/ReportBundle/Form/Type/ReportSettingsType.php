@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ReportSettingsType.
- */
 class ReportSettingsType extends AbstractType
 {
     /**

@@ -12,15 +12,11 @@
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\Serializer;
-use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ReportWidgetType.
- */
 class ReportWidgetType extends AbstractType
 {
     /**
@@ -29,8 +25,6 @@ class ReportWidgetType extends AbstractType
     protected $model;
 
     /**
-     * ReportWidgetType constructor.
-     *
      * @param ReportModel $reportModel
      */
     public function __construct(ReportModel $reportModel)
@@ -52,8 +46,8 @@ class ReportWidgetType extends AbstractType
                 $graphs = Serializer::decode($report['graphs']);
 
                 foreach ($graphs as $graph) {
-                    $graphValue                            = $report['id'].':'.$graph;
-                    $choices[$report['name']][$graphValue] = $graph;
+                    $graphValue                       = $report['id'].':'.$graph;
+                    $choices[$report['name']][$graph] = $graphValue;
                 }
             }
         }
@@ -63,14 +57,15 @@ class ReportWidgetType extends AbstractType
             'graph',
             ChoiceType::class,
             [
-                'choices'     => $choices,
-                'expanded'    => false,
-                'multiple'    => false,
-                'label'       => 'mautic.report.report.form.choose_graphs',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-                'attr'        => [
+                'choices_as_values' => true,
+                'choices'           => $choices,
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.report.report.form.choose_graphs',
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => false,
+                'required'          => false,
+                'attr'              => [
                     'class' => 'form-control',
                 ],
             ]
