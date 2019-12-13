@@ -13,7 +13,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
@@ -24,7 +24,7 @@ class BuilderTokenHelper
     private $isConfigured = false;
 
     private $security;
-    private $entityManager;
+    private $modelFactory;
     private $connection;
     private $userHelper;
 
@@ -34,20 +34,14 @@ class BuilderTokenHelper
     protected $langVar;
     protected $bundleName;
 
-    /**
-     * @param CorePermissions $security
-     * @param EntityManager   $entityManager
-     * @param Connection      $connection
-     * @param UserHelper      $userHelper
-     */
     public function __construct(
         CorePermissions $security,
-        EntityManager $entityManager,
+        ModelFactory $modelFactory,
         Connection $connection,
         UserHelper $userHelper
     ) {
         $this->security      = $security;
-        $this->entityManager = $entityManager;
+        $this->modelFactory  = $modelFactory;
         $this->connection    = $connection;
         $this->userHelper    = $userHelper;
     }
@@ -112,7 +106,7 @@ class BuilderTokenHelper
             return;
         }
 
-        $repo   = $this->entityManager->getRepository($this->modelName);
+        $repo   = $this->modelFactory->getModel($this->modelName)->getRepository();
         $prefix = $repo->getTableAlias();
         if (!empty($prefix)) {
             $prefix .= '.';
