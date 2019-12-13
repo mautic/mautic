@@ -128,14 +128,6 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.timezone.not.supported';
         }
 
-        if (
-            version_compare(PHP_VERSION, '5.6.0', '>=')
-            &&
-            version_compare(PHP_VERSION, '7', '<')
-            ) {
-            $messages[] = 'mautic.install.always_populate_raw_post_data_enabled';
-        }
-
         if (!function_exists('json_encode')) {
             $messages[] = 'mautic.install.function.jsonencode';
         }
