@@ -26,7 +26,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TriggerType extends AbstractType
 {
@@ -36,18 +35,11 @@ class TriggerType extends AbstractType
     private $security;
 
     /**
-     * @var TranslatorInterface
+     * @param CorePermissions $security
      */
-    private $translator;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
-    public function __construct(TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $translator;
-        $this->security   = $security;
+        $this->security = $security;
     }
 
     /**

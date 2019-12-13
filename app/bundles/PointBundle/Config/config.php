@@ -147,7 +147,6 @@ return [
             'mautic.pointtrigger.type.form' => [
                 'class'     => \Mautic\PointBundle\Form\Type\TriggerType::class,
                 'arguments' => [
-                  'translator',
                   'mautic.security',
                 ],
             ],
