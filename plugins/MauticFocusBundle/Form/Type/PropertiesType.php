@@ -106,7 +106,8 @@ class PropertiesType extends AbstractType
             'when',
             ChoiceType::class,
             [
-                'choices' => [
+                'choices_as_values' => true,
+                'choices'           => [
                     'mautic.focus.form.when.immediately'   => 'immediately',
                     'mautic.focus.form.when.scroll_slight' => 'scroll_slight',
                     'mautic.focus.form.when.scroll_middle' => 'scroll_middle',
@@ -141,7 +142,8 @@ class PropertiesType extends AbstractType
             'frequency',
             ChoiceType::class,
             [
-                'choices' => [
+                'choices_as_values' => true,
+                'choices'           => [
                     'mautic.focus.form.frequency.everypage' => 'everypage',
                     'mautic.focus.form.frequency.once'      => 'once',
                     'mautic.focus.form.frequency.q2m'       => 'q2min',

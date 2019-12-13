@@ -102,7 +102,8 @@ class ContentType extends AbstractType
             'font',
             ChoiceType::class,
             [
-                'choices' => [
+                'choices_as_values' => true,
+                'choices'           => [
                     'Arial'                    => 'Arial, Helvetica, sans-serif',
                     'Arial Black'              => '\'Arial Black\', Gadget, sans-serif',
                     'Arial Narrow'             => '\'Arial Narrow\', sans-serif',

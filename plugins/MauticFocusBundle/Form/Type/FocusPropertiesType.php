@@ -25,6 +25,8 @@ class FocusPropertiesType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $choices = [];
+
         // Type specific
         switch ($options['focus_style']) {
             case 'bar':
@@ -70,7 +72,8 @@ class FocusPropertiesType extends AbstractType
                     'size',
                     ChoiceType::class,
                     [
-                        'choices' => [
+                        'choices_as_values' => true,
+                        'choices'           => [
                             'mautic.focus.form.bar.size.large'   => 'large',
                             'mautic.focus.form.bar.size.regular' => 'regular',
                         ],
@@ -86,23 +89,23 @@ class FocusPropertiesType extends AbstractType
                 );
 
                 $choices = [
-                    'top'    => 'mautic.focus.form.placement.top',
-                    'bottom' => 'mautic.focus.form.placement.bottom',
+                    'mautic.focus.form.placement.top'    => 'top',
+                    'mautic.focus.form.placement.bottom' => 'bottom',
                 ];
                 break;
             case 'modal':
                 $choices = [
-                    'top'    => 'mautic.focus.form.placement.top',
-                    'middle' => 'mautic.focus.form.placement.middle',
-                    'bottom' => 'mautic.focus.form.placement.bottom',
+                    'mautic.focus.form.placement.top'    => 'top',
+                    'mautic.focus.form.placement.middle' => 'middle',
+                    'mautic.focus.form.placement.bottom' => 'bottom',
                 ];
                 break;
             case 'notification':
                 $choices = [
-                    'top_left'     => 'mautic.focus.form.placement.top_left',
-                    'top_right'    => 'mautic.focus.form.placement.top_right',
-                    'bottom_left'  => 'mautic.focus.form.placement.bottom_left',
-                    'bottom_right' => 'mautic.focus.form.placement.bottom_right',
+                    'mautic.focus.form.placement.top_left'     => 'top_left',
+                    'mautic.focus.form.placement.top_right'    => 'top_right',
+                    'mautic.focus.form.placement.bottom_left'  => 'bottom_left',
+                    'mautic.focus.form.placement.bottom_right' => 'bottom_right',
                 ];
                 break;
             case 'page':
@@ -114,10 +117,11 @@ class FocusPropertiesType extends AbstractType
                 'placement',
                 ChoiceType::class,
                 [
-                    'choices'    => array_flip($choices),
-                    'label'      => 'mautic.focus.form.placement',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
+                    'choices_as_values' => true,
+                    'choices'           => $choices,
+                    'label'             => 'mautic.focus.form.placement',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',
                     ],

@@ -8,9 +8,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FocusListType.
- */
 class FocusListType extends AbstractType
 {
     /**
@@ -36,7 +33,8 @@ class FocusListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) {
+                'choices_as_values' => true,
+                'choices'           => function (Options $options) {
                     $choices = [];
 
                     $list = $this->repo->getFocusList($options['data']);
