@@ -256,32 +256,6 @@ class CheckStep implements StepInterface
             }
         }
 
-        if (class_exists('\\Locale')) {
-            if (defined('INTL_ICU_VERSION')) {
-                $version = INTL_ICU_VERSION;
-            } else {
-                try {
-                    $reflector = new \ReflectionExtension('intl');
-
-                    ob_start();
-                    $reflector->info();
-                    $output = strip_tags(ob_get_clean());
-
-                    preg_match('/^ICU version +(?:=> )?(.*)$/m', $output, $matches);
-                    $version = $matches[1];
-                } catch (\ReflectionException $exception) {
-                    $messages[] = 'mautic.install.module.intl';
-
-                    // Fake the version here for the next check
-                    $version = '4.0';
-                }
-            }
-
-            if (version_compare($version, '4.0', '<')) {
-                $messages[] = 'mautic.install.intl.icu.version';
-            }
-        }
-
         return $messages;
     }
 
