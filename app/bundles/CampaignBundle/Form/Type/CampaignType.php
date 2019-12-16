@@ -91,7 +91,7 @@ class CampaignType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'data' => $data,
             'attr' => [
-                'readonly' => true,
+                'readonly' => $readonly,
             ],
         ]);
 

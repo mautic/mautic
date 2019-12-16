@@ -124,7 +124,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 [
                     'data' => $data,
                     'attr' => [
-                        'readonly' => true,
+                        'readonly' => $readonly,
                     ],
                 ]
             );
@@ -140,7 +140,7 @@ abstract class AbstractFormStandardType extends AbstractType
                         'attr'       => [
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
-                            'readonly'    => true,
+                            'readonly'    => $readonly,
                         ],
                         'format'     => 'yyyy-MM-dd HH:mm',
                         'required'   => false,
@@ -157,7 +157,7 @@ abstract class AbstractFormStandardType extends AbstractType
                         'attr'       => [
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
-                            'readonly'    => true,
+                            'readonly'    => $readonly,
                         ],
                         'format'     => 'yyyy-MM-dd HH:mm',
                         'required'   => false,
