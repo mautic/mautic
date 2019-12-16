@@ -18,6 +18,7 @@ use Mautic\QueueBundle\Queue\QueueService;
 use Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
@@ -74,7 +75,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
     {
         $messagesConsumed = 0;
 
-        while ($event->getMessages() === null || $event->getMessages() > $messagesConsumed) {
+        while (null === $event->getMessages() || $event->getMessages() > $messagesConsumed) {
             $pheanstalk = $this->container->get('leezy.pheanstalk');
             $job        = $pheanstalk
                 ->watch($event->getQueueName())
@@ -87,16 +88,16 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
             $consumerEvent = $this->queueService->dispatchConsumerEventFromPayload($job->getData());
 
-            if ($consumerEvent->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
+            if (QueueConsumerResults::TEMPORARY_REJECT === $consumerEvent->getResult()) {
                 $pheanstalk->release($job, PheanstalkInterface::DEFAULT_PRIORITY, static::DELAY_DURATION);
-            } elseif ($consumerEvent->getResult() === QueueConsumerResults::REJECT) {
+            } elseif (QueueConsumerResults::REJECT === $consumerEvent->getResult()) {
                 $pheanstalk->bury($job);
             } else {
                 try {
                     $pheanstalk->delete($job);
                 } catch (Pheanstalk\Exception\ServerException $e) {
-                    if (strpos($e->getMessage(), 'Cannot delete job') === false
-                        && strpos($e->getMessage(), 'NOT_FOUND') === false
+                    if (false === strpos($e->getMessage(), 'Cannot delete job')
+                        && false === strpos($e->getMessage(), 'NOT_FOUND')
                     ) {
                         throw $e;
                     }
@@ -117,7 +118,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -139,7 +140,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -161,7 +162,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.beanstalkd.timeout',
                 'label_attr' => ['class' => 'control-label'],
