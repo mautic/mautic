@@ -231,7 +231,7 @@ class CheckStep implements StepInterface
 
         if (!defined('PHP_WINDOWS_VERSION_BUILD')) {
             if (!function_exists('posix_isatty')) {
-                $messages[] = 'mautic.install.function.posix';
+                $messages[] = 'mautic.install.function.posix.enable';
             }
         }
 
