@@ -21,9 +21,9 @@ $loader = require_once __DIR__.'/vendor/autoload.php';
 umask(0000);
 
 if (extension_loaded('apc') && in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1', '172.17.0.1'])) {
-    @apc_clear_cache();
-    @apc_clear_cache('user');
-    @apc_clear_cache('opcode');
+    @apcu_clear_cache();
+    @apcu_clear_cache('user');
+    @apcu_clear_cache('opcode');
 }
 
 \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('dev');

@@ -164,7 +164,7 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.mbstring';
         }
 
-        if (!function_exists('apc_store')) {
+        if (!extension_loaded('apcu') || !ini_get('apc.enabled')) {
             $messages[] = 'mautic.install.extension.apcu';
         }
 
