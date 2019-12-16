@@ -172,12 +172,6 @@ class CheckStep implements StepInterface
             }
         }
 
-        if (extension_loaded('suhosin')) {
-            if (stripos(ini_get('suhosin.executor.include.whitelist'), 'phar')) {
-                $messages[] = 'mautic.install.suhosin.whitelist';
-            }
-        }
-
         if (extension_loaded('xdebug')) {
             if (ini_get('xdebug.show_exception_trace')) {
                 $messages[] = 'mautic.install.xdebug.exception.trace';
