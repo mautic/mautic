@@ -291,7 +291,7 @@ class CheckStep implements StepInterface
      *
      * @return int
      */
-    public function toBytes($val)
+    private function toBytes($val)
     {
         $val = trim($val);
 
