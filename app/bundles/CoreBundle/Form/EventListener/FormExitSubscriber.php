@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -58,27 +59,39 @@ class FormExitSubscriber implements EventSubscriberInterface
             //add a hidden field that is used exclusively to warn a user to use save/cancel to exit a form
             $form = $event->getForm();
 
-            $form->add('unlockModel', 'hidden', [
-                'data'     => $this->model,
-                'required' => false,
-                'mapped'   => false,
-                'attr'     => ['class' => 'form-exit-unlock-model'],
-            ]);
-
-            $form->add('unlockId', 'hidden', [
-                'data'     => $id,
-                'required' => false,
-                'mapped'   => false,
-                'attr'     => ['class' => 'form-exit-unlock-id'],
-            ]);
-
-            if (isset($this->options['unlockParameter'])) {
-                $form->add('unlockParameter', 'hidden', [
-                    'data'     => $this->options['unlockParameter'],
+            $form->add(
+                'unlockModel',
+                HiddenType::class,
+                [
+                    'data'     => $this->model,
                     'required' => false,
                     'mapped'   => false,
-                    'attr'     => ['class' => 'form-exit-unlock-parameter'],
-                ]);
+                    'attr'     => ['class' => 'form-exit-unlock-model'],
+                ]
+            );
+
+            $form->add(
+                'unlockId',
+                HiddenType::class,
+                [
+                    'data'     => $id,
+                    'required' => false,
+                    'mapped'   => false,
+                    'attr'     => ['class' => 'form-exit-unlock-id'],
+                ]
+            );
+
+            if (isset($this->options['unlockParameter'])) {
+                $form->add(
+                    'unlockParameter',
+                    HiddenType::class,
+                    [
+                        'data'     => $this->options['unlockParameter'],
+                        'required' => false,
+                        'mapped'   => false,
+                        'attr'     => ['class' => 'form-exit-unlock-parameter'],
+                    ]
+                );
             }
         }
     }
