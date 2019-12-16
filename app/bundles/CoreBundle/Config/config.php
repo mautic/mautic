@@ -522,7 +522,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\BuilderTokenHelperFactory::class,
                 'arguments' => [
                     'mautic.security',
-                    'doctrine.orm.entity_manager',
+                    'mautic.model.factory',
                     'database_connection',
                     'mautic.helper.user',
                 ],
