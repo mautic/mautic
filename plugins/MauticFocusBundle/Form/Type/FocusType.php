@@ -178,8 +178,10 @@ class FocusType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
-                'data'      => $data,
+                'data' => $data,
+                'attr' => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 
