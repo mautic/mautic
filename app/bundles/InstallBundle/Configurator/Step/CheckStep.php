@@ -182,12 +182,6 @@ class CheckStep implements StepInterface
             }
         }
 
-        $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
-
-        if (is_null($pcreVersion)) {
-            $messages[] = 'mautic.install.function.pcre';
-        }
-
         return $messages;
     }
 
@@ -197,14 +191,6 @@ class CheckStep implements StepInterface
     public function checkOptionalSettings()
     {
         $messages = [];
-
-        $pcreVersion = defined('PCRE_VERSION') ? (float) PCRE_VERSION : null;
-
-        if (!is_null($pcreVersion)) {
-            if (version_compare($pcreVersion, '8.0', '<')) {
-                $messages[] = 'mautic.install.pcre.version';
-            }
-        }
 
         if (extension_loaded('xdebug')) {
             $cfgValue = ini_get('xdebug.max_nesting_level');
