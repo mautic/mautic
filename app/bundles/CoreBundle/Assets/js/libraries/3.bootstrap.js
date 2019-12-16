@@ -943,9 +943,9 @@ if (typeof jQuery === 'undefined') {
         if (this.options.remote) {
             this.$element
                 .find('.modal-content')
-                .load(this.options.remote, $.proxy(function () {
+                .on('load', $.proxy(function () {
                     this.$element.trigger('loaded.bs.modal')
-                }, this))
+                }, this), this.options.remote)
         }
     }
 
@@ -1307,7 +1307,7 @@ if (typeof jQuery === 'undefined') {
         this.type      = type
         this.$element  = $(element)
         this.options   = this.getOptions(options)
-        this.$viewport = this.options.viewport && $($.isFunction(this.options.viewport) ? this.options.viewport.call(this, this.$element) : (this.options.viewport.selector || this.options.viewport))
+        this.$viewport = this.options.viewport && $((typeof this.options.viewport === "function") ? this.options.viewport.call(this, this.$element) : (this.options.viewport.selector || this.options.viewport))
         this.inState   = { click: false, hover: false, focus: false }
 
         if (this.$element[0] instanceof document.constructor && !this.options.selector) {
@@ -1933,7 +1933,7 @@ if (typeof jQuery === 'undefined') {
         this.targets      = []
         this.scrollHeight = this.getScrollHeight()
 
-        if (!$.isWindow(this.$scrollElement[0])) {
+        if (!(null != this.$scrollElement[0] && this.$scrollElement[0] == this.$scrollElement[0].window)) {
             offsetMethod = 'position'
             offsetBase   = this.$scrollElement.scrollTop()
         }
@@ -2094,7 +2094,7 @@ if (typeof jQuery === 'undefined') {
 
         if ($this.parent('li').hasClass('active')) return
 
-        var $previous = $ul.find('.active:last a')
+        var $previous = $ul.find('.active').last().find('a')
         var hideEvent = $.Event('hide.bs.tab', {
             relatedTarget: $this[0]
         })
