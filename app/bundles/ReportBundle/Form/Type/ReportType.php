@@ -58,7 +58,7 @@ class ReportType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
         // Only add these fields if we're in edit mode
-        if (!$options['read_only']) {
+        if (!($options['attr']['readonly'] ?? false)) {
             $builder->add(
                 'name',
                 TextType::class,

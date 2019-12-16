@@ -84,25 +84,21 @@ class RestrictionHelper
     {
         switch ($this->displayMode) {
             case self::MODE_MASK:
-                $attr = [
-                    'placeholder' => $this->translator->trans('mautic.config.restricted'),
-                ];
-                $fieldOptions = $childType->getConfig()->getOptions();
-                $fieldOptions = array_merge(
-                    $fieldOptions,
-                    [
-                        'required'  => false,
-                        'mapped'    => false,
-                        'disabled'  => true,
-                        'read_only' => true,
-                        'attr'      => (isset($fieldOptions['attr'])) ? array_merge($fieldOptions['attr'], $attr) : $attr,
-                    ]
-                );
-
                 $parentType->add(
                     $childType->getName(),
-                    $childType->getConfig()->getType()->getName(),
-                    $fieldOptions
+                    get_class($childType->getConfig()->getType()->getInnerType()),
+                    array_merge(
+                        $childType->getConfig()->getOptions(),
+                        [
+                            'required' => false,
+                            'mapped'   => false,
+                            'disabled' => true,
+                            'attr'     => array_merge($fieldOptions['attr'] ?? [], [
+                                'placeholder' => $this->translator->trans('mautic.config.restricted'),
+                                'readonly'    => true,
+                            ]),
+                        ]
+                    )
                 );
                 break;
             case self::MODE_REMOVE:
