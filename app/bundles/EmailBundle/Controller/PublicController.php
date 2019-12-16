@@ -187,7 +187,16 @@ class PublicController extends CommonFormController
             if (!$this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
             } elseif ($lead) {
-                $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+                $action           = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+                $doNotContactText = str_replace(
+                    [
+                        '|URL|',
+                    ],
+                    [
+                        $this->generateUrl('mautic_email_dnc', ['idHash' => $idHash]),
+                    ],
+                    $this->coreParametersHelper->get('do_not_contact_text')
+                );
 
                 $viewParameters = [
                     'lead'                         => $lead,
@@ -197,6 +206,8 @@ class PublicController extends CommonFormController
                     'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->get('show_contact_preferred_channels'),
                     'showContactCategories'        => $this->get('mautic.helper.core_parameters')->get('show_contact_categories'),
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
+                    'showContactDnc'               => $this->get('mautic.helper.core_parameters')->get('show_contact_dnc'),
+                    'doNotContactText'             => $doNotContactText,
                 ];
 
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
@@ -234,6 +245,7 @@ class PublicController extends CommonFormController
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
                                 'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
                                 'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'showContactDnc'               => false !== strpos($html, 'data-slot="donotcontact"') || false !== strpos($html, BuilderSubscriber::doNotContactToken),
                             ]
                         );
                         // Replace tokens in preference center page
@@ -311,6 +323,76 @@ class PublicController extends CommonFormController
         }
 
         return $this->render($contentTemplate, $viewParams);
+    }
+
+    /**
+     * @param $idHash
+     *
+     * @return Response
+     *
+     * @throws \Exception
+     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     */
+    public function doNotContactAction($idHash)
+    {
+        //find the email
+        $model = $this->getModel('email');
+        $stat  = $model->getEmailStatus($idHash);
+
+        if (!empty($stat)) {
+            $email = $stat->getEmail();
+            $lead  = $stat->getLead();
+
+            if ($lead) {
+                // Set the lead as current lead
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
+                $leadModel->setCurrentLead($lead);
+
+                // Set lead lang
+                if ($lead->getPreferredLocale()) {
+                    $this->translator->setLocale($lead->getPreferredLocale());
+                }
+            }
+
+            $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
+        } else {
+            $email   = $lead   = false;
+            $message = $this->translator->trans('mautic.email.stat_record.not_found');
+        }
+
+        $template = ($email !== null && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
+
+        $theme = $this->factory->getTheme($template);
+
+        if ($theme->getTheme() != $template) {
+            $template = $theme->getTheme();
+        }
+
+        // Ensure template still exists
+        $theme = $this->factory->getTheme($template);
+        if (empty($theme) || $theme->getTheme() !== $template) {
+            $template = $this->coreParametersHelper->get('theme');
+        }
+
+        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+
+        if (!empty($analytics)) {
+            $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
+        }
+
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+
+        return $this->render(
+            $logicalName,
+            [
+                'message'  => $message,
+                'type'     => 'notice',
+                'email'    => $email,
+                'lead'     => $lead,
+                'template' => $template,
+            ]
+        );
     }
 
     /**

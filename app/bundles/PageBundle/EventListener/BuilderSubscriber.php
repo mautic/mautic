@@ -100,6 +100,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     const saveprefsRegex    = '{saveprefsbutton}';
     const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
+    const doNotContactToken = '{donotcontact}';
 
     /**
      * BuilderSubscriber constructor.
@@ -191,6 +192,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                         self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
                         self::successmessage     => $this->translator->trans('mautic.page.form.successmessage'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
+                        self::doNotContactToken  => $this->translator->trans('mautic.page.form.donotcontact'),
                     ]
                 )
             );
@@ -470,6 +472,12 @@ class BuilderSubscriber implements EventSubscriberInterface
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
+
+            if (false !== strpos($content, self::doNotContactToken)) {
+                $doNotContact = $this->renderDoNotContact($params);
+                $content      = str_ireplace(self::doNotContactToken, $doNotContact, $content);
+            }
+
             // add form before first block of prefs center
             if (isset($params['startform']) && false !== strpos($content, 'data-prefs-center')) {
                 $dom = new DOMDocument('1.0', 'utf-8');
@@ -616,6 +624,24 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (empty($content)) {
             $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
             $content .= $this->templating->getTemplating()->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderDoNotContact(array $params = [])
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class='pref-donotcontact ' ".$this->getAttributeForFirtSlot().">\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:donotcontact.html.php', $params);
             $content .= "</div>\n";
         }
 
