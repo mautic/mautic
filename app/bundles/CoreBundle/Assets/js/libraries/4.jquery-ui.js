@@ -120,7 +120,7 @@
         // inheriting from
         basePrototype.options = $.widget.extend( {}, basePrototype.options );
         $.each( prototype, function( prop, value ) {
-            if ( !$.isFunction( value ) ) {
+            if ( !(typeof  value  === 'function') ) {
                 proxiedPrototype[ prop ] = value;
                 return;
             }
@@ -248,7 +248,7 @@
                                 "attempted to call method '" + options + "'" );
                         }
 
-                        if ( !$.isFunction( instance[ options ] ) || options.charAt( 0 ) === "_" ) {
+                        if ( !(typeof  instance[ options ]  === 'function') || options.charAt( 0 ) === "_" ) {
                             return $.error( "no such method '" + options + "' for " + name +
                                 " widget instance" );
                         }
@@ -693,7 +693,7 @@
             }
 
             this.element.trigger( event, data );
-            return !( $.isFunction( callback ) &&
+            return !( (typeof  callback  === 'function') &&
                 callback.apply( this.element[ 0 ], [ event ].concat( data ) ) === false ||
                 event.isDefaultPrevented() );
         }
@@ -2288,7 +2288,7 @@
 
             if ( ( this.options.revert === "invalid" && !dropped ) ||
                 ( this.options.revert === "valid" && dropped ) ||
-                this.options.revert === true || ( $.isFunction( this.options.revert ) &&
+                this.options.revert === true || ( (typeof  this.options.revert  === 'function') &&
                     this.options.revert.call( this.element, dropped ) )
             ) {
                 $( this.helper ).animate(
@@ -2360,7 +2360,7 @@
         _createHelper: function( event ) {
 
             var o = this.options,
-                helperIsFunction = $.isFunction( o.helper ),
+                helperIsFunction = (typeof  o.helper  === 'function'),
                 helper = helperIsFunction ?
                     $( o.helper.apply( this.element[ 0 ], [ event ] ) ) :
                     ( o.helper === "clone" ?
@@ -3283,7 +3283,7 @@
             this.isover = false;
             this.isout = true;
 
-            this.accept = $.isFunction( accept ) ? accept : function( d ) {
+            this.accept = (typeof  accept  === 'function') ? accept : function( d ) {
                 return d.is( accept );
             };
 
@@ -3335,7 +3335,7 @@
         _setOption: function( key, value ) {
 
             if ( key === "accept" ) {
-                this.accept = $.isFunction( value ) ? value : function( d ) {
+                this.accept = (typeof  value  === 'function') ? value : function( d ) {
                     return d.is( value );
                 };
             } else if ( key === "scope" ) {
@@ -4721,7 +4721,7 @@
                     for ( j = cur.length - 1; j >= 0; j-- ) {
                         inst = $.data( cur[ j ], this.widgetFullName );
                         if ( inst && inst !== this && !inst.options.disabled ) {
-                            queries.push( [ $.isFunction( inst.options.items ) ?
+                            queries.push( [ (typeof  inst.options.items  === 'function') ?
                                 inst.options.items.call( inst.element ) :
                                 $( inst.options.items, inst.element )
                                     .not( ".ui-sortable-helper" )
@@ -4731,7 +4731,7 @@
                 }
             }
 
-            queries.push( [ $.isFunction( this.options.items ) ?
+            queries.push( [ (typeof  this.options.items  === 'function') ?
                 this.options.items
                     .call( this.element, null, { options: this.options, item: this.currentItem } ) :
                 $( this.options.items, this.element )
@@ -4771,7 +4771,7 @@
 
             var i, j, cur, inst, targetData, _queries, item, queriesLength,
                 items = this.items,
-                queries = [ [ $.isFunction( this.options.items ) ?
+                queries = [ [ (typeof  this.options.items  === 'function') ?
                     this.options.items.call( this.element[ 0 ], event, { item: this.currentItem } ) :
                     $( this.options.items, this.element ), this ] ],
                 connectWith = this._connectWith();
@@ -4783,7 +4783,7 @@
                     for ( j = cur.length - 1; j >= 0; j-- ) {
                         inst = $.data( cur[ j ], this.widgetFullName );
                         if ( inst && inst !== this && !inst.options.disabled ) {
-                            queries.push( [ $.isFunction( inst.options.items ) ?
+                            queries.push( [ (typeof  inst.options.items  === 'function') ?
                                 inst.options.items
                                     .call( inst.element[ 0 ], event, { item: this.currentItem } ) :
                                 $( inst.options.items, inst.element ), inst ] );
@@ -5067,7 +5067,7 @@
         _createHelper: function( event ) {
 
             var o = this.options,
-                helper = $.isFunction( o.helper ) ?
+                helper = (typeof  o.helper  === 'function') ?
                     $( o.helper.apply( this.element[ 0 ], [ event, this.currentItem ] ) ) :
                     ( o.helper === "clone" ? this.currentItem.clone() : this.currentItem );
 
@@ -6828,7 +6828,7 @@
             }
 
             // Catch (effect, callback)
-            if ( $.isFunction( options ) ) {
+            if ( (typeof  options  === 'function') ) {
                 callback = options;
                 speed = null;
                 options = {};
@@ -6842,7 +6842,7 @@
             }
 
             // Catch (effect, options, callback)
-            if ( $.isFunction( speed ) ) {
+            if ( (typeof  speed  === 'function') ) {
                 callback = speed;
                 speed = null;
             }
@@ -6876,7 +6876,7 @@
             }
 
             // Complete callback
-            if ( $.isFunction( option ) ) {
+            if ( (typeof  option  === 'function') ) {
                 return true;
             }
 
@@ -6921,7 +6921,7 @@
                             $.effects.saveStyle( el );
                         }
 
-                        if ( $.isFunction( next ) ) {
+                        if ( (typeof  next  === 'function') ) {
                             next();
                         }
                     };
@@ -6956,11 +6956,11 @@
                     }
 
                     function done() {
-                        if ( $.isFunction( complete ) ) {
+                        if ( (typeof  complete  === 'function') ) {
                             complete.call( elem[ 0 ] );
                         }
 
-                        if ( $.isFunction( next ) ) {
+                        if ( (typeof  next  === 'function') ) {
                             next();
                         }
                     }
@@ -7081,7 +7081,7 @@
                         } )
                         .animate( animation, options.duration, options.easing, function() {
                             transfer.remove();
-                            if ( $.isFunction( done ) ) {
+                            if ( (typeof  done  === 'function') ) {
                                 done();
                             }
                         } );
