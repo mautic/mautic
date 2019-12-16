@@ -11,11 +11,17 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -33,9 +39,6 @@ use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
@@ -96,7 +99,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addDecision(
             'email.open',
@@ -180,8 +183,13 @@ class CampaignSubscriber implements EventSubscriberInterface
      * Trigger campaign event for opening of an email.
      *
      * @param EmailOpenEvent $event
+     *
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
-    public function onEmailOpen(EmailOpenEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event): void
     {
         $email = $event->getEmail();
 
@@ -194,8 +202,13 @@ class CampaignSubscriber implements EventSubscriberInterface
      * Trigger campaign event for reply to an email.
      *
      * @param EmailReplyEvent $event
+     *
+     * @throws CannotProcessEventException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws NotSchedulableException
      */
-    public function onEmailReply(EmailReplyEvent $event)
+    public function onEmailReply(EmailReplyEvent $event): void
     {
         $email = $event->getEmail();
         if (null !== $email) {
@@ -205,8 +218,10 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
      */
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         /** @var Email $eventDetails */
         $eventDetails = $event->getEventDetails();
@@ -252,9 +267,10 @@ class CampaignSubscriber implements EventSubscriberInterface
      *
      * @param PendingEvent $event
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
+     * @throws NoContactsFoundException
      */
-    public function onCampaignTriggerActionSendEmailToContact(PendingEvent $event)
+    public function onCampaignTriggerActionSendEmailToContact(PendingEvent $event): void
     {
         if (!$event->checkContext('email.send')) {
             return;
@@ -359,7 +375,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @param PendingEvent $event
      */
-    public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event)
+    public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event): void
     {
         if (!$event->checkContext('email.send.to.user')) {
             return;
