@@ -249,7 +249,7 @@ class UserType extends AbstractType
                             'class' => 'form-control',
                         ],
                         'class'         => Role::class,
-                        'property'      => 'name',
+                        'choice_label'  => 'name',
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('r')
                                 ->where('r.isPublished = true')

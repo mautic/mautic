@@ -447,7 +447,7 @@ class FieldType extends AbstractType
                 [
                     'label'         => 'mautic.core.order',
                     'class'         => 'MauticLeadBundle:LeadField',
-                    'property'      => 'label',
+                    'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
                     'query_builder' => function (EntityRepository $er) {
