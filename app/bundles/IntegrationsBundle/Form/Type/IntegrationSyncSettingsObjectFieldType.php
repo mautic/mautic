@@ -43,7 +43,7 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
                 'label'          => false,
                 'choices'        => $options['mauticFields'],
                 'required'       => $field->showAsRequired(),
-                'empty_value'    => '',
+                'placeholder'    => '',
                 'error_bubbling' => false,
                 'attr'           => [
                     'class'            => 'form-control integration-mapped-field',

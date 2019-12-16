@@ -55,7 +55,7 @@ class TrackingPixelSendType extends AbstractType
             'expanded'    => false,
             'multiple'    => true,
             'choices'     => array_flip($trackingServices),
-            'empty_value' => 'mautic.core.form.chooseone',
+            'placeholder' => 'mautic.core.form.chooseone',
             'constraints' => [
                 new NotBlank(
                     ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']

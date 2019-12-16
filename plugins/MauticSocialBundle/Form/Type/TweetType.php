@@ -109,7 +109,7 @@ class TweetType extends AbstractType
                 AssetListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -127,7 +127,7 @@ class TweetType extends AbstractType
                 'page_list',
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [

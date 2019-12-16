@@ -227,7 +227,7 @@ class FocusType extends AbstractType
             [
                 'label'       => 'mautic.focus.form.choose_form',
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'attr'        => [
                     'onchange' => 'Mautic.focusUpdatePreview()',
                 ],

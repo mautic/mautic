@@ -106,7 +106,7 @@ class ClientType extends AbstractType
                     ],
                     'choices_as_values' => true,
                     'required'          => false,
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'data'              => $this->apiMode,
                 ]
             );

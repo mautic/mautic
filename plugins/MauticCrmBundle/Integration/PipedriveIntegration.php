@@ -319,7 +319,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.pipedrive.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -336,7 +336,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.pipedrive.add.edit.contact.import',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
