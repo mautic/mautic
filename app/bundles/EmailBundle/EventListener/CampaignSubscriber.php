@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -30,7 +29,6 @@ use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -41,19 +39,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var EmailModel
      */
     private $emailModel;
-
-    /**
-     * @var EmailModel
-     */
-    private $messageQueueModel;
 
     /**
      * @var EventModel
@@ -71,24 +59,19 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @param LeadModel         $leadModel
-     * @param EmailModel        $emailModel
-     * @param EventModel        $eventModel
-     * @param MessageQueueModel $messageQueueModel
-     * @param SendEmailToUser   $sendEmailToUser
+     * @param EmailModel          $emailModel
+     * @param EventModel          $eventModel
+     * @param SendEmailToUser     $sendEmailToUser
+     * @param TranslatorInterface $translator
      */
     public function __construct(
-        LeadModel $leadModel,
         EmailModel $emailModel,
         EventModel $eventModel,
-        MessageQueueModel $messageQueueModel,
         SendEmailToUser $sendEmailToUser,
         TranslatorInterface $translator
     ) {
-        $this->leadModel          = $leadModel;
         $this->emailModel         = $emailModel;
         $this->campaignEventModel = $eventModel;
-        $this->messageQueueModel  = $messageQueueModel;
         $this->sendEmailToUser    = $sendEmailToUser;
         $this->translator         = $translator;
     }
