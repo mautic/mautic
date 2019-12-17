@@ -47,11 +47,11 @@ class PendingEvent extends AbstractLogCollectionEvent
     private $now;
 
     /**
-     * PendingEvent constructor.
-     *
      * @param AbstractEventAccessor $config
      * @param Event                 $event
      * @param ArrayCollection       $logs
+     *
+     * @throws \Exception
      */
     public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
     {
