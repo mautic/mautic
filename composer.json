@@ -151,7 +151,8 @@
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist"
     },
     "config": {
-        "bin-dir": "bin"
+        "bin-dir": "bin",
+        "process-timeout": 5000
     },
     "extra": {
         "symfony-app-dir": "app",
