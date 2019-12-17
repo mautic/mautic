@@ -374,6 +374,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @param PendingEvent $event
+     *
+     * @throws ORMException
      */
     public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event): void
     {

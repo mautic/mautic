@@ -108,7 +108,19 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
     {
-        $lead = new Lead();
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = (new Event())->setEventType('email.send');
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
+
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(6);
+
+        $logs = new ArrayCollection([$leadEventLog]);
 
         $args = [
             'lead'  => $lead,
@@ -122,12 +134,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
-        $mockSendEmailToUser->expects($this->once())
+        $this->sendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
             ->with($this->config, $lead);
 
-        $event = new CampaignExecutionEvent($args, false);
-
+        $event = new PendingEvent($eventAccessor, $event, $logs);
         $this->subscriber->onCampaignTriggerActionSendEmailToUser($event);
 
         $this->assertTrue($event->getResult());
