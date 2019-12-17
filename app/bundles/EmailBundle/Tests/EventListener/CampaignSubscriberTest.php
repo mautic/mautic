@@ -29,7 +29,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $config = [
         'useremail' => [
             'email' => 33,
@@ -40,31 +42,53 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'bcc'      => 'hidden@translation.in',
     ];
 
+    /**
+     * @var EmailModel|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $emailModel;
+
+    /**
+     * @var EventModel|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $eventModel;
+
+    /**
+     * @var SendEmailToUser|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $sendEmailToUser;
+
+    /**
+     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $translator;
+
+    /**
+     * @var CampaignSubscriber
+     */
+    private $subscriber;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->emailModel      = $this->createMock(EmailModel::class);
+        $this->eventModel      = $this->createMock(EventModel::class);
+        $this->sendEmailToUser = $this->createMock(SendEmailToUser::class);
+        $this->translator      = $this->createMock(TranslatorInterface::class);
+
+        $this->subscriber = new CampaignSubscriber(
+            $this->emailModel,
+            $this->eventModel,
+            $this->sendEmailToUser,
+            $this->translator
+        );
+    }
+
     public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
     {
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockTranslator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockEmailModel, $mockEventModel, $mockSendEmailToUser, $mockTranslator);
-
         $eventAccessor = $this->createMock(ActionAccessor::class);
-
-        $event = (new Event())->setEventType('email.send');
-
-        $lead = (new Lead())->setEmail('tester@mautic.org');
+        $event         = (new Event())->setEventType('email.send');
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
         $leadEventLog
@@ -77,7 +101,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $logs = new ArrayCollection([$leadEventLog]);
 
         $event = new PendingEvent($eventAccessor, $event, $logs);
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($event);
 
         $this->assertCount(0, $event->getSuccessful());
     }
@@ -85,32 +109,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
     {
         $lead = new Lead();
-
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockTranslator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator);
 
         $args = [
             'lead'  => $lead,
@@ -130,7 +128,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = new CampaignExecutionEvent($args, false);
 
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($event);
 
         $this->assertTrue($event->getResult());
     }
