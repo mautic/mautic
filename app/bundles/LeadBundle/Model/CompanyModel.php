@@ -496,7 +496,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
+        $this->em->clear(CompanyLead::class);
 
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $listId) {
