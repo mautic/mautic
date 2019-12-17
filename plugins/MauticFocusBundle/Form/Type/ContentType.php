@@ -120,7 +120,6 @@ class ContentType extends AbstractType
                     'Trebuchet MS'             => '\'Trebuchet MS\', Helvetica, sans-serif',
                     'Verdana'                  => 'Verdana, Geneva, sans-serif',
                 ],
-                'choice_as_values' => true,
                 'label'            => 'mautic.focus.form.font',
                 'label_attr'       => ['class' => 'control-label'],
                 'attr'             => [
