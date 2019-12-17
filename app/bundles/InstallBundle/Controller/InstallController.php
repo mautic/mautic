@@ -13,6 +13,9 @@ namespace Mautic\InstallBundle\Controller;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -24,11 +27,11 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
-/**
- * InstallController.
- */
 class InstallController extends CommonController
 {
     const CHECK_STEP    = 0;
@@ -54,7 +57,9 @@ class InstallController extends CommonController
      *
      * @param int $index The step number to process
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
+     *
+     * @throws DBALException
      */
     public function stepAction($index = 0)
     {
@@ -258,7 +263,9 @@ class InstallController extends CommonController
     /**
      * Controller action for the final step.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
+     *
+     * @throws \Exception
      */
     public function finalAction()
     {
@@ -326,7 +333,7 @@ class InstallController extends CommonController
             return false;
         }
 
-        /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
+        /** @var Configurator $configurator */
         $params = $this->configurator->getParameters();
 
         // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
@@ -341,8 +348,6 @@ class InstallController extends CommonController
 
     /**
      * Installs data fixtures for the application.
-     *
-     * @return array|bool Array containing the flash message data on a failure, boolean true on success
      */
     private function installDatabaseFixtures()
     {
@@ -375,7 +380,8 @@ class InstallController extends CommonController
      *
      * @param array $data
      *
-     * @return array|bool
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     private function createAdminUserStep($data)
     {
@@ -394,7 +400,7 @@ class InstallController extends CommonController
             $user = new User();
         }
 
-        /** @var \Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface $encoder */
+        /** @var PasswordEncoderInterface $encoder */
         $encoder = $this->get('security.encoder_factory')->getEncoder($user);
 
         $user->setFirstName($data->firstname);

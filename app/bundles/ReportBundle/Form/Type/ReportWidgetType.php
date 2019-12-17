@@ -12,14 +12,11 @@
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\Serializer;
-use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class ReportWidgetType.
- */
 class ReportWidgetType extends AbstractType
 {
     /**
@@ -28,8 +25,6 @@ class ReportWidgetType extends AbstractType
     protected $model;
 
     /**
-     * ReportWidgetType constructor.
-     *
      * @param ReportModel $reportModel
      */
     public function __construct(ReportModel $reportModel)
@@ -51,8 +46,8 @@ class ReportWidgetType extends AbstractType
                 $graphs = Serializer::decode($report['graphs']);
 
                 foreach ($graphs as $graph) {
-                    $graphValue                            = $report['id'].':'.$graph;
-                    $choices[$graph]                       = [$report['name'] => $graphValue];
+                    $graphValue                       = $report['id'].':'.$graph;
+                    $choices[$report['name']][$graph] = $graphValue;
                 }
             }
         }
@@ -60,10 +55,10 @@ class ReportWidgetType extends AbstractType
         // Build a list of data sources
         $builder->add(
             'graph',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'           => $choices,
                 'choices_as_values' => true,
+                'choices'           => $choices,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.form.choose_graphs',
@@ -84,7 +79,7 @@ class ReportWidgetType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'report_widget';
     }

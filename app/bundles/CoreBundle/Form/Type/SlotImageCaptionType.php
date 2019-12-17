@@ -51,9 +51,9 @@ class SlotImageCaptionType extends SlotType
                     'data-slot-param' => 'align',
                 ],
                 'choices'           => [
-                    'mautic.core.left'   => 'left',
-                    'mautic.core.center' => 'center',
-                    'mautic.core.right'  => 'right',
+                    'mautic.core.left'   => 0,
+                    'mautic.core.center' => 1,
+                    'mautic.core.right'  => 2,
                 ],
                 'choices_as_values' => true,
             ]
@@ -71,9 +71,9 @@ class SlotImageCaptionType extends SlotType
                     'data-slot-param' => 'text-align',
                 ],
                 'choices'           => [
-                    'mautic.core.left'   => 'left',
-                    'mautic.core.center' => 'center',
-                    'mautic.core.right'  => 'right',
+                    'mautic.core.left'   => 0,
+                    'mautic.core.center' => 1,
+                    'mautic.core.right'  => 2,
                 ],
                 'choices_as_values' => true,
             ]

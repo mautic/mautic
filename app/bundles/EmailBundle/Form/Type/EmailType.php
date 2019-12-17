@@ -27,6 +27,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -69,7 +70,7 @@ class EmailType extends AbstractType
     /**
      * @param TranslatorInterface $translator
      * @param EntityManager       $entityManager
-     * @param RequestStack        $request
+     * @param RequestStack        $requestStack
      * @param StageModel          $stageModel
      */
     public function __construct(
@@ -313,7 +314,7 @@ class EmailType extends AbstractType
         $builder->add(
             $builder->create(
                 'preferenceCenter',
-                'preference_center_list',
+                PreferenceCenterListType::class,
                 [
                     'label'      => 'mautic.email.form.preference_center',
                     'label_attr' => ['class' => 'control-label'],

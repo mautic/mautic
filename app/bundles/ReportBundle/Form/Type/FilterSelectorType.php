@@ -14,16 +14,14 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FilterSelectorType.
- */
 class FilterSelectorType extends AbstractType
 {
     /**
@@ -34,10 +32,10 @@ class FilterSelectorType extends AbstractType
         // Build a list of columns
         $builder->add(
             'column',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'           => array_flip($options['filterList']),
                 'choices_as_values' => true,
+                'choices'           => array_flip($options['filterList']),
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.label.filtercolumn',
@@ -60,10 +58,10 @@ class FilterSelectorType extends AbstractType
             // Build a list of condition values
             $form->add(
                 'condition',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'           => array_flip($choices),
                     'choices_as_values' => true,
+                    'choices'           => array_flip($choices),
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.report.report.label.filtercondition',
@@ -97,22 +95,22 @@ class FilterSelectorType extends AbstractType
             'glue',
             ChoiceType::class,
             [
-                'label'      => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control filter-glue not-chosen'],
-                'required'   => false,
-                'choices'    => [
+                'choices_as_values' => true,
+                'label'             => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control filter-glue not-chosen'],
+                'required'          => false,
+                'choices'           => [
                     'mautic.report.report.glue.choice.and' => 'and',
                     'mautic.report.report.glue.choice.or'  => 'or',
                 ],
-                'choices_as_values' => true,
-                'placeholder'       => false,
+                'placeholder' => false,
             ]
         );
 
         $builder->add(
             'value',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.report.report.label.filtervalue',
                 'label_attr' => ['class' => 'control-label'],
@@ -152,7 +150,7 @@ class FilterSelectorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'filter_selector';
     }
@@ -160,7 +158,7 @@ class FilterSelectorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

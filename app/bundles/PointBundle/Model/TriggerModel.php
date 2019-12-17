@@ -11,6 +11,7 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -20,23 +21,14 @@ use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
+use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class TriggerModel.
- */
 class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];
-
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
 
     /**
      * @var IpLookupHelper
@@ -54,17 +46,24 @@ class TriggerModel extends CommonFormModel
     protected $pointTriggerEventModel;
 
     /**
-     * EventModel constructor.
+     * @deprecated https://github.com/mautic/mautic/issues/8229
      *
+     * @var MauticFactory
+     */
+    protected $mauticFactory;
+
+    /**
      * @param IpLookupHelper    $ipLookupHelper
      * @param LeadModel         $leadModel
      * @param TriggerEventModel $pointTriggerEventModel
+     * @param MauticFactory     $mauticFactory
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel, MauticFactory $mauticFactory)
     {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
+        $this->mauticFactory          = $mauticFactory;
     }
 
     /**
@@ -110,7 +109,7 @@ class TriggerModel extends CommonFormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('pointtrigger', $entity, $options);
+        return $formFactory->create(TriggerType::class, $entity, $options);
     }
 
     /**
@@ -373,7 +372,7 @@ class TriggerModel extends CommonFormModel
         $args = [
           'event'   => $event,
           'lead'    => $lead,
-          'factory' => $this->factory, // WHAT??
+          'factory' => $this->mauticFactory,
           'config'  => $event['properties'],
         ];
 

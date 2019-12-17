@@ -4,12 +4,10 @@ namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FocusListType.
- */
 class FocusListType extends AbstractType
 {
     /**
@@ -35,7 +33,8 @@ class FocusListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) {
+                'choices_as_values' => true,
+                'choices'           => function (Options $options) {
                     $choices = [];
 
                     $list = $this->repo->getFocusList($options['data']);
@@ -68,7 +67,7 @@ class FocusListType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'focus_list';
     }
@@ -78,6 +77,6 @@ class FocusListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

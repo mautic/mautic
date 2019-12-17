@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -69,7 +70,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'facebook_pixel_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.page.config.form.facebook.pixel.id',
                 'attr'  => [
@@ -99,7 +100,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add(
             'google_analytics_id',
-            'text',
+            TextType::class,
             [
                 'label' => 'mautic.page.config.form.google.analytics.id',
                 'attr'  => [
@@ -143,7 +144,7 @@ class ConfigTrackingPageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'trackingconfig';
     }

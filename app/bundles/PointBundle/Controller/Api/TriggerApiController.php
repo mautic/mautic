@@ -12,11 +12,10 @@
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class TriggerApiController.
- */
 class TriggerApiController extends CommonApiController
 {
     /**
@@ -75,7 +74,7 @@ class TriggerApiController extends CommonApiController
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
-                    return $this->returnError('Trigger events: '.$msg, Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError('Trigger events: '.$msg, Response::HTTP_BAD_REQUEST);
                 }
             }
 
