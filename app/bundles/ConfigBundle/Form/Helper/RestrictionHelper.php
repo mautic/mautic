@@ -93,7 +93,7 @@ class RestrictionHelper
                             'required' => false,
                             'mapped'   => false,
                             'disabled' => true,
-                            'attr'     => array_merge($fieldOptions['attr'] ?? [], [
+                            'attr'     => array_merge($childType->getConfig()->getOptions()['attr'] ?? [], [
                                 'placeholder' => $this->translator->trans('mautic.config.restricted'),
                                 'readonly'    => true,
                             ]),
