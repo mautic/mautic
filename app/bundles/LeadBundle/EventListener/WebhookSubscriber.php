@@ -101,7 +101,7 @@ class WebhookSubscriber implements EventSubscriberInterface
             ]
         );
 
-        // add checkbox to the webhook form for new leads
+        // add checkbox to the webhook form for new/updated companies
         $event->addEvent(
             LeadEvents::LEAD_COMPANY_CHANGE,
             [
