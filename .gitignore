@@ -77,6 +77,7 @@
 !/media/images/.htaccess
 
 /plugins/*
+!/plugins/MarketplaceBundle
 !/plugins/MauticCitrixBundle
 !/plugins/MauticClearbitBundle
 !/plugins/MauticCloudStorageBundle

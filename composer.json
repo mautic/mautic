@@ -52,7 +52,7 @@
         "symfony/twig-bundle": "~3.4.0",
         "symfony/doctrine-bridge": "~3.4.0",
         "symfony/monolog-bridge": "~3.4.0",
-        "symfony/swiftmailer-bundle": "~3.3",
+        "symfony/swiftmailer-bundle": "^3.3",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/security-acl": "~3.0.0",
         "symfony/polyfill-php73": "^1.13",
@@ -111,7 +111,9 @@
         "barryvdh/elfinder-flysystem-driver": "^0.2.1",
         "bandwidth-throttle/token-bucket": "^2.0",
         "gaufrette/extras": "^0.1.0",
-        "gaufrette/aws-s3-adapter": "^0.4.0"
+        "gaufrette/aws-s3-adapter": "^0.4.0",
+        "composer/composer": "^1.9",
+        "mautic/composer-plugin": "^1.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",

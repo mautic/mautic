@@ -1,0 +1,7 @@
+parameters:
+    inferPrivatePropertyTypeFromConstructor: true
+    autoload_files:
+        - %currentWorkingDirectory%/../../vendor/autoload.php
+    excludes_analyse:
+        - vendor
+        - Views

@@ -1,0 +1,43 @@
+{
+    "name": "mautic/plugin-marketplace",
+    "description": "Allows users browse, install and update Mautic plugins from Packagist by Composer",
+    "type": "mautic-plugin",
+    "version": "0.0-dev",
+    "config": {
+        "process-timeout": 2000
+    },
+    "keywords": [
+        "composer",
+        "packagist",
+        "marketplace",
+        "mautic",
+        "plugin"
+    ],
+    "require": {
+        "php": "^7.2 || ^7.3",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.2"
+    },
+    "scripts": {
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@csfixer"
+        ],
+        "quicktest": [
+            "@unit",
+            "@phpstan",
+            "@csfixer"
+        ],
+        "phpunit": "../../bin/phpunit --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all",
+        "unit": "../../bin/phpunit --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
+        "functional": "../../bin/phpunit --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=functional",
+        "coverage": "../../bin/phpunit --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
+        "codecov": "../../bin/phpunit --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --testsuite=all --coverage-clover=coverage.xml --coverage-text",
+        "phpstan": "vendor/bin/phpstan analyse --level=4 .",
+        "csfixer": "../../bin/php-cs-fixer fix -v --dry-run --diff . && rm .php_cs.cache",
+        "fixcs": "../../bin/php-cs-fixer fix -v . && rm .php_cs.cache"
+    }
+}
