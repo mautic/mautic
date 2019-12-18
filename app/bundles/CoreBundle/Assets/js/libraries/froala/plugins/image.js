@@ -691,7 +691,7 @@
           return false;
         }
 
-        var resp = $.parseJSON(response);
+        var resp = JSON.parse(response);
         if (resp.link) {
           return resp;
         } else {
@@ -1139,7 +1139,7 @@
     function _initEvents () {
       // Mouse down on image. It might start move.
       editor.events.$on(editor.$el, editor._mousedown, editor.el.tagName == 'IMG' ? null : 'img:not([contenteditable="false"])', function (e) {
-        if ($(this).parents('[contenteditable]:not(.fr-element):not(body):first').attr('contenteditable') == 'false') return true;
+        if ($(this).parents('[contenteditable]:not(.fr-element):not(body)').first().attr('contenteditable') == 'false') return true;
 
         if (!editor.helpers.isMobile()) editor.selection.clear();
 
@@ -1160,7 +1160,7 @@
 
       // Mouse up on an image prevent move.
       editor.events.$on(editor.$el, editor._mouseup, editor.el.tagName == 'IMG' ? null : 'img:not([contenteditable="false"])', function (e) {
-        if ($(this).parents('[contenteditable]:not(.fr-element):not(body):first').attr('contenteditable') == 'false') return true;
+        if ($(this).parents('[contenteditable]:not(.fr-element):not(body)').first().attr('contenteditable') == 'false') return true;
 
         if (mousedown) {
           mousedown = false;
@@ -2019,7 +2019,7 @@
     var touchScroll;
 
     function _edit (e) {
-      if ($(this).parents('[contenteditable]:not(.fr-element):not(body):first').attr('contenteditable') == 'false') return true;
+      if ($(this).parents('[contenteditable]:not(.fr-element):not(body)').first().attr('contenteditable') == 'false') return true;
 
       if (e && e.type == 'touchend' && touchScroll) {
         return true;
@@ -2283,7 +2283,7 @@
      */
     function refreshAlign ($btn) {
       if ($current_image) {
-        $btn.find('> *:first').replaceWith(editor.icon.create('image-align-' + getAlign()));
+        $btn.find('> *').first().replaceWith(editor.icon.create('image-align-' + getAlign()));
       }
     }
 
