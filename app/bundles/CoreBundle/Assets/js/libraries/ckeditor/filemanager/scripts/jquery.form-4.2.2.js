@@ -917,7 +917,7 @@
 
                 return (doc && doc.documentElement && doc.documentElement.nodeName !== 'parsererror') ? doc : null;
             };
-            var parseJSON = $.parseJSON || function(s) {
+            var parseJSON = JSON.parse || function(s) {
                 /* jslint evil:true */
                 return window['eval']('(' + s + ')');			// eslint-disable-line dot-notation
             };
