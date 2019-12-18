@@ -1027,7 +1027,7 @@
       cur = this.$el.find('.cur').removeClass('cur');
       next = cur.next();
       if (!next.length) {
-        next = this.$el.find('li:first');
+        next = this.$el.find('li').first();
       }
       next.addClass('cur');
       nextEl = next[0];
@@ -1040,7 +1040,7 @@
       cur = this.$el.find('.cur').removeClass('cur');
       prev = cur.prev();
       if (!prev.length) {
-        prev = this.$el.find('li:last');
+        prev = this.$el.find('li').last();
       }
       prev.addClass('cur');
       prevEl = prev[0];
@@ -1116,7 +1116,7 @@
       }
       this.show();
       if (this.context.getOpt('highlightFirst')) {
-        return $ul.find("li:first").addClass("cur");
+        return $ul.find("li").first().addClass("cur");
       }
     };
 
