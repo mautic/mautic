@@ -576,7 +576,7 @@
           return false;
         }
 
-        var resp = $.parseJSON(response);
+        var resp = JSON.parse(response);
         if (resp.link) {
           return resp;
         } else {
@@ -1506,7 +1506,7 @@
     function refreshAlign ($btn) {
       if (!$current_video) return false;
 
-      $btn.find('> *:first').replaceWith(editor.icon.create('video-align-' + getAlign()));
+      $btn.find('> *').first().replaceWith(editor.icon.create('video-align-' + getAlign()));
     }
 
     /**
