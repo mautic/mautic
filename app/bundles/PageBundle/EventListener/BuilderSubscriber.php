@@ -100,7 +100,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     const saveprefsRegex    = '{saveprefsbutton}';
     const successmessage    = '{successmessage}';
     const identifierToken   = '{leadidentifier}';
-    const doNotContactToken = '{donotcontact}';
+    const doNotContactToken = '{do_not_contact_text}';
 
     /**
      * BuilderSubscriber constructor.
