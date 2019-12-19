@@ -136,46 +136,47 @@ return [
         ],
         'forms' => [
             'mautic.point.type.form' => [
-                'class'     => 'Mautic\PointBundle\Form\Type\PointType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'point',
+                'class'     => \Mautic\PointBundle\Form\Type\PointType::class,
+                'arguments' => [
+                  'translator',
+                  'mautic.security', ],
             ],
             'mautic.point.type.action' => [
-                'class' => 'Mautic\PointBundle\Form\Type\PointActionType',
-                'alias' => 'pointaction',
+                'class' => \Mautic\PointBundle\Form\Type\PointActionType::class,
             ],
             'mautic.pointtrigger.type.form' => [
-                'class'     => 'Mautic\PointBundle\Form\Type\TriggerType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'pointtrigger',
+                'class'     => \Mautic\PointBundle\Form\Type\TriggerType::class,
+                'arguments' => [
+                  'mautic.security',
+                ],
             ],
             'mautic.pointtrigger.type.action' => [
-                'class' => 'Mautic\PointBundle\Form\Type\TriggerEventType',
-                'alias' => 'pointtriggerevent',
+                'class' => \Mautic\PointBundle\Form\Type\TriggerEventType::class,
             ],
             'mautic.point.type.genericpoint_settings' => [
-                'class' => 'Mautic\PointBundle\Form\Type\GenericPointSettingsType',
-                'alias' => 'genericpoint_settings',
+                'class' => \Mautic\PointBundle\Form\Type\GenericPointSettingsType::class,
             ],
         ],
         'models' => [
             'mautic.point.model.point' => [
-                'class'     => 'Mautic\PointBundle\Model\PointModel',
+                'class'     => \Mautic\PointBundle\Model\PointModel::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
+                    'mautic.factory',
                 ],
             ],
             'mautic.point.model.triggerevent' => [
-                'class' => 'Mautic\PointBundle\Model\TriggerEventModel',
+                'class' => \Mautic\PointBundle\Model\TriggerEventModel::class,
             ],
             'mautic.point.model.trigger' => [
-                'class'     => 'Mautic\PointBundle\Model\TriggerModel',
+                'class'     => \Mautic\PointBundle\Model\TriggerModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.point.model.triggerevent',
+                    'mautic.factory',
                 ],
             ],
         ],

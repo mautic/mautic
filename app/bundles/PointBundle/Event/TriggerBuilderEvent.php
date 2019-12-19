@@ -15,9 +15,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class TriggerBuilderEvent.
- */
 class TriggerBuilderEvent extends Event
 {
     /**
@@ -84,8 +81,6 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
-     * Get events.
-     *
      * @return array
      */
     public function getEvents()

@@ -35,7 +35,7 @@ class MergeType extends AbstractType
                 'label'             => 'mautic.lead.merge.select',
                 'label_attr'        => ['class' => 'control-label'],
                 'multiple'          => false,
-                'empty_value'       => '',
+                'placeholder'       => '',
                 'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.merge.select.modal.tooltip',

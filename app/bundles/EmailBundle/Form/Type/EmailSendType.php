@@ -170,7 +170,7 @@ class EmailSendType extends AbstractType
                             'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'        => $data,
-                        'empty_value' => false,
+                        'placeholder' => false,
                     ]
                 );
 

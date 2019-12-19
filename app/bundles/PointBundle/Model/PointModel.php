@@ -11,35 +11,27 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PointBundle\Entity\Action;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Entity\PointRepository;
 use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
+use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class PointModel.
- */
 class PointModel extends CommonFormModel
 {
-    /**
-     * @deprecated Remove in 2.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var Session
      */
@@ -56,23 +48,30 @@ class PointModel extends CommonFormModel
     protected $leadModel;
 
     /**
-     * PointModel constructor.
+     * @deprecated https://github.com/mautic/mautic/issues/8229
      *
+     * @var MauticFactory
+     */
+    protected $mauticFactory;
+
+    /**
      * @param Session        $session
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
+     * @param MauticFactory  $mauticFactory
      */
-    public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel)
+    public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, MauticFactory $mauticFactory)
     {
-        $this->session        = $session;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
+        $this->session            = $session;
+        $this->ipLookupHelper     = $ipLookupHelper;
+        $this->leadModel          = $leadModel;
+        $this->mauticFactory      = $mauticFactory;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\PointBundle\Entity\PointRepository
+     * @return PointRepository
      */
     public function getRepository()
     {
@@ -106,7 +105,7 @@ class PointModel extends CommonFormModel
             $options['pointActions'] = $this->getPointActions();
         }
 
-        return $formFactory->create('point', $entity, $options);
+        return $formFactory->create(PointType::class, $entity, $options);
     }
 
     /**
@@ -254,7 +253,7 @@ class PointModel extends CommonFormModel
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->factory, // WHAT?
+                'factory'      => $this->mauticFactory, // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 
@@ -322,7 +321,7 @@ class PointModel extends CommonFormModel
     /**
      * Get line chart data of points.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat

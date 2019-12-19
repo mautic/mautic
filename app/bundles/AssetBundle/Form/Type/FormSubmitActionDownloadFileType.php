@@ -31,7 +31,7 @@ class FormSubmitActionDownloadFileType extends AbstractType
                 'multiple'    => false,
                 'label'       => 'mautic.asset.form.submit.assets',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => 'mautic.asset.form.submit.latest.category',
+                'placeholder' => 'mautic.asset.form.submit.latest.category',
                 'required'    => false,
                 'attr'        => [
                     'class'   => 'form-control',
@@ -46,7 +46,7 @@ class FormSubmitActionDownloadFileType extends AbstractType
             [
                 'label'         => 'mautic.asset.form.submit.latest.category',
                 'label_attr'    => ['class' => 'control-label'],
-                'empty_value'   => false,
+                'placeholder'   => false,
                 'required'      => false,
                 'bundle'        => 'asset',
                 'return_entity' => false,

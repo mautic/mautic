@@ -28,7 +28,7 @@ class CitrixListType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'empty_value',
+            'placeholder',
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.emptyvalue',

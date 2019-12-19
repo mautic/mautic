@@ -24,9 +24,6 @@ use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Report.
- */
 class Report extends FormEntity implements SchedulerInterface
 {
     /**
@@ -637,8 +634,8 @@ class Report extends FormEntity implements SchedulerInterface
     public function ensureIsMonthlyScheduled()
     {
         if (
-            !array_key_exists($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
-            !array_key_exists($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
+            !in_array($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
+            !in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
         }
@@ -651,7 +648,7 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function ensureIsWeeklyScheduled()
     {
-        if (!array_key_exists($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())) {
+        if (!in_array($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())) {
             throw new ScheduleNotValidException();
         }
         $this->setIsScheduled(true);

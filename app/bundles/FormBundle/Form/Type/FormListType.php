@@ -73,7 +73,7 @@ class FormListType extends AbstractType
             'choices_as_values' => true,
             'expanded'          => false,
             'multiple'          => true,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'form_type'         => null,
         ]);
 

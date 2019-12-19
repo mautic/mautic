@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -77,7 +78,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'                  => 'mautic.focus.campaign.event.show_focus',
             'description'            => 'mautic.focus.campaign.event.show_focus_descr',
             'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'               => 'focusshow_list',
+            'formType'               => FocusShowType::class,
             'formTheme'              => 'MauticFocusBundle:FormTheme\FocusShowList',
             'formTypeOptions'        => ['update_select' => 'campaignevent_properties_focus'],
             'connectionRestrictions' => [

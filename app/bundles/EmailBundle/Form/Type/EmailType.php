@@ -305,7 +305,7 @@ class EmailType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => '',
+                    'placeholder' => '',
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -326,7 +326,7 @@ class EmailType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => '',
+                    'placeholder' => '',
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -362,7 +362,7 @@ class EmailType extends AbstractType
                 'required'       => false,
                 'multiple'       => false,
                 'email_type'     => 'list',
-                'empty_value'    => 'mautic.core.form.translation_parent.empty',
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
                 'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
                 'ignore_ids'     => [(int) $options['data']->getId()],
@@ -383,7 +383,7 @@ class EmailType extends AbstractType
                 ],
                 'required'       => false,
                 'multiple'       => false,
-                'empty_value'    => 'mautic.core.form.translation_parent.empty',
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
                 'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
                 'email_type'     => 'template',

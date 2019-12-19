@@ -37,7 +37,7 @@ class TwitterType extends AbstractType
             'choices_as_values' => true,
             'label'             => 'mautic.integration.Twitter.share.layout',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => ['class' => 'form-control'],
         ]);
