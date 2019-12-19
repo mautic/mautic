@@ -11,31 +11,75 @@
 
 namespace Mautic\Middleware;
 
+use AppKernel;
+use ReflectionClass;
+use ReflectionException;
+use SplPriorityQueue;
 use Stack\StackedHttpKernel;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class MiddlewareBuilder
 {
+    /**
+     * @var SplPriorityQueue|ReflectionClass[]
+     */
     protected $specs;
 
-    public function __construct($env = null)
+    public function __construct()
     {
-        $this->specs = new \SplPriorityQueue();
+        $this->specs = new SplPriorityQueue();
+    }
 
-        $middlewares = glob(__DIR__.'/*Middleware.php');
+    /**
+     * @param AppKernel $app
+     *
+     * @return StackedHttpKernel
+     *
+     * @throws ReflectionException
+     */
+    public function resolve(AppKernel $app): StackedHttpKernel
+    {
+        $this->loadMiddlewaresFromDirectory(__DIR__);
 
-        $this->addMiddlewares($middlewares);
+        $env    = $app->getEnvironment();
+        $envDir = __DIR__.'/'.ucfirst($env);
 
-        if (isset($env)) {
-            $envMiddlewares = glob(__DIR__.'/'.ucfirst($env).'/*Middleware.php');
+        if (file_exists($envDir)) {
+            $this->loadMiddlewaresFromDirectory($envDir, $env);
+        }
 
-            if (!empty($envMiddlewares)) {
-                $this->addMiddlewares($envMiddlewares, $env);
-            }
+        $middlewares = [$app];
+
+        foreach ($this->specs as $spec) {
+            $app = $spec->newInstanceArgs([$app]);
+
+            array_unshift($middlewares, $app);
+        }
+
+        return new StackedHttpKernel($app, $middlewares);
+    }
+
+    /**
+     * @param string      $directory
+     * @param string|null $env
+     *
+     * @throws ReflectionException
+     */
+    private function loadMiddlewaresFromDirectory(string $directory, ?string $env = null): void
+    {
+        $middlewares = glob($directory.'/*Middleware.php');
+
+        if (!empty($middlewares)) {
+            $this->addMiddlewares($middlewares, $env);
         }
     }
 
-    public function addMiddlewares(array $middlewares, $env = null)
+    /**
+     * @param array       $middlewares
+     * @param string|null $env
+     *
+     * @throws ReflectionException
+     */
+    private function addMiddlewares(array $middlewares, ?string $env = null)
     {
         $prefix = 'Mautic\\Middleware\\';
 
@@ -48,25 +92,16 @@ class MiddlewareBuilder
         }
     }
 
-    public function push($kernelClass)
+    /**
+     * @param string $kernelClass
+     *
+     * @throws ReflectionException
+     */
+    private function push(string $kernelClass): void
     {
-        $reflection = new \ReflectionClass($kernelClass);
+        $reflection = new ReflectionClass($kernelClass);
         $priority   = $reflection->getConstant('PRIORITY');
 
         $this->specs->insert($reflection, $priority);
-    }
-
-    public function resolve(HttpKernelInterface $app)
-    {
-        $middlewares = [$app];
-
-        /** @var \ReflectionClass $spec */
-        foreach ($this->specs as $spec) {
-            $app = $spec->newInstanceArgs([$app]);
-
-            array_unshift($middlewares, $app);
-        }
-
-        return new StackedHttpKernel($app, $middlewares);
     }
 }
