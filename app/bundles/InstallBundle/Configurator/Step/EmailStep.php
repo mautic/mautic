@@ -115,7 +115,7 @@ class EmailStep implements StepInterface
      */
     public function getFormType()
     {
-        return new EmailStepType();
+        return EmailStepType::class;
     }
 
     /**

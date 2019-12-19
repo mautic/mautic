@@ -11,8 +11,6 @@
 
 namespace Mautic\CoreBundle\Configurator\Step;
 
-use Symfony\Component\Form\FormTypeInterface;
-
 /**
  * StepInterface.
  *
@@ -23,7 +21,7 @@ interface StepInterface
     /**
      * Returns the form used for configuration.
      *
-     * @return FormTypeInterface
+     * @return string
      */
     public function getFormType();
 
