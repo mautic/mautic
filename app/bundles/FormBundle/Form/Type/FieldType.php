@@ -392,7 +392,7 @@ class FieldType extends AbstractType
                 'leadField',
                 ChoiceType::class,
                 [
-                    'choices'           => $options['leadFields'],
+                    'choices'           => array_flip($options['leadFields']),
                     'choices_as_values' => true,
                     'choice_attr'       => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
