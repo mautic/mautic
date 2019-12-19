@@ -92,8 +92,7 @@ class MobileNotificationDetailsType extends AbstractType
                         'mautic.notification.form.mobile.ios_badges.set'       => 'SetTo',
                         'mautic.notification.form.mobile.ios_badges.increment' => 'Increase',
                     ],
-                    'choices_as_values' => true,
-                    'attr'              => [
+                                        'attr'              => [
                         'tooltip' => 'mautic.notification.form.mobile.ios_badges.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.ios_badges',
@@ -258,8 +257,7 @@ class MobileNotificationDetailsType extends AbstractType
                         'mautic.notification.form.mobile.android_lockscreen_visibility.private' => '0',
                         'mautic.notification.form.mobile.android_lockscreen_visibility.secret'  => '-1',
                     ],
-                    'choices_as_values' => true,
-                    'attr'              => [
+                                        'attr'              => [
                         'tooltip' => 'mautic.notification.form.mobile.android_lockscreen_visibility.tooltip',
                     ],
                     'label'       => 'mautic.notification.form.mobile.android_lockscreen_visibility',

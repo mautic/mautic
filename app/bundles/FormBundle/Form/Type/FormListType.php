@@ -70,11 +70,10 @@ class FormListType extends AbstractType
 
                 return $choices;
             },
-            'choices_as_values' => true,
-            'expanded'          => false,
-            'multiple'          => true,
-            'empty_value'       => false,
-            'form_type'         => null,
+                        'expanded'          => false,
+            'multiple'                      => true,
+            'empty_value'                   => false,
+            'form_type'                     => null,
         ]);
 
         $resolver->setDefined(['form_type']);

@@ -107,8 +107,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'encryption',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
-                    'choices'           => [
+                                        'choices'           => [
                         'mautic.email.config.mailer_encryption.ssl'                     => '/ssl',
                         'mautic.email.config.monitored_email_encryption.ssl_novalidate' => '/ssl/novalidate-cert',
                         'mautic.email.config.mailer_encryption.tls'                     => '/tls',
@@ -203,11 +202,10 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'folder',
                 ChoiceType::class,
                 [
-                    'choices'           => $choices,
-                    'choices_as_values' => true,
-                    'label'             => 'mautic.email.config.monitored_email_folder',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => array_merge(
+                    'choices'                               => $choices,
+                                        'label'             => 'mautic.email.config.monitored_email_folder',
+                    'label_attr'                            => ['class' => 'control-label'],
+                    'attr'                                  => array_merge(
                         [
                             'class'             => 'form-control',
                             'tooltip'           => 'mautic.email.config.monitored_email_folder.tooltip',

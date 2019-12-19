@@ -56,9 +56,8 @@ class IntegrationCampaignsTaskType extends AbstractType
             'campaign_activity_type',
             ChoiceType::class,
             [
-                'choices'           => array_flip($activityTypes), // Choice type expects labels as keys
-                'choices_as_values' => true,
-                'attr'              => [
+                'choices'                           => array_flip($activityTypes), // Choice type expects labels as keys
+                                'attr'              => [
                     'class' => 'form-control', ],
                 'label'    => 'mautic.plugin.integration.campaigns.connectwise.activity.type',
                 'required' => false,
@@ -69,9 +68,8 @@ class IntegrationCampaignsTaskType extends AbstractType
             'campaign_members',
             ChoiceType::class,
             [
-                'choices'           => array_flip($members),  // Choice type expects labels as keys
-                'choices_as_values' => true,
-                'attr'              => [
+                'choices'                           => array_flip($members),  // Choice type expects labels as keys
+                                'attr'              => [
                     'class' => 'form-control', ],
                 'label'       => 'mautic.plugin.integration.campaigns.connectwise.members',
                 'constraints' => [

@@ -74,13 +74,12 @@ class CampaignListType extends AbstractType
 
                     return $choices;
                 },
-                'choices_as_values' => true,
-                'empty_value'       => false,
-                'expanded'          => false,
-                'multiple'          => true,
-                'required'          => false,
-                'include_this'      => false,
-                'this_translation'  => 'mautic.campaign.form.thiscampaign',
+                                'empty_value'       => false,
+                'expanded'                          => false,
+                'multiple'                          => true,
+                'required'                          => false,
+                'include_this'                      => false,
+                'this_translation'                  => 'mautic.campaign.form.thiscampaign',
             ]
         );
     }

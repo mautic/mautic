@@ -57,8 +57,7 @@ class DwcEntryFiltersType extends AbstractType
                     'mautic.lead.list.form.glue.and' => 'and',
                     'mautic.lead.list.form.glue.or'  => 'or',
                 ],
-                'choices_as_values' => true,
-                'attr'              => [
+                                'attr'              => [
                     'class'    => 'form-control not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
                 ],

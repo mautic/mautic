@@ -38,12 +38,11 @@ class UserListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'           => $this->getUserChoices(),
-                'choices_as_values' => true,
-                'expanded'          => false,
-                'multiple'          => true,
-                'required'          => false,
-                'empty_value'       => 'mautic.core.form.chooseone',
+                'choices'                           => $this->getUserChoices(),
+                                'expanded'          => false,
+                'multiple'                          => true,
+                'required'                          => false,
+                'empty_value'                       => 'mautic.core.form.chooseone',
             ]
         );
     }

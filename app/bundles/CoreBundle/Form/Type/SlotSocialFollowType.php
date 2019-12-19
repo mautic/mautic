@@ -88,8 +88,7 @@ class SlotSocialFollowType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                'choices_as_values' => true,
-            ]
+                            ]
         );
     }
 

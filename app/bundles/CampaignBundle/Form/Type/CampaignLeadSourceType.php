@@ -34,12 +34,11 @@ class CampaignLeadSourceType extends AbstractType
                     'lists',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($options['source_choices']),
-                        'choices_as_values' => true,
-                        'multiple'          => true,
-                        'label'             => 'mautic.campaign.leadsource.lists',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => [
+                        'choices'                                   => array_flip($options['source_choices']),
+                                                'multiple'          => true,
+                        'label'                                     => 'mautic.campaign.leadsource.lists',
+                        'label_attr'                                => ['class' => 'control-label'],
+                        'attr'                                      => [
                             'class' => 'form-control',
                         ],
                         'constraints' => [
@@ -57,12 +56,11 @@ class CampaignLeadSourceType extends AbstractType
                     'forms',
                     ChoiceType::class,
                     [
-                        'choices'           => array_flip($options['source_choices']),
-                        'choices_as_values' => true,
-                        'multiple'          => true,
-                        'label'             => 'mautic.campaign.leadsource.forms',
-                        'label_attr'        => ['class' => 'control-label'],
-                        'attr'              => [
+                        'choices'                                   => array_flip($options['source_choices']),
+                                                'multiple'          => true,
+                        'label'                                     => 'mautic.campaign.leadsource.forms',
+                        'label_attr'                                => ['class' => 'control-label'],
+                        'attr'                                      => [
                             'class' => 'form-control',
                         ],
                         'constraints' => [

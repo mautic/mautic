@@ -72,8 +72,7 @@ class FocusPropertiesType extends AbstractType
                     'size',
                     ChoiceType::class,
                     [
-                        'choices_as_values' => true,
-                        'choices'           => [
+                                                'choices'           => [
                             'mautic.focus.form.bar.size.large'   => 'large',
                             'mautic.focus.form.bar.size.regular' => 'regular',
                         ],
@@ -117,11 +116,10 @@ class FocusPropertiesType extends AbstractType
                 'placement',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
-                    'choices'           => $choices,
-                    'label'             => 'mautic.focus.form.placement',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => [
+                                        'choices'           => $choices,
+                    'label'                                 => 'mautic.focus.form.placement',
+                    'label_attr'                            => ['class' => 'control-label'],
+                    'attr'                                  => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',
                     ],

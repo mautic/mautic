@@ -92,11 +92,10 @@ class EmailStepType extends AbstractType
                     'mautic.email.config.mailer_transport.smtp'     => 'smtp',
                     'mautic.email.config.mailer_transport.sendmail' => 'sendmail',
                 ],
-                'choices_as_values' => true,
-                'label'             => 'mautic.install.form.email.transport',
-                'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
-                'attr'              => [
+                                'label'             => 'mautic.install.form.email.transport',
+                'label_attr'                        => ['class' => 'control-label'],
+                'empty_value'                       => false,
+                'attr'                              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.install.form.email.transport_descr',
                     'onchange' => 'MauticInstaller.toggleTransportDetails(this.value);',

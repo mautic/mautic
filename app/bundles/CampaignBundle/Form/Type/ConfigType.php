@@ -49,8 +49,7 @@ class ConfigType extends AbstractType
                     '1 week'     => 'PT14D',
                     '3 months'   => 'P3M',
                 ],
-                'choices_as_values' => true,
-                'attr'              => [
+                                'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.campaignconfig.campaign_time_wait_on_event_false_tooltip',
                 ],

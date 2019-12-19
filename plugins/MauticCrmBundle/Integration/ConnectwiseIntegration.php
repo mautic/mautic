@@ -294,13 +294,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'choices_as_values' => true,
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
-                    'required'          => false,
+                                        'expanded'          => true,
+                    'multiple'                              => true,
+                    'label'                                 => 'mautic.integrations.form.blanks',
+                    'label_attr'                            => ['class' => 'control-label'],
+                    'empty_value'                           => false,
+                    'required'                              => false,
                 ]
             );
             $builder->add(
@@ -311,13 +310,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'mautic.connectwise.object.contact' => 'Contact',
                         'mautic.connectwise.object.company' => 'company',
                     ],
-                    'choices_as_values' => true,
-                    'expanded'          => true,
-                    'multiple'          => true,
-                    'label'             => 'mautic.connectwise.form.objects_to_pull_from',
-                    'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
-                    'required'          => false,
+                                        'expanded'          => true,
+                    'multiple'                              => true,
+                    'label'                                 => 'mautic.connectwise.form.objects_to_pull_from',
+                    'label_attr'                            => ['class' => ''],
+                    'empty_value'                           => false,
+                    'required'                              => false,
                 ]
             );
         }

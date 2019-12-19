@@ -46,8 +46,7 @@ class ConfigType extends AbstractType
                     ]
                 ),
             ],
-            'choices_as_values' => true,
-        ]);
+                    ]);
 
         $builder->add('events_orderby_dir', ChoiceType::class, [
             'choices' => [
@@ -60,8 +59,7 @@ class ConfigType extends AbstractType
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
             'required'          => false,
-            'choices_as_values' => true,
-        ]);
+                    ]);
     }
 
     /**

@@ -46,7 +46,6 @@ class DynamicFiltersType extends AbstractType
                     case 'bool':
                     case 'boolean':
                         $type                      = ButtonGroupType::class;
-                        $args['choices_as_values'] = true;
                         $args['choices']           = [
                             [
                                 'mautic.core.form.no'      => false,
@@ -78,7 +77,6 @@ class DynamicFiltersType extends AbstractType
                     case 'multiselect':
                     case 'select':
                         $type                      = ChoiceType::class;
-                        $args['choices_as_values'] = true;
                         $args['choices']           = array_flip($definition['list']);
                         break;
                     default:

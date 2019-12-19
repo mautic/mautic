@@ -67,10 +67,9 @@ class VariantType extends AbstractType
             $builder->add(
                 'winnerCriteria',
                 ChoiceType::class, [
-                    'choices_as_values' => true,
-                    'label'             => 'mautic.core.ab_test.form.winner',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => [
+                                        'label'             => 'mautic.core.ab_test.form.winner',
+                    'label_attr'                            => ['class' => 'control-label'],
+                    'attr'                                  => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
                     ],

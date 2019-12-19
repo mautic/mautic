@@ -37,12 +37,11 @@ class TwitterMentionType extends TwitterAbstractType
                 'mautic.social.monitoring.twitter.no'  => '0',
                 'mautic.social.monitoring.twitter.yes' => '1',
             ],
-            'choices_as_values' => true,
-            'label'             => 'mautic.social.monitoring.twitter.namematching',
-            'required'          => false,
-            'empty_value'       => false,
-            'label_attr'        => ['class' => 'control-label'],
-            'attr'              => [
+                        'label'             => 'mautic.social.monitoring.twitter.namematching',
+            'required'                      => false,
+            'empty_value'                   => false,
+            'label_attr'                    => ['class' => 'control-label'],
+            'attr'                          => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.social.monitoring.twitter.namematching.tooltip',
             ],

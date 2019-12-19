@@ -49,12 +49,11 @@ class ConfigType extends AbstractType
             'queue_protocol',
             ChoiceType::class,
             [
-                'label'               => 'mautic.queue.config.protocol',
-                'label_attr'          => ['class' => 'control-label'],
-                'data'                => $options['data']['queue_protocol'],
-                'choices'             => array_flip($protocolChoices),
-                'choices_as_values'   => true,
-                'attr'                => [
+                'label'                               => 'mautic.queue.config.protocol',
+                'label_attr'                          => ['class' => 'control-label'],
+                'data'                                => $options['data']['queue_protocol'],
+                'choices'                             => array_flip($protocolChoices),
+                                'attr'                => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.queue.config.protocol.tooltip',
                 ],

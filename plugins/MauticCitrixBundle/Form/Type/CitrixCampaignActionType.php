@@ -78,8 +78,7 @@ class CitrixCampaignActionType extends AbstractType
             [
                 'label'             => $this->translator->trans('plugin.citrix.action.criteria'),
                 'choices'           => $newChoices,
-                'choices_as_values' => true,
-            ]
+                            ]
         );
 
         if (CitrixProducts::GOTOASSIST !== $product) {
@@ -87,10 +86,9 @@ class CitrixCampaignActionType extends AbstractType
                 $product.'-list',
                 ChoiceType::class,
                 [
-                    'label'             => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                    'choices'           => array_flip(CitrixHelper::getCitrixChoices($product)),
-                    'choices_as_values' => true,
-                    'multiple'          => true,
+                    'label'                                 => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                    'choices'                               => array_flip(CitrixHelper::getCitrixChoices($product)),
+                                        'multiple'          => true,
                 ]
             );
         }

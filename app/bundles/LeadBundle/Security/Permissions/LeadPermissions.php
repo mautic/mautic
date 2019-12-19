@@ -70,11 +70,10 @@ class LeadPermissions extends AbstractPermissions
                     'mautic.core.permissions.deleteother' => 'deleteother',
                     'mautic.core.permissions.full'        => 'full',
                 ],
-                'choices_as_values' => true,
-                'label'             => 'mautic.lead.permissions.lists',
-                'data'              => (!empty($data['lists']) ? $data['lists'] : []),
-                'bundle'            => 'lead',
-                'level'             => 'lists',
+                                'label'             => 'mautic.lead.permissions.lists',
+                'data'                              => (!empty($data['lists']) ? $data['lists'] : []),
+                'bundle'                            => 'lead',
+                'level'                             => 'lists',
             ]
         );
 
@@ -85,11 +84,10 @@ class LeadPermissions extends AbstractPermissions
                 'choices' => [
                     'mautic.core.permissions.manage' => 'full',
                 ],
-                'choices_as_values' => true,
-                'label'             => 'mautic.lead.permissions.fields',
-                'data'              => (!empty($data['fields']) ? $data['fields'] : []),
-                'bundle'            => 'lead',
-                'level'             => 'fields',
+                                'label'             => 'mautic.lead.permissions.fields',
+                'data'                              => (!empty($data['fields']) ? $data['fields'] : []),
+                'bundle'                            => 'lead',
+                'level'                             => 'fields',
             ]
         );
 

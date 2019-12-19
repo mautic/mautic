@@ -204,11 +204,10 @@ class ConfigType extends AbstractType
             'locale',
             ChoiceType::class,
             [
-                'choices'           => $this->getLanguageChoices(),
-                'choices_as_values' => true,
-                'label'             => 'mautic.core.config.form.locale',
-                'required'          => false,
-                'attr'              => [
+                'choices'                           => $this->getLanguageChoices(),
+                                'label'             => 'mautic.core.config.form.locale',
+                'required'                          => false,
+                'attr'                              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
@@ -298,12 +297,11 @@ class ConfigType extends AbstractType
                     'mautic.core.pagination.50'  => 50,
                     'mautic.core.pagination.100' => 100,
                 ],
-                'choices_as_values' => true,
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.core.config.form.default.pagelimit',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => [
+                                'expanded'          => false,
+                'multiple'                          => false,
+                'label'                             => 'mautic.core.config.form.default.pagelimit',
+                'label_attr'                        => ['class' => 'control-label'],
+                'attr'                              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
                 ],
@@ -446,12 +444,11 @@ class ConfigType extends AbstractType
                     $this->translator->transChoice('mautic.core.daterange.year', 1, ['%count%' => 1])  => '-1 year',
                     $this->translator->transChoice('mautic.core.daterange.year', 2, ['%count%' => 2])  => '-2 years',
                 ],
-                'choices_as_values' => true,
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.core.config.form.default.daterange_default',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => [
+                                'expanded'          => false,
+                'multiple'                          => false,
+                'label'                             => 'mautic.core.config.form.default.daterange_default',
+                'label_attr'                        => ['class' => 'control-label'],
+                'attr'                              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
                 ],
@@ -464,10 +461,9 @@ class ConfigType extends AbstractType
             'ip_lookup_service',
             ChoiceType::class,
             [
-                'choices'           => $this->getIpServicesChoices(),
-                'choices_as_values' => true,
-                'label'             => 'mautic.core.config.form.ip.lookup.service',
-                'label_attr'        => [
+                'choices'                           => $this->getIpServicesChoices(),
+                                'label'             => 'mautic.core.config.form.ip.lookup.service',
+                'label_attr'                        => [
                     'class' => 'control-label',
                 ],
                 'required'          => false,
@@ -584,10 +580,9 @@ class ConfigType extends AbstractType
                     'mautic.core.config.update_stability.rc'     => 'rc',
                     'mautic.core.config.update_stability.stable' => 'stable',
                 ],
-                'choices_as_values' => true,
-                'label'             => 'mautic.core.config.form.update.stability',
-                'required'          => false,
-                'attr'              => [
+                                'label'             => 'mautic.core.config.form.update.stability',
+                'required'                          => false,
+                'attr'                              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],

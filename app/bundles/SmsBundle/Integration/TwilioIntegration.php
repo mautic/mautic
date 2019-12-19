@@ -129,12 +129,11 @@ class TwilioIntegration extends AbstractIntegration
                         'week'  => 'WEEK',
                         'month' => 'MONTH',
                     ],
-                    'choices_as_values' => true,
-                    'label'             => 'mautic.lead.list.frequency.times',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'required'          => false,
-                    'multiple'          => false,
-                    'attr'              => [
+                                        'label'             => 'mautic.lead.list.frequency.times',
+                    'label_attr'                            => ['class' => 'control-label'],
+                    'required'                              => false,
+                    'multiple'                              => false,
+                    'attr'                                  => [
                         'class' => 'form-control frequency',
                     ],
                 ]);

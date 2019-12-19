@@ -124,8 +124,7 @@ class OneSignalIntegration extends AbstractIntegration
                         'mautic.integration.form.platforms.ios'     => 'ios',
                         'mautic.integration.form.platforms.android' => 'android',
                     ],
-                    'choices_as_values' => true,
-                    'attr'              => [
+                                        'attr'              => [
                         'tooltip'      => 'mautic.integration.form.platforms.tooltip',
                         'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
                     ],

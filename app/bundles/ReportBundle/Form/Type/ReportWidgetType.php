@@ -57,15 +57,14 @@ class ReportWidgetType extends AbstractType
             'graph',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
-                'choices'           => $choices,
-                'expanded'          => false,
-                'multiple'          => false,
-                'label'             => 'mautic.report.report.form.choose_graphs',
-                'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
-                'required'          => false,
-                'attr'              => [
+                                'choices'           => $choices,
+                'expanded'                          => false,
+                'multiple'                          => false,
+                'label'                             => 'mautic.report.report.form.choose_graphs',
+                'label_attr'                        => ['class' => 'control-label'],
+                'empty_value'                       => false,
+                'required'                          => false,
+                'attr'                              => [
                     'class' => 'form-control',
                 ],
             ]
