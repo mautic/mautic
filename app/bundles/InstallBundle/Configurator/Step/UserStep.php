@@ -60,7 +60,7 @@ class UserStep implements StepInterface
      */
     public function getFormType()
     {
-        return new UserStepType($this->session);
+        return UserStepType::class;
     }
 
     /**
