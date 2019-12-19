@@ -55,7 +55,7 @@ class FormListType extends AbstractType
                 static $choices;
 
                 if (is_array($choices)) {
-                    return array_flip($choices);
+                    return $choices;
                 }
 
                 $choices = [];
