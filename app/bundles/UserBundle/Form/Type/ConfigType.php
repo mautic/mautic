@@ -195,7 +195,7 @@ class ConfigType extends AbstractType
                     'tooltip'          => 'mautic.user.config.form.saml.idp.default_role.tooltip',
                 ],
                 'required'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
             ]
         );
     }

@@ -89,8 +89,10 @@ class CampaignType extends AbstractType
         }
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'read_only' => $readonly,
-            'data'      => $data,
+            'data' => $data,
+            'attr' => [
+                'readonly' => $readonly,
+            ],
         ]);
 
         $builder->add('publishUp', DateTimeType::class, [

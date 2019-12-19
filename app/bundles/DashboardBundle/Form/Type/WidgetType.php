@@ -79,7 +79,7 @@ class WidgetType extends AbstractType
                 'label'       => 'mautic.dashboard.widget.form.type',
                 'choices'     => $event->getTypes(),
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => 'mautic.core.select',
+                'placeholder' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateWidgetForm(this)',

@@ -34,7 +34,7 @@ class LinkedInType extends AbstractType
             ],
             'label'       => 'mautic.integration.LinkedIn.share.counter',
             'required'    => false,
-            'empty_value' => false,
+            'placeholder' => false,
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => ['class' => 'form-control'],
         ]);

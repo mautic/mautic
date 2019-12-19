@@ -43,7 +43,7 @@ class RoleListType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'required'          => false,
-                'empty_value'       => 'mautic.core.form.chooseone',
+                'placeholder'       => 'mautic.core.form.chooseone',
             ]
         );
     }

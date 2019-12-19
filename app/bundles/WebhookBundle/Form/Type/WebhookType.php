@@ -126,7 +126,7 @@ class WebhookType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
             ],
-            'empty_value'       => '',
+            'placeholder'       => '',
             'required'          => false,
             'choices_as_values' => true,
         ]);

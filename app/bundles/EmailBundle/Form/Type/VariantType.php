@@ -77,7 +77,7 @@ class VariantType extends AbstractType
                     'expanded'    => false,
                     'multiple'    => false,
                     'choices'     => $choices,
-                    'empty_value' => 'mautic.core.form.chooseone',
+                    'placeholder' => 'mautic.core.form.chooseone',
                     'constraints' => [
                         new NotBlank(
                             ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']

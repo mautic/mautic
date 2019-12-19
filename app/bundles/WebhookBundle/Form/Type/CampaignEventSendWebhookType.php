@@ -87,7 +87,7 @@ class CampaignEventSendWebhookType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'required'          => false,
                 'choices_as_values' => true,
             ]

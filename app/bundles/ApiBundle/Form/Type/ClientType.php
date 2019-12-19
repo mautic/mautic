@@ -106,7 +106,7 @@ class ClientType extends AbstractType
                     ],
                     'choices_as_values' => true,
                     'required'          => false,
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'data'              => $this->apiMode,
                 ]
             );
@@ -222,10 +222,10 @@ class ClientType extends AbstractType
                     'label'      => 'mautic.api.client.form.consumerkey',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'onclick' => 'this.setSelectionRange(0, this.value.length);',
+                        'class'    => 'form-control',
+                        'onclick'  => 'this.setSelectionRange(0, this.value.length);',
+                        'readonly' => true,
                     ],
-                    'read_only' => true,
                     'required'  => false,
                     'mapped'    => false,
                     'data'      => $options['data']->getConsumerKey(),
@@ -239,10 +239,10 @@ class ClientType extends AbstractType
                     'label'      => 'mautic.api.client.form.consumersecret',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'onclick' => 'this.setSelectionRange(0, this.value.length);',
+                        'class'    => 'form-control',
+                        'onclick'  => 'this.setSelectionRange(0, this.value.length);',
+                        'readonly' => true,
                     ],
-                    'read_only' => true,
                     'required'  => false,
                 ]
             );
