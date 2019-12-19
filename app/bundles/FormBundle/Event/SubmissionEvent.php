@@ -95,7 +95,7 @@ class SubmissionEvent extends CommonEvent
     private $request;
 
     /**
-     * @var array|null|Response
+     * @var array|Response|null
      */
     private $postSubmitResponse;
 
