@@ -86,7 +86,7 @@ class CheckStep implements StepInterface
      */
     public function getFormType()
     {
-        return new CheckStepType();
+        return CheckStepType::class;
     }
 
     /**
