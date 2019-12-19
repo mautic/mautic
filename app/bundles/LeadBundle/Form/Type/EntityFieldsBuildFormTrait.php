@@ -184,7 +184,8 @@ trait EntityFieldsBuildFormTrait
                         'mapped'            => $mapped,
                         'multiple'          => false,
                         'constraints'       => $constraints,
-                                            ];
+                        'choices_as_values' => true,
+                    ];
 
                     $choiceType = ChoiceType::class;
                     $emptyValue = '';
@@ -237,12 +238,13 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         ChoiceType::class,
                         [
-                                                        'choices'           => $choices,
-                            'required'                                      => $required,
-                            'label'                                         => $field['label'],
-                            'label_attr'                                    => ['class' => 'control-label'],
-                            'data'                                          => $value,
-                            'attr'                                          => [
+                            'choices_as_values' => true,
+                            'choices'           => $choices,
+                            'required'          => $required,
+                            'label'             => $field['label'],
+                            'label_attr'        => ['class' => 'control-label'],
+                            'data'              => $value,
+                            'attr'              => [
                                 'class'            => 'form-control',
                                 'data-placeholder' => $field['label'],
                             ],

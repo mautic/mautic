@@ -30,8 +30,9 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
             'flag',
             ChoiceType::class,
             [
-                'label'                             => 'mautic.email.flag.filter',
-                                'choices'           => [
+                'label'             => 'mautic.email.flag.filter',
+                'choices_as_values' => true,
+                'choices'           => [
                     'mautic.email.flag.sent'                       => '',
                     'mautic.email.flag.opened'                     => 'opened',
                     'mautic.email.flag.failed'                     => 'failed',

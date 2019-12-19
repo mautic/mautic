@@ -75,7 +75,8 @@ class PageListType extends AbstractType
                 'required'          => false,
                 'top_level'         => 'variant',
                 'ignore_ids'        => [],
-                            ]
+                'choices_as_values' => true,
+            ]
         );
 
         $resolver->setDefined(['top_level', 'ignore_ids']);

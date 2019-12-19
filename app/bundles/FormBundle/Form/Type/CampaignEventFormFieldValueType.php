@@ -74,7 +74,8 @@ class CampaignEventFormFieldValueType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $choices,
-                            ]
+                'choices_as_values' => true,
+            ]
         );
 
         // function to add 'template' choice field dynamically
@@ -130,8 +131,9 @@ class CampaignEventFormFieldValueType extends AbstractType
                 'field',
                 ChoiceType::class,
                 [
-                    'choices'                               => $fields,
-                                        'attr'              => [
+                    'choices'           => $fields,
+                    'choices_as_values' => true,
+                    'attr'              => [
                         'onchange'           => 'Mautic.updateFormFieldValues(this)',
                         'data-field-options' => json_encode($options),
                     ],
@@ -169,6 +171,8 @@ class CampaignEventFormFieldValueType extends AbstractType
                     ChoiceType::class,
                     [
                         'choices'    => $options[$data['field']],
+                        // specifically leaving off choices_as_values here
+                        // as the $key === $value
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [

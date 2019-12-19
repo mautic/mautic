@@ -49,13 +49,14 @@ class YesNoButtonGroupType extends AbstractType
                         $options['yes_label'] => $options['yes_value'],
                     ];
                 },
-                                'choice_value'      => function ($choiceKey) {
-                                    if (null === $choiceKey || '' === $choiceKey) {
-                                        return null;
-                                    }
+                'choices_as_values' => true,
+                'choice_value'      => function ($choiceKey) {
+                    if (null === $choiceKey || '' === $choiceKey) {
+                        return null;
+                    }
 
-                                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (int) $choiceKey;
-                                },
+                    return (is_string($choiceKey) && !is_numeric($choiceKey)) ? $choiceKey : (int) $choiceKey;
+                },
                 'expanded'          => true,
                 'multiple'          => false,
                 'label_attr'        => ['class' => 'control-label'],

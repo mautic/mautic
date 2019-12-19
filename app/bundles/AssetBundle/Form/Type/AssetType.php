@@ -66,7 +66,8 @@ class AssetType extends AbstractType
                 'mautic.asset.asset.form.storageLocation.local'  => 'local',
                 'mautic.asset.asset.form.storageLocation.remote' => 'remote',
             ],
-                        'attr'              => [
+            'choices_as_values' => true,
+            'attr'              => [
                 'onchange' => 'Mautic.changeAssetStorageLocation();',
             ],
         ]);

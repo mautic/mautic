@@ -64,7 +64,8 @@ class ConfigType extends AbstractType
                 'tooltip' => 'mautic.sms.config.select_default_transport',
             ],
             'choices'           => $choices,
-                    ]);
+            'choices_as_values' => true,
+        ]);
     }
 
     /**

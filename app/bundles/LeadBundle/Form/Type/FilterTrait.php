@@ -77,6 +77,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['assets'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
                 break;
             case 'leadlist':
@@ -94,6 +95,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['lists'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
                 break;
             case 'campaign':
@@ -106,6 +108,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['campaign'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
                 break;
             case 'lead_email_received':
@@ -118,6 +121,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['emails'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
                 break;
             case 'device_type':
@@ -129,6 +133,7 @@ trait FilterTrait
 
                 $customOptions['choices']           = $options['deviceTypes'];
                 $customOptions['multiple']          = true;
+                $customOptions['choices_as_values'] = true;
                 $type                               = ChoiceType::class;
                 break;
             case 'device_brand':
@@ -140,6 +145,7 @@ trait FilterTrait
 
                 $customOptions['choices']           = $options['deviceBrands'];
                 $customOptions['multiple']          = true;
+                $customOptions['choices_as_values'] = true;
                 $type                               = ChoiceType::class;
                 break;
             case 'device_os':
@@ -151,6 +157,7 @@ trait FilterTrait
 
                 $customOptions['choices']           = $options['deviceOs'];
                 $customOptions['multiple']          = true;
+                $customOptions['choices_as_values'] = true;
                 $type                               = ChoiceType::class;
                 break;
             case 'tags':
@@ -162,6 +169,7 @@ trait FilterTrait
                 $customOptions['choices']                   = $options['tags'];
                 $customOptions['multiple']                  = true;
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
                 $attr                                       = array_merge(
                     $attr,
@@ -176,6 +184,7 @@ trait FilterTrait
             case 'stage':
                 $customOptions['choices']                   = $options['stage'];
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
                 break;
             case 'globalcategory':
@@ -186,6 +195,7 @@ trait FilterTrait
                 }
                 $customOptions['choices']           = $options['globalcategory'];
                 $customOptions['multiple']          = true;
+                $customOptions['choices_as_values'] = true;
                 $type                               = ChoiceType::class;
                 break;
             case 'timezone':
@@ -208,6 +218,7 @@ trait FilterTrait
                 }
 
                 $type                                       = ChoiceType::class;
+                $customOptions['choices_as_values']         = true;
                 $customOptions['choices']                   = $options[$choiceKey];
                 $customOptions['choice_translation_domain'] = false;
                 $customOptions['multiple']                  = (in_array($data['operator'], ['in', '!in']));
@@ -282,6 +293,7 @@ trait FilterTrait
 
                 $customOptions['choices']                   = $choices;
                 $customOptions['choice_translation_domain'] = false;
+                $customOptions['choices_as_values']         = true;
                 $type                                       = ChoiceType::class;
             break;
             case 'lookup':
@@ -389,9 +401,10 @@ trait FilterTrait
             'operator',
             ChoiceType::class,
             [
-                                'label'             => false,
-                'choices'                           => isset($field['operators']) ? $field['operators'] : [],
-                'attr'                              => [
+                'choices_as_values' => true,
+                'label'             => false,
+                'choices'           => isset($field['operators']) ? $field['operators'] : [],
+                'attr'              => [
                     'class'    => 'form-control not-chosen',
                     'onchange' => 'Mautic.convertLeadFilterInput(this)',
                 ],

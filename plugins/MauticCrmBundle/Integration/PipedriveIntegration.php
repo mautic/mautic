@@ -314,12 +314,13 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'choices'     => [
                         'mautic.pipedrive.object.organization'  => 'company',
                     ],
-                                        'expanded'          => true,
-                    'multiple'                              => true,
-                    'label'                                 => 'mautic.pipedrive.form.objects_to_pull_from',
-                    'label_attr'                            => ['class' => ''],
-                    'empty_value'                           => false,
-                    'required'                              => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.form.objects_to_pull_from',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
 
@@ -330,12 +331,13 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'choices'     => [
                         'mautic.pipedrive.add.edit.contact.import.enabled' => 'enabled',
                     ],
-                                        'expanded'          => true,
-                    'multiple'                              => true,
-                    'label'                                 => 'mautic.pipedrive.add.edit.contact.import',
-                    'label_attr'                            => ['class' => ''],
-                    'empty_value'                           => false,
-                    'required'                              => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.pipedrive.add.edit.contact.import',
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }

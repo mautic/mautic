@@ -392,17 +392,18 @@ class FieldType extends AbstractType
                 'leadField',
                 ChoiceType::class,
                 [
-                    'choices'                               => array_flip($options['leadFields']),
-                                        'choice_attr'       => function ($val, $key, $index) use ($options) {
-                                            $objects = ['lead', 'company'];
-                                            foreach ($objects as $object) {
-                                                if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
-                                                    return ['data-list-type' => 1];
-                                                }
-                                            }
+                    'choices'           => array_flip($options['leadFields']),
+                    'choices_as_values' => true,
+                    'choice_attr'       => function ($val, $key, $index) use ($options) {
+                        $objects = ['lead', 'company'];
+                        foreach ($objects as $object) {
+                            if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
+                                return ['data-list-type' => 1];
+                            }
+                        }
 
-                                            return [];
-                                        },
+                        return [];
+                    },
                     'label'      => 'mautic.form.field.form.lead_field',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [

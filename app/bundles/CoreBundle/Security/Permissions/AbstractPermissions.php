@@ -384,11 +384,12 @@ abstract class AbstractPermissions
             "$bundle:$level",
             PermissionListType::class,
             [
-                'choices'                           => $choices,
-                                'label'             => $label,
-                'bundle'                            => $bundle,
-                'level'                             => $level,
-                'data'                              => (!empty($data[$level]) ? $data[$level] : []),
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'label'             => $label,
+                'bundle'            => $bundle,
+                'level'             => $level,
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
             ]
         );
     }
@@ -429,11 +430,12 @@ abstract class AbstractPermissions
             "$bundle:$level",
             PermissionListType::class,
             [
-                'choices'                           => $choices,
-                                'label'             => "mautic.$bundle.permissions.$level",
-                'data'                              => (!empty($data[$level]) ? $data[$level] : []),
-                'bundle'                            => $bundle,
-                'level'                             => $level,
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'label'             => "mautic.$bundle.permissions.$level",
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'            => $bundle,
+                'level'             => $level,
             ]
         );
     }
@@ -501,11 +503,12 @@ abstract class AbstractPermissions
             "$bundle:$level",
             PermissionListType::class,
             [
-                'choices'                           => $choices,
-                                'label'             => "mautic.$bundle.permissions.$level",
-                'data'                              => (!empty($data[$level]) ? $data[$level] : []),
-                'bundle'                            => $bundle,
-                'level'                             => $level,
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'label'             => "mautic.$bundle.permissions.$level",
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'            => $bundle,
+                'level'             => $level,
             ]
         );
     }

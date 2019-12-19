@@ -94,23 +94,24 @@ class DetailsType extends AbstractType
             }
 
             $builder->add('supportedFeatures', ChoiceType::class, [
-                'choices'                           => $choices,
-                'expanded'                          => true,
-                'label_attr'                        => ['class' => 'control-label'],
-                'multiple'                          => true,
-                'label'                             => 'mautic.integration.form.features',
-                'required'                          => false,
-                'data'                              => $data,
-                                'choice_attr'       => function ($val, $key, $index) use ($tooltips) {
-                                    if (array_key_exists($val, $tooltips)) {
-                                        return [
+                'choices'           => $choices,
+                'expanded'          => true,
+                'label_attr'        => ['class' => 'control-label'],
+                'multiple'          => true,
+                'label'             => 'mautic.integration.form.features',
+                'required'          => false,
+                'data'              => $data,
+                'choices_as_values' => true,
+                'choice_attr'       => function ($val, $key, $index) use ($tooltips) {
+                    if (array_key_exists($val, $tooltips)) {
+                        return [
                             'data-toggle' => 'tooltip',
                             'title'       => $tooltips[$val],
                         ];
-                                    } else {
-                                        return [];
-                                    }
-                                },
+                    } else {
+                        return [];
+                    }
+                },
             ]);
         }
 

@@ -79,12 +79,13 @@ class LeadImportFieldType extends AbstractType
                 $field,
                 ChoiceType::class,
                 [
-                                        'choices'           => $importChoiceFields,
-                    'label'                                 => $label,
-                    'required'                              => false,
-                    'label_attr'                            => ['class' => 'control-label'],
-                    'attr'                                  => ['class' => 'form-control'],
-                    'data'                                  => $this->getDefaultValue($field, $options['import_fields']),
+                    'choices_as_values' => true,
+                    'choices'           => $importChoiceFields,
+                    'label'             => $label,
+                    'required'          => false,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => ['class' => 'form-control'],
+                    'data'              => $this->getDefaultValue($field, $options['import_fields']),
                 ]
             );
         }

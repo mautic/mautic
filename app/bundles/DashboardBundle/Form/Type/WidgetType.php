@@ -76,11 +76,12 @@ class WidgetType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'label'                             => 'mautic.dashboard.widget.form.type',
-                'choices'                           => array_flip($event->getTypes()),
-                                'label_attr'        => ['class' => 'control-label'],
-                'empty_value'                       => 'mautic.core.select',
-                'attr'                              => [
+                'label'             => 'mautic.dashboard.widget.form.type',
+                'choices'           => array_flip($event->getTypes()),
+                'choices_as_values' => true,
+                'label_attr'        => ['class' => 'control-label'],
+                'empty_value'       => 'mautic.core.select',
+                'attr'              => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.updateWidgetForm(this)',
                 ],
@@ -98,10 +99,11 @@ class WidgetType extends AbstractType
                     '75%'  => '75',
                     '100%' => '100',
                 ],
-                                'empty_data'        => '100',
-                'label_attr'                        => ['class' => 'control-label'],
-                'attr'                              => ['class' => 'form-control'],
-                'required'                          => false,
+                'choices_as_values' => true,
+                'empty_data'        => '100',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
             ]
         );
 
@@ -117,10 +119,11 @@ class WidgetType extends AbstractType
                     '560px' => '560',
                     '675px' => '675',
                 ],
-                                'empty_data'        => '330',
-                'label_attr'                        => ['class' => 'control-label'],
-                'attr'                              => ['class' => 'form-control'],
-                'required'                          => false,
+                'choices_as_values' => true,
+                'empty_data'        => '330',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
             ]
         );
 

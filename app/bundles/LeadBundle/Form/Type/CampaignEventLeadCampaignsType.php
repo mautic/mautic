@@ -62,9 +62,10 @@ class CampaignEventLeadCampaignsType extends AbstractType
             'expr',
             ChoiceType::class,
             [
-                                'label'             => 'mautic.lead.lead.events.campaigns.expression',
-                'multiple'                          => false,
-                'choices'                           => $this->listModel->getOperatorsForFieldType([
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.lead.events.campaigns.expression',
+                'multiple'          => false,
+                'choices'           => $this->listModel->getOperatorsForFieldType([
                     'include' => [
                         'gt',
                         'lt',

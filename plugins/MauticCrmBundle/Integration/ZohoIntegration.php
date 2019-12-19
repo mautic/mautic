@@ -618,12 +618,13 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                                        'expanded'          => true,
-                    'multiple'                              => true,
-                    'label'                                 => 'mautic.integrations.form.blanks',
-                    'label_attr'                            => ['class' => 'control-label'],
-                    'empty_value'                           => false,
-                    'required'                              => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => 'mautic.integrations.form.blanks',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }
@@ -638,10 +639,11 @@ class ZohoIntegration extends CrmAbstractIntegration
                         'mautic.plugin.zoho.zone_japan'  => 'zoho.co.jp',
                         'mautic.plugin.zoho.zone_china'  => 'zoho.com.cn',
                     ],
-                                        'label'             => 'mautic.plugin.zoho.zone_select',
-                    'empty_value'                           => false,
-                    'required'                              => true,
-                    'attr'                                  => [
+                    'choices_as_values' => true,
+                    'label'             => 'mautic.plugin.zoho.zone_select',
+                    'empty_value'       => false,
+                    'required'          => true,
+                    'attr'              => [
                         'tooltip' => 'mautic.plugin.zoho.zone.tooltip',
                     ],
                 ]
@@ -656,12 +658,13 @@ class ZohoIntegration extends CrmAbstractIntegration
                         'mautic.zoho.object.contact' => 'Contacts',
                         'mautic.zoho.object.account' => 'company',
                     ],
-                                        'expanded'          => true,
-                    'multiple'                              => true,
-                    'label'                                 => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Zoho']),
-                    'label_attr'                            => ['class' => ''],
-                    'empty_value'                           => false,
-                    'required'                              => false,
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'label'             => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Zoho']),
+                    'label_attr'        => ['class' => ''],
+                    'empty_value'       => false,
+                    'required'          => false,
                 ]
             );
         }

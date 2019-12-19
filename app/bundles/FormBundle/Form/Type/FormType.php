@@ -182,9 +182,10 @@ class FormType extends AbstractType
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.message'  => 'message',
             ],
-                        'label'             => 'mautic.form.form.postaction',
-            'label_attr'                    => ['class' => 'control-label'],
-            'attr'                          => [
+            'choices_as_values' => true,
+            'label'             => 'mautic.form.form.postaction',
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
             ],

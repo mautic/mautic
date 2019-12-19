@@ -52,9 +52,10 @@ class CategoryBundlesType extends AbstractType
 
                 return array_flip($types);
             },
-                        'expanded'          => false,
-            'multiple'                      => false,
-            'required'                      => false,
+            'choices_as_values' => true,
+            'expanded'          => false,
+            'multiple'          => false,
+            'required'          => false,
         ]);
     }
 

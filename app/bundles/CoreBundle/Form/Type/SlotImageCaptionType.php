@@ -55,7 +55,8 @@ class SlotImageCaptionType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                            ]
+                'choices_as_values' => true,
+            ]
         );
 
         $builder->add(
@@ -74,7 +75,8 @@ class SlotImageCaptionType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                            ]
+                'choices_as_values' => true,
+            ]
         );
 
         $builder->add(

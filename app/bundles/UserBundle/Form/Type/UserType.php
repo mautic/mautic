@@ -204,10 +204,11 @@ class UserType extends AbstractType
             'locale',
             ChoiceType::class,
             [
-                'choices'                           => $this->getSupportedLanguageChoices(),
-                                'label'             => 'mautic.core.language',
-                'label_attr'                        => ['class' => 'control-label'],
-                'attr'                              => [
+                'choices'           => $this->getSupportedLanguageChoices(),
+                'choices_as_values' => true,
+                'label'             => 'mautic.core.language',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => [
                     'class' => 'form-control',
                 ],
                 'multiple'    => false,

@@ -33,11 +33,12 @@ class GooglePlusType extends AbstractType
                 'mautic.integration.GooglePlus.share.annotation.verticalbubble' => 'vertical-bubble',
                 'mautic.integration.GooglePlus.share.annotation.none'           => 'none',
             ],
-                        'label'             => 'mautic.integration.GooglePlus.share.annotation',
-            'required'                      => false,
-            'empty_value'                   => false,
-            'label_attr'                    => ['class' => 'control-label'],
-            'attr'                          => ['class' => 'form-control'],
+            'choices_as_values' => true,
+            'label'             => 'mautic.integration.GooglePlus.share.annotation',
+            'required'          => false,
+            'empty_value'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => ['class' => 'form-control'],
         ]);
 
         $builder->add('height', ChoiceType::class, [
@@ -46,11 +47,12 @@ class GooglePlusType extends AbstractType
                 'mautic.integration.GooglePlus.share.height.small'    => '15',
                 'mautic.integration.GooglePlus.share.height.large'    => '24',
             ],
-                        'label'             => 'mautic.integration.GooglePlus.share.height',
-            'required'                      => false,
-            'empty_value'                   => false,
-            'label_attr'                    => ['class' => 'control-label'],
-            'attr'                          => ['class' => 'form-control'],
+            'choices_as_values' => true,
+            'label'             => 'mautic.integration.GooglePlus.share.height',
+            'required'          => false,
+            'empty_value'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => ['class' => 'form-control'],
         ]);
     }
 

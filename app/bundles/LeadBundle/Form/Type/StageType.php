@@ -30,12 +30,13 @@ class StageType extends AbstractType
             'addstage',
             ChoiceType::class,
             [
-                                'label'             => 'mautic.lead.batch.add_to',
-                'multiple'                          => false,
-                'choices'                           => $options['items'],
-                'required'                          => false,
-                'label_attr'                        => ['class' => 'control-label'],
-                'attr'                              => ['class' => 'form-control'],
+                'choices_as_values' => true,
+                'label'             => 'mautic.lead.batch.add_to',
+                'multiple'          => false,
+                'choices'           => $options['items'],
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
             ]
         );
 

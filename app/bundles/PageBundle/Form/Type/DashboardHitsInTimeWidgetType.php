@@ -37,7 +37,8 @@ class DashboardHitsInTimeWidgetType extends AbstractType
                 'attr'              => ['class' => 'form-control'],
                 'empty_data'        => '',
                 'required'          => false,
-                            ]
+                'choices_as_values' => true,
+            ]
         );
     }
 

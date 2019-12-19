@@ -57,8 +57,9 @@ class FilterType extends AbstractType
             'glue',
             ChoiceType::class,
             [
-                                'label'             => false,
-                'choices'                           => [
+                'choices_as_values' => true,
+                'label'             => false,
+                'choices'           => [
                     'mautic.lead.list.form.glue.and' => 'and',
                     'mautic.lead.list.form.glue.or'  => 'or',
                 ],

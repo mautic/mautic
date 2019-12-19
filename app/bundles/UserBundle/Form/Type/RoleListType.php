@@ -38,11 +38,12 @@ class RoleListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'                           => $this->getRoleChoices(),
-                                'expanded'          => false,
-                'multiple'                          => false,
-                'required'                          => false,
-                'empty_value'                       => 'mautic.core.form.chooseone',
+                'choices'           => $this->getRoleChoices(),
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => false,
+                'required'          => false,
+                'empty_value'       => 'mautic.core.form.chooseone',
             ]
         );
     }

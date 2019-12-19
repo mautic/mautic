@@ -33,23 +33,25 @@ class FocusListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                                'choices'           => function (Options $options) {
-                                    $choices = [];
+                'choices_as_values' => true,
+                'choices'           => function (Options $options) {
+                    $choices = [];
 
-                                    $list = $this->repo->getFocusList($options['data']);
-                                    foreach ($list as $row) {
-                                        $choices[$row['name']] = $row['id'];
-                                    }
+                    $list = $this->repo->getFocusList($options['data']);
+                    foreach ($list as $row) {
+                        $choices[$row['name']] = $row['id'];
+                    }
 
-                                    //sort by language
-                                    asort($choices);
+                    //sort by language
+                    asort($choices);
 
-                                    return $choices;
-                                },
-                                'expanded'          => false,
-                'multiple'                          => true,
-                'required'                          => false,
-                'empty_value'                       => function (Options $options) {
+                    return $choices;
+                },
+                'choices_as_values' => true,
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
+                'empty_value'       => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone';
                 },
                 'disabled' => function (Options $options) {
