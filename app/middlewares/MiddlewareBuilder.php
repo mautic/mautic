@@ -20,33 +20,37 @@ use Stack\StackedHttpKernel;
 class MiddlewareBuilder
 {
     /**
-     * @var SplPriorityQueue|ReflectionClass[]
+     * @var AppKernel
      */
-    protected $specs;
-
-    public function __construct()
-    {
-        $this->specs = new SplPriorityQueue();
-    }
+    private $app;
 
     /**
-     * @param AppKernel $app
-     *
-     * @return StackedHttpKernel
-     *
-     * @throws ReflectionException
+     * @var string
      */
-    public function resolve(AppKernel $app): StackedHttpKernel
+    private $cacheFile;
+
+    /**
+     * @var SplPriorityQueue|ReflectionClass[]
+     */
+    private $specs;
+
+    /**
+     * MiddlewareBuilder constructor.
+     *
+     * @param AppKernel $app
+     */
+    public function __construct(AppKernel $app)
     {
-        $this->loadMiddlewaresFromDirectory(__DIR__);
+        $this->app       = $app;
+        $this->cacheFile = sprintf('%s/middlewares.cache.php', $app->getCacheDir());
+        $this->specs     = new SplPriorityQueue();
+    }
 
-        $env    = $app->getEnvironment();
-        $envDir = __DIR__.'/'.ucfirst($env);
+    public function resolve(): StackedHttpKernel
+    {
+        $this->loadMiddlewares();
 
-        if (file_exists($envDir)) {
-            $this->loadMiddlewaresFromDirectory($envDir, $env);
-        }
-
+        $app         = $this->app;
         $middlewares = [$app];
 
         foreach ($this->specs as $spec) {
@@ -58,27 +62,70 @@ class MiddlewareBuilder
         return new StackedHttpKernel($app, $middlewares);
     }
 
-    /**
-     * @param string      $directory
-     * @param string|null $env
-     *
-     * @throws ReflectionException
-     */
-    private function loadMiddlewaresFromDirectory(string $directory, ?string $env = null): void
+    private function loadMiddlewares(): void
     {
-        $middlewares = glob($directory.'/*Middleware.php');
+        if ($this->hasCacheFile()) {
+            $this->loadCacheFile();
 
-        if (!empty($middlewares)) {
-            $this->addMiddlewares($middlewares, $env);
+            return;
+        }
+
+        $this->loadFromDirectory(__DIR__);
+
+        $env    = $this->app->getEnvironment();
+        $envDir = __DIR__.'/'.ucfirst($env);
+
+        if (file_exists($envDir)) {
+            $this->loadFromDirectory($envDir, $env);
+        }
+
+        $this->createCacheFile();
+    }
+
+    private function hasCacheFile(): bool
+    {
+        return file_exists($this->cacheFile);
+    }
+
+    private function loadCacheFile(): void
+    {
+        /** @var array $middlewares */
+        $middlewares = include $this->cacheFile;
+
+        foreach ($middlewares as $middleware) {
+            $this->push($middleware);
         }
     }
 
-    /**
-     * @param array       $middlewares
-     * @param string|null $env
-     *
-     * @throws ReflectionException
-     */
+    private function createCacheFile(): void
+    {
+        if (file_exists($this->cacheFile)) {
+            unlink($this->cacheFile);
+        }
+
+        $data  = [];
+        $clone = clone $this->specs;
+        $clone->setExtractFlags(SplPriorityQueue::EXTR_DATA);
+
+        /** @var ReflectionClass $middleware */
+        foreach ($clone as $middleware) {
+            $data[] = $middleware->getName();
+        }
+
+        $content = sprintf('<?php return %s;', var_export($data, true));
+
+        file_put_contents($this->cacheFile, $content);
+    }
+
+    private function loadFromDirectory(string $directory, ?string $env = null): void
+    {
+        $glob = glob($directory.'/*Middleware.php');
+
+        if (!empty($glob)) {
+            $this->addMiddlewares($glob, $env);
+        }
+    }
+
     private function addMiddlewares(array $middlewares, ?string $env = null)
     {
         $prefix = 'Mautic\\Middleware\\';
@@ -92,16 +139,18 @@ class MiddlewareBuilder
         }
     }
 
-    /**
-     * @param string $kernelClass
-     *
-     * @throws ReflectionException
-     */
-    private function push(string $kernelClass): void
+    private function push(string $middlewareClass): void
     {
-        $reflection = new ReflectionClass($kernelClass);
-        $priority   = $reflection->getConstant('PRIORITY');
+        try {
+            $reflection = new ReflectionClass($middlewareClass);
+            $priority   = $reflection->getConstant('PRIORITY');
 
-        $this->specs->insert($reflection, $priority);
+            $this->specs->insert($reflection, $priority);
+        } catch (ReflectionException $e) {
+            /* If there's an error getting the kernel class, it's
+             * an invalid middleware. If it's invalid, don't push
+             * it to the stack
+             */
+        }
     }
 }

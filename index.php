@@ -21,4 +21,4 @@ use function Stack\run;
 
 ErrorHandler::register('prod');
 
-run((new MiddlewareBuilder())->resolve(new AppKernel('prod', false)));
+run((new MiddlewareBuilder(new AppKernel('prod', false)))->resolve());
