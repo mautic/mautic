@@ -108,11 +108,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot.'/cache')) {
+        if (!is_writable(str_replace('%kernel.root_dir%', dirname($this->kernelRoot), $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable($this->kernelRoot.'/logs')) {
+        if (!is_writable(str_replace('%kernel.root_dir%', dirname($this->kernelRoot), $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 
@@ -162,10 +162,6 @@ class CheckStep implements StepInterface
 
         if (!function_exists('mb_strtolower')) {
             $messages[] = 'mautic.install.extension.mbstring';
-        }
-
-        if (!extension_loaded('apcu') || !ini_get('apc.enabled')) {
-            $messages[] = 'mautic.install.extension.apcu';
         }
 
         if (extension_loaded('xdebug')) {
@@ -250,6 +246,10 @@ class CheckStep implements StepInterface
             } catch (\Exception $exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
+        }
+
+        if (!extension_loaded('apcu') || !ini_get('apc.enabled')) {
+            $messages[] = 'mautic.install.extension.apcu';
         }
 
         return $messages;
