@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Form\Type;
 use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -105,7 +106,7 @@ class SortableListType extends AbstractType
                 'remove_icon'         => 'fa fa-times',
                 'sortable'            => 'fa fa-ellipsis-v handle',
                 'with_labels'         => false,
-                'entry_type'          => 'text',
+                'entry_type'          => TextType::class,
                 'add_value_button'    => 'mautic.core.form.list.additem',
                 // Stores as [label => value] array instead of [list => [[label => the label, value => the value], ...]]
                 'key_value_pairs'     => false,

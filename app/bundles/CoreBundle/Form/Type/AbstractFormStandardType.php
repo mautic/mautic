@@ -122,8 +122,10 @@ abstract class AbstractFormStandardType extends AbstractType
                 'isPublished',
                 YesNoButtonGroupType::class,
                 [
-                    'read_only' => $readonly,
-                    'data'      => $data,
+                    'data' => $data,
+                    'attr' => [
+                        'readonly' => $readonly,
+                    ],
                 ]
             );
 
@@ -138,10 +140,10 @@ abstract class AbstractFormStandardType extends AbstractType
                         'attr'       => [
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
+                            'readonly'    => $readonly,
                         ],
                         'format'     => 'yyyy-MM-dd HH:mm',
                         'required'   => false,
-                        'read_only'  => $readonly,
                     ]
                 );
 
@@ -155,10 +157,10 @@ abstract class AbstractFormStandardType extends AbstractType
                         'attr'       => [
                             'class'       => 'form-control',
                             'data-toggle' => 'datetime',
+                            'readonly'    => $readonly,
                         ],
                         'format'     => 'yyyy-MM-dd HH:mm',
                         'required'   => false,
-                        'read_only'  => $readonly,
                     ]
                 );
             }

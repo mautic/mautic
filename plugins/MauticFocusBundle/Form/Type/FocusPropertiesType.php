@@ -84,7 +84,7 @@ class FocusPropertiesType extends AbstractType
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
                         'required'    => false,
-                        'empty_value' => false,
+                        'placeholder' => false,
                     ]
                 );
 
@@ -126,7 +126,7 @@ class FocusPropertiesType extends AbstractType
                         'onchange' => 'Mautic.focusUpdatePreview()',
                     ],
                     'required'    => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                 ]
             );
         }

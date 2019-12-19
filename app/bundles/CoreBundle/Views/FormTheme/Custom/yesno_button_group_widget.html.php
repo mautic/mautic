@@ -17,7 +17,7 @@ $attr['style'] = 'width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;';
     <?php foreach ($form as $child): ?>
         <?php $class =
             (!empty($child->vars['checked']) ? ' active' : '').
-            (!empty($child->vars['disabled']) || !empty($child->vars['read_only']) ? ' disabled' : '').
+            (!empty($child->vars['disabled']) || !empty($attr['readonly']) ? ' disabled' : '').
             ('0' === $child->vars['name'] ? ' btn-no' : ('1' === $child->vars['name'] ? ' btn-yes' : ' btn-extra')).
             ('0' === $child->vars['name'] && !empty($child->vars['checked']) ? ' btn-danger' : '').
             ('1' === $child->vars['name'] && !empty($child->vars['checked']) ? ' btn-success' : ''); ?>

@@ -34,7 +34,7 @@ class FormFieldSelectType extends AbstractType
         }
 
         $builder->add(
-            'empty_value',
+            'placeholder',
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.emptyvalue',

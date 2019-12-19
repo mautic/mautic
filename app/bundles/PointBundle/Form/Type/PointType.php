@@ -83,7 +83,7 @@ class PointType extends AbstractType
             [
                 'choices'           => $options['pointActions']['choices'],
                 'choices_as_values' => true,
-                'empty_value'       => '',
+                'placeholder'       => '',
                 'label'             => 'mautic.point.form.type',
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => [
@@ -142,8 +142,10 @@ class PointType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
-                'data'      => $data,
+                'data' => $data,
+                'attr' => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 

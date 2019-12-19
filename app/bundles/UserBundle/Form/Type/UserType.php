@@ -196,7 +196,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                'placeholder' => 'mautic.user.user.form.defaulttimezone',
             ]
         );
 
@@ -212,7 +212,7 @@ class UserType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaultlocale',
+                'placeholder' => 'mautic.user.user.form.defaultlocale',
             ]
         );
 
@@ -249,7 +249,7 @@ class UserType extends AbstractType
                             'class' => 'form-control',
                         ],
                         'class'         => Role::class,
-                        'property'      => 'name',
+                        'choice_label'  => 'name',
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('r')
                                 ->where('r.isPublished = true')

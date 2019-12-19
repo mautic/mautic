@@ -89,7 +89,7 @@ class MonitoringType extends AbstractType
             ],
             'choices'           => array_flip((array) $options['networkTypes']), // passed from the controller
             'choices_as_values' => true,
-            'empty_value'       => 'mautic.core.form.chooseone',
+            'placeholder'       => 'mautic.core.form.chooseone',
         ]);
 
         // if we have a network type value add in the form

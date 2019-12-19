@@ -120,7 +120,7 @@ class PropertiesType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -157,7 +157,7 @@ class PropertiesType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 

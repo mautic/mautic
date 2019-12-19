@@ -63,7 +63,7 @@ class ReportWidgetType extends AbstractType
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.form.choose_graphs',
                 'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [
                     'class' => 'form-control',

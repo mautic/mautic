@@ -36,7 +36,7 @@ class CampaignEventLeadChangeType extends AbstractType
             'multiple'    => false,
             'label_attr'  => ['class' => 'control-label'],
             'label'       => 'mautic.campaign.form.trigger_leadchanged',
-            'empty_value' => false,
+            'placeholder' => false,
             'required'    => false,
             'data'        => $data,
         ]);
