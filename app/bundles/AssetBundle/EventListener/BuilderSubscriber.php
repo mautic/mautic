@@ -13,12 +13,11 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,37 +30,43 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $assetToken = '{assetlink=(.*?)}';
 
     /**
-     * @var TokenHelper
-     */
-    private $tokenHelper;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var CorePermissions
      */
     private $security;
 
     /**
-     * @var MauticFactory
+     * @var TokenHelper
      */
-    private $factory;
+    private $tokenHelper;
 
     /**
-     * @param TokenHelper     $tokenHelper
-     * @param LeadModel       $leadModel
-     * @param CorePermissions $security
-     * @param MauticFactory   $factory
+     * @var ContactTracker
      */
-    public function __construct(TokenHelper $tokenHelper, LeadModel $leadModel, CorePermissions $security, MauticFactory $factory)
-    {
-        $this->tokenHelper = $tokenHelper;
-        $this->leadModel   = $leadModel;
-        $this->security    = $security;
-        $this->factory     = $factory; // Temporary. @see https://github.com/mautic/mautic/issues/8088
+    private $contactTracker;
+
+    /**
+     * @var BuilderTokenHelperFactory
+     */
+    private $builderTokenHelperFactory;
+
+    /**
+     * BuilderSubscriber constructor.
+     *
+     * @param CorePermissions           $security
+     * @param TokenHelper               $tokenHelper
+     * @param ContactTracker            $contactTracker
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
+     */
+    public function __construct(
+        CorePermissions $security,
+        TokenHelper $tokenHelper,
+        ContactTracker $contactTracker,
+        BuilderTokenHelperFactory $builderTokenHelperFactory
+    ) {
+        $this->security                  = $security;
+        $this->tokenHelper               = $tokenHelper;
+        $this->contactTracker            = $contactTracker;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**
@@ -84,7 +89,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     public function onBuilderBuild(BuilderEvent $event)
     {
         if ($event->tokensRequested($this->assetToken)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('asset');
             $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', true);
         }
     }
@@ -95,9 +100,9 @@ class BuilderSubscriber implements EventSubscriberInterface
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $lead   = $event->getLead();
-        $leadId = (null !== $lead) ? $lead['id'] : null;
+        $leadId = (int) (null !== $lead ? $lead['id'] : null);
         $email  = $event->getEmail();
-        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), (null === $email) ? null : $email->getId());
+        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), null === $email ? null : $email->getId());
         $event->addTokens($tokens);
     }
 
@@ -107,8 +112,8 @@ class BuilderSubscriber implements EventSubscriberInterface
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $page    = $event->getPage();
-        $lead    = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead() : null;
-        $leadId  = ($lead) ? $lead->getId() : null;
+        $lead    = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
+        $leadId  = $lead ? $lead->getId() : null;
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
 
@@ -119,30 +124,23 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param       $event
-     * @param       $leadId
-     * @param array $source
-     * @param null  $emailId
+     * @param PageDisplayEvent|EmailSendEvent $event
+     * @param int                             $leadId
+     * @param array                           $source
+     * @param null                            $emailId
      *
      * @return array
      */
     private function generateTokensFromContent($event, $leadId, $source = [], $emailId = null)
     {
-        $content = $event->getContent();
-
-        $clickthrough = [];
         if ($event instanceof PageDisplayEvent || ($event instanceof EmailSendEvent && $event->shouldAppendClickthrough())) {
-            $clickthrough = ['source' => $source];
-
-            if (null !== $leadId) {
-                $clickthrough['lead'] = $leadId;
-            }
-
-            if (!empty($emailId)) {
-                $clickthrough['email'] = $emailId;
-            }
+            $clickthrough = [
+                'source' => $source,
+                'lead'   => $leadId ?? false,
+                'email'  => $emailId ?? false,
+            ];
         }
 
-        return $this->tokenHelper->findAssetTokens($content, $clickthrough);
+        return $this->tokenHelper->findAssetTokens($event->getContent(), array_filter($clickthrough ?? []));
     }
 }

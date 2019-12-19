@@ -11,8 +11,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
@@ -32,6 +31,11 @@ class PageSubscriber implements EventSubscriberInterface
     private $formModel;
 
     /**
+     * @var BuilderTokenHelperFactory
+     */
+    private $builderTokenHelperFactory;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -42,26 +46,23 @@ class PageSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var MauticFactory
-     */
-    private $mauticFactory;
-
-    /**
-     * @param FormModel           $formModel
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     * @param MauticFactory       $mauticFactory
+     * PageSubscriber constructor.
+     *
+     * @param FormModel                 $formModel
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
+     * @param TranslatorInterface       $translator
+     * @param CorePermissions           $security
      */
     public function __construct(
         FormModel $formModel,
+        BuilderTokenHelperFactory $builderTokenHelperFactory,
         TranslatorInterface $translator,
-        CorePermissions $security,
-        MauticFactory $mauticFactory
+        CorePermissions $security
     ) {
-        $this->formModel     = $formModel;
-        $this->translator    = $translator;
-        $this->security      = $security;
-        $this->mauticFactory = $mauticFactory;
+        $this->formModel                 = $formModel;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+        $this->translator                = $translator;
+        $this->security                  = $security;
     }
 
     /**
@@ -93,8 +94,8 @@ class PageSubscriber implements EventSubscriberInterface
         }
 
         if ($event->tokensRequested($this->formRegex)) {
-            $tokenHelper = new BuilderTokenHelper($this->mauticFactory, 'form');
-            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id');
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('form');
+            $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name');
         }
     }
 
