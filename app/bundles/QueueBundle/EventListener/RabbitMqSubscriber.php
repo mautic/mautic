@@ -15,6 +15,8 @@ use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RabbitMqSubscriber extends AbstractQueueSubscriber
@@ -80,7 +82,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -102,7 +104,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -124,7 +126,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_vhost',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.rabbitmq.vhost',
                 'label_attr' => ['class' => 'control-label'],
@@ -146,7 +148,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_user',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.rabbitmq.user',
                 'label_attr' => ['class' => 'control-label'],
@@ -168,7 +170,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.queue.config.rabbitmq.password',
                 'label_attr' => ['class' => 'control-label'],
