@@ -95,7 +95,7 @@ class CategoryListType extends AbstractType
             'label'       => 'mautic.core.category',
             'label_attr'  => ['class' => 'control-label'],
             'multiple'    => false,
-            'empty_value' => 'mautic.core.form.uncategorized',
+            'placeholder' => 'mautic.core.form.uncategorized',
             'attr'        => function (Options $options) {
                 $modalHeader = $this->translator->trans('mautic.category.header.new');
                 $newUrl = $this->router->generate('mautic_category_action', [

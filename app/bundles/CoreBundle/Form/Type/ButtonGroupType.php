@@ -38,7 +38,7 @@ class ButtonGroupType extends AbstractType
         $resolver->setDefaults([
             'expanded'           => true,
             'multiple'           => false,
-            'empty_value'        => false,
+            'placeholder'        => false,
             'required'           => false,
             'label_attr'         => ['class' => 'control-label'],
             'button_group_class' => 'btn-block',

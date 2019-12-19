@@ -13,6 +13,7 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -88,7 +89,7 @@ class PasswordResetConfirmType extends AbstractType
                         new Assert\NotBlank(['message' => 'mautic.user.user.passwordreset.notblank']),
                     ],
                 ],
-                'type'            => 'password',
+                'type'            => PasswordType::class,
                 'invalid_message' => 'mautic.user.user.password.mismatch',
                 'required'        => true,
                 'error_bubbling'  => false,

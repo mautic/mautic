@@ -97,7 +97,7 @@ class DoctrineStep implements StepInterface
      */
     public function getFormType()
     {
-        return new DoctrineStepType();
+        return DoctrineStepType::class;
     }
 
     /**

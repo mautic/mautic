@@ -254,7 +254,7 @@ class ConfigType extends AbstractType
                     'tooltip'  => 'mautic.email.config.mailer.transport.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -337,7 +337,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.amazon_host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -377,7 +377,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.auth.mode.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => 'mautic.email.config.mailer_auth_mode.none',
+                'placeholder' => 'mautic.email.config.mailer_auth_mode.none',
             ]
         );
 
@@ -468,7 +468,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.encryption.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => 'mautic.email.config.mailer_encryption.none',
+                'placeholder' => 'mautic.email.config.mailer_encryption.none',
             ]
         );
 
@@ -557,7 +557,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.spool.type.tooltip',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 

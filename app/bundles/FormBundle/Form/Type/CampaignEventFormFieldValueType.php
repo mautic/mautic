@@ -47,7 +47,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                 'label'       => 'mautic.form.campaign.event.forms',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
-                'empty_value' => 'mautic.core.select',
+                'placeholder' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.form.campaign.event.forms_descr',

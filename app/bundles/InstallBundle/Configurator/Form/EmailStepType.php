@@ -95,7 +95,7 @@ class EmailStepType extends AbstractType
                 'choices_as_values' => true,
                 'label'             => 'mautic.install.form.email.transport',
                 'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'attr'              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.install.form.email.transport_descr',
@@ -163,7 +163,7 @@ class EmailStepType extends AbstractType
                 ],
                 'label'       => 'mautic.install.form.email.encryption',
                 'expanded'    => true,
-                'empty_value' => 'mautic.install.form.none',
+                'placeholder' => 'mautic.install.form.none',
             ]
         );
 
@@ -172,13 +172,13 @@ class EmailStepType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'plain'    => 'mautic.email.config.mailer_auth_mode.plain',
-                    'login'    => 'mautic.email.config.mailer_auth_mode.login',
-                    'cram-md5' => 'mautic.email.config.mailer_auth_mode.cram-md5',
+                    'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
+                    'mautic.email.config.mailer_auth_mode.login'    => 'login',
+                    'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
                 ],
                 'label'       => 'mautic.install.form.email.auth_mode',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => 'mautic.install.form.none',
+                'placeholder' => 'mautic.install.form.none',
                 'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'MauticInstaller.toggleAuthDetails(this.value);',
@@ -196,7 +196,7 @@ class EmailStepType extends AbstractType
                 ],
                 'label'       => 'mautic.install.form.email.spool_type',
                 'expanded'    => true,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 

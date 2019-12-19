@@ -58,7 +58,7 @@ class ReportType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
         // Only add these fields if we're in edit mode
-        if (!$options['read_only']) {
+        if (!($options['attr']['readonly'] ?? false)) {
             $builder->add(
                 'name',
                 TextType::class,
@@ -138,7 +138,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.report.form.source',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'    => 'form-control',
@@ -359,7 +359,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.every',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'                => 'form-control',
@@ -378,7 +378,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.day',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'                => 'form-control',
@@ -397,7 +397,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.month_frequency',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'                => 'form-control',

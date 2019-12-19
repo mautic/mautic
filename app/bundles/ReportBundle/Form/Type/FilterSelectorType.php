@@ -40,7 +40,7 @@ class FilterSelectorType extends AbstractType
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.label.filtercolumn',
                 'label_attr'        => ['class' => 'control-label filter-column'],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [
                     'class' => 'form-control filter-columns',
@@ -66,7 +66,7 @@ class FilterSelectorType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.report.label.filtercondition',
                     'label_attr'        => ['class' => 'control-label filter-condition'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class' => 'form-control not-chosen',

@@ -18,6 +18,7 @@ use Mautic\QueueBundle\Queue\QueueService;
 use Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
@@ -117,7 +118,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -139,7 +140,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -161,7 +162,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.beanstalkd.timeout',
                 'label_attr' => ['class' => 'control-label'],

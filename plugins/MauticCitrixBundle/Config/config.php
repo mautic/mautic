@@ -114,6 +114,13 @@ return [
                 ],
             ],
         ],
+        'fixtures' => [
+            'mautic.citrix.fixture.load_citrix_data' => [
+                'class'     => MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM\LoadCitrixData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['doctrine.orm.entity_manager'],
+            ],
+        ],
         'integrations' => [
             'mautic.integration.gotoassist' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotoassistIntegration::class,

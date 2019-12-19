@@ -559,7 +559,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.sandbox',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
@@ -579,7 +579,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.updateOwner',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
@@ -598,7 +598,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -614,7 +614,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.update.dnc.by.date.label',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -634,7 +634,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );

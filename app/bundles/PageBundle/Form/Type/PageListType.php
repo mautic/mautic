@@ -69,7 +69,7 @@ class PageListType extends AbstractType
 
                     return $choices;
                 },
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'expanded'          => false,
                 'multiple'          => true,
                 'required'          => false,

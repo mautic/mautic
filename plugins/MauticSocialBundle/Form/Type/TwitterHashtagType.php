@@ -40,7 +40,7 @@ class TwitterHashtagType extends TwitterAbstractType
             'choices_as_values' => true,
             'label'             => 'mautic.social.monitoring.twitter.namematching',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => [
                 'class'   => 'form-control',
