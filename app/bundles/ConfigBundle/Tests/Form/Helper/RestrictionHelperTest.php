@@ -210,7 +210,7 @@ class RestrictionHelperTest extends TypeTestCase
         /** @var FormInterface $address */
         $address = $form['emailconfig']['monitored_email']['EmailBundle_unsubscribes']['address'];
 
-        $this->assertTrue($address->getConfig()->getOption('read_only'));
+        $this->assertTrue($address->getConfig()->getOption('attr')['readonly']);
         $this->assertTrue($address->getConfig()->getOption('disabled'));
         $this->assertEquals(
             [

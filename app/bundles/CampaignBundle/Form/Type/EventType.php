@@ -92,7 +92,7 @@ class EventType extends AbstractType
                     'multiple'          => false,
                     'label_attr'        => ['class' => 'control-label'],
                     'label'             => $label,
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
@@ -151,7 +151,7 @@ class EventType extends AbstractType
                     'attr'              => [
                         'class' => 'form-control',
                     ],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                     'data'        => $data,
                 ]

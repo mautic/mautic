@@ -121,7 +121,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                         'data-show-on' => $monitoredShowOn,
                         'tooltip'      => 'mautic.email.config.monitored_email_encryption.tooltip',
                     ],
-                    'empty_value' => 'mautic.email.config.mailer_encryption.none',
+                    'placeholder' => 'mautic.email.config.mailer_encryption.none',
                     'data'        => (isset($options['data']['encryption'])) ? $options['data']['encryption'] : '/ssl',
                 ]
             );

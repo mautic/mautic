@@ -36,7 +36,7 @@ class GooglePlusType extends AbstractType
             'choices_as_values' => true,
             'label'             => 'mautic.integration.GooglePlus.share.annotation',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => ['class' => 'form-control'],
         ]);
@@ -50,7 +50,7 @@ class GooglePlusType extends AbstractType
             'choices_as_values' => true,
             'label'             => 'mautic.integration.GooglePlus.share.height',
             'required'          => false,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => ['class' => 'form-control'],
         ]);

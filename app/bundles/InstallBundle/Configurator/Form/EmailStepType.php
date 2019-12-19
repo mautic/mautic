@@ -95,6 +95,7 @@ class EmailStepType extends AbstractType
                 'choices_as_values' => true,
                 'label'             => 'mautic.install.form.email.transport',
                 'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
                 'attr'              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.install.form.email.transport_descr',
@@ -162,9 +163,7 @@ class EmailStepType extends AbstractType
                 ],
                 'label'       => 'mautic.install.form.email.encryption',
                 'expanded'    => true,
-                'attr'        => [
-                    'placeholder' => 'mautic.install.form.none',
-                ],
+                'placeholder' => 'mautic.install.form.none',
             ]
         );
 
@@ -178,10 +177,8 @@ class EmailStepType extends AbstractType
                     'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
                 ],
                 'label'       => 'mautic.install.form.email.auth_mode',
-                'label_attr'  => [
-                    'class'       => 'control-label',
-                    'placeholder' => 'mautic.install.form.none',
-                ],
+                'label_attr'  => ['class' => 'control-label'],
+                'placeholder' => 'mautic.install.form.none',
                 'attr'        => [
                     'class'    => 'form-control',
                     'onchange' => 'MauticInstaller.toggleAuthDetails(this.value);',
@@ -199,6 +196,7 @@ class EmailStepType extends AbstractType
                 ],
                 'label'       => 'mautic.install.form.email.spool_type',
                 'expanded'    => true,
+                'placeholder' => false,
             ]
         );
 

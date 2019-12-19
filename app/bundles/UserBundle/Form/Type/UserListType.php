@@ -43,7 +43,7 @@ class UserListType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => true,
                 'required'          => false,
-                'empty_value'       => 'mautic.core.form.chooseone',
+                'placeholder'       => 'mautic.core.form.chooseone',
             ]
         );
     }
