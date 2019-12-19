@@ -345,7 +345,7 @@ Mautic.switchFormFieldVisibilty = function (formName) {
     // find all fields to hide
     form.find('[data-hide-on]').each(function(index, el) {
         var field  = mQuery(el);
-        var hideOn = jQuery.parseJSON(field.attr('data-hide-on'));
+        var hideOn = JSON.parse(field.attr('data-hide-on'));
 
         if (typeof hideOn.display_priority !== 'undefined') {
             fieldsPriority[field.attr('id')] = 'hide';
