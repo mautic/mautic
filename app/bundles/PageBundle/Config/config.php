@@ -106,14 +106,14 @@ return [
             'mautic.pagebuilder.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
+                    'mautic.helper.token_builder.factory',
                     'translator',
                     'doctrine.dbal.default_connection',
-                    'mautic.security',
                     'mautic.helper.templating',
-                    'mautic.factory',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [

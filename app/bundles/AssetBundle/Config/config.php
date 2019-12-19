@@ -9,6 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\AssetBundle\EventListener\BuilderSubscriber;
+use Mautic\AssetBundle\EventListener\ReportSubscriber;
+
 return [
     'routes' => [
         'main' => [
@@ -86,19 +89,19 @@ return [
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [
-                'class'     => \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
+                'class'     => ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
                     'mautic.asset.repository.download',
                 ],
             ],
             'mautic.asset.builder.subscriber' => [
-                'class'     => \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
+                'class'     => BuilderSubscriber::class,
                 'arguments' => [
-                    'mautic.asset.helper.token',
-                    'mautic.lead.model.lead',
                     'mautic.security',
-                    'mautic.factory',
+                    'mautic.asset.helper.token',
+                    'mautic.tracker.contact',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.asset.leadbundle.subscriber' => [

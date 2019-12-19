@@ -14,7 +14,6 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use DOMDocument;
 use DOMXPath;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCategoryListType;
@@ -32,7 +31,7 @@ use Mautic\CoreBundle\Form\Type\SlotSocialFollowType;
 use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
@@ -79,9 +78,9 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $templating;
 
     /**
-     * @var MauticFactory
+     * @var BuilderTokenHelperFactory
      */
-    private $factory;
+    private $builderTokenHelperFactory;
 
     /**
      * @var PageModel
@@ -105,33 +104,32 @@ class BuilderSubscriber implements EventSubscriberInterface
     const identifierToken   = '{leadidentifier}';
 
     /**
-     * @param TokenHelper         $tokenHelper
-     * @param IntegrationHelper   $integrationHelper
-     * @param PageModel           $pageModel
-     * @param TranslatorInterface $translator
-     * @param Connection          $connection
-     * @param CorePermissions     $security
-     * @param TemplatingHelper    $templating
-     * @param MauticFactory       $factory
+     * BuilderSubscriber constructor.
+     *
+     * @param CorePermissions           $security
+     * @param TokenHelper               $tokenHelper
+     * @param IntegrationHelper         $integrationHelper
+     * @param PageModel                 $pageModel
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
     public function __construct(
+        CorePermissions $security,
         TokenHelper $tokenHelper,
         IntegrationHelper $integrationHelper,
         PageModel $pageModel,
+        BuilderTokenHelperFactory $builderTokenHelperFactory,
         TranslatorInterface $translator,
         Connection $connection,
-        CorePermissions $security,
-        TemplatingHelper $templating,
-        MauticFactory $factory // To be removed once BuilderTokenHelper is refactored out of MauticFactory.
+        TemplatingHelper $templating
     ) {
-        $this->tokenHelper       = $tokenHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->pageModel         = $pageModel;
-        $this->translator        = $translator;
-        $this->connection        = $connection;
-        $this->security          = $security;
-        $this->templating        = $templating;
-        $this->factory           = $factory;
+        $this->security                  = $security;
+        $this->tokenHelper               = $tokenHelper;
+        $this->integrationHelper         = $integrationHelper;
+        $this->pageModel                 = $pageModel;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
+        $this->translator                = $translator;
+        $this->connection                = $connection;
+        $this->templating                = $templating;
     }
 
     /**
@@ -155,7 +153,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     public function onPageBuild(Events\PageBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
+        $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
 
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
@@ -178,7 +176,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
 
             // add only filter based dwc tokens
-            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent', 'dynamiccontent:dynamiccontents');
+            $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
             $expr           = $this->connection->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
@@ -743,7 +741,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', true);
         }
     }
@@ -755,7 +753,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     {
         $content      = $event->getContent();
         $plainText    = $event->getPlainText();
-        $clickthrough = ($event->shouldAppendClickthrough()) ? $event->generateClickthrough() : [];
+        $clickthrough = $event->shouldAppendClickthrough() ? $event->generateClickthrough() : [];
 
         $this->emailIsInternalSend = $event->isInternalSend();
         $this->emailEntity         = $event->getEmail();
