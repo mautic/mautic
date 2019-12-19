@@ -11,8 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -27,13 +26,16 @@ class EmailSubscriber implements EventSubscriberInterface
     private static $contactFieldRegex = '{contactfield=(.*?)}';
 
     /**
-     * @var MauticFactory
+     * @var string
      */
-    private $mauticFactory;
+    private $builderTokenHelperFactory;
 
-    public function __construct(MauticFactory $mauticFactory)
+    /**
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
+     */
+    public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
-        $this->mauticFactory = $mauticFactory;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**
@@ -53,7 +55,7 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->mauticFactory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
+        $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
         // the permissions are for viewing contact data, not for managing contact fields
         $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 

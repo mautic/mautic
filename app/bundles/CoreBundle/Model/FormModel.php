@@ -16,9 +16,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * Class FormModel.
- */
 class FormModel extends AbstractCommonModel
 {
     /**
