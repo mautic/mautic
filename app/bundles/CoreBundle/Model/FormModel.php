@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
@@ -19,16 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FormModel extends AbstractCommonModel
 {
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
     /**
      * Lock an entity to prevent multiple people from editing.
      *
