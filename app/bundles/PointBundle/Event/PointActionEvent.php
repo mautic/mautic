@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Point;
 
-/**
- * Class PointActionEvent.
- */
 class PointActionEvent extends CommonEvent
 {
     /**
@@ -34,15 +31,13 @@ class PointActionEvent extends CommonEvent
      * @param Point $point
      * @param Lead  $lead
      */
-    public function __construct(Point &$point, Lead &$lead)
+    public function __construct(Point $point, Lead $lead)
     {
         $this->point = $point;
         $this->lead  = $lead;
     }
 
     /**
-     * Returns the Point entity.
-     *
      * @return Point
      */
     public function getPoint()
@@ -51,8 +46,6 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Sets the Point entity.
-     *
      * @param Point $point
      */
     public function setPoint(Point $point)
@@ -61,8 +54,6 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Returns the Lead entity.
-     *
      * @return Lead
      */
     public function getLead()
@@ -71,11 +62,9 @@ class PointActionEvent extends CommonEvent
     }
 
     /**
-     * Sets the Lead entity.
-     *
-     * @param $lead
+     * @param Lead $lead
      */
-    public function setLead($lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
     }

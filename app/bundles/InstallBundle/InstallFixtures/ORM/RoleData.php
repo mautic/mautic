@@ -18,9 +18,6 @@ use Mautic\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class RoleData.
- */
 class RoleData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
     /**

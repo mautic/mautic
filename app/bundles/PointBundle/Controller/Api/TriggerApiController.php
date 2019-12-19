@@ -12,11 +12,10 @@
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class TriggerApiController.
- */
 class TriggerApiController extends CommonApiController
 {
     /**

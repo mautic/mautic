@@ -14,9 +14,6 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class LeadPointLog.
- */
 class LeadPointLog
 {
     /**

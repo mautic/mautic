@@ -14,6 +14,7 @@ namespace Mautic\ReportBundle\EventListener;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Mautic\ReportBundle\Form\Type\ReportWidgetType;
 use Mautic\ReportBundle\Model\ReportModel;
 
 class DashboardSubscriber extends MainDashboardSubscriber
@@ -42,7 +43,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $types = [
         'report' => [
-            'formAlias' => 'report_widget',
+            'formAlias' => ReportWidgetType::class,
         ],
     ];
 
