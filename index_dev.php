@@ -18,4 +18,4 @@ use function Stack\run;
 
 ErrorHandler::register('dev');
 
-run((new MiddlewareBuilder(new AppKernel('dev', false)))->resolve());
+run((new MiddlewareBuilder(new AppKernel('dev', true)))->resolve());
