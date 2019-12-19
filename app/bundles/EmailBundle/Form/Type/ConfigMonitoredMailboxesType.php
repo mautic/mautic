@@ -107,7 +107,6 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'encryption',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => [
                         'mautic.email.config.mailer_encryption.ssl'                     => '/ssl',
                         'mautic.email.config.monitored_email_encryption.ssl_novalidate' => '/ssl/novalidate-cert',
@@ -204,7 +203,6 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 ChoiceType::class,
                 [
                     'choices'           => $choices,
-                    'choices_as_values' => true,
                     'label'             => 'mautic.email.config.monitored_email_folder',
                     'label_attr'        => ['class' => 'control-label'],
                     'attr'              => array_merge(

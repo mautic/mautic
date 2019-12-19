@@ -205,7 +205,6 @@ class UserType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $this->getSupportedLanguageChoices(),
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.language',
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => [

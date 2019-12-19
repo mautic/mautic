@@ -87,7 +87,6 @@ class EventType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices'           => array_flip($choices),
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => false,
                     'label_attr'        => ['class' => 'control-label'],
@@ -144,7 +143,6 @@ class EventType extends AbstractType
                         'mautic.campaign.event.intervalunit.choice.m' => 'm',
                         'mautic.campaign.event.intervalunit.choice.y' => 'y',
                     ],
-                    'choices_as_values' => true,
                     'multiple'          => false,
                     'label_attr'        => ['class' => 'control-label'],
                     'label'             => false,
@@ -225,7 +223,6 @@ class EventType extends AbstractType
                         'mautic.report.schedule.day.sunday'     => 0,
                         'mautic.report.schedule.day.week_days'  => -1,
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'required'          => false,

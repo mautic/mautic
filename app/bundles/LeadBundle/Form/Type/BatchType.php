@@ -30,7 +30,6 @@ class BatchType extends AbstractType
             'add',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'label'             => 'mautic.lead.batch.add_to',
                 'multiple'          => true,
                 'choices'           => $options['items'],
@@ -44,7 +43,6 @@ class BatchType extends AbstractType
             'remove',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'label'             => 'mautic.lead.batch.remove_from',
                 'multiple'          => true,
                 'choices'           => $options['items'],

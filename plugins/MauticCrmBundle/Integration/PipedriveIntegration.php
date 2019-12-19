@@ -314,7 +314,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'choices'     => [
                         'mautic.pipedrive.object.organization'  => 'company',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.pipedrive.form.objects_to_pull_from',
@@ -331,7 +330,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'choices'     => [
                         'mautic.pipedrive.add.edit.contact.import.enabled' => 'enabled',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.pipedrive.add.edit.contact.import',

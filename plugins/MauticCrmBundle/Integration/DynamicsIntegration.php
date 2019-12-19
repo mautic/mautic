@@ -83,7 +83,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 'choices' => [
                     'mautic.integrations.blanks' => 'updateBlanks',
                 ],
-                'choices_as_values' => true,
                 'expanded'          => true,
                 'multiple'          => true,
                 'label'             => 'mautic.integrations.form.blanks',
@@ -101,7 +100,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         'mautic.dynamics.object.contact'  => 'contacts',
                         'mautic.dynamics.object.company'  => 'company',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.dynamics.form.objects_to_pull_from',

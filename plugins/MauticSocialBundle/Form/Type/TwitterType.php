@@ -34,7 +34,6 @@ class TwitterType extends AbstractType
                 'mautic.integration.Twitter.share.layout.vertical'   => 'vertical',
                 'mautic.integration.Twitter.share.layout.none'       => 'none',
             ],
-            'choices_as_values' => true,
             'label'             => 'mautic.integration.Twitter.share.layout',
             'required'          => false,
             'empty_value'       => false,

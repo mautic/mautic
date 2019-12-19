@@ -101,7 +101,6 @@ class DetailsType extends AbstractType
                 'label'             => 'mautic.integration.form.features',
                 'required'          => false,
                 'data'              => $data,
-                'choices_as_values' => true,
                 'choice_attr'       => function ($val, $key, $index) use ($tooltips) {
                     if (array_key_exists($val, $tooltips)) {
                         return [

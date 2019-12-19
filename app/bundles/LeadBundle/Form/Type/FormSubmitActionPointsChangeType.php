@@ -28,7 +28,6 @@ class FormSubmitActionPointsChangeType extends AbstractType
             'operator',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'label'             => 'mautic.lead.lead.submitaction.operator',
                 'attr'              => ['class' => 'form-control'],
                 'label_attr'        => ['class' => 'control-label'],

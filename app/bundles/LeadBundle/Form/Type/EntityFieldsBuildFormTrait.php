@@ -184,7 +184,6 @@ trait EntityFieldsBuildFormTrait
                         'mapped'            => $mapped,
                         'multiple'          => false,
                         'constraints'       => $constraints,
-                        'choices_as_values' => true,
                     ];
 
                     $choiceType = ChoiceType::class;
@@ -238,7 +237,6 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         ChoiceType::class,
                         [
-                            'choices_as_values' => true,
                             'choices'           => $choices,
                             'required'          => $required,
                             'label'             => $field['label'],

@@ -41,7 +41,6 @@ class TableOrderType extends AbstractType
             'column',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => array_flip($options['columnList']),
                 'expanded'          => false,
                 'multiple'          => false,
@@ -60,7 +59,6 @@ class TableOrderType extends AbstractType
             'direction',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     $this->translator->trans('mautic.report.report.label.tableorder_dir.asc')  => 'ASC',
                     $this->translator->trans('mautic.report.report.label.tableorder_dir.desc') => 'DESC',

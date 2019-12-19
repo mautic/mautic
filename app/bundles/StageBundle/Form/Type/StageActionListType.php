@@ -49,8 +49,7 @@ class StageActionListType extends AbstractType
                 return $choices;
             },
             'required'          => false,
-            'choices_as_values' => true,
-        ]);
+            ]);
     }
 
     /**

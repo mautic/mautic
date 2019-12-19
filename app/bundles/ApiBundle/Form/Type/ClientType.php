@@ -104,7 +104,6 @@ class ClientType extends AbstractType
                         'OAuth 1.0a' => 'oauth1a',
                         'OAuth 2'    => 'oauth2',
                     ],
-                    'choices_as_values' => true,
                     'required'          => false,
                     'empty_value'       => false,
                     'data'              => $this->apiMode,

@@ -86,7 +86,6 @@ class MailchimpType extends AbstractType
 
         $builder->add('list', ChoiceType::class, [
             'choices'           => array_flip($choices), // Choice type expects labels as keys
-            'choices_as_values' => true,
             'label'             => 'mautic.emailmarketing.list',
             'required'          => false,
             'attr'              => [

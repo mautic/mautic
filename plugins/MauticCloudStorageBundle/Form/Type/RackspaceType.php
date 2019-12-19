@@ -25,7 +25,6 @@ class RackspaceType extends AbstractType
         $builder->add(
             'serverLocation',
             ChoiceType::class, [
-                'choices_as_values' => true,
                 'label'             => 'mautic.integration.Rackspace.server.location',
                 'choices'           => [
                     'mautic.integration.Rackspace.server.location.us' => 'us',

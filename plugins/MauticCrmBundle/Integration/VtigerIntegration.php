@@ -285,7 +285,6 @@ class VtigerIntegration extends CrmAbstractIntegration
                         'mautic.vtiger.object.contact' => 'contacts',
                         'mautic.vtiger.object.company' => 'company',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.vtiger.form.objects_to_pull_from',

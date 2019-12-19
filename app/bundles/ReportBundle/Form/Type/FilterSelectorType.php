@@ -34,7 +34,6 @@ class FilterSelectorType extends AbstractType
             'column',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => array_flip($options['filterList']),
                 'expanded'          => false,
                 'multiple'          => false,
@@ -60,7 +59,6 @@ class FilterSelectorType extends AbstractType
                 'condition',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => array_flip($choices),
                     'expanded'          => false,
                     'multiple'          => false,
@@ -95,7 +93,6 @@ class FilterSelectorType extends AbstractType
             'glue',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'label'             => false,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control filter-glue not-chosen'],

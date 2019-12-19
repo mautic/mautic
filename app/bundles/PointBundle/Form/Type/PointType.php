@@ -82,7 +82,6 @@ class PointType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $options['pointActions']['choices'],
-                'choices_as_values' => true,
                 'empty_value'       => '',
                 'label'             => 'mautic.point.form.type',
                 'label_attr'        => ['class' => 'control-label'],

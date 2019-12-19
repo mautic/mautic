@@ -41,7 +41,6 @@ class ContactChannelsType extends AbstractType
             'subscribed_channels',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => $options['channels'],
                 'expanded'          => true,
                 'label_attr'        => ['class' => 'control-label'],
@@ -57,7 +56,6 @@ class ContactChannelsType extends AbstractType
                 'preferred_channel',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => $options['channels'],
                     'expanded'          => false,
                     'multiple'          => false,
@@ -99,7 +97,6 @@ class ContactChannelsType extends AbstractType
                     'frequency_time_'.$channel,
                     ChoiceType::class,
                     [
-                        'choices_as_values' => true,
                         'choices'           => [
                             'mautic.core.time.days'   => FrequencyRule::TIME_DAY,
                             'mautic.core.time.weeks'  => FrequencyRule::TIME_WEEK,

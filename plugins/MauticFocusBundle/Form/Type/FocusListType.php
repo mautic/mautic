@@ -33,7 +33,6 @@ class FocusListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices_as_values' => true,
                 'choices'           => function (Options $options) {
                     $choices = [];
 
@@ -47,7 +46,6 @@ class FocusListType extends AbstractType
 
                     return $choices;
                 },
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => true,
                 'required'          => false,
