@@ -44,7 +44,6 @@ class DoctrineStepType extends AbstractType
                 'multiple'          => false,
                 'label'             => 'mautic.install.form.database.driver',
                 'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
                 'required'          => true,
                 'attr'              => [
                     'class' => 'form-control',
