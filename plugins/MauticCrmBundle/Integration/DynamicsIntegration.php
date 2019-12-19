@@ -88,7 +88,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 'multiple'          => true,
                 'label'             => 'mautic.integrations.form.blanks',
                 'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'required'          => false,
             ]
         );
@@ -106,7 +106,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.dynamics.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );

@@ -38,7 +38,7 @@ class ConfigType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.form.queue.mode.tooltip',
             ],
-            'empty_value' => false,
+            'placeholder' => false,
             'constraints' => [
                 new NotBlank(
                     [

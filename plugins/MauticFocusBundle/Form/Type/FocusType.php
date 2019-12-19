@@ -178,8 +178,10 @@ class FocusType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
-                'data'      => $data,
+                'data' => $data,
+                'attr' => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 
@@ -227,7 +229,7 @@ class FocusType extends AbstractType
             [
                 'label'       => 'mautic.focus.form.choose_form',
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'attr'        => [
                     'onchange' => 'Mautic.focusUpdatePreview()',
                 ],

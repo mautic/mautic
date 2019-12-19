@@ -61,7 +61,7 @@ class TagType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')->orderBy('t.tag', 'ASC');
                 },
-                'property'        => 'tag',
+                'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,
                 'disabled'        => false,

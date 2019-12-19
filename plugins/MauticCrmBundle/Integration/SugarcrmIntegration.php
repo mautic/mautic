@@ -1068,7 +1068,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.updateOwner',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
@@ -1088,7 +1088,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.updateDnc',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
@@ -1108,7 +1108,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -1127,7 +1127,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );

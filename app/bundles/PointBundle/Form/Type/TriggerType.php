@@ -135,8 +135,10 @@ class TriggerType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
                 'data'      => $data,
+                'attr'      => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 
