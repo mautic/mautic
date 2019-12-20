@@ -1506,7 +1506,7 @@
     function refreshAlign ($btn) {
       if (!$current_video) return false;
 
-      $btn.find('> *').first().replaceWith(editor.icon.create('video-align-' + getAlign()));
+      $btn.find('> *:first').replaceWith(editor.icon.create('video-align-' + getAlign()));
     }
 
     /**
