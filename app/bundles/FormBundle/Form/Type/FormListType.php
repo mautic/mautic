@@ -66,7 +66,7 @@ class FormListType extends AbstractType
                 }
 
                 //sort by language
-                asort($choices);
+                ksort($choices);
 
                 return $choices;
             },

@@ -179,13 +179,14 @@ trait FieldsTypeTrait
                             ButtonGroupType::class,
                             [
                                 'choices' => [
-                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>',
-                                    '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
+                                    '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>'  => 0,
+                                    '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>' => 1,
                                 ],
-                                'label'       => false,
-                                'data'        => $data,
-                                'placeholder' => false,
-                                'attr'        => [
+                                'choices_as_values' => true,
+                                'label'             => false,
+                                'data'              => $data,
+                                'empty_value'       => false,
+                                'attr'              => [
                                     'data-toggle'   => 'tooltip',
                                     'title'         => 'mautic.plugin.direction.data.update',
                                     'disabled'      => $disabled,

@@ -125,15 +125,16 @@ class TwilioIntegration extends AbstractIntegration
             $builder->add('frequency_time', ChoiceType::class,
                 [
                     'choices' => [
-                        'DAY'   => 'day',
-                        'WEEK'  => 'week',
-                        'MONTH' => 'month',
+                        'day'   => 'DAY',
+                        'week'  => 'WEEK',
+                        'month' => 'MONTH',
                     ],
-                    'label'      => 'mautic.lead.list.frequency.times',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
-                    'multiple'   => false,
-                    'attr'       => [
+                    'choices_as_values' => true,
+                    'label'             => 'mautic.lead.list.frequency.times',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'required'          => false,
+                    'multiple'          => false,
+                    'attr'              => [
                         'class' => 'form-control frequency',
                     ],
                 ]);

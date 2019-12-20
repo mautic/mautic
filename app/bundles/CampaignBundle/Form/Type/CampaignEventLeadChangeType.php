@@ -29,16 +29,17 @@ class CampaignEventLeadChangeType extends AbstractType
         $data = (isset($options['data']['action'])) ? $options['data']['action'] : 'added';
         $builder->add('action', ButtonGroupType::class, [
             'choices' => [
-                'added'   => 'mautic.campaign.form.trigger_leadchanged_added',
-                'removed' => 'mautic.campaign.form.trigger_leadchanged_removed',
+                'mautic.campaign.form.trigger_leadchanged_added'   => 'added',
+                'mautic.campaign.form.trigger_leadchanged_removed' => 'removed',
             ],
-            'expanded'    => true,
-            'multiple'    => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'label'       => 'mautic.campaign.form.trigger_leadchanged',
-            'placeholder' => false,
-            'required'    => false,
-            'data'        => $data,
+            'choices_as_values' => true,
+            'expanded'          => true,
+            'multiple'          => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'label'             => 'mautic.campaign.form.trigger_leadchanged',
+            'empty_value'       => false,
+            'required'          => false,
+            'data'              => $data,
         ]);
 
         $builder->add('campaigns', CampaignListType::class, [

@@ -28,15 +28,16 @@ class LinkedInType extends AbstractType
     {
         $builder->add('counter', ChoiceType::class, [
             'choices' => [
-                'right' => 'mautic.integration.LinkedIn.share.counter.right',
-                'top'   => 'mautic.integration.LinkedIn.share.counter.top',
-                ''      => 'mautic.integration.LinkedIn.share.counter.none',
+                'mautic.integration.LinkedIn.share.counter.right' => 'right',
+                'mautic.integration.LinkedIn.share.counter.top'   => 'top',
+                'mautic.integration.LinkedIn.share.counter.none'  => '',
             ],
-            'label'       => 'mautic.integration.LinkedIn.share.counter',
-            'required'    => false,
-            'placeholder' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => ['class' => 'form-control'],
+            'choices_as_values' => true,
+            'label'             => 'mautic.integration.LinkedIn.share.counter',
+            'required'          => false,
+            'empty_value'       => false,
+            'label_attr'        => ['class' => 'control-label'],
+            'attr'              => ['class' => 'form-control'],
         ]);
     }
 
