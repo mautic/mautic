@@ -249,6 +249,8 @@ class InstallController extends CommonController
                     'majors'         => $this->configurator->getRequirements(),
                     'minors'         => $this->configurator->getOptionalSettings(),
                     'appRoot'        => $this->container->getParameter('kernel.root_dir'),
+                    'cacheDir'       => $this->container->getParameter('kernel.cache_dir'),
+                    'logDir'         => $this->container->getParameter('kernel.logs_dir'),
                     'configFile'     => $this->get('mautic.helper.paths')->getSystemPath('local_config'),
                     'completedSteps' => $completedSteps,
                 ],

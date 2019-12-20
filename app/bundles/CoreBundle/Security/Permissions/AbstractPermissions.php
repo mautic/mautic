@@ -384,11 +384,12 @@ abstract class AbstractPermissions
             "$bundle:$level",
             PermissionListType::class,
             [
-                'choices' => $choices,
-                'label'   => $label,
-                'bundle'  => $bundle,
-                'level'   => $level,
-                'data'    => (!empty($data[$level]) ? $data[$level] : []),
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'label'             => $label,
+                'bundle'            => $bundle,
+                'level'             => $level,
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
             ]
         );
     }
@@ -429,11 +430,12 @@ abstract class AbstractPermissions
             "$bundle:$level",
             PermissionListType::class,
             [
-                'choices' => $choices,
-                'label'   => "mautic.$bundle.permissions.$level",
-                'data'    => (!empty($data[$level]) ? $data[$level] : []),
-                'bundle'  => $bundle,
-                'level'   => $level,
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'label'             => "mautic.$bundle.permissions.$level",
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'            => $bundle,
+                'level'             => $level,
             ]
         );
     }
@@ -481,39 +483,32 @@ abstract class AbstractPermissions
      */
     protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
-        $choices = $includePublish ?
-            [
-                'mautic.core.permissions.viewown'      => 'viewown',
-                'mautic.core.permissions.viewother'    => 'viewother',
-                'mautic.core.permissions.editown'      => 'editown',
-                'mautic.core.permissions.editother'    => 'editother',
-                'mautic.core.permissions.create'       => 'create',
-                'mautic.core.permissions.deleteown'    => 'deleteown',
-                'mautic.core.permissions.deleteother'  => 'deleteother',
-                'mautic.core.permissions.publishown'   => 'publishown',
-                'mautic.core.permissions.publishother' => 'publishother',
-                'mautic.core.permissions.full'         => 'full',
-            ] :
-            [
-                'mautic.core.permissions.viewown'     => 'viewown',
-                'mautic.core.permissions.viewother'   => 'viewother',
-                'mautic.core.permissions.editown'     => 'editown',
-                'mautic.core.permissions.editother'   => 'editother',
-                'mautic.core.permissions.create'      => 'create',
-                'mautic.core.permissions.deleteown'   => 'deleteown',
-                'mautic.core.permissions.deleteother' => 'deleteother',
-                'mautic.core.permissions.full'        => 'full',
-            ];
+        $choices = [
+            'mautic.core.permissions.viewown'     => 'viewown',
+            'mautic.core.permissions.viewother'   => 'viewother',
+            'mautic.core.permissions.editown'     => 'editown',
+            'mautic.core.permissions.editother'   => 'editother',
+            'mautic.core.permissions.create'      => 'create',
+            'mautic.core.permissions.deleteown'   => 'deleteown',
+            'mautic.core.permissions.deleteother' => 'deleteother',
+            'mautic.core.permissions.full'        => 'full',
+        ];
+
+        if ($includePublish) {
+            $choices['mautic.core.permissions.publishown']   = 'publishown';
+            $choices['mautic.core.permissions.publishother'] = 'publishother';
+        }
 
         $builder->add(
             "$bundle:$level",
             PermissionListType::class,
             [
-                'choices' => $choices,
-                'label'   => "mautic.$bundle.permissions.$level",
-                'data'    => (!empty($data[$level]) ? $data[$level] : []),
-                'bundle'  => $bundle,
-                'level'   => $level,
+                'choices'           => $choices,
+                'choices_as_values' => true,
+                'label'             => "mautic.$bundle.permissions.$level",
+                'data'              => (!empty($data[$level]) ? $data[$level] : []),
+                'bundle'            => $bundle,
+                'level'             => $level,
             ]
         );
     }

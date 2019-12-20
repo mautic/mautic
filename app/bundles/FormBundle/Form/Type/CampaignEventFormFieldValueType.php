@@ -90,7 +90,7 @@ class CampaignEventFormFieldValueType extends AbstractType
             }
 
             if (empty($data['form'])) {
-                $fields[] = 'Select form first';
+                $fields['Select form first'] = 0;
             } else {
                 $formEntity = $this->model->getEntity($data['form']);
                 $formFields = $formEntity->getFields();

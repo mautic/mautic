@@ -11,8 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
@@ -41,28 +40,26 @@ class PageSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * Must be there until BuilderTokenHelper is refactored.
-     *
-     * @var MauticFactory
+     * @var BuilderTokenHelperFactory
      */
-    private $factory;
+    private $builderTokenHelperFactory;
 
     /**
-     * @param FocusModel      $model
-     * @param RouterInterface $router
-     * @param CorePermissions $security
-     * @param MauticFactory   $factory
+     * @param CorePermissions           $security
+     * @param FocusModel                $model
+     * @param RouterInterface           $router
+     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
     public function __construct(
+        CorePermissions $security,
         FocusModel $model,
         RouterInterface $router,
-        CorePermissions $security,
-        MauticFactory $factory
+        BuilderTokenHelperFactory $builderTokenHelperFactory
     ) {
-        $this->model    = $model;
-        $this->router   = $router;
-        $this->security = $security;
-        $this->factory  = $factory;
+        $this->security                  = $security;
+        $this->router                    = $router;
+        $this->model                     = $model;
+        $this->builderTokenHelperFactory = $builderTokenHelperFactory;
     }
 
     /**
@@ -84,8 +81,8 @@ class PageSubscriber implements EventSubscriberInterface
     public function onPageBuild(PageBuilderEvent $event)
     {
         if ($event->tokensRequested($this->regex)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
-            $event->addTokensFromHelper($tokenHelper, $this->regex, 'name', 'id');
+            $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
+            $event->addTokensFromHelper($tokenHelper, $this->regex, 'name');
         }
     }
 

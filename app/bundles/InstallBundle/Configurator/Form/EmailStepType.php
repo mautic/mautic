@@ -172,9 +172,9 @@ class EmailStepType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'plain'    => 'mautic.email.config.mailer_auth_mode.plain',
-                    'login'    => 'mautic.email.config.mailer_auth_mode.login',
-                    'cram-md5' => 'mautic.email.config.mailer_auth_mode.cram-md5',
+                    'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
+                    'mautic.email.config.mailer_auth_mode.login'    => 'login',
+                    'mautic.email.config.mailer_auth_mode.cram-md5' => 'cram-md5',
                 ],
                 'label'       => 'mautic.install.form.email.auth_mode',
                 'label_attr'  => ['class' => 'control-label'],
