@@ -37,11 +37,7 @@ class FormSubscriber implements EventSubscriberInterface
     private $emailModel;
 
     /**
-<<<<<<< HEAD
-     * @var LeadModel
-=======
-     * @param EmailModel $emailModel
->>>>>>> 3.x
+     * @param LeadModel
      */
     protected $leadModel;
 
