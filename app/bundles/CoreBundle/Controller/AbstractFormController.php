@@ -141,27 +141,27 @@ abstract class AbstractFormController extends CommonController
      *
      * @param Form $form
      *
-     * @return int
+     * @return bool
      */
     protected function isFormCancelled(Form $form)
     {
-        $name = $form->getName();
+        $formData = $this->request->request->get($form->getName());
 
-        return false !== $this->request->request->get($name.'[buttons][cancel]', false, true);
+        return array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
     }
 
     /**
      * Checks to see if the form was applied or saved.
      *
-     * @param $form
+     * @param Form $form
      *
      * @return bool
      */
-    protected function isFormApplied($form)
+    protected function isFormApplied(Form $form)
     {
-        $name = $form->getName();
+        $formData = $this->request->request->get($form->getName());
 
-        return false !== $this->request->request->get($name.'[buttons][apply]', false, true);
+        return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
     }
 
     /**
