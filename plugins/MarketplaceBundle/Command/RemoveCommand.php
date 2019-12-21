@@ -9,13 +9,14 @@
 
 namespace MauticPlugin\MarketplaceBundle\Command;
 
+use Composer\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\ArrayInput;
-use Composer\Console\Application;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class RemoveCommand extends ContainerAwareCommand
 {
@@ -26,6 +27,11 @@ class RemoveCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:marketplace:remove');
         $this->setDescription('Lists plugins that are available at Packagist.org');
+        $this->addArgument(
+            'package',
+            InputOption::VALUE_REQUIRED,
+            'Provide package name in format vendor_name/package_name.'
+        );
         parent::configure();
     }
 
@@ -34,19 +40,21 @@ class RemoveCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
         $stopwatch->start('command');
 
         $composerApp = new Application();
 
         $arguments = [
-            'command' => 'remove',
-            'packages' => ['mautic/mautic-saelos-bundle'],
-            '--update-no-dev' => true,
+            'command'  => 'remove',
+            'packages' => [$input->getArgument('package')],
+            // '--update-no-dev' => true, // set value by current env.
             '-v' => true,
         ];
-    
+
+        $composerApp->setAutoExit(false);
+
         $returnCode = $composerApp->run(new ArrayInput($arguments), $output);
 
         dump($returnCode);

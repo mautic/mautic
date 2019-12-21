@@ -9,14 +9,14 @@
 
 namespace MauticPlugin\MarketplaceBundle\Command;
 
-use MauticPlugin\MarketplaceBundle\Api\Connection;
+use Composer\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\ArrayInput;
-use Composer\Console\Application;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -27,6 +27,11 @@ class InstallCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:marketplace:install');
         $this->setDescription('Lists plugins that are available at Packagist.org');
+        $this->addArgument(
+            'package',
+            InputOption::VALUE_REQUIRED,
+            'Provide package name in format vendor_name/package_name.'
+        );
         parent::configure();
     }
 
@@ -35,22 +40,29 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
         $stopwatch->start('command');
 
         $composerApp = new Application();
 
         $arguments = [
-            'command' => 'require',
-            'packages' => ['mautic/mautic-saelos-bundle'],
-            '--update-no-dev' => true,
-            '--no-suggest' => true,
+            'command'  => 'require',
+            'packages' => [$input->getArgument('package')],
+            // '--update-no-dev' => true, // @todo read the value from env.
+            '--no-suggest'  => true,
+            '--no-scripts'  => true,
             '--prefer-dist' => true,
-            '-v' => true,
+            '-v'            => true, // also, enable in dev only.
         ];
-    
-        $returnCode = $composerApp->run(new ArrayInput($arguments), $output);
+
+        $composerApp->setAutoExit(false);
+
+        try {
+            $returnCode = $composerApp->run(new ArrayInput($arguments), $output);
+        } catch (\Throwable $e) {
+            $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
+        }
 
         dump($returnCode);
 
@@ -58,6 +70,6 @@ class InstallCommand extends ContainerAwareCommand
 
         $io->writeln("<fg=green>Execution time: {$event->getDuration()} ms</>");
 
-        return 0;
+        return $returnCode;
     }
 }
