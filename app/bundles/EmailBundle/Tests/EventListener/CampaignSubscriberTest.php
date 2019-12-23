@@ -87,7 +87,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
-        $event         = (new Event())->setEventType('email.send');
+        $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
@@ -109,7 +109,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
-        $event         = (new Event())->setEventType('email.send.to.user');
+        $event         = (new Event())->setType('email.send.to.user');
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
