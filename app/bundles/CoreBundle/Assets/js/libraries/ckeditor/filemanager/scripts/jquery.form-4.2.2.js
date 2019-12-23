@@ -736,8 +736,7 @@
 
                     return;
 
-                }
-                if (e === SERVER_ABORT && xhr) {
+                } else if (e === SERVER_ABORT && xhr) {
                     xhr.abort('server abort');
                     deferred.reject(xhr, 'error', 'server abort');
 
@@ -1115,7 +1114,7 @@
             return a;
         }
 
-        if ((typeof filtering === 'function')) {
+        if (typeof filtering === 'function') {
             els = $.map(els, filtering);
         }
 

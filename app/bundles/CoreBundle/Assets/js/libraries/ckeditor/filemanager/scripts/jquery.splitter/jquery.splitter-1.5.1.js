@@ -43,8 +43,8 @@
 			bar.addClass(opts.activeClass);
 			A._posSplit = A[0][opts.pxSplit] - evt[opts.eventPos];
 			$(document)
-				.bind("mousemove", doSplitMouse)
-				.bind("mouseup", endSplitMouse);
+				.on("mousemove", doSplitMouse)
+				.on("mouseup", endSplitMouse);
 		}
 		function doSplitMouse(evt) {
 			var newPos = A._posSplit+evt[opts.eventPos];
@@ -63,8 +63,8 @@
 			}
 			panes.css("-webkit-user-select", "text");	// let Safari select text again
 			$(document)
-				.unbind("mousemove", doSplitMouse)
-				.unbind("mouseup", endSplitMouse);
+				.off("mousemove", doSplitMouse)
+				.off("mouseup", endSplitMouse);
 		}
 		function resplit(newPos) {
 			// Constrain new splitbar position to fit pane size limits
@@ -125,14 +125,14 @@
 		// Focuser element, provides keyboard support; title is shown by Opera accessKeys
 		var focuser = $('<a href="javascript:void(0)"></a>')
 			.attr({accessKey: opts.accessKey, tabIndex: opts.tabIndex, title: opts.splitbarClass})
-			.bind($.browser.opera?"click":"focus", function(){ this.focus(); bar.addClass(opts.activeClass) })
-			.bind("keydown", function(e){
+			.on($.browser.opera?"click":"focus", function(){ this.focus(); bar.addClass(opts.activeClass) })
+			.on("keydown", function(e){
 				var key = e.which || e.keyCode;
 				var dir = key==opts["key"+opts.side1]? 1 : key==opts["key"+opts.side2]? -1 : 0;
 				if ( dir )
 					resplit(A[0][opts.pxSplit]+dir*opts.pxPerKey, false);
 			})
-			.bind("blur", function(){ bar.removeClass(opts.activeClass) });
+			.on("blur", function(){ bar.removeClass(opts.activeClass) });
 			
 		// Splitbar element, can be already in the doc or we create one
 		var bar = $(panes[2] || '<div></div>')
@@ -140,15 +140,16 @@
 			.attr({"class": opts.splitbarClass, unselectable: "on"})
 			.css({position: "absolute",	"user-select": "none", "-webkit-user-select": "none",
 				"-khtml-user-select": "none", "-moz-user-select": "none"})
-			.bind("mousedown", startSplitMouse);
+			.on("mousedown", startSplitMouse);
 		// Use our cursor unless the style specifies a non-default cursor
 		if ( /^(auto|default|)$/.test(bar.css("cursor")) )
 			bar.css("cursor", opts.cursor);
 
 		// Cache several dimensions for speed, rather than re-querying constantly
 		bar._DA = bar[0][opts.pxSplit];
-		splitter._PBF = $.boxModel? dimSum(splitter, "border"+opts.side3+"Width", "border"+opts.side4+"Width") : 0;
-		splitter._PBA = $.boxModel? dimSum(splitter, "border"+opts.side1+"Width", "border"+opts.side2+"Width") : 0;
+		var boxModel = document.compatMode === 'CSS1Compat';
+		splitter._PBF = boxModel? dimSum(splitter, "border"+opts.side3+"Width", "border"+opts.side4+"Width") : 0;
+		splitter._PBA = boxModel? dimSum(splitter, "border"+opts.side1+"Width", "border"+opts.side2+"Width") : 0;
 		A._pane = opts.side1;
 		B._pane = opts.side2;
 		$.each([A,B], function(){
@@ -168,7 +169,7 @@
 			var ckpos = parseInt($.cookie(opts.cookie));
 			if ( !isNaN(ckpos) )
 				initPos = ckpos;
-			$(window).bind("unload", function(){
+			$(window).on("unload", function(){
 				var state = String(bar.css(opts.origin));	// current location of splitbar
 				$.cookie(opts.cookie, state, {expires: opts.cookieExpires || 365, 
 					path: opts.cookiePath || document.location.pathname});
@@ -182,7 +183,7 @@
 			// Account for margin or border on the splitter container and enforce min height
 			splitter._hadjust = dimSum(splitter, "borderTopWidth", "borderBottomWidth", "marginBottom");
 			splitter._hmin = Math.max(dimSum(splitter, "minHeight"), 20);
-			$(window).bind("resize", function(){
+			$(window).on("resize", function(){
 				var top = splitter.offset().top;
 				var wh = $(window).height();
 				splitter.css("height", Math.max(wh-top-splitter._hadjust, splitter._hmin)+"px");
@@ -190,12 +191,12 @@
 			}).trigger("resize");
 		}
 		else if ( opts.resizeToWidth && !$.browser.msie )
-			$(window).bind("resize", function(){
+			$(window).on("resize", function(){
 				splitter.trigger("resize"); 
 			});
 
 		// Resize event handler; triggered immediately to set initial position
-		splitter.bind("resize", function(e, size){
+		splitter.on("resize", function(e, size){
 			// Custom events bubble in jQuery 1.3; don't get into a Yo Dawg
 			if ( e.target != this ) return;
 			// Determine new width/height of splitter container

@@ -435,7 +435,7 @@ var setUploader = function(path) {
 	$('#currentpath').val(path);
 	$('#uploader h1').text(lg.current_folder + displayPath(path)).attr('title', displayPath(path, false)).attr('data-path', path);
 
-	$('#newfolder').unbind().click(function(){
+	$('#newfolder').off().click(function(){
 		var foldername =  lg.default_foldername;
 		var msg = lg.prompt_foldername + ' : <input id="fname" name="fname" type="text" value="' + foldername + '" />';
 
@@ -732,7 +732,7 @@ var renameItem = function(data) {
 						data['Filename']=newName;
 
 						// Bind toolbar functions.
-						$('#fileinfo').find('button#rename, button#delete, button#download').unbind();
+						$('#fileinfo').find('button#rename, button#delete, button#download').off();
 						bindToolbar(data);
 
 						if(config.options.showConfirmation) $.prompt(lg.successful_rename);
@@ -775,7 +775,7 @@ var replaceItem = function(data) {
 //	$('body').prepend($form);
 
     // we auto-submit form when user filled it up
-    $('#fileR').bind('change', function () {
+    $('#fileR').on('change', function () {
         $(this).closest("form#toolbar").submit();
     });
 
@@ -819,7 +819,7 @@ var replaceItem = function(data) {
             $.prompt(lg.ERROR_UPLOADING_FILE);
         },
         success: function (result) {
-            var data = jQuery.parseJSON($('#uploadresponse').find('textarea').text());
+            var data = JSON.parse($('#uploadresponse').find('textarea').text());
 
             if (data['Code'] == 0) {
                 var fullpath = data["Path"] + '/' + data["Name"];
@@ -1055,7 +1055,7 @@ var addNode = function(path, name) {
 
 	// if is root folder
 	// TODO optimize
-	if(!parentNode.find('ul').size()) {
+	if(!parentNode.find('ul').length) {
 		parentNode = $('#filetree').find('ul.jqueryFileTree');
 
 		parentNode.prepend(newNode);
@@ -1472,7 +1472,7 @@ var getFolderInfo = function(path) {
 
 			$('#fileinfo').find('table').tablesorter({
 				textExtraction: function(node){
-					if($(node).find('abbr').size()){
+					if($(node).find('abbr').length){
 						return $(node).find('abbr').attr('title');
 					} else {
 						return node.innerHTML;
@@ -1715,7 +1715,7 @@ $(function(){
             $( "#newfolder").before('<button class="btn btn-success btn-xs em" id="upload" name="upload" type="button"><i class="btn-xs fa fa-upload mr-3"></i>' + lg.upload + '</button>');
             //$( "#newfolder" ).before( '<button value="Upload" type="button" name="upload" id="upload" class="em"><span>' + lg.upload + '</span></button> ' );
 
-		$('#upload').unbind().click(function() {
+		$('#upload').off().click(function() {
 			// we create prompt
 			var msg  = '<div id="dropzone-container"><h2>' + lg.current_folder + $('#uploader h1').attr('title')  + '</h2><div id="multiple-uploads" class="dropzone"></div>';
 				msg += '<div id="total-progress"><div data-dz-uploadprogress="" style="width:0%;" class="progress-bar"></div></div>';
@@ -1778,7 +1778,7 @@ $(function(){
 				},
 				success: function(file, response) {
 					$('#uploadresponse').empty().html(response);
-					var data = jQuery.parseJSON($('#uploadresponse').find('textarea').text());
+					var data = JSON.parse($('#uploadresponse').find('textarea').text());
 
 					if (data['Code'] == 0) {
 						this.removeFile(file);
@@ -1869,7 +1869,7 @@ $(function(){
 				$.prompt(lg.ERROR_UPLOADING_FILE);
 			},
 			success: function (result) {
-				var data = jQuery.parseJSON($('#uploadresponse').find('textarea').text());
+				var data = JSON.parse($('#uploadresponse').find('textarea').text());
 				if (data['Code'] == 0) {
 					addNode(data['Path'], data['Name']);
 					$("#filepath, #newfile").val('');
@@ -1897,7 +1897,7 @@ $(function(){
 		var csTheme = config.customScrollbar.theme != undefined ? config.customScrollbar.theme : 'inset-2-dark';
 		var csButton = config.customScrollbar.button != undefined ? config.customScrollbar.button : true;
 
-		$(window).load(function(){
+		$(window).on('load', (function(){
 			$("#filetree").append('<div style="height:3000px"></div>'); // because if #filetree has height equal to 0, mCustomScrollbar is not applied
 			$("#filetree").mCustomScrollbar({
 				theme:csTheme,
@@ -1916,7 +1916,7 @@ $(function(){
 				alwaysShowScrollbar: 1
 			});
 
-		});
+		}));
 	} else {
 		createFileTree();
 	}
@@ -1956,8 +1956,8 @@ if(config.options.logger) {
 	console.log('Total execution time : ' + time + ' ms');
 }
 
-$(window).load(function() {
+$(window).on('load', (function() {
 	setDimensions();
-});
+}));
 
 })(jQuery);
