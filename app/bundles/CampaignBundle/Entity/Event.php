@@ -528,7 +528,7 @@ class Event implements ChannelInterface
     public function setType($type)
     {
         $this->isChanged('type', $type);
-        $this->type = $type;
+        $this->eventType = $type;
 
         return $this;
     }
@@ -540,7 +540,7 @@ class Event implements ChannelInterface
      */
     public function getType()
     {
-        return $this->type;
+        return $this->eventType;
     }
 
     /**

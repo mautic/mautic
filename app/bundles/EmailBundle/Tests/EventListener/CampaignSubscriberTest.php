@@ -109,7 +109,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
     {
         $eventAccessor = $this->createMock(ActionAccessor::class);
-        $event         = (new Event())->setEventType('email.send');
+        $event         = (new Event())->setEventType('email.send.to.user');
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
         $leadEventLog = $this->createMock(LeadEventLog::class);
@@ -118,30 +118,18 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($lead);
         $leadEventLog
             ->method('getId')
-            ->willReturn(6);
+            ->willReturn(0);
+        $leadEventLog
+            ->method('setIsScheduled')
+            ->with(false)
+            ->willReturn($leadEventLog);
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'email.send.to.user',
-                'properties' => $this->config,
-            ],
-            'eventDetails' => [
-            ],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $eventType = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($eventType);
 
-        $this->sendEmailToUser->expects($this->once())
-            ->method('sendEmailToUsers')
-            ->with($this->config, $lead);
-
-        $event = new PendingEvent($eventAccessor, $event, $logs);
-        $this->subscriber->onCampaignTriggerActionSendEmailToUser($event);
-
-        $this->assertTrue($event->getResult());
+        $this->assertCount(1, $eventType->getSuccessful());
     }
 
     public function testOnCampaignTriggerActionSendEmailToUserWithError()
