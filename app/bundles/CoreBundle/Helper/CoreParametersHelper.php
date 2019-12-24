@@ -20,16 +20,20 @@ use Symfony\Component\HttpKernel\Kernel;
 class CoreParametersHelper
 {
     /**
-     * @var ParameterBagInterface
+     * @var \MauticParameterImporter
      */
-    protected $parameterBag;
+    private $parameters;
 
     /**
      * CoreParametersHelper constructor.
      */
-    public function __construct(Kernel $kernel)
+    public function __construct(string $root)
     {
-        $this->parameterBag = $kernel->getContainer()->getParameterBag();
+        $this->rootPath = $root;
+
+        /** @var array $paths */
+        include $root.'/config/paths_helper.php';
+        $this->parameters = new \MauticParameterImporter($paths['local_config'], $paths);
     }
 
     /**
@@ -45,24 +49,7 @@ class CoreParametersHelper
             return MAUTIC_TABLE_PREFIX;
         }
 
-        if ($this->parameterBag->has('mautic.'.$name)) {
-            $value = $this->parameterBag->get('mautic.'.$name);
-
-            // Do not convert null values to strings
-            if (null === $value) {
-                return $value;
-            }
-
-            // Decode %%
-            return str_replace('%%', '%', $this->parameterBag->get('mautic.'.$name));
-        }
-
-        // Last ditch effort in case we're getting non-mautic params
-        if ($this->parameterBag->has($name)) {
-            return $this->parameterBag->get($name);
-        }
-
-        return $default;
+        return $this->parameters->has($name) ? $this->parameters->get($name) : $default;
     }
 
     /**
@@ -72,6 +59,6 @@ class CoreParametersHelper
      */
     public function hasParameter($name)
     {
-        return $this->parameterBag->has('mautic.'.$name);
+        return $this->parameters->has($name);
     }
 }

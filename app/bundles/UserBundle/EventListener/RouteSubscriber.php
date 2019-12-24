@@ -24,11 +24,6 @@ class RouteSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    /**
-     * RouteSubscriber constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;

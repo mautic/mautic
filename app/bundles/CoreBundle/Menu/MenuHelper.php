@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Menu;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,9 +40,9 @@ class MenuHelper
     private $orphans = [];
 
     /**
-     * @var array
+     * @var CoreParametersHelper
      */
-    protected $mauticParameters;
+    private $coreParametersHelper;
 
     /**
      * @var IntegrationHelper
@@ -51,12 +52,12 @@ class MenuHelper
     /**
      * MenuHelper constructor.
      */
-    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters, IntegrationHelper $integrationHelper)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper)
     {
-        $this->security          = $security;
-        $this->mauticParameters  = $mauticParameters;
-        $this->request           = $requestStack->getCurrentRequest();
-        $this->integrationHelper = $integrationHelper;
+        $this->security              = $security;
+        $this->coreParametersHelper  = $coreParametersHelper;
+        $this->request               = $requestStack->getCurrentRequest();
+        $this->integrationHelper     = $integrationHelper;
     }
 
     /**
@@ -242,11 +243,11 @@ class MenuHelper
     /**
      * @param $name
      *
-     * @return bool
+     * @return mixed
      */
     protected function getParameter($name)
     {
-        return isset($this->mauticParameters[$name]) ? $this->mauticParameters[$name] : false;
+        return $this->coreParametersHelper->getParameter($name, false);
     }
 
     /**
