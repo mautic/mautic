@@ -11,6 +11,7 @@
 
 namespace Mautic\UserBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,15 +20,18 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class RouteSubscriber implements EventSubscriberInterface
 {
     /**
-     * Core params.
-     *
-     * @var array
+     * @var CoreParametersHelper
      */
-    private $params;
+    private $coreParametersHelper;
 
-    public function __construct(array $params)
+    /**
+     * RouteSubscriber constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->params = $params;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public static function getSubscribedEvents()
@@ -43,7 +47,7 @@ class RouteSubscriber implements EventSubscriberInterface
             $request = $event->getRequest();
 
             $route = $request->attributes->get('_route');
-            if (false !== strpos($route, 'lightsaml') && empty($this->params['saml_idp_metadata'])) {
+            if (false !== strpos($route, 'lightsaml') && empty($this->coreParametersHelper->get('saml_idp_metadata'))) {
                 throw new NotFoundHttpException();
             }
         }
