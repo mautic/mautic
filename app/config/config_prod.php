@@ -2,6 +2,11 @@
 
 $loader->import('config.php');
 
+// Load after config.php which hydrates default parameters from the bundle configs statically into MauticParameterImporter
+$root = $container->getParameter('kernel.root_dir');
+include __DIR__.'/paths_helper.php';
+$parameterImporter = new MauticParameterImporter($paths['local_config'], $paths);
+
 if (file_exists(__DIR__.'/security_local.php')) {
     $loader->import('security_local.php');
 } else {
@@ -24,7 +29,7 @@ $container->loadFromExtension("doctrine", array(
 ));
 */
 
-$debugMode = $container->hasParameter('mautic.debug') ? $container->getParameter('mautic.debug') : $container->getParameter('kernel.debug');
+$debugMode = $parameterImporter->has('debug') ? $parameterImporter->get('debug') : $container->getParameter('kernel.debug');
 
 $container->loadFromExtension('monolog', [
     'channels' => [

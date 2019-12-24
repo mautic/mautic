@@ -258,19 +258,17 @@ class AppKernel extends Kernel
             define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
-        if ($this->loadClassCache) {
-            $this->doLoadClassCache($this->loadClassCache[0], $this->loadClassCache[1]);
-        }
-
         // init bundles
         $this->initializeBundles();
+
+        // load parameters into the environment
+        $localParams = $this->getLocalParams();
 
         // init container
         $this->initializeContainer();
 
         // If in console, set the table prefix since handle() is not executed
         if (defined('IN_MAUTIC_CONSOLE') && !defined('MAUTIC_TABLE_PREFIX')) {
-            $localParams = $this->getLocalParams();
             $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
             define('MAUTIC_TABLE_PREFIX', $prefix);
         }
@@ -422,26 +420,11 @@ class AppKernel extends Kernel
             $root = $this->getRootDir();
             include $root.'/config/paths.php';
 
-            if ($configFile = $this->getLocalConfigFile()) {
-                /** @var $parameters */
-                include $configFile;
-                $localParameters = (isset($parameters) && is_array($parameters)) ? $parameters : [];
-            } else {
-                $localParameters = [];
-            }
+            require_once __DIR__.'/config/parameters_importer.php';
+            $parameterImporter = new MauticParameterImporter($this->getLocalConfigFile(), $paths);
 
-            //check for parameter overrides
-            if (file_exists($root.'/config/parameters_local.php')) {
-                /** @var $parameters */
-                include $root.'/config/parameters_local.php';
-                $localParameters = array_merge($localParameters, $parameters);
-            }
-
-            foreach ($localParameters as $k => &$v) {
-                if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
-                    $v = (string) getenv($match[1]);
-                }
-            }
+            $localParameters = $parameterImporter->all();
+            $parameterImporter->loadIntoEnvironment();
         }
 
         return $localParameters;
@@ -452,9 +435,9 @@ class AppKernel extends Kernel
      *
      * @param bool $checkExists If true, then return false if the file doesn't exist
      *
-     * @return bool
+     * @return string|null
      */
-    public function getLocalConfigFile($checkExists = true)
+    public function getLocalConfigFile($checkExists = true): ?string
     {
         /** @var $paths */
         $root = $this->getRootDir();
@@ -467,7 +450,7 @@ class AppKernel extends Kernel
             }
         }
 
-        return false;
+        return null;
     }
 
     /**

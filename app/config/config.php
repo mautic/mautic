@@ -1,5 +1,9 @@
 <?php
 
+require_once __DIR__.'/parameters_importer.php';
+
+// Include path settings
+$root = $container->getParameter('kernel.root_dir');
 include __DIR__.'/paths_helper.php';
 
 $ormMappings        =
@@ -174,17 +178,20 @@ $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 
 // Load parameters
 include __DIR__.'/parameters.php';
+/* @var MauticParameterImporter $parameterImporter */
 $container->loadFromExtension('mautic_core');
 
 // Set template engines
 $engines = ['php', 'twig'];
 
 // Decide on secure cookie based on site_url setting
-$secureCookie = $container->hasParameter('mautic.site_url') && 'https' === substr(ltrim($container->getParameter('mautic.site_url')), 0, 5);
+$secureCookie = $parameterImporter->has('site_url') && 'https' === substr(ltrim($parameterImporter->get('site_url')), 0, 5);
 
 // Generate session name
-// Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
-$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+$key         = $parameterImporter->has('secret_key') ? $parameterImporter->get('secret_key') : uniqid();
+
+// @todo - not gonna work
+
 $sessionName = md5(md5($paths['local_config']).$key);
 
 $container->loadFromExtension('framework', [
@@ -211,8 +218,8 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'trusted_hosts'   => '%mautic.trusted_hosts%',
-    'trusted_proxies' => '%mautic.trusted_proxies%',
+    'trusted_hosts'   => $parameterImporter->get('trusted_hosts'),
+    'trusted_proxies' => $parameterImporter->get('trusted_proxies'),
     'session'         => [ //handler_id set to null will use default session handler from php.ini
         'handler_id'    => null,
         'name'          => $sessionName,
@@ -256,7 +263,7 @@ $dbalSettings = [
 ];
 
 // If using pdo_sqlite as the database driver, add the path to config file
-$dbDriver = $container->getParameter('mautic.db_driver');
+$dbDriver = $parameterImporter->get('db_driver');
 if ('pdo_sqlite' == $dbDriver) {
     $dbalSettings['path'] = '%mautic.db_path%';
 }
@@ -271,7 +278,7 @@ $container->loadFromExtension('doctrine', [
 ]);
 
 //MigrationsBundle Configuration
-$prefix = $container->getParameter('mautic.db_table_prefix');
+$prefix = $parameterImporter->get('db_table_prefix');
 $container->loadFromExtension('doctrine_migrations', [
     'dir_name'   => '%kernel.root_dir%/migrations',
     'namespace'  => 'Mautic\\Migrations',
@@ -291,14 +298,14 @@ $mailerSettings = [
 ];
 
 // Only spool if using file as otherwise emails are not sent on redirects
-$spoolType = $container->getParameter('mautic.mailer_spool_type');
+$spoolType = $parameterImporter->get('mailer_spool_type');
 if ('file' == $spoolType) {
     $mailerSettings['spool'] = [
         'type' => '%mautic.mailer_spool_type%',
         'path' => '%mautic.mailer_spool_path%',
     ];
 }
-$container->loadFromExtension('swiftmailer', $mailerSettings);
+//$container->loadFromExtension('swiftmailer', $mailerSettings);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
@@ -308,8 +315,6 @@ $container->loadFromExtension('knp_menu', [
 ]);
 
 // OneupUploader Configuration
-$uploadDir = $container->getParameter('mautic.upload_dir');
-$maxSize   = $container->getParameter('mautic.max_size');
 $container->loadFromExtension('oneup_uploader', [
     // 'orphanage' => array(
     //     'maxage' => 86400,
@@ -326,7 +331,7 @@ $container->loadFromExtension('oneup_uploader', [
             // 'max_size' => ($maxSize * 1000000),
             // 'use_orphanage' => true,
             'storage' => [
-                'directory' => $uploadDir,
+                'directory' => '%mautic.upload_dir%',
             ],
         ],
     ],
@@ -378,20 +383,19 @@ $container->loadFromExtension('jms_serializer', [
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
-            'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
+            'api_rate_limiter_cache' => $parameterImporter->get('api_rate_limiter_cache'),
         ],
     ],
 ]);
 
-$api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'        => 0 == $api_rate_limiter_limit ? false : true,
+  'enabled'        => 0 == $parameterImporter->get('api_rate_limiter_limit') ? false : true,
   'storage_engine' => 'cache',
   'cache_service'  => 'api_rate_limiter_cache',
   'path_limits'    => [
     [
       'path'   => '/api',
-      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'limit'  => $parameterImporter->get('api_rate_limiter_limit'),
       'period' => 3600,
     ],
   ],

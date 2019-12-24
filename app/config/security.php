@@ -9,6 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+$root = $container->getParameter('kernel.root_dir');
+include __DIR__.'/paths_helper.php';
+$parameterImporter = new MauticParameterImporter($paths['local_config'], $paths);
+
 $firewalls = [
     'install' => [
         'pattern'   => '^/installer',
@@ -78,7 +82,7 @@ $firewalls = [
         'bazinga_oauth'      => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
-        'http_basic'         => '%mautic.api_enable_basic_auth%',
+        'http_basic'         => false, // @todo '%mautic.api_enable_basic_auth%',
     ],
     'main' => [
         'pattern'       => '^/s/',
@@ -123,7 +127,8 @@ $firewalls = [
 ];
 
 // If SAML is disabled, remove it from the firewall so that Symfony doesn't default to it
-if (!$container->getParameter('mautic.saml_idp_metadata')) {
+// @todo - this could make or break environment only config
+if (!$parameterImporter->get('saml_idp_metadata')) {
     unset(
         $firewalls['saml_login'],
         $firewalls['saml_discover'],
@@ -131,7 +136,7 @@ if (!$container->getParameter('mautic.saml_idp_metadata')) {
     );
 }
 
-if (!$container->getParameter('mautic.api_enabled')) {
+if (!$parameterImporter->get('api_enabled')) {
     unset(
         $firewalls['oauth2_token'],
         $firewalls['oauth2_area'],
@@ -178,21 +183,12 @@ $container->loadFromExtension(
     ]
 );
 
-$entityId = 'mautic';
-if ($container->hasParameter('mautic.site_url')) {
-    $parts = parse_url($container->getParameter('mautic.site_url'));
-
-    if (!empty($parts['host'])) {
-        $scheme   = (!empty($parts['scheme']) ? $parts['scheme'] : 'http');
-        $entityId = $scheme.'://'.$parts['host'];
-    }
-}
-$container->setParameter('mautic.saml_idp_entity_id', $entityId);
+$container->setParameter('mautic.saml_idp_entity_id', '%env(MAUTIC_SAML_ENTITY_ID)%');
 $container->loadFromExtension(
     'light_saml_symfony_bridge',
     [
         'own' => [
-            'entity_id' => $entityId,
+            'entity_id' => '%mautic.saml_idp_entity_id%',
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',

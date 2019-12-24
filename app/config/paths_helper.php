@@ -9,9 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-// Include path settings
-$root = $container->getParameter('kernel.root_dir');
-
 // Include local paths
 include 'paths.php';
 
