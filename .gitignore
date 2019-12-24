@@ -41,6 +41,7 @@
 /app/config/local*.php
 /app/config/config_local.php
 /app/config/paths_local.php
+/app/config/parameters_defaults.php
 
 /vendor/*
 !/vendor/.htaccess
