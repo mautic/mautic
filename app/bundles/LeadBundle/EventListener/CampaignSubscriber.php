@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -76,11 +77,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
-     * System params.
-     *
-     * @var array
+     * @var CoreParametersHelper
      */
-    private $params;
+    private $coreParametersHelper;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -89,15 +88,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ListModel $listModel,
         CompanyModel $companyModel,
         CampaignModel $campaignModel,
-        array $params
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->leadModel      = $leadModel;
-        $this->leadFieldModel = $leadFieldModel;
-        $this->listModel      = $listModel;
-        $this->companyModel   = $companyModel;
-        $this->campaignModel  = $campaignModel;
-        $this->params         = $params;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->leadModel            = $leadModel;
+        $this->leadFieldModel       = $leadFieldModel;
+        $this->listModel            = $listModel;
+        $this->companyModel         = $companyModel;
+        $this->campaignModel        = $campaignModel;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -400,7 +399,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $primaryCompany =  $this->companyModel->getEntity($company['id']);
 
         if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
+            [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
             if ($leadAdded) {
                 $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
@@ -471,7 +470,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
-                $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
+                $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->getParameter('default_timezone')));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (false !== strpos($event->getConfig()['value'], '+P')) { //add date
