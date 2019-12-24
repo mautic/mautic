@@ -103,6 +103,10 @@ class MiddlewareBuilder
             unlink($this->cacheFile);
         }
 
+        if (false === file_exists($this->app->getCacheDir())) {
+            mkdir($this->app->getCacheDir(), 0755, true);
+        }
+
         $data  = [];
         $clone = clone $this->specs;
         $clone->setExtractFlags(SplPriorityQueue::EXTR_DATA);
