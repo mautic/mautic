@@ -1,7 +1,10 @@
 <?php
-/**
- * @copyright   2019 Cronfig.io. All rights reserved
- * @author      Jan Linhart
+
+/*
+ * @copyright   2019 Mautic. All rights reserved
+ * @author      Mautic.
+ *
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */

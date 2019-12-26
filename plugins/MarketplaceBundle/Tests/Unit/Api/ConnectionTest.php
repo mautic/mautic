@@ -1,26 +1,27 @@
 <?php
 
 /*
- * @package     Cronfig Mautic Bundle
- * @copyright   2016 Cronfig.io. All rights reserved
- * @author      Jan Linhart
- * @link        http://cronfig.io
+ * @copyright   2019 Mautic. All rights reserved
+ * @author      Mautic.
+ *
+ * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MarketplaceBundle\Tests\Unit\Api;
 
-use GuzzleHttp\Psr7\Response;
-use PHPUnit\Framework\MockObject\MockObject;
-use MauticPlugin\MarketplaceBundle\Api\Config;
 use GuzzleHttp\Client;
-use MauticPlugin\MarketplaceBundle\Api\Connection;
-use MauticPlugin\MarketplaceBundle\Api\QueryBuilder;
-use Psr\Log\LoggerInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Http\Adapter\Guzzle6\Client as GuzzleClient;
+use MauticPlugin\MarketplaceBundle\Api\Config;
+use MauticPlugin\MarketplaceBundle\Api\Connection;
+use MauticPlugin\MarketplaceBundle\Api\QueryBuilder;
 use MauticPlugin\MarketplaceBundle\Exception\MissingJwtException;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 
 class ConnectionTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,9 +42,9 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $this->apiConfig = $this->createMock(Config::class);
+        $this->apiConfig    = $this->createMock(Config::class);
         $this->queryBuilder = new QueryBuilder();
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->logger       = $this->createMock(LoggerInterface::class);
     }
 
     public function testQueryWhenJwtCached()
@@ -57,7 +58,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
                         '{"some":"response"}'
                     ),
                 ])
-            )
+            ),
         ]);
 
         $connection = new Connection(
@@ -93,7 +94,7 @@ class ConnectionTest extends \PHPUnit\Framework\TestCase
                         '{"some":"response"}'
                     ),
                 ])
-            )
+            ),
         ]);
 
         $connection = new Connection(

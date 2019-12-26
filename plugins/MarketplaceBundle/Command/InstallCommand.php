@@ -1,9 +1,11 @@
 <?php
+
 /*
- * @package     Cronfig Mautic Bundle
- * @copyright   2019 Cronfig.io. All rights reserved
- * @author      Jan Linhart
- * @link        http://cronfig.io
+ * @copyright   2019 Mautic. All rights reserved
+ * @author      Mautic.
+ *
+ * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -94,6 +96,8 @@ class InstallCommand extends ContainerAwareCommand
         } catch (\Throwable $e) {
             $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
         }
+
+        // @todo clear cache here.
 
         $stopwatch->start('reload');
 

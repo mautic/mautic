@@ -1,9 +1,11 @@
 <?php
+
 /*
- * @package     Cronfig Mautic Bundle
- * @copyright   2019 Cronfig.io. All rights reserved
- * @author      Jan Linhart
- * @link        http://cronfig.io
+ * @copyright   2019 Mautic. All rights reserved
+ * @author      Mautic.
+ *
+ * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,11 +13,11 @@ namespace MauticPlugin\MarketplaceBundle\Command;
 
 use MauticPlugin\MarketplaceBundle\Api\Connection;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 class ListCommand extends ContainerAwareCommand
 {
@@ -45,7 +47,7 @@ class ListCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $io = new SymfonyStyle($input, $output);
+        $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
         $stopwatch->start('command');
 
