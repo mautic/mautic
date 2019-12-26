@@ -61,7 +61,6 @@ $mauticParams['supported_languages'] = $locales;
 $mauticParams['paths'] = $paths;
 
 foreach ($mauticParams as $k => &$v) {
-    $type = '';
     switch (true) {
         case is_bool($v):
             $type = 'bool:';
@@ -75,16 +74,13 @@ foreach ($mauticParams as $k => &$v) {
         case is_float($v):
             $type = 'float:';
             break;
+        default:
+            $type = 'nullable:';
     }
 
     // Add to the container
     $container->setParameter("mautic.{$k}", sprintf('%%env(%sMAUTIC_%s)%%', $type, mb_strtoupper($k)));
 }
-
-// Used for passing params into factory/services
-//$container->setParameter('mautic.parameters', $mauticParams);
-// @todo anything that uses this has to be refactored
-$container->setParameter('mautic.parameters', []);
 
 // Store default parameters into the importer
 $parameterImporter = new MauticParameterImporter($paths['local_config'], $paths, $mauticParams);

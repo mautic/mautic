@@ -305,7 +305,7 @@ if ('file' == $spoolType) {
         'path' => '%mautic.mailer_spool_path%',
     ];
 }
-//$container->loadFromExtension('swiftmailer', $mailerSettings);
+$container->loadFromExtension('swiftmailer', $mailerSettings);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [

@@ -603,6 +603,10 @@ return [
             ],
 
             // System uses
+            'mautic.di.env_processor.nullable' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
