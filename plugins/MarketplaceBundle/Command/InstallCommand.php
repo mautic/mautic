@@ -10,6 +10,10 @@
 namespace MauticPlugin\MarketplaceBundle\Command;
 
 use Composer\Console\Application;
+use Mautic\PluginBundle\Facade\ReloadFacade;
+use MauticPlugin\MarketplaceBundle\DTO\Package;
+use MauticPlugin\MarketplaceBundle\Service\PluginCollector;
+use MauticPlugin\MarketplaceBundle\Service\PluginDownloader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +24,21 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class InstallCommand extends ContainerAwareCommand
 {
+    private $pluginCollector;
+    private $pluginDownloader;
+    private $reloadFacade;
+
+    public function __construct(
+        PluginCollector $pluginCollector,
+        PluginDownloader $pluginDownloader,
+        ReloadFacade $reloadFacade
+    ) {
+        parent::__construct();
+        $this->pluginCollector  = $pluginCollector;
+        $this->pluginDownloader = $pluginDownloader;
+        $this->reloadFacade     = $reloadFacade;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,18 +61,30 @@ class InstallCommand extends ContainerAwareCommand
     {
         $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
-        $stopwatch->start('command');
+        $stopwatch->start('total');
+        $stopwatch->start('versions');
+
+        $pluginCollection = $this->pluginCollector->collectPackageVersions($input->getArgument('package'));
+
+        $io->writeln("{$pluginCollection->count()} versions of the plugin metadata fetched in {$stopwatch->stop('versions')->getDuration()} ms");
+
+        $package = $pluginCollection->findLatestVersionPackage('@todo the mautic version here', Package::STABILITY_STABLE);
+
+        $io->writeln("{$package->getVersion()} version is considered to be latest stable} ms");
+        $stopwatch->start('download');
+
+        $this->pluginDownloader->download($package);
+
+        $io->writeln("Package distribution downloaded in {$stopwatch->stop('download')->getDuration()} ms");
 
         $composerApp = new Application();
 
         $arguments = [
-            'command'  => 'require',
-            'packages' => [$input->getArgument('package')],
-            // '--update-no-dev' => true, // @todo read the value from env.
-            '--no-suggest'  => true,
-            '--no-scripts'  => true,
-            '--prefer-dist' => true,
-            '-v'            => true, // also, enable in dev only.
+            'command'               => 'install',
+            '--no-dev'              => true,
+            '--optimize-autoloader' => true,
+            '--prefer-dist'         => true,
+            '-d'                    => $this->pluginDownloader->getPluginDirectory().$package->getInstallDirName(),
         ];
 
         $composerApp->setAutoExit(false);
@@ -64,11 +95,15 @@ class InstallCommand extends ContainerAwareCommand
             $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
         }
 
-        dump($returnCode);
+        $stopwatch->start('reload');
 
-        $event = $stopwatch->stop('command');
+        $this->reloadFacade->reloadPlugins();
 
-        $io->writeln("<fg=green>Execution time: {$event->getDuration()} ms</>");
+        $io->writeln("Plugin schema installed in {$stopwatch->stop('reload')->getDuration()} ms");
+
+        $event = $stopwatch->stop('total');
+
+        $io->writeln("<fg=green>Total execution time: {$event->getDuration()} ms</>");
 
         return $returnCode;
     }
