@@ -9,23 +9,15 @@
 
 namespace MauticPlugin\MarketplaceBundle\Api;
 
-use GuzzleHttp\Psr7\Request;
-use Http\Adapter\Guzzle6\Client;
 use Guzzle\Http\Message\RequestInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use MauticPlugin\MarketplaceBundle\Exception\ApiException;
 use Psr\Log\LoggerInterface;
 
 class Connection
 {
-    public const URL = 'https://packagist.org/';
-    /**
-     * @var Client
-     */
     private $httpClient;
-
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
 
     public function __construct(
@@ -33,7 +25,7 @@ class Connection
         LoggerInterface $logger
     ) {
         $this->httpClient = $httpClient;
-        $this->logger = $logger;
+        $this->logger     = $logger;
     }
 
     /**
@@ -43,21 +35,38 @@ class Connection
      */
     public function getPlugins(): array
     {
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'Accept-Encoding' => 'gzip, deflate, br',
-            'Connection' => 'keep-alive',
-            'User-Agent' => 'Jan\'s minimal GraphQL client',
-        ];
+        return $this->makeRequest('https://packagist.org/search.json?type=mautic-plugin');
+    }
 
-        $url = $this->buildFulUrl('search.json?type=mautic-plugin');
+    /**
+     * @return array
+     *
+     * @throws ApiException
+     */
+    public function getPlugin(string $pluginName): array
+    {
+        return $this->makeRequest("https://repo.packagist.org/p/{$pluginName}.json");
+    }
 
+    /**
+     * @throws ApiException
+     */
+    public function download(string $sourceUrl, string $destinationPath): void
+    {
+        $request = new Request(RequestInterface::GET, $sourceUrl, $this->getHeaders());
+
+        if (false === file_put_contents($destinationPath, $this->httpClient->send($request)->getBody()->getContents())) {
+            throw new \Exception("Could not save the package zip file into {$destinationPath}. Check the permissions.");
+        }
+    }
+
+    public function makeRequest(string $url): array
+    {
         $this->logger->debug('About to query the Packagist API: '.$url);
 
-        $request = new Request(RequestInterface::GET, $url, $headers);
-        $response = $this->httpClient->sendRequest($request);
-        $body = (string) $response->getBody();
+        $request  = new Request(RequestInterface::GET, $url, $this->getHeaders());
+        $response = $this->httpClient->send($request);
+        $body     = (string) $response->getBody();
 
         if ($response->getStatusCode() >= 300) {
             throw new ApiException($body, $response->getStatusCode());
@@ -70,8 +79,14 @@ class Connection
         return $payload;
     }
 
-    private function buildFulUrl(string $endpoint): string
+    private function getHeaders(): array
     {
-        return self::URL.$endpoint;
+        return  [
+            'Content-Type'    => 'application/json',
+            'Accept'          => 'application/json',
+            'Accept-Encoding' => 'gzip, deflate, br',
+            'Connection'      => 'keep-alive',
+            'User-Agent'      => 'Mautic Marketplace',
+        ];
     }
 }
