@@ -91,6 +91,7 @@ $firewalls = [
             'success_handler' => 'mautic.security.authentication_handler',
             'failure_handler' => 'mautic.security.authentication_handler',
             'user_creator'    => 'mautic.security.saml.user_creator',
+            'username_mapper' => 'mautic.security.saml.username_mapper',
             'login_path'      => '/s/saml/login',
             'check_path'      => '/s/saml/login_check',
         ],
@@ -128,26 +129,26 @@ $firewalls = [
 
 // If SAML is disabled, remove it from the firewall so that Symfony doesn't default to it
 // @todo - containerless config compatibility
-if (!$parameterImporter->get('saml_idp_metadata')) {
-    unset(
-        $firewalls['saml_login'],
-        $firewalls['saml_discover'],
-        $firewalls['main']['light_saml_sp']
-    );
-}
-
-if (!$parameterImporter->get('api_enabled')) {
-    unset(
-        $firewalls['oauth2_token'],
-        $firewalls['oauth2_area'],
-        $firewalls['oauth1_request_token'],
-        $firewalls['oauth1_access_token'],
-        $firewalls['oauth1_area'],
-        $firewalls['api'],
-        $firewalls['main']['fos_oauth'],
-        $firewalls['main']['bazinga_oauth']
-    );
-}
+//if (!$parameterImporter->get('saml_idp_metadata')) {
+//    unset(
+//        $firewalls['saml_login'],
+//        $firewalls['saml_discover'],
+//        $firewalls['main']['light_saml_sp']
+//    );
+//}
+//
+//if (!$parameterImporter->get('api_enabled')) {
+//    unset(
+//        $firewalls['oauth2_token'],
+//        $firewalls['oauth2_area'],
+//        $firewalls['oauth1_request_token'],
+//        $firewalls['oauth1_access_token'],
+//        $firewalls['oauth1_area'],
+//        $firewalls['api'],
+//        $firewalls['main']['fos_oauth'],
+//        $firewalls['main']['bazinga_oauth']
+//    );
+//}
 
 if (!$container->getParameter('mautic.famework.csrf_protection')) {
     unset($firewalls['main']['simple_form']['csrf_token_generator']);
@@ -192,19 +193,6 @@ $container->loadFromExtension(
         ],
         'store' => [
             'id_state' => 'mautic.security.saml.id_store',
-        ],
-    ]
-);
-
-$container->loadFromExtension(
-    'light_saml_sp',
-    [
-        'username_mapper' => [
-            'email'     => '%mautic.saml_idp_email_attribute%',
-            'username'  => '%mautic.saml_idp_username_attribute%',
-            'firstname' => '%mautic.saml_idp_firstname_attribute%',
-            'lastname'  => '%mautic.saml_idp_lastname_attribute%',
-            'nameId'    => \Mautic\UserBundle\Security\User\UserMapper::NAME_ID,
         ],
     ]
 );

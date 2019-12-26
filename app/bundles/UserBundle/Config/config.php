@@ -282,13 +282,55 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+
+            // SAML
+            'mautic.security.saml.credential_store' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\CredentialsStore::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    '%mautic.saml_idp_entity_id%',
+                ],
+                'tag'       => 'lightsaml.own_credential_store',
+            ],
+
+            'mautic.security.saml.trust_store' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    '%mautic.saml_idp_entity_id%',
+                ],
+                'tag'       => 'lightsaml.trust_options_store',
+            ],
+
+            'mautic.security.saml.entity_descriptor_store' => [
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    '%mautic.saml_idp_entity_id%',
+                ],
+                'tag'       => 'lightsaml.idp_entity_store',
+            ],
+
             'mautic.security.saml.id_store' => [
-                'class'     => 'Mautic\UserBundle\Security\Store\IdStore',
+                'class'     => \Mautic\UserBundle\Security\SAML\Store\IdStore::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'lightsaml.system.time_provider',
                 ],
             ],
+
+            'mautic.security.saml.username_mapper' => [
+                'class'     => \Mautic\UserBundle\Security\User\UserMapper::class,
+                'arguments' => [
+                    [
+                        'email'     => '%mautic.saml_idp_email_attribute%',
+                        'username'  => '%mautic.saml_idp_username_attribute%',
+                        'firstname' => '%mautic.saml_idp_firstname_attribute%',
+                        'lastname'  => '%mautic.saml_idp_lastname_attribute%',
+                    ],
+                ],
+            ],
+
             'mautic.security.saml.user_creator' => [
                 'class'     => 'Mautic\UserBundle\Security\User\UserCreator',
                 'arguments' => [

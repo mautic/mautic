@@ -21,7 +21,9 @@ class UserMapper implements UsernameMapperInterface
 {
     const NAME_ID = '@name_id@';
 
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     private $attributes;
 
     /**
@@ -29,6 +31,8 @@ class UserMapper implements UsernameMapperInterface
      */
     public function __construct(array $attributes)
     {
+        $attributes['nameId'] = self::NAME_ID;
+
         $this->attributes = $attributes;
     }
 
