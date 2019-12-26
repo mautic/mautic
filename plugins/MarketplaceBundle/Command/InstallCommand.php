@@ -12,16 +12,19 @@
 namespace MauticPlugin\MarketplaceBundle\Command;
 
 use Composer\Console\Application;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Facade\ReloadFacade;
 use MauticPlugin\MarketplaceBundle\DTO\Package;
 use MauticPlugin\MarketplaceBundle\Service\PluginCollector;
 use MauticPlugin\MarketplaceBundle\Service\PluginDownloader;
+use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class InstallCommand extends ContainerAwareCommand
@@ -29,16 +32,25 @@ class InstallCommand extends ContainerAwareCommand
     private $pluginCollector;
     private $pluginDownloader;
     private $reloadFacade;
+    private $cacheClearCommand;
+    private $coreParametersHelper;
+    private $filesystem;
 
     public function __construct(
         PluginCollector $pluginCollector,
         PluginDownloader $pluginDownloader,
-        ReloadFacade $reloadFacade
+        ReloadFacade $reloadFacade,
+        CacheClearCommand $cacheClearCommand,
+        CoreParametersHelper $coreParametersHelper,
+        Filesystem $filesystem
     ) {
         parent::__construct();
-        $this->pluginCollector  = $pluginCollector;
-        $this->pluginDownloader = $pluginDownloader;
-        $this->reloadFacade     = $reloadFacade;
+        $this->pluginCollector      = $pluginCollector;
+        $this->pluginDownloader     = $pluginDownloader;
+        $this->reloadFacade         = $reloadFacade;
+        $this->cacheClearCommand    = $cacheClearCommand;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->filesystem           = $filesystem;
     }
 
     /**
@@ -79,6 +91,8 @@ class InstallCommand extends ContainerAwareCommand
 
         $io->writeln("Package distribution downloaded in {$stopwatch->stop('download')->getDuration()} ms");
 
+        $stopwatch->start('composer');
+
         $composerApp = new Application();
 
         $arguments = [
@@ -86,6 +100,8 @@ class InstallCommand extends ContainerAwareCommand
             '--no-dev'              => true,
             '--optimize-autoloader' => true,
             '--prefer-dist'         => true,
+            // '--profile' => true,
+            // '--no-progress' => true,
             '-d'                    => $this->pluginDownloader->getPluginDirectory().$package->getInstallDirName(),
         ];
 
@@ -97,8 +113,22 @@ class InstallCommand extends ContainerAwareCommand
             $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
         }
 
-        // @todo clear cache here.
+        $io->writeln("Dependencies installed in {$stopwatch->stop('composer')->getDuration()} ms");
 
+        $stopwatch->start('cache');
+
+        // $arguments = [
+        //     // 'command' => 'cache:clear',
+        //     // '--no-interaction' => true,
+        //     '--no-warmup' => true,
+        //     // '-vvv' => true,
+        // ];
+
+        // $this->cacheClearCommand->run(new ArrayInput($arguments), $output);
+
+        $this->filesystem->remove($this->coreParametersHelper->getParameter('kernel.cache_dir'));
+
+        $io->writeln("Mautic cache cleared in {$stopwatch->stop('cache')->getDuration()} ms");
         $stopwatch->start('reload');
 
         $this->reloadFacade->reloadPlugins();

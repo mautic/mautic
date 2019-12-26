@@ -1,13 +1,15 @@
 <?php
 
 /*
- * @copyright   2019 Mautic. All rights reserved
- * @author      Mautic.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+* @copyright   2019 Mautic. All rights reserved
+* @author      Mautic.
+*
+* @link        https://mautic.org
+*
+* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+*/
+
+use MauticPlugin\MarketplaceBundle\Service\RouteProvider;
 
 return [
     'name'        => 'Marketplace',
@@ -30,147 +32,66 @@ return [
 
     'routes' => [
         'main' => [
-            CustomObjectRouteProvider::ROUTE_LIST => [
-                'path'       => '/custom/object/{page}',
-                'controller' => 'CustomObjectsBundle:CustomObject\List:list',
+            RouteProvider::ROUTE_LIST => [
+                'path'       => '/marketplace/{page}',
+                'controller' => 'MarketplaceBundle:Package\List:list',
                 'method'     => 'GET|POST',
                 'defaults'   => [
                     'page' => 1,
                 ],
             ],
-            CustomObjectRouteProvider::ROUTE_INSTALL => [
-                'path'       => '/custom/object/new',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:new',
+            RouteProvider::ROUTE_INSTALL => [
+                'path'       => '/marketplace/install/{package}',
+                'controller' => 'MarketplaceBundle:Package\Form:new',
                 'method'     => 'GET',
             ],
-            CustomObjectRouteProvider::ROUTE_CONFIGURE => [
-                'path'       => '/custom/object/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:edit',
+            RouteProvider::ROUTE_CONFIGURE => [
+                'path'       => '/marketplace/configure/{package}',
+                'controller' => 'MarketplaceBundle:Package\Form:edit',
                 'method'     => 'GET',
             ],
-            CustomObjectRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/object/cancel/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Cancel:cancel',
-                'method'     => 'GET',
-                'defaults'   => [
-                    'objectId' => null,
-                ],
-            ],
-            CustomObjectRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/object/save/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Save:save',
+            // RouteProvider::ROUTE_CANCEL => [
+            //     'path'       => '/marketplace/cancel/{package}',
+            //     'controller' => 'MarketplaceBundle:Package\Cancel:cancel',
+            //     'method'     => 'GET',
+            //     'defaults'   => [
+            //         'objectId' => null,
+            //     ],
+            // ],
+            RouteProvider::ROUTE_CONFIGURE_SAVE => [
+                'path'       => '/marketplace/configure/{package}',
+                'controller' => 'MarketplaceBundle:Package\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
                     'objectId' => null,
                 ],
             ],
-            CustomObjectRouteProvider::ROUTE_REMOVE => [
-                'path'       => '/custom/object/delete/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
+            RouteProvider::ROUTE_REMOVE => [
+                'path'       => '/marketplace/remove/{package}',
+                'controller' => 'MarketplaceBundle:Package\Delete:delete',
                 'method'     => 'GET',
             ],
         ],
     ],
 
     'services' => [
-        'controllers' => [
-            'custom_object.list_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
-                'arguments' => [
-                    'request_stack',
-                    'custom_object.session.provider',
-                    'mautic.custom.model.object',
-                    'custom_object.permission.provider',
-                    'custom_object.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_object.view_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController::class,
-                'arguments' => [
-                    'request_stack',
-                    'form.factory',
-                    'mautic.custom.model.object',
-                    'mautic.core.model.auditlog',
-                    'custom_object.permission.provider',
-                    'custom_object.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_object.form_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::class,
-                'arguments' => [
-                    'form.factory',
-                    'mautic.custom.model.object',
-                    'mautic.custom.model.field',
-                    'custom_object.permission.provider',
-                    'custom_object.route.provider',
-                    'custom_field.type.provider',
-                    'custom_object.lock_flash_message.helper',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_object.save_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.core.service.flashbag',
-                    'form.factory',
-                    'mautic.custom.model.object',
-                    'mautic.custom.model.field',
-                    'custom_object.permission.provider',
-                    'custom_object.route.provider',
-                    'custom_field.type.provider',
-                    'custom_field.field.params.to.string.transformer',
-                    'custom_field.field.options.to.string.transformer',
-                    'custom_object.lock_flash_message.helper',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_object.delete_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
-                'arguments' => [
-                    'mautic.custom.model.object',
-                    'custom_object.session.provider',
-                    'mautic.core.service.flashbag',
-                    'custom_object.permission.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_object.cancel_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
-                'arguments' => [
-                    'custom_object.session.provider',
-                    'custom_object.route.provider',
-                    'mautic.custom.model.object',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-        ],
+        // 'controllers' => [
+        //     'custom_object.list_controller' => [
+        //         'class'     => \MauticPlugin\MarketplaceBundle\Controller\Package\ListController::class,
+        //         'arguments' => [
+        //             'request_stack',
+        //             'custom_object.session.provider',
+        //             'mautic.custom.model.object',
+        //             'custom_object.permission.provider',
+        //             'custom_object.route.provider',
+        //         ],
+        //         'methodCalls' => [
+        //             'setContainer' => [
+        //                 '@service_container',
+        //             ],
+        //         ],
+        //     ],
+        // ],
         'commands' => [
             'marketplace.command.list' => [
                 'class'     => \MauticPlugin\MarketplaceBundle\Command\ListCommand::class,
@@ -184,6 +105,9 @@ return [
                     'marketplace.service.plugin_collector',
                     'marketplace.service.plugin_downloader',
                     'mautic.plugin.facade.reload',
+                    'console.command.cache_clear',
+                    'mautic.helper.core_parameters',
+                    'symfony.filesystem',
                 ],
             ],
             'marketplace.command.remove' => [
