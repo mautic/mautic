@@ -295,16 +295,12 @@ $mailerSettings = [
     'password'   => '%mautic.mailer_password%',
     'encryption' => '%mautic.mailer_encryption%',
     'auth_mode'  => '%mautic.mailer_auth_mode%',
+    'spool'      => [
+        'type' => 'service',
+        'id'   => 'mautic.transport.spool',
+    ],
 ];
 
-// Only spool if using file as otherwise emails are not sent on redirects
-$spoolType = $parameterImporter->get('mailer_spool_type');
-if ('file' == $spoolType) {
-    $mailerSettings['spool'] = [
-        'type' => '%mautic.mailer_spool_type%',
-        'path' => '%mautic.mailer_spool_path%',
-    ];
-}
 $container->loadFromExtension('swiftmailer', $mailerSettings);
 
 //KnpMenu Configuration

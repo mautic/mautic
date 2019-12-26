@@ -362,7 +362,23 @@ return [
             ],
         ],
         'other' => [
+            'mautic.spool.delegator' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'swiftmailer.transport.real',
+                ],
+            ],
+
             // Mailers
+            'mautic.transport.spool' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport::class,
+                'arguments' => [
+                    'swiftmailer.mailer.default.transport.eventdispatcher',
+                    'mautic.spool.delegator',
+                ],
+            ],
+
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',

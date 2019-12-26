@@ -127,7 +127,7 @@ $firewalls = [
 ];
 
 // If SAML is disabled, remove it from the firewall so that Symfony doesn't default to it
-// @todo - this could make or break environment only config
+// @todo - containerless config compatibility
 if (!$parameterImporter->get('saml_idp_metadata')) {
     unset(
         $firewalls['saml_login'],
