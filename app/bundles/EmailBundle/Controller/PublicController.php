@@ -416,22 +416,16 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        // Use the real transport as the one in Mailer could be SpoolTransport if the system is configured to queue
-        // Can't use swiftmailer.transport.real because it's not set for when queue is disabled
-        $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
-        $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
+        $realTransport = $this->container->get('swiftmailer.transport.real');
 
-        $isCallbackInterface = $currentTransport instanceof CallbackTransportInterface;
-        if ($isCallbackInterface && $currentTransport->getCallbackPath() === $transport) {
-            if ($currentTransport instanceof CallbackTransportInterface) {
-                $event = new TransportWebhookEvent($currentTransport, $this->request);
-                $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
-            }
-
-            return new Response('success');
+        if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        $event = new TransportWebhookEvent($realTransport, $this->request);
+        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+
+        return new Response('success');
     }
 
     /**
