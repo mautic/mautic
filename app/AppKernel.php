@@ -184,6 +184,10 @@ class AppKernel extends Kernel
 
             $class = '\\MauticPlugin'.'\\'.$dirname.'\\'.$filename;
             if (class_exists($class)) {
+                if (file_exists($dirname.'/vendor/autoload.php')) {
+                    require_once $dirname.'/vendor/autoload.php';
+                }
+
                 $plugin = new $class();
 
                 if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
