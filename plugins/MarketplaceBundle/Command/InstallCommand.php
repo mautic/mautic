@@ -70,7 +70,7 @@ class InstallCommand extends ContainerAwareCommand
 
         $package = $pluginCollection->findLatestVersionPackage('@todo the mautic version here', Package::STABILITY_STABLE);
 
-        $io->writeln("{$package->getVersion()} version is considered to be latest stable} ms");
+        $io->writeln("{$package->getVersion()} version is considered to be latest stable");
         $stopwatch->start('download');
 
         $this->pluginDownloader->download($package);
