@@ -24,9 +24,6 @@ class CoreParametersHelper
      */
     private $parameters;
 
-    /**
-     * CoreParametersHelper constructor.
-     */
     public function __construct(string $root)
     {
         $this->rootPath = $root;
@@ -36,14 +33,10 @@ class CoreParametersHelper
         $this->parameters = new \MauticParameterImporter($paths['local_config'], $paths);
     }
 
-    /**
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
     public function getParameter($name, $default = null)
     {
+        $name = $this->stripMauticPrefix($name);
+
         if ('db_table_prefix' === $name && defined('MAUTIC_TABLE_PREFIX')) {
             //use the constant in case in the installer
             return MAUTIC_TABLE_PREFIX;
@@ -52,13 +45,13 @@ class CoreParametersHelper
         return $this->parameters->has($name) ? $this->parameters->get($name) : $default;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function hasParameter($name)
+    public function hasParameter($name): bool
     {
-        return $this->parameters->has($name);
+        return $this->parameters->has($this->stripMauticPrefix($name));
+    }
+
+    private function stripMauticPrefix(string $name): string
+    {
+        return str_replace('mautic.', '', $name);
     }
 }

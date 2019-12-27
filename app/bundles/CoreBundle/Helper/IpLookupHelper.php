@@ -68,10 +68,10 @@ class IpLookupHelper
         $this->request               = $requestStack->getCurrentRequest();
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
-        $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
-        $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
-        $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
-        $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('mautic.track_private_ip_ranges');
+        $this->doNotTrackIps         = $coreParametersHelper->getParameter('do_not_track_ips');
+        $this->doNotTrackBots        = $coreParametersHelper->getParameter('do_not_track_bots');
+        $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('do_not_track_internal_ips');
+        $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('track_private_ip_ranges');
         $this->coreParametersHelper  = $coreParametersHelper;
     }
 
