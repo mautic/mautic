@@ -48,7 +48,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigSave(ConfigEvent $event)
     {
-        $data = $event->getConfig(ConfigType::class);
+        $data = $event->getConfig('userconfig');
 
         foreach ($this->fileFields as $field) {
             if (isset($data[$field]) && $data[$field] instanceof UploadedFile) {
@@ -76,7 +76,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
         }
 
-        $event->setConfig($data, ConfigType::class);
+        $event->setConfig($data, 'userconfig');
     }
 
     /**
