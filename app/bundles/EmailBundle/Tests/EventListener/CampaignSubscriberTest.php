@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Test\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -32,7 +31,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $config = [
         'useremail' => [
-            'email' => 33,
+            'email' => 0,
         ],
         'user_id'  => [6, 7],
         'to_owner' => true,
@@ -134,34 +133,43 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithError()
     {
-        $lead = new Lead();
+        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $event         = (new Event())->setType('email.send.to.user');
+        $lead          = (new Lead())->setEmail('tester@mautic.org');
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'email.send.to.user',
-                'properties' => $this->config,
-            ],
-            'eventDetails' => [
-            ],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
+        $leadEventLog = $this->createMock(LeadEventLog::class);
+        $leadEventLog
+            ->method('getLead')
+            ->willReturn($lead);
+        $leadEventLog
+            ->method('getId')
+            ->willReturn(0);
+        $leadEventLog
+            ->method('setIsScheduled')
+            ->with(false)
+            ->willReturn($leadEventLog);
+        $leadEventLog
+            ->method('getMetadata')
+            ->willReturn([]);
 
-        $mockSendEmailToUser->expects($this->once())
+        $logs = new ArrayCollection([$leadEventLog]);
+
+        $this->sendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
-            ->with($this->config, $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException('Something happenned')));
+            ->with([], $lead)
+            ->will($this->throwException(new EmailCouldNotBeSentException('Something happened')));
 
-        $event = new CampaignExecutionEvent($args, false);
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
 
-        $subscriber->onCampaignTriggerActionSendEmailToUser($event);
+        $this->assertCount(0, $pendingEvent->getSuccessful());
 
-        $expected = [
-            'failed' => 1,
-            'reason' => 'Something happenned',
-        ];
+        $failures = $pendingEvent->getFailures();
+        $this->assertCount(1, $failures);
+        /** @var LeadEventLog $failure */
+        $failure    = $failures->first();
+        $failedLead = $failure->getLead();
 
-        $this->assertSame($expected, $event->getResult());
+        $this->assertSame('tester@mautic.org', $failedLead->getEmail());
     }
 }
