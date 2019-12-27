@@ -18,6 +18,7 @@ use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,9 +43,8 @@ class ConfigController extends FormController
         $fileFields  = $event->getFileFields();
         $formThemes  = $event->getFormThemes();
         $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
-        $doNotChange = $this->coreParametersHelper->getParameter('security.restrictedConfigFields');
 
-        $this->mergeParamsWithLocal($formConfigs, $doNotChange);
+        $this->mergeParamsWithLocal($formConfigs);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
@@ -270,13 +270,14 @@ class ConfigController extends FormController
      *
      * @return array
      */
-    private function mergeParamsWithLocal(&$forms, $doNotChange)
+    private function mergeParamsWithLocal(&$forms)
     {
-        // Import the current local configuration, $parameters is defined in this file
+        $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
+        /** @var PathsHelper $pathsHelper */
+        $pathsHelper     = $this->get('mautic.helper.paths');
+        $localConfigFile = $pathsHelper->getLocalConfigurationFile();
 
-        /** @var \AppKernel $kernel */
-        $kernel          = $this->container->get('kernel');
-        $localConfigFile = $kernel->getLocalConfigFile();
+        // Import the current local configuration, $parameters is defined in this file
 
         /** @var $parameters */
         include $localConfigFile;
