@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Doctrine\ORM\ORMException;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\LeadBundle\Entity\Lead;
@@ -18,7 +19,9 @@ use Mautic\UserBundle\Hash\UserHash;
 
 class SendEmailToUser
 {
-    /** @var EmailModel */
+    /**
+     * @var EmailModel
+     */
     private $emailModel;
 
     public function __construct(EmailModel $emailModel)
@@ -31,6 +34,7 @@ class SendEmailToUser
      * @param Lead  $lead
      *
      * @throws EmailCouldNotBeSentException
+     * @throws ORMException
      */
     public function sendEmailToUsers(array $config, Lead $lead)
     {

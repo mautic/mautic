@@ -165,10 +165,8 @@ return [
             'mautic.email.campaignbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
-                    'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_user',
                     'translator',
                 ],
