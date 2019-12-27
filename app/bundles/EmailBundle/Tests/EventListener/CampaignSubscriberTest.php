@@ -18,13 +18,11 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -100,10 +98,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $event = new PendingEvent($eventAccessor, $event, $logs);
-        $this->subscriber->onCampaignTriggerActionSendEmailToUser($event);
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
 
-        $this->assertCount(0, $event->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
     }
 
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()
@@ -126,41 +125,16 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $logs = new ArrayCollection([$leadEventLog]);
 
-        $eventType = new PendingEvent($eventAccessor, $event, $logs);
-        $this->subscriber->onCampaignTriggerActionSendEmailToUser($eventType);
+        $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
+        $this->subscriber->onCampaignTriggerActionSendEmailToUser($pendingEvent);
 
-        $this->assertCount(1, $eventType->getSuccessful());
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
     }
 
     public function testOnCampaignTriggerActionSendEmailToUserWithError()
     {
         $lead = new Lead();
-
-        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEventModel = $this->getMockBuilder(EventModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockMessageQueueModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockSendEmailToUser = $this->getMockBuilder(SendEmailToUser::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockTranslator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $subscriber = new CampaignSubscriber($mockLeadModel, $mockEmailModel, $mockEventModel, $mockMessageQueueModel, $mockSendEmailToUser, $mockTranslator);
 
         $args = [
             'lead'  => $lead,
