@@ -344,26 +344,26 @@ class AppKernel extends Kernel
             $params = $this->getLocalParams();
         }
 
-        if (!empty($params) && !empty($params['db_driver'])) {
-            $testParams = ['driver', 'host', 'port', 'name', 'user', 'password', 'path'];
-            $dbParams   = [];
-            foreach ($testParams as &$p) {
-                $param = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
-                if ('port' == $p) {
-                    $param = (int) $param;
-                }
-                $name            = ('name' == $p) ? 'dbname' : $p;
-                $dbParams[$name] = $param;
-            }
-
-            // Test a database connection and existence of a user
-            $db = \Doctrine\DBAL\DriverManager::getConnection($dbParams);
-            $db->connect();
-
-            return $db;
-        } else {
+        if (empty($params) || empty($params['db_driver'])) {
             throw new \Exception('not configured');
         }
+
+        $testParams = ['driver', 'host', 'port', 'name', 'user', 'password', 'path'];
+        $dbParams   = [];
+        foreach ($testParams as &$p) {
+            $param = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
+            if ('port' == $p) {
+                $param = (int) $param;
+            }
+            $name            = ('name' == $p) ? 'dbname' : $p;
+            $dbParams[$name] = $param;
+        }
+
+        // Test a database connection and existence of a user
+        $db = \Doctrine\DBAL\DriverManager::getConnection($dbParams);
+        $db->connect();
+
+        return $db;
     }
 
     /**
@@ -386,9 +386,9 @@ class AppKernel extends Kernel
             $envFolder = ('/' != substr($parameters['cache_path'], -1)) ? '/'.$this->environment : $this->environment;
 
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['cache_path'].$envFolder);
-        } else {
-            return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
         }
+
+        return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
     }
 
     /**
@@ -401,9 +401,9 @@ class AppKernel extends Kernel
         $parameters = $this->getLocalParams();
         if (isset($parameters['log_path'])) {
             return str_replace('%kernel.root_dir%', $this->getRootDir(), $parameters['log_path']);
-        } else {
-            return dirname(__DIR__).'/var/logs';
         }
+
+        return dirname(__DIR__).'/var/logs';
     }
 
     /**
@@ -443,119 +443,15 @@ class AppKernel extends Kernel
         $root = $this->getRootDir();
         include $root.'/config/paths.php';
 
-        if (isset($paths['local_config'])) {
-            $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
-            if (!$checkExists || file_exists($paths['local_config'])) {
-                return $paths['local_config'];
-            }
+        if (!isset($paths['local_config'])) {
+            return null;
+        }
+
+        $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+        if (!$checkExists || file_exists($paths['local_config'])) {
+            return $paths['local_config'];
         }
 
         return null;
-    }
-
-    /**
-     * Get the container file name or path.
-     *
-     * @param bool|true $fullPath
-     *
-     * @return string
-     */
-    public function getContainerFile($fullPath = true)
-    {
-        $fileName = $this->getContainerClass().'.php';
-
-        if ($fullPath) {
-            // Override the container class for the local instance
-            $params        = $this->getLocalParams();
-            $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
-
-            if (!file_exists($containerPath)) {
-                @mkdir($containerPath, 0755, true);
-            }
-
-            $containerPath = (isset($params['container_path'])) ? $params['container_path'] : $this->getCacheDir();
-
-            $fileName = $containerPath.'/'.$fileName;
-        }
-
-        return $fileName;
-    }
-
-    /**
-     * Initializes the service container.
-     *
-     * The cached version of the service container is used when fresh, otherwise the
-     * container is built.
-     */
-    protected function initializeContainer()
-    {
-        return parent::initializeContainer();
-
-        // @todo - figure out what is needed from 2.x to 3.x (custom container location?)
-        $class = $this->getContainerClass();
-
-        $cache = new \Symfony\Component\Config\ConfigCache($this->getContainerFile(true), $this->debug);
-
-        $fresh = file_exists($this->getCacheDir().'/classes.php');
-        if (!$cache->isFresh()) {
-            $container = $this->buildContainer();
-            $container->compile();
-            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-
-            if ($this->debug) {
-                $fresh = false;
-            }
-        }
-
-        require_once $cache->getPath();
-
-        $this->container = new $class();
-        $this->container->set('kernel', $this);
-
-        // Warm up the cache if classes.php is missing or in dev mode
-        if (!$fresh && $this->container->has('cache_warmer')) {
-            $warmer = $this->container->get('cache_warmer');
-            $warmer->enableOptionalWarmers();
-            $warmer->warmUp($this->container->getParameter('kernel.cache_dir'));
-        }
-    }
-
-    /**
-     * Builds the service container.
-     *
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder The compiled service container
-     *
-     * @throws \RuntimeException
-     */
-    protected function buildContainer()
-    {
-        foreach (['cache' => $this->getCacheDir(), 'logs' => $this->getLogDir()] as $name => $dir) {
-            if (!is_dir($dir)) {
-                if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
-                    throw new \RuntimeException(sprintf("Unable to create the %s directory (%s)\n", $name, $dir));
-                }
-            } elseif (!is_writable($dir)) {
-                throw new \RuntimeException(sprintf("Unable to write in the %s directory (%s)\n", $name, $dir));
-            }
-        }
-
-        $container = $this->getContainerBuilder();
-        $container->addObjectResource($this);
-        $this->prepareContainer($container);
-
-        if (null !== $cont = $this->registerContainerConfiguration($this->getContainerLoader($container))) {
-            $container->merge($cont);
-        }
-
-        // Only rebuild the classes if it doesn't exist or if the kernel is booted through the console meaning likely cache:clear is used
-        if (defined('IN_MAUTIC_CONSOLE') || !file_exists($this->getCacheDir().'/classes.php')) {
-            $container->addCompilerPass(new DependencyInjection\AddClassesToCachePass($this));
-        }
-
-        // Environmentally set parameters
-        $container->addResource(new EnvParametersResource('SYMFONY__'));
-        $container->addResource(new EnvParametersResource('MAUTIC__'));
-
-        return $container;
     }
 }

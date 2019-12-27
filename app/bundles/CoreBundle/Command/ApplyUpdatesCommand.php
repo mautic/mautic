@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -235,6 +236,7 @@ EOT
         $progressBar->setMessage($translator->trans('mautic.core.update.clear.cache').'                  ');
         $progressBar->advance();
 
+        /** @var CacheHelper $cacheHelper */
         $cacheHelper = $this->getContainer()->get('mautic.helper.cache');
         $cacheHelper->nukeCache();
 

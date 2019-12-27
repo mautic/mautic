@@ -16,6 +16,7 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -127,10 +128,9 @@ class ConfigController extends FormController
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
-                            // We must clear the application cache for the updated values to take effect
-                            /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+                            /** @var CacheHelper $cacheHelper */
                             $cacheHelper = $this->get('mautic.helper.cache');
-                            $cacheHelper->clearContainerFile();
+                            $cacheHelper->refreshConfig();
 
                             if ($isValid && !empty($formData['coreconfig']['last_shown_tab'])) {
                                 $openTab = $formData['coreconfig']['last_shown_tab'];
@@ -250,10 +250,10 @@ class ConfigController extends FormController
             $configurator->mergeParameters([$objectId => null]);
             try {
                 $configurator->write();
-                // We must clear the application cache for the updated values to take effect
-                /** @var \Mautic\CoreBundle\Helper\CacheHelper $cacheHelper */
+
+                /** @var CacheHelper $cacheHelper */
                 $cacheHelper = $this->get('mautic.helper.cache');
-                $cacheHelper->clearContainerFile();
+                $cacheHelper->refreshConfig();
                 $success = 1;
             } catch (\Exception $exception) {
             }
