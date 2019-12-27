@@ -144,9 +144,10 @@ return [
                 'class' => \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.user.route.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\RouteSubscriber::class,
+                'class'     => \Mautic\UserBundle\EventListener\SAMLSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'router',
                 ],
             ],
             'mautic.user.security_subscriber' => [
