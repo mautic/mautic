@@ -82,7 +82,7 @@ $firewalls = [
         'bazinga_oauth'      => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
-        'http_basic'         => false, // @todo '%mautic.api_enable_basic_auth%',
+        'http_basic'         => false, // @todo containerless config compatibility '%mautic.api_enable_basic_auth%',
     ],
     'main' => [
         'pattern'       => '^/s/',
@@ -92,8 +92,10 @@ $firewalls = [
             'failure_handler' => 'mautic.security.authentication_handler',
             'user_creator'    => 'mautic.security.saml.user_creator',
             'username_mapper' => 'mautic.security.saml.username_mapper',
-            'login_path'      => '/s/saml/login',
-            'check_path'      => '/s/saml/login_check',
+
+            // Environment variables will overwrite these with the standard login URLs if SAML is disabled
+            'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
+            'check_path'      => '%env(MAUTIC_SAML_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'simple_form' => [
             'authenticator'        => 'mautic.user.form_authenticator',

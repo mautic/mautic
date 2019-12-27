@@ -119,6 +119,10 @@ class MauticParameterImporter
             //$replaceRootPlaceholder($v);
         }
 
+        $samlEnabled                            = (bool) $this->parameters['saml_idp_metadata'];
+        $envVariables['MAUTIC_SAML_LOGIN_PATH'] = $samlEnabled ? '/s/saml/login' : '/s/login';
+        $envVariables['MAUTIC_SAML_CHECK_PATH'] = $samlEnabled ? '/s/saml/login_check' : '/s/login_check';
+
         // Load the values into the environment for cache use
         $dotenv = new \Symfony\Component\Dotenv\Dotenv();
         $dotenv->populate($envVariables);
