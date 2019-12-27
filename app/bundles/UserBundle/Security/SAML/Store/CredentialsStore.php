@@ -48,11 +48,6 @@ class CredentialsStore implements CredentialStoreInterface
 
     public function getByEntityId($entityId): array
     {
-        // SAML is not enabled
-        if (!$this->coreParametersHelper->getParameter('saml_idp_metadata')) {
-            return [];
-        }
-
         // EntityIds do not match
         if ($entityId !== $this->entityId) {
             return [];
@@ -67,8 +62,13 @@ class CredentialsStore implements CredentialStoreInterface
 
     private function delegateAndCreateCredentials(): void
     {
-        if (!$certificateContent = $this->coreParametersHelper->getParameter('saml_idp_own_certificate')) {
+        // Credentials are required or SP will cause a never ending login loop as it throws an exception
+        $samlEnabled = (bool) $this->coreParametersHelper->getParameter('saml_idp_metadata');
+
+        if (!$samlEnabled || !$certificateContent = $this->coreParametersHelper->getParameter('saml_idp_own_certificate')) {
             $this->credentials = $this->createDefaultCredentials();
+
+            return;
         }
 
         $this->credentials = $this->createOwnCredentials();
@@ -78,7 +78,7 @@ class CredentialsStore implements CredentialStoreInterface
     {
         $certificateContent = base64_decode($this->coreParametersHelper->getParameter('saml_idp_own_certificate'));
         $privateKeyContent  = base64_decode($this->coreParametersHelper->getParameter('saml_idp_own_private_key'));
-        $keyPassword        = $this->coreParametersHelper->getParameter('saml_idp_own_password');
+        $keyPassword        = (string) $this->coreParametersHelper->getParameter('saml_idp_own_password');
 
         return $this->createCredentials($certificateContent, $privateKeyContent, $keyPassword);
     }
