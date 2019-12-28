@@ -37,6 +37,18 @@ class PackageCollection implements Iterator, Countable, ArrayAccess
         $this->records = array_values($records);
     }
 
+    public static function fromArray(array $array): PackageCollection
+    {
+        return new self(
+            array_map(
+                function (array $record) {
+                    return Package::fromArray($record);
+                },
+                $array
+            )
+        );
+    }
+
     public function map(callable $callback): PackageCollection
     {
         return new self(array_map($callback, $this->records));
@@ -50,33 +62,6 @@ class PackageCollection implements Iterator, Countable, ArrayAccess
     public function filter(callable $callback): PackageCollection
     {
         return new self(array_values(array_filter($this->records, $callback)));
-    }
-
-    public function findLatestVersionPackage(string $mauticVersion, int $stabilityPriority): Package
-    {
-        $latestPackage = null;
-
-        $this->map(function (Package $package) use (&$latestPackage, $mauticVersion, $stabilityPriority) {
-            // @todo check for the right Mautic supported version as well.
-
-            if ($package->getStabilityPriority() > $stabilityPriority) {
-                return $package;
-            }
-
-            if (empty($latestPackage)) {
-                $latestPackage = $package;
-            }
-
-            if (version_compare($package->getVersion(), $latestPackage->getVersion(), '>')) {
-                $latestPackage = $package;
-            }
-        });
-
-        if (empty($latestPackage)) {
-            throw new \Exception("No version was found for Mautic version {$maticVersion}");
-        }
-
-        return $latestPackage;
     }
 
     /**

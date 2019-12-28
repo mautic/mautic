@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MarketplaceBundle\Command;
 
-use MauticPlugin\MarketplaceBundle\Api\Connection;
+use MauticPlugin\MarketplaceBundle\Service\PluginCollector;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,15 +21,12 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class ListCommand extends ContainerAwareCommand
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private $pluginCollector;
 
-    public function __construct(Connection $connection)
+    public function __construct(PluginCollector $pluginCollector)
     {
         parent::__construct();
-        $this->connection = $connection;
+        $this->pluginCollector = $pluginCollector;
     }
 
     /**
@@ -54,15 +51,15 @@ class ListCommand extends ContainerAwareCommand
         $table = new Table($output);
         $table->setHeaders(['name', 'description', 'downloads', 'favers']);
 
-        $plugins = $this->connection->getPlugins();
+        $plugins = $this->pluginCollector->collectPackages();
 
-        foreach ($plugins['results'] as $plugin) {
+        foreach ($plugins as $plugin) {
             $color = 'white';
             $table->addRow([
-                "<fg={$color}>{$plugin['name']}</>",
-                "<fg={$color}>{$plugin['description']}</>",
-                "<fg={$color}>{$plugin['downloads']}</>",
-                "<fg={$color}>{$plugin['favers']}</>",
+                "<fg={$color}>{$plugin->getName()}</>",
+                "<fg={$color}>{$plugin->getDescription()}</>",
+                "<fg={$color}>{$plugin->getDownloads()}</>",
+                "<fg={$color}>{$plugin->getFavers()}</>",
             ]);
         }
 
