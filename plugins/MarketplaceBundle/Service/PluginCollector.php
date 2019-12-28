@@ -32,4 +32,11 @@ class PluginCollector
 
         return $this->packageFactory->makePackageCollection($payload['packages'][$packageName]);
     }
+
+    public function collectPackages(): PackageCollection
+    {
+        $payload = $this->connection->getPlugins();
+
+        return PackageCollection::fromArray($payload['results']);
+    }
 }
