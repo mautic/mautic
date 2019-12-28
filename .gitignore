@@ -7,6 +7,8 @@
 /.env
 /composer.phar
 /coverage.xml
+/composer-combined.json
+/composer-combined.lock
 
 /app/bootstrap*
 /app/console
