@@ -30,7 +30,7 @@ class Package
         $this->favers      = $favers;
     }
 
-    public static function fromArray(array $array): Package
+    public static function fromArray(array $array)
     {
         return new self(
             $array['name'],

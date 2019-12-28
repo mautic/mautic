@@ -9,12 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MarketplaceBundle\Service;
+namespace MauticPlugin\MarketplaceBundle\Model;
 
 use MauticPlugin\MarketplaceBundle\Api\Connection;
-use MauticPlugin\MarketplaceBundle\Collection\PackageCollection;
+use MauticPlugin\MarketplaceBundle\DTO\PackageDetail;
 
-class PluginCollector
+class PackageModel
 {
     private $connection;
 
@@ -23,10 +23,10 @@ class PluginCollector
         $this->connection = $connection;
     }
 
-    public function collectPackages(): PackageCollection
+    public function getPackageDetail(string $name): PackageDetail
     {
-        $payload = $this->connection->getPlugins();
+        $payload = $this->connection->getPackage($name);
 
-        return PackageCollection::fromArray($payload['results']);
+        return PackageDetail::fromArray($payload['package']);
     }
 }

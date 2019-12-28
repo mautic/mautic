@@ -22,17 +22,13 @@ class Connection
     private $httpClient;
     private $logger;
 
-    public function __construct(
-        Client $httpClient,
-        LoggerInterface $logger
-    ) {
+    public function __construct(Client $httpClient, LoggerInterface $logger)
+    {
         $this->httpClient = $httpClient;
         $this->logger     = $logger;
     }
 
     /**
-     * @return array
-     *
      * @throws ApiException
      */
     public function getPlugins(): array
@@ -41,25 +37,11 @@ class Connection
     }
 
     /**
-     * @return array
-     *
      * @throws ApiException
      */
-    public function getPlugin(string $pluginName): array
+    public function getPackage(string $pluginName): array
     {
-        return $this->makeRequest("https://repo.packagist.org/p/{$pluginName}.json");
-    }
-
-    /**
-     * @throws ApiException
-     */
-    public function download(string $sourceUrl, string $destinationPath): void
-    {
-        $request = new Request(RequestInterface::GET, $sourceUrl, $this->getHeaders());
-
-        if (false === file_put_contents($destinationPath, $this->httpClient->send($request)->getBody()->getContents())) {
-            throw new \Exception("Could not save the package zip file into {$destinationPath}. Check the permissions.");
-        }
+        return $this->makeRequest("https://packagist.org/packages/{$pluginName}.json");
     }
 
     public function makeRequest(string $url): array
