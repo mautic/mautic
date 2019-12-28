@@ -15,9 +15,9 @@ use Composer\Console\Application;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Facade\ReloadFacade;
 use MauticPlugin\MarketplaceBundle\DTO\Package;
+use MauticPlugin\MarketplaceBundle\Service\ComposerCombiner;
 use MauticPlugin\MarketplaceBundle\Service\PluginCollector;
 use MauticPlugin\MarketplaceBundle\Service\PluginDownloader;
-use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,25 +32,25 @@ class InstallCommand extends ContainerAwareCommand
     private $pluginCollector;
     private $pluginDownloader;
     private $reloadFacade;
-    private $cacheClearCommand;
     private $coreParametersHelper;
     private $filesystem;
+    private $composerCombiner;
 
     public function __construct(
         PluginCollector $pluginCollector,
         PluginDownloader $pluginDownloader,
         ReloadFacade $reloadFacade,
-        CacheClearCommand $cacheClearCommand,
         CoreParametersHelper $coreParametersHelper,
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        ComposerCombiner $composerCombiner
     ) {
         parent::__construct();
         $this->pluginCollector      = $pluginCollector;
         $this->pluginDownloader     = $pluginDownloader;
         $this->reloadFacade         = $reloadFacade;
-        $this->cacheClearCommand    = $cacheClearCommand;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->filesystem           = $filesystem;
+        $this->composerCombiner     = $composerCombiner;
     }
 
     /**
@@ -73,36 +73,26 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->composerCombiner->useComposerCombinedJson();
+
         $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
         $stopwatch->start('total');
-        $stopwatch->start('versions');
-
-        $pluginCollection = $this->pluginCollector->collectPackageVersions($input->getArgument('package'));
-
-        $io->writeln("{$pluginCollection->count()} versions of the plugin metadata fetched in {$stopwatch->stop('versions')->getDuration()} ms");
-
-        $package = $pluginCollection->findLatestVersionPackage('@todo the mautic version here', Package::STABILITY_STABLE);
-
-        $io->writeln("{$package->getVersion()} version is considered to be latest stable");
-        $stopwatch->start('download');
-
-        $this->pluginDownloader->download($package);
-
-        $io->writeln("Package distribution downloaded in {$stopwatch->stop('download')->getDuration()} ms");
-
         $stopwatch->start('composer');
 
         $composerApp = new Application();
 
         $arguments = [
-            'command'               => 'install',
-            '--no-dev'              => true,
-            '--optimize-autoloader' => true,
+            'command'               => 'require',
+            'packages'              => [$input->getArgument('package')],
+            // '--no-dev'              => true, // @todo set acutal env.
+            '--no-scripts'              => true,
+            // '--optimize-autoloader' => true,
+            // '--no-autoloader' => true,
             '--prefer-dist'         => true,
             // '--profile' => true,
             // '--no-progress' => true,
-            '-d'                    => $this->pluginDownloader->getPluginDirectory().$package->getInstallDirName(),
+            // '-d'                    => $this->pluginDownloader->getPluginDirectory().$package->getInstallDirName(),
         ];
 
         $composerApp->setAutoExit(false);
@@ -113,18 +103,9 @@ class InstallCommand extends ContainerAwareCommand
             $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
         }
 
-        $io->writeln("Dependencies installed in {$stopwatch->stop('composer')->getDuration()} ms");
+        $io->writeln("Composer dependencies installed in {$stopwatch->stop('composer')->getDuration()} ms");
 
         $stopwatch->start('cache');
-
-        // $arguments = [
-        //     // 'command' => 'cache:clear',
-        //     // '--no-interaction' => true,
-        //     '--no-warmup' => true,
-        //     // '-vvv' => true,
-        // ];
-
-        // $this->cacheClearCommand->run(new ArrayInput($arguments), $output);
 
         $this->filesystem->remove($this->coreParametersHelper->getParameter('kernel.cache_dir'));
 

@@ -41,17 +41,17 @@ return [
                 ],
             ],
             RouteProvider::ROUTE_INSTALL => [
-                'path'       => '/marketplace/install/{package}',
+                'path'       => '/marketplace/install/{vendor}/{package}',
                 'controller' => 'MarketplaceBundle:Package\Form:new',
                 'method'     => 'GET',
             ],
             RouteProvider::ROUTE_CONFIGURE => [
-                'path'       => '/marketplace/configure/{package}',
+                'path'       => '/marketplace/configure/{vendor}/{package}',
                 'controller' => 'MarketplaceBundle:Package\Form:edit',
                 'method'     => 'GET',
             ],
             // RouteProvider::ROUTE_CANCEL => [
-            //     'path'       => '/marketplace/cancel/{package}',
+            //     'path'       => '/marketplace/cancel/{vendor}/{package}',
             //     'controller' => 'MarketplaceBundle:Package\Cancel:cancel',
             //     'method'     => 'GET',
             //     'defaults'   => [
@@ -59,7 +59,7 @@ return [
             //     ],
             // ],
             RouteProvider::ROUTE_CONFIGURE_SAVE => [
-                'path'       => '/marketplace/configure/{package}',
+                'path'       => '/marketplace/configure/{vendor}/{package}',
                 'controller' => 'MarketplaceBundle:Package\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
@@ -67,7 +67,7 @@ return [
                 ],
             ],
             RouteProvider::ROUTE_REMOVE => [
-                'path'       => '/marketplace/remove/{package}',
+                'path'       => '/marketplace/remove/{vendor}/{package}',
                 'controller' => 'MarketplaceBundle:Package\Delete:delete',
                 'method'     => 'GET',
             ],
@@ -75,28 +75,30 @@ return [
     ],
 
     'services' => [
-        // 'controllers' => [
-        //     'custom_object.list_controller' => [
-        //         'class'     => \MauticPlugin\MarketplaceBundle\Controller\Package\ListController::class,
-        //         'arguments' => [
-        //             'request_stack',
-        //             'custom_object.session.provider',
-        //             'mautic.custom.model.object',
-        //             'custom_object.permission.provider',
-        //             'custom_object.route.provider',
-        //         ],
-        //         'methodCalls' => [
-        //             'setContainer' => [
-        //                 '@service_container',
-        //             ],
-        //         ],
-        //     ],
-        // ],
+        'controllers' => [
+            'marketplace.controller.package.list' => [
+                'class'     => \MauticPlugin\MarketplaceBundle\Controller\Package\ListController::class,
+                'arguments' => [
+                    'marketplace.service.plugin_collector',
+                    'request_stack',
+                    'marketplace.service.route_provider',
+                    // 'custom_object.session.provider',
+                    // 'mautic.custom.model.object',
+                    // 'custom_object.permission.provider',
+                    // 'custom_object.route.provider',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+        ],
         'commands' => [
             'marketplace.command.list' => [
                 'class'     => \MauticPlugin\MarketplaceBundle\Command\ListCommand::class,
                 'tag'       => 'console.command',
-                'arguments' => ['marketplace.api.connection'],
+                'arguments' => ['marketplace.service.plugin_collector'],
             ],
             'marketplace.command.install' => [
                 'class'     => \MauticPlugin\MarketplaceBundle\Command\InstallCommand::class,
@@ -105,9 +107,9 @@ return [
                     'marketplace.service.plugin_collector',
                     'marketplace.service.plugin_downloader',
                     'mautic.plugin.facade.reload',
-                    'console.command.cache_clear',
                     'mautic.helper.core_parameters',
                     'symfony.filesystem',
+                    'marketplace.service.composer_combiner',
                 ],
             ],
             'marketplace.command.remove' => [
@@ -137,6 +139,14 @@ return [
             'marketplace.service.plugin_collector' => [
                 'class'     => \MauticPlugin\MarketplaceBundle\Service\PluginCollector::class,
                 'arguments' => ['marketplace.api.connection', 'marketplace.factory.package'],
+            ],
+            'marketplace.service.composer_combiner' => [
+                'class'     => \MauticPlugin\MarketplaceBundle\Service\ComposerCombiner::class,
+                'arguments' => ['symfony.filesystem'],
+            ],
+            'marketplace.service.route_provider' => [
+                'class'     => \MauticPlugin\MarketplaceBundle\Service\RouteProvider::class,
+                'arguments' => ['router'],
             ],
         ],
     ],
