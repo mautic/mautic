@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-use MauticPlugin\MarketplaceBundle\DTO\Version;
-
 /*
  * @copyright   2019 Mautic. All rights reserved
  * @author      Mautic.
@@ -11,9 +9,32 @@ use MauticPlugin\MarketplaceBundle\DTO\Version;
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use MauticPlugin\MarketplaceBundle\DTO\Version;
+
 /* @var \MauticPlugin\MarketplaceBundle\DTO\PackageDetail $packageDetail */
 $view['slots']->set('headerTitle', $view->escape($packageDetail->getHumanPackageName()));
 $view->extend('MauticCoreBundle:Default:content.html.php');
+echo $view['assets']->includeScript('plugins/MarketplaceBundle/Assets/js/marketplace.js');
+
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'customButtons' => [
+                [
+                    'attr' => [
+                        'data-toggle' => 'download',
+                        'onClick'     => "Marketplace.startInstall(this, '{$packageDetail->getName()}')",
+                    ],
+                    'btnText'   => $view['translator']->trans('mautic.core.theme.install'),
+                    'iconClass' => 'fa fa-download',
+                ],
+            ],
+        ]
+    )
+);
+
 // @todo make the stability configurable
 // @todo make the version configurable
 try {

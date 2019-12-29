@@ -21,6 +21,8 @@ class RouteProvider
 
     public const ROUTE_INSTALL = 'mautic_marketplace_install';
 
+    public const ROUTE_INSTALL_STEP_COMPOSER = 'mautic_marketplace_install_step_composer';
+
     public const ROUTE_CONFIGURE = 'mautic_marketplace_configure';
 
     public const ROUTE_DELETE = 'mautic_marketplace_delete';

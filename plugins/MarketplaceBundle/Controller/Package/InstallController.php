@@ -16,6 +16,7 @@ namespace MauticPlugin\MarketplaceBundle\Controller\Package;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\MarketplaceBundle\Model\PackageModel;
 use MauticPlugin\MarketplaceBundle\Service\RouteProvider;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -53,5 +54,10 @@ class InstallController extends CommonController
                 ],
             ]
         );
+    }
+
+    public function StepComposerAction(string $vendor, string $package): Response
+    {
+        return new JsonResponse('lalala');
     }
 }

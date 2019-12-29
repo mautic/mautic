@@ -43,6 +43,11 @@ return [
                 'controller' => 'MarketplaceBundle:Package\Install:view',
                 'method'     => 'GET',
             ],
+            RouteProvider::ROUTE_INSTALL_STEP_COMPOSER => [
+                'path'       => '/marketplace/install/{vendor}/{package}/step/composer',
+                'controller' => 'MarketplaceBundle:Package\Install:stepComposer',
+                'method'     => 'GET',
+            ],
         ],
     ],
 
