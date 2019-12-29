@@ -111,6 +111,9 @@ class CredentialsStore implements CredentialStoreInterface
         $certificate = $this->createCertificate($certificateContent);
         $privateKey  = $this->createPrivateKey($privateKeyContent, $keyPassword, $certificate);
 
-        return new X509Credential($certificate, $privateKey);
+        $credentials = new X509Credential($certificate, $privateKey);
+        $credentials->setEntityId($this->entityId);
+
+        return $credentials;
     }
 }
