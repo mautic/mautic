@@ -43,7 +43,7 @@ class InstallController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'package'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
                 ],
                 'contentTemplate' => 'MarketplaceBundle:Package:install.html.php',
                 'passthroughVars' => [

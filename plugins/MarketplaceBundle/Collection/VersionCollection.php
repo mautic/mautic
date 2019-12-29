@@ -12,6 +12,7 @@
 namespace MauticPlugin\MarketplaceBundle\Collection;
 
 use ArrayAccess;
+use Composer\Package\Package;
 use Countable;
 use Iterator;
 use MauticPlugin\MarketplaceBundle\DTO\Version;
@@ -62,6 +63,34 @@ class VersionCollection implements Iterator, Countable, ArrayAccess
     public function filter(callable $callback): VersionCollection
     {
         return new self(array_values(array_filter($this->records, $callback)));
+    }
+
+    public function findLatestVersionPackage(int $stabilityPriority = Package::STABILITY_STABLE, string $mauticVersion = MAUTIC_VERSION): Version
+    {
+        $latestVersion = null;
+
+        $this->map(function (Version $version) use (&$latestVersion, $mauticVersion, $stabilityPriority) {
+            // @todo check for the right Mautic supported version as well.
+
+            if ($version->getStabilityPriority() >= $stabilityPriority) {
+                return $version;
+            }
+
+            if (empty($latestVersion)) {
+                $latestVersion = $version;
+            }
+
+            if (version_compare($version->getVersion(), $latestVersion->getVersion(), '>')) {
+                $latestVersion = $version;
+            }
+        });
+
+        if (empty($latestVersion)) {
+            $stability = array_search($stabilityPriority, Package::$stabilities);
+            throw new \Exception("No version was found for Mautic version {$mauticVersion} and {$stability} stability. There are {$this->count()} other versions. Try to lower the stability.");
+        }
+
+        return $latestVersion;
     }
 
     /**

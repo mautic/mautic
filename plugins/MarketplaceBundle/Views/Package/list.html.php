@@ -86,8 +86,8 @@ if ('index' === $tmpl) {
                                             'href' => $view['router']->path(
                                                 RouteProvider::ROUTE_INSTALL,
                                                 [
-                                                    'vendor'  => $item->getVendorName(),
-                                                    'package' => $item->getPackageName(),
+                                                    'vendor'  => $view->escape($item->getVendorName()),
+                                                    'package' => $view->escape($item->getPackageName()),
                                                 ]
                                             ),
                                         ],
@@ -100,19 +100,19 @@ if ('index' === $tmpl) {
                     </td>
                     <td>
                         <div>
-                            <a href="<?php echo $item->getUrl(); ?>" target="_blank" rel="noopener noreferrer" >
-                                <?php echo $item->getHumanPackageName(); ?>
+                            <a href="<?php echo $view->escape($item->getUrl()); ?>" target="_blank" rel="noopener noreferrer" >
+                                <?php echo $view->escape($item->getHumanPackageName()); ?>
                             </a>
                         </div>
                         <?php if ($item->getDescription()): ?>
                             <div class="text-muted mt-4">
-                                <small><?php echo $item->getDescription(); ?></small>
+                                <small><?php echo $view->escape($item->getDescription()); ?></small>
                             </div>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo $item->getVendorName(); ?></td>
-                    <td><?php echo $item->getDownloads(); ?></td>
-                    <td><?php echo $item->getFavers(); ?></td>
+                    <td><?php echo $view->escape($item->getVendorName()); ?></td>
+                    <td><?php echo $view->escape($item->getDownloads()); ?></td>
+                    <td><?php echo $view->escape($item->getFavers()); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

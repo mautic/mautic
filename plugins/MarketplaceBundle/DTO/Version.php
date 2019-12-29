@@ -11,9 +11,10 @@
 
 namespace MauticPlugin\MarketplaceBundle\DTO;
 
-class Version
+use Composer\Package\Package;
+
+class Version extends Package
 {
-    private $version;
     private $license;
     private $homepage;
     private $issues;
@@ -21,7 +22,7 @@ class Version
     private $require;
     private $keywords;
 
-    public function __construct(string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
+    public function __construct(string $name, string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
     {
         $this->version  = $version;
         $this->license  = $license;
@@ -30,11 +31,14 @@ class Version
         $this->issues   = $issues;
         $this->require  = $require;
         $this->keywords = $keywords;
+
+        parent::__construct($name, $version, $version);
     }
 
     public static function fromArray(array $array): Version
     {
         return new self(
+            $array['name'],
             $array['version'],
             $array['license'],
             new \DateTimeImmutable($array['time']),

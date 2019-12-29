@@ -145,18 +145,12 @@ class PackageDetail extends Package
         $this->time = $time;
     }
 
-    /**
-     * @return Maintainer[]
-     */
-    public function getMaintainers(): array
+    public function getMaintainers(): MaintainerCollection
     {
         return $this->maintainers;
     }
 
-    /**
-     * @param Maintainer[] $maintainers
-     */
-    public function setMaintainers($maintainers): void
+    public function setMaintainers(MaintainerCollection $maintainers): void
     {
         $this->maintainers = $maintainers;
     }
