@@ -48,6 +48,9 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     public function onConfigSave(ConfigEvent $event)
     {
+        // Preserve existing value
+        $event->unsetIfEmpty('saml_idp_own_password');
+
         $data = $event->getConfig('userconfig');
 
         foreach ($this->fileFields as $field) {
