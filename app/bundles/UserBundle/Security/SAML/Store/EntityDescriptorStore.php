@@ -23,28 +23,26 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
     private $coreParametersHelper;
 
     /**
-     * @var string
-     */
-    private $entityId;
-
-    /**
      * @var EntityDescriptor
      */
     private $entityDescriptor;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, string $entityId)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->entityId             = $entityId;
     }
 
-    public function get($entityId): EntityDescriptor
+    public function get($entityId): ?EntityDescriptor
     {
         if ($this->entityDescriptor) {
             return $this->entityDescriptor;
         }
 
         $this->createEntityDescriptor();
+
+        if ($entityId !== $this->entityDescriptor->getEntityID()) {
+            return null;
+        }
 
         return $this->entityDescriptor;
     }
@@ -56,8 +54,10 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
             return false;
         }
 
+        $entityDescriptor = $this->get($entityId);
+
         // EntityIds do not match
-        if ($entityId !== $this->entityId) {
+        if ($entityId !== $entityDescriptor->getEntityID()) {
             return false;
         }
 
@@ -69,14 +69,17 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
      */
     public function all(): array
     {
+        if (!$this->entityDescriptor) {
+            $this->createEntityDescriptor();
+        }
+
         return [$this->entityDescriptor];
     }
 
     private function createEntityDescriptor(): void
     {
-        $xml = $this->coreParametersHelper->getParameter('saml_idp_metadata');
+        $xml = base64_decode($this->coreParametersHelper->getParameter('saml_idp_metadata'));
 
         $this->entityDescriptor = EntityDescriptor::loadXml($xml);
-        $this->entityDescriptor->setEntityID($this->entityId);
     }
 }

@@ -64,6 +64,7 @@ class IdStore implements IdStoreInterface
         if (null == $idEntry) {
             return false;
         }
+
         if ($idEntry->getExpiryTime()->getTimestamp() < $this->timeProvider->getTimestamp()) {
             return false;
         }
