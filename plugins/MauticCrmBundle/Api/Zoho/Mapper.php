@@ -11,39 +11,37 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
-use MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer;
 
 class Mapper
 {
     /**
-     * @var Writer
+     * @var array
      */
-    protected $writer;
+    private $contact = [];
 
     /**
      * @var array
      */
-    protected $contact = [];
+    private $fields = [];
 
     /**
      * @var array
      */
-    protected $fields = [];
-
-    /**
-     * @var array
-     */
-    protected $mappedFields = [];
+    private $mappedFields = [];
 
     /**
      * @var
      */
-    protected $object;
+    private $object;
+
+    /**
+     * @var array
+     */
+    private $objectMappedValues = [];
 
     /**
      * Mapper constructor.
      *
-     * @param       $object
      * @param array $fields
      */
     public function __construct(array $fields)
@@ -58,7 +56,6 @@ class Mapper
      */
     public function setObject($object)
     {
-        $this->writer = new Writer($object);
         $this->object = $object;
 
         return $this;
@@ -89,17 +86,17 @@ class Mapper
     }
 
     /**
-     * @param $id
+     * @param int|null $id Zoho ID if known
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
-    public function map($id, $zohoId = null)
+    public function map($id = null)
     {
-        $mapped = 0;
-        $row    = $this->writer->row($id);
+        $mapped             = 0;
+        $objectMappedValues = [];
 
-        if ($zohoId) {
-            $row->add('Id', $zohoId);
+        if ($id) {
+            $objectMappedValues['id'] = $id;
         }
 
         foreach ($this->mappedFields as $zohoField => $mauticField) {
@@ -109,19 +106,21 @@ class Mapper
                 $apiField = $field['api_name'];
                 $apiValue = $this->contact[$mauticField];
 
-                $row->add($apiField, $apiValue);
+                $objectMappedValues[$apiField] = $apiValue;
             }
         }
+
+        $this->objectMappedValues = $objectMappedValues;
 
         return $mapped;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getXml()
+    public function getArray()
     {
-        return $this->writer->write();
+        return $this->objectMappedValues;
     }
 
     /**
@@ -129,10 +128,12 @@ class Mapper
      *
      * @return mixed
      */
-    protected function getField($fieldName)
+    private function getField($fieldName)
     {
-        return isset($this->fields[$this->object][$fieldName]) ?
-            $this->fields[$this->object][$fieldName] :
+        return isset($this->fields[$this->object][$fieldName])
+            ?
+            $this->fields[$this->object][$fieldName]
+            :
             null;
     }
 }

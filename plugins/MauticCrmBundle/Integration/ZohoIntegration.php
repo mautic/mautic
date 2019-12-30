@@ -16,12 +16,10 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
-use MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer;
 use MauticPlugin\MauticCrmBundle\Api\ZohoApi;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -186,40 +184,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         return $data;
-    }
-
-    /**
-     * @param $rows
-     *
-     * @return array
-     */
-    protected function formatZohoData($rows)
-    {
-        if (isset($rows['FL'])) {
-            $rows = [$rows];
-        }
-        $fieldsValues = [];
-        foreach ($rows as $row) {
-            if (isset($row['FL'])) {
-                $fl = $row['FL'];
-                if (isset($fl['val'])) {
-                    $fl = [$fl];
-                }
-                foreach ($fl as $field) {
-                    // Fix boolean comparison
-                    $value = $field['content'];
-                    if ($field['content'] === 'true') {
-                        $value = true;
-                    } elseif ($field['content'] === 'false') {
-                        $value = false;
-                    }
-
-                    $fieldsValues[$row['no'] - 1][$this->getFieldKey($field['val'])] = $value;
-                }
-            }
-        }
-
-        return $fieldsValues;
     }
 
     /**
@@ -987,39 +951,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $config
-     *
-     * @return string
-     */
-    public function populateLeadData($lead, $config = [])
-    {
-        $config['object'] = 'Leads';
-        $mappedData       = parent::populateLeadData($lead, $config);
-        $writer           = new Writer($config['object']);
-        if ($lead instanceof Lead) {
-            $row = $writer->row($lead->getId());
-        } else {
-            $row = $writer->row($lead['id']);
-        }
-        foreach ($mappedData as $name => $value) {
-            $row->add($name, $value);
-        }
-
-        return $writer->write();
-    }
-
-    /**
-     * @param $dv
-     *
-     * @return string
-     */
-    protected function getFieldKey($dv)
-    {
-        return InputHelper::alphanum(InputHelper::transliterate($dv));
-    }
-
-    /**
      * @param array $params
      *
      * @return mixed
@@ -1197,7 +1128,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $totalUpdated += $mapper
                     ->setMappedFields($fieldsToUpdate[$zObject])
                     ->setContact($lead)
-                    ->map($lead['internal_entity_id'], $lead['integration_entity_id']);
+                    ->map($lead['integration_entity_id']);
                 ++$counter;
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
@@ -1227,7 +1158,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $totalCreated += $mapper
                     ->setMappedFields($config['leadFields'])
                     ->setContact($lead)
-                    ->map($lead['internal_entity_id']);
+                    ->map();
                 ++$counter;
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
@@ -1290,32 +1221,27 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $counter      = 0;
         $errorCounter = 0;
+
         try {
             if ($this->isAuthorized()) {
                 if (!empty($existingPerson) && empty($integrationId)) {
-                    /** @var IntegrationEntity $integrationEntity */
-                    $jsonArray = [];
-                    $leadData  = $lead->getProfileFields();
-                    foreach ($config['leadFields'] as $key => $value) {
-                        $jsonArray[$key] = $leadData[$value];
-                    }
-                    $jsonArray['id'] = $existingPerson['id'];
-                    $this->updateContactInZoho($zObject, $counter, $errorCounter, $jsonArray);
+                    $mapper
+                        ->setMappedFields($fieldsToUpdate[$zObject])
+                        ->setContact($lead->getProfileFields())
+                        ->map($existingPerson['id']);
+                    $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
                 } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
-                    $jsonArray = [];
-                    $leadData  = $lead->getProfileFields();
-                    foreach ($config['leadFields'] as $key => $value) {
-                        $jsonArray[$key] = $leadData[$value];
-                    }
-                    $jsonArray['id'] = $existingPerson['id'];
-                    $this->updateContactInZoho($zObject, $counter, $errorCounter, $jsonArray);
+                    $mapper
+                        ->setMappedFields($fieldsToUpdate[$zObject])
+                        ->setContact($lead->getProfileFields())
+                        ->map($existingPerson['id']);
+                    $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
                 } else {
-                    $jsonArray = [];
-                    $leadData  = $lead->getProfileFields();
-                    foreach ($config['leadFields'] as $key => $value) {
-                        $jsonArray[$key] = $leadData[$value];
-                    }
-                    $this->createContactInZoho($zObject, $counter, $errorCounter, $jsonArray);
+                    $mapper
+                        ->setMappedFields($config['leadFields'])
+                        ->setContact($lead->getProfileFields())
+                        ->map();
+                    $this->createContactInZoho($mapper, $zObject, $counter, $errorCounter);
                 }
 
                 return true;
@@ -1457,30 +1383,30 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param Mapper $mapper
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter
-     * @param array  $jsonArray
      */
-    private function updateContactInZoho($object, &$counter, &$errorCounter, array $jsonArray)
+    private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
-        $response = $this->getApiHelper()->updateLead($jsonArray, $object);
-        $failed   = $this->consumeResponse($response, $object);
-        $counter -= $failed;
+        $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
+        $failed       = $this->consumeResponse($response, $object);
+        $counter      -= $failed;
         $errorCounter += $failed;
     }
 
     /**
+     * @param Mapper $mapper
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter
-     * @param array  $jsonArray
      */
-    private function createContactInZoho($object, &$counter, &$errorCounter, array $jsonArray)
+    private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
-        $response = $this->getApiHelper()->createLead($jsonArray, $object);
-        $failed   = $this->consumeResponse($response, $object, true);
-        $counter -= $failed;
+        $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
+        $failed       = $this->consumeResponse($response, $object, true);
+        $counter      -= $failed;
         $errorCounter += $failed;
     }
 
