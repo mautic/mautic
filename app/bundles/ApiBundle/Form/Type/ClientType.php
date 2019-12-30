@@ -161,28 +161,22 @@ class ClientType extends AbstractType
                 ]
             );
 
-            $translator = $this->translator;
-            $validator  = $this->validator;
-
             $builder->addEventListener(
                 FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($translator, $validator) {
+                function (FormEvent $event) {
                     $form = $event->getForm();
                     $data = $event->getData();
 
                     if ($form->has('redirectUris')) {
                         foreach ($data->getRedirectUris() as $uri) {
                             $urlConstraint = new OAuthCallback();
-                            $urlConstraint->message = $translator->trans(
+                            $urlConstraint->message = $this->translator->trans(
                                 'mautic.api.client.redirecturl.invalid',
                                 ['%url%' => $uri],
                                 'validators'
                             );
 
-                            $errors = $validator->validateValue(
-                                $uri,
-                                $urlConstraint
-                            );
+                            $errors = $this->validator->validate($uri, $urlConstraint);
 
                             if (!empty($errors)) {
                                 foreach ($errors as $error) {
