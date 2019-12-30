@@ -19,7 +19,7 @@ $replaceRootPlaceholder = function (&$value) use ($root, &$replaceRootPlaceholde
             $replaceRootPlaceholder($v);
         }
     } elseif (false !== strpos($value, '%kernel.root_dir%')) {
-        $value = str_replace('%kernel.root_dir%', $root, $value);
+        $value = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $root, $value);
     }
 };
 

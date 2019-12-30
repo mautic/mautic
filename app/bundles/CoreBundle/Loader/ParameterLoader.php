@@ -75,7 +75,7 @@ class ParameterLoader
             return $root.'/config/local.php';
         }
 
-        $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
+        $paths['local_config'] = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $root, $paths['local_config']);
 
         defined('MAUTIC_LOCAL_CONFIG_FILE') or define('MAUTIC_LOCAL_CONFIG_FILE', $paths['local_config']);
 
