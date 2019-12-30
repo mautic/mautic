@@ -123,7 +123,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
                 'Email'      => 'zoho3@email.com',
                 'First Name' => 'FirstName3',
                 'Last Name'  => 'LastName3',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $mapper->getArray());
@@ -166,7 +166,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
                 'Email'      => 'zoho3@email.com',
                 'First Name' => 'FirstName3',
                 'Last Name'  => 'LastName3',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $mapper->getArray());
@@ -207,7 +207,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
                 'Email'      => 'zoho3@email.com',
                 'First Name' => 'FirstName3',
                 'Last Name'  => 'LastName3',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $mapper->getArray());
