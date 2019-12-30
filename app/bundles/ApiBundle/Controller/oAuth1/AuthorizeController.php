@@ -19,9 +19,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * Class AuthorizeController.
- */
 class AuthorizeController extends Controller
 {
     /**
@@ -36,11 +33,9 @@ class AuthorizeController extends Controller
     {
         $oauth_token    = $request->get('oauth_token', null);
         $oauth_callback = $request->get('oauth_callback', null);
-
-        $securityContext = $this->container->get('security.token_storage');
-        $tokenProvider   = $this->container->get('bazinga.oauth.provider.token_provider');
-
-        $user = $securityContext->getToken()->getUser();
+        $tokenStorage   = $this->container->get('security.token_storage');
+        $tokenProvider  = $this->container->get('bazinga.oauth.provider.token_provider');
+        $user           = $tokenStorage->getToken()->getUser();
 
         if (!$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');
@@ -55,7 +50,7 @@ class AuthorizeController extends Controller
         }
 
         if ($token instanceof RequestTokenInterface) {
-            $tokenProvider->setUserForRequestToken($token, $securityContext->getToken()->getUser());
+            $tokenProvider->setUserForRequestToken($token, $tokenStorage->getToken()->getUser());
 
             return new Response($this->container->get('templating')->render('MauticApiBundle:Authorize:oAuth1/authorize.html.php', [
                 'consumer'       => $token->getConsumer(),
