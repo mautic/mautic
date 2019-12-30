@@ -35,13 +35,8 @@ class ZohoApi extends CrmApi
 
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if (!empty($response['response']['error'])) {
-            $response = $response['response'];
-            $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
-            if (isset($response['uri'])) {
-                $errorMsg .= '; '.$response['uri'];
-            }
-            throw new ApiErrorException($errorMsg);
+        if (isset($response['status']) && 'error' === $response['status']) {
+            throw new ApiErrorException($response['message']);
         }
 
         return $response;
@@ -116,9 +111,6 @@ class ZohoApi extends CrmApi
         } else {
             $data = $this->request($object, $params, 'GET', $object);
         }
-        if (isset($data['response'], $data['response']['result'])) {
-            $data = $data['response']['result'];
-        }
 
         return $data;
     }
@@ -143,10 +135,6 @@ class ZohoApi extends CrmApi
             $data = $this->request('Accounts', $params, 'GET', 'Accounts');
         } else {
             $data = $this->request('Accounts', $params, 'GET', 'Accounts');
-        }
-
-        if (isset($data['response'], $data['response']['result'])) {
-            $data = $data['response']['result'];
         }
 
         return $data;
