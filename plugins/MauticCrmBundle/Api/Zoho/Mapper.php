@@ -34,7 +34,7 @@ class Mapper
     private $object;
 
     /**
-     * @var array
+     * @var array[]
      */
     private $objectMappedValues = [];
 
@@ -109,7 +109,7 @@ class Mapper
             }
         }
 
-        $this->objectMappedValues = $objectMappedValues;
+        $this->objectMappedValues[] = $objectMappedValues;
 
         return $mapped;
     }

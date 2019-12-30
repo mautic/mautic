@@ -94,7 +94,7 @@ class ZohoApi extends CrmApi
      */
     public function createLead(array $data, $object = 'Leads')
     {
-        $parameters['data'][] = $data;
+        $parameters['data'] = $data;
 
         return $this->request($object, $parameters, 'POST', $object, true);
     }
@@ -107,7 +107,7 @@ class ZohoApi extends CrmApi
      */
     public function updateLead(array $data, $object = 'Leads')
     {
-        $parameters['data'][] = $data;
+        $parameters['data'] = $data;
 
         return $this->request($object, $parameters, 'PUT', $object, true);
     }
