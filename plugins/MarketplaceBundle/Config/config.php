@@ -70,6 +70,7 @@ return [
                 'class'     => \MauticPlugin\MarketplaceBundle\Controller\Package\InstallController::class,
                 'arguments' => [
                     'marketplace.model.package',
+                    'marketplace.service.package_installer',
                     'request_stack',
                     'marketplace.service.route_provider',
                 ],
@@ -90,17 +91,16 @@ return [
                 'class'     => \MauticPlugin\MarketplaceBundle\Command\InstallCommand::class,
                 'tag'       => 'console.command',
                 'arguments' => [
-                    'marketplace.service.plugin_collector',
-                    'marketplace.service.plugin_downloader',
+                    'marketplace.service.package_installer',
                     'mautic.plugin.facade.reload',
                     'mautic.helper.core_parameters',
                     'symfony.filesystem',
-                    'marketplace.service.composer_combiner',
                 ],
             ],
             'marketplace.command.remove' => [
-                'class' => \MauticPlugin\MarketplaceBundle\Command\RemoveCommand::class,
-                'tag'   => 'console.command',
+                'class'     => \MauticPlugin\MarketplaceBundle\Command\RemoveCommand::class,
+                'tag'       => 'console.command',
+                'arguments' => ['marketplace.service.package_remover'],
             ],
         ],
         'api' => [
@@ -119,9 +119,13 @@ return [
             ],
         ],
         'other' => [
-            'marketplace.service.plugin_downloader' => [
-                'class'     => \MauticPlugin\MarketplaceBundle\Service\PluginDownloader::class,
-                'arguments' => ['marketplace.api.connection'],
+            'marketplace.service.package_installer' => [
+                'class'     => \MauticPlugin\MarketplaceBundle\Service\PackageInstaller::class,
+                'arguments' => ['marketplace.service.composer_combiner'],
+            ],
+            'marketplace.service.package_remover' => [
+                'class'     => \MauticPlugin\MarketplaceBundle\Service\PackageRemover::class,
+                'arguments' => ['marketplace.service.composer_combiner'],
             ],
             'marketplace.service.plugin_collector' => [
                 'class'     => \MauticPlugin\MarketplaceBundle\Service\PluginCollector::class,
