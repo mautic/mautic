@@ -106,7 +106,7 @@ class Mapper
             $field = $this->getField($zohoField);
             if ($field && isset($this->contact[$mauticField]) && $this->contact[$mauticField]) {
                 $mapped   = 1;
-                $apiField = $field['dv'];
+                $apiField = $field['api_name'];
                 $apiValue = $this->contact[$mauticField];
 
                 $row->add($apiField, $apiValue);

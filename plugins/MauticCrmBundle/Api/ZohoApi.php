@@ -6,7 +6,10 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class ZohoApi extends CrmApi
 {
-    /**
+    protected $requestSettings = [
+        'encode_parameters' => 'json',
+    ];
+	/**
      * @param        $operation
      * @param array  $parameters
      * @param string $method
@@ -17,18 +20,41 @@ class ZohoApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads', $isJson = true)
+    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads' , $json = false)
     {
         $tokenData = $this->integration->getKeys();
-        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl($isJson), $moduleobject, $operation);
 
-        $parameters = array_merge([
-            'authtoken' => $tokenData['AUTHTOKEN'],
-            'scope'     => 'crmapi',
-        ], $parameters);
-
-        $response = $this->integration->makeRequest($url, $parameters, $method);
-
+        $url       = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation, $moduleobject);
+		
+		$settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
+		if($operation == 'Leads/search' || $operation == 'Contacts/search' || $operation == 'Accounts/search'){
+			$settings['headers']['If-Modified-Since'] = date('c');
+		}
+		//
+		
+		if ( $json == true) {
+			$settings['Content-Type'] = 'application/json';
+			$settings['encode_parameters'] = 'json';
+        }
+		
+	    $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
+		
+		if(isset($response['code']) == 'INVALID_TOKEN' && isset($response['status']) == 'error' ){
+			$authParameters = array(				
+				'client_id' => $tokenData['client_id'],
+				'client_secret' => $tokenData['client_secret'],
+				'refresh_token' => $tokenData['refresh_token'],
+				'grant_type'	=> 'refresh_token',
+			);
+			$authResponse = $this->integration->makeRequest($this->integration->getAccessTokenUrl(), $authParameters, "POST");
+			
+			if ($authResponse == null) {
+				//$new_response = json_encode($response);
+				return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $authResponse['CAUSE'] : 'UNKNOWN')]);
+			}		
+			$this->integration->extractAuthKeys($authResponse, 'access_token');	
+			$response = $this->integration->makeRequest($url, $parameters, $method, $settings);			
+		}
         if (!empty($response['response']['error'])) {
             $response = $response['response'];
             $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
@@ -53,8 +79,8 @@ class ZohoApi extends CrmApi
         if ($object == 'company') {
             $object = 'Accounts'; // Zoho object name
         }
-
-        return $this->request('getFields', [], 'GET', $object);
+		
+        return $this->request('settings/fields?module='.$object, [], 'GET', $object);
     }
 
     /**
@@ -66,14 +92,9 @@ class ZohoApi extends CrmApi
      */
     public function createLead($data, $lead = null, $object = 'Leads')
     {
-        $parameters = [
-            'xmlData'        => $data,
-            'duplicateCheck' => 2, // update if exists
-            'newFormat'      => 2, // To include fields with "null" values while inserting data from your CRM account
-            'version'        => 4, // This will trigger duplicate check functionality for multiple records.
-        ];
-
-        return $this->request('insertRecords', $parameters, 'POST', $object, false);
+        $parameters['data'][] = $data;	
+		
+        return $this->request($object, $parameters, 'POST', $object, true);
     }
 
     /**
@@ -85,13 +106,8 @@ class ZohoApi extends CrmApi
      */
     public function updateLead($data, $lead = null, $object = 'Leads')
     {
-        $parameters = [
-            'xmlData'   => $data,
-            'newFormat' => 2, // To include fields with "null" values while inserting data from your CRM account
-            'version'   => 4, // This will trigger duplicate check functionality for multiple records.
-        ];
-
-        return $this->request('updateRecords', $parameters, 'POST', $object, false);
+        $parameters['data'][] = $data;	
+        return $this->request($object, $parameters, 'PUT', $object, true);
     }
 
     /**
@@ -105,7 +121,8 @@ class ZohoApi extends CrmApi
      */
     public function getLeads(array $params, $object, $id = null)
     {
-        if (!isset($params['selectColumns'])) {
+        
+		if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
             $params['newFormat']     = 1;
         }
@@ -117,14 +134,14 @@ class ZohoApi extends CrmApi
                 $params['id'] = $id;
             }
 
-            $data = $this->request('getRecordById', $params, 'GET', $object);
+            $data = $this->request($object, $params, 'GET', $object);
         } else {
-            $data = $this->request('getRecords', $params, 'GET', $object);
+            $data = $this->request($object, $params, 'GET', $object);
         }
         if (isset($data['response'], $data['response']['result'])) {
             $data = $data['response']['result'];
         }
-
+			
         return $data;
     }
 
@@ -145,9 +162,9 @@ class ZohoApi extends CrmApi
         if ($id) {
             $params['id'] = $id;
 
-            $data = $this->request('getRecordById', $params, 'GET', 'Accounts');
+            $data = $this->request('Accounts', $params, 'GET', 'Accounts');
         } else {
-            $data = $this->request('getRecords', $params, 'GET', 'Accounts');
+            $data = $this->request('Accounts', $params, 'GET', 'Accounts');
         }
 
         if (isset($data['response'], $data['response']['result'])) {
@@ -168,12 +185,9 @@ class ZohoApi extends CrmApi
     public function getSearchRecords($selectColumns, $searchColumn, $searchValue, $object = 'Leads')
     {
         $parameters = [
-            'selectColumns' => 'All',
-            'searchColumn'  => $searchColumn, // search by email
-            'searchValue'   => $searchValue, // email value
-            'newFormat'     => 2,
+            'criteria' => '('.$searchColumn.':equals:'.$searchValue.')'           
         ];
 
-        return $this->request('getSearchRecordsByPDC', $parameters, 'GET', $object, true);
+        return $this->request($object.'/search', $parameters, 'GET', $object, false);
     }
 }
