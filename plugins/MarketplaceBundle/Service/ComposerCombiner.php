@@ -30,10 +30,12 @@ class ComposerCombiner
      */
     public function useComposerCombinedJson(): void
     {
+        $mauticRootDir = MAUTIC_ROOT_DIR;
+
         // Tell Composer to use composer-combined.json instead of composer.json.
         putenv('COMPOSER=composer-combined.json');
+        putenv("COMPOSER_HOME={$mauticRootDir}");
 
-        $mauticRootDir        = __DIR__.'/../..';
         $composerCombinedPath = "{$mauticRootDir}/composer-combined.json";
 
         if ($this->filesystem->exists($composerCombinedPath)) {
