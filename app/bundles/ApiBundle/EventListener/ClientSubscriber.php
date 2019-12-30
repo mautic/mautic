@@ -1,0 +1,97 @@
+<?php
+
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\ApiBundle\EventListener;
+
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event as Events;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+class ClientSubscriber implements EventSubscriberInterface
+{
+    /**
+     * @var IpLookupHelper
+     */
+    private $ipLookupHelper;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var AuditLogModel
+     */
+    private $auditLogModel;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        CoreParametersHelper $coreParametersHelper,
+        AuditLogModel $auditLogModel
+    ) {
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->auditLogModel        = $auditLogModel;
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ApiEvents::CLIENT_POST_SAVE   => ['onClientPostSave', 0],
+            ApiEvents::CLIENT_POST_DELETE => ['onClientDelete', 0],
+        ];
+    }
+
+    /**
+     * Add a client change entry to the audit log.
+     *
+     * @param Events\ClientEvent $event
+     */
+    public function onClientPostSave(Events\ClientEvent $event): void
+    {
+        $client = $event->getClient();
+        if (!$details = $event->getChanges()) {
+            return;
+        }
+
+        $log = [
+            'bundle'    => 'api',
+            'object'    => 'client',
+            'objectId'  => $client->getId(),
+            'action'    => ($event->isNew()) ? 'create' : 'update',
+            'details'   => $details,
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * Add a role delete entry to the audit log.
+     *
+     * @param Events\ClientEvent $event
+     */
+    public function onClientDelete(Events\ClientEvent $event): void
+    {
+        $client = $event->getClient();
+        $log    = [
+            'bundle'    => 'api',
+            'object'    => 'client',
+            'objectId'  => $client->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $client->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ];
+        $this->auditLogModel->writeToLog($log);
+    }
+}

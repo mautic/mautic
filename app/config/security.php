@@ -82,7 +82,7 @@ $firewalls = [
         'bazinga_oauth'      => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
-        'http_basic'         => false, // @todo containerless config compatibility '%mautic.api_enable_basic_auth%',
+        'http_basic'         => true,
     ],
     'main' => [
         'pattern'       => '^/s/',
