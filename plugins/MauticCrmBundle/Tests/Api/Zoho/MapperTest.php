@@ -146,23 +146,23 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         foreach ($contacts as $contact) {
             $mapper->setMappedFields($this->mappedFields)
                 ->setContact($contact)
-                ->map($contact['internal_entity_id']);
+                ->map($contact['integration_entity_id']);
         }
 
         $expected = [
             [
-                'id'         => 1,
+                'id'         => 'abc',
                 'Email'      => 'zoho1@email.com',
                 'First Name' => 'FirstName1',
                 'Last Name'  => 'LastName1',
             ],
             [
-                'id'         => 2,
+                'id'         => 'def',
                 'Email'      => 'zoho2@email.com',
                 'Last Name'  => 'LastName2',
             ],
             [
-                'id'         => 3,
+                'id'         => 'ghi',
                 'Email'      => 'zoho3@email.com',
                 'First Name' => 'FirstName3',
                 'Last Name'  => 'LastName3',
@@ -186,24 +186,24 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         foreach ($this->contacts as $contact) {
             $mapper->setMappedFields($this->mappedFields)
                 ->setContact($contact)
-                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
+                ->map($contact['integration_entity_id']);
         }
 
         $expected = [
             [
-                'id'         => 1,
+                'id'         => 'abc',
                 'Email'      => 'zoho1@email.com',
                 'First Name' => 'FirstName1',
                 'Last Name'  => 'LastName1',
             ],
             [
-                'id'         => 2,
+                'id'         => 'def',
                 'First Name' => 'FirstName2',
                 'Email'      => 'zoho2@email.com',
                 'Last Name'  => 'LastName2',
             ],
             [
-                'id'         => 3,
+                'id'         => 'ghi',
                 'Email'      => 'zoho3@email.com',
                 'First Name' => 'FirstName3',
                 'Last Name'  => 'LastName3',
