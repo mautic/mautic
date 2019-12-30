@@ -16,6 +16,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -26,8 +27,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormBuilder;
-use Mautic\PluginBundle\Entity\Integration;
-use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class ZohoIntegration.
@@ -36,8 +35,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ZohoIntegration extends CrmAbstractIntegration
 {
-
-	/**
+    /**
      * Returns the name of the social integration that must match the name of the file.
      *
      * @return string
@@ -47,12 +45,12 @@ class ZohoIntegration extends CrmAbstractIntegration
         return 'Zoho';
     }
 
-	/**
+    /**
      * {@inheritdoc}
      *
      * @return string
      */
-	public function getAuthenticationType()
+    public function getAuthenticationType()
     {
         return 'oauth2';
     }
@@ -94,7 +92,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return 'access_token';
     }
 
-	/**
+    /**
      * @return string
      */
     public function getAuthScope()
@@ -102,15 +100,14 @@ class ZohoIntegration extends CrmAbstractIntegration
         return 'ZohoCRM.modules.ALL,ZohoCRM.settings.ALL,ZohoCRM.bulk.all,ZohoCRM.users.all,ZohoCRM.org.all';
     }
 
-	/**
+    /**
      * @param bool $isJson
      *
      * @return string
      */
     public function getApiUrl()
     {
-
-		return 'https://accounts.zoho.com';
+        return 'https://accounts.zoho.com';
     }
 
     /**
@@ -133,7 +130,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         return $this->getApiUrl().'/oauth/v2/auth';
     }
 
-
     /**
      * @return array
      */
@@ -153,7 +149,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads', 'push_leads'];
     }
 
-	/**
+    /**
      * {@inheritdoc}
      *
      * @return bool
@@ -161,22 +157,23 @@ class ZohoIntegration extends CrmAbstractIntegration
     public function isAuthorized()
     {
         $keys = $this->getKeys();
-		$this->prepareResponseForExtraction($keys);
+        $this->prepareResponseForExtraction($keys);
+
         return isset($keys[$this->getAuthTokenKey()]);
     }
 
-	/**
+    /**
      * Refresh tokens.
      */
     public function getRefreshTokenKeys()
     {
-		return [
+        return [
             'refresh_token',
             'expires_in',
         ];
     }
 
-	/**
+    /**
      * {@inheritdoc}
      *
      * @param $data
@@ -187,19 +184,18 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (is_array($data) && isset($data['expires_in'])) {
             $data['expires'] = $data['expires_in'] + time();
         }
+
         return $data;
     }
 
-
-	/**
+    /**
      * @param $rows
      *
      * @return array
      */
     protected function formatZohoData($rows)
     {
-
-		if (isset($rows['FL'])) {
+        if (isset($rows['FL'])) {
             $rows = [$rows];
         }
         $fieldsValues = [];
@@ -248,268 +244,268 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (isset($data['data'])) {
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+            $integrationEntityRepo    = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
             $objects                  = $data['data'];
             /** @var array $rows */
-           // foreach ($rows as $row) {
-				$integrationEntities = [];
-				/** @var array $objects */
-				foreach ($objects as $recordId => $entityData) {
-					$isModified = false;
-					if ('Accounts' === $object) {
-						$recordId = $entityData['id'];
-						// first try to find integration entity
-						$integrationId = $integrationEntityRepo->getIntegrationsEntityId(
-							'Zoho',
-							$object,
-							'company',
-							null,
-							null,
-							null,
-							false,
-							0,
-							0,
-							[$recordId]
-						);
-						if (count($integrationId)) { // company exists, then update local fields
-							/** @var Company $entity */
-							$entity        = $this->companyModel->getEntity($integrationId[0]['internal_entity_id']);
-							$matchedFields = $this->populateMauticLeadData($entityData, $config, 'company');
+            // foreach ($rows as $row) {
+            $integrationEntities = [];
+            /** @var array $objects */
+            foreach ($objects as $recordId => $entityData) {
+                $isModified = false;
+                if ('Accounts' === $object) {
+                    $recordId = $entityData['id'];
+                    // first try to find integration entity
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
+                            'Zoho',
+                            $object,
+                            'company',
+                            null,
+                            null,
+                            null,
+                            false,
+                            0,
+                            0,
+                            [$recordId]
+                        );
+                    if (count($integrationId)) { // company exists, then update local fields
+                        /** @var Company $entity */
+                        $entity        = $this->companyModel->getEntity($integrationId[0]['internal_entity_id']);
+                        $matchedFields = $this->populateMauticLeadData($entityData, $config, 'company');
 
-							// Match that data with mapped lead fields
-							$fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
-							if (!empty($fieldsToUpdateInMautic)) {
-								$fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
-								$newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-							} else {
-								$newMatchedFields = $matchedFields;
-							}
-							if (!isset($newMatchedFields['companyname'])) {
-								if (isset($newMatchedFields['companywebsite'])) {
-									$newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
-								}
-							}
-
-							// update values if already empty
-							foreach ($matchedFields as $field => $value) {
-								if (empty($entity->getFieldValue($field))) {
-									$newMatchedFields[$field] = $value;
-								}
-							}
-
-							// remove unchanged fields
-							foreach ($newMatchedFields as $k => $v) {
-								if ($entity->getFieldValue($k) === $v) {
-									unset($newMatchedFields[$k]);
-								}
-							}
-
-							if (count($newMatchedFields)) {
-								$this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
-								$this->companyModel->saveEntity($entity, false);
-								$isModified = true;
-							}
-						} else {
-							$entity = $this->getMauticCompany($entityData, 'Accounts');
-						}
-						if ($entity) {
-							$result[] = $entity->getName();
-						}
-						$mauticObjectReference = 'company';
-					} elseif ('Leads' === $object) {
-						$recordId = $entityData['id'];
-						// first try to find integration entity
-						$integrationId = $integrationEntityRepo->getIntegrationsEntityId(
-							'Zoho',
-							$object,
-							'lead',
-							null,
-							null,
-							null,
-							false,
-							0,
-							0,
-							[$recordId]
-						);
-
-						if (count($integrationId)) { // lead exists, then update
-							/** @var Lead $entity */
-							$entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
-							$matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
-
-							// Match that data with mapped lead fields
-							$fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-
-							if (!empty($fieldsToUpdateInMautic)) {
-								$fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
-								$newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-							} else {
-								$newMatchedFields = $matchedFields;
-							}
-
-							// update values if already empty
-							foreach ($matchedFields as $field => $value) {
-								if (empty($entity->getFieldValue($field))) {
-									$newMatchedFields[$field] = $value;
-								}
-							}
-							// remove unchanged fields
-							foreach ($newMatchedFields as $k => $v) {
-								if ($entity->getFieldValue($k) === $v) {
-									unset($newMatchedFields[$k]);
-								}
-							}
-							if (count($newMatchedFields)) {
-								$this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
-								$this->leadModel->saveEntity($entity, false);
-								$isModified = true;
-							}
-						} else {
-							/** @var Lead $entity */
-							$entity = $this->getMauticLead($entityData, true, null, null, $object);
-						}
-
-						if ($entity) {
-							$result[] = $entity->getEmail();
-						}
-
-						// Associate lead company
-						if (!empty($entityData['Company'])
-							&& $entityData['Company'] !== $this->translator->trans(
-								'mautic.integration.form.lead.unknown'
-							)
-						) {
-							$company = IdentifyCompanyHelper::identifyLeadsCompany(
-								['company' => $entityData['Company']],
-								null,
-								$this->companyModel
-							);
-
-							if (!empty($company[2])) {
-								$syncLead = $this->companyModel->addLeadToCompany($company[2], $entity);
-								$this->em->detach($company[2]);
-							}
-						}
-
-						$mauticObjectReference = 'lead';
-					} elseif ('Contacts' === $object) {
-						$recordId = $entityData['id'];
-
-						$integrationId = $integrationEntityRepo->getIntegrationsEntityId(
-							'Zoho',
-							$object,
-							'lead',
-							null,
-							null,
-							null,
-							false,
-							0,
-							0,
-							[$recordId]
-						);
-						if (count($integrationId)) { // contact exists, then update
-							/** @var Lead $entity */
-							$entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
-							$matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
-
-							// Match that data with mapped lead fields
-							$fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-							if (!empty($fieldsToUpdateInMautic)) {
-								$fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
-								$newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-							} else {
-								$newMatchedFields = $matchedFields;
-							}
-
-							// update values if already empty
-							foreach ($matchedFields as $field => $value) {
-								if (empty($entity->getFieldValue($field))) {
-									$newMatchedFields[$field] = $value;
-								}
-							}
-
-							// remove unchanged fields
-							foreach ($newMatchedFields as $k => $v) {
-								if ($entity->getFieldValue($k) === $v) {
-									unset($newMatchedFields[$k]);
-								}
-							}
-
-							if (count($newMatchedFields)) {
-								$this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
-								$this->leadModel->saveEntity($entity, false);
-								$isModified = true;
-							}
-						} else {
-							/** @var Lead $entity */
-							$entity = $this->getMauticLead($entityData, true, null, null, $object);
-						}
-
-						if ($entity) {
-							$result[] = $entity->getEmail();
-
-                            // Associate lead company
-                            if (!empty($entityData['AccountName'])
-                                && $entityData['AccountName'] !== $this->translator->trans(
-                                    'mautic.integration.form.lead.unknown'
-                                )
-                            ) {
-                                $company = IdentifyCompanyHelper::identifyLeadsCompany(
-                                    ['company' => $entityData['AccountName']],
-                                    null,
-                                    $this->companyModel
-                                );
-
-                                if (!empty($company[2])) {
-                                    $syncLead = $this->companyModel->addLeadToCompany($company[2], $entity);
-                                    $this->em->detach($company[2]);
-                                }
+                        // Match that data with mapped lead fields
+                        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
+                        if (!empty($fieldsToUpdateInMautic)) {
+                            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
+                            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+                        } else {
+                            $newMatchedFields = $matchedFields;
+                        }
+                        if (!isset($newMatchedFields['companyname'])) {
+                            if (isset($newMatchedFields['companywebsite'])) {
+                                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
                             }
-						}
+                        }
 
-						$mauticObjectReference = 'lead';
-					} else {
-						$this->logIntegrationError(
-							new \Exception(
-								sprintf('Received an unexpected object "%s"', $object)
-							)
-						);
-						continue;
-					}
+                        // update values if already empty
+                        foreach ($matchedFields as $field => $value) {
+                            if (empty($entity->getFieldValue($field))) {
+                                $newMatchedFields[$field] = $value;
+                            }
+                        }
 
-					if ($entity) {
-						$integrationId = $integrationEntityRepo->getIntegrationsEntityId(
-							'Zoho',
-							$object,
-							$mauticObjectReference,
-							$entity->getId()
-						);
+                        // remove unchanged fields
+                        foreach ($newMatchedFields as $k => $v) {
+                            if ($entity->getFieldValue($k) === $v) {
+                                unset($newMatchedFields[$k]);
+                            }
+                        }
 
-						if (0 === count($integrationId)) {
-							$integrationEntity = new IntegrationEntity();
-							$integrationEntity->setDateAdded(new \DateTime());
-							$integrationEntity->setIntegration('Zoho');
-							$integrationEntity->setIntegrationEntity($object);
-							$integrationEntity->setIntegrationEntityId($recordId);
-							$integrationEntity->setInternalEntity($mauticObjectReference);
-							$integrationEntity->setInternalEntityId($entity->getId());
-							$integrationEntities[] = $integrationEntity;
-						} else {
-							$integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
-							if ($isModified) {
-								$integrationEntity->setLastSyncDate(new \DateTime());
-								$integrationEntities[] = $integrationEntity;
-							}
-						}
-						$this->em->detach($entity);
-						unset($entity);
-					} else {
-						continue;
-					}
-				}
+                        if (count($newMatchedFields)) {
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->companyModel->saveEntity($entity, false);
+                            $isModified = true;
+                        }
+                    } else {
+                        $entity = $this->getMauticCompany($entityData, 'Accounts');
+                    }
+                    if ($entity) {
+                        $result[] = $entity->getName();
+                    }
+                    $mauticObjectReference = 'company';
+                } elseif ('Leads' === $object) {
+                    $recordId = $entityData['id'];
+                    // first try to find integration entity
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
+                            'Zoho',
+                            $object,
+                            'lead',
+                            null,
+                            null,
+                            null,
+                            false,
+                            0,
+                            0,
+                            [$recordId]
+                        );
 
-				$this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-				$this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                    if (count($integrationId)) { // lead exists, then update
+                        /** @var Lead $entity */
+                        $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
+                        $matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
+
+                        // Match that data with mapped lead fields
+                        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
+
+                        if (!empty($fieldsToUpdateInMautic)) {
+                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
+                            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+                        } else {
+                            $newMatchedFields = $matchedFields;
+                        }
+
+                        // update values if already empty
+                        foreach ($matchedFields as $field => $value) {
+                            if (empty($entity->getFieldValue($field))) {
+                                $newMatchedFields[$field] = $value;
+                            }
+                        }
+                        // remove unchanged fields
+                        foreach ($newMatchedFields as $k => $v) {
+                            if ($entity->getFieldValue($k) === $v) {
+                                unset($newMatchedFields[$k]);
+                            }
+                        }
+                        if (count($newMatchedFields)) {
+                            $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->leadModel->saveEntity($entity, false);
+                            $isModified = true;
+                        }
+                    } else {
+                        /** @var Lead $entity */
+                        $entity = $this->getMauticLead($entityData, true, null, null, $object);
+                    }
+
+                    if ($entity) {
+                        $result[] = $entity->getEmail();
+                    }
+
+                    // Associate lead company
+                    if (!empty($entityData['Company'])
+                            && $entityData['Company'] !== $this->translator->trans(
+                                'mautic.integration.form.lead.unknown'
+                            )
+                        ) {
+                        $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                                ['company' => $entityData['Company']],
+                                null,
+                                $this->companyModel
+                            );
+
+                        if (!empty($company[2])) {
+                            $syncLead = $this->companyModel->addLeadToCompany($company[2], $entity);
+                            $this->em->detach($company[2]);
+                        }
+                    }
+
+                    $mauticObjectReference = 'lead';
+                } elseif ('Contacts' === $object) {
+                    $recordId = $entityData['id'];
+
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
+                            'Zoho',
+                            $object,
+                            'lead',
+                            null,
+                            null,
+                            null,
+                            false,
+                            0,
+                            0,
+                            [$recordId]
+                        );
+                    if (count($integrationId)) { // contact exists, then update
+                        /** @var Lead $entity */
+                        $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
+                        $matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
+
+                        // Match that data with mapped lead fields
+                        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
+                        if (!empty($fieldsToUpdateInMautic)) {
+                            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], $fieldsToUpdateInMautic);
+                            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+                        } else {
+                            $newMatchedFields = $matchedFields;
+                        }
+
+                        // update values if already empty
+                        foreach ($matchedFields as $field => $value) {
+                            if (empty($entity->getFieldValue($field))) {
+                                $newMatchedFields[$field] = $value;
+                            }
+                        }
+
+                        // remove unchanged fields
+                        foreach ($newMatchedFields as $k => $v) {
+                            if ($entity->getFieldValue($k) === $v) {
+                                unset($newMatchedFields[$k]);
+                            }
+                        }
+
+                        if (count($newMatchedFields)) {
+                            $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->leadModel->saveEntity($entity, false);
+                            $isModified = true;
+                        }
+                    } else {
+                        /** @var Lead $entity */
+                        $entity = $this->getMauticLead($entityData, true, null, null, $object);
+                    }
+
+                    if ($entity) {
+                        $result[] = $entity->getEmail();
+
+                        // Associate lead company
+                        if (!empty($entityData['AccountName'])
+                            && $entityData['AccountName'] !== $this->translator->trans(
+                                'mautic.integration.form.lead.unknown'
+                            )
+                        ) {
+                            $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                                ['company' => $entityData['AccountName']],
+                                null,
+                                $this->companyModel
+                            );
+
+                            if (!empty($company[2])) {
+                                $syncLead = $this->companyModel->addLeadToCompany($company[2], $entity);
+                                $this->em->detach($company[2]);
+                            }
+                        }
+                    }
+
+                    $mauticObjectReference = 'lead';
+                } else {
+                    $this->logIntegrationError(
+                            new \Exception(
+                                sprintf('Received an unexpected object "%s"', $object)
+                            )
+                        );
+                    continue;
+                }
+
+                if ($entity) {
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
+                            'Zoho',
+                            $object,
+                            $mauticObjectReference,
+                            $entity->getId()
+                        );
+
+                    if (0 === count($integrationId)) {
+                        $integrationEntity = new IntegrationEntity();
+                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setIntegration('Zoho');
+                        $integrationEntity->setIntegrationEntity($object);
+                        $integrationEntity->setIntegrationEntityId($recordId);
+                        $integrationEntity->setInternalEntity($mauticObjectReference);
+                        $integrationEntity->setInternalEntityId($entity->getId());
+                        $integrationEntities[] = $integrationEntity;
+                    } else {
+                        $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                        if ($isModified) {
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntities[] = $integrationEntity;
+                        }
+                    }
+                    $this->em->detach($entity);
+                    unset($entity);
+                } else {
+                    continue;
+                }
+            }
+
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
             //}
             unset($integrationEntities);
         }
@@ -542,25 +538,24 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $aFields          = $this->getAvailableLeadFields($config);
                 $mappedData       = [];
 
-				foreach (array_keys($fields) as $k) {
+                foreach (array_keys($fields) as $k) {
                     if (isset($aFields[$object][$k])) {
                         $mappedData[] = $aFields[$object][$k]['api_name'];
                     }
                 }
 
-                $maxRecords               = 200;
-                $fields                   = implode(',', $mappedData);
-                $oparams['fields'] = $fields;
+                $maxRecords                = 200;
+                $fields                    = implode(',', $mappedData);
+                $oparams['fields']         = $fields;
                 $oparams['per_page']       = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
                     $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
                 }
 
-				if (array_key_exists('page',$oparams)) {
-
-				} else {
-					$oparams['page'] = 1;
-				}
+                if (array_key_exists('page', $oparams)) {
+                } else {
+                    $oparams['page'] = 1;
+                }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
@@ -571,7 +566,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     // {"response":{"nodata":{"code":"4422","message":"There is no data to show"},"uri":"/crm/private/json/Contacts/getRecords"}}
                     $data = $this->getApiHelper()->getLeads($oparams, $object);
 
-					if (!isset($data['data'])) {
+                    if (!isset($data['data'])) {
                         break; // no more data, exit loop
                     }
                     $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
@@ -620,25 +615,24 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $aFields          = $this->getAvailableLeadFields($config);
                 $mappedData       = [];
 
-				foreach (array_keys($fields) as $k) {
+                foreach (array_keys($fields) as $k) {
                     if (isset($aFields[$object][$k])) {
                         $mappedData[] = $aFields[$object][$k]['api_name'];
                     }
                 }
 
-				$maxRecords               = 200;
-                $fields                   = implode(',', $mappedData);
-                $oparams['fields'] = $fields;
+                $maxRecords                = 200;
+                $fields                    = implode(',', $mappedData);
+                $oparams['fields']         = $fields;
                 $oparams['per_page']       = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
                     $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
                 }
 
-				if (array_key_exists('page',$oparams)) {
-
-				} else {
-					$oparams['page'] = 1;
-				}
+                if (array_key_exists('page', $oparams)) {
+                } else {
+                    $oparams['page'] = 1;
+                }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
@@ -686,8 +680,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function populateMauticLeadData($data, $config = [], $object = 'Leads')
     {
-
-		// Match that data with mapped lead fields
+        // Match that data with mapped lead fields
         $aFields       = $this->getAvailableLeadFields($config);
         $matchedFields = [];
 
@@ -703,10 +696,11 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
             }
         }
+
         return $matchedFields;
     }
 
-	/**
+    /**
      * Generate the auth login URL.  Note that if oauth2, response_type=code is assumed.  If this is not the case,
      * override this function.
      *
@@ -743,7 +737,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
     }
 
-	/**
+    /**
      * @param array $settings
      * @param array $parameters
      *
@@ -753,22 +747,22 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function authCallback($settings = [], $parameters = [])
     {
-		$parameters  = array_merge(
-			$parameters,
-			[
-				'grant_type' => 'authorization_code',
-				'client_id' => $this->keys['client_id'],
-				'client_secret' => $this->keys['client_secret'],
-				'redirect_uri' => $this->getAuthCallbackUrl(),
-				'code'	=> $_GET['code'],
-			]
-		);
+        $parameters  = array_merge(
+            $parameters,
+            [
+                'grant_type'    => 'authorization_code',
+                'client_id'     => $this->keys['client_id'],
+                'client_secret' => $this->keys['client_secret'],
+                'redirect_uri'  => $this->getAuthCallbackUrl(),
+                'code'	         => $_GET['code'],
+            ]
+        );
 
-		$settings  = array(
-			[
-				'authorize_session' => true,
-			]
-		);
+        $settings  = [
+            [
+                'authorize_session' => true,
+            ],
+        ];
 
         $response = $this->makeRequest($this->getAccessTokenUrl(), $parameters, 'POST', $settings);
         if ($response == null) {
@@ -777,7 +771,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         return $this->extractAuthKeys($response, 'access_token');
     }
-
 
     /**
      * @param Form|FormBuilder $builder
@@ -855,8 +848,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
-
-		if ($postAuthorization) {
+        if ($postAuthorization) {
             /*
             #
             #Wed Feb 29 03:07:33 PST 2012
@@ -914,7 +906,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-     public function getAvailableLeadFields($settings = [])
+    public function getAvailableLeadFields($settings = [])
     {
         $zohoFields        = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
@@ -947,21 +939,20 @@ class ZohoIntegration extends CrmAbstractIntegration
                         /** @var array $opts */
                         $opts = $leadObject['fields'];
                         foreach ($opts as $field) {
-							if ($field['read_only'] == true) {
-								continue;
-							}
-							$is_required=false;
-							if ($field['system_mandatory'] == true) {
-								$is_required=true;
-							}
-							$zohoFields[$zohoObject][$field['api_name']] = [
-								'type'    		=> 'string',
-								'label'    		=> $field['display_label'],
-								'api_name' 		=> $field['api_name'],
-								'required' 		=> $is_required,
-							];
-
-						}
+                            if ($field['read_only'] == true) {
+                                continue;
+                            }
+                            $is_required=false;
+                            if ($field['system_mandatory'] == true) {
+                                $is_required=true;
+                            }
+                            $zohoFields[$zohoObject][$field['api_name']] = [
+                                'type'    		 => 'string',
+                                'label'    		=> $field['display_label'],
+                                'api_name' 		=> $field['api_name'],
+                                'required' 		=> $is_required,
+                            ];
+                        }
                         if (empty($settings['ignore_field_cache'])) {
                             $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
                         }
@@ -985,7 +976,6 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         return $zohoFields;
     }
-
 
     /**
      * {@inheritdoc}
@@ -1296,7 +1286,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (empty($mappedData)) {
             return false;
         }
-        $mapper    = new Mapper($availableFields);
+        $mapper = new Mapper($availableFields);
         $mapper->setObject($zObject);
 
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -1308,28 +1298,28 @@ class ZohoIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 if (!empty($existingPerson) && empty($integrationId)) {
                     /** @var IntegrationEntity $integrationEntity */
-					$json_array=array();
-					$lead_data = $lead->getProfileFields();
-					foreach ($config['leadFields'] as $key => $value) {
-						$json_array[$key] = $lead_data[$value];
-					}
-					$json_array['id']=$existingPerson['id'];
-                    $this->updateContactInZoho($zObject, $counter, $errorCounter, $json_array);
+                    $jsonArray = [];
+                    $leadData  = $lead->getProfileFields();
+                    foreach ($config['leadFields'] as $key => $value) {
+                        $jsonArray[$key] = $leadData[$value];
+                    }
+                    $jsonArray['id'] = $existingPerson['id'];
+                    $this->updateContactInZoho($zObject, $counter, $errorCounter, $jsonArray);
                 } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
-					$json_array=array();
-					$lead_data = $lead->getProfileFields();
-					foreach ($config['leadFields'] as $key => $value) {
-						$json_array[$key] = $lead_data[$value];
-					}
-					$json_array['id']=$existingPerson['id'];
-                    $this->updateContactInZoho($zObject, $counter, $errorCounter, $json_array);
+                    $jsonArray = [];
+                    $leadData  = $lead->getProfileFields();
+                    foreach ($config['leadFields'] as $key => $value) {
+                        $jsonArray[$key] = $leadData[$value];
+                    }
+                    $jsonArray['id'] = $existingPerson['id'];
+                    $this->updateContactInZoho($zObject, $counter, $errorCounter, $jsonArray);
                 } else {
-					$json_array=array();
-					$lead_data = $lead->getProfileFields();
-					foreach ($config['leadFields'] as $key => $value) {
-						$json_array[$key] = $lead_data[$value];
-					}
-					$this->createContactInZoho($zObject, $counter, $errorCounter, $json_array);
+                    $jsonArray = [];
+                    $leadData  = $lead->getProfileFields();
+                    foreach ($config['leadFields'] as $key => $value) {
+                        $jsonArray[$key] = $leadData[$value];
+                    }
+                    $this->createContactInZoho($zObject, $counter, $errorCounter, $jsonArray);
                 }
 
                 return true;
@@ -1384,7 +1374,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     private function consumeResponse($response, $zObject, $createIntegrationEntity = false)
     {
-		$rows = $response;
+        $rows = $response;
         if (isset($rows['data'][0])) {
             $rows = $rows['data'];
         }
@@ -1393,23 +1383,23 @@ class ZohoIntegration extends CrmAbstractIntegration
         foreach ($rows as $row) {
             if ($row['code'] == 'SUCCESS' && $createIntegrationEntity) {
                 $leadId = $row['id'];
-				$this->logger->debug('CREATE INTEGRATION ENTITY: '.$leadId);
-				$integrationId = $this->getIntegrationEntityRepository()->getIntegrationsEntityId(
-					'Zoho',
-					$zObject,
-					'lead',
-					null,
-					null,
-					null,
-					false,
-					0,
-					0,
-					"LEADID"
-				);
+                $this->logger->debug('CREATE INTEGRATION ENTITY: '.$leadId);
+                $integrationId = $this->getIntegrationEntityRepository()->getIntegrationsEntityId(
+                    'Zoho',
+                    $zObject,
+                    'lead',
+                    null,
+                    null,
+                    null,
+                    false,
+                    0,
+                    0,
+                    'LEADID'
+                );
 
-				if (0 === count($integrationId)) {
-					$this->createIntegrationEntity($zObject, "LEADID" , 'lead', $leadId);
-				}
+                if (0 === count($integrationId)) {
+                    $this->createIntegrationEntity($zObject, 'LEADID', 'lead', $leadId);
+                }
             } elseif (isset($row['error'])) {
                 ++$failed;
                 $exception = new ApiErrorException($row['error']['details'].' ('.$row['error']['code'].')');
@@ -1433,33 +1423,32 @@ class ZohoIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $selectColumns   = implode(',', array_keys($availableFields[$object]));
         $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
-		$id['id'] = array ('type' => 'string', 'label' => 'ID', 'api_name' => 'id', 'required' => true );
-        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], $id ));
+        $id['id']        = ['type' => 'string', 'label' => 'ID', 'api_name' => 'id', 'required' => true];
+        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], $id));
+
         return $parsedRecords;
     }
 
     /**
      * @param        $data
      * @param        $fields
-     * @param string $object
      *
-     * @return mixed
+     * @return array
      */
-    private function parseZohoRecord($data, $fields, $object = 'Leads')
+    private function parseZohoRecord($data, $fields)
     {
         $parsedData = [];
-		if (!empty($data)) {
-            if(!empty($data['data']))
-			{
-				$records = $data['data'][0];
-				foreach ($fields as $key => $field) {
-					foreach ($records as $record_key => $record_value) {
-						if ($record_key == $field['api_name']) {
-							$parsedData[$record_key] = $record_value;
-							continue;
-						}
-					}
-				}
+        if (empty($data['data'])) {
+            return $parsedData;
+        }
+
+        $records = $data['data'][0];
+        foreach ($fields as $key => $field) {
+            foreach ($records as $recordKey => $recordValue) {
+                if ($recordKey === $field['api_name']) {
+                    $parsedData[$recordKey] = $recordValue;
+                    continue;
+                }
             }
         }
 
@@ -1472,9 +1461,9 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param        $counter
      * @param        $totalCounter
      */
-    private function updateContactInZoho($object, &$counter, &$errorCounter, $json_array)
+    private function updateContactInZoho($object, &$counter, &$errorCounter, $jsonArray)
     {
-        $response = $this->getApiHelper()->updateLead($json_array, null, $object);
+        $response = $this->getApiHelper()->updateLead($jsonArray, null, $object);
         $failed   = $this->consumeResponse($response, $object);
         $counter -= $failed;
         $errorCounter += $failed;
@@ -1486,9 +1475,9 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param        $counter
      * @param        $totalCounter
      */
-    private function createContactInZoho($object, &$counter, &$errorCounter, $json_array)
+    private function createContactInZoho($object, &$counter, &$errorCounter, $jsonArray)
     {
-		$response = $this->getApiHelper()->createLead($json_array, null, $object);
+        $response = $this->getApiHelper()->createLead($jsonArray, null, $object);
         $failed   = $this->consumeResponse($response, $object, true);
         $counter -= $failed;
         $errorCounter += $failed;

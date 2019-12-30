@@ -9,7 +9,8 @@ class ZohoApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
-	/**
+
+    /**
      * @param        $operation
      * @param array  $parameters
      * @param string $method
@@ -20,41 +21,40 @@ class ZohoApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads' , $json = false)
+    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads', $json = false)
     {
         $tokenData = $this->integration->getKeys();
 
         $url       = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation, $moduleobject);
-		
-		$settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
-		if($operation == 'Leads/search' || $operation == 'Contacts/search' || $operation == 'Accounts/search'){
-			$settings['headers']['If-Modified-Since'] = date('c');
-		}
-		//
-		
-		if ( $json == true) {
-			$settings['Content-Type'] = 'application/json';
-			$settings['encode_parameters'] = 'json';
+
+        $settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
+        if ($operation == 'Leads/search' || $operation == 'Contacts/search' || $operation == 'Accounts/search') {
+            $settings['headers']['If-Modified-Since'] = date('c');
         }
-		
-	    $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
-		
-		if(isset($response['code']) == 'INVALID_TOKEN' && isset($response['status']) == 'error' ){
-			$authParameters = array(				
-				'client_id' => $tokenData['client_id'],
-				'client_secret' => $tokenData['client_secret'],
-				'refresh_token' => $tokenData['refresh_token'],
-				'grant_type'	=> 'refresh_token',
-			);
-			$authResponse = $this->integration->makeRequest($this->integration->getAccessTokenUrl(), $authParameters, "POST");
-			
-			if ($authResponse == null) {
-				//$new_response = json_encode($response);
-				return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $authResponse['CAUSE'] : 'UNKNOWN')]);
-			}		
-			$this->integration->extractAuthKeys($authResponse, 'access_token');	
-			$response = $this->integration->makeRequest($url, $parameters, $method, $settings);			
-		}
+
+        if ($json == true) {
+            $settings['Content-Type']      = 'application/json';
+            $settings['encode_parameters'] = 'json';
+        }
+
+        $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
+
+        if (isset($response['code']) == 'INVALID_TOKEN' && isset($response['status']) == 'error') {
+            $authParameters = [
+                'client_id'     => $tokenData['client_id'],
+                'client_secret' => $tokenData['client_secret'],
+                'refresh_token' => $tokenData['refresh_token'],
+                'grant_type'	   => 'refresh_token',
+            ];
+            $authResponse = $this->integration->makeRequest($this->integration->getAccessTokenUrl(), $authParameters, 'POST');
+
+            if ($authResponse == null) {
+                //$new_response = json_encode($response);
+                return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $authResponse['CAUSE'] : 'UNKNOWN')]);
+            }
+            $this->integration->extractAuthKeys($authResponse, 'access_token');
+            $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
+        }
         if (!empty($response['response']['error'])) {
             $response = $response['response'];
             $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
@@ -79,7 +79,7 @@ class ZohoApi extends CrmApi
         if ($object == 'company') {
             $object = 'Accounts'; // Zoho object name
         }
-		
+
         return $this->request('settings/fields?module='.$object, [], 'GET', $object);
     }
 
@@ -92,8 +92,8 @@ class ZohoApi extends CrmApi
      */
     public function createLead($data, $lead = null, $object = 'Leads')
     {
-        $parameters['data'][] = $data;	
-		
+        $parameters['data'][] = $data;
+
         return $this->request($object, $parameters, 'POST', $object, true);
     }
 
@@ -106,7 +106,8 @@ class ZohoApi extends CrmApi
      */
     public function updateLead($data, $lead = null, $object = 'Leads')
     {
-        $parameters['data'][] = $data;	
+        $parameters['data'][] = $data;
+
         return $this->request($object, $parameters, 'PUT', $object, true);
     }
 
@@ -121,8 +122,7 @@ class ZohoApi extends CrmApi
      */
     public function getLeads(array $params, $object, $id = null)
     {
-        
-		if (!isset($params['selectColumns'])) {
+        if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
             $params['newFormat']     = 1;
         }
@@ -141,7 +141,7 @@ class ZohoApi extends CrmApi
         if (isset($data['response'], $data['response']['result'])) {
             $data = $data['response']['result'];
         }
-			
+
         return $data;
     }
 
@@ -185,7 +185,7 @@ class ZohoApi extends CrmApi
     public function getSearchRecords($selectColumns, $searchColumn, $searchValue, $object = 'Leads')
     {
         $parameters = [
-            'criteria' => '('.$searchColumn.':equals:'.$searchValue.')'           
+            'criteria' => '('.$searchColumn.':equals:'.$searchValue.')',
         ];
 
         return $this->request($object.'/search', $parameters, 'GET', $object, false);
