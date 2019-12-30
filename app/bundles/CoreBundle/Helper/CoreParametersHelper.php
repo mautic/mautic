@@ -50,6 +50,11 @@ class CoreParametersHelper
         return $this->parameters->has($this->stripMauticPrefix($name));
     }
 
+    public function allParameters(): array
+    {
+        return $this->parameters->all();
+    }
+
     private function stripMauticPrefix(string $name): string
     {
         return str_replace('mautic.', '', $name);

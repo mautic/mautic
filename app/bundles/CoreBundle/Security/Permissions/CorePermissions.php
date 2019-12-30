@@ -70,15 +70,18 @@ class CorePermissions
      */
     private $checkedPermissions = [];
 
-    /**
-     * CorePermissions constructor.
-     */
-    public function __construct(UserHelper $userHelper, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, $bundles, $pluginBundles)
-    {
-        $this->translator    = $translator;
-        $this->bundles       = $bundles;
-        $this->pluginBundles = $pluginBundles;
-        $this->userHelper    = $userHelper;
+    public function __construct(
+        UserHelper $userHelper,
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper,
+        array $bundles,
+        array $pluginBundles
+    ) {
+        $this->userHelper           = $userHelper;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->bundles              = $bundles;
+        $this->pluginBundles        = $pluginBundles;
 
         $this->registerPermissionClasses();
     }
@@ -444,7 +447,7 @@ class CorePermissions
      */
     protected function getParams()
     {
-        return $this->coreParametersHelper->all();
+        return $this->coreParametersHelper->allParameters();
     }
 
     /**
