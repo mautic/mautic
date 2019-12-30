@@ -1417,8 +1417,15 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $records         = $this->getApiHelper()->getSearchRecords($seachColumn, $searchValue, $object);
-        $id['id']        = ['type' => 'string', 'label' => 'ID', 'api_name' => 'id', 'required' => true];
-        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], $id));
+        $idField         = [
+            'id' => [
+                'type'     => 'string',
+                'label'    => 'ID',
+                'api_name' => 'id',
+                'required' => true
+            ]
+        ];
+        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], $idField));
 
         return $parsedRecords;
     }
