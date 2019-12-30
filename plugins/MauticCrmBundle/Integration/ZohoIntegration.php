@@ -1399,7 +1399,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             } elseif (isset($row['error'])) {
                 ++$failed;
                 $exception = new ApiErrorException($row['error']['details'].' ('.$row['error']['code'].')');
-                $exception->setContactId($leadId);
                 $this->logIntegrationError($exception);
             }
         }
