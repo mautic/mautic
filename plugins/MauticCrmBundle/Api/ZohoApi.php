@@ -25,7 +25,7 @@ class ZohoApi extends CrmApi
     {
         $tokenData = $this->integration->getKeys();
 
-        $url       = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation, $moduleobject);
+        $url = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation, $moduleobject);
 
         $settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
         if ($operation == 'Leads/search' || $operation == 'Contacts/search' || $operation == 'Accounts/search') {
@@ -44,13 +44,16 @@ class ZohoApi extends CrmApi
                 'client_id'     => $tokenData['client_id'],
                 'client_secret' => $tokenData['client_secret'],
                 'refresh_token' => $tokenData['refresh_token'],
-                'grant_type'	   => 'refresh_token',
+                'grant_type'    => 'refresh_token',
             ];
-            $authResponse = $this->integration->makeRequest($this->integration->getAccessTokenUrl(), $authParameters, 'POST');
+            $authResponse   = $this->integration->makeRequest($this->integration->getAccessTokenUrl(), $authParameters, 'POST');
 
             if ($authResponse == null) {
                 //$new_response = json_encode($response);
-                return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $authResponse['CAUSE'] : 'UNKNOWN')]);
+                return $this->translator->trans(
+                    'mautic.zoho.auth_error',
+                    ['%cause%' => (isset($response['CAUSE']) ? $authResponse['CAUSE'] : 'UNKNOWN')]
+                );
             }
             $this->integration->extractAuthKeys($authResponse, 'access_token');
             $response = $this->integration->makeRequest($url, $parameters, $method, $settings);

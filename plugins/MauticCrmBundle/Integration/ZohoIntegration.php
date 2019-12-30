@@ -1458,7 +1458,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter
-     * @param array $jsonArray
+     * @param array  $jsonArray
      */
     private function updateContactInZoho($object, &$counter, &$errorCounter, array $jsonArray)
     {
@@ -1472,7 +1472,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter
-     * @param array $jsonArray
+     * @param array  $jsonArray
      */
     private function createContactInZoho($object, &$counter, &$errorCounter, array $jsonArray)
     {
