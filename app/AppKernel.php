@@ -9,11 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Config\EnvParametersResource;
-use Symfony\Component\HttpKernel\DependencyInjection;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -57,6 +56,11 @@ class AppKernel extends Kernel
      * @var array
      */
     private $pluginBundles = [];
+
+    /**
+     * @var array
+     */
+    private $localParameters = [];
 
     /**
      * Constructor.
@@ -286,16 +290,6 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Returns a list of addon bundles that are enabled.
-     *
-     * @return array
-     */
-    public function getPluginBundles()
-    {
-        return $this->pluginBundles;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
@@ -328,42 +322,6 @@ class AppKernel extends Kernel
         }
 
         return $isInstalled;
-    }
-
-    /**
-     * @param array $params
-     *
-     * @return \Doctrine\DBAL\Connection
-     *
-     * @throws Exception
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function getDatabaseConnection($params = [])
-    {
-        if (empty($params)) {
-            $params = $this->getLocalParams();
-        }
-
-        if (empty($params) || empty($params['db_driver'])) {
-            throw new \Exception('not configured');
-        }
-
-        $testParams = ['driver', 'host', 'port', 'name', 'user', 'password', 'path'];
-        $dbParams   = [];
-        foreach ($testParams as &$p) {
-            $param = (isset($params["db_{$p}"])) ? $params["db_{$p}"] : '';
-            if ('port' == $p) {
-                $param = (int) $param;
-            }
-            $name            = ('name' == $p) ? 'dbname' : $p;
-            $dbParams[$name] = $param;
-        }
-
-        // Test a database connection and existence of a user
-        $db = \Doctrine\DBAL\DriverManager::getConnection($dbParams);
-        $db->connect();
-
-        return $db;
     }
 
     /**
@@ -413,45 +371,28 @@ class AppKernel extends Kernel
      */
     public function getLocalParams()
     {
-        static $localParameters;
-
-        if (!is_array($localParameters)) {
-            /** @var $paths */
-            $root = $this->getRootDir();
-            include $root.'/config/paths.php';
-
-            require_once __DIR__.'/config/parameters_importer.php';
-            $parameterImporter = new MauticParameterImporter($this->getLocalConfigFile(), $paths);
-
-            $localParameters = $parameterImporter->all();
-            $parameterImporter->loadIntoEnvironment();
+        if (!empty($this->localParameters)) {
+            return $this->localParameters;
         }
 
-        return $localParameters;
+        $parameterImporter = new ParameterLoader();
+        $parameterImporter->loadIntoEnvironment();
+
+        $this->localParameters = $parameterImporter->getParameterBag()->all();
+
+        return $this->localParameters;
     }
 
     /**
      * Get local config file.
      *
-     * @param bool $checkExists If true, then return false if the file doesn't exist
-     *
-     * @return string|null
+     * @return string
      */
-    public function getLocalConfigFile($checkExists = true): ?string
+    public function getLocalConfigFile(): string
     {
         /** @var $paths */
         $root = $this->getRootDir();
-        include $root.'/config/paths.php';
 
-        if (!isset($paths['local_config'])) {
-            return null;
-        }
-
-        $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
-        if (!$checkExists || file_exists($paths['local_config'])) {
-            return $paths['local_config'];
-        }
-
-        return null;
+        return ParameterLoader::getLocalConfigFile($root);
     }
 }

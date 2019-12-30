@@ -11,8 +11,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 /**
  * Class CoreParametersHelper.
@@ -20,17 +19,15 @@ use Symfony\Component\HttpKernel\Kernel;
 class CoreParametersHelper
 {
     /**
-     * @var \MauticParameterImporter
+     * @var \Symfony\Component\HttpFoundation\ParameterBag
      */
     private $parameters;
 
-    public function __construct(string $root)
+    public function __construct()
     {
-        $this->rootPath = $root;
+        $loader = new ParameterLoader();
 
-        /** @var array $paths */
-        include $root.'/config/paths_helper.php';
-        $this->parameters = new \MauticParameterImporter($paths['local_config'], $paths);
+        $this->parameters = $loader->getParameterBag();
     }
 
     public function getParameter($name, $default = null)
@@ -42,7 +39,7 @@ class CoreParametersHelper
             return MAUTIC_TABLE_PREFIX;
         }
 
-        return $this->parameters->has($name) ? $this->parameters->get($name) : $default;
+        return $this->parameters->get($name, $default);
     }
 
     public function hasParameter($name): bool

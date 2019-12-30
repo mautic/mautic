@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\UserBundle\Entity\User;
 
 /**
@@ -169,11 +170,7 @@ class PathsHelper
 
     public function getLocalConfigurationFile(): string
     {
-        if (!isset($this->paths['local_config'])) {
-            return $this->paths['root'].'/app/config/local.php';
-        }
-
-        return str_replace('%kernel.root_dir%', $this->kernelRootDir, $this->paths['local_config']);
+        return ParameterLoader::getLocalConfigFile($this->kernelRootDir);
     }
 
     private function removeTrailingSlash(?string $dir): ?string
