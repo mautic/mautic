@@ -98,13 +98,21 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param bool $isJson
-     *
+     * @return string
+     */
+    public function getDatacenter()
+    {
+        $featureSettings = $this->getKeys();
+
+        return !empty($featureSettings['datacenter']) ? $featureSettings['datacenter'] : 'zoho.com';
+    }
+
+    /**
      * @return string
      */
     public function getApiUrl()
     {
-        return 'https://accounts.zoho.com';
+        return sprintf('https://accounts.%s', $this->getDatacenter());
     }
 
     /**

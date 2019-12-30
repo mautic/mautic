@@ -6,10 +6,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class ZohoApi extends CrmApi
 {
-    protected $requestSettings = [
-        'encode_parameters' => 'json',
-    ];
-
     /**
      * @param        $operation
      * @param array  $parameters
@@ -32,7 +28,7 @@ class ZohoApi extends CrmApi
             $settings['headers']['If-Modified-Since'] = date('c');
         }
 
-        if ($json == true) {
+        if ($json === true) {
             $settings['Content-Type']      = 'application/json';
             $settings['encode_parameters'] = 'json';
         }
