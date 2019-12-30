@@ -211,7 +211,6 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'trusted_hosts'   => '%mautic.trusted_hosts%',
     'session'         => [ //handler_id set to null will use default session handler from php.ini
         'handler_id'    => null,
         'name'          => '%env(MAUTIC_SESSION_NAME)%',
