@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
-
 class Mapper
 {
     /**
