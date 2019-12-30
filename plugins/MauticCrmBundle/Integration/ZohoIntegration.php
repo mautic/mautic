@@ -155,26 +155,13 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function isAuthorized()
-    {
-        $keys = $this->getKeys();
-        $this->prepareResponseForExtraction($keys);
-
-        return isset($keys[$this->getAuthTokenKey()]);
-    }
-
-    /**
      * Refresh tokens.
      */
     public function getRefreshTokenKeys()
     {
         return [
             'refresh_token',
-            'expires_in',
+            'expires',
         ];
     }
 
@@ -272,7 +259,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         }
 
                         if (count($newMatchedFields)) {
-                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                            $this->companyModel->setFieldValues($entity, $newMatchedFields, false);
                             $this->companyModel->saveEntity($entity, false);
                             $isModified = true;
                         }
@@ -707,41 +694,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     * @param array $parameters
-     *
-     * @return bool|string
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function authCallback($settings = [], $parameters = [])
-    {
-        $parameters = array_merge(
-            $parameters,
-            [
-                'grant_type'    => 'authorization_code',
-                'client_id'     => $this->keys['client_id'],
-                'client_secret' => $this->keys['client_secret'],
-                'redirect_uri'  => $this->getAuthCallbackUrl(),
-                'code'          => $_GET['code'],
-            ]
-        );
-
-        $settings = [
-            [
-                'authorize_session' => true,
-            ],
-        ];
-
-        $response = $this->makeRequest($this->getAccessTokenUrl(), $parameters, 'POST', $settings);
-        if ($response == null) {
-            return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
-        }
-
-        return $this->extractAuthKeys($response, 'access_token');
-    }
-
-    /**
      * @param Form|FormBuilder $builder
      * @param array            $data
      * @param string           $formArea
@@ -808,42 +760,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param string $data
-     * @param bool   $postAuthorization
-     *
-     * @return mixed
-     */
-    public function parseCallbackResponse($data, $postAuthorization = false)
-    {
-        if ($postAuthorization) {
-            /*
-            #
-            #Wed Feb 29 03:07:33 PST 2012
-            AUTHTOKEN=bad18eba1ff45jk7858b8ae88a77fa30
-            RESULT=TRUE
-            */
-            preg_match_all('(\w*=\w*)', $data, $matches);
-            if (!empty($matches[0])) {
-                /** @var array $match */
-                $match      = $matches[0];
-                $attributes = [];
-                foreach ($match as $string_attribute) {
-                    $parts                 = explode('=', $string_attribute);
-                    $attributes[$parts[0]] = $parts[1];
-                }
-
-                return $attributes;
-            }
-
-            return [];
-        }
-
-        return parent::parseCallbackResponse($data, $postAuthorization);
-    }
-
-    /**
      * Get available company fields for choices in the config UI.
      *
      * @param array $settings
@@ -899,7 +815,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         }
                         $leadObject = $this->getApiHelper()->getLeadFields($zohoObject);
 
-                        if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
+                        if (null === $leadObject || (isset($leadObject['status']) && 'error' === $leadObject['status'])) {
                             return [];
                         }
 
@@ -909,10 +825,12 @@ class ZohoIntegration extends CrmAbstractIntegration
                             if ($field['read_only'] == true) {
                                 continue;
                             }
+
                             $is_required = false;
                             if ($field['system_mandatory'] == true) {
                                 $is_required = true;
                             }
+
                             $zohoFields[$zohoObject][$field['api_name']] = [
                                 'type'     => 'string',
                                 'label'    => $field['display_label'],
@@ -1399,7 +1317,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object);
-        $counter      -= $failed;
+        $counter -= $failed;
         $errorCounter += $failed;
     }
 
@@ -1413,7 +1331,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, true);
-        $counter      -= $failed;
+        $counter -= $failed;
         $errorCounter += $failed;
     }
 

@@ -35,25 +35,6 @@ class ZohoApi extends CrmApi
 
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if (isset($response['code']) == 'INVALID_TOKEN' && isset($response['status']) == 'error') {
-            $authParameters = [
-                'client_id'     => $tokenData['client_id'],
-                'client_secret' => $tokenData['client_secret'],
-                'refresh_token' => $tokenData['refresh_token'],
-                'grant_type'    => 'refresh_token',
-            ];
-            $authResponse   = $this->integration->makeRequest($this->integration->getAccessTokenUrl(), $authParameters, 'POST');
-
-            if ($authResponse == null) {
-                //$new_response = json_encode($response);
-                return $this->translator->trans(
-                    'mautic.zoho.auth_error',
-                    ['%cause%' => (isset($response['CAUSE']) ? $authResponse['CAUSE'] : 'UNKNOWN')]
-                );
-            }
-            $this->integration->extractAuthKeys($authResponse, 'access_token');
-            $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
-        }
         if (!empty($response['response']['error'])) {
             $response = $response['response'];
             $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
