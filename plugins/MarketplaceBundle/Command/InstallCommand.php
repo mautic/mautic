@@ -11,15 +11,10 @@
 
 namespace MauticPlugin\MarketplaceBundle\Command;
 
-use Composer\Console\Application;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Facade\ReloadFacade;
-use MauticPlugin\MarketplaceBundle\DTO\Package;
-use MauticPlugin\MarketplaceBundle\Service\ComposerCombiner;
-use MauticPlugin\MarketplaceBundle\Service\PluginCollector;
-use MauticPlugin\MarketplaceBundle\Service\PluginDownloader;
+use MauticPlugin\MarketplaceBundle\Service\PackageInstaller;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,28 +24,22 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class InstallCommand extends ContainerAwareCommand
 {
-    private $pluginCollector;
-    private $pluginDownloader;
+    private $packageInstaller;
     private $reloadFacade;
     private $coreParametersHelper;
     private $filesystem;
-    private $composerCombiner;
 
     public function __construct(
-        PluginCollector $pluginCollector,
-        PluginDownloader $pluginDownloader,
+        PackageInstaller $packageInstaller,
         ReloadFacade $reloadFacade,
         CoreParametersHelper $coreParametersHelper,
-        Filesystem $filesystem,
-        ComposerCombiner $composerCombiner
+        Filesystem $filesystem
     ) {
         parent::__construct();
-        $this->pluginCollector      = $pluginCollector;
-        $this->pluginDownloader     = $pluginDownloader;
+        $this->packageInstaller     = $packageInstaller;
         $this->reloadFacade         = $reloadFacade;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->filesystem           = $filesystem;
-        $this->composerCombiner     = $composerCombiner;
     }
 
     /**
@@ -73,37 +62,15 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->composerCombiner->useComposerCombinedJson();
-
         $io        = new SymfonyStyle($input, $output);
         $stopwatch = new Stopwatch();
         $stopwatch->start('total');
-        $stopwatch->start('composer');
-
-        $composerApp = new Application();
-
-        $arguments = [
-            'command'               => 'require',
-            'packages'              => [$input->getArgument('package')],
-            // '--no-dev'              => true, // @todo set acutal env.
-            '--no-scripts'              => true,
-            // '--optimize-autoloader' => true,
-            // '--no-autoloader' => true,
-            '--prefer-dist'         => true,
-            // '--profile' => true,
-            // '--no-progress' => true,
-            // '-d'                    => $this->pluginDownloader->getPluginDirectory().$package->getInstallDirName(),
-        ];
-
-        $composerApp->setAutoExit(false);
 
         try {
-            $returnCode = $composerApp->run(new ArrayInput($arguments), $output);
+            $returnCode = $this->packageInstaller->install($input->getArgument('package'), $output);
         } catch (\Throwable $e) {
             $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
         }
-
-        $io->writeln("Composer dependencies installed in {$stopwatch->stop('composer')->getDuration()} ms");
 
         $stopwatch->start('cache');
 
