@@ -1421,8 +1421,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads')
     {
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
-        $selectColumns   = implode(',', array_keys($availableFields[$object]));
-        $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
+        $records         = $this->getApiHelper()->getSearchRecords($seachColumn, $searchValue, $object);
         $id['id']        = ['type' => 'string', 'label' => 'ID', 'api_name' => 'id', 'required' => true];
         $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], $id));
 
@@ -1430,8 +1429,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param        $data
-     * @param        $fields
+     * @param   $data
+     * @param   $fields
      *
      * @return array
      */
@@ -1456,28 +1455,28 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
-     * @param        $object
-     * @param        $counter
-     * @param        $totalCounter
+     * @param string $object
+     * @param int    $counter
+     * @param int    $errorCounter
+     * @param array $jsonArray
      */
-    private function updateContactInZoho($object, &$counter, &$errorCounter, $jsonArray)
+    private function updateContactInZoho($object, &$counter, &$errorCounter, array $jsonArray)
     {
-        $response = $this->getApiHelper()->updateLead($jsonArray, null, $object);
+        $response = $this->getApiHelper()->updateLead($jsonArray, $object);
         $failed   = $this->consumeResponse($response, $object);
         $counter -= $failed;
         $errorCounter += $failed;
     }
 
     /**
-     * @param Mapper $mapper
-     * @param        $object
-     * @param        $counter
-     * @param        $totalCounter
+     * @param string $object
+     * @param int    $counter
+     * @param int    $errorCounter
+     * @param array $jsonArray
      */
-    private function createContactInZoho($object, &$counter, &$errorCounter, $jsonArray)
+    private function createContactInZoho($object, &$counter, &$errorCounter, array $jsonArray)
     {
-        $response = $this->getApiHelper()->createLead($jsonArray, null, $object);
+        $response = $this->getApiHelper()->createLead($jsonArray, $object);
         $failed   = $this->consumeResponse($response, $object, true);
         $counter -= $failed;
         $errorCounter += $failed;

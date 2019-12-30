@@ -84,13 +84,12 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param        $data
-     * @param null   $lead
+     * @param array  $data
      * @param string $object
      *
-     * @return mixed|string
+     * @return mixed
      */
-    public function createLead($data, $lead = null, $object = 'Leads')
+    public function createLead(array $data, $object = 'Leads')
     {
         $parameters['data'][] = $data;
 
@@ -98,13 +97,12 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param        $data
-     * @param null   $lead
+     * @param array  $data
      * @param string $object
      *
-     * @return mixed|string
+     * @return mixed
      */
-    public function updateLead($data, $lead = null, $object = 'Leads')
+    public function updateLead(array $data, $object = 'Leads')
     {
         $parameters['data'][] = $data;
 
@@ -175,14 +173,13 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param        $selectColumns
      * @param        $searchColumn
      * @param        $searchValue
      * @param string $object
      *
      * @return mixed|string
      */
-    public function getSearchRecords($selectColumns, $searchColumn, $searchValue, $object = 'Leads')
+    public function getSearchRecords($searchColumn, $searchValue, $object = 'Leads')
     {
         $parameters = [
             'criteria' => '('.$searchColumn.':equals:'.$searchValue.')',
