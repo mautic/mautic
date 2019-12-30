@@ -97,6 +97,23 @@ return [
     ],
 
     'services' => [
+        'controllers' => [
+            'mautic.api' => [
+                'class'     => \Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class,
+                'arguments' => [
+                    'request_stack',
+                    'fos_oauth_server.authorize.form',
+                    'fos_oauth_server.authorize.form.handler.default',
+                    'fos_oauth_server.server',
+                    'templating',
+                    'security.token_storage',
+                    'router',
+                    'fos_oauth_server.client_manager.default',
+                    'event_dispatcher',
+                    'session',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.api.subscriber' => [
                 'class'     => \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
