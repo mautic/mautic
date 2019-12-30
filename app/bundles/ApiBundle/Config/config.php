@@ -127,13 +127,13 @@ return [
         ],
         'forms' => [
             'mautic.form.type.apiclients' => [
-                'class'     => 'Mautic\ApiBundle\Form\Type\ClientType',
+                'class'     => \Mautic\ApiBundle\Form\Type\ClientType::class,
                 'arguments' => [
                     'request_stack',
                     'translator',
                     'validator',
-                    'router',
                     'session',
+                    'router',
                 ],
             ],
             'mautic.form.type.apiconfig' => [
