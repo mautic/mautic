@@ -363,25 +363,26 @@ $container->loadFromExtension('jms_serializer', [
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
-            'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
+            'api_rate_limiter_cache' => $parameterImporter->getParameterBag()->get('api_rate_limiter_cache'),
         ],
     ],
 ]);
 
+$rateLimit = $parameterImporter->getParameterBag()->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'        => '%env(MAUTIC_API_RATE_LIMIT_ENABLED)%',
+  'enabled'        => 0 === $rateLimit ? false : true,
   'storage_engine' => 'cache',
   'cache_service'  => 'api_rate_limiter_cache',
   'path_limits'    => [
     [
       'path'   => '/api',
-      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'limit'  => $rateLimit,
       'period' => 3600,
     ],
   ],
   'fos_oauth_key_listener' => true,
   'display_headers'        => true,
-  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls per hour.", "details": [] } ]}',
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
