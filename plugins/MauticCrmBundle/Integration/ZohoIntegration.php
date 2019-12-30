@@ -552,8 +552,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
                 }
 
-                if (array_key_exists('page', $oparams)) {
-                } else {
+                if (!array_key_exists('page', $oparams)) {
                     $oparams['page'] = 1;
                 }
 
@@ -630,7 +629,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
 
                 if (array_key_exists('page', $oparams)) {
-                } else {
                     $oparams['page'] = 1;
                 }
 
@@ -933,8 +931,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                         if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                             return [];
                         }
-
-                        $objKey = 'company' === $zohoObject ? 'Accounts' : $zohoObject;
 
                         /** @var array $opts */
                         $opts = $leadObject['fields'];
