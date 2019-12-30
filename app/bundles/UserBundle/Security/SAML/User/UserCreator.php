@@ -1,20 +1,23 @@
 <?php
 
 /*
- * @copyright  2014 Mautic Contributors. All rights reserved
+ * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @link        https://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\UserBundle\Security\User;
+namespace Mautic\UserBundle\Security\SAML\User;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use LightSaml\Model\Protocol\Response;
 use LightSaml\SpBundle\Security\User\UserCreatorInterface;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -43,24 +46,27 @@ class UserCreator implements UserCreatorInterface
     private $encoder;
 
     /**
-     * @var
+     * @var int
      */
     private $defaultRole;
 
     /**
      * @var array
      */
-    private $requiredFields = ['username', 'firstname', 'lastname', 'email'];
+    private $requiredFields = [
+        'username',
+        'firstname',
+        'lastname',
+        'email',
+    ];
 
-    /**
-     * UserCreator constructor.
-     *
-     * @param $entityManager
-     * @param $userMapper
-     * @param $defaultRole
-     */
-    public function __construct($entityManager, $userMapper, UserModel $userModel, EncoderFactoryInterface $encoder, $defaultRole)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UserMapper $userMapper,
+        UserModel $userModel,
+        EncoderFactoryInterface $encoder,
+        $defaultRole
+    ) {
         $this->entityManager = $entityManager;
         $this->userMapper    = $userMapper;
         $this->userModel     = $userModel;
@@ -71,26 +77,40 @@ class UserCreator implements UserCreatorInterface
     /**
      * @return UserInterface|null
      */
-    public function createUser(Response $response)
+    public function createUser(Response $response): User
     {
         if (empty($this->defaultRole)) {
             throw new BadCredentialsException('User does not exist.');
         }
 
-        $user = $this->userMapper->getUsername($response, true);
-        $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder->getEncoder($user), EncryptionHelper::generateKey()));
-        $user->setRole($this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole));
+        /** @var Role $defaultRole */
+        $defaultRole = $this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole);
 
-        // Validate that the user has all that's required
-        foreach ($this->requiredFields as $field) {
-            $getter = 'get'.ucfirst($field);
-            if (!$user->$getter()) {
-                throw new BadCredentialsException('User does not include required fields.');
-            }
-        }
+        $user = $this->userMapper->getUser($response);
+        $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder->getEncoder($user), EncryptionHelper::generateKey()));
+        $user->setRole($defaultRole);
+
+        $this->validateUser($user);
 
         $this->userModel->saveEntity($user);
 
         return $user;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @throws BadCredentialsException
+     */
+    private function validateUser(User $user): void
+    {
+        // Validate that the user has all that's required
+        foreach ($this->requiredFields as $field) {
+            $getter = 'get'.ucfirst($field);
+
+            if (!$user->$getter()) {
+                throw new BadCredentialsException('User does not include required fields.');
+            }
+        }
     }
 }
