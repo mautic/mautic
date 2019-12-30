@@ -1,7 +1,5 @@
 <?php
 
-require_once __DIR__.'/parameters_importer.php';
-
 // Include path settings
 $root = $container->getParameter('kernel.root_dir');
 include __DIR__.'/paths_helper.php';
@@ -177,22 +175,17 @@ unset($setBundles, $setPluginBundles);
 $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 
 // Load parameters
+/** @var $parameterImporter \Mautic\CoreBundle\Loader\ParameterLoader */
 include __DIR__.'/parameters.php';
-/* @var MauticParameterImporter $parameterImporter */
 $container->loadFromExtension('mautic_core');
 
 // Set template engines
 $engines = ['php', 'twig'];
 
 // Decide on secure cookie based on site_url setting
-$secureCookie = $parameterImporter->has('site_url') && 'https' === substr(ltrim($parameterImporter->get('site_url')), 0, 5);
-
-// Generate session name
-$key         = $parameterImporter->has('secret_key') ? $parameterImporter->get('secret_key') : uniqid();
-
-// @todo - not gonna work
-
-$sessionName = md5(md5($paths['local_config']).$key);
+// This cannot be set dynamically
+$siteUrl      = $parameterImporter->getParameterBag()->get('site_url');
+$secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
@@ -218,11 +211,10 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'trusted_hosts'   => $parameterImporter->get('trusted_hosts'),
-    'trusted_proxies' => $parameterImporter->get('trusted_proxies'),
+    'trusted_hosts'   => '%mautic.trusted_hosts%',
     'session'         => [ //handler_id set to null will use default session handler from php.ini
         'handler_id'    => null,
-        'name'          => $sessionName,
+        'name'          => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure' => $secureCookie,
     ],
     'fragments'            => null,
@@ -262,12 +254,6 @@ $dbalSettings = [
     'server_version' => '%mautic.db_server_version%',
 ];
 
-// If using pdo_sqlite as the database driver, add the path to config file
-$dbDriver = $parameterImporter->get('db_driver');
-if ('pdo_sqlite' == $dbDriver) {
-    $dbalSettings['path'] = '%mautic.db_path%';
-}
-
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
     'orm'  => [
@@ -278,11 +264,10 @@ $container->loadFromExtension('doctrine', [
 ]);
 
 //MigrationsBundle Configuration
-$prefix = $parameterImporter->get('db_table_prefix');
 $container->loadFromExtension('doctrine_migrations', [
     'dir_name'   => '%kernel.root_dir%/migrations',
     'namespace'  => 'Mautic\\Migrations',
-    'table_name' => $prefix.'migrations',
+    'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
     'name'       => 'Mautic Migrations',
 ]);
 
@@ -379,19 +364,19 @@ $container->loadFromExtension('jms_serializer', [
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
-            'api_rate_limiter_cache' => $parameterImporter->get('api_rate_limiter_cache'),
+            'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
         ],
     ],
 ]);
 
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'        => 0 == $parameterImporter->get('api_rate_limiter_limit') ? false : true,
+  'enabled'        => '%env(MAUTIC_API_RATE_LIMIT_ENABLED)%',
   'storage_engine' => 'cache',
   'cache_service'  => 'api_rate_limiter_cache',
   'path_limits'    => [
     [
       'path'   => '/api',
-      'limit'  => $parameterImporter->get('api_rate_limiter_limit'),
+      'limit'  => '%mautic.api_rate_limiter_limit%',
       'period' => 3600,
     ],
   ],

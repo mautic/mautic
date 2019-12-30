@@ -2,11 +2,6 @@
 
 $loader->import('config.php');
 
-// Load after config.php which hydrates default parameters from the bundle configs statically into MauticParameterImporter
-$root = $container->getParameter('kernel.root_dir');
-include __DIR__.'/paths_helper.php';
-$parameterImporter = new MauticParameterImporter($paths['local_config'], $paths);
-
 if (file_exists(__DIR__.'/security_local.php')) {
     $loader->import('security_local.php');
 } else {
@@ -29,7 +24,7 @@ $container->loadFromExtension("doctrine", array(
 ));
 */
 
-$debugMode = $parameterImporter->has('debug') ? $parameterImporter->get('debug') : $container->getParameter('kernel.debug');
+$debugMode = $container->getParameter('kernel.debug');
 
 $container->loadFromExtension('monolog', [
     'channels' => [
@@ -37,10 +32,10 @@ $container->loadFromExtension('monolog', [
     ],
     'handlers' => [
         'main' => [
-            'formatter'    => $debugMode ? 'mautic.monolog.fulltrace.formatter' : null,
+            'formatter'    => $debugMode ? 'mautic.monolog.fulltrace.formatter' : '%env(MAUTIC_LOG_MAIN_FORMATTER)%',
             'type'         => 'fingers_crossed',
             'buffer_size'  => '200',
-            'action_level' => ($debugMode) ? 'debug' : 'error',
+            'action_level' => $debugMode ? 'debug' : '%env(MAUTIC_LOG_MAIN_ACTION_LEVEL)%',
             'handler'      => 'nested',
             'channels'     => [
                 '!mautic',
@@ -49,14 +44,14 @@ $container->loadFromExtension('monolog', [
         'nested' => [
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/%kernel.environment%.php',
-            'level'     => ($debugMode) ? 'debug' : 'error',
+            'level'     => $debugMode ? 'debug' : '%env(MAUTIC_LOG_NESTED_ACTION_LEVEL)%',
             'max_files' => 7,
         ],
         'mautic' => [
-            'formatter' => $debugMode ? 'mautic.monolog.fulltrace.formatter' : null,
+            'formatter' => $debugMode ? 'mautic.monolog.fulltrace.formatter' : '%env(MAUTIC_LOG_MAUTIC_FORMATTER)%',
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.php',
-            'level'     => ($debugMode) ? 'debug' : 'notice',
+            'level'     => $debugMode ? 'debug' : '%env(MAUTIC_LOG_MAUTIC_ACTION_LEVEL)%',
             'channels'  => [
                 'mautic',
             ],
@@ -67,7 +62,7 @@ $container->loadFromExtension('monolog', [
 
 //Twig Configuration
 $container->loadFromExtension('twig', [
-    'cache'       => '%mautic.tmp_path%/%kernel.environment%/twig',
+    'cache'       => '%env(MAUTIC_TWIG_CACHE_DIR)%',
     'auto_reload' => true,
     'paths'       => [
         '%kernel.root_dir%/bundles' => 'bundles',

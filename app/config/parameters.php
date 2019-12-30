@@ -60,7 +60,8 @@ $mauticParams['supported_languages'] = $locales;
 // Set the paths
 $mauticParams['paths'] = $paths;
 
-foreach ($mauticParams as $k => &$v) {
+// Set the parameters in the container with env processors
+foreach ($mauticParams as $k => $v) {
     switch (true) {
         case is_bool($v):
             $type = 'bool:';
@@ -82,25 +83,14 @@ foreach ($mauticParams as $k => &$v) {
     $container->setParameter("mautic.{$k}", sprintf('%%env(%sMAUTIC_%s)%%', $type, mb_strtoupper($k)));
 }
 
-// Store default parameters into the importer
-$parameterImporter = new MauticParameterImporter($paths['local_config'], $paths, $mauticParams);
+// Store default parameters into the loader to generate a cached version
+$parameterImporter = new \Mautic\CoreBundle\Loader\ParameterLoader($mauticParams);
 
 // Set the router URI for CLI
-if ($parameterImporter->has('site_url')) {
-    $parts = parse_url($parameterImporter->get('site_url'));
-
-    if (!empty($parts['host'])) {
-        $scheme           = (!empty($parts['scheme']) ? $parts['scheme'] : 'http');
-        $portContainerKey = ('http' === $scheme) ? 'request_listener.http_port' : 'request_listener.https_port';
-
-        $container->setParameter('router.request_context.host', '%env(MAUTIC_REQUEST_CONTEXT_HOST)%');
-        $container->setParameter('router.request_context.scheme', '%env(MAUTIC_REQUEST_CONTEXT_SCHEME)%');
-        $container->setParameter('router.request_context.base_url', '%env(MAUTIC_REQUEST_CONTEXT_BASE_URL)%');
-
-        if (!empty($parts['port'])) {
-            $container->setParameter($portContainerKey, '%env(MAUTIC_REQUEST_CONTEXT_PORT)%');
-        }
-    }
-}
+$container->setParameter('router.request_context.host', '%env(MAUTIC_REQUEST_CONTEXT_HOST)%');
+$container->setParameter('router.request_context.scheme', '%env(MAUTIC_REQUEST_CONTEXT_SCHEME)%');
+$container->setParameter('router.request_context.base_url', '%env(MAUTIC_REQUEST_CONTEXT_BASE_URL)%');
+$container->setParameter('request_listener.http_port', '%env(MAUTIC_REQUEST_CONTEXT_HTTP_PORT)%');
+$container->setParameter('request_listener.https_port', '%env(MAUTIC_REQUEST_CONTEXT_HTTPS_PORT)%');
 
 unset($mauticParams, $replaceRootPlaceholder, $bundles);

@@ -1080,5 +1080,6 @@ return [
         'system_update_url'         => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
+        'debug'                     => false,
     ],
 ];
