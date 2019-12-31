@@ -585,7 +585,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
-                if (array_key_exists('page', $oparams)) {
+                if (!array_key_exists('page', $oparams)) {
                     $oparams['page'] = 1;
                 }
 
