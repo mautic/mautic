@@ -862,19 +862,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $key
-     * @param $field
-     *
-     * @return array
-     */
-    public function convertLeadFieldKey($key, $field)
-    {
-        return [$key, $field['api_name']];
-    }
-
-    /**
      * @param array $params
      *
      * @return mixed
@@ -1130,13 +1117,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        $mappedData = $this->populateLeadData($lead, $config);
-
-        $this->amendLeadDataBeforePush($mappedData);
-
-        if (empty($mappedData)) {
-            return false;
-        }
         $mapper = new Mapper($availableFields);
         $mapper->setObject($zObject);
 
@@ -1316,7 +1296,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object);
-        $counter      -= $failed;
+        $counter -= $failed;
         $errorCounter += $failed;
     }
 
@@ -1330,7 +1310,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, true);
-        $counter      -= $failed;
+        $counter -= $failed;
         $errorCounter += $failed;
     }
 
