@@ -22,15 +22,12 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class EntityLookupChoiceLoader.
- */
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
     /**
      * @var array
      */
-    protected $selected;
+    protected $selected = [];
 
     /**
      * @var array
@@ -58,8 +55,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * EntityLookupChoiceLoader constructor.
-     *
      * @param ModelFactory        $modelFactory
      * @param TranslatorInterface $translator
      * @param Connection          $connection
@@ -126,18 +121,18 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      */
     public function onFormPostSetData(FormEvent $event)
     {
-        $this->selected = $event->getData();
+        $this->selected = (array) $event->getData();
     }
 
     /**
-     * @param null $data
-     * @param bool $includeNew
+     * @param array|null $data
+     * @param bool       $includeNew
      *
      * @return array
      */
     protected function getChoices($data = null, $includeNew = false)
     {
-        if (null == $data) {
+        if (null === $data) {
             $data = $this->selected;
         }
 

@@ -18,9 +18,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class DynamicContentFilterType.
- */
 class DynamicContentFilterType extends AbstractType
 {
     /**
@@ -56,7 +53,7 @@ class DynamicContentFilterType extends AbstractType
                 'filters',
                 CollectionType::class,
                 [
-                    'type'           => DynamicContentFilterEntryType::class,
+                    'entry_type'     => DynamicContentFilterEntryType::class,
                     'entry_options'  => [
                         'label' => false,
                         'attr'  => [
