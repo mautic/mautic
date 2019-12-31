@@ -36,7 +36,7 @@ if(jQuery)( function() {
 					$(this).mouseup( function(e) {
 						e.stopPropagation();
 						var srcElement = $(this);
-						$(this).unbind('mouseup');
+						$(this).off('mouseup');
 						if( evt.button == 2 ) {
 							// Hide context menus that may be showing
 							$(".contextMenu").hide();
@@ -68,7 +68,7 @@ if(jQuery)( function() {
 							(e.pageY) ? y = e.pageY : y = e.clientY + d.scrollTop;
 							
 							// Show the menu
-							$(document).unbind('click');
+							$(document).off('click');
 							$(menu).css({ top: y, left: x }).fadeIn(o.inSpeed);
 							// Hover events
 							$(menu).find('A').mouseover( function() {
@@ -82,19 +82,19 @@ if(jQuery)( function() {
 							$(document).keypress( function(e) {
 								switch( e.keyCode ) {
 									case 38: // up
-										if( $(menu).find('LI.hover').size() == 0 ) {
-											$(menu).find('LI:last').addClass('hover');
+										if( $(menu).find('LI.hover').length == 0 ) {
+											$(menu).find('LI').last().addClass('hover');
 										} else {
 											$(menu).find('LI.hover').removeClass('hover').prevAll('LI:not(.disabled)').eq(0).addClass('hover');
-											if( $(menu).find('LI.hover').size() == 0 ) $(menu).find('LI:last').addClass('hover');
+											if( $(menu).find('LI.hover').length == 0 ) $(menu).find('LI').last().addClass('hover');
 										}
 									break;
 									case 40: // down
-										if( $(menu).find('LI.hover').size() == 0 ) {
-											$(menu).find('LI:first').addClass('hover');
+										if( $(menu).find('LI.hover').length == 0 ) {
+											$(menu).find('LI').first().addClass('hover');
 										} else {
 											$(menu).find('LI.hover').removeClass('hover').nextAll('LI:not(.disabled)').eq(0).addClass('hover');
-											if( $(menu).find('LI.hover').size() == 0 ) $(menu).find('LI:first').addClass('hover');
+											if( $(menu).find('LI.hover').length == 0 ) $(menu).find('LI').first().addClass('hover');
 										}
 									break;
 									case 13: // enter
@@ -107,9 +107,9 @@ if(jQuery)( function() {
 							});
 							
 							// When items are selected
-							$('#' + o.menu).find('A').unbind('click');
+							$('#' + o.menu).find('A').off('click');
 							$('#' + o.menu).find('LI:not(.disabled) A').click( function() {
-								$(document).unbind('click').unbind('keypress');
+								$(document).off('click').off('keypress');
 								$(".contextMenu").hide();
 								// Callback
 								if( callback ) callback( $(this).attr('href').substr(1), $(srcElement), {x: x - offset.left, y: y - offset.top, docX: x, docY: y} );
@@ -119,7 +119,7 @@ if(jQuery)( function() {
 							// Hide bindings
 							setTimeout( function() { // Delay for Mozilla
 								$(document).click( function() {
-									$(document).unbind('click').unbind('keypress');
+									$(document).off('click').off('keypress');
 									$(menu).fadeOut(o.outSpeed);
 									return false;
 								});
@@ -132,12 +132,12 @@ if(jQuery)( function() {
 				if( $.browser.mozilla ) {
 					$('#' + o.menu).each( function() { $(this).css({ 'MozUserSelect' : 'none' }); });
 				} else if( $.browser.msie ) {
-					$('#' + o.menu).each( function() { $(this).bind('selectstart.disableTextSelect', function() { return false; }); });
+					$('#' + o.menu).each( function() { $(this).on('selectstart.disableTextSelect', function() { return false; }); });
 				} else {
-					$('#' + o.menu).each(function() { $(this).bind('mousedown.disableTextSelect', function() { return false; }); });
+					$('#' + o.menu).each(function() { $(this).on('mousedown.disableTextSelect', function() { return false; }); });
 				}
 				// Disable browser context menu (requires both selectors to work in IE/Safari + FF/Chrome)
-				$(el).add($('UL.contextMenu')).bind('contextmenu', function() { return false; });
+				$(el).add($('UL.contextMenu')).on('contextmenu', function() { return false; });
 				
 			});
 			return $(this);
@@ -202,7 +202,7 @@ if(jQuery)( function() {
 			// Destroy specified context menus
 			$(this).each( function() {
 				// Disable action
-				$(this).unbind('mousedown').unbind('mouseup');
+				$(this).off('mousedown').off('mouseup');
 			});
 			return( $(this) );
 		}

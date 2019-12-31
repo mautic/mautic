@@ -22,7 +22,7 @@
             return typeof obj === "number";
         },
         isArray: $.isArray,
-        isFunction: $.isFunction,
+        isFunction: function(value) {return typeof value === 'function';},
         isObject: $.isPlainObject,
         isUndefined: function (obj) {
             return typeof obj === "undefined";
@@ -68,7 +68,7 @@
             };
         }(),
         templatify: function templatify(obj) {
-            return $.isFunction(obj) ? obj : template;
+            return (typeof obj === 'function') ? obj : template;
             function template() {
                 return String(obj);
             }

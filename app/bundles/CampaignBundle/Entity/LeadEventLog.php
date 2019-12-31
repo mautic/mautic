@@ -43,7 +43,7 @@ class LeadEventLog implements ChannelInterface
     private $campaign;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress
      */
     private $ipAddress;
 
