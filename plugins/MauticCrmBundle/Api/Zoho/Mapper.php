@@ -41,14 +41,14 @@ class Mapper
     private $objectMappedValues = [];
 
     /**
-     * Used to keep track of the key used to map contact ID with the response Zoho returns
+     * Used to keep track of the key used to map contact ID with the response Zoho returns.
      *
      * @var int
      */
     private $objectCounter = 0;
 
     /**
-     * Used to map contact ID with the response Zoho returns
+     * Used to map contact ID with the response Zoho returns.
      *
      * @var array
      */
@@ -146,6 +146,7 @@ class Mapper
      * @param int $key
      *
      * @return int
+     *
      * @throws MatchingKeyNotFoundException
      */
     public function getContactIdByKey($key)

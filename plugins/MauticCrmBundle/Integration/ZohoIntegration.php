@@ -1200,6 +1200,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param Mapper|null $mapper
      *
      * @return int
+     *
      * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
     private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null)
@@ -1302,7 +1303,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object);
+        $failed       = $this->consumeResponse($response, $object, false, $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }
