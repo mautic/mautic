@@ -11,6 +11,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api\Zoho;
 
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
+
 class Mapper
 {
     /**
@@ -37,6 +39,20 @@ class Mapper
      * @var array[]
      */
     private $objectMappedValues = [];
+
+    /**
+     * Used to keep track of the key used to map contact ID with the response Zoho returns
+     *
+     * @var int
+     */
+    private $objectCounter = 0;
+
+    /**
+     * Used to map contact ID with the response Zoho returns
+     *
+     * @var array
+     */
+    private $contactMapper = [];
 
     /**
      * Mapper constructor.
@@ -85,18 +101,15 @@ class Mapper
     }
 
     /**
-     * @param int|null $id Zoho ID if known
+     * @param int      $mauticContactId Mautic Contact ID
+     * @param int|null $zohoId          Zoho ID if known
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
-    public function map($id = null)
+    public function map($mauticContactId, $zohoId = null)
     {
         $mapped             = 0;
         $objectMappedValues = [];
-
-        if ($id) {
-            $objectMappedValues['id'] = $id;
-        }
 
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
@@ -107,9 +120,16 @@ class Mapper
 
                 $objectMappedValues[$apiField] = $apiValue;
             }
+
+            if ($zohoId) {
+                $objectMappedValues['id'] = $zohoId;
+            }
         }
 
-        $this->objectMappedValues[] = $objectMappedValues;
+        $this->objectMappedValues[$this->objectCounter] = $objectMappedValues;
+        $this->contactMapper[$this->objectCounter]      = $mauticContactId;
+
+        ++$this->objectCounter;
 
         return $mapped;
     }
@@ -120,6 +140,21 @@ class Mapper
     public function getArray()
     {
         return $this->objectMappedValues;
+    }
+
+    /**
+     * @param int $key
+     *
+     * @return int
+     * @throws MatchingKeyNotFoundException
+     */
+    public function getContactIdByKey($key)
+    {
+        if (isset($this->contactMapper[$key])) {
+            return $this->contactMapper[$key];
+        }
+
+        throw new MatchingKeyNotFoundException();
     }
 
     /**

@@ -1039,7 +1039,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $totalUpdated += $mapper
                     ->setMappedFields($fieldsToUpdate[$zObject])
                     ->setContact($lead)
-                    ->map($lead['integration_entity_id']);
+                    ->map($lead['internal_entity_id'], $lead['integration_entity_id']);
                 ++$counter;
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
@@ -1069,7 +1069,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $totalCreated += $mapper
                     ->setMappedFields($config['leadFields'])
                     ->setContact($lead)
-                    ->map();
+                    ->map($lead['internal_entity_id']);
                 ++$counter;
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
@@ -1134,19 +1134,19 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())
-                        ->map($existingPerson['id']);
+                        ->map($lead->getId(), $existingPerson['id']);
                     $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
                 } elseif (!empty($existingPerson) && !empty($integrationId)) { // contact exists, then update
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())
-                        ->map($existingPerson['id']);
+                        ->map($lead->getId(), $existingPerson['id']);
                     $this->updateContactInZoho($mapper, $zObject, $counter, $errorCounter);
                 } else {
                     $mapper
                         ->setMappedFields($config['leadFields'])
                         ->setContact($lead->getProfileFields())
-                        ->map();
+                        ->map($lead->getId());
                     $this->createContactInZoho($mapper, $zObject, $counter, $errorCounter);
                 }
 
@@ -1194,13 +1194,15 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $response
-     * @param      $zObject
-     * @param bool $createIntegrationEntity
+     * @param array       $response
+     * @param string      $zObject
+     * @param bool        $createIntegrationEntity
+     * @param Mapper|null $mapper
      *
      * @return int
+     * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
-    private function consumeResponse($response, $zObject, $createIntegrationEntity = false)
+    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null)
     {
         $rows = $response;
         if (isset($rows['data'][0])) {
@@ -1208,10 +1210,12 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         $failed = 0;
-        foreach ($rows as $row) {
+        foreach ($rows as $key => $row) {
+            $mauticId = $mapper->getContactIdByKey($key);
+
             if ($row['code'] === 'SUCCESS' && $createIntegrationEntity) {
-                $leadId = $row['details']['id'];
-                $this->logger->debug('CREATE INTEGRATION ENTITY: '.$leadId);
+                $zohoId = $row['details']['id'];
+                $this->logger->debug('CREATE INTEGRATION ENTITY: '.$zohoId);
                 $integrationId = $this->getIntegrationEntityRepository()->getIntegrationsEntityId(
                     'Zoho',
                     $zObject,
@@ -1222,15 +1226,16 @@ class ZohoIntegration extends CrmAbstractIntegration
                     false,
                     0,
                     0,
-                    $leadId
+                    $zohoId
                 );
 
                 if (0 === count($integrationId)) {
-                    $this->createIntegrationEntity($zObject, $leadId, 'lead', 'lead');
+                    $this->createIntegrationEntity($zObject, $zohoId, 'lead', $mauticId);
                 }
-            } elseif (isset($row['error'])) {
+            } elseif (isset($row['status']) && 'error' === $row['status']) {
                 ++$failed;
-                $exception = new ApiErrorException($row['error']['details'].' ('.$row['error']['code'].')');
+                $exception = new ApiErrorException($row['message']);
+                $exception->setContactId($mauticId);
                 $this->logIntegrationError($exception);
             }
         }
@@ -1311,7 +1316,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
-        $failed       = $this->consumeResponse($response, $object, true);
+        $failed       = $this->consumeResponse($response, $object, true, $mapper);
         $counter -= $failed;
         $errorCounter += $failed;
     }

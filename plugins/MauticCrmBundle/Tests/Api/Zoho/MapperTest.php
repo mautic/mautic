@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho;
 
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 
 class MapperTest extends \PHPUnit_Framework_TestCase
@@ -92,10 +93,10 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
-     * @testdox Test that xml is generated according to the mapping
+     * @testdox Test that array is generated according to the mapping
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
     public function testArrayIsGeneratedBasedOnMapping()
     {
@@ -105,7 +106,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         foreach ($this->contacts as $contact) {
             $mapper->setMappedFields($this->mappedFields)
                 ->setContact($contact)
-                ->map();
+                ->map($contact['internal_entity_id']);
         }
 
         $expected = [
@@ -133,7 +134,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
      * @testdox Test that contacts do not inherit previous contact information
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
     public function testContactDoesNotInheritPreviousContactData()
     {
@@ -146,7 +147,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         foreach ($contacts as $contact) {
             $mapper->setMappedFields($this->mappedFields)
                 ->setContact($contact)
-                ->map($contact['integration_entity_id']);
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
         }
 
         $expected = [
@@ -173,10 +174,10 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @testdox Test that xml is generated according to the mapping
+     * @testdox Test that array is generated according to the mapping
      *
      * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::map()
-     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getXml()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getArray()
      */
     public function testArrayIsGeneratedBasedOnMappingWithId()
     {
@@ -186,7 +187,7 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         foreach ($this->contacts as $contact) {
             $mapper->setMappedFields($this->mappedFields)
                 ->setContact($contact)
-                ->map($contact['integration_entity_id']);
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
         }
 
         $expected = [
@@ -211,5 +212,47 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertEquals($expected, $mapper->getArray());
+    }
+
+    /**
+     * @testdox Test asking for a key returns the correct contact
+     *
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
+     */
+    public function testThatContactIdMatchesGivenKey()
+    {
+        $mapper = new Mapper($this->availableFields);
+        $mapper->setObject('Leads');
+
+        foreach ($this->contacts as $contact) {
+            $mapper->setMappedFields($this->mappedFields)
+                ->setContact($contact)
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
+        }
+
+        $this->assertEquals(3, $mapper->getContactIdByKey(2));
+        $this->assertEquals(2, $mapper->getContactIdByKey(1));
+        $this->assertEquals(1, $mapper->getContactIdByKey(0));
+    }
+
+    /**
+     * @testdox Test asking for a key that doesn't exist throws exception
+     *
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper::getContactIdByKey()
+     */
+    public function testThatExceptionIsThrownIfKeyNotFound()
+    {
+        $this->expectException(MatchingKeyNotFoundException::class);
+
+        $mapper = new Mapper($this->availableFields);
+        $mapper->setObject('Leads');
+
+        foreach ($this->contacts as $contact) {
+            $mapper->setMappedFields($this->mappedFields)
+                ->setContact($contact)
+                ->map($contact['internal_entity_id'], $contact['integration_entity_id']);
+        }
+
+        $mapper->getContactIdByKey(4);
     }
 }
