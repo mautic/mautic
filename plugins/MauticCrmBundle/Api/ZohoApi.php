@@ -7,28 +7,27 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 class ZohoApi extends CrmApi
 {
     /**
-     * @param        $operation
+     * @param string $operation
      * @param array  $parameters
      * @param string $method
-     * @param string $moduleobject
-     * @param bool   $isJson
+     * @param bool   $json
+     * @param array  $settings
      *
-     * @return mixed|string
-     *
+     * @return array
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads', $json = false)
+    protected function request($operation, array $parameters = [], $method = 'GET', $json = false, $settings = [])
     {
         $tokenData = $this->integration->getKeys();
 
-        $url = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation, $moduleobject);
+        $url = sprintf('%s/%s', $tokenData['api_domain'].'/crm/v2', $operation);
 
-        $settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
-        if ($operation == 'Leads/search' || $operation == 'Contacts/search' || $operation == 'Accounts/search') {
-            $settings['headers']['If-Modified-Since'] = date('c');
+        if (!isset($settings['headers'])) {
+            $settings['headers'] = [];
         }
+        $settings['headers']['Authorization'] = 'Zoho-oauthtoken '.$tokenData['access_token'];
 
-        if ($json === true) {
+        if ($json) {
             $settings['Content-Type']      = 'application/json';
             $settings['encode_parameters'] = 'json';
         }
@@ -43,11 +42,10 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * List types.
+     * @param string $object
      *
-     * @param string $object Zoho module name
-     *
-     * @return mixed
+     * @return array
+     * @throws ApiErrorException
      */
     public function getLeadFields($object = 'Leads')
     {
@@ -55,49 +53,57 @@ class ZohoApi extends CrmApi
             $object = 'Accounts'; // Zoho object name
         }
 
-        return $this->request('settings/fields?module='.$object, [], 'GET', $object);
+        return $this->request('settings/fields?module='.$object, [], 'GET');
     }
 
     /**
      * @param array  $data
      * @param string $object
      *
-     * @return mixed
+     * @return array
+     * @throws ApiErrorException
      */
     public function createLead(array $data, $object = 'Leads')
     {
         $parameters['data'] = $data;
 
-        return $this->request($object, $parameters, 'POST', $object, true);
+        return $this->request($object, $parameters, 'POST', true);
     }
 
     /**
      * @param array  $data
      * @param string $object
      *
-     * @return mixed
+     * @return array
+     * @throws ApiErrorException
      */
     public function updateLead(array $data, $object = 'Leads')
     {
         $parameters['data'] = $data;
 
-        return $this->request($object, $parameters, 'PUT', $object, true);
+        return $this->request($object, $parameters, 'PUT', true);
     }
 
     /**
-     * gets Zoho leads.
+     * @param array $params
+     * @param string      $object
+     * @param null  $id
      *
-     * @param array     $params
-     * @param string    $object
-     * @param array|int $id
-     *
-     * @return mixed
+     * @return array
+     * @throws ApiErrorException
      */
     public function getLeads(array $params, $object, $id = null)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
             $params['newFormat']     = 1;
+        }
+
+        $settings = [];
+        if ($params['lastModifiedTime']) {
+            $settings['headers'] = [
+                'If-Modified-Since' => $params['lastModifiedTime']
+            ];
         }
 
         if ($id) {
@@ -107,21 +113,20 @@ class ZohoApi extends CrmApi
                 $params['id'] = $id;
             }
 
-            $data = $this->request($object, $params, 'GET', $object);
+            $data = $this->request($object, $params, 'GET', false, $settings);
         } else {
-            $data = $this->request($object, $params, 'GET', $object);
+            $data = $this->request($object, $params, 'GET', false, $settings);
         }
 
         return $data;
     }
 
     /**
-     * gets Zoho companies.
+     * @param array $params
+     * @param null  $id
      *
-     * @param array  $params
-     * @param string $id
-     *
-     * @return mixed
+     * @return array
+     * @throws ApiErrorException
      */
     public function getCompanies(array $params, $id = null)
     {
@@ -129,23 +134,31 @@ class ZohoApi extends CrmApi
             $params['selectColumns'] = 'All';
         }
 
+        $settings = [];
+        if ($params['lastModifiedTime']) {
+            $settings['headers'] = [
+                'If-Modified-Since' => $params['lastModifiedTime']
+            ];
+        }
+
         if ($id) {
             $params['id'] = $id;
 
-            $data = $this->request('Accounts', $params, 'GET', 'Accounts');
+            $data = $this->request('Accounts', $params, 'GET', false, $settings);
         } else {
-            $data = $this->request('Accounts', $params, 'GET', 'Accounts');
+            $data = $this->request('Accounts', $params, 'GET', false, $settings);
         }
 
         return $data;
     }
 
     /**
-     * @param        $searchColumn
-     * @param        $searchValue
+     * @param string       $searchColumn
+     * @param string       $searchValue
      * @param string $object
      *
      * @return mixed|string
+     * @throws ApiErrorException
      */
     public function getSearchRecords($searchColumn, $searchValue, $object = 'Leads')
     {
@@ -153,6 +166,6 @@ class ZohoApi extends CrmApi
             'criteria' => '('.$searchColumn.':equals:'.$searchValue.')',
         ];
 
-        return $this->request($object.'/search', $parameters, 'GET', $object, false);
+        return $this->request($object.'/search', $parameters, 'GET', false);
     }
 }

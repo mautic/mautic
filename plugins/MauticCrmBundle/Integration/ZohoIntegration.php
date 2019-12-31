@@ -507,7 +507,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $oparams['fields']   = $fields;
                 $oparams['per_page'] = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
+                    $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
                 if (!array_key_exists('page', $oparams)) {
@@ -520,7 +520,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
 
                 while (true) {
-                    // {"response":{"nodata":{"code":"4422","message":"There is no data to show"},"uri":"/crm/private/json/Contacts/getRecords"}}
                     $data = $this->getApiHelper()->getLeads($oparams, $object);
 
                     if (!isset($data['data'])) {
@@ -583,7 +582,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $oparams['fields']   = $fields;
                 $oparams['per_page'] = $maxRecords; // maximum number of records
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
+                    $oparams['lastModifiedTime'] = date('c', strtotime($params['start']));
                 }
 
                 if (array_key_exists('page', $oparams)) {
@@ -1228,7 +1227,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $failed = 0;
         foreach ($rows as $row) {
-            if ($row['code'] == 'SUCCESS' && $createIntegrationEntity) {
+            if ($row['code'] === 'SUCCESS' && $createIntegrationEntity) {
                 $leadId = $row['id'];
                 $this->logger->debug('CREATE INTEGRATION ENTITY: '.$leadId);
                 $integrationId = $this->getIntegrationEntityRepository()->getIntegrationsEntityId(
@@ -1258,11 +1257,11 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param        $seachColumn
-     * @param        $searchValue
+     * @param string $seachColumn
+     * @param string $searchValue
      * @param string $object
      *
-     * @return mixed
+     * @return array
      */
     private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads')
     {
@@ -1317,7 +1316,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object);
-        $counter -= $failed;
+        $counter      -= $failed;
         $errorCounter += $failed;
     }
 
@@ -1331,7 +1330,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);
         $failed       = $this->consumeResponse($response, $object, true);
-        $counter -= $failed;
+        $counter      -= $failed;
         $errorCounter += $failed;
     }
 
