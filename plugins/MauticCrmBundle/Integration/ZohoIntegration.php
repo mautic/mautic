@@ -1129,6 +1129,8 @@ class ZohoIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($existingPerson) && empty($integrationId)) {
+                    $this->createIntegrationEntity($zObject, $existingPerson['id'], 'lead', $lead->getId());
+
                     $mapper
                         ->setMappedFields($fieldsToUpdate[$zObject])
                         ->setContact($lead->getProfileFields())
@@ -1208,7 +1210,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $failed = 0;
         foreach ($rows as $row) {
             if ($row['code'] === 'SUCCESS' && $createIntegrationEntity) {
-                $leadId = $row['id'];
+                $leadId = $row['details']['id'];
                 $this->logger->debug('CREATE INTEGRATION ENTITY: '.$leadId);
                 $integrationId = $this->getIntegrationEntityRepository()->getIntegrationsEntityId(
                     'Zoho',
@@ -1220,11 +1222,11 @@ class ZohoIntegration extends CrmAbstractIntegration
                     false,
                     0,
                     0,
-                    'LEADID'
+                    $leadId
                 );
 
                 if (0 === count($integrationId)) {
-                    $this->createIntegrationEntity($zObject, 'LEADID', 'lead', $leadId);
+                    $this->createIntegrationEntity($zObject, $leadId, 'lead', 'lead');
                 }
             } elseif (isset($row['error'])) {
                 ++$failed;
