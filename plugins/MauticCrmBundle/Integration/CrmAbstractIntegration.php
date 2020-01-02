@@ -432,7 +432,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 return;
             }
 
-            $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
+            $fieldsToUpdateInMautic = array_intersect_key($leadFields, array_flip($fieldsToUpdateInMautic));
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
             if ((isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks')) {
                 $matchedFields = $this->getBlankFieldsToUpdateInMautic($matchedFields, $lead->getFields(true), $leadFields, $data, $object);
