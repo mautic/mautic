@@ -1004,7 +1004,11 @@ if(key===name){result=cookie;break;}
 if(!key){result[name]=cookie;}}catch(e){}}
 return result;}
 api.get=api.set=api;api.getJSON=function(){return api.apply({json:true},[].slice.call(arguments));};api.defaults={};api.remove=function(key,attributes){api(key,'',extend(attributes,{expires:-1}));};api.withConverter=init;return api;}
-return init();}));;
+return init();}));;jQuery.fn.extend({jQuery2Offset:function(options){if(arguments.length){return options===undefined?this:this.each(function(i){jQuery.offset.setOffset(this,options,i);});}
+var docElem,win,elem=this[0],box={top:0,left:0},doc=elem&&elem.ownerDocument;if(!doc){return;}
+docElem=doc.documentElement;if(!jQuery.contains(docElem,elem)){return box;}
+if(typeof elem.getBoundingClientRect!==strundefined){box=elem.getBoundingClientRect();}
+win=getWindow(doc);var pageYOffset=win?win.pageYOffset:0;var pageXOffset=win?win.pageXOffset:0;return{top:box.top+pageYOffset-docElem.clientTop,left:box.left+pageXOffset-docElem.clientLeft};},});;
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.
