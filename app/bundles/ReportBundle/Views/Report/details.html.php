@@ -52,7 +52,7 @@ if ('index' == $tmpl) {
                 'iconClass' => 'fa fa-file-text-o',
             ];
 
-            if (class_exists('PHPExcel')) {
+            if (class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
                 $buttons[] = [
                     'attr' => [
                         'data-toggle' => 'download',

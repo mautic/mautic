@@ -39,7 +39,7 @@ $buttons[] = [
     'primary'   => true,
 ];
 
-if (class_exists('PHPExcel')) {
+if (class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet')) {
     $buttons[] = [
         'attr' => [
             'data-toggle' => '',

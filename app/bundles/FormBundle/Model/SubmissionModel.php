@@ -48,6 +48,8 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -557,10 +559,10 @@ class SubmissionModel extends CommonFormModel
 
                 return new Response($content);
             case 'xlsx':
-                if (class_exists('PHPExcel')) {
+                if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
                         function () use ($results, $form, $translator, $name, $viewOnlyFields) {
-                            $objPHPExcel = new \PHPExcel();
+                            $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
                             $objPHPExcel->createSheet();
@@ -612,7 +614,7 @@ class SubmissionModel extends CommonFormModel
                                 ++$count;
                             }
 
-                            $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                            $objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
                             $objWriter->setPreCalculateFormulas(false);
 
                             $objWriter->save('php://output');
@@ -627,7 +629,7 @@ class SubmissionModel extends CommonFormModel
 
                     return $response;
                 }
-                throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
             default:
                 return new Response();
         }
