@@ -427,3 +427,26 @@ $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
     $definitionConsoleExceptionListener
 );
+
+// File Manager
+$container->loadFromExtension('fm_elfinder', [
+    'instances'              => [
+        'default' => [
+            'locale'             => '%mautic.locale%',
+            'editor'             => 'tinymce',
+            'include_assets'     => true,
+            'relative_path'      => false,
+            'connector'          => [
+                'roots' => [
+                    'uploads' => [
+                        'driver'            => 'LocalFileSystem',
+                        'path'              => 'uploads',
+                        'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
+                        'upload_deny'       => ['all'],
+                        'upload_max_size'   => '2M',
+                    ],
+                ],
+            ],
+        ],
+    ],
+]);
