@@ -614,7 +614,7 @@ class SubmissionModel extends CommonFormModel
                                 ++$count;
                             }
 
-                            $objWriter = IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                            $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
                             $objWriter->setPreCalculateFormulas(false);
 
                             $objWriter->save('php://output');
