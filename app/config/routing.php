@@ -16,4 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
 $collection = new RouteCollection();
 $collection->addCollection($loader->import('.', 'mautic'));
 
+// WYSIWYG editor
+$collection->addCollection($loader->import('@FMElfinderBundle/Resources/config/routing.yml'));
+
 return $collection;
