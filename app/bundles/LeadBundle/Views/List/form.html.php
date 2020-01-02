@@ -149,10 +149,10 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
         <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter"<?php echo $attr; ?>>
             <?php
             if (isset($form->vars[$dataKey])):
-                foreach ($form->vars[$dataKey] as $value => $label):
-                    if (is_array($label)):
-                        echo "<optgroup label=\"$value\">\n";
-                        foreach ($label as $optionValue => $optionLabel):
+                foreach ($form->vars[$dataKey] as $label => $value):
+                    if (is_array($value)):
+                        echo "<optgroup label=\"$label\">\n";
+                        foreach ($value as $optionLabel => $optionValue):
                             echo "<option value=\"$optionValue\">$optionLabel</option>\n";
                         endforeach;
                         echo "</optgroup>\n";
