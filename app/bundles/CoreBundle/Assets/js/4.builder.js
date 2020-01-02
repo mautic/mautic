@@ -860,7 +860,7 @@ Mautic.initSections = function() {
         iframeFix: true,
         connectToSortable: 'body',
         revert: 'invalid',
-        iframeOffset: 'function' === typeof iframe.getClientRects ? iframe.offset() : { top: 0, left: 0 },
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // Fix body overflow that messes sortable up
             bodyOverflow.overflowX = mQuery('body', parent.document).css('overflow-x');
@@ -1017,11 +1017,11 @@ Mautic.initSlots = function(slotContainers) {
         iframeFix: true,
         connectToSortable: '[data-slot-container]',
         revert: 'invalid',
-        iframeOffset: 'function' === typeof iframe.getClientRects ? iframe.offset() : { top: 0, left: 0 },
+        iframeOffset: iframe.jQuery2Offset(),
         helper: function(e, ui) {
             // fix for Uncaught TypeError: Cannot read property 'document' of null
             // Fix body overflow that messes sortable up
-            bodyOverflow.overflowX = mQuery('body', Mautic.parentDocument).css('overflow-x');
+            bodyOverflow.overflowX = mQuery('body', Mautic.parentDocument).css('overflow-x');``
             bodyOverflow.overflowY = mQuery('body', Mautic.parentDocument).css('overflow-y');
             mQuery('body', Mautic.parentDocument).css({
                 overflowX: 'hidden',
