@@ -16,9 +16,6 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
-/**
- * Class CacheHelper.
- */
 class CacheHelper
 {
     protected $cacheDir;
@@ -29,9 +26,9 @@ class CacheHelper
 
     protected $container;
 
+    private $kernel;
+
     /**
-     * CacheHelper constructor.
-     *
      * @param \AppKernel $kernel
      */
     public function __construct(\AppKernel $kernel)

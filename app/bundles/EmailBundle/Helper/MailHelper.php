@@ -437,6 +437,7 @@ class MailHelper
                     $this->transportStartTime = time();
                 }
 
+                $failures = null;
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {

@@ -18,9 +18,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
-/**
- * Class OAuthListener.
- */
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
     /**
@@ -48,7 +45,7 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
             $returnValue = $this->authenticationManager->authenticate($token);
 
             if ($returnValue instanceof TokenInterface) {
-                return $this->securityContext->setToken($returnValue);
+                return $this->tokenStorage->setToken($returnValue);
             } elseif ($returnValue instanceof Response) {
                 return $event->setResponse($returnValue);
             }

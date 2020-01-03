@@ -17,9 +17,6 @@ use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class IpLookupHelper.
- */
 class IpLookupHelper
 {
     /**
@@ -53,13 +50,16 @@ class IpLookupHelper
     protected $doNotTrackInternalIps;
 
     /**
+     * @var array
+     */
+    protected $trackPrivateIPRanges;
+
+    /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
 
     /**
-     * IpLookupHelper constructor.
-     *
      * @param RequestStack         $requestStack
      * @param EntityManager        $em
      * @param CoreParametersHelper $coreParametersHelper

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;

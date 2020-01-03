@@ -991,8 +991,7 @@ class PageModel extends FormModel
         $q->groupBy('ds.device');
 
         $results = $q->execute()->fetchAll();
-
-        $chart = new PieChart($data['labels']);
+        $chart   = new PieChart();
 
         if (empty($results)) {
             $results[] = [

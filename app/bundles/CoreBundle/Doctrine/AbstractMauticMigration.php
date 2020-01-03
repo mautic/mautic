@@ -110,7 +110,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         static $tables = [];
 
         if (empty($schemaManager)) {
-            $schemaManager = $this->factory->getDatabase()->getSchemaManager();
+            $schemaManager = $this->connection->getSchemaManager();
         }
 
         // Prepend prefix

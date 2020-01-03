@@ -13,7 +13,6 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use GuzzleHttp\Client;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -22,9 +21,6 @@ use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SparkpostTransport.
- */
 class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**

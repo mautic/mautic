@@ -21,9 +21,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class IntegrationsListType.
- */
 class IntegrationsListType extends AbstractType
 {
     /**
@@ -82,7 +79,7 @@ class IntegrationsListType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $data) use ($integrationObjects, $integrationHelper) {
+        $formModifier = function (FormInterface $form, $data) use ($integrationObjects) {
             $statusChoices   = [];
             $campaignChoices = [];
 

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Doctrine;
+namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
@@ -32,9 +32,6 @@ class ExampleClassWithPublicProperty
     public $test = 'value';
 }
 
-/**
- * Class IpLookupFactoryTest.
- */
 class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';

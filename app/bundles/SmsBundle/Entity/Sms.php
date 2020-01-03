@@ -93,7 +93,6 @@ class Sms extends FormEntity
         $this->id        = null;
         $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
-        $this->readCount = 0;
 
         parent::__clone();
     }

@@ -11,9 +11,6 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-/**
- * Class MaxmindLookup.
- */
 class MaxmindLookup extends AbstractRemoteDataLookup
 {
     /**
