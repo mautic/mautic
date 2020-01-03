@@ -30,9 +30,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- * Class ClientType.
- */
 class ClientType extends AbstractType
 {
     /**
@@ -56,8 +53,6 @@ class ClientType extends AbstractType
     private $router;
 
     /**
-     * Constructor.
-     *
      * @param RequestStack        $requestStack
      * @param TranslatorInterface $translator
      * @param ValidatorInterface  $validator
@@ -166,28 +161,22 @@ class ClientType extends AbstractType
                 ]
             );
 
-            $translator = $this->translator;
-            $validator  = $this->validator;
-
             $builder->addEventListener(
                 FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($translator, $validator) {
+                function (FormEvent $event) {
                     $form = $event->getForm();
                     $data = $event->getData();
 
                     if ($form->has('redirectUris')) {
                         foreach ($data->getRedirectUris() as $uri) {
                             $urlConstraint = new OAuthCallback();
-                            $urlConstraint->message = $translator->trans(
+                            $urlConstraint->message = $this->translator->trans(
                                 'mautic.api.client.redirecturl.invalid',
                                 ['%url%' => $uri],
                                 'validators'
                             );
 
-                            $errors = $validator->validateValue(
-                                $uri,
-                                $urlConstraint
-                            );
+                            $errors = $this->validator->validate($uri, $urlConstraint);
 
                             if (!empty($errors)) {
                                 foreach ($errors as $error) {
@@ -247,24 +236,18 @@ class ClientType extends AbstractType
                 ]
             );
 
-            $translator = $this->translator;
-            $validator  = $this->validator;
-
             $builder->addEventListener(
                 FormEvents::POST_SUBMIT,
-                function (FormEvent $event) use ($translator, $validator) {
+                function (FormEvent $event) {
                     $form = $event->getForm();
                     $data = $event->getData();
 
                     if ($form->has('callback')) {
                         $uri = $data->getCallback();
                         $urlConstraint = new OAuthCallback();
-                        $urlConstraint->message = $translator->trans('mautic.api.client.redirecturl.invalid', ['%url%' => $uri], 'validators');
+                        $urlConstraint->message = $this->translator->trans('mautic.api.client.redirecturl.invalid', ['%url%' => $uri], 'validators');
 
-                        $errors = $validator->validateValue(
-                            $uri,
-                            $urlConstraint
-                        );
+                        $errors = $this->validator->validate($uri, $urlConstraint);
 
                         if (!empty($errors)) {
                             foreach ($errors as $error) {

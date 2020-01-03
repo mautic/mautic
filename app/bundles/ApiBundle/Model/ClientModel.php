@@ -15,6 +15,7 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth1\Consumer;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Event\ClientEvent;
+use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
@@ -22,9 +23,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ClientModel.
- */
 class ClientModel extends FormModel
 {
     /**
@@ -38,8 +36,6 @@ class ClientModel extends FormModel
     protected $session;
 
     /**
-     * ClientModel constructor.
-     *
      * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
@@ -75,9 +71,9 @@ class ClientModel extends FormModel
     public function getRepository()
     {
         if ('oauth2' == $this->apiMode) {
-            return $this->em->getRepository('MauticApiBundle:oAuth2\Client');
+            return $this->em->getRepository(Client::class);
         } else {
-            return $this->em->getRepository('MauticApiBundle:oAuth1\Consumer');
+            return $this->em->getRepository(Consumer::class);
         }
     }
 
@@ -102,7 +98,7 @@ class ClientModel extends FormModel
 
         $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('client', $entity, $params);
+        return $formFactory->create(ClientType::class, $entity, $params);
     }
 
     /**
