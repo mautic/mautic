@@ -46,7 +46,7 @@ class TemplatingHelper
     /**
      * @return TemplateNameParser
      */
-    public function getTemplateNameParser(
+    public function getTemplateNameParser()
     {
         return new TemplateNameParser($this->container->get('kernel'));
     }
