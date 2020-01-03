@@ -198,7 +198,7 @@ class AppKernel extends Kernel
             // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
-            new \FM\ElfinderBundle\FMElfinderBundle(),
+            new FM\ElfinderBundle\FMElfinderBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles

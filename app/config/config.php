@@ -430,10 +430,12 @@ $container->setDefinition(
 
 // File Manager
 $container->loadFromExtension('fm_elfinder', [
+    'assets_path'            => 'media/assets',
     'instances'              => [
         'default' => [
             'locale'             => '%mautic.locale%',
-            'editor'             => 'tinymce',
+            'editor'             => 'simple',
+            'fullscreen'         => true,
             'include_assets'     => true,
             'relative_path'      => false,
             'connector'          => [
