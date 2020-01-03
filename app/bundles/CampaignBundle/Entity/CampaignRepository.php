@@ -16,9 +16,6 @@ use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * Class CampaignRepository.
- */
 class CampaignRepository extends CommonRepository
 {
     use ContactLimiterTrait;
@@ -729,7 +726,7 @@ class CampaignRepository extends CommonRepository
             }
         }
 
-        unset($parameters, $q, $expr, $results);
+        unset($q, $expr, $results);
 
         return $leads;
     }
@@ -820,7 +817,7 @@ class CampaignRepository extends CommonRepository
             }
         }
 
-        unset($parameters, $q, $expr, $results);
+        unset($q, $expr, $results);
 
         return $leads;
     }

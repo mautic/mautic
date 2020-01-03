@@ -28,19 +28,16 @@ before_install:
   # set to test environment for Symfony's commands in post install commands
   - export SYMFONY_ENV="test"
 
-  # install PHPSTAN for PHP 7+
-  - composer global require phpstan/phpstan-shim:0.8.5
-
 install:
   - composer install
 
 script:
 
   # Run PHPUnit
-  - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning
+  - composer test
 
-  # Run PHPSTAN analysis for PHP 7+
-  - ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/DashboardBundle app/bundles/ConfigBundle app/bundles/CampaignBundle app/bundles/PointBundle app/bundles/WebhookBundle app/bundles/LeadBundle app/bundles/FormBundle
+  # Run PHPSTAN analysis
+  - composer phpstan
 
   # Check if the code standards weren't broken.
-  - bin/php-cs-fixer fix -v --dry-run --diff
+  - composer cs

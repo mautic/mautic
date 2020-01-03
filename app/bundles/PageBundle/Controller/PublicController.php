@@ -28,9 +28,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Class PublicController.
- */
 class PublicController extends CommonFormController
 {
     /**

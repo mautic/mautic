@@ -9,14 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests;
+namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
-/**
- * Class Mailbox.
- */
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithDefaultConfig()

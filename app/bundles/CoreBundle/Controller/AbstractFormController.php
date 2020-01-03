@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
 
-/**
- * Class AbstractFormController.
- */
 abstract class AbstractFormController extends CommonController
 {
     use FormThemeTrait;
@@ -238,23 +235,18 @@ abstract class AbstractFormController extends CommonController
             return $vars;
         }
 
-        $returnUrl                              = !empty($this->request->server->get('HTTP_REFERER'))
-                                                ? $this->request->server->get('HTTP_REFERER')
-                                                : $returnUrl;
-        $vars['returnUrl']                      = $returnUrl;
+        $returnUrl         = !empty($this->request->server->get('HTTP_REFERER')) ? $this->request->server->get('HTTP_REFERER') : '';
+        $vars['returnUrl'] = $returnUrl;
 
-        $urlMatcher                             = explode('/s/', $returnUrl);
-        $actionRoute                            = $this->get('router')->match('/s/'.$urlMatcher[1]);
-        $objAction                              = isset($actionRoute['objectAction'])
-                                                ? $actionRoute['objectAction']
-                                                : 'index';
-        $routeCtrlr                             = explode('\\', $actionRoute['_controller']);
-        $vars['contentTemplate']                = isset($vars['contentTemplate'])
-                                                ? $vars['contentTemplate']
-                                                : $routeCtrlr[0].$routeCtrlr[1].':'.
-                                                ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).
-                                                ':'.$objAction;
-        $vars['passthroughVars']['activeLink']  = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
+        $urlMatcher  = explode('/s/', $returnUrl);
+        $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
+        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $routeCtrlr  = explode('\\', $actionRoute['_controller']);
+
+        $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
+        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+
+        $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 
         if (isset($actionRoute['objectId']) && $actionRoute['objectId'] > 0) {
             $vars['viewParameters']['objectId'] = $actionRoute['objectId'];
