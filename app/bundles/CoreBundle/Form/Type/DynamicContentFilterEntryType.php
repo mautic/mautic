@@ -23,9 +23,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-/**
- * Class DynamicContentFilterEntryType.
- */
 class DynamicContentFilterEntryType extends AbstractType
 {
     private $fieldChoices    = [];
@@ -40,8 +37,6 @@ class DynamicContentFilterEntryType extends AbstractType
     private $stageModel;
 
     /**
-     * DynamicContentFilterEntryType constructor.
-     *
      * @param ListModel  $listModel
      * @param StageModel $stageModel
      */
@@ -80,7 +75,7 @@ class DynamicContentFilterEntryType extends AbstractType
                 'filters',
                 CollectionType::class,
                 [
-                    'type'          => DynamicContentFilterEntryFiltersType::class,
+                    'entry_type'    => DynamicContentFilterEntryFiltersType::class,
                     'entry_options' => [
                         'label' => false,
                         'attr'  => [
