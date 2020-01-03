@@ -41,7 +41,7 @@ class TemplatingHelper
      *
      * @return DelegatingEngine
      *
-     * @throws \Exception
+     *  @throws \Exception
      */
     public function getTemplating()
     {
@@ -50,8 +50,6 @@ class TemplatingHelper
 
     /**
      * @return TemplateNameParser
-     *
-     * @throws \Exception
      */
     public function getTemplateNameParser()
     {
