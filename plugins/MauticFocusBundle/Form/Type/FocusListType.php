@@ -47,7 +47,6 @@ class FocusListType extends AbstractType
 
                     return $choices;
                 },
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => true,
                 'required'          => false,

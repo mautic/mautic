@@ -22,8 +22,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * Class ConnectwiseIntegration.
- *
  * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
@@ -342,9 +340,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'campaign_task',
                         IntegrationCampaignsTaskType::class,
                         [
-                            'label'  => false,
-                            'helper' => $this->factory->getHelper('integration'),
-                            'attr'   => [
+                            'label' => false,
+                            'attr'  => [
                                 'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                             ],
                             'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],

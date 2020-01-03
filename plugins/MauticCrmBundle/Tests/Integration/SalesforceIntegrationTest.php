@@ -23,9 +23,6 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 
-/**
- * Class SalesforceIntegrationTest.
- */
 class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
     const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
@@ -1027,7 +1024,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                                         ],
                                     ];
                                 } elseif (isset($args[1]['q']) && false !== strpos($args[1]['q'], 'from '.$updateObject.'History')) {
-                                    return $this->getSalesforceDNCHistory($updateObject);
+                                    return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
                                 } else {
                                     // Extract emails
                                     $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);

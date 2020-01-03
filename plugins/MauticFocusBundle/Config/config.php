@@ -138,6 +138,7 @@ return [
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
+                    'mautic.security',
                 ],
             ],
         ],

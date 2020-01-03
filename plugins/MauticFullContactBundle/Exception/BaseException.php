@@ -16,6 +16,8 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Exception;
 
-class NoCredit extends FullContact_Exception_Base
+use Exception;
+
+class BaseException extends Exception
 {
 }
