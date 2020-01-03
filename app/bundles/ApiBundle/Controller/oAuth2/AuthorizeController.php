@@ -103,8 +103,6 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     }
 
     /**
-     * @param Request $request
-     *
      * @return \FOS\OAuthServerBundle\Controller\Response|\Symfony\Component\HttpFoundation\Response
      *
      * @throws \OAuth2\OAuth2RedirectException
