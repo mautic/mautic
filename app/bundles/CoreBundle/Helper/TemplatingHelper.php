@@ -16,9 +16,6 @@ use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Kernel;
 
-/**
- * Class TemplatingHelper.
- */
 class TemplatingHelper
 {
     /**
@@ -27,8 +24,6 @@ class TemplatingHelper
     protected $container;
 
     /**
-     * TemplatingHelper constructor.
-     *
      * @param Kernel $kernel
      */
     public function __construct(Kernel $kernel)
@@ -51,7 +46,7 @@ class TemplatingHelper
     /**
      * @return TemplateNameParser
      */
-    public function getTemplateNameParser()
+    public function getTemplateNameParser(
     {
         return new TemplateNameParser($this->container->get('kernel'));
     }
