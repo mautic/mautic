@@ -428,12 +428,12 @@ $container->setDefinition(
     $definitionConsoleExceptionListener
 );
 
-// File Manager
+// elFinder File Manager
 $container->loadFromExtension('fm_elfinder', [
     'assets_path'            => 'media/assets',
     'instances'              => [
         'default' => [
-            'locale'             => '%mautic.locale%',
+            'locale'             => 'LANG',
             'editor'             => 'simple',
             'fullscreen'         => true,
             'include_assets'     => true,
