@@ -186,9 +186,6 @@ return [
             'mautic.form.type.assetconfig' => [
                 'class' => \Mautic\AssetBundle\Form\Type\ConfigType::class,
             ],
-            'mautic.form.type.asset_dashboard_downloads_in_time_widget' => [
-                'class' => \Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType::class,
-            ],
         ],
         'others' => [
             'mautic.asset.upload.error.handler' => [
