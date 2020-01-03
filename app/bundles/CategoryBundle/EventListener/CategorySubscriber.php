@@ -36,11 +36,6 @@ class CategorySubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param BundleHelper   $bundleHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(BundleHelper $bundleHelper, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->bundleHelper   = $bundleHelper;
@@ -62,8 +57,6 @@ class CategorySubscriber implements EventSubscriberInterface
 
     /**
      * Add bundle to the category.
-     *
-     * @param CategoryTypesEvent $event
      */
     public function onCategoryBundleListBuild(CategoryTypesEvent $event)
     {
@@ -80,8 +73,6 @@ class CategorySubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\CategoryEvent $event
      */
     public function onCategoryPostSave(Events\CategoryEvent $event)
     {
@@ -101,8 +92,6 @@ class CategorySubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\CategoryEvent $event
      */
     public function onCategoryDelete(Events\CategoryEvent $event)
     {

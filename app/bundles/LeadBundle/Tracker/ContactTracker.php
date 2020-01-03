@@ -93,17 +93,6 @@ class ContactTracker
 
     /**
      * ContactTracker constructor.
-     *
-     * @param LeadRepository                  $leadRepository
-     * @param ContactTrackingServiceInterface $contactTrackingService
-     * @param DeviceTracker                   $deviceTracker
-     * @param CorePermissions                 $security
-     * @param Logger                          $logger
-     * @param IpLookupHelper                  $ipLookupHelper
-     * @param RequestStack                    $requestStack
-     * @param CoreParametersHelper            $coreParametersHelper
-     * @param EventDispatcherInterface        $dispatcher
-     * @param FieldModel                      $leadFieldModel
      */
     public function __construct(
         LeadRepository $leadRepository,
@@ -208,8 +197,6 @@ class ContactTracker
 
     /**
      * System contact bypasses cookie tracking.
-     *
-     * @param Lead|null $lead
      */
     public function setSystemContact(Lead $lead = null)
     {
@@ -329,8 +316,7 @@ class ContactTracker
     }
 
     /**
-     * @param IpAddress|null $ip
-     * @param bool           $persist
+     * @param bool $persist
      *
      * @return Lead
      */
@@ -391,8 +377,7 @@ class ContactTracker
     }
 
     /**
-     * @param Lead $previouslyTrackedContact
-     * @param      $previouslyTrackedId
+     * @param $previouslyTrackedId
      */
     private function dispatchContactChangeEvent(Lead $previouslyTrackedContact, $previouslyTrackedId)
     {

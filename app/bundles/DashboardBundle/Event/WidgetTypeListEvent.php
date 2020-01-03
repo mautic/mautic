@@ -61,8 +61,6 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Set translator if you want the strings to be translated.
-     *
-     * @param TranslatorInterface $translator
      */
     public function setTranslator(TranslatorInterface $translator)
     {
@@ -71,8 +69,6 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Set security object to check the perimissions.
-     *
-     * @param CorePermissions $security
      */
     public function setSecurity(CorePermissions $security)
     {
@@ -81,8 +77,6 @@ class WidgetTypeListEvent extends CommonEvent
 
     /**
      * Check if the user has permission to see the widgets.
-     *
-     * @param array $permissions
      *
      * @return bool
      */

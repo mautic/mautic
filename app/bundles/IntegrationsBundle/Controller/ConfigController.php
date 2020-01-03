@@ -67,9 +67,6 @@ class ConfigController extends AbstractFormController
     private $integrationsHelper;
 
     /**
-     * @param Request $request
-     * @param string  $integration
-     *
      * @return array|JsonResponse|RedirectResponse|Response
      */
     public function editAction(Request $request, string $integration)

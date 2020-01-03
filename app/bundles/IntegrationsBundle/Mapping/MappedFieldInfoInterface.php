@@ -15,43 +15,19 @@ namespace Mautic\IntegrationsBundle\Mapping;
 
 interface MappedFieldInfoInterface
 {
-    /**
-     * @return string
-     */
     public function getName(): string;
 
-    /**
-     * @return string
-     */
     public function getLabel(): string;
 
-    /**
-     * @return bool
-     */
     public function showAsRequired(): bool;
 
-    /**
-     * @return bool
-     */
     public function hasTooltip(): bool;
 
-    /**
-     * @return string
-     */
     public function getTooltip(): string;
 
-    /**
-     * @return bool
-     */
     public function isBidirectionalSyncEnabled(): bool;
 
-    /**
-     * @return bool
-     */
     public function isToIntegrationSyncEnabled(): bool;
 
-    /**
-     * @return bool
-     */
     public function isToMauticSyncEnabled(): bool;
 }

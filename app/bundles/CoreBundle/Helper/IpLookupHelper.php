@@ -60,10 +60,7 @@ class IpLookupHelper
     /**
      * IpLookupHelper constructor.
      *
-     * @param RequestStack         $requestStack
-     * @param EntityManager        $em
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param AbstractLookup       $ipLookup
+     * @param AbstractLookup $ipLookup
      */
     public function __construct(
         RequestStack $requestStack,

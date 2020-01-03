@@ -82,15 +82,6 @@ class AssetModel extends FormModel
 
     /**
      * AssetModel constructor.
-     *
-     * @param LeadModel                      $leadModel
-     * @param CategoryModel                  $categoryModel
-     * @param RequestStack                   $requestStack
-     * @param IpLookupHelper                 $ipLookupHelper
-     * @param CoreParametersHelper           $coreParametersHelper
-     * @param DeviceCreatorServiceInterface  $deviceCreatorService
-     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         LeadModel $leadModel,
@@ -563,12 +554,10 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */

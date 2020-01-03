@@ -84,9 +84,8 @@ class EmailSendEvent extends CommonEvent
     /**
      * EmailSendEvent constructor.
      *
-     * @param MailHelper|null $helper
-     * @param array           $args
-     * @param bool            $isDynamicContentParsing
+     * @param array $args
+     * @param bool  $isDynamicContentParsing
      */
     public function __construct(MailHelper $helper = null, $args = [], $isDynamicContentParsing = false)
     {
@@ -289,9 +288,6 @@ class EmailSendEvent extends CommonEvent
         return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
     }
 
-    /**
-     * @param array $tokens
-     */
     public function addTokens(array $tokens)
     {
         $this->tokens = array_merge($this->tokens, $tokens);

@@ -34,9 +34,6 @@ class TriggerType extends AbstractType
      */
     private $security;
 
-    /**
-     * @param CorePermissions $security
-     */
     public function __construct(CorePermissions $security)
     {
         $this->security = $security;

@@ -36,18 +36,12 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
      */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         // The container is needed due to non-required binding of the producer & consumer
         $this->container = $container;
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function publishMessage(Events\QueueEvent $event)
     {
         $producer = $this->container->get('old_sound_rabbit_mq.mautic_producer');
@@ -57,9 +51,6 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
         ]);
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function consumeMessage(Events\QueueEvent $event)
     {
         $consumer = $this->container->get('old_sound_rabbit_mq.mautic_consumer');
@@ -72,9 +63,6 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
         $consumer->consume($event->getMessages());
     }
 
-    /**
-     * @param Events\QueueConfigEvent $event
-     */
     public function buildConfig(Events\QueueConfigEvent $event)
     {
         $options        = $event->getOptions();

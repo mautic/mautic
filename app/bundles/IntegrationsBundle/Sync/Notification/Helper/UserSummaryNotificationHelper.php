@@ -69,13 +69,6 @@ class UserSummaryNotificationHelper
      */
     private $listTranslationKey;
 
-    /**
-     * @param Writer              $writer
-     * @param UserHelper          $userHelper
-     * @param OwnerProvider       $ownerProvider
-     * @param RouteHelper         $routeHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         Writer $writer,
         UserHelper $userHelper,
@@ -91,9 +84,6 @@ class UserSummaryNotificationHelper
     }
 
     /**
-     * @param string $mauticObject
-     * @param string $listTranslationKey
-     *
      * @throws ObjectNotSupportedException
      * @throws \Doctrine\ORM\ORMException
      */
@@ -118,11 +108,6 @@ class UserSummaryNotificationHelper
         $this->userNotifications = [];
     }
 
-    /**
-     * @param string $integrationDisplayName
-     * @param string $objectDisplayName
-     * @param int    $id
-     */
     public function storeSummaryNotification(string $integrationDisplayName, string $objectDisplayName, int $id): void
     {
         if (!isset($this->userNotifications[$integrationDisplayName])) {
@@ -137,8 +122,6 @@ class UserSummaryNotificationHelper
     }
 
     /**
-     * @param array $ids
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws ObjectNotSupportedException
      */
@@ -174,9 +157,6 @@ class UserSummaryNotificationHelper
     }
 
     /**
-     * @param array $ids
-     * @param int   $userId
-     *
      * @throws ObjectNotSupportedException
      * @throws \Doctrine\ORM\ORMException
      */

@@ -35,10 +35,6 @@ class CitrixHelper
      */
     private static $integratonHelper;
 
-    /**
-     * @param IntegrationHelper $helper
-     * @param LoggerInterface   $logger
-     */
     public static function init(IntegrationHelper $helper, LoggerInterface $logger)
     {
         self::$logger           = $logger;

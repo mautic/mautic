@@ -55,11 +55,6 @@ class FieldBuilder
      */
     private $requestObject;
 
-    /**
-     * @param Router              $router
-     * @param FieldHelper         $fieldHelper
-     * @param ContactObjectHelper $contactObjectHelper
-     */
     public function __construct(Router $router, FieldHelper $fieldHelper, ContactObjectHelper $contactObjectHelper)
     {
         $this->valueNormalizer = new ValueNormalizer();
@@ -70,11 +65,6 @@ class FieldBuilder
     }
 
     /**
-     * @param string           $field
-     * @param array            $mauticObject
-     * @param RequestObjectDAO $requestObject
-     * @param string           $integration
-     *
      * @return ReportFieldDAO
      *
      * @throws FieldNotFoundException
@@ -112,8 +102,6 @@ class FieldBuilder
     }
 
     /**
-     * @param string $field
-     *
      * @return ReportFieldDAO
      */
     private function addContactIdField(string $field)
@@ -127,9 +115,6 @@ class FieldBuilder
     }
 
     /**
-     * @param string $field
-     * @param int    $ownerId
-     *
      * @return ReportFieldDAO
      */
     private function createOwnerIdReportFieldDAO(string $field, int $ownerId)
@@ -144,8 +129,6 @@ class FieldBuilder
     }
 
     /**
-     * @param string $field
-     *
      * @return ReportFieldDAO
      */
     private function addDoNotContactField(string $field)
@@ -161,9 +144,6 @@ class FieldBuilder
     }
 
     /**
-     * @param string $integration
-     * @param string $field
-     *
      * @return ReportFieldDAO
      */
     private function addContactTimelineField(string $integration, string $field)
@@ -184,8 +164,6 @@ class FieldBuilder
     }
 
     /**
-     * @param string $field
-     *
      * @return ReportFieldDAO
      *
      * @throws FieldNotFoundException

@@ -104,9 +104,6 @@ class Webhook extends FormEntity
         $this->logs   = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -172,9 +169,6 @@ class Webhook extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -366,8 +360,6 @@ class Webhook extends FormEntity
 
     /**
      * Takes the array of triggers and builds events from them if they don't exist already.
-     *
-     * @param array $triggers
      */
     public function setTriggers(array $triggers)
     {
@@ -488,8 +480,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param WebhookQueue $queue
-     *
      * @return $this
      */
     public function addQueue(WebhookQueue $queue)
@@ -500,8 +490,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param WebhookQueue $queue
-     *
      * @return $this
      */
     public function removeQueue(WebhookQueue $queue)
@@ -539,8 +527,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param Log $log
-     *
      * @return $this
      */
     public function addLog(Log $log)
@@ -551,8 +537,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param Log $log
-     *
      * @return $this
      */
     public function removeLog(Log $log)

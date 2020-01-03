@@ -33,11 +33,6 @@ class FormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormBuilderEvent $event
-     *
-     * @throws BadConfigurationException
-     */
     public function onFormBuild(FormBuilderEvent $event)
     {
         $event->addSubmitAction('plugin.leadpush', [
@@ -51,8 +46,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param SubmissionEvent $event
-     *
      * @return mixed
      */
     public function onFormSubmitActionTriggered(SubmissionEvent $event): void

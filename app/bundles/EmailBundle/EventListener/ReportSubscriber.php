@@ -45,11 +45,6 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $statRepository;
 
-    /**
-     * @param Connection        $db
-     * @param CompanyReportData $companyReportData
-     * @param StatRepository    $statRepository
-     */
     public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
     {
         $this->db                = $db;
@@ -71,8 +66,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -302,8 +295,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -408,8 +399,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -619,8 +608,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add the Do Not Contact table to the query builder.
-     *
-     * @param QueryBuilder $qb
      */
     private function addDNCTable(QueryBuilder $qb)
     {

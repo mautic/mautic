@@ -22,8 +22,7 @@ class SwiftMessageServiceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param MauticMessage $mauticMessage
-     * @param string        $expectedTransmissionJson
+     * @param string $expectedTransmissionJson
      *
      * @dataProvider dataTransformToTransmission
      */

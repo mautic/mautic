@@ -717,7 +717,6 @@ class ReportController extends FormController
      *
      * @param object                               $entity
      * @param int                                  $objectId
-     * @param array                                $permissions
      * @param \Mautic\CoreBundle\Model\CommonModel $model
      * @param string                               $modelName
      *

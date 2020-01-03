@@ -17,12 +17,6 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InformationChangeRequestDAO;
 
 interface JudgementModeInterface
 {
-    /**
-     * @param InformationChangeRequestDAO $leftChangeRequest
-     * @param InformationChangeRequestDAO $rightChangeRequest
-     *
-     * @return InformationChangeRequestDAO
-     */
     public static function adjudicate(
         InformationChangeRequestDAO $leftChangeRequest,
         InformationChangeRequestDAO $rightChangeRequest

@@ -32,9 +32,6 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface
         $this->encoder = $encoder;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $user = new User();

@@ -34,8 +34,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class PublicController extends CommonFormController
 {
     /**
-     * @param         $slug
-     * @param Request $request
+     * @param $slug
      *
      * @return Response
      *

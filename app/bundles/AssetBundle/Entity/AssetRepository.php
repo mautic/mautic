@@ -24,8 +24,6 @@ class AssetRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -176,8 +174,6 @@ class AssetRepository extends CommonRepository
 
     /**
      * Gets the sum size of assets.
-     *
-     * @param array $assets
      *
      * @return int
      */

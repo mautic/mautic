@@ -39,11 +39,6 @@ class Notifier
      */
     private $configIntegrationsHelper;
 
-    /**
-     * @param HandlerContainer         $handlerContainer
-     * @param SyncIntegrationsHelper   $syncIntegrationsHelper
-     * @param ConfigIntegrationsHelper $configIntegrationsHelper
-     */
     public function __construct(
         HandlerContainer $handlerContainer,
         SyncIntegrationsHelper $syncIntegrationsHelper,
@@ -84,9 +79,6 @@ class Notifier
     }
 
     /**
-     * @param string $integration
-     * @param string $object
-     *
      * @return string
      */
     private function getObjectDisplayName(string $integration, string $object)

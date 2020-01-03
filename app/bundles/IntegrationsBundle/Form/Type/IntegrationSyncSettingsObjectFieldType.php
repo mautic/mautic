@@ -24,9 +24,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IntegrationSyncSettingsObjectFieldType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws InvalidFormOptionException
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -90,9 +87,6 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(

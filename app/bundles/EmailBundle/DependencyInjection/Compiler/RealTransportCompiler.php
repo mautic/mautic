@@ -20,8 +20,6 @@ class RealTransportCompiler implements CompilerPassInterface
      * The swiftmailer.transport.real is only set by a Swiftmailer bundle's dependency injection compiler when email queuing (to filesystem) is enabled.
      * This makes it tricky to use the "real" transport in services which is maybe necessary for processing webhooks, bounces, etc. So this makes sure
      * that swiftmailer.transport.real service is available regardless.
-     *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {

@@ -36,10 +36,6 @@ class DynamicContentFilterEntryType extends AbstractType
      */
     private $stageModel;
 
-    /**
-     * @param ListModel  $listModel
-     * @param StageModel $stageModel
-     */
     public function __construct(ListModel $listModel, StageModel $stageModel)
     {
         $this->fieldChoices = $listModel->getChoiceFields();
@@ -53,10 +49,6 @@ class DynamicContentFilterEntryType extends AbstractType
         $this->stageModel      = $stageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(

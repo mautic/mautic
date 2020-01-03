@@ -29,9 +29,6 @@ abstract class AbstractPermissions
      */
     protected $params = [];
 
-    /**
-     * @param array $params
-     */
     public function __construct(array $params)
     {
         $this->params = $params;
@@ -93,10 +90,6 @@ abstract class AbstractPermissions
 
     /**
      * Builds the bundle's specific form elements for its permissions.
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
@@ -112,8 +105,6 @@ abstract class AbstractPermissions
     /**
      * Takes an array from PermissionRepository::getPermissionsByRole() and converts the bitwise integers to an array
      * of permission names that can be used in forms, for example.
-     *
-     * @param array $permissions
      *
      * @return mixed
      */
@@ -226,9 +217,8 @@ abstract class AbstractPermissions
     }
 
     /**
-     * @param array $permissions
-     * @param       $allPermissions
-     * @param bool  $isSecondRound
+     * @param      $allPermissions
+     * @param bool $isSecondRound
      *
      * @return bool Return true if a second round is required after all other bundles have analyzed it's permissions
      */
@@ -282,8 +272,6 @@ abstract class AbstractPermissions
     /**
      * Generates an array of granted and total permissions.
      *
-     * @param array $data
-     *
      * @return array
      */
     public function getPermissionRatio(array $data)
@@ -322,8 +310,6 @@ abstract class AbstractPermissions
 
     /**
      * Gives the bundle an opportunity to change how JavaScript calculates permissions granted.
-     *
-     * @param array $perms
      */
     public function parseForJavascript(array &$perms)
     {

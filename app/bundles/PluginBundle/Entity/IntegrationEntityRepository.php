@@ -513,9 +513,8 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param array $integrationIds
-     * @param       $integration
-     * @param       $internalEntityType
+     * @param $integration
+     * @param $internalEntityType
      */
     public function markAsDeleted(array $integrationIds, $integration, $internalEntityType)
     {

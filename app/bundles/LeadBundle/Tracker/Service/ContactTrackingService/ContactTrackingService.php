@@ -53,12 +53,6 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
 
     /**
      * ContactTrackingService constructor.
-     *
-     * @param CookieHelper          $cookieHelper
-     * @param LeadDeviceRepository  $leadDeviceRepository
-     * @param LeadRepository        $leadRepository
-     * @param MergeRecordRepository $mergeRecordRepository
-     * @param RequestStack          $requestStack
      */
     public function __construct(
         CookieHelper $cookieHelper,

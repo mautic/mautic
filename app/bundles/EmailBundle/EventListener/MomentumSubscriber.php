@@ -46,12 +46,6 @@ class MomentumSubscriber implements EventSubscriberInterface
      */
     private $logger;
 
-    /**
-     * @param MomentumCallbackInterface $momentumCallback
-     * @param QueueService              $queueService
-     * @param RequestStorageHelper      $requestStorageHelper
-     * @param LoggerInterface           $logger
-     */
     public function __construct(
         MomentumCallbackInterface $momentumCallback,
         QueueService $queueService,
@@ -77,8 +71,6 @@ class MomentumSubscriber implements EventSubscriberInterface
 
     /**
      * Webhook handling specific to Momentum transport.
-     *
-     * @param QueueConsumerEvent $event
      */
     public function onMomentumWebhookQueueProcessing(QueueConsumerEvent $event)
     {
@@ -98,9 +90,6 @@ class MomentumSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param TransportWebhookEvent $event
-     */
     public function onMomentumWebhookRequest(TransportWebhookEvent $event)
     {
         $transport = MomentumTransport::class;

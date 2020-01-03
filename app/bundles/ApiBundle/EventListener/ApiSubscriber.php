@@ -47,12 +47,6 @@ class ApiSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param AuditLogModel        $auditLogModel
-     * @param TranslatorInterface  $translator
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -81,8 +75,6 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * Check for API requests and throw denied access if API is disabled.
      *
-     * @param GetResponseEvent $event
-     *
      * @throws AccessDeniedHttpException
      */
     public function onKernelRequest(GetResponseEvent $event)
@@ -99,9 +91,6 @@ class ApiSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FilterResponseEvent $event
-     */
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $response   = $event->getResponse();
@@ -180,8 +169,6 @@ class ApiSubscriber implements EventSubscriberInterface
 
     /**
      * Add a client change entry to the audit log.
-     *
-     * @param Events\ClientEvent $event
      */
     public function onClientPostSave(Events\ClientEvent $event)
     {
@@ -201,8 +188,6 @@ class ApiSubscriber implements EventSubscriberInterface
 
     /**
      * Add a role delete entry to the audit log.
-     *
-     * @param Events\ClientEvent $event
      */
     public function onClientDelete(Events\ClientEvent $event)
     {

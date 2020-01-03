@@ -39,11 +39,6 @@ class CampaignListType extends AbstractType
      */
     private $canViewOther = false;
 
-    /**
-     * @param CampaignModel       $campaignModel
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
     public function __construct(CampaignModel $campaignModel, TranslatorInterface $translator, CorePermissions $security)
     {
         $this->model        = $campaignModel;

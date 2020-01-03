@@ -25,9 +25,6 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 
     /**
      * PluginIntegrationKeyEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param array|null          $keys
      */
     public function __construct(AbstractIntegration $integration, array $keys = null)
     {

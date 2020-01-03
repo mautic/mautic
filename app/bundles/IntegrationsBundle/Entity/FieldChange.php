@@ -59,9 +59,6 @@ class FieldChange
      */
     private $columnValue;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -118,9 +115,6 @@ class FieldChange
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
@@ -139,8 +133,6 @@ class FieldChange
     }
 
     /**
-     * @param int $id
-     *
      * @return FieldChange
      */
     public function setObjectId(int $id): self
@@ -150,17 +142,12 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getObjectId(): int
     {
         return $this->objectId;
     }
 
     /**
-     * @param string $type
-     *
      * @return FieldChange
      */
     public function setObjectType(string $type): self
@@ -170,17 +157,12 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectType(): string
     {
         return $this->objectType;
     }
 
     /**
-     * @param \DateTime $time
-     *
      * @return FieldChange
      */
     public function setModifiedAt(\DateTime $time): self
@@ -190,17 +172,12 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
     public function getModifiedAt(): \DateTime
     {
         return $this->modifiedAt;
     }
 
     /**
-     * @param string $name
-     *
      * @return FieldChange
      */
     public function setColumnName(string $name): self
@@ -210,17 +187,12 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColumnName(): string
     {
         return $this->columnName;
     }
 
     /**
-     * @param string $type
-     *
      * @return FieldChange
      */
     public function setColumnType(string $type): self
@@ -230,17 +202,12 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColumnType(): string
     {
         return $this->columnType;
     }
 
     /**
-     * @param string $value
-     *
      * @return FieldChange
      */
     public function setColumnValue(string $value): self
@@ -250,9 +217,6 @@ class FieldChange
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getColumnValue(): string
     {
         return $this->columnValue;

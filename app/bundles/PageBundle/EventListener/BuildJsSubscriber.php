@@ -36,11 +36,6 @@ class BuildJsSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param AssetsHelper    $assetsHelper
-     * @param TrackingHelper  $trackingHelper
-     * @param RouterInterface $router
-     */
     public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, RouterInterface $router)
     {
         $this->assetsHelper   = $assetsHelper;
@@ -62,9 +57,6 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJs(BuildJsEvent $event)
     {
         $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -252,9 +244,6 @@ JS;
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
         $formSubmitUrl = $this->router->generate(
@@ -532,9 +521,6 @@ JS;
         $event->appendJs($js, 'Mautic Gated Videos');
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJsForTrackingEvent(BuildJsEvent $event)
     {
         $js = '';

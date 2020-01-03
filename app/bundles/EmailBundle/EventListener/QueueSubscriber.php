@@ -27,9 +27,6 @@ class QueueSubscriber implements EventSubscriberInterface
      */
     private $emailModel;
 
-    /**
-     * @param EmailModel $emailModel
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
@@ -45,9 +42,6 @@ class QueueSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param QueueConsumerEvent $event
-     */
     public function onEmailHit(QueueConsumerEvent $event)
     {
         $payload = $event->getPayload();

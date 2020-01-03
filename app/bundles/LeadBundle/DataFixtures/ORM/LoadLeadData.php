@@ -44,9 +44,6 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         /** @var LeadRepository $leadRepo */

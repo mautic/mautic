@@ -24,8 +24,6 @@ class EncryptionService
 
     /**
      * EncryptionService constructor.
-     *
-     * @param EncryptionHelper $encryptionHelper
      */
     public function __construct(EncryptionHelper $encryptionHelper)
     {

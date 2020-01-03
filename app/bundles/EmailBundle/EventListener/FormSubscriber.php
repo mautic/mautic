@@ -66,10 +66,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add a send email actions to available form submit actions.
-     *
-     * @param FormBuilderEvent $event
-     *
-     * @throws BadConfigurationException
      */
     public function onFormBuilder(FormBuilderEvent $event)
     {

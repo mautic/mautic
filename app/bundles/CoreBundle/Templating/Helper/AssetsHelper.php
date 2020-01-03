@@ -70,8 +70,6 @@ class AssetsHelper
 
     /**
      * AssetsHelper constructor.
-     *
-     * @param Packages $packages
      */
     public function __construct(Packages $packages)
     {
@@ -559,8 +557,7 @@ class AssetsHelper
      * Turn all URLs in clickable links.
      *
      * @param string $text
-     * @param array  $protocols  http/https, ftp, mail, twitter
-     * @param array  $attributes
+     * @param array  $protocols http/https, ftp, mail, twitter
      *
      * @return string
      */
@@ -693,9 +690,6 @@ class AssetsHelper
     {
     }
 
-    /**
-     * @param AssetGenerationHelper $helper
-     */
     public function setAssetHelper(AssetGenerationHelper $helper)
     {
         $this->assetHelper = $helper;
@@ -713,9 +707,6 @@ class AssetsHelper
         $this->siteUrl = $siteUrl;
     }
 
-    /**
-     * @param PathsHelper $pathsHelper
-     */
     public function setPathsHelper(PathsHelper $pathsHelper)
     {
         $this->pathsHelper = $pathsHelper;

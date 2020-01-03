@@ -87,9 +87,6 @@ class FormEntity extends CommonEntity
      */
     public $deletedId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);

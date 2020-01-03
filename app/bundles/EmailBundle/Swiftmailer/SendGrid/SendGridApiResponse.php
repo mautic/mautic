@@ -29,8 +29,6 @@ class SendGridApiResponse
     }
 
     /**
-     * @param Response $response
-     *
      * @throws SendGridBadLoginException
      * @throws SendGridBadRequestException
      */

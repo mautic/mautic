@@ -155,9 +155,6 @@ class Field
         $this->form = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -541,8 +538,6 @@ class Field
 
     /**
      * Set form.
-     *
-     * @param Form $form
      *
      * @return Field
      */

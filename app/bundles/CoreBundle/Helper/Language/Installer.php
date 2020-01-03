@@ -103,9 +103,6 @@ class Installer
         }
     }
 
-    /**
-     * @param \SplFileInfo $bundle
-     */
     private function copyBundle(\SplFileInfo $bundle)
     {
         $name            = $bundle->getFilename();

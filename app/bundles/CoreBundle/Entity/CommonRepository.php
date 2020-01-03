@@ -83,7 +83,6 @@ class CommonRepository extends EntityRepository
      * Examines the arguments passed to getEntities and converts ORM properties to dBAL column names.
      *
      * @param string $entityClass
-     * @param array  $args
      *
      * @return array
      */
@@ -199,9 +198,6 @@ class CommonRepository extends EntityRepository
         }
     }
 
-    /**
-     * @param array $entities
-     */
     public function detachEntities(array $entities)
     {
         foreach ($entities as $entity) {
@@ -319,8 +315,6 @@ class CommonRepository extends EntityRepository
 
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
      */
@@ -558,10 +552,7 @@ class CommonRepository extends EntityRepository
      *
      * @param int   $start
      * @param int   $limit
-     * @param array $order
-     * @param array $where
      * @param array $select
-     * @param array $allowedJoins
      *
      * @return array
      */
@@ -810,9 +801,6 @@ class CommonRepository extends EntityRepository
         $this->currentUser = $user;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -946,7 +934,6 @@ class CommonRepository extends EntityRepository
      *
      * @param QueryBuilder $q
      * @param object       $filter
-     * @param array        $columns
      *
      * @return array
      */
@@ -1002,7 +989,6 @@ class CommonRepository extends EntityRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
      * @param object                     $filter
-     * @param array                      $columns
      *
      * @return array
      */
@@ -1157,7 +1143,6 @@ class CommonRepository extends EntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
-     * @param array                      $args
      *
      * @return bool
      */
@@ -1173,10 +1158,8 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                   $associations
-     * @param                                   $alias
-     * @param array                             $allowed
+     * @param $associations
+     * @param $alias
      *
      * @return bool
      */
@@ -1218,8 +1201,7 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param       $q
-     * @param array $args
+     * @param $q
      */
     protected function buildIndexByClause($q, array $args)
     {
@@ -1239,7 +1221,6 @@ class CommonRepository extends EntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
-     * @param array                      $args
      *
      * @return bool
      */
@@ -1256,7 +1237,6 @@ class CommonRepository extends EntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
-     * @param array                      $args
      */
     protected function buildOrderByClause($q, array $args)
     {
@@ -1306,7 +1286,6 @@ class CommonRepository extends EntityRepository
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $q
-     * @param array                                                        $args
      */
     protected function buildSelectClause($q, array $args)
     {
@@ -1380,7 +1359,6 @@ class CommonRepository extends EntityRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder $q
-     * @param array                      $args
      */
     protected function buildWhereClause($q, array $args)
     {
@@ -1715,10 +1693,6 @@ class CommonRepository extends EntityRepository
         return InputHelper::alphanum($sqlAttr, false, false, $allowedCharacters);
     }
 
-    /**
-     * @param array $filters
-     * @param array $properties
-     */
     private function convertOrmPropertiesToColumns(array &$filters, array $properties)
     {
         foreach ($filters as $k => &$f) {

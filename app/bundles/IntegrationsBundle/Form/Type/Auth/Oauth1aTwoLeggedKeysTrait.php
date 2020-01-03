@@ -21,9 +21,6 @@ trait Oauth1aTwoLeggedKeysTrait
 {
     use NotBlankIfPublishedConstraintTrait;
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     private function addKeyFields(FormBuilderInterface $builder): void
     {
         $builder->add(

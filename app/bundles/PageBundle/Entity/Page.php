@@ -149,9 +149,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->variantChildren     = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -224,9 +221,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         self::addVariantMetadata($builder, self::class);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new NotBlank([

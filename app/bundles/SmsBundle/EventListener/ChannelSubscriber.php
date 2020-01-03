@@ -27,9 +27,6 @@ class ChannelSubscriber implements EventSubscriberInterface
      */
     private $transportChain;
 
-    /**
-     * @param TransportChain $transportChain
-     */
     public function __construct(TransportChain $transportChain)
     {
         $this->transportChain = $transportChain;
@@ -45,9 +42,6 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {

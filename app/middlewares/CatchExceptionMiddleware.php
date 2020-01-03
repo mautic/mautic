@@ -27,8 +27,6 @@ class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddle
 
     /**
      * CatchExceptionMiddleware constructor.
-     *
-     * @param HttpKernelInterface $app
      */
     public function __construct(HttpKernelInterface $app)
     {

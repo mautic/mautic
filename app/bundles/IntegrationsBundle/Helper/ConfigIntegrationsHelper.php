@@ -29,25 +29,17 @@ class ConfigIntegrationsHelper
      */
     private $integrationsHelper;
 
-    /**
-     * @param IntegrationsHelper $integrationsHelper
-     */
     public function __construct(IntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;
     }
 
-    /**
-     * @param ConfigFormInterface $integration
-     */
     public function addIntegration(ConfigFormInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
 
     /**
-     * @param string $integration
-     *
      * @return ConfigFormInterface
      *
      * @throws IntegrationNotFoundException
@@ -64,9 +56,6 @@ class ConfigIntegrationsHelper
         return $this->integrations[$integration];
     }
 
-    /**
-     * @param Integration $integrationConfiguration
-     */
     public function saveIntegrationConfiguration(Integration $integrationConfiguration): void
     {
         $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);

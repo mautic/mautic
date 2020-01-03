@@ -310,8 +310,6 @@ class RoleController extends FormController
     }
 
     /**
-     * @param Entity\Role $role
-     *
      * @return array
      */
     private function getPermissionsConfig(Entity\Role $role)

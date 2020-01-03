@@ -22,8 +22,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 trait SortableListTrait
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param                      $options
+     * @param $options
      */
     public function addSortableList(FormBuilderInterface $builder, $options, $listName = 'list', $listData = null, $formName = 'formfield')
     {

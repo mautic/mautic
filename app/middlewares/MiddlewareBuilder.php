@@ -36,8 +36,6 @@ class MiddlewareBuilder
 
     /**
      * MiddlewareBuilder constructor.
-     *
-     * @param AppKernel $app
      */
     public function __construct(AppKernel $app)
     {

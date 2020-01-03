@@ -28,9 +28,6 @@ class FormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormBuilderEvent $event
-     */
     public function onFormBuild(FormBuilderEvent $event)
     {
         $action = [

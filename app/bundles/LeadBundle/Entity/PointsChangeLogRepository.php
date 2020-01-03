@@ -22,7 +22,6 @@ class PointsChangeLogRepository extends CommonRepository
      * Get a lead's point log.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -49,8 +48,6 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from point log table.
      *
-     * @param QueryBuilder $query
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
@@ -68,8 +65,6 @@ class PointsChangeLogRepository extends CommonRepository
 
     /**
      * Get table stat data from lead table.
-     *
-     * @param QueryBuilder $query
      *
      * @return array
      *

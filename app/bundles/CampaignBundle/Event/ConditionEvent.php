@@ -35,9 +35,6 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * DecisionEvent constructor.
-     *
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log)
     {

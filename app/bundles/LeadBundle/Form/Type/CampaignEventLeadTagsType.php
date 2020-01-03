@@ -22,9 +22,6 @@ class CampaignEventLeadTagsType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

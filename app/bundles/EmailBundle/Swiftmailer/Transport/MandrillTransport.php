@@ -34,9 +34,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
     /**
      * MandrillTransport constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param TransportCallback   $transportCallback
      */
     public function __construct(TranslatorInterface $translator, TransportCallback $transportCallback)
     {
@@ -402,9 +399,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
@@ -416,8 +412,6 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
     /**
      * Handle response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {

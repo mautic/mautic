@@ -41,9 +41,8 @@ class FieldExclusionStrategy implements ExclusionStrategyInterface
     /**
      * FieldExclusionStrategy constructor.
      *
-     * @param array $fields
-     * @param int   $level
-     * @param null  $path
+     * @param int  $level
+     * @param null $path
      */
     public function __construct(array $fields, $level = 3, $path = null)
     {

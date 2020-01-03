@@ -506,8 +506,6 @@ class ImportController extends FormController
     /**
      * Decide whether the import will be processed in client's browser.
      *
-     * @param Form $form
-     *
      * @return bool
      */
     protected function importInBrowser(Form $form)
@@ -530,8 +528,6 @@ class ImportController extends FormController
 
     /**
      * Decide whether the import will be queued to be processed by the CLI command in the background.
-     *
-     * @param Form $form
      *
      * @return bool
      */
@@ -619,8 +615,7 @@ class ImportController extends FormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */

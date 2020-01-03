@@ -39,11 +39,6 @@ class InternalObjectUpdateEvent extends Event
      */
     private $updatedObjectMappings = [];
 
-    /**
-     * @param ObjectInterface $object
-     * @param array           $identifiedObjectIds
-     * @param array           $updateObjects
-     */
     public function __construct(ObjectInterface $object, array $identifiedObjectIds, array $updateObjects)
     {
         $this->object              = $object;
@@ -51,25 +46,16 @@ class InternalObjectUpdateEvent extends Event
         $this->updateObjects       = $updateObjects;
     }
 
-    /**
-     * @return ObjectInterface
-     */
     public function getObject(): ObjectInterface
     {
         return $this->object;
     }
 
-    /**
-     * @return array
-     */
     public function getIdentifiedObjectIds(): array
     {
         return $this->identifiedObjectIds;
     }
 
-    /**
-     * @return array
-     */
     public function getUpdateObjects(): array
     {
         return $this->updateObjects;

@@ -34,10 +34,6 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private $primaryCompanyHelper;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param PrimaryCompanyHelper     $primaryCompanyHelper
-     */
     public function __construct(EventDispatcherInterface $dispatcher, PrimaryCompanyHelper $primaryCompanyHelper)
     {
         $this->dispatcher           = $dispatcher;
@@ -56,9 +52,6 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function decodeTokens(EmailSendEvent $event)
     {
         if ($event->isDynamicContentParsing()) {
@@ -96,9 +89,6 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param TokenReplacementEvent $event
-     */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
         $clickthrough = $event->getClickthrough();

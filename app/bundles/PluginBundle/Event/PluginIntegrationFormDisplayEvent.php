@@ -26,8 +26,7 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
     /**
      * PluginIntegrationAuthCallbackUrlEvent constructor.
      *
-     * @param AbstractIntegration $integration
-     * @param                     $settings
+     * @param $settings
      */
     public function __construct(AbstractIntegration $integration, array $settings)
     {
@@ -43,9 +42,6 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
         return $this->settings;
     }
 
-    /**
-     * @param array $settings
-     */
     public function setSettings(array $settings)
     {
         $this->settings = $settings;

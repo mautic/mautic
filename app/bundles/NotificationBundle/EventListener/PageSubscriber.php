@@ -29,10 +29,6 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $integrationHelper;
 
-    /**
-     * @param AssetsHelper      $assetsHelper
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(AssetsHelper $assetsHelper, IntegrationHelper $integrationHelper)
     {
         $this->assetsHelper      = $assetsHelper;
@@ -49,9 +45,6 @@ class PageSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');

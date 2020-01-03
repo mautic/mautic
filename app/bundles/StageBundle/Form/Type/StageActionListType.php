@@ -24,17 +24,11 @@ class StageActionListType extends AbstractType
 {
     private $model;
 
-    /**
-     * @param StageModel $model
-     */
     public function __construct(StageModel $model)
     {
         $this->model = $model;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

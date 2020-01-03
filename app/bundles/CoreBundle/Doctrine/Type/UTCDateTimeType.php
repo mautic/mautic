@@ -27,8 +27,7 @@ class UTCDateTimeType extends DateTimeType
     private static $utc;
 
     /**
-     * @param \DateTime        $value
-     * @param AbstractPlatform $platform
+     * @param \DateTime $value
      *
      * @return string|null
      */
@@ -55,8 +54,7 @@ class UTCDateTimeType extends DateTimeType
     }
 
     /**
-     * @param mixed            $value
-     * @param AbstractPlatform $platform
+     * @param mixed $value
      *
      * @return \DateTime|null
      *

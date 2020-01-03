@@ -35,25 +35,16 @@ class MappingManualDAO
      */
     private $integrationObjectsMapping = [];
 
-    /**
-     * @param string $integration
-     */
     public function __construct(string $integration)
     {
         $this->integration = $integration;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
     }
 
-    /**
-     * @param ObjectMappingDAO $objectMappingDAO
-     */
     public function addObjectMapping(ObjectMappingDAO $objectMappingDAO): void
     {
         $internalObjectName    = $objectMappingDAO->getInternalObjectName();
@@ -75,12 +66,6 @@ class MappingManualDAO
         $this->integrationObjectsMapping[$integrationObjectName][] = $internalObjectName;
     }
 
-    /**
-     * @param string $internalObjectName
-     * @param string $integrationObjectName
-     *
-     * @return ObjectMappingDAO|null
-     */
     public function getObjectMapping(string $internalObjectName, string $integrationObjectName): ?ObjectMappingDAO
     {
         if (!array_key_exists($internalObjectName, $this->objectsMapping)) {
@@ -94,10 +79,6 @@ class MappingManualDAO
     }
 
     /**
-     * @param string $internalObjectName
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getMappedIntegrationObjectsNames(string $internalObjectName): array
@@ -110,10 +91,6 @@ class MappingManualDAO
     }
 
     /**
-     * @param string $integrationObjectName
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getMappedInternalObjectsNames(string $integrationObjectName): array
@@ -125,9 +102,6 @@ class MappingManualDAO
         return $this->integrationObjectsMapping[$integrationObjectName];
     }
 
-    /**
-     * @return array
-     */
     public function getInternalObjectNames(): array
     {
         return array_keys($this->internalObjectsMapping);
@@ -135,10 +109,6 @@ class MappingManualDAO
 
     /**
      * Get a list of fields that should sync from Mautic to the integration.
-     *
-     * @param string $internalObjectName
-     *
-     * @return array
      *
      * @throws ObjectNotFoundException
      */
@@ -170,10 +140,6 @@ class MappingManualDAO
     /**
      * Get a list of internal fields that are required.
      *
-     * @param string $internalObjectName
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getInternalObjectRequiredFieldNames(string $internalObjectName): array
@@ -200,9 +166,6 @@ class MappingManualDAO
         return array_keys($fields);
     }
 
-    /**
-     * @return array
-     */
     public function getIntegrationObjectNames(): array
     {
         return array_keys($this->integrationObjectsMapping);
@@ -210,10 +173,6 @@ class MappingManualDAO
 
     /**
      * Get a list of fields that should sync from the integration to Mautic.
-     *
-     * @param string $integrationObjectName
-     *
-     * @return array
      *
      * @throws ObjectNotFoundException
      */
@@ -246,10 +205,6 @@ class MappingManualDAO
     /**
      * Get a list of integration fields that are required.
      *
-     * @param string $integrationObjectName
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     public function getIntegrationObjectRequiredFieldNames(string $integrationObjectName): array
@@ -278,12 +233,6 @@ class MappingManualDAO
     }
 
     /**
-     * @param string $integrationObjectName
-     * @param string $internalObjectName
-     * @param string $internalFieldName
-     *
-     * @return string
-     *
      * @throws FieldNotFoundException
      * @throws ObjectNotFoundException
      */
@@ -310,12 +259,6 @@ class MappingManualDAO
     }
 
     /**
-     * @param string $internalObjectName
-     * @param string $integrationObjectName
-     * @param string $integrationFieldName
-     *
-     * @return string
-     *
      * @throws FieldNotFoundException
      * @throws ObjectNotFoundException
      */

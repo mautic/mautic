@@ -17,13 +17,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface CredentialsInterface extends AuthCredentialsInterface
 {
-    /**
-     * @return string|null
-     */
     public function getUsername(): ?string;
 
-    /**
-     * @return string|null
-     */
     public function getPassword(): ?string;
 }

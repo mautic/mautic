@@ -40,11 +40,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $campaignEventModel;
 
-    /**
-     * @param FormModel       $formModel
-     * @param SubmissionModel $formSubmissionModel
-     * @param EventModel      $campaignEventModel
-     */
     public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, EventModel $campaignEventModel)
     {
         $this->formModel           = $formModel;
@@ -67,8 +62,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Add the option to the list.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
@@ -92,8 +85,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger campaign event for when a form is submitted.
-     *
-     * @param SubmissionEvent $event
      */
     public function onFormSubmit(SubmissionEvent $event)
     {
@@ -101,9 +92,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->campaignEventModel->triggerEvent('form.submit', $form, 'form', $form->getId());
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
@@ -122,9 +110,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         $lead = $event->getLead();

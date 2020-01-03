@@ -49,11 +49,10 @@ class CitrixEventUpdateEvent extends CommonEvent
     /**
      * CitrixEventUpdateEvent constructor.
      *
-     * @param      $product
-     * @param      $eventName
-     * @param      $eventDesc
-     * @param      $eventType
-     * @param Lead $lead
+     * @param $product
+     * @param $eventName
+     * @param $eventDesc
+     * @param $eventType
      */
     public function __construct($product, $eventName, $eventDesc, $eventType, Lead $lead)
     {

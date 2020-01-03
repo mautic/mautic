@@ -29,10 +29,6 @@ class PointSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -54,8 +50,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\PointEvent $event
      */
     public function onPointPostSave(Events\PointEvent $event)
     {
@@ -75,8 +69,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\PointEvent $event
      */
     public function onPointDelete(Events\PointEvent $event)
     {
@@ -94,8 +86,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\TriggerEvent $event
      */
     public function onTriggerPostSave(Events\TriggerEvent $event)
     {
@@ -115,8 +105,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\TriggerEvent $event
      */
     public function onTriggerDelete(Events\TriggerEvent $event)
     {

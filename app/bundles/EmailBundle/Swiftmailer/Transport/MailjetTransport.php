@@ -50,8 +50,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int|void
      *
@@ -88,8 +87,6 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
 
     /**
      * Handle response.
-     *
-     * @param Request $request
      *
      * @return mixed
      */

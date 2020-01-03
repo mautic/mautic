@@ -32,10 +32,6 @@ class EventType extends AbstractType
 {
     use PropertiesTrait;
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $masks = [];
@@ -292,17 +288,13 @@ class EventType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['settings']);
     }
 
     /**
-     * @param array $data
-     * @param       $name
+     * @param $name
      *
      * @return \DateTime|mixed|null
      */

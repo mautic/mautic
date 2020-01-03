@@ -39,10 +39,6 @@ class SchemaHelperFactory
 
     /**
      * SchemaHelperFactory constructor.
-     *
-     * @param TableSchemaHelper  $tableSchemaHelper
-     * @param IndexSchemaHelper  $indexSchemaHelper
-     * @param ColumnSchemaHelper $columnSchemaHelper
      */
     public function __construct(TableSchemaHelper $tableSchemaHelper, IndexSchemaHelper $indexSchemaHelper, ColumnSchemaHelper $columnSchemaHelper)
     {

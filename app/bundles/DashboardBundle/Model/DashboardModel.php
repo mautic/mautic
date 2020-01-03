@@ -52,9 +52,6 @@ class DashboardModel extends FormModel
 
     /**
      * DashboardModel constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param PathsHelper          $pathsHelper
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -66,9 +63,6 @@ class DashboardModel extends FormModel
         $this->filesystem           = $filesystem;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -210,8 +204,6 @@ class DashboardModel extends FormModel
     /**
      * Creates a new Widget object from an array data.
      *
-     * @param array $data
-     *
      * @return Widget
      */
     public function populateWidgetEntity(array $data)
@@ -232,8 +224,7 @@ class DashboardModel extends FormModel
     /**
      * Load widget content from the onWidgetDetailGenerate event.
      *
-     * @param Widget $widget
-     * @param array  $filter
+     * @param array $filter
      */
     public function populateWidgetContent(Widget $widget, $filter = [])
     {

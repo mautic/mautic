@@ -28,9 +28,6 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
         $event->addChannel(

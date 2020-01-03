@@ -48,9 +48,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $stageModel;
 
-    /**
-     * @param StageModel $stageModel
-     */
     public function __construct(StageModel $stageModel)
     {
         $this->stageModel = $stageModel;
@@ -58,8 +55,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

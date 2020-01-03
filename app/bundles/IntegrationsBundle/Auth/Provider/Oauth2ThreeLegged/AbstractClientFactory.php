@@ -31,9 +31,6 @@ abstract class AbstractClientFactory implements AuthProviderInterface
 {
     const NAME = 'oauth2_three_legged';
 
-    /**
-     * @return string
-     */
     public function getAuthType(): string
     {
         return self::NAME;
@@ -41,9 +38,6 @@ abstract class AbstractClientFactory implements AuthProviderInterface
 
     /**
      * @param AuthCredentialsInterface|CredentialsInterface $credentials
-     * @param AuthConfigInterface|null                      $config
-     *
-     * @return ClientInterface
      *
      * @throws PluginNotConfiguredException
      */
@@ -56,17 +50,7 @@ abstract class AbstractClientFactory implements AuthProviderInterface
         return $this->buildClient($credentials);
     }
 
-    /**
-     * @param CredentialsInterface $credentials
-     *
-     * @return ClientInterface
-     */
     abstract protected function buildClient(CredentialsInterface $credentials): ClientInterface;
 
-    /**
-     * @param CredentialsInterface $credentials
-     *
-     * @return bool
-     */
     abstract protected function credentialsAreConfigured(CredentialsInterface $credentials): bool;
 }

@@ -28,9 +28,6 @@ class ConfigMapper
      */
     private $restrictedParameters;
 
-    /**
-     * @param CoreParametersHelper $parametersHelper
-     */
     public function __construct(CoreParametersHelper $parametersHelper, array $restrictedParameters = [])
     {
         $this->parametersHelper     = $parametersHelper;
@@ -38,8 +35,6 @@ class ConfigMapper
     }
 
     /**
-     * @param array $forms
-     *
      * @return array
      *
      * @throws BadFormConfigException
@@ -59,8 +54,6 @@ class ConfigMapper
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
-     *
-     * @param array $formParameters
      *
      * @return array
      */

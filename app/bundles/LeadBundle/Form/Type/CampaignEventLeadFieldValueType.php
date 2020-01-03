@@ -40,11 +40,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     protected $fieldModel;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LeadModel           $leadModel
-     * @param FieldModel          $fieldModel
-     */
     public function __construct(TranslatorInterface $translator, LeadModel $leadModel, FieldModel $fieldModel)
     {
         $this->translator = $translator;

@@ -28,9 +28,8 @@ class ApiErrorException extends \Exception
     /**
      * ApiErrorException constructor.
      *
-     * @param string          $message
-     * @param int             $code
-     * @param \Exception|null $previous
+     * @param string $message
+     * @param int    $code
      */
     public function __construct($message = 'API error', $code = 0, \Exception $previous = null)
     {
@@ -66,8 +65,6 @@ class ApiErrorException extends \Exception
     }
 
     /**
-     * @param Lead $contact
-     *
      * @return ApiErrorException
      */
     public function setContact(Lead $contact)

@@ -38,11 +38,6 @@ class RequestSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param CsrfTokenManagerInterface $tokenManager
-     * @param TranslatorInterface       $translator
-     * @param TemplatingHelper          $templating
-     */
     public function __construct(
         CsrfTokenManagerInterface $tokenManager,
         TranslatorInterface $translator,
@@ -63,9 +58,6 @@ class RequestSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function validateCsrfTokenForAjaxPost(GetResponseEvent $event)
     {
         $request = $event->getRequest();
@@ -81,8 +73,6 @@ class RequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Request $request
-     *
      * @return bool
      */
     private function isAjaxPost(Request $request)
@@ -91,8 +81,6 @@ class RequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Request $request
-     *
      * @return bool
      */
     private function isSecurePath(Request $request)
@@ -101,8 +89,6 @@ class RequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Request $request
-     *
      * @return bool
      */
     private function isCsrfTokenFromRequestHeaderValid(Request $request)

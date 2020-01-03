@@ -53,10 +53,9 @@ class TransportChain
     }
 
     /**
-     * @param                $alias
-     * @param AbstractSmsApi $transport
-     * @param                $translatableAlias
-     * @param                $integrationAlias
+     * @param $alias
+     * @param $translatableAlias
+     * @param $integrationAlias
      *
      * @return $this
      */
@@ -93,7 +92,6 @@ class TransportChain
     }
 
     /**
-     * @param Lead   $lead
      * @param string $content
      *
      * @return mixed

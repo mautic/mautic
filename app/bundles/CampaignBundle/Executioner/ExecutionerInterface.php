@@ -18,10 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 interface ExecutionerInterface
 {
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return mixed
      */
     public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null);

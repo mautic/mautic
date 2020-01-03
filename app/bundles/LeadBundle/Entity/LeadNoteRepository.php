@@ -22,8 +22,6 @@ class LeadNoteRepository extends CommonRepository
     /**
      * {@inhertidoc}.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])

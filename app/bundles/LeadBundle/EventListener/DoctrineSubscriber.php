@@ -29,8 +29,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
     /**
      * DoctrineSubscriber constructor.
-     *
-     * @param Logger $logger
      */
     public function __construct(Logger $logger)
     {
@@ -47,9 +45,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
         ];
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();

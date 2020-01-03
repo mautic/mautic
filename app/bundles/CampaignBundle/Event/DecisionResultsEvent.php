@@ -36,10 +36,6 @@ class DecisionResultsEvent extends Event
 
     /**
      * DecisionResultsEvent constructor.
-     *
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     * @param EvaluatedContacts     $evaluatedContacts
      */
     public function __construct(AbstractEventAccessor $config, ArrayCollection $logs, EvaluatedContacts $evaluatedContacts)
     {

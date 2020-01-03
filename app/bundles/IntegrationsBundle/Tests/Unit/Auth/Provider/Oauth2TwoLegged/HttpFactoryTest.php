@@ -357,10 +357,6 @@ class HttpFactoryTest extends TestCase
     }
 
     /**
-     * @param ClientInterface $client
-     *
-     * @return OAuth2Middleware
-     *
      * @throws \ReflectionException
      */
     private function extractMiddleware(ClientInterface $client): OAuth2Middleware

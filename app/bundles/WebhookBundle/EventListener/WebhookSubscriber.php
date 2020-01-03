@@ -29,10 +29,6 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -52,8 +48,6 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param WebhookEvent $event
      */
     public function onWebhookSave(WebhookEvent $event)
     {
@@ -74,8 +68,6 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param WebhookEvent $event
      */
     public function onWebhookDelete(WebhookEvent $event)
     {

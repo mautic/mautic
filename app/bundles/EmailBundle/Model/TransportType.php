@@ -212,8 +212,6 @@ class TransportType
     }
 
     /**
-     * @param array $services
-     *
      * @return string
      */
     private function getString(array $services)

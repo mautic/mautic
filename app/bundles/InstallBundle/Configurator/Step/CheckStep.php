@@ -62,10 +62,9 @@ class CheckStep implements StepInterface
     public $site_url;
 
     /**
-     * @param Configurator  $configurator  Configurator service
-     * @param string        $kernelRoot    Kernel root path
-     * @param RequestStack  $requestStack  Request stack
-     * @param OpenSSLCipher $openSSLCipher
+     * @param Configurator $configurator Configurator service
+     * @param string       $kernelRoot   Kernel root path
+     * @param RequestStack $requestStack Request stack
      */
     public function __construct(
         Configurator $configurator,

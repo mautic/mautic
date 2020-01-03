@@ -34,20 +34,12 @@ class ConfigType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param CoreParametersHelper $parametersHelper
-     * @param TranslatorInterface  $translator
-     */
     public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {
         $this->parameters = $parametersHelper;
         $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -200,11 +192,6 @@ class ConfigType extends AbstractType
         );
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['entityId'] = $this->parameters->getParameter('mautic.saml_idp_entity_id');

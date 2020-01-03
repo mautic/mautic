@@ -88,8 +88,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -132,8 +130,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      *
      * @throws ApiErrorException
@@ -176,8 +172,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array|mixed|string
      *
      * @throws ApiErrorException
@@ -194,8 +188,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param       $sfObject
+     * @param $sfObject
      *
      * @return mixed|string
      *
@@ -215,9 +208,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param       $sfObject
-     * @param       $sfObjectId
+     * @param $sfObject
+     * @param $sfObjectId
      *
      * @return mixed|string
      *
@@ -235,8 +227,6 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
@@ -249,8 +239,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $activity
-     * @param       $object
+     * @param $object
      *
      * @return array
      *
@@ -435,9 +424,8 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param       $campaignId
-     * @param       $object
-     * @param array $people
+     * @param $campaignId
+     * @param $object
      *
      * @return array
      *
@@ -491,8 +479,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $names
-     * @param null  $requiredFieldString
+     * @param null $requiredFieldString
      *
      * @return mixed|string
      *
@@ -508,8 +495,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $ids
-     * @param       $requiredFieldString
+     * @param $requiredFieldString
      *
      * @return mixed|string
      *
@@ -550,8 +536,7 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array $error
-     * @param       $isRetry
+     * @param $isRetry
      *
      * @return string|false
      *

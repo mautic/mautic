@@ -35,35 +35,21 @@ class SyncEvent extends Event
         $this->toDateTime      = $toDateTime;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegrationName(): string
     {
         return $this->integrationName;
     }
 
-    /**
-     * @param string $integrationName
-     *
-     * @return bool
-     */
     public function isIntegration(string $integrationName): bool
     {
         return $this->getIntegrationName() === $integrationName;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getFromDateTime(): ?\DateTimeInterface
     {
         return $this->fromDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getToDateTime(): ?\DateTimeInterface
     {
         return $this->toDateTime;

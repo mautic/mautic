@@ -117,16 +117,6 @@ class PageModel extends FormModel
 
     /**
      * PageModel constructor.
-     *
-     * @param CookieHelper   $cookieHelper
-     * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel      $leadModel
-     * @param FieldModel     $leadFieldModel
-     * @param RedirectModel  $pageRedirectModel
-     * @param TrackableModel $pageTrackableModel
-     * @param QueueService   $queueService
-     * @param CompanyModel   $companyModel
-     * @param DeviceTracker  $deviceTracker
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -431,8 +421,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Hit $hit
-     *
      * @return array|mixed
      */
     protected function generateClickThrough(Hit $hit)
@@ -453,9 +441,7 @@ class PageModel extends FormModel
 
     /**
      * @param Page|Redirect $page
-     * @param Request       $request
      * @param string        $code
-     * @param Lead|null     $lead
      * @param array         $query
      *
      * @throws \Exception
@@ -550,10 +536,7 @@ class PageModel extends FormModel
     /**
      * Process page hit.
      *
-     * @param Hit           $hit
      * @param Page|Redirect $page
-     * @param Request       $request
-     * @param Lead          $lead
      * @param bool          $trackingNewlyGenerated
      * @param bool          $activeRequest
      *
@@ -783,7 +766,6 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Request            $request
      * @param Redirect|Page|null $page
      *
      * @return array
@@ -809,7 +791,6 @@ class PageModel extends FormModel
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
-     * @param Page|null    $page
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
      * @param string|null  $tokenFilter
      *
@@ -826,7 +807,6 @@ class PageModel extends FormModel
     /**
      * Get number of page bounces.
      *
-     * @param Page      $page
      * @param \DateTime $fromDate
      *
      * @return int
@@ -838,8 +818,6 @@ class PageModel extends FormModel
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -851,12 +829,10 @@ class PageModel extends FormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -935,10 +911,8 @@ class PageModel extends FormModel
     /**
      * Get pie chart data of dwell times.
      *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -1078,9 +1052,7 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param      $page
-     * @param Hit  $hit
-     * @param Lead $lead
+     * @param $page
      */
     private function setLeadManipulator($page, Hit $hit, Lead $lead)
     {
@@ -1105,8 +1077,7 @@ class PageModel extends FormModel
     }
 
     /**
-     * @param Request $request
-     * @param         $page
+     * @param $page
      *
      * @return mixed|string
      */

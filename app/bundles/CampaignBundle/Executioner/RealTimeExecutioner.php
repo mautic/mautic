@@ -92,16 +92,6 @@ class RealTimeExecutioner
 
     /**
      * RealTimeExecutioner constructor.
-     *
-     * @param LoggerInterface  $logger
-     * @param LeadModel        $leadModel
-     * @param EventRepository  $eventRepository
-     * @param EventExecutioner $executioner
-     * @param Executioner      $decisionExecutioner
-     * @param EventCollector   $collector
-     * @param EventScheduler   $scheduler
-     * @param ContactTracker   $contactTracker
-     * @param LeadRepository   $leadRepository
      */
     public function __construct(
         LoggerInterface $logger,
@@ -193,9 +183,6 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param ArrayCollection $children
-     * @param \DateTime       $now
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
@@ -226,7 +213,6 @@ class RealTimeExecutioner
     }
 
     /**
-     * @param Event       $event
      * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId

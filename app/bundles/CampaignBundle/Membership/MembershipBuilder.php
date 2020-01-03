@@ -76,12 +76,6 @@ class MembershipBuilder
 
     /**
      * MembershipBuilder constructor.
-     *
-     * @param MembershipManager        $manager
-     * @param CampaignMemberRepository $campaignMemberRepository
-     * @param LeadRepository           $leadRepository
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TranslatorInterface      $translator
      */
     public function __construct(
         MembershipManager $manager,
@@ -98,10 +92,7 @@ class MembershipBuilder
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $contactLimiter
-     * @param int                  $runLimit
-     * @param OutputInterface|null $output
+     * @param int $runLimit
      *
      * @return int
      */

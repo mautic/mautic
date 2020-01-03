@@ -32,9 +32,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConfigBuilderEvent $event
-     */
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addFileFields($this->fileFields)
@@ -49,9 +46,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigSave(ConfigEvent $event)
     {
         $data = $event->getConfig(ConfigType::class);

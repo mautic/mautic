@@ -71,11 +71,7 @@ class PhpEngine extends BasePhpEngine
     /**
      * PhpEngine constructor.
      *
-     * @param TemplateNameParserInterface $parser
-     * @param ContainerInterface          $container
-     * @param LoaderInterface             $loader
-     * @param Stopwatch|GlobalVariables   $delegateStopWatch
-     * @param GlobalVariables|null        $globals
+     * @param Stopwatch|GlobalVariables $delegateStopWatch
      */
     public function __construct(
         TemplateNameParserInterface $parser,
@@ -93,17 +89,11 @@ class PhpEngine extends BasePhpEngine
         parent::__construct($parser, $container, $loader, $globals);
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
@@ -111,7 +101,6 @@ class PhpEngine extends BasePhpEngine
 
     /**
      * @param string|\Symfony\Component\Templating\TemplateReferenceInterface $name
-     * @param array                                                           $parameters
      *
      * @return false|string
      */
@@ -151,9 +140,6 @@ class PhpEngine extends BasePhpEngine
     }
 
     /**
-     * @param Storage $template
-     * @param array   $mauticTemplateVars
-     *
      * @return false|string
      *
      * @throws \Exception
@@ -194,8 +180,6 @@ class PhpEngine extends BasePhpEngine
     }
 
     /**
-     * @param \Exception $exception
-     *
      * @return false|string
      */
     protected function generateErrorContent(\Exception $exception)

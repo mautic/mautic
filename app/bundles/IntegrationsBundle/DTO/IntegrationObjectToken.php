@@ -51,8 +51,6 @@ class IntegrationObjectToken
 
     /**
      * IntegrationObjectToken constructor.
-     *
-     * @param string $token
      */
     public function __construct(string $token)
     {

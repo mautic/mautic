@@ -11,8 +11,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class CompanyExport extends AbstractPipedrive
 {
     /**
-     * @param Company $company
-     *
      * @return bool
      */
     public function pushCompany(Company $company)
@@ -32,9 +30,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param Company $company
-     * @param array   $mappedData
-     *
      * @return bool
      */
     public function create(Company $company, array $mappedData = [])
@@ -70,9 +65,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param IntegrationEntity $integrationEntity
-     * @param array             $mappedData
-     *
      * @return bool
      */
     public function update(IntegrationEntity $integrationEntity, array $mappedData = [])
@@ -96,8 +88,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param Company $company
-     *
      * @return bool
      */
     public function delete(Company $company)
@@ -131,8 +121,6 @@ class CompanyExport extends AbstractPipedrive
     }
 
     /**
-     * @param Company $company
-     *
      * @return array
      */
     private function getMappedCompanyData(Company $company)
@@ -165,9 +153,6 @@ class CompanyExport extends AbstractPipedrive
         return $mappedData;
     }
 
-    /**
-     * @param Company $company
-     */
     private function getCompanyIntegrationOwnerId(Company $company)
     {
         $mauticOwner = $company->getOwner();

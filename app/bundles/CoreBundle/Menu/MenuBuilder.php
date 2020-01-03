@@ -45,11 +45,6 @@ class MenuBuilder
 
     /**
      * MenuBuilder constructor.
-     *
-     * @param FactoryInterface         $knpFactory
-     * @param MatcherInterface         $matcher
-     * @param EventDispatcherInterface $dispatcher
-     * @param MenuHelper               $menuHelper
      */
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {

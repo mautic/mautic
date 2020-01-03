@@ -40,8 +40,6 @@ class PipedriveController extends CommonController
     const USER_UPDATE_EVENT = 'updated.user';
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     public function webhookAction(Request $request)
@@ -105,8 +103,6 @@ class PipedriveController extends CommonController
     /**
      * Transform unknown Exception codes into 500 code.
      *
-     * @param \Exception $e
-     *
      * @return int
      */
     private function getErrorCodeFromException(\Exception $e)
@@ -159,9 +155,6 @@ class PipedriveController extends CommonController
     }
 
     /**
-     * @param Request              $request
-     * @param PipedriveIntegration $pipedriveIntegration
-     *
      * @return bool
      */
     private function validCredential(Request $request, PipedriveIntegration $pipedriveIntegration)

@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class SyncIntegrationsPass implements CompilerPassInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container): void
     {
         $taggedServices         = $container->findTaggedServiceIds('mautic.sync_integration');

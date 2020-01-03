@@ -91,11 +91,6 @@ class ThemeHelper
 
     /**
      * ThemeHelper constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
@@ -431,9 +426,7 @@ class ThemeHelper
         $themeName = basename($zipFile, '.zip');
 
         if (in_array($themeName, $this->getDefaultThemes())) {
-            throw new \Exception(
-                $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
-            );
+            throw new \Exception($this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators'));
         }
 
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
@@ -485,15 +478,7 @@ class ThemeHelper
         }
 
         if ($missingFiles = array_diff($requiredFiles, $foundRequiredFiles)) {
-            throw new MauticException\FileNotFoundException(
-                $this->translator->trans(
-                    'mautic.core.theme.missing.files',
-                    [
-                        '%files%' => implode(', ', $missingFiles),
-                    ],
-                    'validators'
-                )
-            );
+            throw new MauticException\FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
         }
 
         // Extract the archive file now
@@ -583,9 +568,6 @@ class ThemeHelper
     }
 
     /**
-     * @param EngineInterface   $templating
-     * @param TemplateReference $template
-     *
      * @throws MauticException\BadConfigurationException
      * @throws MauticException\FileNotFoundException
      */

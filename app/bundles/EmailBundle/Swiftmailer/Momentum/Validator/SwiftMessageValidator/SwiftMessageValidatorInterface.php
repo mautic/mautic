@@ -19,8 +19,6 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageVali
 interface SwiftMessageValidatorInterface
 {
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @throws SwiftMessageValidationException
      */
     public function validate(\Swift_Mime_SimpleMessage $message);

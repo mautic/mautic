@@ -71,12 +71,6 @@ class ImportModel extends FormModel
 
     /**
      * ImportModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param LeadModel            $leadModel
-     * @param NotificationModel    $notificationModel
-     * @param CoreParametersHelper $config
-     * @param CompanyModel         $companyModel
      */
     public function __construct(
         PathsHelper $pathsHelper,
@@ -137,8 +131,6 @@ class ImportModel extends FormModel
     /**
      * Generates a HTML link to the import detail.
      *
-     * @param Import $import
-     *
      * @return string
      */
     public function generateLink(Import $import)
@@ -190,9 +182,7 @@ class ImportModel extends FormModel
      * Start import. This is meant for the CLI command since it will import
      * the whole file at once.
      *
-     * @param Import   $import
-     * @param Progress $progress
-     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
+     * @param int $limit Number of records to import before delaying the import. 0 will import all
      *
      * @throws ImportFailedException
      * @throws ImportDelayedException
@@ -285,9 +275,7 @@ class ImportModel extends FormModel
     /**
      * Import the CSV file from configuration in the $import entity.
      *
-     * @param Import   $import
-     * @param Progress $progress
-     * @param int      $limit    Number of records to import before delaying the import
+     * @param int $limit Number of records to import before delaying the import
      *
      * @return bool
      */
@@ -469,8 +457,6 @@ class ImportModel extends FormModel
     /**
      * Trim all values in a one dymensional array.
      *
-     * @param array $data
-     *
      * @return array
      */
     public function trimArrayValues(array $data)
@@ -501,8 +487,7 @@ class ImportModel extends FormModel
     /**
      * Save log about errored line.
      *
-     * @param LeadEventLog $eventLog
-     * @param string       $errorMessage
+     * @param string $errorMessage
      */
     public function logImportRowError(LeadEventLog $eventLog, $errorMessage)
     {
@@ -515,8 +500,7 @@ class ImportModel extends FormModel
     /**
      * Initialize LeadEventLog object and configure it as the import event.
      *
-     * @param Import $import
-     * @param int    $lineNumber
+     * @param int $lineNumber
      *
      * @return LeadEventLog
      */
@@ -541,11 +525,9 @@ class ImportModel extends FormModel
     /**
      * Get line chart data of imported rows.
      *
-     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
      *
      * @return array
      */

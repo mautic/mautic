@@ -35,8 +35,6 @@ class QueueConfigEvent extends CommonEvent
 
     /**
      * QueueConfigEvent constructor.
-     *
-     * @param array $options
      */
     public function __construct(array $options)
     {
@@ -70,7 +68,6 @@ class QueueConfigEvent extends CommonEvent
     /**
      * @param string      $child
      * @param string|null $type
-     * @param array       $options
      */
     public function addFormField($child, $type = null, array $options = [])
     {

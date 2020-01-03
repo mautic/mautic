@@ -74,9 +74,6 @@ class ObjectMapping
      */
     private $integrationReferenceId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -144,8 +141,6 @@ class ObjectMapping
 
     /**
      * ObjectMapping constructor.
-     *
-     * @param \DateTime|null $dateCreated
      *
      * @throws \Exception
      */

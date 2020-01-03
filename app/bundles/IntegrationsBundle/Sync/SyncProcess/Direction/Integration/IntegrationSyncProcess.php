@@ -59,11 +59,6 @@ class IntegrationSyncProcess
      */
     private $syncDataExchange;
 
-    /**
-     * @param SyncDateHelper        $syncDateHelper
-     * @param MappingHelper         $mappingHelper
-     * @param ObjectChangeGenerator $objectChangeGenerator
-     */
     public function __construct(SyncDateHelper $syncDateHelper, MappingHelper $mappingHelper, ObjectChangeGenerator $objectChangeGenerator)
     {
         $this->syncDateHelper        = $syncDateHelper;
@@ -71,11 +66,6 @@ class IntegrationSyncProcess
         $this->objectChangeGenerator = $objectChangeGenerator;
     }
 
-    /**
-     * @param InputOptionsDAO           $inputOptionsDAO
-     * @param MappingManualDAO          $mappingManualDAO
-     * @param SyncDataExchangeInterface $syncDataExchange
-     */
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, SyncDataExchangeInterface $syncDataExchange): void
     {
         $this->inputOptionsDAO  = $inputOptionsDAO;
@@ -84,8 +74,6 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @param int $syncIteration
-     *
      * @return ReportDAO
      *
      * @throws ObjectNotFoundException
@@ -150,8 +138,6 @@ class IntegrationSyncProcess
     }
 
     /**
-     * @param ReportDAO $syncReport
-     *
      * @return OrderDAO
      *
      * @throws ObjectNotFoundException

@@ -29,8 +29,6 @@ class Responses
 
     /**
      * DecisionResponses constructor.
-     *
-     * @param ArrayCollection $logs
      */
     public function setFromLogs(ArrayCollection $logs)
     {
@@ -52,7 +50,6 @@ class Responses
     }
 
     /**
-     * @param Event $event
      * @param mixed $response
      */
     public function setResponse(Event $event, $response)

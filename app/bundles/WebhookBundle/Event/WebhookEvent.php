@@ -20,8 +20,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 class WebhookEvent extends CommonEvent
 {
     /**
-     * @param Webhook $webhook
-     * @param bool    $isNew
+     * @param bool $isNew
      */
     public function __construct(Webhook $webhook, $isNew = false)
     {
@@ -41,8 +40,6 @@ class WebhookEvent extends CommonEvent
 
     /**
      * Sets the Webhook entity.
-     *
-     * @param Webhook $webhook
      */
     public function setWebhook(Webhook $webhook)
     {

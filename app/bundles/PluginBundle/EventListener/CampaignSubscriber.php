@@ -33,9 +33,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
@@ -49,9 +46,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('plugin.leadpush', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $config                  = $event->getConfig();

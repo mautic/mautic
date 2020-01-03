@@ -226,7 +226,6 @@ class LeadListRepository extends CommonRepository
     /**
      * Check Lead segments by ids.
      *
-     * @param Lead $lead
      * @param $ids
      *
      * @return bool
@@ -346,13 +345,9 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param array             $filters
-     * @param array             $parameters
-     * @param QueryBuilder      $q
-     * @param QueryBuilder|null $parameterQ
-     * @param null              $listId
-     * @param bool              $isNot
-     * @param string            $leadTablePrefix
+     * @param null   $listId
+     * @param bool   $isNot
+     * @param string $leadTablePrefix
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
@@ -411,13 +406,12 @@ class LeadListRepository extends CommonRepository
      * This is a public method that can be used by 3rd party.
      * Do not change the signature.
      *
-     * @param              $filters
-     * @param              $parameters
-     * @param QueryBuilder $q
-     * @param bool         $isNot
-     * @param null         $leadId
-     * @param string       $object
-     * @param null         $listId
+     * @param        $filters
+     * @param        $parameters
+     * @param bool   $isNot
+     * @param null   $leadId
+     * @param string $object
+     * @param null   $listId
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
@@ -1638,22 +1632,17 @@ class LeadListRepository extends CommonRepository
         return $objectFilters;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param       $table
-     * @param       $alias
-     * @param       $column
-     * @param       $value
-     * @param array $parameters
-     * @param null  $leadId
-     * @param array $subQueryFilters
+     * @param      $table
+     * @param      $alias
+     * @param      $column
+     * @param      $value
+     * @param null $leadId
      *
      * @return QueryBuilder
      */
@@ -1852,8 +1841,7 @@ class LeadListRepository extends CommonRepository
      * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
      * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
      *
-     * @param QueryBuilder $q
-     * @param string       $leadTablePrefix
+     * @param string $leadTablePrefix
      */
     private function applyCompanyFieldFilters(QueryBuilder $q, $leadTablePrefix = 'l')
     {

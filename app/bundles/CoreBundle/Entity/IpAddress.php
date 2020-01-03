@@ -42,9 +42,6 @@ class IpAddress
      */
     private $ipDetails;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -160,8 +157,6 @@ class IpAddress
 
     /**
      * Set list of IPs to not track.
-     *
-     * @param array $ips
      */
     public function setDoNotTrackList(array $ips)
     {

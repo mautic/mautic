@@ -22,10 +22,6 @@ class EmailToUserType extends AbstractType
 {
     use ToBcBccFieldsTrait;
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('useremail',
@@ -65,9 +61,6 @@ class EmailToUserType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

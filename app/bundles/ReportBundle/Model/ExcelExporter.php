@@ -29,7 +29,6 @@ class ExcelExporter
     }
 
     /**
-     * @param array  $reportData
      * @param string $name
      *
      * @throws \Exception

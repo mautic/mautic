@@ -106,7 +106,6 @@ class ChannelBroadcastEvent extends Event
      * @param string $channelLabel
      * @param int    $successCount
      * @param int    $failedCount
-     * @param array  $failedRecipientsByList
      */
     public function setResults($channelLabel, $successCount, $failedCount = 0, array $failedRecipientsByList = [])
     {

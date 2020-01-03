@@ -35,11 +35,6 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $requestStack;
 
-    /**
-     * @param EmailModel   $emailModel
-     * @param EventModel   $campaignEventModel
-     * @param RequestStack $requestStack
-     */
     public function __construct(EmailModel $emailModel, EventModel $campaignEventModel, RequestStack $requestStack)
     {
         $this->emailModel         = $emailModel;
@@ -59,8 +54,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger point actions for page hits.
-     *
-     * @param Events\PageHitEvent $event
      */
     public function onPageHit(Events\PageHitEvent $event)
     {

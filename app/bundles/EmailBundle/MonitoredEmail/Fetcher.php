@@ -53,10 +53,7 @@ class Fetcher
     /**
      * Fetcher constructor.
      *
-     * @param Mailbox                  $imapHelper
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     * @param array                    $mailboxes
+     * @param array $mailboxes
      */
     public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
@@ -66,8 +63,6 @@ class Fetcher
     }
 
     /**
-     * @param array $mailboxes
-     *
      * @return $this
      */
     public function setMailboxes(array $mailboxes)
@@ -139,9 +134,8 @@ class Fetcher
     }
 
     /**
-     * @param array $mailIds
-     * @param int   $limit
-     * @param bool  $markAsSeen
+     * @param int  $limit
+     * @param bool $markAsSeen
      *
      * @return array
      */

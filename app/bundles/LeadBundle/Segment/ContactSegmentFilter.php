@@ -42,12 +42,6 @@ class ContactSegmentFilter
      */
     private $schemaCache;
 
-    /**
-     * @param ContactSegmentFilterCrate   $contactSegmentFilterCrate
-     * @param FilterDecoratorInterface    $filterDecorator
-     * @param TableSchemaColumnsCache     $cache
-     * @param FilterQueryBuilderInterface $filterQueryBuilder
-     */
     public function __construct(
         ContactSegmentFilterCrate $contactSegmentFilterCrate,
         FilterDecoratorInterface $filterDecorator,
@@ -163,8 +157,6 @@ class ContactSegmentFilter
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     *
      * @return QueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder)

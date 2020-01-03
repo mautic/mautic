@@ -26,17 +26,11 @@ trait FormFieldTrait
      */
     protected $formModel;
 
-    /**
-     * @param FieldModel $fieldModel
-     */
     public function setFieldModel(FieldModel $fieldModel)
     {
         $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @param FormModel $formModel
-     */
     public function setFormModel(FormModel $formModel)
     {
         $this->formModel = $formModel;

@@ -20,25 +20,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface AuthorizatorInterface
 {
-    /**
-     * @return bool
-     */
     public function isAuthorized(): bool;
 
-    /**
-     * @return string
-     */
     public function getAccessToken(): string;
 
-    /**
-     * @param CredentialsInterface $credentials
-     *
-     * @return string
-     */
     public function getAuthorizationUri(CredentialsInterface $credentials): string;
 
-    /**
-     * @param Request $request
-     */
     public function handleCallback(Request $request): void;
 }

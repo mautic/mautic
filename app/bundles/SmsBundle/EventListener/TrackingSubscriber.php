@@ -26,8 +26,6 @@ class TrackingSubscriber implements EventSubscriberInterface
 
     /**
      * TrackingSubscriber constructor.
-     *
-     * @param StatRepository $statRepository
      */
     public function __construct(StatRepository $statRepository)
     {
@@ -44,9 +42,6 @@ class TrackingSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ContactIdentificationEvent $event
-     */
     public function onIdentifyContact(ContactIdentificationEvent $event)
     {
         $clickthrough = $event->getClickthrough();

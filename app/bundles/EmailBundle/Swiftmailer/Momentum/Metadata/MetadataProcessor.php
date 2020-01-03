@@ -48,8 +48,6 @@ class MetadataProcessor
 
     /**
      * MetadataProcessor constructor.
-     *
-     * @param \Swift_Message $message
      */
     public function __construct(\Swift_Message $message)
     {
@@ -133,9 +131,6 @@ class MetadataProcessor
         $this->extractCampaignId($metadataSample);
     }
 
-    /**
-     * @param array $metadataSample
-     */
     private function extractCampaignId(array $metadataSample)
     {
         // Extract and build a campaign ID from the metadata sample

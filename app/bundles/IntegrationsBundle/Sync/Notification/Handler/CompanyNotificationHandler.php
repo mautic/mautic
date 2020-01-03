@@ -36,11 +36,6 @@ class CompanyNotificationHandler implements HandlerInterface
      */
     private $companyHelper;
 
-    /**
-     * @param Writer                 $writer
-     * @param UserNotificationHelper $userNotificationHelper
-     * @param CompanyHelper          $companyHelper
-     */
     public function __construct(Writer $writer, UserNotificationHelper $userNotificationHelper, CompanyHelper $companyHelper)
     {
         $this->writer                 = $writer;
@@ -48,27 +43,17 @@ class CompanyNotificationHandler implements HandlerInterface
         $this->companyHelper          = $companyHelper;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return MauticSyncDataExchange::NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getSupportedObject(): string
     {
         return MauticSyncDataExchange::OBJECT_COMPANY;
     }
 
     /**
-     * @param NotificationDAO $notificationDAO
-     * @param string          $integrationDisplayName
-     * @param string          $objectDisplayName
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */

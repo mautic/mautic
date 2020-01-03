@@ -43,27 +43,18 @@ class SyncIntegrationsHelper
      */
     private $objectProvider;
 
-    /**
-     * @param IntegrationsHelper $integrationsHelper
-     * @param ObjectProvider     $objectProvider
-     */
     public function __construct(IntegrationsHelper $integrationsHelper, ObjectProvider $objectProvider)
     {
         $this->integrationsHelper = $integrationsHelper;
         $this->objectProvider     = $objectProvider;
     }
 
-    /**
-     * @param SyncInterface $integration
-     */
     public function addIntegration(SyncInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
 
     /**
-     * @param string $integration
-     *
      * @return SyncInterface
      *
      * @throws IntegrationNotFoundException
@@ -105,10 +96,6 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @param string $mauticObject
-     *
-     * @return bool
-     *
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
@@ -153,10 +140,6 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @param string $integration
-     *
-     * @return MappingManualDAO
-     *
      * @throws IntegrationNotFoundException
      */
     public function getMappingManual(string $integration): MappingManualDAO
@@ -167,10 +150,6 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @param string $integration
-     *
-     * @return SyncDataExchangeInterface
-     *
      * @throws IntegrationNotFoundException
      */
     public function getSyncDataExchange(string $integration): SyncDataExchangeInterface

@@ -54,8 +54,7 @@ class ColumnSchemaHelper
     protected $toTable;
 
     /**
-     * @param Connection $db
-     * @param string     $prefix
+     * @param string $prefix
      */
     public function __construct(Connection $db, $prefix)
     {
@@ -124,8 +123,6 @@ class ColumnSchemaHelper
 
     /**
      * Add an array of columns to the table.
-     *
-     * @param array $columns
      *
      * @throws SchemaException
      */

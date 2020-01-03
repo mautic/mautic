@@ -46,9 +46,8 @@ final class RecipientDTO implements \JsonSerializable
     /**
      * RecipientDTO constructor.
      *
-     * @param AddressDTO $addressDTO
-     * @param array      $metadata
-     * @param array      $substitutionData
+     * @param array $metadata
+     * @param array $substitutionData
      */
     public function __construct(AddressDTO $addressDTO, $metadata = [], $substitutionData = [])
     {

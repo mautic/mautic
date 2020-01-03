@@ -134,9 +134,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $this->guest = $isGuest;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -213,9 +210,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('username', new Assert\NotBlank(
@@ -280,8 +274,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     }
 
     /**
-     * @param Form $form
-     *
      * @return array
      */
     public static function determineValidationGroups(Form $form)
@@ -664,8 +656,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
     /**
      * Set active permissions.
-     *
-     * @param array $permissions
      *
      * @return User
      */

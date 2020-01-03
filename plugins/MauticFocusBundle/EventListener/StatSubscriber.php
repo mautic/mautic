@@ -32,10 +32,6 @@ class StatSubscriber implements EventSubscriberInterface
      */
     private $requestStack;
 
-    /**
-     * @param FocusModel   $model
-     * @param RequestStack $requestStack
-     */
     public function __construct(FocusModel $model, RequestStack $requestStack)
     {
         $this->model        = $model;
@@ -53,9 +49,6 @@ class StatSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param PageHitEvent $event
-     */
     public function onPageHit(PageHitEvent $event)
     {
         $hit    = $event->getHit();
@@ -73,8 +66,6 @@ class StatSubscriber implements EventSubscriberInterface
 
     /**
      * Note if this submission is from a focus submit.
-     *
-     * @param SubmissionEvent $event
      */
     public function onFormSubmit(SubmissionEvent $event)
     {

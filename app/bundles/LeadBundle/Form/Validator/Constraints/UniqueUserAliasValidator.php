@@ -29,10 +29,6 @@ class UniqueUserAliasValidator extends ConstraintValidator
      */
     public $userHelper;
 
-    /**
-     * @param LeadListRepository $segmentRepository
-     * @param UserHelper         $userHelper
-     */
     public function __construct(LeadListRepository $segmentRepository, UserHelper $userHelper)
     {
         $this->segmentRepository = $segmentRepository;

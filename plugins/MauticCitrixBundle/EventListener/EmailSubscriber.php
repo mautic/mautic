@@ -73,8 +73,6 @@ class EmailSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param TokenGenerateEvent $event
-     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -106,8 +104,6 @@ class EmailSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param EmailBuilderEvent $event
-     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -140,8 +136,6 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Search and replace tokens with content.
      *
-     * @param EmailSendEvent $event
-     *
      * @throws \RuntimeException
      */
     public function decodeTokensDisplay(EmailSendEvent $event)
@@ -151,8 +145,6 @@ class EmailSubscriber implements EventSubscriberInterface
 
     /**
      * Search and replace tokens with content.
-     *
-     * @param EmailSendEvent $event
      *
      * @throws \RuntimeException
      */
@@ -164,8 +156,7 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * Search and replace tokens with content.
      *
-     * @param EmailSendEvent $event
-     * @param bool           $triggerEvent
+     * @param bool $triggerEvent
      *
      * @throws \RuntimeException
      */

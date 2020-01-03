@@ -42,10 +42,9 @@ class TagEntityModelTransformer implements DataTransformerInterface
     private $isArray;
 
     /**
-     * @param EntityManager $em
-     * @param string        $repo
-     * @param string        $identifier
-     * @param bool          $isArray
+     * @param string $repo
+     * @param string $identifier
+     * @param bool   $isArray
      */
     public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
     {
@@ -99,10 +98,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
             ;
 
             if (null === $entity) {
-                throw new TransformationFailedException(sprintf(
-                    'Tag with "%s" does not exist!',
-                    $id
-                ));
+                throw new TransformationFailedException(sprintf('Tag with "%s" does not exist!', $id));
             }
 
             return $entity;
@@ -131,10 +127,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf(
-                'Tags for "%s" does not exist!',
-                $id
-            ));
+            throw new TransformationFailedException(sprintf('Tags for "%s" does not exist!', $id));
         }
 
         return $entities;

@@ -35,10 +35,6 @@ class AssetGenerationHelper
 
     /**
      * AssetGenerationHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param PathsHelper          $pathsHelper
-     * @param AppVersion           $version
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper, AppVersion $version)
     {

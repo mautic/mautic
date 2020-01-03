@@ -114,10 +114,7 @@ class SendEmailToContact
     /**
      * SendEmailToContact constructor.
      *
-     * @param MailHelper          $mailer
-     * @param StatRepository      $statRepository
-     * @param DoNotContact        $dncModel
-     * @param TranslatorInterface $translator
+     * @param StatRepository $statRepository
      */
     public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
     {
@@ -168,10 +165,7 @@ class SendEmailToContact
     /**
      * Use an Email entity to populate content, from, etc.
      *
-     * @param Email $email
-     * @param array $channel          ['channelName', 'channelId']
-     * @param array $customHeaders
-     * @param array $assetAttachments
+     * @param array $channel ['channelName', 'channelId']
      *
      * @return $this
      */
@@ -211,9 +205,6 @@ class SendEmailToContact
     }
 
     /**
-     * @param array $contact
-     * @param array $tokens
-     *
      * @return $this
      *
      * @throws FailedToSendToContactException

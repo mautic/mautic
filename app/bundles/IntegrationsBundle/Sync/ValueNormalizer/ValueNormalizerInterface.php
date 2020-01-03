@@ -20,14 +20,10 @@ interface ValueNormalizerInterface
     /**
      * @param $value
      * @param $type
-     *
-     * @return NormalizedValueDAO
      */
     public function normalizeForMautic(string $value, $type): NormalizedValueDAO;
 
     /**
-     * @param NormalizedValueDAO $value
-     *
      * @return mixed
      */
     public function normalizeForIntegration(NormalizedValueDAO $value);

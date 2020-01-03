@@ -47,11 +47,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * PageSubscriber constructor.
-     *
-     * @param FormModel                 $formModel
-     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
-     * @param TranslatorInterface       $translator
-     * @param CorePermissions           $security
      */
     public function __construct(
         FormModel $formModel,
@@ -78,8 +73,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param PageBuilderEvent $event
      */
     public function onPageBuild(PageBuilderEvent $event)
     {
@@ -99,9 +92,6 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $content = $event->getContent();

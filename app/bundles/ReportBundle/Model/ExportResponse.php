@@ -19,8 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ExportResponse
 {
     /**
-     * @param Response $response
-     * @param string   $fileName
+     * @param string $fileName
      */
     public static function setResponseHeaders(Response $response, $fileName)
     {

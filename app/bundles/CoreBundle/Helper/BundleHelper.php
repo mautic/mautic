@@ -30,9 +30,6 @@ class BundleHelper
 
     /**
      * BundleHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param Kernel               $kernel
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, Kernel $kernel)
     {

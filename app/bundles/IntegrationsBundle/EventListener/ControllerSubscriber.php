@@ -34,9 +34,6 @@ class ControllerSubscriber implements EventSubscriberInterface
 
     /**
      * ControllerSubscriber constructor.
-     *
-     * @param IntegrationsHelper          $integrationsHelper
-     * @param ControllerResolverInterface $resolver
      */
     public function __construct(IntegrationsHelper $integrationsHelper, ControllerResolverInterface $resolver)
     {
@@ -54,9 +51,6 @@ class ControllerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function onKernelController(FilterControllerEvent $event): void
     {
         $request = $event->getRequest();

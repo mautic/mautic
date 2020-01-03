@@ -33,8 +33,6 @@ class BatchSegmentController extends AbstractFormController
     /**
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
-     *
-     * @param FilterControllerEvent $event
      */
     public function initialize(FilterControllerEvent $event)
     {

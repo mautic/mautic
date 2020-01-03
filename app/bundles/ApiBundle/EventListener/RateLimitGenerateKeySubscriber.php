@@ -23,9 +23,6 @@ class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -41,9 +38,6 @@ class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param \Noxlogic\RateLimitBundle\Events\GenerateKeyEvent $event
-     */
     public function onGenerateKey(GenerateKeyEvent $event)
     {
         $suffix = $this->coreParametersHelper->getParameter('site_url');

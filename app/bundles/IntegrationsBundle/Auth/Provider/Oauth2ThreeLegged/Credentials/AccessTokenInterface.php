@@ -17,13 +17,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface AccessTokenInterface extends AuthCredentialsInterface
 {
-    /**
-     * @return string|null
-     */
     public function getAccessToken(): ?string;
 
-    /**
-     * @return \DateTimeImmutable|null
-     */
     public function getAccessTokenExpiry(): ?\DateTimeImmutable;
 }

@@ -88,14 +88,6 @@ class ReportModel extends FormModel
 
     /**
      * ReportModel constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param ChannelListHelper    $channelListHelper
-     * @param FieldModel           $fieldModel
-     * @param ReportHelper         $reportHelper
-     * @param CsvExporter          $csvExporter
-     * @param ExcelExporter        $excelExporter
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -115,9 +107,6 @@ class ReportModel extends FormModel
         $this->excelExporter     = $excelExporter;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -297,8 +286,6 @@ class ReportModel extends FormModel
     /**
      * Prevent same aliases using numeric suffixes for each alias.
      *
-     * @param array $columns
-     *
      * @return array
      */
     private function preventSameAliases(array $columns)
@@ -430,8 +417,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param Report $report
-     * @param array  $reportData
      * @param null   $handle
      * @param int    $page
      *
@@ -508,9 +493,7 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @param Report               $entity
      * @param FormFactoryInterface $formFactory
-     * @param array                $options
      *
      * @return array
      */
@@ -732,8 +715,6 @@ class ReportModel extends FormModel
     /**
      * Determine what operators should be used for the filter type.
      *
-     * @param array $data
-     *
      * @return mixed|string
      */
     private function getOperatorOptions(array $data)
@@ -759,9 +740,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param array        $debugData
-     *
      * @return int
      */
     private function getTotalCount(QueryBuilder $qb, array &$debugData)

@@ -41,12 +41,6 @@ class SearchSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param AssetModel       $assetModel
-     * @param CorePermissions  $security
-     * @param UserHelper       $userHelper
-     * @param TemplatingHelper $templating
-     */
     public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, TemplatingHelper $templating)
     {
         $this->assetModel = $assetModel;
@@ -66,9 +60,6 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
@@ -122,9 +113,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted(['asset:assets:viewown', 'asset:assets:viewother'], 'MATCH_ONE')) {

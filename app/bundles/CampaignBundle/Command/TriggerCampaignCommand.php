@@ -109,15 +109,6 @@ class TriggerCampaignCommand extends ModeratedCommand
 
     /**
      * TriggerCampaignCommand constructor.
-     *
-     * @param CampaignRepository       $campaignRepository
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     * @param KickoffExecutioner       $kickoffExecutioner
-     * @param ScheduledExecutioner     $scheduledExecutioner
-     * @param InactiveExecutioner      $inactiveExecutioner
-     * @param LoggerInterface          $logger
-     * @param FormatterHelper          $formatterHelper
      */
     public function __construct(
         CampaignRepository $campaignRepository,
@@ -239,9 +230,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception
@@ -311,8 +299,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @return bool
      */
     protected function dispatchTriggerEvent(Campaign $campaign)
@@ -331,8 +317,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @throws \Exception
      */
     private function triggerCampaign(Campaign $campaign)

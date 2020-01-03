@@ -25,8 +25,6 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 
     /**
      * BaseFilterQueryBuilder constructor.
-     *
-     * @param RandomParameterName $randomParameterNameService
      */
     public function __construct(RandomParameterName $randomParameterNameService)
     {

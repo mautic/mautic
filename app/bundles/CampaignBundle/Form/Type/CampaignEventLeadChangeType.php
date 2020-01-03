@@ -20,10 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class CampaignEventLeadChangeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $data = (isset($options['data']['action'])) ? $options['data']['action'] : 'added';

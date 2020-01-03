@@ -83,9 +83,6 @@ class UtmTag
      */
     private $utmTerm;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -177,8 +174,6 @@ class UtmTag
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return UtmTag
      */
     public function setLead(Lead $lead)

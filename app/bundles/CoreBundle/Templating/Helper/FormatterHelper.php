@@ -37,11 +37,6 @@ class FormatterHelper extends Helper
      */
     private $translator;
 
-    /**
-     * @param AppVersion          $appVersion
-     * @param DateHelper          $dateHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
     {
         $this->appVersion = $appVersion;
@@ -153,7 +148,6 @@ class FormatterHelper extends Helper
     }
 
     /**
-     * @param array  $array
      * @param string $delimeter
      *
      * @return string

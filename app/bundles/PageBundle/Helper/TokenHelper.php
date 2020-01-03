@@ -25,8 +25,6 @@ class TokenHelper
 
     /**
      * TokenHelper constructor.
-     *
-     * @param PageModel $model
      */
     public function __construct(PageModel $model)
     {

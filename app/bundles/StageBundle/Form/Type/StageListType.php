@@ -24,9 +24,6 @@ class StageListType extends AbstractType
 {
     private $choices = [];
 
-    /**
-     * @param StageModel $model
-     */
     public function __construct(StageModel $model)
     {
         $choices = $model->getRepository()->getEntities([

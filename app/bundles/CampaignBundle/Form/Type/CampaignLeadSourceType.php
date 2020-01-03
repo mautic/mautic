@@ -103,9 +103,6 @@ class CampaignLeadSourceType extends AbstractType
         ]);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['source_choices']);

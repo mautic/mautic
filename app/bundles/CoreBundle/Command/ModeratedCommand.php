@@ -64,9 +64,6 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return bool
      */
     protected function checkRunStatus(InputInterface $input, OutputInterface $output, $moderationKey = '')

@@ -31,10 +31,6 @@ class AssetsSubscriber implements EventSubscriberInterface
      */
     private $dispatcher;
 
-    /**
-     * @param AssetsHelper             $assetsHelper
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(AssetsHelper $assetsHelper, EventDispatcherInterface $dispatcher)
     {
         $this->assetsHelper = $assetsHelper;
@@ -51,9 +47,6 @@ class AssetsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function fetchCustomAssets(GetResponseEvent $event)
     {
         if ($event->isMasterRequest() && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_ASSETS)) {

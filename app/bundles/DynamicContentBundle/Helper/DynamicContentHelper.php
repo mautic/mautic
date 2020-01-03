@@ -43,10 +43,6 @@ class DynamicContentHelper
 
     /**
      * DynamicContentHelper constructor.
-     *
-     * @param DynamicContentModel      $dynamicContentModel
-     * @param EventModel               $campaignEventModel
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, EventDispatcherInterface $dispatcher)
     {

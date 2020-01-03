@@ -22,10 +22,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class BuilderSectionType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Content - Background Color

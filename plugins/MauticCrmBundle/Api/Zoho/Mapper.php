@@ -43,8 +43,7 @@ class Mapper
     /**
      * Mapper constructor.
      *
-     * @param       $object
-     * @param array $fields
+     * @param $object
      */
     public function __construct(array $fields)
     {
@@ -65,8 +64,6 @@ class Mapper
     }
 
     /**
-     * @param array $contact
-     *
      * @return $this
      */
     public function setContact(array $contact)
@@ -77,8 +74,6 @@ class Mapper
     }
 
     /**
-     * @param array $fields
-     *
      * @return $this
      */
     public function setMappedFields(array $fields)

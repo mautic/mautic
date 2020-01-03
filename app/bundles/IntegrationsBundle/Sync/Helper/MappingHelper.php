@@ -53,12 +53,6 @@ class MappingHelper
      */
     private $dispatcher;
 
-    /**
-     * @param FieldModel               $fieldModel
-     * @param ObjectMappingRepository  $objectMappingRepository
-     * @param ObjectProvider           $objectProvider
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         FieldModel $fieldModel,
         ObjectMappingRepository $objectMappingRepository,
@@ -72,10 +66,6 @@ class MappingHelper
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDAO
-     * @param string           $internalObjectName
-     * @param ObjectDAO        $integrationObjectDAO
-     *
      * @return ObjectDAO
      *
      * @throws ObjectDeletedException
@@ -163,10 +153,6 @@ class MappingHelper
     /**
      * Returns corresponding Mautic entity class name for the given Mautic object.
      *
-     * @param string $internalObject
-     *
-     * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     public function getMauticEntityClassName(string $internalObject): string
@@ -180,10 +166,6 @@ class MappingHelper
     }
 
     /**
-     * @param string    $integration
-     * @param string    $integrationObjectName
-     * @param ObjectDAO $internalObjectDAO
-     *
      * @return ObjectDAO
      *
      * @throws ObjectDeletedException
@@ -220,9 +202,6 @@ class MappingHelper
         }
     }
 
-    /**
-     * @param array $mappings
-     */
     public function updateObjectMappings(array $mappings): void
     {
         foreach ($mappings as $mapping) {
@@ -260,9 +239,6 @@ class MappingHelper
         }
     }
 
-    /**
-     * @param ObjectMapping $objectMapping
-     */
     private function saveObjectMapping(ObjectMapping $objectMapping): void
     {
         $this->objectMappingRepository->saveEntity($objectMapping);
@@ -270,8 +246,6 @@ class MappingHelper
     }
 
     /**
-     * @param UpdatedObjectMappingDAO $updatedObjectMappingDAO
-     *
      * @throws ObjectNotFoundException
      */
     private function updateObjectMapping(UpdatedObjectMappingDAO $updatedObjectMappingDAO): void
@@ -286,9 +260,7 @@ class MappingHelper
         );
 
         if (!$objectMapping) {
-            throw new ObjectNotFoundException(
-                $updatedObjectMappingDAO->getIntegrationObjectName().':'.$updatedObjectMappingDAO->getIntegrationObjectId()
-            );
+            throw new ObjectNotFoundException($updatedObjectMappingDAO->getIntegrationObjectName().':'.$updatedObjectMappingDAO->getIntegrationObjectId());
         }
 
         $objectMapping->setLastSyncDate($updatedObjectMappingDAO->getObjectModifiedDate());

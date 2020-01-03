@@ -48,9 +48,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $pointModel;
 
-    /**
-     * @param PointModel $pointModel
-     */
     public function __construct(PointModel $pointModel)
     {
         $this->pointModel = $pointModel;
@@ -58,8 +55,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

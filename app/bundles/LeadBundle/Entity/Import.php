@@ -164,9 +164,6 @@ class Import extends FormEntity
         $this->priority = self::LOW;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -191,9 +188,6 @@ class Import extends FormEntity
             ->addNullableField('properties', Type::JSON_ARRAY);
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('dir', new Assert\NotBlank(
@@ -754,8 +748,6 @@ class Import extends FormEntity
     }
 
     /**
-     * @param array $fields
-     *
      * @return Import
      */
     public function setMatchedFields(array $fields)
@@ -857,8 +849,6 @@ class Import extends FormEntity
     /**
      * Set headers array to the properties.
      *
-     * @param array $headers
-     *
      * @return Import
      */
     public function setHeaders(array $headers)
@@ -879,8 +869,6 @@ class Import extends FormEntity
 
     /**
      * Set parser config array to the properties.
-     *
-     * @param array $parser
      *
      * @return Import
      */
@@ -951,8 +939,6 @@ class Import extends FormEntity
 
     /**
      * Get pie graph data for row status counts.
-     *
-     * @param TranslatorHelper $translator
      *
      * @return array
      */

@@ -32,8 +32,7 @@ class TokenHelper
     /**
      * TokenHelper constructor.
      *
-     * @param FormModel       $model
-     * @param CorePermissions $security
+     * @param FormModel $model
      */
     public function __construct(FormModel $formModel, CorePermissions $security)
     {

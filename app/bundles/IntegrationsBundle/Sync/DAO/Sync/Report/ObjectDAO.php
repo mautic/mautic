@@ -38,9 +38,8 @@ class ObjectDAO
     private $changeDateTime = null;
 
     /**
-     * @param string                  $object
-     * @param mixed                   $objectId
-     * @param \DateTimeInterface|null $changeDateTime
+     * @param string $object
+     * @param mixed  $objectId
      */
     public function __construct($object, $objectId, ?\DateTimeInterface $changeDateTime = null)
     {
@@ -49,17 +48,12 @@ class ObjectDAO
         $this->changeDateTime = $changeDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getChangeDateTime(): ?\DateTimeInterface
     {
         return $this->changeDateTime;
     }
 
     /**
-     * @param \DateTimeInterface $changeDateTime
-     *
      * @return ObjectDAO
      */
     public function setChangeDateTime(\DateTimeInterface $changeDateTime): self
@@ -70,8 +64,6 @@ class ObjectDAO
     }
 
     /**
-     * @param FieldDAO $fieldDAO
-     *
      * @return $this
      */
     public function addField(FieldDAO $fieldDAO)

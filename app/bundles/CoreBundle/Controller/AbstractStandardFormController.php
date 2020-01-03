@@ -65,7 +65,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
      *
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param null $pass
      */
@@ -76,11 +75,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Called after the form is validated on POST.
      *
-     * @param      $isValid
-     * @param      $entity
-     * @param Form $form
-     * @param      $action
-     * @param      $isClone
+     * @param $isValid
+     * @param $entity
+     * @param $action
+     * @param $isClone
      */
     protected function afterFormProcessed($isValid, $entity, Form $form, $action, $isClone = false)
     {
@@ -176,10 +174,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Do anything necessary before the form is checked for POST and processed.
      *
-     * @param      $entity
-     * @param Form $form
-     * @param      $action
-     * @param      $isPost
+     * @param $entity
+     * @param $action
+     * @param $isPost
      * @param $objectId
      * @param $isClone
      */
@@ -577,8 +574,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Set custom form themes, etc.
      *
-     * @param Form $form
-     * @param      $action
+     * @param $action
      *
      * @return \Symfony\Component\Form\FormView
      */
@@ -650,8 +646,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Amend the parameters sent through postActionRedirect.
      *
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */
@@ -770,8 +765,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Amend the parameters sent through delegateView.
      *
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */

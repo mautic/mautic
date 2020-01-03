@@ -98,9 +98,6 @@ class EmailStep implements StepInterface
      */
     public $mailer_spool_path = '%kernel.root_dir%/var/spool';
 
-    /**
-     * @param Session $session
-     */
     public function __construct(Session $session)
     {
         $user = $session->get('mautic.installer.user');

@@ -38,9 +38,6 @@ abstract class AbstractQueueSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function onPublishMessage(Events\QueueEvent $event)
     {
         if (!$event->checkContext($this->protocol)) {
@@ -50,9 +47,6 @@ abstract class AbstractQueueSubscriber implements EventSubscriberInterface
         $this->publishMessage($event);
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function onConsumeMessage(Events\QueueEvent $event)
     {
         if (!$event->checkContext($this->protocol)) {

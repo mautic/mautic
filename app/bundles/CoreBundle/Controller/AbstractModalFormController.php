@@ -35,7 +35,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
 
     /**
      * @param      $data
-     * @param Form $form
      * @param      $action
      * @param null $objectId
      *
@@ -240,7 +239,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     /**
      * @param      $isValid
      * @param      $data
-     * @param Form $form
      * @param      $action
      * @param bool $objectId
      */

@@ -30,9 +30,6 @@ class KeysEncryptionEvent extends Event
 
     /**
      * KeysEncryptionEvent constructor.
-     *
-     * @param Integration $integrationConfiguration
-     * @param array       $keys
      */
     public function __construct(Integration $integrationConfiguration, array $keys)
     {
@@ -40,25 +37,16 @@ class KeysEncryptionEvent extends Event
         $this->keys                     = $keys;
     }
 
-    /**
-     * @return Integration
-     */
     public function getIntegrationConfiguration(): Integration
     {
         return $this->integrationConfiguration;
     }
 
-    /**
-     * @return array
-     */
     public function getKeys(): array
     {
         return $this->keys;
     }
 
-    /**
-     * @param array $keys
-     */
     public function setKeys(array $keys): void
     {
         $this->keys = $keys;

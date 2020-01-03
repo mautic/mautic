@@ -12,9 +12,6 @@ use Symfony\Component\Finder\Finder;
  */
 class Version20190704154940 extends AbstractMauticMigration
 {
-    /**
-     * @param Schema $schema
-     */
     public function up(Schema $schema): void
     {
         /** @var PathsHelper $pathsHelper */
@@ -43,9 +40,6 @@ class Version20190704154940 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function down(Schema $schema): void
     {
         /** @var PathsHelper $pathsHelper */

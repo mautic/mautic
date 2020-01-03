@@ -31,18 +31,11 @@ class ConfigMonitoredMailboxesType extends AbstractType
      */
     private $imapHelper;
 
-    /**
-     * @param Mailbox $imapHelper
-     */
     public function __construct(Mailbox $imapHelper)
     {
         $this->imapHelper = $imapHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $monitoredShowOn = ('general' == $options['mailbox']) ? '{}'

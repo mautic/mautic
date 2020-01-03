@@ -71,9 +71,6 @@ class Stat
      */
     private $tokens = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -186,9 +183,6 @@ class Stat
         return $this->dynamicContent;
     }
 
-    /**
-     * @param DynamicContent $dynamicContent
-     */
     public function setDynamicContent(DynamicContent $dynamicContent)
     {
         $this->dynamicContent = $dynamicContent;

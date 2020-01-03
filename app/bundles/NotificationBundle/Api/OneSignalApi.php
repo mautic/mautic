@@ -61,8 +61,7 @@ class OneSignalApi extends AbstractNotificationApi
     }
 
     /**
-     * @param string|array $playerId     Player ID as string, or an array of player ID's
-     * @param Notification $notification
+     * @param string|array $playerId Player ID as string, or an array of player ID's
      *
      * @return Response
      *
@@ -117,10 +116,6 @@ class OneSignalApi extends AbstractNotificationApi
         return $this->send('/notifications', $data);
     }
 
-    /**
-     * @param array $data
-     * @param array $mobileConfig
-     */
     protected function addMobileData(array &$data, array $mobileConfig)
     {
         foreach ($mobileConfig as $key => $value) {

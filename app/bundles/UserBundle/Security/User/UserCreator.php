@@ -55,11 +55,9 @@ class UserCreator implements UserCreatorInterface
     /**
      * UserCreator constructor.
      *
-     * @param                         $entityManager
-     * @param                         $userMapper
-     * @param UserModel               $userModel
-     * @param EncoderFactoryInterface $encoder
-     * @param                         $defaultRole
+     * @param $entityManager
+     * @param $userMapper
+     * @param $defaultRole
      */
     public function __construct($entityManager, $userMapper, UserModel $userModel, EncoderFactoryInterface $encoder, $defaultRole)
     {
@@ -71,8 +69,6 @@ class UserCreator implements UserCreatorInterface
     }
 
     /**
-     * @param Response $response
-     *
      * @return UserInterface|null
      */
     public function createUser(Response $response)

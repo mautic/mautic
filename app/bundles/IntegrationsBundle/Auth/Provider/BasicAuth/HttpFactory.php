@@ -34,9 +34,6 @@ class HttpFactory implements AuthProviderInterface
      */
     private $initializedClients = [];
 
-    /**
-     * @return string
-     */
     public function getAuthType(): string
     {
         return self::NAME;
@@ -45,8 +42,6 @@ class HttpFactory implements AuthProviderInterface
     /**
      * @param CredentialsInterface|AuthCredentialsInterface $credentials
      * @param AuthConfigInterface                           $config
-     *
-     * @return ClientInterface
      *
      * @throws PluginNotConfiguredException
      */
@@ -73,11 +68,6 @@ class HttpFactory implements AuthProviderInterface
         return $this->initializedClients[$credentials->getUsername()];
     }
 
-    /**
-     * @param CredentialsInterface $credentials
-     *
-     * @return bool
-     */
     protected function credentialsAreConfigured(CredentialsInterface $credentials): bool
     {
         return $credentials->getUsername() && $credentials->getPassword();

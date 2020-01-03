@@ -47,11 +47,7 @@ class DBALMocker
             return $this->queryParts[$part];
         }
 
-        throw new \UnexpectedValueException(sprintf(
-            'The requested query part (%s) does not exist. It must be one of %s.',
-            $part,
-            implode(', ', array_keys($this->queryParts))
-        ));
+        throw new \UnexpectedValueException(sprintf('The requested query part (%s) does not exist. It must be one of %s.', $part, implode(', ', array_keys($this->queryParts))));
     }
 
     public function resetQueryParts()

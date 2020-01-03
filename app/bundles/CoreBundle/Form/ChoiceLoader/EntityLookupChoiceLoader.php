@@ -55,10 +55,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * @param ModelFactory        $modelFactory
-     * @param TranslatorInterface $translator
-     * @param Connection          $connection
-     * @param array               $options
+     * @param array $options
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
     {
@@ -91,8 +88,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      *
-     * @param array $values
-     * @param null  $value
+     * @param null $value
      *
      * @return array
      */
@@ -104,8 +100,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      *
-     * @param array $choices
-     * @param null  $value
+     * @param null $value
      *
      * @return array
      */
@@ -116,8 +111,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * Take note of the selected values for loadChoiceList.
-     *
-     * @param FormEvent $event
      */
     public function onFormPostSetData(FormEvent $event)
     {
@@ -290,9 +283,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $choices;
     }
 
-    /**
-     * @param array $choices
-     */
     protected function formatChoices(array &$choices)
     {
         // Get the first key

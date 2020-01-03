@@ -71,12 +71,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $modelFactory;
 
     /**
-     * @param AuditLogModel       $auditLogModel
-     * @param TranslatorInterface $translator
-     * @param AuditLogModel       $router
-     * @param CorePermissions     $security
-     * @param CorePermissions     $dispatcher
-     * @param ModelFactory        $modelFactory
+     * @param AuditLogModel   $router
+     * @param CorePermissions $dispatcher
      */
     public function __construct(
         AuditLogModel $auditLogModel,
@@ -96,8 +92,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

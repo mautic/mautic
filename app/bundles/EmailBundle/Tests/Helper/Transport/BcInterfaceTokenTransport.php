@@ -37,8 +37,7 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      */
     public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
@@ -58,9 +57,8 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */
@@ -106,9 +104,6 @@ class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Trans
         // ignore
     }
 
-    /**
-     * @param Swift_Events_EventListener $plugin
-     */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
         // ignore

@@ -78,9 +78,6 @@ class LeadEventLog
         $this->setDateAdded(new \DateTime());
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -144,8 +141,6 @@ class LeadEventLog
 
     /**
      * Set lead.
-     *
-     * @param Lead $lead
      *
      * @return LeadEventLog
      */
@@ -264,8 +259,6 @@ class LeadEventLog
 
     /**
      * Set properties.
-     *
-     * @param array $properties
      *
      * @return LeadEventLog
      */

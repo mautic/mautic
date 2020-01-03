@@ -1205,8 +1205,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param array $knownAliases
-     *
      * @throws QueryException
      */
     private function verifyAllAliasesAreKnown(array $knownAliases)
@@ -1348,8 +1346,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
-     * @param       $fromAlias
-     * @param array $knownAliases
+     * @param $fromAlias
      *
      * @return string
      *

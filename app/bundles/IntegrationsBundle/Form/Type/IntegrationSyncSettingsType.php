@@ -24,9 +24,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IntegrationSyncSettingsType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws IntegrationNotFoundException
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -89,9 +86,6 @@ class IntegrationSyncSettingsType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(

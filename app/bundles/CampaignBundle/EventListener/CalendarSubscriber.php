@@ -55,8 +55,6 @@ class CalendarSubscriber implements EventSubscriberInterface
 
     /**
      * Adds events to the calendar.
-     *
-     * @param CalendarGeneratorEvent $event
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {

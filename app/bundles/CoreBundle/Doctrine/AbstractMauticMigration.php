@@ -53,8 +53,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     protected $entityManager;
 
     /**
-     * @param Schema $schema
-     *
      * @throws DBALException
      * @throws AbortMigration
      */
@@ -73,8 +71,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws AbortMigration
      */
     public function down(Schema $schema): void
@@ -176,9 +172,8 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * Generate the  name for the property.
      *
-     * @param       $table
-     * @param       $type
-     * @param array $columnNames
+     * @param $table
+     * @param $type
      *
      * @return string
      */
@@ -201,8 +196,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
     /**
      * Generate index and foreign constraint.
      *
-     * @param       $table
-     * @param array $columnNames
+     * @param $table
      *
      * @return array [idx, fk]
      */

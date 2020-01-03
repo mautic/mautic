@@ -52,13 +52,6 @@ class ClientType extends AbstractType
      */
     private $router;
 
-    /**
-     * @param RequestStack        $requestStack
-     * @param TranslatorInterface $translator
-     * @param ValidatorInterface  $validator
-     * @param Session             $session
-     * @param RouterInterface     $router
-     */
     public function __construct(
         RequestStack $requestStack,
         TranslatorInterface $translator,

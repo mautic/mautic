@@ -49,11 +49,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param CitrixModel         $citrixModel
-     * @param TranslatorInterface $translator
-     * @param TemplatingHelper    $templating
-     */
     public function __construct(
         CitrixModel $citrixModel,
         TranslatorInterface $translator,
@@ -84,41 +79,28 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /* Actions */
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onWebinarAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onMeetingAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOMEETING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onTrainingAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onAssistAction(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixAction(CitrixProducts::GOTOASSIST, $event));
     }
 
     /**
-     * @param string                 $product
-     * @param CampaignExecutionEvent $event
+     * @param string $product
      *
      * @return bool
      */
@@ -166,41 +148,28 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /* Events */
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onWebinarEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOWEBINAR, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onMeetingEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOMEETING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onTrainingEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOTRAINING, $event));
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onAssistEvent(CampaignExecutionEvent $event)
     {
         $event->setResult($this->onCitrixEvent(CitrixProducts::GOTOASSIST, $event));
     }
 
     /**
-     * @param string                 $product
-     * @param CampaignExecutionEvent $event
+     * @param string $product
      *
      * @return bool
      *
@@ -242,9 +211,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $counter > 0;
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $activeProducts = [];

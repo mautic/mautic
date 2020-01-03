@@ -26,9 +26,6 @@ class CompanyApiController extends CommonApiController
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->model              = $this->getModel('lead.company');

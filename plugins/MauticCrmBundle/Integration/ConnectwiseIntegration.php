@@ -479,8 +479,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Get Companies from connectwise.
      *
-     * @param array $params
-     * @param null  $query
+     * @param null $query
      */
     public function getCompanies(array $params = [])
     {

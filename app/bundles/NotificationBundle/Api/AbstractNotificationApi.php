@@ -36,10 +36,6 @@ abstract class AbstractNotificationApi
 
     /**
      * AbstractNotificationApi constructor.
-     *
-     * @param Http              $http
-     * @param TrackableModel    $trackableModel
-     * @param IntegrationHelper $integrationHelper
      */
     public function __construct(Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
     {
@@ -57,8 +53,7 @@ abstract class AbstractNotificationApi
     abstract public function send($endpoint, $data);
 
     /**
-     * @param              $id
-     * @param Notification $notification
+     * @param $id
      *
      * @return mixed
      */
@@ -68,7 +63,6 @@ abstract class AbstractNotificationApi
      * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array  $clickthrough
      *
      * @return string
      */

@@ -73,7 +73,6 @@ class CorePermissions
      * CorePermissions constructor.
      *
      * @param Translator $translator
-     * @param array      $parameters
      * @param            $bundles
      * @param            $pluginBundles
      */
@@ -139,8 +138,6 @@ class CorePermissions
 
     /**
      * Generates the bit value for the bundle's permission.
-     *
-     * @param array $permissions
      *
      * @return array
      *
@@ -270,12 +267,7 @@ class CorePermissions
                     if ($allowUnknown) {
                         $permissions[$permission] = false;
                     } else {
-                        throw new PermissionNotFoundException(
-                            $this->getTranslator()->trans(
-                                'mautic.core.permissions.notfound',
-                                ['%permission%' => $permission]
-                            )
-                        );
+                        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.notfound', ['%permission%' => $permission]));
                     }
                 } elseif ('anon.' == $userEntity) {
                     //anon user or session timeout
@@ -300,12 +292,7 @@ class CorePermissions
         } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
         } else {
-            throw new PermissionNotFoundException(
-                $this->getTranslator()->trans(
-                    'mautic.core.permissions.mode.notfound',
-                    ['%mode%' => $mode]
-                )
-            );
+            throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
         }
     }
 

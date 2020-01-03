@@ -53,11 +53,10 @@ class InformationChangeRequestDAO
     private $certainChangeDateTime = null;
 
     /**
-     * @param string             $integration
-     * @param string             $objectName
-     * @param mixed              $objectId
-     * @param string             $field
-     * @param NormalizedValueDAO $normalizedValueDAO
+     * @param string $integration
+     * @param string $objectName
+     * @param mixed  $objectId
+     * @param string $field
      */
     public function __construct($integration, $objectName, $objectId, $field, NormalizedValueDAO $normalizedValueDAO)
     {
@@ -68,9 +67,6 @@ class InformationChangeRequestDAO
         $this->newValue    = $normalizedValueDAO;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
@@ -84,41 +80,27 @@ class InformationChangeRequestDAO
         return $this->objectId;
     }
 
-    /**
-     * @return string
-     */
     public function getObject(): string
     {
         return $this->objectName;
     }
 
-    /**
-     * @return string
-     */
     public function getField(): string
     {
         return $this->field;
     }
 
-    /**
-     * @return NormalizedValueDAO
-     */
     public function getNewValue(): NormalizedValueDAO
     {
         return $this->newValue;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getPossibleChangeDateTime(): ?\DateTimeInterface
     {
         return $this->possibleChangeDateTime;
     }
 
     /**
-     * @param \DateTimeInterface|null $possibleChangeDateTime
-     *
      * @return InformationChangeRequestDAO
      */
     public function setPossibleChangeDateTime(?\DateTimeInterface $possibleChangeDateTime = null): self
@@ -128,17 +110,12 @@ class InformationChangeRequestDAO
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getCertainChangeDateTime(): ?\DateTimeInterface
     {
         return $this->certainChangeDateTime;
     }
 
     /**
-     * @param \DateTimeInterface|null $certainChangeDateTime
-     *
      * @return InformationChangeRequestDAO
      */
     public function setCertainChangeDateTime(?\DateTimeInterface $certainChangeDateTime = null): self

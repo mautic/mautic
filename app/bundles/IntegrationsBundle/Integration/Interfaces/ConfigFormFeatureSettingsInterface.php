@@ -17,8 +17,6 @@ interface ConfigFormFeatureSettingsInterface
 {
     /**
      * Return the name of the form type service for the feature settings.
-     *
-     * @return string
      */
     public function getFeatureSettingsConfigFormName(): string;
 }

@@ -25,8 +25,6 @@ class TokenHelper
 
     /**
      * TokenHelper constructor.
-     *
-     * @param AssetModel $model
      */
     public function __construct(AssetModel $model)
     {

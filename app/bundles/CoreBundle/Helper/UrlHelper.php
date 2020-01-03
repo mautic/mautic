@@ -37,9 +37,7 @@ class UrlHelper
     /**
      * UrlHelper constructor.
      *
-     * @param Http|null   $http
-     * @param null        $shortnerServiceUrl
-     * @param Logger|null $logger
+     * @param null $shortnerServiceUrl
      */
     public function __construct(Http $http = null, $shortnerServiceUrl = null, Logger $logger = null)
     {
@@ -150,7 +148,6 @@ class UrlHelper
      * With exception of URLs used as a token default values.
      *
      * @param string $text
-     * @param array  $contactUrlFields
      *
      * @return array
      */

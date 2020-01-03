@@ -23,9 +23,6 @@ class DebugLogger
      */
     private static $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         static::$logger = $logger;
@@ -35,7 +32,6 @@ class DebugLogger
      * @param string $integration
      * @param string $loggedFrom
      * @param string $message
-     * @param array  $context
      * @param string $urgency
      */
     public static function log($integration, $message, $loggedFrom = null, array $context = [], $urgency = LogLevel::DEBUG): void
