@@ -32,12 +32,13 @@ install:
   - composer install
 
 script:
-
-  # Run PHPUnit
   - composer test
 
-  # Run PHPSTAN analysis
-  - composer phpstan
-
-  # Check if the code standards weren't broken.
-  - composer cs
+jobs:
+  include:
+    - stage: test
+      name: PHPSTAN
+      script: composer phpstan
+    -
+      name: CS
+      script: composer cs
