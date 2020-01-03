@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -46,11 +45,6 @@ class TemplatingHelper
      */
     public function getTemplating()
     {
-        if (defined('IN_MAUTIC_CONSOLE')) {
-            // Use the request scope in order to be the templating.helper.assets service used
-            $this->container->set('request', new Request());
-        }
-
         return $this->container->get('templating');
     }
 
