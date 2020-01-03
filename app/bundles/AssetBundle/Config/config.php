@@ -199,7 +199,7 @@ return [
                 'arguments' => 'mautic.factory',
             ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController',
+            'oneup_uploader.controller.dropzone.class' => \Mautic\AssetBundle\Controller\UploadController::class,
             'mautic.asset.helper.token'                => [
                 'class'     => 'Mautic\AssetBundle\Helper\TokenHelper',
                 'arguments' => 'mautic.asset.model.asset',
