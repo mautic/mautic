@@ -78,7 +78,7 @@
         "friendsofsymfony/oauth-server-bundle": "~1.6.0",
         "willdurand/oauth-server-bundle": "dev-release-0.0.3",
         "jms/serializer-bundle": "~3.4.0",
-        "oneup/uploader-bundle": "~1.3",
+        "oneup/uploader-bundle": "~2.0",
         "phpoffice/phpexcel": "1.8.1",
         "joomla/http": "1.2.*",
         "joomla/filter": "1.2.*",
