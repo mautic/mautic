@@ -2,6 +2,9 @@ parameters:
 	level: 0
 	excludes_analyse:
 		- *.html.php
+		- *.js.php
+		- *.less.php
+		- *.inc.php
 		- app/bundles/CoreBundle/Assets/js/libraries/ckeditor/*
 		- app/bundles/CoreBundle/Controller/AbstractFormController.php
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php

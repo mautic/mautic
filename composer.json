@@ -149,7 +149,7 @@
             "php -r \"if(file_exists('./.git/hooks/pre-commit')&&(PHP_OS!='WINNT')){chmod('./.git/hooks/pre-commit',0755);}\""
         ],
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
-        "phpstan": "bin/phpstan analyse app/bundles",
+        "phpstan": "bin/phpstan analyse app/bundles plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
         "fixcs": "bin/php-cs-fixer fix -v"
     },

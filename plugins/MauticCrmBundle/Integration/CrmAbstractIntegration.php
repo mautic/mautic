@@ -19,9 +19,6 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
-/**
- * Class CrmAbstractIntegration.
- */
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
@@ -105,7 +102,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if ($this->isAuthorized()) {
                 $result = $this->getApiHelper()->getLeads($query);
 
-                $executed = $this->amendLeadDataBeforeMauticPopulate($result);
+                $executed = $this->amendLeadDataBeforeMauticPopulate($result, $object);
 
                 return $executed;
             }

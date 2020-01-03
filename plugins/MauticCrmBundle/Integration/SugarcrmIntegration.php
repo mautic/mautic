@@ -27,6 +27,7 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
+use Mautic\UserBundle\Model\UserModel;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -38,9 +39,6 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class SugarcrmIntegration.
- */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
     private $objects = [
@@ -51,15 +49,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
     private $authorzationError;
+    private $userModel;
 
     /**
      * @var DoNotContact
      */
     protected $doNotContactModel;
 
-    /**
-     * SugarcrmIntegration constructor.
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -76,9 +72,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
-        DoNotContact $doNotContactModel
+        DoNotContact $doNotContactModel,
+        UserModel $userModel
     ) {
         $this->doNotContactModel = $doNotContactModel;
+        $this->userModel         = $userModel;
 
         parent::__construct(
             $eventDispatcher,
@@ -575,7 +573,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 $sugarLeadData[$sugarId]            = $leadActivity[$leadId];
                                 $sugarLeadData[$sugarId]['id']      = $ids['integration_entity_id'];
                                 $sugarLeadData[$sugarId]['leadId']  = $ids['internal_entity_id'];
-                                $sugarLeadData[$sugarId]['leadUrl'] = $this->factory->getRouter()->generate(
+                                $sugarLeadData[$sugarId]['leadUrl'] = $this->router->generate(
                                     'mautic_plugin_timeline_view',
                                     ['integration' => 'Sugarcrm', 'leadId' => $leadId],
                                     UrlGeneratorInterface::ABSOLUTE_URL
@@ -949,16 +947,15 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 ]
                             );
                             if (isset($integrationCompanyEntity)) {
-                                $companyId    = $integrationCompanyEntity->getInternalEntityId();
-                                $companyModel = $this->factory->getModel('lead.company');
-                                $company      = $companyRepo->find($companyId);
+                                $companyId = $integrationCompanyEntity->getInternalEntityId();
+                                $company   = $companyRepo->find($companyId);
 
-                                $companyModel->addLeadToCompany($company, $entity);
+                                $this->companyModel->addLeadToCompany($company, $entity);
                                 $this->em->clear(Company::class);
                                 $this->em->detach($entity);
                             }
                         }
-                    } elseif ('Accounts' == $object) {
+                    } elseif ('Accounts' === $object) {
                         $entity                = $this->getMauticCompany($dataObject, $object);
                         $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
@@ -1615,10 +1612,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     protected function getOwnerEmail($lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
-            /** @var \Mautic\UserBundle\Model\UserModel $model */
-            $model = $this->factory->getModel('user.user');
             /** @var \Mautic\UserBundle\Entity\User $user */
-            $user = $model->getEntity($lead['owner_id']);
+            $user = $this->userModel->getEntity($lead['owner_id']);
 
             return $user->getEmail();
         }
@@ -1651,7 +1646,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                     $body[] = ['name' => $sugarField, 'value' =>  $value];
                 } elseif ($required) {
-                    $value  = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                    $value  = $this->translator->trans('mautic.integration.form.lead.unknown');
                     $body[] = ['name' => $sugarField, 'value' => $value];
                 }
             }

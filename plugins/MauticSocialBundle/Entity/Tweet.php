@@ -112,9 +112,6 @@ class Tweet extends FormEntity
      */
     private $stats;
 
-    /**
-     * Tweet constructor.
-     */
     public function __construct()
     {
         $this->stats = new ArrayCollection();
@@ -123,7 +120,6 @@ class Tweet extends FormEntity
     public function __clone()
     {
         $this->id            = null;
-        $this->tweetId       = null;
         $this->sentCount     = 0;
         $this->favoriteCount = 0;
         $this->retweetCount  = 0;
