@@ -43,7 +43,7 @@ class PackageRemover
             '--no-scripts'          => true,
             '--optimize-autoloader' => true,
         ];
-        dump($arguments + $defautArguments);
+
         $composerApp->setAutoExit(false);
 
         $returnCode = $composerApp->run(new ArrayInput($arguments + $defautArguments), $output);

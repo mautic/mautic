@@ -68,7 +68,13 @@ class Version extends Package
      */
     public function estimateComposerRuntime(): int
     {
-        return self::COMPOSER_RUNTIME_BASE + count($this->getRequire()) * self::COMPOSER_RUNTIME_DEPENDENCY;
+        $xdebugCoeficient = 1;
+
+        if (extension_loaded('xdebug')) {
+            $xdebugCoeficient = 2;
+        }
+
+        return (self::COMPOSER_RUNTIME_BASE + count($this->getRequire()) * self::COMPOSER_RUNTIME_DEPENDENCY) * $xdebugCoeficient;
     }
 
     public function getVersion(): string
