@@ -18,6 +18,8 @@ class StreamOutput extends SymfonyStreamOutput
 {
     protected function doWrite($message, $newline)
     {
+        $message = $this->prependTimestamp($message);
+
         if (
             false === @fwrite($this->getStream(), $message) ||
             (
@@ -32,5 +34,16 @@ class StreamOutput extends SymfonyStreamOutput
 
         ob_flush();
         flush();
+    }
+
+    private function prependTimestamp(string $message): string
+    {
+        if (empty($message)) {
+            return $message;
+        }
+
+        $dateTime = new \DateTimeImmutable();
+
+        return "{$dateTime->format(\DateTimeInterface::ATOM)} - {$message}";
     }
 }
