@@ -12,7 +12,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'Package');
-$view['slots']->set('headerTitle', $view['translator']->trans('marketplace.package.title'));
+$view['slots']->set('headerTitle', $view['translator']->trans('marketplace.title'));
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php'));
 ?>
 

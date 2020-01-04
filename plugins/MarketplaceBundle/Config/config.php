@@ -22,8 +22,8 @@ return [
             'items' => [
                 'marketplace.title' => [
                     'id'        => 'marketplace',
-                    'route'     => 'marketplace',
-                    'iconClass' => 'fa-clock-o',
+                    'route'     => RouteProvider::ROUTE_LIST,
+                    'iconClass' => 'fa-plus',
                     // 'access'    => 'plugin:marketplace:marketplace:view',
                 ],
             ],
@@ -37,6 +37,11 @@ return [
                 'controller' => 'MarketplaceBundle:Package\List:list',
                 'method'     => 'GET|POST',
                 'defaults'   => ['page' => 1],
+            ],
+            RouteProvider::ROUTE_DETAIL => [
+                'path'       => '/marketplace/detail/{vendor}/{package}',
+                'controller' => 'MarketplaceBundle:Package\Detail:view',
+                'method'     => 'GET',
             ],
             RouteProvider::ROUTE_INSTALL => [
                 'path'       => '/marketplace/install/{vendor}/{package}',
@@ -58,6 +63,18 @@ return [
                 'arguments' => [
                     'marketplace.service.plugin_collector',
                     'request_stack',
+                    'marketplace.service.route_provider',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+            'marketplace.controller.package.detail' => [
+                'class'     => \MauticPlugin\MarketplaceBundle\Controller\Package\DetailController::class,
+                'arguments' => [
+                    'marketplace.model.package',
                     'marketplace.service.route_provider',
                 ],
                 'methodCalls' => [

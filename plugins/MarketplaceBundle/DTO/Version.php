@@ -22,6 +22,20 @@ class Version extends Package
     private $require;
     private $keywords;
 
+    /**
+     * An average time to run composer require some/package takes between 60 and 90 seconds.
+     *
+     * In seconds.
+     */
+    private const COMPOSER_RUNTIME_BASE = 90;
+
+    /**
+     * An average time to download one package dependency in the require array.
+     *
+     * In seconds.
+     */
+    private const COMPOSER_RUNTIME_DEPENDENCY = 4;
+
     public function __construct(string $name, string $version, array $license, \DateTimeInterface $time, string $homepage, string $issues, array $require, array $keywords)
     {
         $this->version  = $version;
@@ -47,6 +61,14 @@ class Version extends Package
             (array) $array['require'],
             (array) $array['keywords']
         );
+    }
+
+    /**
+     * Returns composer runtime estimation in seconds.
+     */
+    public function estimateComposerRuntime(): int
+    {
+        return self::COMPOSER_RUNTIME_BASE + count($this->getRequire()) * self::COMPOSER_RUNTIME_DEPENDENCY;
     }
 
     public function getVersion(): string

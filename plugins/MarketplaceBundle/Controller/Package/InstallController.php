@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\MarketplaceBundle\DTO\Version;
 use MauticPlugin\MarketplaceBundle\Model\PackageModel;
 use MauticPlugin\MarketplaceBundle\Service\PackageInstaller;
 use MauticPlugin\MarketplaceBundle\Service\RouteProvider;
@@ -43,19 +44,27 @@ class InstallController extends CommonController
 
     public function ViewAction(string $vendor, string $package): Response
     {
-        $route = $this->routeProvider->buildListRoute();
+        $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
+        try {
+            // @todo set the stability the user really wants.
+            $version = $packageDetail->getVersions()->findLatestVersionPackage(Version::STABILITY_BETA);
+        } catch (\Throwable $e) {
+            $version = null;
+        }
 
         return $this->delegateView(
             [
-                'returnUrl'      => $route,
+                'returnUrl'      => $this->routeProvider->buildDetailRoute($vendor, $package),
                 'viewParameters' => [
-                    'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'packageDetail'    => $packageDetail,
+                    'version'          => $version,
+                    'maxExecutionTime' => $this->getMaxExecutionTime(),
                 ],
                 'contentTemplate' => 'MarketplaceBundle:Package:install.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',
-                    'route'         => $route,
+                    'route'         => $this->routeProvider->buildIntallRoute($vendor, $package),
                 ],
             ]
         );
@@ -81,9 +90,17 @@ class InstallController extends CommonController
     private function setComposerTimeout(): void
     {
         $timeSpentAlready = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
-        $maxExecutionTime = (int) ini_get('max_execution_time');
+        $maxExecutionTime = $this->getMaxExecutionTime();
         $precaution       = 3;
         $timeout          = $maxExecutionTime - $timeSpentAlready - $precaution;
         putenv("COMPOSER_PROCESS_TIMEOUT={$timeout}");
+    }
+
+    /**
+     * Returns max_execution_time from php.ini. In seconds.
+     */
+    private function getMaxExecutionTime(): int
+    {
+        return (int) ini_get('max_execution_time');
     }
 }

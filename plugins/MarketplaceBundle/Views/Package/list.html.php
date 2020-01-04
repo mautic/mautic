@@ -100,7 +100,13 @@ if ('index' === $tmpl) {
                     </td>
                     <td>
                         <div>
-                            <a href="<?php echo $view->escape($item->getUrl()); ?>" target="_blank" rel="noopener noreferrer" >
+                            <a href="<?php echo $view['router']->path(
+                                    RouteProvider::ROUTE_DETAIL,
+                                    [
+                                        'vendor'  => $view->escape($item->getVendorName()),
+                                        'package' => $view->escape($item->getPackageName()),
+                                    ]
+                                ); ?>">
                                 <?php echo $view->escape($item->getHumanPackageName()); ?>
                             </a>
                         </div>
