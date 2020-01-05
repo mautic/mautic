@@ -53,6 +53,11 @@ return [
                 'controller' => 'MarketplaceBundle:Package\Install:stepComposer',
                 'method'     => 'GET',
             ],
+            RouteProvider::ROUTE_INSTALL_STEP_DATABASE => [
+                'path'       => '/marketplace/install/{vendor}/{package}/step/database',
+                'controller' => 'MarketplaceBundle:Package\Install:stepDatabase',
+                'method'     => 'GET',
+            ],
         ],
     ],
 

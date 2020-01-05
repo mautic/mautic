@@ -1,13 +1,27 @@
 Marketplace = {
     startInstall: function(elHtml, package) {
         mQuery(elHtml).attr('disable', true);
+        Marketplace.stepComposer(package, function() {
+            Marketplace.stepDatabase(package, function() {});
+        });
+    },
+
+    stepComposer: function(package, callback) {
+        Marketplace.runStep('s/marketplace/install/'+package+'/step/composer', '#composer-progress .progress-bar', callback)
+    },
+
+    stepDatabase: function(package, callback) {
+        Marketplace.runStep('s/marketplace/install/'+package+'/step/database', '#database-progress .progress-bar', callback)
+    },
+
+    runStep: function(url, progressBarSelector, callback) {
         var last_response_len = false;
-        var progressBar = mQuery('#composer-progress .progress-bar');
+        var progressBar = mQuery(progressBarSelector);
         var interval = Marketplace.startProgressBar(progressBar);
 
         mQuery.ajax({
             type: 'GET',
-            url: mauticBaseUrl+'s/marketplace/install/'+package+'/step/composer',
+            url: mauticBaseUrl+url,
             xhrFields: {
                 onprogress: function(e)
                 {
@@ -26,6 +40,7 @@ Marketplace = {
                 clearInterval(interval);
                 progressBar.css('width', '100%');
                 progressBar.attr('aria-valuenow', 100);
+                callback();
             },
         });
     },

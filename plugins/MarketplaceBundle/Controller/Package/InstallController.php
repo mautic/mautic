@@ -76,15 +76,24 @@ class InstallController extends CommonController
 
         $this->setComposerTimeout();
 
-        $response = new StreamedResponse(function () use ($packageName) {
+        return new StreamedResponse(function () use ($packageName) {
             $this->packageInstaller->install(
                 $packageName,
                 new StreamOutput(fopen('php://stdout', 'w')),
                 ['--optimize-autoloader' => false]
             );
         });
+    }
 
-        return $response;
+    public function StepDatabaseAction(): Response
+    {
+        $output = new StreamOutput(fopen('php://stdout', 'w'));
+
+        return new StreamedResponse(function () use ($output) {
+            $output->writeln('Starting to refresh Mautic plugins');
+            $output->writeln($this->reloadFacade->reloadPlugins());
+            $output->writeln('Plugin successfully installed');
+        });
     }
 
     private function setComposerTimeout(): void

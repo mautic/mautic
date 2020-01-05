@@ -72,14 +72,14 @@ class InstallCommand extends ContainerAwareCommand
             $io->writeln("<fg=red>Composer error: {$e->getMessage()}</>");
         }
 
-        $stopwatch->start('cache');
+        // $stopwatch->start('cache');
 
-        $this->filesystem->remove($this->coreParametersHelper->getParameter('kernel.cache_dir'));
+        // $this->filesystem->remove($this->coreParametersHelper->getParameter('kernel.cache_dir'));
 
-        $io->writeln("Mautic cache cleared in {$stopwatch->stop('cache')->getDuration()} ms");
+        // $io->writeln("Mautic cache cleared in {$stopwatch->stop('cache')->getDuration()} ms");
         $stopwatch->start('reload');
 
-        $this->reloadFacade->reloadPlugins();
+        $io->writeln($this->reloadFacade->reloadPlugins());
 
         $io->writeln("Plugin schema installed in {$stopwatch->stop('reload')->getDuration()} ms");
 

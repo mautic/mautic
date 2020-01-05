@@ -74,7 +74,12 @@ $view['slots']->set(
         <p><?php echo $view['translator']->trans('marketplace.cli.installation.description'); ?></p>
         <p><code><?php echo MAUTIC_ROOT_DIR.'/bin/console mautic:marketplace:install '.$packageDetail->getName(); ?></code></p>
     </div>
+    <h4><?php echo $view['translator']->trans('marketplace.installation.step1.heading'); ?></h4>
     <div class="progress" id="composer-progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-expected-runtime="<?php echo $version->estimateComposerRuntime(); ?>"></div>
+    </div>
+    <h4><?php echo $view['translator']->trans('marketplace.installation.step2.heading'); ?></h4>
+    <div class="progress" id="database-progress">
         <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" data-expected-runtime="<?php echo $version->estimateComposerRuntime(); ?>"></div>
     </div>
     <div id="log-wrapper"></div>

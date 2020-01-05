@@ -25,6 +25,8 @@ class RouteProvider
 
     public const ROUTE_INSTALL_STEP_COMPOSER = 'mautic_marketplace_install_step_composer';
 
+    public const ROUTE_INSTALL_STEP_DATABASE = 'mautic_marketplace_install_step_database';
+
     /**
      * @var RouterInterface
      */
