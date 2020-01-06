@@ -63,7 +63,7 @@
 !/media/dashboards/*.json
 /media/files/*
 !/media/files/.htaccess
-/media/assets/*
+/media/elfinder/*
 /media/images/*
 !/media/images/flags
 !/media/images/mejs

@@ -430,7 +430,7 @@ $container->setDefinition(
 
 // ElFinder File Manager
 $container->loadFromExtension('fm_elfinder', [
-    'assets_path'            => 'media/assets',
+    'assets_path'            => 'media/elfinder',
     'instances'              => [
         'default' => [
             'locale'          => 'LANG',
