@@ -60,7 +60,12 @@ class ExcelExporter
                 foreach ($data as $k => $v) {
                     if (0 === $count) {
                         //set the header
-                        $header[] = $k;
+                        foreach ($reportData['columns'] as $c) {
+                            if ($c['alias'] == $k) {
+                                $header[] = $c['label'];
+                                break;
+                            }
+                        }
                     }
                     $row[] = htmlspecialchars_decode($this->formatterHelper->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
                 }
