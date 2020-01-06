@@ -245,12 +245,7 @@ class CorePermissions
 
             $parts = explode(':', $permission);
             if (false === in_array(count($parts), [3, 4])) {
-                throw new PermissionBadFormatException(
-                    $this->getTranslator()->trans(
-                        'mautic.core.permissions.badformat',
-                        ['%permission%' => $permission]
-                    )
-                );
+                throw new PermissionBadFormatException($this->getTranslator()->trans('mautic.core.permissions.badformat', ['%permission%' => $permission]));
             }
 
             if ($userEntity->isAdmin()) {

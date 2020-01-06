@@ -91,8 +91,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param SubmissionEvent $event
-     *
      * @throws ORMException
      */
     public function onFormSubmitActionSendEmail(SubmissionEvent $event): void
