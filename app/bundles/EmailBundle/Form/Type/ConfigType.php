@@ -39,20 +39,12 @@ class ConfigType extends AbstractType
      */
     private $transportType;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param TransportType       $transportType
-     */
     public function __construct(TranslatorInterface $translator, TransportType $transportType)
     {
         $this->translator    = $translator;
         $this->transportType = $transportType;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(
@@ -807,9 +799,10 @@ class ConfigType extends AbstractType
      */
     private function getTransportChoices()
     {
-        $choices = $this->transportType->getTransportTypes();
+        $choices    = [];
+        $transports = $this->transportType->getTransportTypes();
 
-        foreach ($choices as $value => $label) {
+        foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;
         }
 
