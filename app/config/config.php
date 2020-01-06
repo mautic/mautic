@@ -435,7 +435,7 @@ $container->loadFromExtension('fm_elfinder', [
         'default' => [
             'locale'             => 'LANG',
             'editor'             => 'custom',
-            'editor_template'    => 'app/bundles/CoreBundle/Assets/js/libraries/filemanager/index.twig.html',
+            'editor_template'    => 'app/bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'         => true,
             'include_assets'     => true,
             'relative_path'      => false,
