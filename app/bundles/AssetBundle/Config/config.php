@@ -9,9 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\AssetBundle\EventListener\BuilderSubscriber;
-use Mautic\AssetBundle\EventListener\ReportSubscriber;
-
 return [
     'routes' => [
         'main' => [
@@ -89,14 +86,14 @@ return [
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [
-                'class'     => ReportSubscriber::class,
+                'class'     => \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.company_report_data',
                     'mautic.asset.repository.download',
                 ],
             ],
             'mautic.asset.builder.subscriber' => [
-                'class'     => BuilderSubscriber::class,
+                'class'     => \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
                     'mautic.security',
                     'mautic.asset.helper.token',
@@ -189,19 +186,16 @@ return [
             'mautic.form.type.assetconfig' => [
                 'class' => \Mautic\AssetBundle\Form\Type\ConfigType::class,
             ],
-            'mautic.form.type.asset_dashboard_downloads_in_time_widget' => [
-                'class' => \Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType::class,
-            ],
         ],
         'others' => [
             'mautic.asset.upload.error.handler' => [
-                'class'     => 'Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler',
+                'class'     => \Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
                 'arguments' => 'mautic.factory',
             ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController',
+            'oneup_uploader.controller.dropzone.class' => \Mautic\AssetBundle\Controller\UploadController::class,
             'mautic.asset.helper.token'                => [
-                'class'     => 'Mautic\AssetBundle\Helper\TokenHelper',
+                'class'     => \Mautic\AssetBundle\Helper\TokenHelper::class,
                 'arguments' => 'mautic.asset.model.asset',
             ],
         ],
