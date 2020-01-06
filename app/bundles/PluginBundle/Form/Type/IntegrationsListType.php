@@ -82,7 +82,7 @@ class IntegrationsListType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $data) use ($integrationObjects, $integrationHelper) {
+        $formModifier = function (FormInterface $form, $data) use ($integrationObjects) {
             $statusChoices   = [];
             $campaignChoices = [];
 

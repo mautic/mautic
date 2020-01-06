@@ -247,7 +247,7 @@ class CorePermissions
             }
 
             $parts = explode(':', $permission);
-            if (3 != count($parts)) {
+            if (false === in_array(count($parts), [3, 4])) {
                 throw new PermissionBadFormatException(
                     $this->getTranslator()->trans(
                         'mautic.core.permissions.badformat',

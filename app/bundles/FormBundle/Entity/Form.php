@@ -699,7 +699,7 @@ class Form extends FormEntity
     /**
      * Get actions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Action[]
      */
     public function getActions()
     {

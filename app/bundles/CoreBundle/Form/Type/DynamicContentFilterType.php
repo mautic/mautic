@@ -51,7 +51,7 @@ class DynamicContentFilterType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                CollectionType::class,
+                DynamicListType::class,
                 [
                     'entry_type'     => DynamicContentFilterEntryType::class,
                     'entry_options'  => [

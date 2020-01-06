@@ -12,8 +12,10 @@
 namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class SubmissionEvent.
@@ -78,23 +80,24 @@ class SubmissionEvent extends CommonEvent
     private $feedback = [];
 
     /**
-     * Configuration for the action.
-     *
-     * @var array
-     */
-    private $actionConfig = [];
-
-    /**
-     * Active action.
-     *
-     * @var
+     * @var Action
      */
     private $action;
+
+    /**
+     * @var string
+     */
+    private $context;
 
     /**
      * @var Request
      */
     private $request;
+
+    /**
+     * @var array|Response|null
+     */
+    private $postSubmitResponse;
 
     /**
      * SubmissionEvent constructor.
@@ -252,7 +255,7 @@ class SubmissionEvent extends CommonEvent
      */
     public function getActionFeedback($key = null)
     {
-        if (null == $key) {
+        if (null === $key) {
             return $this->feedback;
         } elseif (isset($this->feedback[$key])) {
             return $this->feedback[$key];
@@ -261,31 +264,30 @@ class SubmissionEvent extends CommonEvent
         return false;
     }
 
-    /**
-     * @param $action
-     *
-     * @return bool
-     */
-    public function checkContext($action)
+    public function checkContext(string $context): bool
     {
-        return $this->action === $action;
+        return $this->context === $context;
     }
 
-    /**
-     * @param array $config
-     */
-    public function setActionConfig($action, array $config)
+    public function setContext(string $context): void
     {
-        $this->action       = $action;
-        $this->actionConfig = $config;
+        $this->context = $context;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getActionConfig()
+    public function setAction(?Action $action = null)
     {
-        return $this->actionConfig;
+        $this->action = $action;
+        $this->setContext($action->getType());
+    }
+
+    public function getAction(): ?Action
+    {
+        return $this->action;
+    }
+
+    public function getActionConfig(): array
+    {
+        return $this->action ? $this->action->getProperties() : [];
     }
 
     /**
@@ -296,9 +298,8 @@ class SubmissionEvent extends CommonEvent
      */
     public function setPostSubmitCallback($key, array $callback)
     {
-        // support for `callback` is @deprecated and should be removed in 3.0
-        if (!array_key_exists('eventName', $callback) && !array_key_exists('callback', $callback)) {
-            throw new \InvalidArgumentException('eventName or callback required');
+        if (!array_key_exists('eventName', $callback)) {
+            throw new \InvalidArgumentException('eventName required');
         }
 
         $this->callbacks[$key] = $callback;
@@ -338,5 +339,20 @@ class SubmissionEvent extends CommonEvent
         $this->callbackResponses[$key] = $callbackResponse;
 
         return $this;
+    }
+
+    public function hasPostSubmitResponse(): bool
+    {
+        return null !== $this->postSubmitResponse;
+    }
+
+    public function getPostSubmitResponse()
+    {
+        return $this->postSubmitResponse;
+    }
+
+    public function setPostSubmitResponse($response): void
+    {
+        $this->postSubmitResponse = $response;
     }
 }

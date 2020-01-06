@@ -13,15 +13,14 @@ namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 
-/**
- * Class ComponentValidationTrait.
- */
 trait ComponentValidationTrait
 {
     /**
      * @param array $keys
      * @param array $component
-     * @param array $methods
+     * @param array $callbacks
+     *
+     * @throws BadConfigurationException
      */
     private function verifyComponent(array $keys, array $component, array $callbacks = [])
     {

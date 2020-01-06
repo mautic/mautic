@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\EmailBundle\EventListener\FormSubscriber;
+
 return [
     'routes' => [
         'main' => [
@@ -178,7 +180,12 @@ return [
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
-                'class' => \Mautic\EmailBundle\EventListener\FormSubscriber::class,
+                'class'     => FormSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
+                ],
             ],
             'mautic.email.reportbundle.subscriber' => [
                 'class'     => \Mautic\EmailBundle\EventListener\ReportSubscriber::class,
