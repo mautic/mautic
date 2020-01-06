@@ -2,12 +2,12 @@
 <html>
 <head>
     {% if includeAssets %}
-    {{ include("@FMElfinder/Elfinder/helper/assets_css.html.twig") }}
+    {{ include("@bundles/CoreBundle/Assets/js/libraries/filemanager/assets_css.html.twig") }}
     {% endif %}
 </head>
 <body>
 {% if includeAssets %}
-{{ include("@FMElfinder/Elfinder/helper/assets_js.html.twig") }}
+    {{ include("@bundles/CoreBundle/Assets/js/libraries/filemanager/assets_js.html.twig") }}
 {% endif %}
 <script type="text/javascript" charset="utf-8">
     $().ready(function() {
