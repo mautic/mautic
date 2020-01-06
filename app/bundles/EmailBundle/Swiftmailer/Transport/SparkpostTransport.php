@@ -327,8 +327,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * @param int    $toBeAdded
      * @param string $type
-     *
-     * @return int
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to'): int
     {
