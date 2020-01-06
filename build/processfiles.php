@@ -3,7 +3,7 @@
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
- * @link        http://mautic.org
+ * @see        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -22,6 +22,8 @@ system('rm -rf app/bundles/*/Tests');
 system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache/*');
 system('rm -rf media/files/*');
+// Delete ElFinder's (filemanager) assets
+system('rm -rf media/elfinder/');
 system('rm -f app/config/config_dev.php');
 system('rm -f app/config/config_test.php');
 system('rm -f app/config/local*.php');
