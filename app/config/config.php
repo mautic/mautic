@@ -428,13 +428,14 @@ $container->setDefinition(
     $definitionConsoleExceptionListener
 );
 
-// elFinder File Manager
+// ElFinder File Manager
 $container->loadFromExtension('fm_elfinder', [
     'assets_path'            => 'media/assets',
     'instances'              => [
         'default' => [
             'locale'             => 'LANG',
-            'editor'             => 'simple',
+            'editor'             => 'custom',
+            'editor_template'    => 'app/bundles/CoreBundle/Assets/js/libraries/filemanager/index.twig.html',
             'fullscreen'         => true,
             'include_assets'     => true,
             'relative_path'      => false,
