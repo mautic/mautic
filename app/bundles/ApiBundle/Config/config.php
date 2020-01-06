@@ -198,7 +198,7 @@ return [
         'api_batch_max_limit'               => 200,
         'api_rate_limiter_limit'            => 0,
         'api_rate_limiter_cache'            => [
-          'type'      => 'file_system',
+            'adapter' => 'cache.adapter.filesystem',
         ],
     ],
 ];
