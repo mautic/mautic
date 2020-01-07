@@ -141,13 +141,19 @@ Mautic.filterIntegrations = function(update) {
 
     //activate shuffles
     if (mQuery('.shuffle-integrations').length) {
-        var grid = mQuery(".shuffle-integrations");
-
         //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
         setTimeout(function () {
-            grid.shuffle('shuffle', function($el, shuffle) {
+
+            var Shuffle = window.Shuffle;
+            var element = document.querySelector('.shuffle-integrations');
+
+            var shuffleInstance = new Shuffle(element, {
+                itemSelector: '.shuffle-item'
+            });
+
+            shuffleInstance.filter(function($el, shuffle) {
                 if (filter) {
-                    return $el.hasClass('plugin' + filter);
+                    return mQuery($el).hasClass('plugin' + filter);
                 } else {
                     return true;
                 }
@@ -155,12 +161,8 @@ Mautic.filterIntegrations = function(update) {
 
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
-                })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
-                });
+                .on("fa.sidebar.minimize", shuffleInstance.update)
+                .on("fa.sidebar.maximize", shuffleInstance.update);
         }, 500);
     }
 };
