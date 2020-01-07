@@ -23,7 +23,7 @@ system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache/*');
 system('rm -rf media/files/*');
 // Delete ElFinder's (filemanager) assets
-system('rm -rf media/elfinder/');
+system('rm -rf media/assets/');
 system('rm -f app/config/config_dev.php');
 system('rm -f app/config/config_test.php');
 system('rm -f app/config/local*.php');

@@ -430,7 +430,7 @@ $container->setDefinition(
 
 // ElFinder File Manager
 $container->loadFromExtension('fm_elfinder', [
-    'assets_path'            => 'media/elfinder',
+    'assets_path'            => 'media/assets',
     'instances'              => [
         'default' => [
             'locale'          => 'LANG',
@@ -447,6 +447,7 @@ $container->loadFromExtension('fm_elfinder', [
                         'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
                         'upload_deny'       => ['all'],
                         'upload_max_size'   => '2M',
+                        'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
                     ],
                 ],
             ],

@@ -153,7 +153,7 @@
     },
     "config": {
         "bin-dir": "bin",
-        "component-dir": "media/elfinder",
+        "component-dir": "media/assets",
         "process-timeout": 5000
     },
     "extra": {
