@@ -8,7 +8,6 @@ class ZohoApi extends CrmApi
 {
     /**
      * @param        $operation
-     * @param array  $parameters
      * @param string $method
      * @param string $moduleobject
      * @param bool   $isJson
@@ -97,7 +96,6 @@ class ZohoApi extends CrmApi
     /**
      * gets Zoho leads.
      *
-     * @param array     $params
      * @param string    $object
      * @param array|int $id
      *
@@ -131,7 +129,6 @@ class ZohoApi extends CrmApi
     /**
      * gets Zoho companies.
      *
-     * @param array  $params
      * @param string $id
      *
      * @return mixed

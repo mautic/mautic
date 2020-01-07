@@ -32,8 +32,6 @@ class CitrixActionType extends AbstractType
 
     /**
      * CitrixActionType constructor.
-     *
-     * @param FieldModel $fieldModel
      */
     public function __construct(FieldModel $fieldModel)
     {

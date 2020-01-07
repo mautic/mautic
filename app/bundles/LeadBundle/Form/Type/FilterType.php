@@ -37,20 +37,12 @@ class FilterType extends AbstractType
      */
     private $requestStack;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param RequestStack        $requestStack
-     */
     public function __construct(TranslatorInterface $translator, RequestStack $requestStack)
     {
         $this->translator   = $translator;
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -98,9 +90,6 @@ class FilterType extends AbstractType
         $builder->add('type', HiddenType::class);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(

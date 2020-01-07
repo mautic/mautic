@@ -49,13 +49,6 @@ class CalendarSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param PageModel           $pageModel
-     * @param Connection          $connection
-     * @param CorePermissions     $security
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     */
     public function __construct(
         PageModel $pageModel,
         Connection $connection,
@@ -83,8 +76,6 @@ class CalendarSubscriber implements EventSubscriberInterface
 
     /**
      * Adds events to the calendar.
-     *
-     * @param CalendarGeneratorEvent $event
      *
      * @todo   This method is only a model and should be removed when actual data is being populated
      */
@@ -147,8 +138,6 @@ class CalendarSubscriber implements EventSubscriberInterface
 
     /**
      * Let the calendar to edit / create new entities.
-     *
-     * @param EventGeneratorEvent $event
      */
     public function onCalendarEventGenerate(EventGeneratorEvent $event)
     {

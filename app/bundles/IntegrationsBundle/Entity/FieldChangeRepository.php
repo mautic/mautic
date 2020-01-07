@@ -21,10 +21,6 @@ class FieldChangeRepository extends CommonRepository
     /**
      * Takes an object id & type and deletes all entities
      * that match the given column names.
-     *
-     * @param int    $objectId
-     * @param string $objectType
-     * @param array  $columnNames
      */
     public function deleteEntitiesForObjectByColumnName(int $objectId, string $objectType, array $columnNames): void
     {
@@ -47,10 +43,6 @@ class FieldChangeRepository extends CommonRepository
 
     /**
      * Takes an object id & type and deletes all entities that match.
-     *
-     * @param int         $objectId
-     * @param string      $objectType
-     * @param string|null $integration
      */
     public function deleteEntitiesForObject(int $objectId, string $objectType, ?string $integration = null): void
     {
@@ -78,11 +70,8 @@ class FieldChangeRepository extends CommonRepository
     }
 
     /**
-     * @param string             $integration
-     * @param string             $objectType
-     * @param \DateTimeInterface $toDateTime
-     * @param int|null           $afterObjectId
-     * @param int                $objectCount
+     * @param int|null $afterObjectId
+     * @param int      $objectCount
      *
      * @return array
      */
@@ -143,9 +132,7 @@ class FieldChangeRepository extends CommonRepository
     }
 
     /**
-     * @param string $integration
-     * @param string $objectType
-     * @param int    $objectId
+     * @param int $objectId
      *
      * @return array
      */

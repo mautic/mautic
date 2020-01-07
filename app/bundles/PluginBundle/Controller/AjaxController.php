@@ -26,8 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function setIntegrationFilterAction(Request $request)
@@ -41,8 +39,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the HTML for list of fields.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -136,8 +132,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the HTML for integration properties.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -256,8 +250,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getIntegrationCampaignsAction(Request $request)

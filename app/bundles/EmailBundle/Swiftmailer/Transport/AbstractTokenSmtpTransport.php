@@ -29,8 +29,7 @@ abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implement
     abstract protected function prepareMessage();
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int
      *

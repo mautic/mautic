@@ -84,8 +84,6 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
     }
 
     /**
-     * @param array $ids
-     *
      * @return array
      */
     protected function getCampaignEventLogs(array $ids)

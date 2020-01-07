@@ -27,9 +27,6 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param TriggerBuilderEvent $event
-     */
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $changeLists = [

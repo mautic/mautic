@@ -46,9 +46,6 @@ class Event
         $this->queues = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -110,8 +107,6 @@ class Event
     }
 
     /**
-     * @param Webhook $webhook
-     *
      * @return $this
      */
     public function setWebhook(Webhook $webhook)

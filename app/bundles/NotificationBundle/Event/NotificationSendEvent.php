@@ -36,7 +36,6 @@ class NotificationSendEvent extends CommonEvent
 
     /**
      * @param string $message
-     * @param Lead   $lead
      */
     public function __construct($message, $heading, Lead $lead)
     {

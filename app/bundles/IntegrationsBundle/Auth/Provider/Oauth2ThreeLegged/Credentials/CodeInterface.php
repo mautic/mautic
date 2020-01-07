@@ -15,8 +15,5 @@ namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
 interface CodeInterface
 {
-    /**
-     * @return string|null
-     */
     public function getCode(): ?string;
 }

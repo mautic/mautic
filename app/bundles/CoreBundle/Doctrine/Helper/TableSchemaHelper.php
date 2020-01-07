@@ -58,9 +58,7 @@ class TableSchemaHelper
     protected $addTables;
 
     /**
-     * @param Connection         $db
-     * @param                    $prefix
-     * @param ColumnSchemaHelper $columnHelper
+     * @param $prefix
      */
     public function __construct(Connection $db, $prefix, ColumnSchemaHelper $columnHelper)
     {
@@ -90,8 +88,6 @@ class TableSchemaHelper
 
     /**
      * Add an array of tables to db.
-     *
-     * @param array $tables
      *
      * @return $this
      *

@@ -51,10 +51,6 @@ class LeadPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $data
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {

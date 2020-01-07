@@ -49,11 +49,6 @@ class CategoryListType extends AbstractType
 
     /**
      * CategoryListType constructor.
-     *
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     * @param CategoryModel       $model
-     * @param Router              $router
      */
     public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
     {
@@ -63,10 +58,6 @@ class CategoryListType extends AbstractType
         $this->router     = $router;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (true === $options['return_entity']) {
@@ -75,9 +66,6 @@ class CategoryListType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

@@ -23,9 +23,6 @@ trait FiltersEntityTrait
      */
     private $filters = [];
 
-    /**
-     * @param ClassMetadataBuilder $builder
-     */
     protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
     {
         $builder->createField('filters', 'array')

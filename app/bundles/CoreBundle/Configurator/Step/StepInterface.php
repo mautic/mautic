@@ -49,8 +49,6 @@ interface StepInterface
     /**
      * Updates form data parameters.
      *
-     * @param StepInterface $data
-     *
      * @return array
      */
     public function update(StepInterface $data);

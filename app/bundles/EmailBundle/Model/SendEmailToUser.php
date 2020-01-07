@@ -30,9 +30,6 @@ class SendEmailToUser
     }
 
     /**
-     * @param array $config
-     * @param Lead  $lead
-     *
      * @throws EmailCouldNotBeSentException
      * @throws ORMException
      */

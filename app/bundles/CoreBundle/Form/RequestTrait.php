@@ -22,8 +22,6 @@ use Symfony\Component\Form\Form;
 trait RequestTrait
 {
     /**
-     * @param Form  $form
-     * @param array $params
      * @param null  $entity
      * @param array $masks
      */

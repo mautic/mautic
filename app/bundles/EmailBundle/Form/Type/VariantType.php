@@ -27,18 +27,11 @@ class VariantType extends AbstractType
      */
     private $emailModel;
 
-    /**
-     * @param EmailModel $emailModel
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('weight',

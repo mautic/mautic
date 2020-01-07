@@ -62,11 +62,10 @@ class CacheStorageHelper
     /**
      * CacheStorageHelper constructor.
      *
-     * @param                 $adaptor
-     * @param null            $namespace
-     * @param Connection|null $connection
-     * @param null            $cacheDir
-     * @param int             $defaultExpiration
+     * @param      $adaptor
+     * @param null $namespace
+     * @param null $cacheDir
+     * @param int  $defaultExpiration
      */
     public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
     {

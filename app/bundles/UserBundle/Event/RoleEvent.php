@@ -20,7 +20,6 @@ use Mautic\UserBundle\Entity\Role;
 class RoleEvent extends CommonEvent
 {
     /**
-     * @param Role $role
      * @param bool $isNew
      */
     public function __construct(Role &$role, $isNew = false)
@@ -41,8 +40,6 @@ class RoleEvent extends CommonEvent
 
     /**
      * Sets the Role entity.
-     *
-     * @param Role $role
      */
     public function setRole(Role $role)
     {

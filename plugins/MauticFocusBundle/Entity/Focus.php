@@ -104,9 +104,6 @@ class Focus extends FormEntity
      */
     private $cache;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -140,9 +137,6 @@ class Focus extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);

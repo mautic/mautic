@@ -127,22 +127,6 @@ class SubmissionModel extends CommonFormModel
      */
     private $dateHelper;
 
-    /**
-     * @param IpLookupHelper                 $ipLookupHelper
-     * @param TemplatingHelper               $templatingHelper
-     * @param FormModel                      $formModel
-     * @param PageModel                      $pageModel
-     * @param LeadModel                      $leadModel
-     * @param CampaignModel                  $campaignModel
-     * @param LeadFieldModel                 $leadFieldModel
-     * @param CompanyModel                   $companyModel
-     * @param FormFieldHelper                $fieldHelper
-     * @param UploadFieldValidator           $uploadFieldValidator
-     * @param FormUploader                   $formUploader
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
-     * @param FieldValueTransformer          $fieldValueTransformer
-     * @param DateHelper                     $dateHelper
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         TemplatingHelper $templatingHelper,
@@ -186,11 +170,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param         $post
-     * @param         $server
-     * @param Form    $form
-     * @param Request $request
-     * @param bool    $returnEvent
+     * @param      $post
+     * @param      $server
+     * @param bool $returnEvent
      *
      * @return bool|array
      *
@@ -654,12 +636,10 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -761,7 +741,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Execute a form submit action.
      *
-     * @param SubmissionEvent $event
+     * @throws ValidationException
      */
     protected function executeFormActions(SubmissionEvent $event): void
     {
@@ -778,10 +758,6 @@ class SubmissionModel extends CommonFormModel
 
     /**
      * Create/update lead from form submit.
-     *
-     * @param Form  $form
-     * @param array $leadFieldMatches
-     * @param $leadFields
      *
      * @return Lead
      *
@@ -1006,8 +982,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Validates a field value.
      *
-     * @param Field $field
-     * @param       $value
+     * @param $value
      *
      * @return bool|string True if valid; otherwise string with invalid reason
      */

@@ -53,21 +53,12 @@ class MauticSyncProcess
      */
     private $syncDataExchange;
 
-    /**
-     * @param SyncDateHelper        $syncDateHelper
-     * @param ObjectChangeGenerator $objectChangeGenerator
-     */
     public function __construct(SyncDateHelper $syncDateHelper, ObjectChangeGenerator $objectChangeGenerator)
     {
         $this->syncDateHelper        = $syncDateHelper;
         $this->objectChangeGenerator = $objectChangeGenerator;
     }
 
-    /**
-     * @param InputOptionsDAO        $inputOptionsDAO
-     * @param MappingManualDAO       $mappingManualDAO
-     * @param MauticSyncDataExchange $syncDataExchange
-     */
     public function setupSync(InputOptionsDAO $inputOptionsDAO, MappingManualDAO $mappingManualDAO, MauticSyncDataExchange $syncDataExchange): void
     {
         $this->inputOptionsDAO  = $inputOptionsDAO;
@@ -76,8 +67,6 @@ class MauticSyncProcess
     }
 
     /**
-     * @param int $syncIteration
-     *
      * @return ReportDAO
      *
      * @throws ObjectNotFoundException
@@ -134,8 +123,6 @@ class MauticSyncProcess
     }
 
     /**
-     * @param ReportDAO $syncReport
-     *
      * @return OrderDAO
      *
      * @throws ObjectNotFoundException

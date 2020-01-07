@@ -61,12 +61,6 @@ class PageType extends AbstractType
      */
     private $canViewOther = false;
 
-    /**
-     * @param EntityManager   $entityManager
-     * @param PageModel       $pageModel
-     * @param CorePermissions $corePermissions
-     * @param UserHelper      $userHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         PageModel $pageModel,

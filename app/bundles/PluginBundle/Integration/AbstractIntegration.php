@@ -197,23 +197,6 @@ abstract class AbstractIntegration
      */
     protected $commandParameters = [];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param CacheStorageHelper       $cacheStorageHelper
-     * @param EntityManager            $entityManager
-     * @param Session                  $session
-     * @param RequestStack             $requestStack
-     * @param Router                   $router
-     * @param TranslatorInterface      $translator
-     * @param Logger                   $logger
-     * @param EncryptionHelper         $encryptionHelper
-     * @param LeadModel                $leadModel
-     * @param CompanyModel             $companyModel
-     * @param PathsHelper              $pathsHelper
-     * @param NotificationModel        $notificationModel
-     * @param FieldModel               $fieldModel
-     * @param IntegrationEntityModel   $integrationEntityModel
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -431,8 +414,6 @@ abstract class AbstractIntegration
 
     /**
      * Set the social integration entity.
-     *
-     * @param Integration $settings
      */
     public function setIntegrationSettings(Integration $settings)
     {
@@ -503,9 +484,6 @@ abstract class AbstractIntegration
 
     /**
      * Encrypts and saves keys to the entity.
-     *
-     * @param array       $keys
-     * @param Integration $entity
      */
     public function encryptAndSetApiKeys(array $keys, Integration $entity)
     {
@@ -569,8 +547,6 @@ abstract class AbstractIntegration
     /**
      * Encrypts API keys.
      *
-     * @param array $keys
-     *
      * @return array
      */
     public function encryptApiKeys(array $keys)
@@ -588,8 +564,7 @@ abstract class AbstractIntegration
     /**
      * Decrypts API keys.
      *
-     * @param array $keys
-     * @param bool  $mainDecryptOnly
+     * @param bool $mainDecryptOnly
      *
      * @return array
      */
@@ -962,12 +937,11 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param            $integrationEntity
-     * @param            $integrationEntityId
-     * @param            $internalEntity
-     * @param            $internalEntityId
-     * @param array|null $internal
-     * @param bool       $persist
+     * @param      $integrationEntity
+     * @param      $integrationEntityId
+     * @param      $internalEntity
+     * @param      $internalEntityId
+     * @param bool $persist
      */
     public function createIntegrationEntity(
         $integrationEntity,
@@ -1538,10 +1512,6 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param Integration $entity
-     * @param array       $mauticLeadFields
-     * @param array       $mauticCompanyFields
-     *
      * @return array
      */
     public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields)
@@ -1641,7 +1611,6 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array  $fields
      * @param string $fieldType
      *
      * @return array
@@ -2113,10 +2082,6 @@ abstract class AbstractIntegration
         return $this->notificationModel;
     }
 
-    /**
-     * @param \Exception $e
-     * @param Lead|null  $contact
-     */
     public function logIntegrationError(\Exception $e, Lead $contact = null)
     {
         $logger = $this->logger;
@@ -2324,7 +2289,6 @@ abstract class AbstractIntegration
 
     /**
      * returns template to render on popup window after trying to run OAuth.
-     *
      *
      * @return string|null
      */

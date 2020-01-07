@@ -26,8 +26,6 @@ class CoreParametersHelper
 
     /**
      * CoreParametersHelper constructor.
-     *
-     * @param Kernel $kernel
      */
     public function __construct(Kernel $kernel)
     {

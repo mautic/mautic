@@ -24,9 +24,6 @@ class VersionHelper extends Helper
      */
     private $appVersion;
 
-    /**
-     * @param AppVersion $appVersion
-     */
     public function __construct(AppVersion $appVersion)
     {
         $this->appVersion = $appVersion;

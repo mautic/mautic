@@ -22,7 +22,6 @@ class Serializer
      * PHP does not recommend untrusted user input even with ['allowed_classes' => false]
      *
      * @param string $serializedString
-     * @param array  $options
      *
      * @return mixed
      */

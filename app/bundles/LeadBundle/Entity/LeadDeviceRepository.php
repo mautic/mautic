@@ -22,8 +22,6 @@ class LeadDeviceRepository extends CommonRepository
     /**
      * {@inhertidoc}.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -176,8 +174,6 @@ class LeadDeviceRepository extends CommonRepository
     /**
      * Check if there is at least one device with filled tracking code assigned to Lead.
      *
-     * @param Lead $lead
-     *
      * @return bool
      */
     public function isAnyLeadDeviceTracked(Lead $lead)
@@ -198,8 +194,6 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getLeadDevices(Lead $lead)

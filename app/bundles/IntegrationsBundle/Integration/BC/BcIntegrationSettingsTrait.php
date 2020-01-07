@@ -19,8 +19,6 @@ trait BcIntegrationSettingsTrait
 {
     /**
      * @deprecated Use setIntegrationConfiguration
-     *
-     * @param Integration $integration
      */
     public function setIntegrationSettings(Integration $integration): void
     {
@@ -29,8 +27,6 @@ trait BcIntegrationSettingsTrait
 
     /**
      * @deprecated Use getIntegrationConfiguration
-     *
-     * @return Integration|null
      */
     public function getIntegrationSettings(): ?Integration
     {
@@ -39,8 +35,6 @@ trait BcIntegrationSettingsTrait
 
     /**
      * @deprecated Implement ConfigFormFeaturesInterface instead
-     *
-     * @return array
      */
     public function getSupportedFeatures(): array
     {

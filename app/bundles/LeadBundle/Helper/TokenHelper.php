@@ -81,9 +81,8 @@ class TokenHelper
     }
 
     /**
-     * @param array $lead
-     * @param       $alias
-     * @param       $defaultValue
+     * @param $alias
+     * @param $defaultValue
      *
      * @return mixed
      */

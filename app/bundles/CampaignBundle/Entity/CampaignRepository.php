@@ -353,9 +353,7 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param array          $pendingEvents
-     * @param ContactLimiter $limiter
+     * @param $campaignId
      *
      * @return CountResult
      */
@@ -400,8 +398,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Get pending contact IDs for a campaign.
      *
-     * @param                $campaignId
-     * @param ContactLimiter $limiter
+     * @param $campaignId
      *
      * @return array
      */
@@ -640,7 +637,6 @@ class CampaignRepository extends CommonRepository
      * @deprecated 2.14 to be removed in 3.0; use LeadRepository::getCampaignContacts
      *
      * @param       $id
-     * @param array $lists
      * @param array $args
      *
      * @return array|int
@@ -744,7 +740,6 @@ class CampaignRepository extends CommonRepository
      * @deprecated 2.14 to be removed in 3.0; use LeadRepository::getOprhanedContacts instead
      *
      * @param       $id
-     * @param array $lists
      * @param array $args
      *
      * @return array|int

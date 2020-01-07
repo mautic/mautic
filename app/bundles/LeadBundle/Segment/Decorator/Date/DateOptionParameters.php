@@ -41,11 +41,6 @@ class DateOptionParameters
      */
     private $dateTimeHelper;
 
-    /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                     $relativeDateStrings
-     * @param TimezoneResolver          $timezoneResolver
-     */
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,
         array $relativeDateStrings,
@@ -104,9 +99,6 @@ class DateOptionParameters
     }
 
     /**
-     * @param ContactSegmentFilterCrate $leadSegmentFilterCrate
-     * @param array                     $relativeDateStrings
-     *
      * @return string
      */
     private function parseTimeFrame(ContactSegmentFilterCrate $leadSegmentFilterCrate, array $relativeDateStrings)

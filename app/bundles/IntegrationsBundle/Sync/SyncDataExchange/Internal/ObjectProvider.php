@@ -33,19 +33,12 @@ class ObjectProvider
      */
     private $objects = [];
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param string $name
-     *
-     * @return ObjectInterface
-     *
      * @throws ObjectNotFoundException
      */
     public function getObjectByName(string $name): ObjectInterface
@@ -62,10 +55,6 @@ class ObjectProvider
     }
 
     /**
-     * @param string $entityName
-     *
-     * @return ObjectInterface
-     *
      * @throws ObjectNotFoundException
      */
     public function getObjectByEntityName(string $entityName): ObjectInterface

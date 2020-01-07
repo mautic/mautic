@@ -23,8 +23,6 @@ class AnalyticsHelper extends Helper
 
     /**
      * AnalyticsHelper constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
      */
     public function __construct(CoreParametersHelper $parametersHelper)
     {

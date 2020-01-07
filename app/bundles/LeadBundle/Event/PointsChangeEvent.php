@@ -23,7 +23,6 @@ class PointsChangeEvent extends CommonEvent
     protected $new;
 
     /**
-     * @param Lead $lead
      * @param bool $isNew
      */
     public function __construct(Lead &$lead, $old, $new)

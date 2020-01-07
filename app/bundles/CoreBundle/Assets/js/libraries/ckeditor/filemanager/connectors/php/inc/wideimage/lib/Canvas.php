@@ -40,9 +40,6 @@
          * Sets the active font. Can be an instance of
          * WideImage_Font_TTF, WideImage_Font_PS, or WideImage_Font_GDF.
          *
-         *
-         *
-         *
          * @param object $font Font object to set for writeText()
          */
         public function setFont($font)

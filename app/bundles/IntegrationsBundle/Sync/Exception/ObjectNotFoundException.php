@@ -15,9 +15,6 @@ namespace Mautic\IntegrationsBundle\Sync\Exception;
 
 class ObjectNotFoundException extends \Exception
 {
-    /**
-     * @param string $object
-     */
     public function __construct(string $object)
     {
         parent::__construct("$object was not found in the mapping");

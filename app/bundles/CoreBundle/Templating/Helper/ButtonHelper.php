@@ -138,10 +138,6 @@ class ButtonHelper extends Helper
 
     /**
      * ButtonHelper constructor.
-     *
-     * @param EngineInterface          $templating
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EngineInterface $templating, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
@@ -151,8 +147,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param array $buttons
-     *
      * @return $this
      */
     public function addButtons(array $buttons)
@@ -164,8 +158,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param array $button
-     *
      * @return $this
      */
     public function addButton(array $button)
@@ -281,10 +273,9 @@ class ButtonHelper extends Helper
     /**
      * Reset the buttons.
      *
-     * @param         $buttonCount
-     * @param Request $request
-     * @param string  $groupType
-     * @param null    $item
+     * @param        $buttonCount
+     * @param string $groupType
+     * @param null   $item
      *
      * @return $this
      */

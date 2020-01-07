@@ -26,8 +26,6 @@ class TrackingPixelHelper
     }
 
     /**
-     * @param Request $request
-     *
      * @return Response
      */
     public static function getResponse(Request $request)

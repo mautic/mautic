@@ -42,12 +42,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param StagesChangeLogRepository $stagesChangeLogRepository
-     * @param LeadStageLogRepository    $leadStageLogRepository
-     * @param TranslatorInterface       $translator
-     * @param RouterInterface           $router
-     */
     public function __construct(
         StagesChangeLogRepository $stagesChangeLogRepository,
         LeadStageLogRepository $leadStageLogRepository,
@@ -73,8 +67,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -124,9 +116,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->leadStageLogRepository->updateLead(

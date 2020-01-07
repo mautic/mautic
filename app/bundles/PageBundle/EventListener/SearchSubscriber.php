@@ -41,12 +41,6 @@ class SearchSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param UserHelper       $userHelper
-     * @param PageModel        $pageModel
-     * @param CorePermissions  $security
-     * @param TemplatingHelper $templating
-     */
     public function __construct(
         UserHelper $userHelper,
         PageModel $pageModel,
@@ -70,9 +64,6 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
@@ -126,9 +117,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted(['page:pages:viewown', 'page:pages:viewother'], 'MATCH_ONE')) {

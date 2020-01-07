@@ -34,10 +34,6 @@ class OwnerProvider
      */
     private $objectProvider;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param ObjectProvider           $objectProvider
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ObjectProvider $objectProvider
@@ -47,8 +43,7 @@ class OwnerProvider
     }
 
     /**
-     * @param string $objectName
-     * @param int[]  $objectIds
+     * @param int[] $objectIds
      *
      * @return ObjectInterface
      *

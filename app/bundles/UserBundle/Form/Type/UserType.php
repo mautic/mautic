@@ -56,12 +56,6 @@ class UserType extends AbstractType
      */
     private $parametersHelper;
 
-    /**
-     * @param TranslatorInterface  $translator
-     * @param UserModel            $model
-     * @param LanguageHelper       $languageHelper
-     * @param CoreParametersHelper $parametersHelper
-     */
     public function __construct(
         TranslatorInterface $translator,
         UserModel $model,

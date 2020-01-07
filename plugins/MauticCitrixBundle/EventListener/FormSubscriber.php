@@ -76,14 +76,6 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param CitrixModel         $citrixModel
-     * @param FormModel           $formModel
-     * @param SubmissionModel     $submissionModel
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     * @param TemplatingHelper    $templating
-     */
     public function __construct(
         CitrixModel $citrixModel,
         FormModel $formModel,
@@ -122,9 +114,8 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param SubmissionEvent $event
-     * @param string          $product
-     * @param string          $startType indicates that this is a start product, not registration
+     * @param string $product
+     * @param string $startType indicates that this is a start product, not registration
      *
      * @throws ValidationException
      */
@@ -222,9 +213,7 @@ class FormSubscriber implements EventSubscriberInterface
                     throw new BadRequestHttpException('Lead not found!');
                 }
             } else {
-                throw new BadRequestHttpException(
-                    'There are no products to '.((null === $startType) ? 'register' : 'start')
-                );
+                throw new BadRequestHttpException('There are no products to '.((null === $startType) ? 'register' : 'start'));
             } // end-block
         } catch (\Exception $ex) {
             CitrixHelper::log('onProductRegistration - '.$product.': '.$ex->getMessage());
@@ -265,8 +254,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Helper function to debug REST requests.
-     *
-     * @param PluginIntegrationRequestEvent $event
      */
     public function onRequest(PluginIntegrationRequestEvent $event)
     {
@@ -279,8 +266,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\ValidationEvent $event
-     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
@@ -385,8 +370,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\FormEvent $event
-     *
      * @throws ValidationException
      */
     public function onFormPreSave(Events\FormEvent $event)
@@ -408,8 +391,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Form $form
-     *
      * @return array
      *
      * @throws \InvalidArgumentException
@@ -525,10 +506,7 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\FormBuilderEvent $event
-     *
      * @throws InvalidArgumentException
-     * @throws BadConfigurationException
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {

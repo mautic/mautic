@@ -20,8 +20,6 @@ trait TranslationMigrationTrait
 {
     /**
      * Add translation parent/child relationship columns.
-     *
-     * @param Schema $schema
      */
     protected function addTranslationSchema(Schema $schema, $tableName, $languageColumnName = 'lang')
     {

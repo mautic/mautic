@@ -44,9 +44,6 @@ class InstallController extends CommonController
      */
     private $configurator;
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->configurator = $this->container->get('mautic.configurator');
@@ -366,9 +363,7 @@ class InstallController extends CommonController
         $fixtures = $loader->getFixtures();
 
         if (!$fixtures) {
-            throw new \InvalidArgumentException(
-                sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths))
-            );
+            throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
         }
 
         $purger = new ORMPurger($entityManager);

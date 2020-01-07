@@ -21,8 +21,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthListener
 {
     /**
-     * @param GetResponseEvent $event
-     *
      * @throws AuthenticationException
      * @throws HttpException
      */

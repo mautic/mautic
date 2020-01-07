@@ -44,12 +44,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param EventModel      $eventModel
-     * @param FocusModel      $focusModel
-     * @param TrackingHelper  $trackingHelper
-     * @param RouterInterface $router
-     */
     public function __construct(EventModel $eventModel, FocusModel $focusModel, TrackingHelper $trackingHelper, RouterInterface $router)
     {
         $this->campaignEventModel = $eventModel;
@@ -69,9 +63,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
@@ -95,9 +86,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('focus.show', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $focusId = (int) $event->getConfig()['focus'];

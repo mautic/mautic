@@ -60,14 +60,6 @@ class NotificationHelper
 
     /**
      * NotificationHelper constructor.
-     *
-     * @param EntityManager                         $em
-     * @param AssetsHelper                          $assetsHelper
-     * @param CoreParametersHelper                  $coreParametersHelper
-     * @param IntegrationHelper                     $integrationHelper
-     * @param Router                                $router
-     * @param RequestStack                          $requestStack
-     * @param \Mautic\LeadBundle\Model\DoNotContact $doNotContact
      */
     public function __construct(EntityManager $em, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack, \Mautic\LeadBundle\Model\DoNotContact $doNotContact)
     {

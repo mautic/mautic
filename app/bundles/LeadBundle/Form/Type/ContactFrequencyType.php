@@ -24,18 +24,11 @@ class ContactFrequencyType extends AbstractType
      */
     protected $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
@@ -113,9 +106,6 @@ class ContactFrequencyType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['channels']);

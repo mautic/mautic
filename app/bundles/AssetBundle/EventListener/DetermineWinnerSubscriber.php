@@ -31,10 +31,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     */
     public function __construct(EntityManager $em, TranslatorInterface $translator)
     {
         $this->em         = $em;
@@ -53,8 +49,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on number of asset downloads.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event)
     {

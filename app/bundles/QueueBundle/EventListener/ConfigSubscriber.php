@@ -27,8 +27,6 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     /**
      * ConfigSubscriber constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -46,9 +44,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConfigBuilderEvent $event
-     */
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm([
@@ -60,9 +55,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigBeforeSave(ConfigEvent $event)
     {
         $data = $event->getConfig('queueconfig');

@@ -74,8 +74,6 @@ class InputOptionsDAO
      *      'end-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
      * ].
      *
-     * @param array $input
-     *
      * @throws InvalidValueException
      */
     public function __construct(array $input)
@@ -94,76 +92,47 @@ class InputOptionsDAO
         $this->integrationObjectIds = $this->validateObjectIds($input, 'integration-object-id');
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
     }
 
-    /**
-     * @return bool
-     */
     public function isFirstTimeSync(): bool
     {
         return $this->firstTimeSync;
     }
 
-    /**
-     * @return bool
-     */
     public function pullIsEnabled(): bool
     {
         return !$this->disablePull;
     }
 
-    /**
-     * @return bool
-     */
     public function pushIsEnabled(): bool
     {
         return !$this->disablePush;
     }
 
-    /**
-     * @return ObjectIdsDAO|null
-     */
     public function getMauticObjectIds(): ?ObjectIdsDAO
     {
         return $this->mauticObjectIds;
     }
 
-    /**
-     * @return ObjectIdsDAO|null
-     */
     public function getIntegrationObjectIds(): ?ObjectIdsDAO
     {
         return $this->integrationObjectIds;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getStartDateTime(): ?\DateTimeInterface
     {
         return $this->startDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getEndDateTime(): ?\DateTimeInterface
     {
         return $this->endDateTime;
     }
 
     /**
-     * @param array  $input
-     * @param string $optionName
-     *
-     * @return DateTimeInterface|null
-     *
      * @throws InvalidValueException
      */
     private function validateDateTime(array $input, string $optionName): ?DateTimeInterface
@@ -184,11 +153,6 @@ class InputOptionsDAO
     }
 
     /**
-     * @param array  $input
-     * @param string $optionName
-     *
-     * @return ObjectIdsDAO|null
-     *
      * @throws InvalidValueException
      */
     private function validateObjectIds(array $input, string $optionName): ?ObjectIdsDAO
@@ -209,10 +173,6 @@ class InputOptionsDAO
     /**
      * This method exists only because Mautic leads were renamed to contacts. Users will be able
      * to use the "contact" keywoard and developers "lead" as the integration bundle use "lead" everywhere.
-     *
-     * @param array $input
-     *
-     * @return array
      */
     private function fixNaming(array $input): array
     {

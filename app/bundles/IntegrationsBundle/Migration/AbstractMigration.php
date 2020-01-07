@@ -33,10 +33,6 @@ abstract class AbstractMigration implements MigrationInterface
      */
     private $queries = [];
 
-    /**
-     * @param EntityManager $entityManager
-     * @param string        $tablePrefix
-     */
     public function __construct(EntityManager $entityManager, string $tablePrefix)
     {
         $this->entityManager = $entityManager;
@@ -75,13 +71,9 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * Generate the ALTER TABLE query that adds the foreign key.
      *
-     * @param string   $table
      * @param string[] $columns
-     * @param string   $referenceTable
      * @param string[] $referenceColumns
      * @param string   $suffix           usually a 'ON DELETE ...' statement
-     *
-     * @return string
      */
     protected function generateAlterTableForeignKeyStatement(
         string $table,
@@ -98,10 +90,7 @@ abstract class AbstractMigration implements MigrationInterface
     }
 
     /**
-     * @param string   $table
      * @param string[] $columns
-     *
-     * @return string
      */
     protected function generateIndexStatement(string $table, array $columns): string
     {
@@ -110,8 +99,6 @@ abstract class AbstractMigration implements MigrationInterface
 
     /**
      * @param string[] $columns
-     *
-     * @return string
      */
     protected function columnsToString(array $columns): string
     {
@@ -123,11 +110,7 @@ abstract class AbstractMigration implements MigrationInterface
      *
      * This method was copied from AbstractMauticMigration.
      *
-     * @param string   $table
-     * @param string   $type
      * @param string[] $columnNames
-     *
-     * @return string
      */
     protected function generatePropertyName(string $table, string $type, array $columnNames): string
     {
@@ -145,9 +128,6 @@ abstract class AbstractMigration implements MigrationInterface
         return substr(strtoupper($type.'_'.$hash), 0, 63);
     }
 
-    /**
-     * @param string $sql
-     */
     protected function addSql(string $sql): void
     {
         $this->queries[] = $sql;
@@ -155,10 +135,6 @@ abstract class AbstractMigration implements MigrationInterface
 
     /**
      * Concatenates table/index prefix to the provided name.
-     *
-     * @param string $name
-     *
-     * @return string
      */
     protected function concatPrefix(string $name): string
     {
@@ -168,10 +144,6 @@ abstract class AbstractMigration implements MigrationInterface
     /**
      * Define in the child migration whether the migration should be executed.
      * Check if the migration is applied in the schema already.
-     *
-     * @param Schema $schema
-     *
-     * @return bool
      */
     abstract protected function isApplicable(Schema $schema): bool;
 

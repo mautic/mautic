@@ -104,8 +104,6 @@ class EmailRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -345,7 +343,6 @@ class EmailRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param null   $emailType
-     * @param array  $ignoreIds
      * @param null   $variantParentId
      *
      * @return array
@@ -598,10 +595,9 @@ class EmailRepository extends CommonRepository
     /**
      * Set Max and/or Min ID where conditions to the query builder.
      *
-     * @param QueryBuilder $q
-     * @param string       $column
-     * @param int          $minContactId
-     * @param int          $maxContactId
+     * @param string $column
+     * @param int    $minContactId
+     * @param int    $maxContactId
      *
      * @return QueryBuilder
      */

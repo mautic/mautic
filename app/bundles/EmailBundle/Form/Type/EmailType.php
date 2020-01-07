@@ -68,12 +68,6 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     * @param RequestStack        $requestStack
-     * @param StageModel          $stageModel
-     */
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
@@ -86,10 +80,6 @@ class EmailType extends AbstractType
         $this->stageModel   = $stageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
@@ -547,9 +537,6 @@ class EmailType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

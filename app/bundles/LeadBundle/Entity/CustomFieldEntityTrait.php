@@ -291,11 +291,6 @@ trait CustomFieldEntityTrait
         return $this;
     }
 
-    /**
-     * @param ClassMetadataBuilder $builder
-     * @param array                $fields
-     * @param array                $customFieldDefinitions
-     */
     protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions)
     {
         foreach ($fields as $fieldProperty) {

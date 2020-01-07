@@ -22,9 +22,6 @@ class HandlerContainer
      */
     private $handlers = [];
 
-    /**
-     * @param HandlerInterface $handler
-     */
     public function registerHandler(HandlerInterface $handler): void
     {
         if (!isset($this->handlers[$handler->getIntegration()])) {
@@ -35,9 +32,6 @@ class HandlerContainer
     }
 
     /**
-     * @param string $integration
-     * @param string $object
-     *
      * @return HandlerInterface
      *
      * @throws HandlerNotSupportedException

@@ -26,8 +26,6 @@ class UserHelper
 
     /**
      * UserHelper constructor.
-     *
-     * @param TokenStorage $tokenStorage
      */
     public function __construct(TokenStorage $tokenStorage)
     {

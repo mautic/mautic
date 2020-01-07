@@ -298,10 +298,8 @@ class ListController extends FormController
     /**
      * Create modifying response for segments - edit/clone.
      *
-     * @param LeadList $segment
-     * @param array    $postActionVars
-     * @param string   $action
-     * @param bool     $ignorePost
+     * @param string $action
+     * @param bool   $ignorePost
      *
      * @return Response
      */

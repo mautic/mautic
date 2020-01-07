@@ -107,9 +107,6 @@ class Stat
      */
     private $lastClicked;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -469,8 +466,6 @@ class Stat
     }
 
     /**
-     * @param \DateTime $lastClicked
-     *
      * @return Stat
      */
     public function setLastClicked(\DateTime $lastClicked)

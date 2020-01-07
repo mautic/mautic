@@ -18,9 +18,6 @@ use Mautic\IntegrationsBundle\Sync\SyncJudge\SyncJudgeInterface;
 trait DateComparisonTrait
 {
     /**
-     * @param \DateTimeInterface|null $leftDateTime
-     * @param \DateTimeInterface|null $rightDateTime
-     *
      * @return string self::LEFT_WINNER|self::RIGHT_WINNER|self::NO_WINNER
      */
     private static function compareDateTimes(?\DateTimeInterface $leftDateTime = null, ?\DateTimeInterface $rightDateTime = null)

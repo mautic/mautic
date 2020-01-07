@@ -26,9 +26,6 @@ class DncReasonHelper extends Helper
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -59,9 +56,7 @@ class DncReasonHelper extends Helper
                 $reasonKey = 'mautic.lead.event.donotcontact_manual';
                 break;
             default:
-                throw new UnknownDncReasonException(
-                    sprintf("Unknown DNC reason ID '%c'", $reasonId)
-                );
+                throw new UnknownDncReasonException(sprintf("Unknown DNC reason ID '%c'", $reasonId));
         }
 
         return $this->translator->trans($reasonKey);

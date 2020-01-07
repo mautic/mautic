@@ -28,18 +28,11 @@ class TweetSendType extends AbstractType
      */
     protected $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -118,9 +111,6 @@ class TweetSendType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_select']);

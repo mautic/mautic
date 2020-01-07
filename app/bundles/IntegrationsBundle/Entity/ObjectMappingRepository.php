@@ -146,9 +146,6 @@ class ObjectMappingRepository extends CommonRepository
     }
 
     /**
-     * @param string $internalObject
-     * @param int    $internalObjectId
-     *
      * @return ObjectMapping[]
      */
     public function getIntegrationMappingsForInternalObject(string $internalObject, int $internalObjectId): array

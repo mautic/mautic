@@ -29,10 +29,6 @@ class UserSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -54,8 +50,6 @@ class UserSubscriber implements EventSubscriberInterface
 
     /**
      * Add a user entry to the audit log.
-     *
-     * @param Events\UserEvent $event
      */
     public function onUserPostSave(Events\UserEvent $event)
     {
@@ -76,8 +70,6 @@ class UserSubscriber implements EventSubscriberInterface
 
     /**
      * Add a user delete entry to the audit log.
-     *
-     * @param Events\UserEvent $event
      */
     public function onUserDelete(Events\UserEvent $event)
     {
@@ -95,8 +87,6 @@ class UserSubscriber implements EventSubscriberInterface
 
     /**
      * Add a role entry to the audit log.
-     *
-     * @param Events\RoleEvent $event
      */
     public function onRolePostSave(Events\RoleEvent $event)
     {
@@ -116,8 +106,6 @@ class UserSubscriber implements EventSubscriberInterface
 
     /**
      * Add a role delete entry to the audit log.
-     *
-     * @param Events\RoleEvent $event
      */
     public function onRoleDelete(Events\RoleEvent $event)
     {

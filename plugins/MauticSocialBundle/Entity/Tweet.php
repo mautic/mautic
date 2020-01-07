@@ -132,9 +132,6 @@ class Tweet extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -204,8 +201,6 @@ class Tweet extends FormEntity
 
     /**
      * Constraints for required fields.
-     *
-     * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
@@ -446,8 +441,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Asset $asset
-     *
      * @return $this
      */
     public function setAsset(Asset $asset)
@@ -466,8 +459,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Page $page
-     *
      * @return $this
      */
     public function setPage(Page $page)

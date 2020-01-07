@@ -44,11 +44,6 @@ class FullObjectReportBuilder
      */
     private $dispatcher;
 
-    /**
-     * @param FieldBuilder             $fieldBuilder
-     * @param ObjectProvider           $objectProvider
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         FieldBuilder $fieldBuilder,
         ObjectProvider $objectProvider,
@@ -59,11 +54,6 @@ class FullObjectReportBuilder
         $this->dispatcher     = $dispatcher;
     }
 
-    /**
-     * @param RequestDAO $requestDAO
-     *
-     * @return ReportDAO
-     */
     public function buildReport(RequestDAO $requestDAO): ReportDAO
     {
         $syncReport       = new ReportDAO(MauticSyncDataExchange::NAME);
@@ -125,11 +115,6 @@ class FullObjectReportBuilder
         return $syncReport;
     }
 
-    /**
-     * @param ObjectDAO $requestedObjectDAO
-     * @param ReportDAO $syncReport
-     * @param array     $foundObjects
-     */
     private function processObjects(ObjectDAO $requestedObjectDAO, ReportDAO $syncReport, array $foundObjects): void
     {
         $fields = $requestedObjectDAO->getFields();

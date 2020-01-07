@@ -29,9 +29,6 @@ class RequestStorageHelper
      */
     private $cacheStorage;
 
-    /**
-     * @param CacheStorageHelper $cacheStorage
-     */
     public function __construct(CacheStorageHelper $cacheStorage)
     {
         $this->cacheStorage = $cacheStorage;
@@ -40,8 +37,7 @@ class RequestStorageHelper
     /**
      * Stores the request content into cache and returns the unique key under which it's stored.
      *
-     * @param string  $transportName
-     * @param Request $request
+     * @param string $transportName
      *
      * @return string
      */

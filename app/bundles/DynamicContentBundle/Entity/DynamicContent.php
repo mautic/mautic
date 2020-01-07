@@ -127,9 +127,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -184,8 +181,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @param ClassMetadata $metadata
-     *
      * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
      * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
@@ -238,9 +233,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         ]));
     }
 
-    /**
-     * @param ApiMetadataDriver $metadata
-     */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('dwc')
@@ -502,8 +494,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @param array $utmTags
-     *
      * @return DynamicContent
      */
     public function setUtmTags(array $utmTags)

@@ -21,10 +21,6 @@ use Mautic\PageBundle\Entity\VideoHit;
 
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * @param CorePermissions $security
-     * @param EntityManager   $entityManager
-     */
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
         parent::__construct($security, $entityManager);

@@ -62,10 +62,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $router;
 
-    /**
-     * @param PageModel       $pageModel
-     * @param RouterInterface $router
-     */
     public function __construct(PageModel $pageModel, RouterInterface $router)
     {
         $this->pageModel = $pageModel;
@@ -74,8 +70,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

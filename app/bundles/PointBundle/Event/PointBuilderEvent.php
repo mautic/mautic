@@ -27,9 +27,6 @@ class PointBuilderEvent extends Event
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -121,10 +118,6 @@ class PointBuilderEvent extends Event
     }
 
     /**
-     * @param array $keys
-     * @param array $methods
-     * @param array $component
-     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)

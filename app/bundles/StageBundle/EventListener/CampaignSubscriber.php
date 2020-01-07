@@ -33,10 +33,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $stageModel;
 
-    /**
-     * @param LeadModel  $leadModel
-     * @param StageModel $stageModel
-     */
     public function __construct(LeadModel $leadModel, StageModel $stageModel)
     {
         $this->leadModel  = $leadModel;
@@ -54,9 +50,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
@@ -69,9 +62,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('stage.change', $action);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
     {
         $stageChange = false;

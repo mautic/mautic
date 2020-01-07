@@ -26,9 +26,6 @@ class OAuthProvider extends \Bazinga\OAuthServerBundle\Security\Authentification
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;

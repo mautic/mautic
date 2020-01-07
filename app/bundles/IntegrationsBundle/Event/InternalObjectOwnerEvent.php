@@ -36,8 +36,7 @@ class InternalObjectOwnerEvent extends Event
     private $owners = [];
 
     /**
-     * @param ObjectInterface $object
-     * @param int[]           $objectIds
+     * @param int[] $objectIds
      */
     public function __construct(ObjectInterface $object, array $objectIds)
     {
@@ -45,9 +44,6 @@ class InternalObjectOwnerEvent extends Event
         $this->objectIds = $objectIds;
     }
 
-    /**
-     * @return ObjectInterface
-     */
     public function getObject(): ObjectInterface
     {
         return $this->object;
@@ -61,17 +57,11 @@ class InternalObjectOwnerEvent extends Event
         return $this->objectIds;
     }
 
-    /**
-     * @return array
-     */
     public function getOwners(): array
     {
         return $this->owners;
     }
 
-    /**
-     * @param array $owners
-     */
     public function setOwners(array $owners): void
     {
         $this->owners = $owners;

@@ -41,9 +41,7 @@ class ChannelPreferences
     /**
      * ChannelPreferences constructor.
      *
-     * @param string          $channel
-     * @param Event           $event
-     * @param LoggerInterface $logger
+     * @param string $channel
      */
     public function __construct($channel, Event $event, LoggerInterface $logger)
     {
@@ -69,8 +67,7 @@ class ChannelPreferences
     }
 
     /**
-     * @param LeadEventLog $log
-     * @param int          $priority
+     * @param int $priority
      *
      * @return $this
      */
@@ -93,8 +90,6 @@ class ChannelPreferences
 
     /**
      * Removes a log from all prioritized groups.
-     *
-     * @param LeadEventLog $log
      *
      * @return $this
      */

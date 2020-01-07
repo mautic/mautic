@@ -25,9 +25,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
  */
 class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
-    /**
-     * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $cm
-     */
     public function __construct(ClassMetadataInfo $cm)
     {
         parent::__construct($cm);
@@ -361,7 +358,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @param string $name
      * @param string $type
-     * @param array  $mapping
      *
      * @return $this
      */
@@ -373,9 +369,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add partial index.
      *
-     * @param array $columns
-     * @param       $name
-     * @param       $where
+     * @param $name
+     * @param $where
      *
      * @return $this
      */

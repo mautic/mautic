@@ -77,8 +77,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     /**
      * This pushes to the integration objects that were updated/created in Mautic. The "sync order" is
      * created by the SyncProcess service.
-     *
-     * @param OrderDAO $syncOrderDAO
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO): void
     {
@@ -195,10 +193,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     /**
      * This fetches objects from the integration that needs to be updated or created in Mautic.
      * A "sync report" is created that will be processed by the SyncProcess service.
-     *
-     * @param RequestDAO $requestDAO
-     *
-     * @return ReportDAO
      */
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
@@ -253,9 +247,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @param                    $object
-     * @param \DateTimeInterface $fromDateTime
-     * @param array              $mappedFields
+     * @param $object
      *
      * @return mixed
      */

@@ -12,9 +12,6 @@ final class SparkpostFactory implements SparkpostFactoryInterface
      */
     private $client;
 
-    /**
-     * @param GuzzleAdapter $client
-     */
     public function __construct(GuzzleAdapter $client)
     {
         $this->client = $client;

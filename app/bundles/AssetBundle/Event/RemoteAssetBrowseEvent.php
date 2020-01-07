@@ -30,9 +30,6 @@ class RemoteAssetBrowseEvent extends CommonEvent
      */
     private $integration;
 
-    /**
-     * @param AbstractIntegration $integration
-     */
     public function __construct(AbstractIntegration $integration)
     {
         $this->integration = $integration;
@@ -55,8 +52,6 @@ class RemoteAssetBrowseEvent extends CommonEvent
     }
 
     /**
-     * @param Adapter $adapter
-     *
      * @return $this
      */
     public function setAdapter(Adapter $adapter)

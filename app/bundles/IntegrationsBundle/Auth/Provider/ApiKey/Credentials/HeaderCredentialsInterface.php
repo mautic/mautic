@@ -17,13 +17,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface HeaderCredentialsInterface extends AuthCredentialsInterface
 {
-    /**
-     * @return string
-     */
     public function getKeyName(): string;
 
-    /**
-     * @return string|null
-     */
     public function getApiKey(): ?string;
 }

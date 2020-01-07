@@ -39,9 +39,6 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         $this->contactModel = $contactModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $segments = [

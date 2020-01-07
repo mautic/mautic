@@ -57,10 +57,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $router;
 
-    /**
-     * @param AssetModel      $assetModel
-     * @param RouterInterface $router
-     */
     public function __construct(AssetModel $assetModel, RouterInterface $router)
     {
         $this->assetModel = $assetModel;
@@ -69,8 +65,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

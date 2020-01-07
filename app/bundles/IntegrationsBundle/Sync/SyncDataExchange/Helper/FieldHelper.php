@@ -72,14 +72,6 @@ class FieldHelper
      */
     private $objectProvider;
 
-    /**
-     * @param FieldModel                       $fieldModel
-     * @param VariableExpresserHelperInterface $variableExpresserHelper
-     * @param ChannelListHelper                $channelListHelper
-     * @param TranslatorInterface              $translator
-     * @param EventDispatcherInterface         $eventDispatcher
-     * @param ObjectProvider                   $objectProvider
-     */
     public function __construct(
         FieldModel $fieldModel,
         VariableExpresserHelperInterface $variableExpresserHelper,
@@ -96,11 +88,6 @@ class FieldHelper
         $this->objectProvider          = $objectProvider;
     }
 
-    /**
-     * @param string $object
-     *
-     * @return array
-     */
     public function getFieldList(string $object): array
     {
         if (!isset($this->fieldList[$object])) {
@@ -110,11 +97,6 @@ class FieldHelper
         return $this->fieldList[$object];
     }
 
-    /**
-     * @param string $type
-     *
-     * @return string
-     */
     public function getNormalizedFieldType(string $type): string
     {
         switch ($type) {
@@ -132,10 +114,6 @@ class FieldHelper
     }
 
     /**
-     * @param string $objectName
-     *
-     * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     public function getFieldObjectName(string $objectName): string
@@ -148,11 +126,6 @@ class FieldHelper
         }
     }
 
-    /**
-     * @param array $fieldChange
-     *
-     * @return FieldDAO
-     */
     public function getFieldChangeObject(array $fieldChange): FieldDAO
     {
         $changeTimestamp = new \DateTimeImmutable($fieldChange['modified_at'], new \DateTimeZone('UTC'));
@@ -166,11 +139,6 @@ class FieldHelper
         return $reportFieldDAO;
     }
 
-    /**
-     * @param string $objectName
-     *
-     * @return array
-     */
     public function getSyncFields(string $objectName): array
     {
         if (isset($this->syncFields[$objectName])) {
@@ -214,11 +182,6 @@ class FieldHelper
         return $this->syncFields[$objectName];
     }
 
-    /**
-     * @param string $object
-     *
-     * @return array
-     */
     public function getRequiredFields(string $object): array
     {
         $requiredFields = $this->fieldModel->getFieldList(

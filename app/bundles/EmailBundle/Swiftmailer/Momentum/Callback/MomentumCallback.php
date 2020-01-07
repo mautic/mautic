@@ -25,17 +25,12 @@ final class MomentumCallback implements MomentumCallbackInterface
 
     /**
      * MomentumCallback constructor.
-     *
-     * @param TransportCallback $transportCallback
      */
     public function __construct(TransportCallback $transportCallback)
     {
         $this->transportCallback = $transportCallback;
     }
 
-    /**
-     * @param Request $request
-     */
     public function processCallbackRequest(Request $request)
     {
         $responseItems = new ResponseItems($request);
@@ -50,9 +45,6 @@ final class MomentumCallback implements MomentumCallbackInterface
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param array                     $response
-     *
      * @return mixed|void
      */
     public function processImmediateFeedback(\Swift_Mime_SimpleMessage $message, array $response)

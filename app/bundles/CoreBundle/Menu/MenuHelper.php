@@ -50,11 +50,6 @@ class MenuHelper
 
     /**
      * MenuHelper constructor.
-     *
-     * @param CorePermissions   $security
-     * @param RequestStack      $requestStack
-     * @param array             $mauticParameters
-     * @param IntegrationHelper $integrationHelper
      */
     public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters, IntegrationHelper $integrationHelper)
     {
@@ -175,9 +170,8 @@ class MenuHelper
     /**
      * Give orphaned menu items a home.
      *
-     * @param array $menuItems
-     * @param bool  $appendOrphans
-     * @param int   $depth
+     * @param bool $appendOrphans
+     * @param int  $depth
      */
     public function placeOrphans(array &$menuItems, $appendOrphans = false, $depth = 1, $type = 'main')
     {
@@ -257,7 +251,6 @@ class MenuHelper
 
     /**
      * @param string $integrationName
-     * @param array  $config
      *
      * @return bool
      */
@@ -333,8 +326,6 @@ class MenuHelper
 
     /**
      * Handle access check and other checks for menu items.
-     *
-     * @param array $menuItem
      *
      * @return bool Returns false if the item fails the access check or any other checks
      */

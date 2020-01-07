@@ -72,12 +72,7 @@ class ConfigType extends AbstractType
     /**
      * ConfigType constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param LanguageHelper      $langHelper
-     * @param IpLookupFactory     $ipLookupFactory
-     * @param array               $supportedLanguages
-     * @param array               $ipLookupServices
-     * @param AbstractLookup      $ipLookup
+     * @param AbstractLookup $ipLookup
      */
     public function __construct(
         TranslatorInterface $translator,
@@ -95,10 +90,6 @@ class ConfigType extends AbstractType
         $this->ipLookupServices    = $ipLookupServices;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('last_shown_tab', HiddenType::class);

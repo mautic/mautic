@@ -73,10 +73,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     private $router;
 
-    /**
-     * @param EmailModel      $emailModel
-     * @param RouterInterface $router
-     */
     public function __construct(EmailModel $emailModel, RouterInterface $router)
     {
         $this->emailModel = $emailModel;
@@ -85,8 +81,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
@@ -375,8 +369,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Count the row limit from the widget height.
-     *
-     * @param Widget $widget
      *
      * @return int
      */

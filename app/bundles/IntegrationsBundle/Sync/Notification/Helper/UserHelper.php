@@ -22,17 +22,11 @@ class UserHelper
      */
     private $connection;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
 
-    /**
-     * @return array
-     */
     public function getAdminUsers(): array
     {
         $qb      = $this->connection->createQueryBuilder();

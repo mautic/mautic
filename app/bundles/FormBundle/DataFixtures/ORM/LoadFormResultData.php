@@ -40,9 +40,6 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
         $this->submissionModel = $submissionModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $importResults = function ($results) {

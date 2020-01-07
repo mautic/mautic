@@ -317,10 +317,6 @@ class FieldModel extends FormModel
 
     /**
      * FieldModel constructor.
-     *
-     * @param IndexSchemaHelper  $indexSchemaHelper
-     * @param ColumnSchemaHelper $columnSchemaHelper
-     * @param ListModel          $leadListModel
      */
     public function __construct(
         IndexSchemaHelper $indexSchemaHelper,
@@ -594,8 +590,6 @@ class FieldModel extends FormModel
     /**
      * Is field used in segment filter?
      *
-     * @param LeadField $field
-     *
      * @return bool
      */
     public function isUsedField(LeadField $field)
@@ -606,8 +600,6 @@ class FieldModel extends FormModel
     /**
      * Returns list of all segments that use $field.
      *
-     * @param LeadField $field
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getFieldSegments(LeadField $field)
@@ -617,8 +609,6 @@ class FieldModel extends FormModel
 
     /**
      * Filter used field ids.
-     *
-     * @param array $ids
      *
      * @return array
      */
@@ -668,8 +658,7 @@ class FieldModel extends FormModel
     /**
      * Reorders fields by a list of field ids.
      *
-     * @param array $list
-     * @param int   $start Number to start the order by (used for paginated reordering)
+     * @param int $start Number to start the order by (used for paginated reordering)
      */
     public function reorderFieldsByList(array $list, $start = 1)
     {

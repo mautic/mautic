@@ -117,8 +117,7 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int
      *

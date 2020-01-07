@@ -24,10 +24,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 class KeysType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $object       = $options['integration_object'];

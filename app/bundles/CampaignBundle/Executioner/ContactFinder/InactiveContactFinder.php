@@ -49,11 +49,6 @@ class InactiveContactFinder
 
     /**
      * InactiveContactFinder constructor.
-     *
-     * @param LeadRepository         $leadRepository
-     * @param CampaignRepository     $campaignRepository
-     * @param CampaignLeadRepository $campaignLeadRepository
-     * @param LoggerInterface        $logger
      */
     public function __construct(
         LeadRepository $leadRepository,
@@ -68,9 +63,7 @@ class InactiveContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param Event          $decisionEvent
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return ArrayCollection
      *
@@ -122,9 +115,7 @@ class InactiveContactFinder
     }
 
     /**
-     * @param int            $campaignId
-     * @param array          $decisionEvents
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return int
      */

@@ -15,9 +15,6 @@ namespace Mautic\IntegrationsBundle\Integration\Interfaces;
 
 interface ConfigFormInterface extends IntegrationInterface
 {
-    /**
-     * @return string
-     */
     public function getDisplayName(): string;
 
     /**

@@ -32,10 +32,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $transportChain;
 
-    /**
-     * @param SmsModel       $smsModel
-     * @param TransportChain $transportChain
-     */
     public function __construct(
         SmsModel $smsModel,
         TransportChain $transportChain
@@ -55,9 +51,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
@@ -79,8 +72,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return $this
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)

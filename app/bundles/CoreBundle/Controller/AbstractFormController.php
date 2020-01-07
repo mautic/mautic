@@ -139,8 +139,6 @@ abstract class AbstractFormController extends CommonController
     /**
      * Checks to see if the form was cancelled.
      *
-     * @param Form $form
-     *
      * @return bool
      */
     protected function isFormCancelled(Form $form)
@@ -152,8 +150,6 @@ abstract class AbstractFormController extends CommonController
 
     /**
      * Checks to see if the form was applied or saved.
-     *
-     * @param Form $form
      *
      * @return bool
      */
@@ -167,7 +163,6 @@ abstract class AbstractFormController extends CommonController
     /**
      * Binds form data, checks validity, and determines cancel request.
      *
-     * @param Form  $form
      * @param array $data
      *
      * @return bool
@@ -215,10 +210,6 @@ abstract class AbstractFormController extends CommonController
         return $this->get('mautic.helper.user')->getUser()->isAdmin();
     }
 
-    /**
-     * @param Form $copyFrom
-     * @param Form $copyTo
-     */
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
     {
         /** @var $error FormError */

@@ -76,9 +76,6 @@ class DoctrineStep implements StepInterface
      */
     public $backup_prefix = 'bak_';
 
-    /**
-     * @param Configurator $configurator
-     */
     public function __construct(Configurator $configurator)
     {
         $parameters = $configurator->getParameters();

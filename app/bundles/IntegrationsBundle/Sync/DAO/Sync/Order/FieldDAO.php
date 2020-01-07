@@ -28,8 +28,7 @@ class FieldDAO
     private $value;
 
     /**
-     * @param string             $name
-     * @param NormalizedValueDAO $value
+     * @param string $name
      */
     public function __construct($name, NormalizedValueDAO $value)
     {
@@ -45,9 +44,6 @@ class FieldDAO
         return $this->name;
     }
 
-    /**
-     * @return NormalizedValueDAO
-     */
     public function getValue(): NormalizedValueDAO
     {
         return $this->value;

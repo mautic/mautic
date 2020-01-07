@@ -17,18 +17,9 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface ClientCredentialsGrantInterface extends AuthCredentialsInterface
 {
-    /**
-     * @return string
-     */
     public function getAuthorizationUrl(): string;
 
-    /**
-     * @return string|null
-     */
     public function getClientId(): ?string;
 
-    /**
-     * @return string|null
-     */
     public function getClientSecret(): ?string;
 }

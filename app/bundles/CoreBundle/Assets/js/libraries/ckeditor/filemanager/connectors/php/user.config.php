@@ -55,7 +55,6 @@ try {
 /**
  *	Check if user is authorized.
  *
- *
  *	@return bool true if access granted, false if no access
  */
 function auth()

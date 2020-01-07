@@ -25,9 +25,6 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -44,9 +41,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConfigBuilderEvent $event
-     */
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm([
@@ -58,9 +52,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigBeforeSave(ConfigEvent $event)
     {
         $event->unsetIfEmpty(

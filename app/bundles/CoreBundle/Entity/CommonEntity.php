@@ -142,9 +142,6 @@ class CommonEntity
         $this->changes     = [];
     }
 
-    /**
-     * @param array $changes
-     */
     public function setChanges(array $changes)
     {
         $this->changes = $changes;

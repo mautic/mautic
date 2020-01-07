@@ -30,9 +30,6 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     private $builderTokenHelperFactory;
 
-    /**
-     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
-     */
     public function __construct(BuilderTokenHelperFactory $builderTokenHelperFactory)
     {
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;
@@ -50,9 +47,6 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');
@@ -64,17 +58,11 @@ class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailDisplay(EmailSendEvent $event)
     {
         $this->onEmailGenerate($event);
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         // Combine all possible content to find tokens across them

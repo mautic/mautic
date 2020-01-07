@@ -25,25 +25,17 @@ class ConfigSaveEvent extends Event
 
     /**
      * ConfigSaveEvent constructor.
-     *
-     * @param Integration $integrationConfiguration
      */
     public function __construct(Integration $integrationConfiguration)
     {
         $this->integrationConfiguration = $integrationConfiguration;
     }
 
-    /**
-     * @return Integration
-     */
     public function getIntegrationConfiguration(): Integration
     {
         return $this->integrationConfiguration;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integrationConfiguration->getName();

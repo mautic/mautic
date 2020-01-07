@@ -52,12 +52,6 @@ class TriggerModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    /**
-     * @param IpLookupHelper    $ipLookupHelper
-     * @param LeadModel         $leadModel
-     * @param TriggerEventModel $pointTriggerEventModel
-     * @param MauticFactory     $mauticFactory
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel, MauticFactory $mauticFactory)
     {
         $this->ipLookupHelper         = $ipLookupHelper;
@@ -237,8 +231,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param Trigger $entity
-     * @param array   $sessionEvents
+     * @param array $sessionEvents
      */
     public function setEvents(Trigger $entity, $sessionEvents)
     {
@@ -361,9 +354,7 @@ class TriggerModel extends CommonFormModel
     }
 
     /**
-     * @param       $event
-     * @param Lead  $lead
-     * @param array $settings
+     * @param $event
      *
      * @return bool
      */
@@ -399,8 +390,6 @@ class TriggerModel extends CommonFormModel
 
     /**
      * Trigger events for the current lead.
-     *
-     * @param Lead $lead
      */
     public function triggerEvents(Lead $lead)
     {

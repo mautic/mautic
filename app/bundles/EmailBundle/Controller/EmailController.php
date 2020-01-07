@@ -1458,10 +1458,6 @@ class EmailController extends FormController
     /**
      * Checks the form data for webinar tokens and validates that the segment has webinar filters.
      *
-     * @param array $data
-     * @param Form  $form
-     * @param Email $email
-     *
      * @return int
      */
     protected function isFormValidForWebinar(array $data, Form &$form, Email $email)

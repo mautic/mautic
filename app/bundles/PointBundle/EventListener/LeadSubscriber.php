@@ -50,13 +50,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $leadTriggerLogRepository;
 
-    /**
-     * @param TriggerModel              $triggerModel
-     * @param TranslatorInterface       $translator
-     * @param PointsChangeLogRepository $pointsChangeLogRepository
-     * @param LeadPointLogRepository    $leadPointLogRepository
-     * @param LeadTriggerLogRepository  $leadTriggerLogRepository
-     */
     public function __construct(
         TriggerModel $triggerModel,
         TranslatorInterface $translator,
@@ -86,8 +79,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger applicable events for the lead.
-     *
-     * @param PointsChangeEvent $event
      */
     public function onLeadPointsChange(PointsChangeEvent $event)
     {
@@ -96,8 +87,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Handle point triggers for new leads (including 0 point triggers).
-     *
-     * @param LeadEvent $event
      */
     public function onLeadSave(LeadEvent $event)
     {
@@ -108,8 +97,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -149,9 +136,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->leadPointLogRepository->updateLead(

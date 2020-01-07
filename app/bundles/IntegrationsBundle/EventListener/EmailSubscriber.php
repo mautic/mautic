@@ -60,13 +60,6 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     protected $integrationHelper;
 
-    /**
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TokenParser              $tokenParser
-     * @param ObjectMappingRepository  $objectMappingRepository
-     * @param IntegrationHelper        $integrationHelper
-     */
     public function __construct(
         TranslatorInterface $translator,
         EventDispatcherInterface $eventDispatcher,
@@ -93,9 +86,6 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event): void
     {
         $tokens = [];
@@ -127,9 +117,6 @@ class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function decodeTokens(EmailSendEvent $event): void
     {
         $tokens = $this->tokenParser->findTokens($event->getContent());

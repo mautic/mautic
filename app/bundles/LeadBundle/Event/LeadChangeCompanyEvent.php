@@ -26,8 +26,7 @@ class LeadChangeCompanyEvent extends Event
     private $added;
 
     /**
-     * @param Lead    $lead
-     * @param Company $company
+     * @param Lead $lead
      */
     public function __construct($leads, Company $company, $added = true)
     {

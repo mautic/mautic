@@ -31,9 +31,6 @@ class SyncCommand extends ContainerAwareCommand
      */
     private $syncService;
 
-    /**
-     * @param SyncServiceInterface $syncService
-     */
     public function __construct(SyncServiceInterface $syncService)
     {
         parent::__construct();

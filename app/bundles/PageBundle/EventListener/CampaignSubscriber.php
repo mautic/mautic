@@ -42,11 +42,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $realTimeExecutioner;
 
-    /**
-     * @param LeadModel           $leadModel
-     * @param TrackingHelper      $trackingHelper
-     * @param RealTimeExecutioner $realTimeExecutioner
-     */
     public function __construct(
         LeadModel $leadModel,
         TrackingHelper $trackingHelper,
@@ -75,8 +70,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
@@ -126,8 +119,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger actions for page hits.
-     *
-     * @param PageHitEvent $event
      */
     public function onPageHit(PageHitEvent $event)
     {
@@ -144,9 +135,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
@@ -189,9 +177,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult($result);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
@@ -263,9 +248,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $config = $event->getConfig();

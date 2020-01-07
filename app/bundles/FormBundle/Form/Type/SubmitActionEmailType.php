@@ -44,9 +44,6 @@ class SubmitActionEmailType extends AbstractType
 
     /**
      * SubmitActionEmailType constructor.
-     *
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
@@ -181,11 +178,6 @@ class SubmitActionEmailType extends AbstractType
         return 'form_submitaction_sendemail';
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['formFields'] = $this->getFormFields($options['attr']['data-formid']);

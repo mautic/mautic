@@ -18,9 +18,6 @@ class EmailMarketingApi
     protected $integration;
     protected $keys;
 
-    /**
-     * @param AbstractIntegration $integration
-     */
     public function __construct(AbstractIntegration $integration)
     {
         $this->integration = $integration;

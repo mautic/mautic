@@ -55,9 +55,6 @@ class Lead
      */
     private $rotation = 1;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -141,9 +138,6 @@ class Lead
         return $this->lead;
     }
 
-    /**
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
         $this->lead = $lead;
@@ -157,9 +151,6 @@ class Lead
         return $this->campaign;
     }
 
-    /**
-     * @param Campaign $campaign
-     */
     public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
@@ -253,8 +244,6 @@ class Lead
     }
 
     /**
-     * @param \DateTime|null $dateLastExited
-     *
      * @return Lead
      */
     public function setDateLastExited(\DateTime $dateLastExited = null)

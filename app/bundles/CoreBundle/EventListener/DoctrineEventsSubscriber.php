@@ -49,9 +49,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         ];
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $args
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
@@ -132,9 +129,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
         }
     }
 
-    /**
-     * @param GenerateSchemaEventArgs $args
-     */
     public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
         $schema = $args->getSchema();

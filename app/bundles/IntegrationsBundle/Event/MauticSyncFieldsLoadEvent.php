@@ -27,36 +27,22 @@ class MauticSyncFieldsLoadEvent extends Event
      */
     private $objectName;
 
-    /**
-     * @param string $objectName
-     * @param array  $fields
-     */
     public function __construct(string $objectName, array $fields)
     {
         $this->objectName = $objectName;
         $this->fields     = $fields;
     }
 
-    /**
-     * @return array
-     */
     public function getFields(): array
     {
         return $this->fields;
     }
 
-    /**
-     * @param string $key
-     * @param string $name
-     */
     public function addField(string $key, string $name): void
     {
         $this->fields[$key] = $name;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectName(): string
     {
         return $this->objectName;

@@ -28,9 +28,6 @@ class PointSubscriber implements EventSubscriberInterface
      */
     private $pointModel;
 
-    /**
-     * @param PointModel $pointModel
-     */
     public function __construct(PointModel $pointModel)
     {
         $this->pointModel = $pointModel;
@@ -47,9 +44,6 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param PointBuilderEvent $event
-     */
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = [
@@ -76,8 +70,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger point actions for page hits.
-     *
-     * @param Events\PageHitEvent $event
      */
     public function onPageHit(Events\PageHitEvent $event)
     {

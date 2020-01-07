@@ -20,8 +20,6 @@ use Symfony\Component\Security\Core\Security;
 class SecurityController extends CommonController
 {
     /**
-     * @param Request $request
-     *
      * @return Response
      */
     public function loginAction(Request $request)

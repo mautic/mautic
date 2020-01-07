@@ -269,7 +269,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param null $persistConnections
      */
@@ -287,7 +286,6 @@ class CampaignController extends AbstractStandardFormController
     /**
      * @param      $isValid
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param bool $isClone
      */
@@ -304,7 +302,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param      $entity
-     * @param Form $form
      * @param      $action
      * @param      $isPost
      * @param null $objectId
@@ -347,7 +344,6 @@ class CampaignController extends AbstractStandardFormController
 
     /**
      * @param Campaign $entity
-     * @param Form     $form
      * @param          $action
      * @param null     $objectId
      * @param bool     $isClone
@@ -433,9 +429,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param Campaign $campaign
-     * @param          $action
-     * @param null     $objectId
+     * @param      $action
+     * @param null $objectId
      *
      * @return int|string|null
      */
@@ -471,12 +466,11 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param       $start
-     * @param       $limit
-     * @param       $filter
-     * @param       $orderBy
-     * @param       $orderByDir
-     * @param array $args
+     * @param $start
+     * @param $limit
+     * @param $filter
+     * @param $orderBy
+     * @param $orderByDir
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
@@ -574,8 +568,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */
@@ -661,8 +654,7 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */

@@ -39,10 +39,6 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
 
     /**
      * ElasticemailTransport constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface     $logger
-     * @param TransportCallback   $transportCallback
      */
     public function __construct(TranslatorInterface $translator, LoggerInterface $logger, TransportCallback $transportCallback)
     {
@@ -56,8 +52,7 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int|void
      *
@@ -86,8 +81,6 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTran
 
     /**
      * Handle bounces & complaints from ElasticEmail.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {

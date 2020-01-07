@@ -32,10 +32,6 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     private $requestStack;
 
-    /**
-     * @param ListModel    $model
-     * @param RequestStack $requestStack
-     */
     public function __construct(ListModel $model, RequestStack $requestStack)
     {
         $this->model        = $model;
@@ -43,8 +39,7 @@ class CircularDependencyValidator extends ConstraintValidator
     }
 
     /**
-     * @param array      $filters
-     * @param Constraint $constraint
+     * @param array $filters
      */
     public function validate($filters, Constraint $constraint)
     {
@@ -80,8 +75,6 @@ class CircularDependencyValidator extends ConstraintValidator
     }
 
     /**
-     * @param array $filters
-     *
      * @return array
      */
     private function reduceToSegmentIds(array $filters)
@@ -96,8 +89,6 @@ class CircularDependencyValidator extends ConstraintValidator
     }
 
     /**
-     * @param array $array
-     *
      * @return array
      */
     private function flatten(array $array)

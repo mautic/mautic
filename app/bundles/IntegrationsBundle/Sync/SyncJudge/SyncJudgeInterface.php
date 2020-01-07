@@ -38,9 +38,7 @@ interface SyncJudgeInterface
     public const NO_WINNER    = 'no';
 
     /**
-     * @param string                      $mode
-     * @param InformationChangeRequestDAO $leftChangeRequest
-     * @param InformationChangeRequestDAO $rightChangeRequest
+     * @param string $mode
      *
      * @return InformationChangeRequestDAO
      *

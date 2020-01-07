@@ -29,10 +29,6 @@ class MaintenanceSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param Connection          $db
-     * @param TranslatorInterface $translator
-     */
     public function __construct(Connection $db, TranslatorInterface $translator)
     {
         $this->db         = $db;
@@ -49,9 +45,6 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MaintenanceEvent $event
-     */
     public function onDataCleanup(MaintenanceEvent $event)
     {
         $qb = $this->db->createQueryBuilder()

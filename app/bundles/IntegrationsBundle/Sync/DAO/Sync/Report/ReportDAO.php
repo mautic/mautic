@@ -59,8 +59,6 @@ class ReportDAO
     }
 
     /**
-     * @param ObjectDAO $objectDAO
-     *
      * @return $this
      */
     public function addObject(ObjectDAO $objectDAO)
@@ -123,8 +121,6 @@ class ReportDAO
     }
 
     /**
-     * @param string|null $objectName
-     *
      * @return ObjectDAO[]
      */
     public function getObjects(?string $objectName)
@@ -152,10 +148,7 @@ class ReportDAO
     }
 
     /**
-     * @param string $objectName
-     * @param int    $objectId
-     *
-     * @return ObjectDAO|null
+     * @param int $objectId
      */
     public function getObject(string $objectName, $objectId): ?ObjectDAO
     {
@@ -178,9 +171,6 @@ class ReportDAO
         return !empty($this->objects);
     }
 
-    /**
-     * @return RelationsDAO
-     */
     public function getRelations(): RelationsDAO
     {
         return $this->relationsDAO;

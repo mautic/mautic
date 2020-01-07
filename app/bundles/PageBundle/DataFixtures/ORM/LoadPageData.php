@@ -31,9 +31,6 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface
         $this->pageModel = $pageModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $pages = CsvHelper::csv_to_array(__DIR__.'/fakepagedata.csv');

@@ -34,17 +34,12 @@ class FieldModel extends CommonFormModel
 
     /**
      * FieldModel constructor.
-     *
-     * @param LeadFieldModel $leadFieldModel
      */
     public function __construct(LeadFieldModel $leadFieldModel)
     {
         $this->leadFieldModel = $leadFieldModel;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;

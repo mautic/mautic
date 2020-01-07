@@ -54,8 +54,6 @@ class DashboardSubscriber implements EventSubscriberInterface
 
     /**
      * Adds widget new widget types to the list of available widget types.
-     *
-     * @param WidgetTypeListEvent $event
      */
     public function onWidgetListGenerate(WidgetTypeListEvent $event)
     {
@@ -72,8 +70,6 @@ class DashboardSubscriber implements EventSubscriberInterface
 
     /**
      * Set a widget edit form when needed.
-     *
-     * @param WidgetFormEvent $event
      */
     public function onWidgetFormGenerate(WidgetFormEvent $event)
     {
@@ -85,8 +81,6 @@ class DashboardSubscriber implements EventSubscriberInterface
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
@@ -94,8 +88,6 @@ class DashboardSubscriber implements EventSubscriberInterface
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function checkPermissions(WidgetDetailEvent $event)
     {

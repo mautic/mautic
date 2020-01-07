@@ -41,11 +41,6 @@ class OrderExecutioner
      */
     private $objectProvider;
 
-    /**
-     * @param MappingHelper            $mappingHelper
-     * @param EventDispatcherInterface $dispatcher
-     * @param ObjectProvider           $objectProvider
-     */
     public function __construct(
         MappingHelper $mappingHelper,
         EventDispatcherInterface $dispatcher,
@@ -56,9 +51,6 @@ class OrderExecutioner
         $this->objectProvider = $objectProvider;
     }
 
-    /**
-     * @param OrderDAO $syncOrderDAO
-     */
     public function execute(OrderDAO $syncOrderDAO): void
     {
         $identifiedObjects   = $syncOrderDAO->getIdentifiedObjects();
@@ -73,11 +65,6 @@ class OrderExecutioner
         }
     }
 
-    /**
-     * @param string   $objectName
-     * @param array    $updateObjects
-     * @param OrderDAO $syncOrderDAO
-     */
     private function updateObjects(string $objectName, array $updateObjects, OrderDAO $syncOrderDAO): void
     {
         $updateCount = count($updateObjects);
@@ -113,10 +100,6 @@ class OrderExecutioner
         $this->mappingHelper->updateObjectMappings($event->getUpdatedObjectMappings());
     }
 
-    /**
-     * @param string $objectName
-     * @param array  $createObjects
-     */
     private function createObjects(string $objectName, array $createObjects): void
     {
         $createCount = count($createObjects);

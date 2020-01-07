@@ -58,10 +58,6 @@ class ObjectIdsDAO
         return $objectsIdDAO;
     }
 
-    /**
-     * @param string $objectType
-     * @param string $id
-     */
     public function addObjectId(string $objectType, string $id): void
     {
         if (!isset($this->objects[$objectType])) {

@@ -39,11 +39,6 @@ class FieldAliasKeywordValidator extends ConstraintValidator
      */
     private $em;
 
-    /**
-     * @param ListModel        $listModel
-     * @param FieldAliasHelper $aliasHelper
-     * @param EntityManager    $em
-     */
     public function __construct(ListModel $listModel, FieldAliasHelper $aliasHelper, EntityManager $em)
     {
         $this->listModel   = $listModel;
@@ -52,8 +47,7 @@ class FieldAliasKeywordValidator extends ConstraintValidator
     }
 
     /**
-     * @param LeadField  $field
-     * @param Constraint $constraint
+     * @param LeadField $field
      */
     public function validate($field, Constraint $constraint)
     {

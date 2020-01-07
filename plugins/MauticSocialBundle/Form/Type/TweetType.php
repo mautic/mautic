@@ -32,18 +32,11 @@ class TweetType extends AbstractType
      */
     protected $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -182,9 +175,6 @@ class TweetType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_select']);

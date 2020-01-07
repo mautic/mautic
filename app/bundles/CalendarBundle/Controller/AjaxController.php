@@ -23,8 +23,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Generates the calendar data.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function generateDataAction(Request $request)
@@ -50,8 +48,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Updates an event on dragging the event around the calendar.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */

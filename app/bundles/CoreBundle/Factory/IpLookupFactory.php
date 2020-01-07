@@ -40,10 +40,7 @@ class IpLookupFactory
     /**
      * IpLookupFactory constructor.
      *
-     * @param array                $lookupServices
-     * @param LoggerInterface|null $logger
-     * @param Http|null            $httpConnector
-     * @param null                 $cacheDir
+     * @param null $cacheDir
      */
     public function __construct(array $lookupServices, LoggerInterface $logger = null, Http $httpConnector = null, $cacheDir = null)
     {
@@ -54,9 +51,8 @@ class IpLookupFactory
     }
 
     /**
-     * @param       $service
-     * @param null  $auth
-     * @param array $ipLookupConfig
+     * @param      $service
+     * @param null $auth
      *
      * @return AbstractLookup|null
      */

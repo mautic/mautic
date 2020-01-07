@@ -22,17 +22,11 @@ trait ConfigurationTrait
      */
     private $integration;
 
-    /**
-     * @return Integration
-     */
     public function getIntegrationConfiguration(): Integration
     {
         return $this->integration;
     }
 
-    /**
-     * @param Integration $integration
-     */
     public function setIntegrationConfiguration(Integration $integration): void
     {
         $this->integration = $integration;
@@ -40,8 +34,6 @@ trait ConfigurationTrait
 
     /**
      * Check if Integration entity has been set to prevent PHP fatal error with using getIntegrationEntity.
-     *
-     * @return bool
      */
     public function hasIntegrationConfiguration(): bool
     {

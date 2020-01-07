@@ -49,8 +49,6 @@ class HubspotApi extends CrmApi
     /**
      * Creates Hubspot lead.
      *
-     * @param array $data
-     *
      * @return mixed
      */
     public function createLead(array $data, $lead, $updateLink = false)

@@ -66,10 +66,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * CompanyModel constructor.
-     *
-     * @param FieldModel     $leadFieldModel
-     * @param Session        $session
-     * @param EmailValidator $validator
      */
     public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
     {
@@ -241,8 +237,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Populates custom field values for updating the company.
      *
-     * @param Company    $company
-     * @param array      $data
      * @param bool|false $overwriteWithBlank
      */
     public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)

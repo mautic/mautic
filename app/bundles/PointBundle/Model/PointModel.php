@@ -54,12 +54,6 @@ class PointModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    /**
-     * @param Session        $session
-     * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel      $leadModel
-     * @param MauticFactory  $mauticFactory
-     */
     public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, MauticFactory $mauticFactory)
     {
         $this->session            = $session;
@@ -321,12 +315,10 @@ class PointModel extends CommonFormModel
     /**
      * Get line chart data of points.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */

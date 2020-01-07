@@ -60,11 +60,6 @@ class NotificationModel extends FormModel
 
     /**
      * NotificationModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param UpdateHelper         $updateHelper
-     * @param FeedReader           $rssReader
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         PathsHelper $pathsHelper,
@@ -78,9 +73,6 @@ class NotificationModel extends FormModel
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;

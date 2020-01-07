@@ -68,11 +68,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
     /**
      * UpdateLeadCampaignsCommand constructor.
-     *
-     * @param CampaignRepository  $campaignRepository
-     * @param TranslatorInterface $translator
-     * @param MembershipBuilder   $membershipBuilder
-     * @param LoggerInterface     $logger
      */
     public function __construct(
         CampaignRepository $campaignRepository,
@@ -212,8 +207,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @throws \Exception
      */
     private function updateCampaign(Campaign $campaign)

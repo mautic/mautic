@@ -17,9 +17,6 @@ use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class SubmissionEvent.
- */
 class SubmissionEvent extends CommonEvent
 {
     /**
@@ -102,10 +99,8 @@ class SubmissionEvent extends CommonEvent
     /**
      * SubmissionEvent constructor.
      *
-     * @param Submission $submission
-     * @param            $post
-     * @param            $server
-     * @param Request    $request
+     * @param $post
+     * @param $server
      */
     public function __construct(Submission $submission, $post, $server, Request $request)
     {
@@ -294,7 +289,6 @@ class SubmissionEvent extends CommonEvent
      * Set an post submit callback - include $callback['eventName' => '', 'anythingElse' ...].
      *
      * @param string $key
-     * @param array  $callback
      */
     public function setPostSubmitCallback($key, array $callback)
     {

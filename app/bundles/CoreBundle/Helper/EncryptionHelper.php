@@ -29,10 +29,6 @@ class EncryptionHelper
 
     /**
      * EncryptionHelper constructor.
-     *
-     * @param CoreParametersHelper          $coreParametersHelper
-     * @param SymmetricCipherInterface      $possibleCipher1
-     * @param SymmetricCipherInterface|null $possibleCipher2
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,

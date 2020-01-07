@@ -49,23 +49,6 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * HubspotIntegration constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param CacheStorageHelper       $cacheStorageHelper
-     * @param EntityManager            $entityManager
-     * @param Session                  $session
-     * @param RequestStack             $requestStack
-     * @param Router                   $router
-     * @param TranslatorInterface      $translator
-     * @param Logger                   $logger
-     * @param EncryptionHelper         $encryptionHelper
-     * @param LeadModel                $leadModel
-     * @param CompanyModel             $companyModel
-     * @param PathsHelper              $pathsHelper
-     * @param NotificationModel        $notificationModel
-     * @param FieldModel               $fieldModel
-     * @param IntegrationEntityModel   $integrationEntityModel
-     * @param UserHelper               $userHelper
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,

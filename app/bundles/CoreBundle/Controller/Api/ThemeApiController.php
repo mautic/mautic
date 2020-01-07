@@ -29,9 +29,6 @@ class ThemeApiController extends CommonApiController
      */
     protected $themeHelper;
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->themeHelper = $this->container->get('mautic.helper.theme');

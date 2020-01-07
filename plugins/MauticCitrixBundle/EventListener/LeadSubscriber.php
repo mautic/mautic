@@ -35,10 +35,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param CitrixModel         $model
-     * @param TranslatorInterface $translator
-     */
     public function __construct(CitrixModel $model, TranslatorInterface $translator)
     {
         $this->model      = $model;
@@ -58,8 +54,6 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
@@ -133,8 +127,6 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadListFiltersChoicesEvent $event
-     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \InvalidArgumentException
@@ -220,9 +212,6 @@ class LeadSubscriber implements EventSubscriberInterface
         } // foreach $product
     }
 
-    /**
-     * @param LeadListFilteringEvent $event
-     */
     public function onListFiltering(LeadListFilteringEvent $event)
     {
         $activeProducts = [];

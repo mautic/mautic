@@ -30,9 +30,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $leadExport;
 
-    /**
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(IntegrationHelper $integrationHelper, LeadExport $leadExport = null)
     {
         $this->integrationHelper = $integrationHelper;
@@ -51,9 +48,6 @@ class LeadSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param Events\LeadEvent $event
-     */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
@@ -80,9 +74,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Events\LeadEvent $event
-     */
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
@@ -100,9 +91,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->leadExport->delete($lead);
     }
 
-    /**
-     * @param Events\LeadChangeCompanyEvent $event
-     */
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event)
     {
         $lead = $event->getLead();

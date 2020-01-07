@@ -131,8 +131,6 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return mixed
      */
     public function getEntitiesByLead(Lead $lead)
@@ -151,8 +149,6 @@ class CompanyLeadRepository extends CommonRepository
 
     /**
      * Updates leads company name If company name changed and company is primary.
-     *
-     * @param Company $company
      */
     public function updateLeadsPrimaryCompanyName(Company $company)
     {

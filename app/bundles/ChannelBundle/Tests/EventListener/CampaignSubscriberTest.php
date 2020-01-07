@@ -284,8 +284,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * BC support for old campaign.
-     *
-     * @param CampaignExecutionEvent $event
      */
     public function sendMarketingMessageSms(CampaignExecutionEvent $event)
     {

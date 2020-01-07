@@ -35,9 +35,6 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
 
     /**
      * TranslationLoader constructor.
-     *
-     * @param BundleHelper $bundleHelper
-     * @param PathsHelper  $pathsHelper
      */
     public function __construct(BundleHelper $bundleHelper, PathsHelper $pathsHelper)
     {

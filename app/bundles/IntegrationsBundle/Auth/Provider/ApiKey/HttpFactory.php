@@ -47,9 +47,6 @@ class HttpFactory implements AuthProviderInterface
      */
     private $credentials;
 
-    /**
-     * @return string
-     */
     public function getAuthType(): string
     {
         return self::NAME;
@@ -57,9 +54,6 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface|null                                                          $config
-     *
-     * @return ClientInterface
      *
      * @throws PluginNotConfiguredException
      * @throws InvalidCredentialsException
@@ -67,13 +61,7 @@ class HttpFactory implements AuthProviderInterface
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface
     {
         if (!$this->credentialsAreValid($credentials)) {
-            throw new InvalidCredentialsException(
-                sprintf(
-                    'Credentials must implement either the %s or %s interfaces',
-                    HeaderCredentialsInterface::class,
-                    ParameterCredentialsInterface::class
-                )
-            );
+            throw new InvalidCredentialsException(sprintf('Credentials must implement either the %s or %s interfaces', HeaderCredentialsInterface::class, ParameterCredentialsInterface::class));
         }
 
         if (!$this->credentialsAreConfigured($credentials)) {
@@ -98,11 +86,6 @@ class HttpFactory implements AuthProviderInterface
         return $this->initializedClients[$credentials->getKeyName()];
     }
 
-    /**
-     * @param AuthCredentialsInterface $credentials
-     *
-     * @return bool
-     */
     private function credentialsAreValid(AuthCredentialsInterface $credentials): bool
     {
         return $credentials instanceof HeaderCredentialsInterface || $credentials instanceof ParameterCredentialsInterface;
@@ -110,17 +93,12 @@ class HttpFactory implements AuthProviderInterface
 
     /**
      * @param HeaderCredentialsInterface|ParameterCredentialsInterface|AuthCredentialsInterface $credentials
-     *
-     * @return bool
      */
     private function credentialsAreConfigured(AuthCredentialsInterface $credentials): bool
     {
         return !empty($credentials->getApiKey());
     }
 
-    /**
-     * @return ClientInterface
-     */
     private function getHeaderClient(): ClientInterface
     {
         return new Client(
@@ -130,9 +108,6 @@ class HttpFactory implements AuthProviderInterface
         );
     }
 
-    /**
-     * @return ClientInterface
-     */
     private function getParameterClient(): ClientInterface
     {
         $handler = new HandlerStack();

@@ -106,8 +106,6 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param array $fields
-     *
      * @return array
      *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException
@@ -307,9 +305,8 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param array $activity
-     * @param       $object
-     *                        TODO 7.x
+     * @param $object
+     *                 TODO 7.x
      *
      * @return array|mixed|string
      */

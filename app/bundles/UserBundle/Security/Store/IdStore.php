@@ -23,10 +23,6 @@ class IdStore implements IdStoreInterface
     /** @var TimeProviderInterface */
     private $timeProvider;
 
-    /**
-     * @param ObjectManager         $manager
-     * @param TimeProviderInterface $timeProvider
-     */
     public function __construct(ObjectManager $manager, TimeProviderInterface $timeProvider)
     {
         $this->manager      = $manager;
@@ -34,9 +30,8 @@ class IdStore implements IdStoreInterface
     }
 
     /**
-     * @param string    $entityId
-     * @param string    $id
-     * @param \DateTime $expiryTime
+     * @param string $entityId
+     * @param string $id
      */
     public function set($entityId, $id, \DateTime $expiryTime)
     {

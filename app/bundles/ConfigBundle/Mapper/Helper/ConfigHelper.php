@@ -16,7 +16,6 @@ class ConfigHelper
     /**
      * Map local config values with form fields.
      *
-     * @param array $configValues
      * @param mixed $defaults
      *
      * @return array

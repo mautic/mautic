@@ -80,8 +80,6 @@ trait TranslationEntityTrait
 
     /**
      * Remove translation.
-     *
-     * @param TranslationEntityInterface $child
      */
     public function removeTranslationChild(TranslationEntityInterface $child)
     {

@@ -93,8 +93,7 @@ class SearchStringHelper
     }
 
     /**
-     * @param       $filters
-     * @param array $commands
+     * @param $filters
      */
     public static function mergeCommands(&$filters, array $commands)
     {

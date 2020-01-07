@@ -43,12 +43,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $downloadRepository;
 
-    /**
-     * @param AssetModel          $assetModel
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     * @param DownloadRepository  $downloadRepository
-     */
     public function __construct(
         AssetModel $assetModel,
         TranslatorInterface $translator,
@@ -75,8 +69,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -123,9 +115,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadChangeEvent $event
-     */
     public function onLeadChange(LeadChangeEvent $event)
     {
         $this->assetModel->getDownloadRepository()->updateLeadByTrackingId(
@@ -135,9 +124,6 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->assetModel->getDownloadRepository()->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());

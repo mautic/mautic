@@ -29,10 +29,6 @@ class AvatarHelper extends Helper
      */
     private $pathsHelper;
 
-    /**
-     * @param AssetsHelper $assetsHelper
-     * @param PathsHelper  $pathsHelper
-     */
     public function __construct(
         AssetsHelper $assetsHelper,
         PathsHelper $pathsHelper
@@ -42,8 +38,6 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return mixed
      */
     public function getAvatar(Lead $lead)

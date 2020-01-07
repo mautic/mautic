@@ -20,8 +20,6 @@ final class Version20191219155630 extends AbstractMauticMigration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigration
      * @throws SchemaException
      */

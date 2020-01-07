@@ -31,10 +31,6 @@ class PluginModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * @param FieldModel           $leadFieldModel
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper)
     {
         $this->leadFieldModel       = $leadFieldModel;
@@ -138,8 +134,6 @@ class PluginModel extends FormModel
     /**
      * Returns all tables of installed plugins.
      *
-     * @param array $pluginsMetadata
-     *
      * @return array
      */
     public function getInstalledPluginTables(array $pluginsMetadata)
@@ -166,8 +160,6 @@ class PluginModel extends FormModel
 
     /**
      * Generates new Schema objects for all installed plugins.
-     *
-     * @param array $installedPluginsTables
      *
      * @return array
      */

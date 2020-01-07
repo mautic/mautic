@@ -1324,10 +1324,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
-     * @param        $object
-     * @param        $counter
-     * @param        $totalCounter
+     * @param $object
+     * @param $counter
+     * @param $totalCounter
      */
     private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
@@ -1338,10 +1337,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
-     * @param        $object
-     * @param        $counter
-     * @param        $totalCounter
+     * @param $object
+     * @param $counter
+     * @param $totalCounter
      */
     private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {

@@ -48,13 +48,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param FormModel            $formModel
-     * @param PageModel            $pageModel
-     * @param SubmissionRepository $submissionRepository
-     * @param TranslatorInterface  $translator
-     * @param RouterInterface      $router
-     */
     public function __construct(
         FormModel $formModel,
         PageModel $pageModel,
@@ -82,8 +75,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -133,9 +124,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->submissionRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());

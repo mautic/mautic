@@ -29,10 +29,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param HitRepository       $hitRepository
-     * @param TranslatorInterface $translator
-     */
     public function __construct(HitRepository $hitRepository, TranslatorInterface $translator)
     {
         $this->hitRepository = $hitRepository;
@@ -52,8 +48,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on bounce rates.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event)
     {
@@ -140,8 +134,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on dwell time rates.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event)
     {

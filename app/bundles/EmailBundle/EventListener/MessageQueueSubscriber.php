@@ -24,9 +24,6 @@ class MessageQueueSubscriber implements EventSubscriberInterface
      */
     private $emailModel;
 
-    /**
-     * @param EmailModel $emailModel
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
@@ -44,8 +41,6 @@ class MessageQueueSubscriber implements EventSubscriberInterface
 
     /**
      * Sends campaign emails.
-     *
-     * @param MessageQueueBatchProcessEvent $event
      */
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
     {

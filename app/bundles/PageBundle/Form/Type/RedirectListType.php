@@ -17,9 +17,6 @@ class RedirectListType extends AbstractType
      */
     private $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;

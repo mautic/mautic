@@ -26,8 +26,6 @@ class UserMapper implements UsernameMapperInterface
 
     /**
      * UserMapper constructor.
-     *
-     * @param array $attributes
      */
     public function __construct(array $attributes)
     {
@@ -35,8 +33,6 @@ class UserMapper implements UsernameMapperInterface
     }
 
     /**
-     * @param Response $response
-     *
      * @return string|null
      */
     public function getUsername(Response $response, $returnEntity = false)
@@ -51,8 +47,6 @@ class UserMapper implements UsernameMapperInterface
     }
 
     /**
-     * @param Assertion $assertion
-     *
      * @return string|null
      */
     private function getValueFromAssertion(Assertion $assertion, User $user)

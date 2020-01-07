@@ -121,9 +121,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param DynamicContent $dwc
-     * @param Lead           $lead
-     * @param                $slot
+     * @param $slot
      */
     public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
     {
@@ -171,9 +169,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param DynamicContent $dynamicContent
-     * @param Lead|array     $lead
-     * @param string         $source
+     * @param Lead|array $lead
+     * @param string     $source
      */
     public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
     {
@@ -251,8 +248,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -264,12 +259,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */

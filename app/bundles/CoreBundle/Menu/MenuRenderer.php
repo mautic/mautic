@@ -45,10 +45,7 @@ class MenuRenderer implements RendererInterface
     /**
      * MenuRenderer constructor.
      *
-     * @param MatcherInterface $matcher
-     * @param TemplatingHelper $templatingHelper
-     * @param                  $charset
-     * @param array            $defaultOptions
+     * @param $charset
      */
     public function __construct(MatcherInterface $matcher, TemplatingHelper $templatingHelper, $charset, array $defaultOptions = [])
     {
@@ -75,9 +72,6 @@ class MenuRenderer implements RendererInterface
 
     /**
      * Renders menu.
-     *
-     * @param ItemInterface $item
-     * @param array         $options
      *
      * @return string
      */

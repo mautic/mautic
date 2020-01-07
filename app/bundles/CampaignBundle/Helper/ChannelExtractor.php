@@ -17,11 +17,6 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
 class ChannelExtractor
 {
-    /**
-     * @param ChannelInterface      $entity
-     * @param Event                 $event
-     * @param AbstractEventAccessor $eventConfig
-     */
     public static function setChannel(ChannelInterface $entity, Event $event, AbstractEventAccessor $eventConfig)
     {
         // Allow event to update itself
@@ -51,7 +46,6 @@ class ChannelExtractor
     }
 
     /**
-     * @param array  $properties
      * @param string $channelIdField
      *
      * @return int|null

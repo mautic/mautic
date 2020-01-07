@@ -71,49 +71,31 @@ abstract class AbstractCommonModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * @param EntityManager $em
-     */
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;
     }
 
-    /**
-     * @param CorePermissions $security
-     */
     public function setSecurity(CorePermissions $security)
     {
         $this->security = $security;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param Router $router
-     */
     public function setRouter(Router $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -121,8 +103,6 @@ abstract class AbstractCommonModel
 
     /**
      * Initialize the user parameter for use in locking procedures.
-     *
-     * @param UserHelper $userHelper
      */
     public function setUserHelper(UserHelper $userHelper)
     {
@@ -131,8 +111,6 @@ abstract class AbstractCommonModel
 
     /**
      * Initialize the CoreParameters parameter.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {

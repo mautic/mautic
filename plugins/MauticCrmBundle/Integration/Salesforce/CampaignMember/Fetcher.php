@@ -79,9 +79,7 @@ class Fetcher
     /**
      * Fetcher constructor.
      *
-     * @param IntegrationEntityRepository $repo
-     * @param Organizer                   $organizer
-     * @param string                      $campaignId
+     * @param string $campaignId
      */
     public function __construct(IntegrationEntityRepository $repo, Organizer $organizer, $campaignId)
     {
@@ -96,8 +94,7 @@ class Fetcher
     /**
      * Return SF query to fetch the object information for a CampaignMember.
      *
-     * @param array $fields
-     * @param       $object
+     * @param $object
      *
      * @return string
      *

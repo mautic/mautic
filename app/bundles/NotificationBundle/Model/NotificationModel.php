@@ -40,8 +40,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * NotificationModel constructor.
-     *
-     * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
     {
@@ -156,10 +154,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Notification $notification
-     * @param Lead         $lead
-     * @param string       $source
-     * @param int          $sourceId
+     * @param string $source
+     * @param int    $sourceId
      */
     public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
     {
@@ -222,8 +218,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -235,12 +229,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */

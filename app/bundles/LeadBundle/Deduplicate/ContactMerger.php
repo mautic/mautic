@@ -57,11 +57,6 @@ class ContactMerger
 
     /**
      * ContactMerger constructor.
-     *
-     * @param LeadModel                $leadModel
-     * @param MergeRecordRepository    $repo
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
      */
     public function __construct(LeadModel $leadModel, MergeRecordRepository $repo, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
@@ -72,9 +67,6 @@ class ContactMerger
     }
 
     /**
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return Lead
      *
      * @throws SameContactException
@@ -115,9 +107,6 @@ class ContactMerger
     /**
      * Merge timestamps.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeTimestamps(Lead $winner, Lead $loser)
@@ -143,9 +132,6 @@ class ContactMerger
     /**
      * Merge IP history into the winner.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeIpAddressHistory(Lead $winner, Lead $loser)
@@ -163,9 +149,6 @@ class ContactMerger
 
     /**
      * Merge custom field data into winner.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */
@@ -214,9 +197,6 @@ class ContactMerger
     /**
      * Merge owners if the winner isn't already assigned an owner.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeOwners(Lead $winner, Lead $loser)
@@ -235,9 +215,6 @@ class ContactMerger
 
     /**
      * Sum points from both contacts.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */
@@ -258,9 +235,6 @@ class ContactMerger
     /**
      * Merge tags from loser into winner.
      *
-     * @param Lead $winner
-     * @param Lead $loser
-     *
      * @return $this
      */
     public function mergeTags(Lead $winner, Lead $loser)
@@ -275,9 +249,6 @@ class ContactMerger
 
     /**
      * Merge past merge records into the winner.
-     *
-     * @param Lead $winner
-     * @param Lead $loser
      *
      * @return $this
      */

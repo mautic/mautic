@@ -147,8 +147,7 @@ class StatRepository extends CommonRepository
     /**
      * Get a contact's notifications stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *

@@ -120,8 +120,7 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      *
@@ -170,8 +169,7 @@ class FocusController extends AbstractStandardFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      *
      * @return array
      */

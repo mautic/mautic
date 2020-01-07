@@ -20,7 +20,6 @@ use Mautic\UserBundle\Entity\User;
 class UserEvent extends CommonEvent
 {
     /**
-     * @param User $user
      * @param bool $isNew
      */
     public function __construct(User &$user, $isNew = false)
@@ -41,8 +40,6 @@ class UserEvent extends CommonEvent
 
     /**
      * Sets the User entity.
-     *
-     * @param User $user
      */
     public function setUser(User $user)
     {

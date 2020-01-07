@@ -20,11 +20,6 @@ class TokenParser
 {
     public const TOKEN = '{mapped-integration-object=(.*?)}';
 
-    /**
-     * @param string $content
-     *
-     * @return ArrayCollection
-     */
     public function findTokens(string $content): ArrayCollection
     {
         $tokens = new ArrayCollection();
@@ -83,8 +78,6 @@ class TokenParser
      * @param $default
      * @param $linkText
      * @param $baseURL
-     *
-     * @return string
      */
     public function buildTokenWithDefaultOptions($integrationObjectName, $integration, $default, $linkText, $baseURL): string
     {
@@ -99,8 +92,6 @@ class TokenParser
     }
 
     /**
-     * @param string $tokenDataRaw
-     *
      * @return string[]
      */
     private function getPartsDividedByPipe(string $tokenDataRaw): array

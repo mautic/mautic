@@ -36,9 +36,6 @@ class CitrixCampaignEventType extends AbstractType
 
     /**
      * CitrixCampaignEventType constructor.
-     *
-     * @param CitrixModel         $model
-     * @param TranslatorInterface $translator
      */
     public function __construct(CitrixModel $model, TranslatorInterface $translator)
     {

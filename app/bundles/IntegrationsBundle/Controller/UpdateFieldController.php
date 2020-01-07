@@ -20,11 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 class UpdateFieldController extends CommonController
 {
     /**
-     * @param Request $request
-     * @param string  $integration
-     * @param string  $object
-     * @param string  $field
-     *
      * @return JsonResponse
      */
     public function updateAction(Request $request, string $integration, string $object, string $field)

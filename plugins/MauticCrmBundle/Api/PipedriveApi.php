@@ -20,9 +20,6 @@ class PipedriveApi extends CrmApi
 
     /**
      * PipedriveApi constructor.
-     *
-     * @param CrmAbstractIntegration $integration
-     * @param TransportInterface     $transport
      */
     public function __construct(CrmAbstractIntegration $integration, TransportInterface $transport)
     {
@@ -32,8 +29,6 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      */
     public function createCompany(array $data = [])
@@ -46,8 +41,7 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param null  $id
+     * @param null $id
      *
      * @return array
      */
@@ -157,7 +151,6 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param array  $query
      * @param string $endpoint
      *
      * @return mixed
@@ -202,8 +195,6 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param ResponseInterface $response
-     *
      * @return array
      */
     private function getResponseData(ResponseInterface $response)
@@ -214,8 +205,6 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     *
      * @return array
      */
     private function getRequestParameters(array $data = [])

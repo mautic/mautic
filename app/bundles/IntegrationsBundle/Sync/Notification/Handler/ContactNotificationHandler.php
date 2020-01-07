@@ -55,12 +55,6 @@ class ContactNotificationHandler implements HandlerInterface
      */
     private $objectDisplayName;
 
-    /**
-     * @param Writer                        $writer
-     * @param LeadEventLogRepository        $leadEventRepository
-     * @param EntityManagerInterface        $em
-     * @param UserSummaryNotificationHelper $userNotificationHelper
-     */
     public function __construct(
         Writer $writer,
         LeadEventLogRepository $leadEventRepository,
@@ -73,27 +67,17 @@ class ContactNotificationHandler implements HandlerInterface
         $this->userNotificationHelper = $userNotificationHelper;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return MauticSyncDataExchange::NAME;
     }
 
-    /**
-     * @return string
-     */
     public function getSupportedObject(): string
     {
         return Contact::NAME;
     }
 
     /**
-     * @param NotificationDAO $notificationDAO
-     * @param string          $integrationDisplayName
-     * @param string          $objectDisplayName
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
@@ -128,10 +112,6 @@ class ContactNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @param string $integration
-     * @param int    $contactId
-     * @param string $message
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     private function writeEventLogEntry(string $integration, int $contactId, string $message): void

@@ -31,9 +31,6 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
         $this->emailModel = $emailModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $emails = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');

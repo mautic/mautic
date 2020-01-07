@@ -25,9 +25,6 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $webhookModel;
 
-    /**
-     * @param WebhookModel $webhookModel
-     */
     public function __construct(WebhookModel $webhookModel)
     {
         $this->webhookModel = $webhookModel;
@@ -46,8 +43,6 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param WebhookBuilderEvent $event
      */
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
@@ -61,9 +56,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(EmailEvents::EMAIL_ON_OPEN, $mailOpen);
     }
 
-    /**
-     * @param EmailOpenEvent $event
-     */
     public function onEmailOpen(EmailOpenEvent $event)
     {
         $this->webhookModel->queueWebhooksByType(

@@ -43,10 +43,6 @@ class ExecuteEventCommand extends Command
 
     /**
      * ExecuteEventCommand constructor.
-     *
-     * @param ScheduledExecutioner $scheduledExecutioner
-     * @param TranslatorInterface  $translator
-     * @param FormatterHelper      $formatterHelper
      */
     public function __construct(ScheduledExecutioner $scheduledExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
@@ -76,9 +72,6 @@ class ExecuteEventCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception

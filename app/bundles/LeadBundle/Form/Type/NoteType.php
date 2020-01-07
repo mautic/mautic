@@ -35,10 +35,6 @@ class NoteType extends AbstractType
         $this->dateHelper = new DateTimeHelper();
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['text' => 'html']));
@@ -101,9 +97,6 @@ class NoteType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

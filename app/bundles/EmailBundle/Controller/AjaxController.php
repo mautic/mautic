@@ -28,8 +28,6 @@ class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getAbTestFormAction(Request $request)
@@ -46,8 +44,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function sendBatchAction(Request $request)
@@ -108,8 +104,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function generatePlaintTextAction(Request $request)
@@ -131,8 +125,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getAttachmentsSizeAction(Request $request)
@@ -150,8 +142,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Tests monitored email connection settings.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -193,8 +183,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Tests mail transport settings.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -269,9 +257,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function sendTestEmailAction(Request $request)
     {
         /** @var MailHelper $mailer */
@@ -301,9 +286,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse(['success' => $success, 'message' => $message]);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function getEmailCountStatsAction(Request $request)
     {
         /** @var EmailModel $model */

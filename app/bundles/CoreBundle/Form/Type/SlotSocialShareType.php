@@ -18,10 +18,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class SlotSocialShareType extends SlotType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);

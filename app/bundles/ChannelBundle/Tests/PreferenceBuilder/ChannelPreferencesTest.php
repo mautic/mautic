@@ -47,8 +47,7 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param       $channel
-     * @param Event $event
+     * @param $channel
      *
      * @return ChannelPreferences
      */

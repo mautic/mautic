@@ -158,9 +158,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     }
 
     /**
-     * @param              $name
-     * @param array        $params
-     * @param Command|null $command
+     * @param $name
      *
      * @return string
      *

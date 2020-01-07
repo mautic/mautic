@@ -32,11 +32,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
         $this->valueNormalizer = new ValueNormalizer();
     }
 
-    /**
-     * @param EncodedValueDAO $encodedValueDAO
-     *
-     * @return NormalizedValueDAO
-     */
     public function decodeVariable(EncodedValueDAO $encodedValueDAO): NormalizedValueDAO
     {
         $value = $encodedValueDAO->getValue();
@@ -46,8 +41,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
 
     /**
      * @param mixed $var
-     *
-     * @return EncodedValueDAO
      */
     public function encodeVariable($var): EncodedValueDAO
     {

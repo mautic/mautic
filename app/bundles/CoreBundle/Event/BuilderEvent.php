@@ -47,8 +47,7 @@ class BuilderEvent extends Event
      * @param $icon
      * @param $content
      * @param $form
-     * @param int   $priority
-     * @param array $params
+     * @param int $priority
      */
     public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
     {
@@ -185,10 +184,6 @@ class BuilderEvent extends Event
         $this->abTestWinnerCriteria[$key] = $criteria;
     }
 
-    /**
-     * @param array $keys
-     * @param array $criteria
-     */
     private function verifyCriteria(array $keys, array $criteria)
     {
         foreach ($keys as $k) {
@@ -199,8 +194,7 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param array $tokens
-     * @param bool  $convertToLinks
+     * @param bool $convertToLinks
      */
     public function addTokens(array $tokens, $convertToLinks = false)
     {
@@ -329,11 +323,10 @@ class BuilderEvent extends Event
     /**
      * Add tokens from a BuilderTokenHelper.
      *
-     * @param BuilderTokenHelper $tokenHelper
-     * @param                    $tokens
-     * @param string             $labelColumn
-     * @param string             $valueColumn
-     * @param bool               $convertToLinks If true, the tokens will be converted to links
+     * @param        $tokens
+     * @param string $labelColumn
+     * @param string $valueColumn
+     * @param bool   $convertToLinks If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(
         BuilderTokenHelper $tokenHelper,
@@ -356,10 +349,9 @@ class BuilderEvent extends Event
     /**
      * Get tokens from a BuilderTokenHelper.
      *
-     * @param BuilderTokenHelper $tokenHelper
-     * @param                    $tokens
-     * @param                    $labelColumn
-     * @param                    $valueColumn
+     * @param $tokens
+     * @param $labelColumn
+     * @param $valueColumn
      *
      * @return array|void
      */

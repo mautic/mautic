@@ -37,10 +37,6 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
      */
     private $fieldHelper;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param FieldHelper         $fieldHelper
-     */
     public function __construct(TranslatorInterface $translator, FieldHelper $fieldHelper)
     {
         $this->translator  = $translator;
@@ -48,9 +44,6 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws InvalidFormOptionException
      * @throws ObjectNotFoundException
      */
@@ -121,9 +114,6 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
@@ -139,11 +129,6 @@ class IntegrationSyncSettingsObjectFieldMappingType extends AbstractType
     }
 
     /**
-     * @param ConfigFormSyncInterface $integrationObject
-     * @param string                  $objectName
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     private function getMauticFields(ConfigFormSyncInterface $integrationObject, string $objectName): array

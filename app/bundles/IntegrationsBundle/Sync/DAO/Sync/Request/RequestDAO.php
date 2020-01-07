@@ -37,11 +37,6 @@ class RequestDAO
      */
     private $objects = [];
 
-    /**
-     * @param string          $syncToIntegration
-     * @param int             $syncIteration
-     * @param InputOptionsDAO $inputOptionsDAO
-     */
     public function __construct(string $syncToIntegration, int $syncIteration, InputOptionsDAO $inputOptionsDAO)
     {
         $this->syncIteration     = (int) $syncIteration;
@@ -50,8 +45,6 @@ class RequestDAO
     }
 
     /**
-     * @param ObjectDAO $objectDAO
-     *
      * @return self
      */
     public function addObject(ObjectDAO $objectDAO)
@@ -69,17 +62,11 @@ class RequestDAO
         return $this->objects;
     }
 
-    /**
-     * @return int
-     */
     public function getSyncIteration(): int
     {
         return $this->syncIteration;
     }
 
-    /**
-     * @return bool
-     */
     public function isFirstTimeSync(): bool
     {
         return $this->inputOptionsDAO->isFirstTimeSync();
@@ -87,8 +74,6 @@ class RequestDAO
 
     /**
      * The integration that will be synced to.
-     *
-     * @return string
      */
     public function getSyncToIntegration(): string
     {
@@ -97,8 +82,6 @@ class RequestDAO
 
     /**
      * Returns DAO object with all input options.
-     *
-     * @return InputOptionsDAO
      */
     public function getInputOptionsDAO(): InputOptionsDAO
     {

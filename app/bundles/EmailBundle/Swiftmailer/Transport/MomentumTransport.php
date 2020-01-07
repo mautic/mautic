@@ -41,9 +41,6 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
 
     /**
      * MomentumTransport constructor.
-     *
-     * @param MomentumCallback        $momentumCallback
-     * @param MomentumFacadeInterface $momentumFacade
      */
     public function __construct(
         MomentumCallback $momentumCallback,
@@ -86,8 +83,7 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
      * Recipient/sender data will be retrieved from the Message API.
      * The return value is the number of recipients who were accepted for delivery.
      *
-     * @param Swift_Mime_SimpleMessage $message
-     * @param string[]                 $failedRecipients An array of failures by-reference
+     * @param string[] $failedRecipients An array of failures by-reference
      *
      * @return int
      *
@@ -100,8 +96,6 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
 
     /**
      * Register a plugin in the Transport.
-     *
-     * @param Swift_Events_EventListener $plugin
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
@@ -134,9 +128,8 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
     /**
      * Get the count for the max number of recipients per batch.
      *
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded Number of emails about to be added
-     * @param string         $type      Type of emails being added (to, cc, bcc)
+     * @param int    $toBeAdded Number of emails about to be added
+     * @param string $type      Type of emails being added (to, cc, bcc)
      *
      * @return int
      */
@@ -169,8 +162,6 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
 
     /**
      * Processes the response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {

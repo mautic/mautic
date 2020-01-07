@@ -33,10 +33,6 @@ class PreferenceCenterListType extends AbstractType
      */
     private $canViewOther = false;
 
-    /**
-     * @param PageModel       $pageModel
-     * @param CorePermissions $corePermissions
-     */
     public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
     {
         $this->model        = $pageModel;

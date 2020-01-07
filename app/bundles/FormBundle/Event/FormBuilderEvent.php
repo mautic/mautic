@@ -207,9 +207,6 @@ class FormBuilderEvent extends Event
         $this->validators[$key] = $validator;
     }
 
-    /**
-     * @param Form $form
-     */
     public function addValidatorsToBuilder(Form $form)
     {
         if (!empty($this->validators)) {

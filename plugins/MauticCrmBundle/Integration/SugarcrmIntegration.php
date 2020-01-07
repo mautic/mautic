@@ -59,23 +59,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * SugarcrmIntegration constructor.
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param CacheStorageHelper       $cacheStorageHelper
-     * @param EntityManager            $entityManager
-     * @param Session                  $session
-     * @param RequestStack             $requestStack
-     * @param Router                   $router
-     * @param TranslatorInterface      $translator
-     * @param Logger                   $logger
-     * @param EncryptionHelper         $encryptionHelper
-     * @param LeadModel                $leadModel
-     * @param CompanyModel             $companyModel
-     * @param PathsHelper              $pathsHelper
-     * @param NotificationModel        $notificationModel
-     * @param FieldModel               $fieldModel
-     * @param IntegrationEntityModel   $integrationEntityModel
-     * @param DoNotContact             $doNotContactModel
      */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -1437,9 +1420,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * Update body to sync.
-     *
-     * @param array $lead
-     * @param array $body
      */
     private function pushDncToSugar(array $lead, array &$body)
     {
@@ -1479,10 +1459,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @param Lead  $lead
-     * @param array $data
-     */
     private function fetchDncToMautic(Lead $lead, array $data)
     {
         $features = $this->settings->getFeatureSettings();

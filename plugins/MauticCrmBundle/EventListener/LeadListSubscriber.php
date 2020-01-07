@@ -38,11 +38,6 @@ class LeadListSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param IntegrationHelper   $helper
-     * @param ListModel           $listModel
-     * @param TranslatorInterface $translator
-     */
     public function __construct(IntegrationHelper $helper, ListModel $listModel, TranslatorInterface $translator)
     {
         $this->helper     = $helper;
@@ -61,9 +56,6 @@ class LeadListSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param LeadListFiltersChoicesEvent $event
-     */
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
     {
         $services = $this->helper->getIntegrationObjects();

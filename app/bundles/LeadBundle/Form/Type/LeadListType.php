@@ -25,17 +25,11 @@ class LeadListType extends AbstractType
      */
     private $segmentModel;
 
-    /**
-     * @param ListModel $segmentModel
-     */
     public function __construct(ListModel $segmentModel)
     {
         $this->segmentModel = $segmentModel;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
