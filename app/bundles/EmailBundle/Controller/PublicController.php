@@ -21,7 +21,6 @@ use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\PageBundle\Entity\Page;
@@ -422,8 +421,8 @@ class PublicController extends CommonFormController
         $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
         $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
 
-        $isCallbackInterface = $currentTransport instanceof InterfaceCallbackTransport || $currentTransport instanceof CallbackTransportInterface;
-        if ($isCallbackInterface && $currentTransport->getCallbackPath() == $transport) {
+        $isCallbackInterface = $currentTransport instanceof CallbackTransportInterface;
+        if ($isCallbackInterface && $currentTransport->getCallbackPath() === $transport) {
             if ($currentTransport instanceof CallbackTransportInterface) {
                 $event = new TransportWebhookEvent($currentTransport, $this->request);
                 $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
