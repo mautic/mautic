@@ -33,7 +33,7 @@ class CitrixHelper
     /**
      * @var IntegrationHelper
      */
-    private static $integratonHelper;
+    private static $integrationHelper;
 
     /**
      * @param IntegrationHelper $helper
@@ -41,8 +41,8 @@ class CitrixHelper
      */
     public static function init(IntegrationHelper $helper, LoggerInterface $logger)
     {
-        self::$logger           = $logger;
-        self::$integratonHelper = $helper;
+        self::$logger            = $logger;
+        self::$integrationHelper = $helper;
     }
 
     /**
@@ -248,7 +248,7 @@ class CitrixHelper
     private static function getIntegration($integration)
     {
         try {
-            return self::$integratonHelper->getIntegrationObject($integration);
+            return self::$integrationHelper->getIntegrationObject($integration);
         } catch (\Exception $e) {
             // do nothing
         }
