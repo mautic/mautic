@@ -11,15 +11,12 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-/**
- * Class MaxmindCountryLookup.
- */
-class MaxmindCountryLookup extends MaxmindLookup
+class MaxmindCountryLookup extends AbstractMaxmindLookup
 {
     /**
      * @return string
      */
-    protected function getName()
+    protected function getName(): string
     {
         return 'maxmind_country';
     }
