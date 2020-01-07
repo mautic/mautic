@@ -588,7 +588,7 @@ function copy_directory($src, $dest)
 
     // Make sure the destination exists
     if (!is_dir($dest)) {
-        if (!@mkdir($dest, 0755, true)) {
+        if (!@mkdir($dest, 0777, true)) {
             return sprintf(
                 'Could not move files from %s to production since the folder could not be created.',
                 str_replace(MAUTIC_UPGRADE_ROOT, '', $src)
