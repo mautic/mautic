@@ -37,7 +37,7 @@ install:
 script:
 
   # Run PHPUnit
-  - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+  - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning
 
   # Run PHPSTAN analysis for PHP 7+
   - ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/DashboardBundle app/bundles/ConfigBundle app/bundles/CampaignBundle app/bundles/PointBundle app/bundles/WebhookBundle app/bundles/LeadBundle app/bundles/FormBundle
