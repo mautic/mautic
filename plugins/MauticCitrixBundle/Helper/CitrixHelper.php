@@ -20,7 +20,7 @@ use MauticPlugin\MauticCitrixBundle\Api\GotowebinarApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class CitrixHelper
@@ -35,10 +35,21 @@ class CitrixHelper
      */
     private static $integrationHelper;
 
-    public static function init(IntegrationHelper $helper, LoggerInterface $logger)
+    /**
+     * @var RouterInterface
+     */
+    private static $router;
+
+    /**
+     * @param IntegrationHelper $helper
+     * @param LoggerInterface   $logger
+     * @param RouterInterface   $router
+     */
+    public static function init(IntegrationHelper $helper, LoggerInterface $logger, RouterInterface $router)
     {
         self::$logger            = $logger;
         self::$integrationHelper = $helper;
+        self::$router            = $router;
     }
 
     /**
@@ -380,8 +391,7 @@ class CitrixHelper
                 } else {
                     if (CitrixProducts::GOTOASSIST === $product) {
                         // TODO: use the sessioncallback to update attendance status
-                        /** @var Router $router */
-                        $router = self::getContainer()->get('router');
+                        $router = self::$router;
                         $params = [
                             'sessionStatusCallbackUrl' => $router
                                 ->generate(
