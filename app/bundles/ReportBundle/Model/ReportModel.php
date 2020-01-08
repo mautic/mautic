@@ -32,6 +32,7 @@ use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -470,8 +471,8 @@ class ReportModel extends FormModel
                 return new Response($content);
 
             case 'xlsx':
-                if (!class_exists('PHPExcel')) {
-                    throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
 
                 $response = new StreamedResponse(
