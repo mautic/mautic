@@ -429,6 +429,9 @@ $container->setDefinition(
 );
 
 // ElFinder File Manager
+$elFinderImagePath = trim($container->getParameter('mautic.image_path'), '/');
+$elFinderSiteUrl   = rtrim($container->getParameter('mautic.site_url'), '/').'/'.$elFinderImagePath;
+
 $container->loadFromExtension('fm_elfinder', [
     'assets_path'            => 'media/assets',
     'instances'              => [
@@ -443,11 +446,12 @@ $container->loadFromExtension('fm_elfinder', [
                 'roots' => [
                     'uploads' => [
                         'driver'            => 'LocalFileSystem',
-                        'path'              => 'media/images',
+                        'path'              => $elFinderImagePath,
                         'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
                         'upload_deny'       => ['all'],
                         'upload_max_size'   => '2M',
                         'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
+                        'url'               => $elFinderSiteUrl, // We need to specify URL in case mod_rewrite is disabled
                     ],
                 ],
             ],
