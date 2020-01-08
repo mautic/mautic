@@ -143,26 +143,33 @@ Mautic.filterIntegrations = function(update) {
     if (mQuery('.shuffle-integrations').length) {
         //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
         setTimeout(function () {
+            var Shuffle = window.Shuffle,
+                element = document.querySelector('.shuffle-integrations'),
+                shuffleOptions = {
+                    itemSelector: '.shuffle-item'
+                };
 
-            var Shuffle = window.Shuffle;
-            var element = document.querySelector('.shuffle-integrations');
+            var shuffleInstance = new Shuffle(element, shuffleOptions);
 
-            var shuffleInstance = new Shuffle(element, {
-                itemSelector: '.shuffle-item'
-            });
-
-            shuffleInstance.filter(function($el, shuffle) {
+            shuffleInstance.filter(function($el) {
                 if (filter) {
                     return mQuery($el).hasClass('plugin' + filter);
                 } else {
+                    // Shuffle.js has a bug. It hides the first item when we reset the filter.
+                    // This fixes it.
+                    mQuery(shuffleOptions.itemSelector).first().css('transform', '');
                     return true;
                 }
             });
 
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
-                .on("fa.sidebar.minimize", shuffleInstance.update)
-                .on("fa.sidebar.maximize", shuffleInstance.update);
+                .on("fa.sidebar.minimize", function() {
+                    shuffleInstance.update();
+                })
+                .on("fa.sidebar.maximize", function() {
+                    shuffleInstance.update();
+                })
         }, 500);
     }
 };
