@@ -21,9 +21,6 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
         return '<a href="https://www.maxmind.com/en/geoip2-precision-services" target="_blank">MaxMind Precision Services</a> is a pay per query lookup service that offers solutions with multiple levels of accuracy and details.';
     }
 
-    /**
-     * @return string
-     */
     abstract protected function getName(): string;
 
     /**

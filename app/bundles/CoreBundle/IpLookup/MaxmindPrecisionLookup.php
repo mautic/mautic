@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\IpLookup;
 
 class MaxmindPrecisionLookup extends AbstractMaxmindLookup
 {
-    /**
-     * @return string
-     */
     protected function getName(): string
     {
         return 'maxmind_precision';

@@ -40,11 +40,6 @@ class CitrixHelper
      */
     private static $router;
 
-    /**
-     * @param IntegrationHelper $helper
-     * @param LoggerInterface   $logger
-     * @param RouterInterface   $router
-     */
     public static function init(IntegrationHelper $helper, LoggerInterface $logger, RouterInterface $router)
     {
         self::$logger            = $logger;
