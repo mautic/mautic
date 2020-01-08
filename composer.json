@@ -117,7 +117,9 @@
 
         "liip/functional-test-bundle": "~3.3.0",
         "sensio/generator-bundle": "~3.1.0",
-        "babdev/transifex": "~1.0",
+        "mautic/transifex": "^4.0",
+        "http-interop/http-factory-guzzle": "^1.0",
+        "ricardofiorani/guzzle-psr18-adapter": "^1.0",
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",

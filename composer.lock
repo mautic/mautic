@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1bb408631984e176c37cf44b5c323be5",
+    "content-hash": "dda8f39a5af815bc4b70c5ccc0255378",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -10760,59 +10760,6 @@
     ],
     "packages-dev": [
         {
-            "name": "babdev/transifex",
-            "version": "1.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/BabDev/Transifex-API.git",
-                "reference": "01177cbc67d56d56f3eda5c93c8863f39c080a42"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/BabDev/Transifex-API/zipball/01177cbc67d56d56f3eda5c93c8863f39c080a42",
-                "reference": "01177cbc67d56d56f3eda5c93c8863f39c080a42",
-                "shasum": ""
-            },
-            "require": {
-                "joomla/http": "~1.1",
-                "php": "^5.3.10|~7.0"
-            },
-            "require-dev": {
-                "joomla/test": "~1.0",
-                "phpunit/phpunit": "~4.8|>=5.0 <5.4",
-                "squizlabs/php_codesniffer": "~1.5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "BabDev\\Transifex\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Babker",
-                    "homepage": "https://www.babdev.com"
-                }
-            ],
-            "description": "The Transifex API Package is a wrapper of the Transifex API available for PHP developers",
-            "homepage": "https://github.com/BabDev/Transifex-API",
-            "keywords": [
-                "php",
-                "transifex"
-            ],
-            "abandoned": true,
-            "time": "2016-06-10T02:57:54+00:00"
-        },
-        {
             "name": "behat/gherkin",
             "version": "v4.6.0",
             "source": {
@@ -11373,6 +11320,56 @@
             "time": "2017-05-02T12:26:19+00:00"
         },
         {
+            "name": "http-interop/http-factory-guzzle",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/http-interop/http-factory-guzzle.git",
+                "reference": "34861658efb9899a6618cef03de46e2a52c80fc0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/http-interop/http-factory-guzzle/zipball/34861658efb9899a6618cef03de46e2a52c80fc0",
+                "reference": "34861658efb9899a6618cef03de46e2a52c80fc0",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/psr7": "^1.4.2",
+                "psr/http-factory": "^1.0"
+            },
+            "provide": {
+                "psr/http-factory-implementation": "^1.0"
+            },
+            "require-dev": {
+                "http-interop/http-factory-tests": "^0.5",
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Http\\Factory\\Guzzle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "An HTTP Factory using Guzzle PSR7",
+            "keywords": [
+                "factory",
+                "http",
+                "psr-17",
+                "psr-7"
+            ],
+            "time": "2018-07-31T19:32:56+00:00"
+        },
+        {
             "name": "kamermans/guzzle-oauth2-subscriber",
             "version": "v1.0.6",
             "source": {
@@ -11551,6 +11548,63 @@
                 "testing"
             ],
             "time": "2019-12-02T16:06:04+00:00"
+        },
+        {
+            "name": "mautic/transifex",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mautic/Transifex-API.git",
+                "reference": "caa46c645d63b2ef84171d2fce69bb5978827eff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mautic/Transifex-API/zipball/caa46c645d63b2ef84171d2fce69bb5978827eff",
+                "reference": "caa46c645d63b2ef84171d2fce69bb5978827eff",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "~7.2",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "guzzlehttp/guzzle": "^6.4.1",
+                "http-interop/http-factory-guzzle": "^1.0",
+                "phpstan/phpstan": "^0.12.4",
+                "phpunit/phpunit": "^8.4.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mautic\\Transifex\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Babker",
+                    "homepage": "https://www.babdev.com"
+                }
+            ],
+            "description": "The Transifex API Package is a wrapper of the Transifex API available for PHP developers",
+            "homepage": "https://github.com/mautic/Transifex-API",
+            "keywords": [
+                "php",
+                "transifex"
+            ],
+            "time": "2020-01-07T08:33:18+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -12376,6 +12430,164 @@
                 "xunit"
             ],
             "time": "2019-07-02T20:42:44+00:00"
+        },
+        {
+            "name": "psr/http-client",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "496a823ef742b632934724bf769560c2a5c7c44e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/496a823ef742b632934724bf769560c2a5c7c44e",
+                "reference": "496a823ef742b632934724bf769560c2a5c7c44e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "time": "2018-10-30T23:29:13+00:00"
+        },
+        {
+            "name": "psr/http-factory",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-factory.git",
+                "reference": "12ac7fcd07e5b077433f5f2bee95b3a771bf61be"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/12ac7fcd07e5b077433f5f2bee95b3a771bf61be",
+                "reference": "12ac7fcd07e5b077433f5f2bee95b3a771bf61be",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interfaces for PSR-7 HTTP message factories",
+            "keywords": [
+                "factory",
+                "http",
+                "message",
+                "psr",
+                "psr-17",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2019-04-30T12:38:16+00:00"
+        },
+        {
+            "name": "ricardofiorani/guzzle-psr18-adapter",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ricardofiorani/guzzle-psr18-adapter.git",
+                "reference": "438353d87054237569932ed52552eed831ad7801"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ricardofiorani/guzzle-psr18-adapter/zipball/438353d87054237569932ed52552eed831ad7801",
+                "reference": "438353d87054237569932ed52552eed831ad7801",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "php": "^7.1",
+                "psr/http-client": "^1.0"
+            },
+            "provide": {
+                "psr/http-client": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.3",
+                "spryker/code-sniffer": "^0.12.4 || ^0.14.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "RicardoFiorani\\GuzzlePsr18Adapter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ricardo Fiorani",
+                    "email": "ricardo.fiorani@gmail.com",
+                    "homepage": "https://github.com/ricardofiorani",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Guzzle PSR-18 adapter",
+            "homepage": "https://github.com/ricardofiorani/guzzle-psr18-adapter",
+            "keywords": [
+                "Guzzle",
+                "psr-18"
+            ],
+            "time": "2019-10-08T16:06:31+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

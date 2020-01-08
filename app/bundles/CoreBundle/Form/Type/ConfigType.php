@@ -534,38 +534,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'transifex_username',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.username',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'transifex_password',
-            PasswordType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.password',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
-                    'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'update_stability',
             ChoiceType::class,
             [
