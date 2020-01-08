@@ -551,7 +551,38 @@ return [
                 ],
             ],
         ],
+        'commands' => [
+            'mautic.core.command.trigger' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\PullTransifexCommand::class,
+                'arguments' => [
+                    'transifex.factory',
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.core.command.trigger' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\PushTransifexCommand::class,
+                'arguments' => [
+                    'transifex.factory',
+                    'translator',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
         'other' => [
+            'mautic.http.client' => [
+                'class' => GuzzleHttp\Client::class,
+            ],
+            'mautic.http.client.psr-18' => [
+                // Warning: Only dev dependency (for TransifexFactory)
+                // Can be replaced with 'mautic.http.client' once the standard Guzzle
+                // Client implements \Psr\Http\Client\ClientInterface
+                // @see https://github.com/guzzle/guzzle/pull/2525
+                // When removing, remove also the ricardofiorani/guzzle-psr18-adapter dependency.
+                'class' => \RicardoFiorani\GuzzlePsr18Adapter\Client::class,
+            ],
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
             ],
@@ -638,13 +669,11 @@ return [
                     'priority' => 255,
                 ],
             ],
-            'transifex' => [
-                'class'     => 'BabDev\Transifex\Transifex',
+            'transifex.factory' => [
+                'class'     => \Mautic\CoreBundle\Factory\TransifexFactory::class,
                 'arguments' => [
-                    [
-                        'api.username' => '%mautic.transifex_username%',
-                        'api.password' => '%mautic.transifex_password%',
-                    ],
+                    'mautic.http.client.psr-18',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             // Helpers
