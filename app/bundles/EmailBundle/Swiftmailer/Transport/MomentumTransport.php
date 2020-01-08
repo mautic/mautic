@@ -137,7 +137,12 @@ class MomentumTransport implements \Swift_Transport, TokenTransportInterface, Ca
     {
         //Sengrid counts all email address (to, cc and bcc)
         //https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.personalizations
-        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
+
+        $toCount  = is_countable($message->getTo()) ? count($message->getTo()) : 0;
+        $ccCount  = is_countable($message->getCc()) ? count($message->getCc()) : 0;
+        $bccCount = is_countable($message->getBcc()) ? count($message->getBcc()) : 0;
+
+        return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
 
     /**
