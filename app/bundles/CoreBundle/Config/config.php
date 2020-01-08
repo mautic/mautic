@@ -552,7 +552,7 @@ return [
             ],
         ],
         'commands' => [
-            'mautic.core.command.trigger' => [
+            'mautic.core.command.transifex_pull' => [
                 'tag'       => 'console.command',
                 'class'     => \Mautic\CoreBundle\Command\PullTransifexCommand::class,
                 'arguments' => [
@@ -561,7 +561,7 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.core.command.trigger' => [
+            'mautic.core.command.transifex_push' => [
                 'tag'       => 'console.command',
                 'class'     => \Mautic\CoreBundle\Command\PushTransifexCommand::class,
                 'arguments' => [
