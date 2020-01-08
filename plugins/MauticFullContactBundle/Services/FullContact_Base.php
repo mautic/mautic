@@ -33,8 +33,9 @@ class FullContact_Base
     private $_next_req_time = null;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
-    protected $_baseUri = 'https://api.fullcontact.com/';
-    protected $_version = 'v2';
+    protected $_baseUri     = 'https://api.fullcontact.com/';
+    protected $_version     = 'v2';
+    protected $_resourceUri = '';
 
     protected $_apiKey           = null;
     protected $_webhookUrl       = null;
