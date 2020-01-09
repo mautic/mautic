@@ -36,7 +36,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
      */
     public function getRemoteDateStoreDownloadUrl()
     {
-        return 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
+        return "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key={$this->auth}&suffix=tar.gz";
     }
 
     /**
