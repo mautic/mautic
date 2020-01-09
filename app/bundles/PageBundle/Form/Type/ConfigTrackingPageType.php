@@ -21,10 +21,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigTrackingPageType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [

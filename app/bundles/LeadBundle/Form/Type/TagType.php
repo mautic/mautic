@@ -27,9 +27,6 @@ class TagType extends AbstractType
      */
     private $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
@@ -49,9 +46,6 @@ class TagType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

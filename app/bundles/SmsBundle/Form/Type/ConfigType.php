@@ -34,9 +34,6 @@ class ConfigType extends AbstractType
 
     /**
      * ConfigType constructor.
-     *
-     * @param TransportChain      $transportChain
-     * @param TranslatorInterface $translator
      */
     public function __construct(TransportChain $transportChain, TranslatorInterface $translator)
     {
@@ -44,10 +41,6 @@ class ConfigType extends AbstractType
         $this->translator     = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $choices    = [];

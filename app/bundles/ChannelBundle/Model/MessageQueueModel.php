@@ -45,10 +45,6 @@ class MessageQueueModel extends FormModel
 
     /**
      * MessageQueueModel constructor.
-     *
-     * @param LeadModel            $leadModel
-     * @param CompanyModel         $companyModel
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(LeadModel $leadModel, CompanyModel $companyModel, CoreParametersHelper $coreParametersHelper)
     {
@@ -66,7 +62,6 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param array  $leads
      * @param        $channel
      * @param        $channelId
      * @param null   $campaignEventId

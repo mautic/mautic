@@ -45,8 +45,6 @@ class SchemaHelper
     protected $dbParams = [];
 
     /**
-     * @param array $dbParams
-     *
      * @throws DBALException
      */
     public function __construct(array $dbParams)
@@ -72,9 +70,6 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    /**
-     * @param EntityManager $em
-     */
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;

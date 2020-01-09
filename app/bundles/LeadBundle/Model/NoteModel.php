@@ -32,9 +32,6 @@ class NoteModel extends FormModel
      */
     protected $session;
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -149,8 +146,7 @@ class NoteModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $useFilters
+     * @param $useFilters
      *
      * @return mixed
      */

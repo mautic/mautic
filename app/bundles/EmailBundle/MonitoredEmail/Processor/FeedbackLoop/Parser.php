@@ -24,8 +24,6 @@ class Parser
 
     /**
      * Parser constructor.
-     *
-     * @param Message $message
      */
     public function __construct(Message $message)
     {

@@ -22,8 +22,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class AuthorizeController extends Controller
 {
     /**
-     * @param Request $request
-     *
      * @return Response
      *
      * @throws AccessDeniedException

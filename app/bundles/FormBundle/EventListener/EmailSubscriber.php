@@ -28,9 +28,6 @@ class EmailSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {

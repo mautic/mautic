@@ -46,9 +46,6 @@ class MauticFactory
      */
     private $entityManager = null;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -120,9 +117,6 @@ class MauticFactory
         return ($this->entityManager) ? $this->entityManager : $this->container->get('doctrine')->getManager();
     }
 
-    /**
-     * @param EntityManager $em
-     */
     public function setEntityManager(EntityManager $em)
     {
         $this->entityManager = $em;

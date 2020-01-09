@@ -55,12 +55,6 @@ class GravatarHelper extends Helper
 
     /**
      * GravatarHelper constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param AssetsHelper         $assetHelper
-     * @param AvatarHelper         $avatarHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param RequestStack         $requestStack
      */
     public function __construct(
         PathsHelper $pathsHelper,

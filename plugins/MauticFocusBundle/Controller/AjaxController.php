@@ -19,8 +19,6 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getWebsiteSnapshotAction(Request $request)
@@ -66,8 +64,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function generatePreviewAction(Request $request)

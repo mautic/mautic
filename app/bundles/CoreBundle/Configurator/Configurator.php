@@ -53,8 +53,6 @@ class Configurator
 
     /**
      * Configurator constructor.
-     *
-     * @param PathsHelper $pathsHelper
      */
     public function __construct(PathsHelper $pathsHelper)
     {
@@ -81,8 +79,7 @@ class Configurator
     /**
      * Add a step to the configurator.
      *
-     * @param StepInterface $step
-     * @param int           $priority
+     * @param int $priority
      */
     public function addStep(StepInterface $step, $priority = 0)
     {

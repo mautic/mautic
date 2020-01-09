@@ -44,12 +44,6 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $builderTokenHelperFactory;
 
-    /**
-     * @param CorePermissions           $security
-     * @param FocusModel                $model
-     * @param RouterInterface           $router
-     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
-     */
     public function __construct(
         CorePermissions $security,
         FocusModel $model,
@@ -75,8 +69,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param PageBuilderEvent $event
      */
     public function onPageBuild(PageBuilderEvent $event)
     {
@@ -86,9 +78,6 @@ class PageSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $content = $event->getContent();

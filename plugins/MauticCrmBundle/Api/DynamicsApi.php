@@ -20,7 +20,6 @@ class DynamicsApi extends CrmApi
 
     /**
      * @param $operation
-     * @param array  $parameters
      * @param string $method
      * @param string $moduleobject
      *
@@ -116,8 +115,6 @@ class DynamicsApi extends CrmApi
     /**
      * gets leads.
      *
-     * @param array $params
-     *
      * @return mixed
      */
     public function getLeads(array $params)
@@ -130,7 +127,6 @@ class DynamicsApi extends CrmApi
     /**
      * gets companies.
      *
-     * @param array  $params
      * @param string $id
      *
      * @return mixed
@@ -225,8 +221,6 @@ class DynamicsApi extends CrmApi
 
     /**
      * @see https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
-     *
-     * @param Response $response
      *
      * @return array
      */

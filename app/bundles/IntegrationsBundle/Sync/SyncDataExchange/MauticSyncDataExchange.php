@@ -66,14 +66,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
      */
     private $orderExecutioner;
 
-    /**
-     * @param FieldChangeRepository      $fieldChangeRepository
-     * @param FieldHelper                $fieldHelper
-     * @param MappingHelper              $mappingHelper
-     * @param FullObjectReportBuilder    $fullObjectReportBuilder
-     * @param PartialObjectReportBuilder $partialObjectReportBuilder
-     * @param OrderExecutioner           $orderExecutioner
-     */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
         FieldHelper $fieldHelper,
@@ -90,11 +82,6 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         $this->orderExecutioner           = $orderExecutioner;
     }
 
-    /**
-     * @param RequestDAO $requestDAO
-     *
-     * @return ReportDAO
-     */
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO
     {
         if ($requestDAO->isFirstTimeSync() || $requestDAO->getInputOptionsDAO()->getMauticObjectIds()) {
@@ -104,19 +91,12 @@ class MauticSyncDataExchange implements SyncDataExchangeInterface
         return $this->partialObjectReportBuilder->buildReport($requestDAO);
     }
 
-    /**
-     * @param OrderDAO $syncOrderDAO
-     */
     public function executeSyncOrder(OrderDAO $syncOrderDAO): void
     {
         $this->orderExecutioner->execute($syncOrderDAO);
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDAO
-     * @param string           $internalObjectName
-     * @param ReportObjectDAO  $integrationObjectDAO
-     *
      * @return ReportObjectDAO
      *
      * @throws ObjectNotFoundException

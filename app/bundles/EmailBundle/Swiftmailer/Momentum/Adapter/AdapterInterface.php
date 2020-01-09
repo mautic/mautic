@@ -20,8 +20,6 @@ use SparkPost\SparkPostPromise;
 interface AdapterInterface
 {
     /**
-     * @param TransmissionDTO $transmissionDTO
-     *
      * @return SparkPostPromise
      */
     public function createTransmission(TransmissionDTO $transmissionDTO);

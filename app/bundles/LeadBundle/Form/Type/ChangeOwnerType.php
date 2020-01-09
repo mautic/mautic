@@ -24,9 +24,6 @@ class ChangeOwnerType extends AbstractType
      */
     private $userModel;
 
-    /**
-     * @param UserModel $userModel
-     */
     public function __construct(UserModel $userModel)
     {
         $this->userModel = $userModel;

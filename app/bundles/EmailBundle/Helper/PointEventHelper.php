@@ -46,9 +46,7 @@ class PointEventHelper
     }
 
     /**
-     * @param               $event
-     * @param Lead          $lead
-     * @param MauticFactory $factory
+     * @param $event
      *
      * @return bool
      */

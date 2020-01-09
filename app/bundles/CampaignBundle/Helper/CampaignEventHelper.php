@@ -19,7 +19,6 @@ class CampaignEventHelper
      * Determine if this campaign applies.
      *
      * @param CampaignLeadChangeEvent $eventDetails
-     * @param array                   $event
      *
      * @return bool
      */

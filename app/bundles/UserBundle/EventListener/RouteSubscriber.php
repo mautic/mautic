@@ -25,9 +25,6 @@ class RouteSubscriber implements EventSubscriberInterface
      */
     private $params;
 
-    /**
-     * @param array $params
-     */
     public function __construct(array $params)
     {
         $this->params = $params;

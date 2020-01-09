@@ -36,11 +36,6 @@ class BuildJsSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param NotificationHelper $notificationHelper
-     * @param IntegrationHelper  $integrationHelper
-     * @param RouterInterface    $router
-     */
     public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper, RouterInterface $router)
     {
         $this->notificationHelper = $notificationHelper;
@@ -58,9 +53,6 @@ class BuildJsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJs(BuildJsEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');

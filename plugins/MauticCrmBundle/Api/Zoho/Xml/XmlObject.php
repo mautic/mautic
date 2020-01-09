@@ -33,9 +33,6 @@ class XmlObject
         $this->object = $object;
     }
 
-    /**
-     * @param Row $row
-     */
     public function add(Row $row)
     {
         $this->rows[] = $row;

@@ -17,8 +17,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 class LeadListEvent extends CommonEvent
 {
     /**
-     * @param LeadList $list
-     * @param bool     $isNew
+     * @param bool $isNew
      */
     public function __construct(LeadList $list, $isNew = false)
     {
@@ -38,8 +37,6 @@ class LeadListEvent extends CommonEvent
 
     /**
      * Sets the List entity.
-     *
-     * @param LeadList $list
      */
     public function setList(LeadList $list)
     {

@@ -123,9 +123,6 @@ class MessageQueue
      */
     private $metadataUpdated = false;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -280,8 +277,6 @@ class MessageQueue
     }
 
     /**
-     * @param Event $event
-     *
      * @return MessageQueue
      */
     public function setEvent(Event $event)
@@ -347,9 +342,6 @@ class MessageQueue
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;
@@ -491,9 +483,6 @@ class MessageQueue
         return (isset($this->options['metadata'])) ? $this->options['metadata'] : [];
     }
 
-    /**
-     * @param array $metadata
-     */
     public function setMetadata(array $metadata = [])
     {
         $this->metadataUpdated     = true;

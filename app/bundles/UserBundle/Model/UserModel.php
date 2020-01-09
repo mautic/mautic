@@ -38,10 +38,6 @@ class UserModel extends FormModel
      */
     private $userTokenService;
 
-    /**
-     * @param MailHelper                $mailHelper
-     * @param UserTokenServiceInterface $userTokenService
-     */
     public function __construct(
         MailHelper $mailHelper,
         UserTokenServiceInterface $userTokenService
@@ -112,10 +108,8 @@ class UserModel extends FormModel
     /**
      * Checks for a new password and rehashes if necessary.
      *
-     * @param User                     $entity
-     * @param PasswordEncoderInterface $encoder
-     * @param string                   $submittedPassword
-     * @param bool|false               $validate
+     * @param string     $submittedPassword
+     * @param bool|false $validate
      *
      * @return string
      */
@@ -259,9 +253,7 @@ class UserModel extends FormModel
     /**
      * Resets the user password and emails it.
      *
-     * @param User                     $user
-     * @param PasswordEncoderInterface $encoder
-     * @param string                   $newPassword
+     * @param string $newPassword
      */
     public function resetPassword(User $user, PasswordEncoderInterface $encoder, $newPassword)
     {
@@ -272,8 +264,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
      * @return UserToken
      */
     protected function getResetToken(User $user)
@@ -288,7 +278,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User   $user
      * @param string $token
      *
      * @return bool
@@ -304,8 +293,6 @@ class UserModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
      * @throws \RuntimeException
      */
     public function sendResetEmail(User $user)

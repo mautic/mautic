@@ -17,8 +17,5 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 
 interface SyncServiceInterface
 {
-    /**
-     * @param InputOptionsDAO $inputOptionsDAO
-     */
     public function processIntegrationSync(InputOptionsDAO $inputOptionsDAO);
 }

@@ -36,11 +36,6 @@ class PreferenceBuilder
 
     /**
      * PreferenceBuilder constructor.
-     *
-     * @param ArrayCollection $logs
-     * @param Event           $event
-     * @param array           $channels
-     * @param LoggerInterface $logger
      */
     public function __construct(ArrayCollection $logs, Event $event, array $channels, LoggerInterface $logger)
     {
@@ -58,9 +53,6 @@ class PreferenceBuilder
         return $this->channels;
     }
 
-    /**
-     * @param LeadEventLog $log
-     */
     public function removeLogFromAllChannels(LeadEventLog $log)
     {
         foreach ($this->channels as $channelPreferences) {
@@ -69,10 +61,8 @@ class PreferenceBuilder
     }
 
     /**
-     * @param string       $channel
-     * @param array        $rule
-     * @param LeadEventLog $log
-     * @param int          $priority
+     * @param string $channel
+     * @param int    $priority
      */
     private function addChannelRule($channel, array $rule, LeadEventLog $log, $priority)
     {
@@ -112,10 +102,6 @@ class PreferenceBuilder
         return $this->channels[$channel];
     }
 
-    /**
-     * @param ArrayCollection $logs
-     * @param array           $channels
-     */
     private function buildRules(ArrayCollection $logs, array $channels)
     {
         /** @var LeadEventLog $log */

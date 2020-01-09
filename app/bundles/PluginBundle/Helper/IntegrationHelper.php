@@ -74,14 +74,6 @@ class IntegrationHelper
     private $byPlugin = [];
 
     /**
-     * @param Kernel               $kernel
-     * @param EntityManager        $em
-     * @param PathsHelper          $pathsHelper
-     * @param BundleHelper         $bundleHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param PluginModel          $pluginModel
-     *
      * @throws \Exception
      */
     public function __construct(

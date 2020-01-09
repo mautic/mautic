@@ -30,8 +30,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param PageBuilderEvent $event
      */
     public function onPageBuild(PageBuilderEvent $event)
     {

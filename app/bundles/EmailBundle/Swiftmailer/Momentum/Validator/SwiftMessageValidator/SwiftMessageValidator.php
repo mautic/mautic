@@ -26,8 +26,6 @@ final class SwiftMessageValidator implements SwiftMessageValidatorInterface
 
     /**
      * MomentumSwiftMessageValidator constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         TranslatorInterface $translator
@@ -36,8 +34,6 @@ final class SwiftMessageValidator implements SwiftMessageValidatorInterface
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @throws SwiftMessageValidationException
      */
     public function validate(\Swift_Mime_SimpleMessage $message)

@@ -45,11 +45,6 @@ class TrackingHelper
 
     /**
      * BuildJsSubscriber constructor.
-     *
-     * @param LeadModel            $leadModel
-     * @param Session              $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param RequestStack         $request
      */
     public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper, RequestStack $request)
     {

@@ -26,9 +26,6 @@ class SegmentReportSubscriber implements EventSubscriberInterface
      */
     private $fieldsBuilder;
 
-    /**
-     * @param FieldsBuilder $fieldsBuilder
-     */
     public function __construct(FieldsBuilder $fieldsBuilder)
     {
         $this->fieldsBuilder = $fieldsBuilder;
@@ -47,8 +44,6 @@ class SegmentReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -83,8 +78,6 @@ class SegmentReportSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {

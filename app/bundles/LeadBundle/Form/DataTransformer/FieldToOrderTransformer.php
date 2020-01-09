@@ -22,9 +22,6 @@ class FieldToOrderTransformer implements DataTransformerInterface
      */
     private $leadFieldRepository;
 
-    /**
-     * @param LeadFieldRepository $leadFieldRepository
-     */
     public function __construct(LeadFieldRepository $leadFieldRepository)
     {
         $this->leadFieldRepository = $leadFieldRepository;

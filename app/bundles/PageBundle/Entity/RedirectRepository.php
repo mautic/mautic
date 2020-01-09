@@ -20,8 +20,6 @@ use Mautic\EmailBundle\Entity\Email;
 class RedirectRepository extends CommonRepository
 {
     /**
-     * @param array $urls
-     *
      * @return array
      */
     public function findByUrls(array $urls)
@@ -39,7 +37,6 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param array $ids
      * @param Email $email
      *
      * @return array
@@ -92,13 +89,11 @@ class RedirectRepository extends CommonRepository
     }
 
     /**
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param int|null  $createdByUserId
-     * @param int|null  $companyId
-     * @param int|null  $campaignId
-     * @param int|null  $segmentId
+     * @param int      $limit
+     * @param int|null $createdByUserId
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */

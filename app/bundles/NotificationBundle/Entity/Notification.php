@@ -150,9 +150,6 @@ class Notification extends FormEntity
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -222,9 +219,6 @@ class Notification extends FormEntity
         $builder->createField('mobileSettings', 'array')->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -590,8 +584,6 @@ class Notification extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Notification
      */
     public function addList(LeadList $list)
@@ -603,8 +595,6 @@ class Notification extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {
@@ -665,8 +655,6 @@ class Notification extends FormEntity
     }
 
     /**
-     * @param array $mobileSettings
-     *
      * @return $this
      */
     public function setMobileSettings(array $mobileSettings)

@@ -48,11 +48,6 @@ class BuilderTokenHelper
 
     /**
      * This method must be called before the BuilderTokenHelper can be used.
-     *
-     * @param string      $modelName
-     * @param string|null $viewPermissionBase
-     * @param string|null $bundleName
-     * @param string|null $langVar
      */
     public function configure(
         string $modelName,
@@ -148,8 +143,6 @@ class BuilderTokenHelper
 
     /**
      * Override default permission set of viewown and viewother.
-     *
-     * @param array $permissions
      */
     public function setPermissionSet(array $permissions)
     {

@@ -19,8 +19,6 @@ class EventRepository extends LegacyEventRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getEntities(array $args = [])

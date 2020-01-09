@@ -17,8 +17,6 @@ class LogNotProcessedException extends \Exception
 {
     /**
      * LogNotProcessedException constructor.
-     *
-     * @param LeadEventLog $log
      */
     public function __construct(LeadEventLog $log)
     {

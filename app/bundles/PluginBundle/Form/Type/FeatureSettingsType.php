@@ -44,10 +44,6 @@ class FeatureSettingsType extends AbstractType
 
     /**
      * FeatureSettingsType constructor.
-     *
-     * @param Session              $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LoggerInterface      $logger
      */
     public function __construct(
         Session $session,
@@ -59,10 +55,6 @@ class FeatureSettingsType extends AbstractType
         $this->logger               = $logger;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integrationObject = $options['integration_object'];

@@ -26,9 +26,6 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
      */
     private $repeatedPass;
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('mautic.sms.transport_chain')) {
@@ -47,9 +44,6 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
         }
     }
 
-    /**
-     * @param RepeatedPass $repeatedPass
-     */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
         $this->repeatedPass = $repeatedPass;

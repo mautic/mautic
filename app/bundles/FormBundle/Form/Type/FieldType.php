@@ -39,8 +39,6 @@ class FieldType extends AbstractType
 
     /**
      * FieldType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

@@ -51,11 +51,6 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     /**
      * BuilderSubscriber constructor.
-     *
-     * @param CorePermissions           $security
-     * @param TokenHelper               $tokenHelper
-     * @param ContactTracker            $contactTracker
-     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
     public function __construct(
         CorePermissions $security,
@@ -83,9 +78,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param BuilderEvent $event
-     */
     public function onBuilderBuild(BuilderEvent $event)
     {
         if ($event->tokensRequested($this->assetToken)) {
@@ -94,9 +86,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $lead   = $event->getLead();
@@ -106,9 +95,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addTokens($tokens);
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function onPageDisplay(PageDisplayEvent $event)
     {
         $page    = $event->getPage();

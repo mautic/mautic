@@ -38,11 +38,6 @@ class UploadSubscriber implements EventSubscriberInterface
      */
     private $fileUploadValidator;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param AssetModel           $assetModel
-     * @param FileUploadValidator  $fileUploadValidator
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -64,8 +59,6 @@ class UploadSubscriber implements EventSubscriberInterface
     /**
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
-     *
-     * @param PostUploadEvent $event
      */
     public function onPostUpload(PostUploadEvent $event)
     {
@@ -87,8 +80,6 @@ class UploadSubscriber implements EventSubscriberInterface
 
     /**
      * Validates file before upload.
-     *
-     * @param ValidationEvent $event
      *
      * @throws ValidationException
      */

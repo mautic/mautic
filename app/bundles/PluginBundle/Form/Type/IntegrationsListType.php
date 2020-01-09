@@ -31,9 +31,6 @@ class IntegrationsListType extends AbstractType
      */
     private $integrationHelper;
 
-    /**
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;

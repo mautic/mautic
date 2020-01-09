@@ -24,18 +24,11 @@ class ReportWidgetType extends AbstractType
      */
     protected $model;
 
-    /**
-     * @param ReportModel $reportModel
-     */
     public function __construct(ReportModel $reportModel)
     {
         $this->model = $reportModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $choices = [];

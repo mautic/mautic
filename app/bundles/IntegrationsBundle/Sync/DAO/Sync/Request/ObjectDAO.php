@@ -50,12 +50,6 @@ class ObjectDAO
      */
     private $requiredFields = [];
 
-    /**
-     * @param string                  $object
-     * @param \DateTimeInterface|null $fromDateTime
-     * @param \DateTimeInterface|null $toDateTime
-     * @param \DateTimeInterface|null $objectLastSyncDateTime
-     */
     public function __construct(
         string $object,
         ?\DateTimeInterface $fromDateTime = null,
@@ -68,17 +62,12 @@ class ObjectDAO
         $this->objectLastSyncDateTime = $objectLastSyncDateTime;
     }
 
-    /**
-     * @return string
-     */
     public function getObject(): string
     {
         return $this->object;
     }
 
     /**
-     * @param string $field
-     *
      * @return self
      */
     public function addField(string $field)
@@ -96,9 +85,6 @@ class ObjectDAO
         return $this->fields;
     }
 
-    /**
-     * @param array $fields
-     */
     public function setRequiredFields(array $fields): void
     {
         $this->requiredFields = $fields;
@@ -112,25 +98,16 @@ class ObjectDAO
         return $this->requiredFields;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getFromDateTime(): ?\DateTimeInterface
     {
         return $this->fromDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getToDateTime(): ?\DateTimeInterface
     {
         return $this->toDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getObjectLastSyncDateTime(): ?\DateTimeInterface
     {
         return $this->objectLastSyncDateTime;

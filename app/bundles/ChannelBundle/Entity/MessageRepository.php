@@ -16,8 +16,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class MessageRepository extends CommonRepository
 {
     /**
-     * @param array $args
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getEntities(array $args = [])

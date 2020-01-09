@@ -47,8 +47,6 @@ class SmtpTransport implements \Swift_Transport
 
     /**
      * Register a plugin in the Transport.
-     *
-     * @param \Swift_Events_EventListener $plugin
      */
     public function registerPlugin(\Swift_Events_EventListener $plugin)
     {

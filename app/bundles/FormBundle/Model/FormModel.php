@@ -91,17 +91,6 @@ class FormModel extends CommonFormModel
 
     /**
      * FormModel constructor.
-     *
-     * @param RequestStack        $requestStack
-     * @param TemplatingHelper    $templatingHelper
-     * @param ThemeHelper         $themeHelper
-     * @param SchemaHelperFactory $schemaHelperFactory
-     * @param ActionModel         $formActionModel
-     * @param FieldModel          $formFieldModel
-     * @param LeadModel           $leadModel
-     * @param FormFieldHelper     $fieldHelper
-     * @param LeadFieldModel      $leadFieldModel
-     * @param FormUploader        $formUploader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -236,8 +225,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $entity
-     * @param      $sessionFields
+     * @param $sessionFields
      */
     public function setFields(Form $entity, $sessionFields)
     {
@@ -286,8 +274,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $entity
-     * @param      $sessionFields
+     * @param $sessionFields
      */
     public function deleteFields(Form $entity, $sessionFields)
     {
@@ -322,8 +309,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $entity
-     * @param      $sessionActions
+     * @param $sessionActions
      */
     public function setActions(Form $entity, $sessionActions)
     {
@@ -375,7 +361,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form  $entity
      * @param array $actions
      */
     public function deleteActions(Form $entity, $actions)
@@ -426,7 +411,6 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the content.
      *
-     * @param Form      $form
      * @param bool|true $withScript
      * @param bool|true $useCache
      *
@@ -448,7 +432,6 @@ class FormModel extends CommonFormModel
     /**
      * Obtains the cached HTML of a form and generates it if missing.
      *
-     * @param Form      $form
      * @param bool|true $useCache
      *
      * @return string
@@ -473,9 +456,8 @@ class FormModel extends CommonFormModel
     /**
      * Get results for a form and lead.
      *
-     * @param Form $form
-     * @param int  $leadId
-     * @param int  $limit
+     * @param int $leadId
+     * @param int $limit
      *
      * @return array
      */
@@ -493,7 +475,6 @@ class FormModel extends CommonFormModel
     /**
      * Generate the form's html.
      *
-     * @param Form $entity
      * @param bool $persist
      *
      * @return string
@@ -604,7 +585,6 @@ class FormModel extends CommonFormModel
     /**
      * Creates the table structure for form results.
      *
-     * @param Form $entity
      * @param bool $isNew
      * @param bool $dropExisting
      */
@@ -679,8 +659,6 @@ class FormModel extends CommonFormModel
     /**
      * Generate an array of columns from fields.
      *
-     * @param Form $form
-     *
      * @return array
      */
     public function generateFieldColumns(Form $form)
@@ -747,8 +725,6 @@ class FormModel extends CommonFormModel
     /**
      * Get the document write javascript for the form.
      *
-     * @param Form $form
-     *
      * @return string
      */
     public function getAutomaticJavascript(Form $form)
@@ -780,8 +756,6 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $form
-     *
      * @return string
      */
     public function getFormScript(Form $form)
@@ -833,8 +807,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param Form $form
-     * @param      $formHtml
+     * @param $formHtml
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {

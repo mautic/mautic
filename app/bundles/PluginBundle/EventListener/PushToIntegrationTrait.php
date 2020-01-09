@@ -30,8 +30,6 @@ trait PushToIntegrationTrait
 
     /**
      * Used by methodCalls to event subscribers.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public function setIntegrationHelper(IntegrationHelper $integrationHelper)
     {
@@ -40,8 +38,6 @@ trait PushToIntegrationTrait
 
     /**
      * Used by callback methods such as point triggers.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public static function setStaticIntegrationHelper(IntegrationHelper $integrationHelper)
     {
@@ -49,8 +45,7 @@ trait PushToIntegrationTrait
     }
 
     /**
-     * @param array $config
-     * @param       $lead
+     * @param $lead
      */
     protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
     {

@@ -101,8 +101,7 @@ class IntegrationEntityModel extends FormModel
     }
 
     /**
-     * @param int       $id
-     * @param \DateTime $dateTime
+     * @param int $id
      *
      * @return IntegrationEntity|null
      */

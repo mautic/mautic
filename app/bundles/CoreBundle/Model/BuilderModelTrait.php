@@ -19,7 +19,6 @@ trait BuilderModelTrait
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     * @param BuilderEvent $event
      *
      * @return array
      */

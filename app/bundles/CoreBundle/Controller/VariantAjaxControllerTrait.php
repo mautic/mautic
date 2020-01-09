@@ -17,13 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 trait VariantAjaxControllerTrait
 {
     /**
-     * @param Request $request
-     * @param string  $modelName
-     * @param string  $abSettingsFormName
-     * @param string  $abSettingsFormBlockPrefix
-     * @param string  $parentFormName
-     * @param string  $abFormTemplate
-     * @param array   $formThemes
+     * @param string $modelName
+     * @param string $abSettingsFormName
+     * @param string $abSettingsFormBlockPrefix
+     * @param string $parentFormName
+     * @param string $abFormTemplate
+     * @param array  $formThemes
      *
      * @return mixed
      */

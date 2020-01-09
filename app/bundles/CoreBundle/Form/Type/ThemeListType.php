@@ -29,17 +29,12 @@ class ThemeListType extends AbstractType
 
     /**
      * ThemeListType constructor.
-     *
-     * @param ThemeHelper $helper
      */
     public function __construct(ThemeHelper $helper)
     {
         $this->themeHelper = $helper;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

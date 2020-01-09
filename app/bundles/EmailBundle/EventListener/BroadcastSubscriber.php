@@ -35,11 +35,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param EmailModel          $emailModel
-     * @param EntityManager       $em
-     * @param TranslatorInterface $translator
-     */
     public function __construct(EmailModel $emailModel, EntityManager $em, TranslatorInterface $translator)
     {
         $this->model      = $emailModel;
@@ -57,9 +52,6 @@ class BroadcastSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelBroadcastEvent $event
-     */
     public function onBroadcast(ChannelBroadcastEvent $event)
     {
         if (!$event->checkContext('email')) {

@@ -34,18 +34,13 @@ trait FilterTrait
      */
     protected $connection;
 
-    /**
-     * @param Connection $connection
-     */
     public function setConnection(Connection $connection)
     {
         $this->connection = $connection;
     }
 
     /**
-     * @param                     $eventName
-     * @param FormEvent           $event
-     * @param TranslatorInterface $translator
+     * @param $eventName
      */
     public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
     {

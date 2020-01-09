@@ -37,10 +37,6 @@ class PointSubscriber implements EventSubscriberInterface
      */
     private $entityManager;
 
-    /**
-     * @param PointModel    $pointModel
-     * @param EntityManager $entityManager
-     */
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
         $this->pointModel    = $pointModel;
@@ -60,9 +56,6 @@ class PointSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param PointBuilderEvent $event
-     */
     public function onPointBuild(PointBuilderEvent $event)
     {
         $action = [
@@ -84,9 +77,6 @@ class PointSubscriber implements EventSubscriberInterface
         $event->addAction('email.send', $action);
     }
 
-    /**
-     * @param TriggerBuilderEvent $event
-     */
     public function onTriggerBuild(TriggerBuilderEvent $event)
     {
         $sendEvent = [
@@ -114,8 +104,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger point actions for email open.
-     *
-     * @param EmailOpenEvent $event
      */
     public function onEmailOpen(EmailOpenEvent $event)
     {
@@ -124,8 +112,6 @@ class PointSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger point actions for email send.
-     *
-     * @param EmailSendEvent $event
      */
     public function onEmailSend(EmailSendEvent $event)
     {

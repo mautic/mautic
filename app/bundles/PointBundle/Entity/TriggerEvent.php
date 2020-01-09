@@ -68,9 +68,6 @@ class TriggerEvent
         $this->log = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -197,8 +194,6 @@ class TriggerEvent
     }
 
     /**
-     * @param Trigger $trigger
-     *
      * @return self
      */
     public function setTrigger(Trigger $trigger)
@@ -288,8 +283,6 @@ class TriggerEvent
     }
 
     /**
-     * @param LeadTriggerLog $log
-     *
      * @return self
      */
     public function addLog(LeadTriggerLog $log)
@@ -299,9 +292,6 @@ class TriggerEvent
         return $this;
     }
 
-    /**
-     * @param LeadTriggerLog $log
-     */
     public function removeLog(LeadTriggerLog $log)
     {
         $this->log->removeElement($log);

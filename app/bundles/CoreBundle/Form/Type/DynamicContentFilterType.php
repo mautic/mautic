@@ -20,10 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DynamicContentFilterType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -67,9 +63,6 @@ class DynamicContentFilterType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

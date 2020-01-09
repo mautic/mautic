@@ -38,8 +38,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     }
 
     /**
-     * @param ObjectManager $manager
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function load(ObjectManager $manager)

@@ -44,9 +44,6 @@ class ChannelListHelper extends Helper
 
     /**
      * ChannelListHelper constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
      */
     public function __construct(EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {

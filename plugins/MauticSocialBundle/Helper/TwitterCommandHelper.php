@@ -82,14 +82,6 @@ class TwitterCommandHelper
 
     /**
      * TwitterCommandHelper constructor.
-     *
-     * @param LeadModel              $leadModel
-     * @param FieldModel             $fieldModel
-     * @param MonitoringModel        $monitoringModel
-     * @param PostCountModel         $postCountModel
-     * @param TranslatorInterface    $translator
-     * @param EntityManagerInterface $em
-     * @param CoreParametersHelper   $coreParametersHelper
      */
     public function __construct(
         LeadModel $leadModel,
@@ -135,9 +127,6 @@ class TwitterCommandHelper
         return $this->manipulatedLeads;
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
@@ -376,8 +365,7 @@ class TwitterCommandHelper
     /**
      * Set the monitor's stat record with the metadata.
      *
-     * @param Monitoring $monitor
-     * @param array      $searchMeta
+     * @param array $searchMeta
      */
     public function setMonitorStats(Monitoring $monitor, $searchMeta)
     {

@@ -174,9 +174,6 @@ class ObjectChangeGeneratorTest extends TestCase
     }
 
     /**
-     * @param string $integration
-     * @param string $objectName
-     *
      * @return MappingManualDAO
      */
     private function getMappingManual(string $integration, string $objectName)
@@ -191,9 +188,6 @@ class ObjectChangeGeneratorTest extends TestCase
     }
 
     /**
-     * @param string $integration
-     * @param string $objectName
-     *
      * @return ReportDAO
      */
     private function getIntegrationSyncReport(string $integration, string $objectName)

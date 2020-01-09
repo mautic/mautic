@@ -57,12 +57,6 @@ class CampaignEventHelper
 
     /**
      * CampaignEventHelper constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     * @param TrackableModel    $trackableModel
-     * @param PageTokenHelper   $pageTokenHelper
-     * @param AssetTokenHelper  $assetTokenHelper
-     * @param TweetModel        $tweetModel
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -79,9 +73,6 @@ class CampaignEventHelper
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $event
-     *
      * @return array|false
      */
     public function sendTweetAction(Lead $lead, array $event)

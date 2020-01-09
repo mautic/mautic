@@ -72,12 +72,7 @@ class ConfigType extends AbstractType
     /**
      * ConfigType constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param LanguageHelper      $langHelper
-     * @param IpLookupFactory     $ipLookupFactory
-     * @param array               $supportedLanguages
-     * @param array               $ipLookupServices
-     * @param AbstractLookup      $ipLookup
+     * @param AbstractLookup $ipLookup
      */
     public function __construct(
         TranslatorInterface $translator,
@@ -95,10 +90,6 @@ class ConfigType extends AbstractType
         $this->ipLookupServices    = $ipLookupServices;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('last_shown_tab', HiddenType::class);
@@ -540,38 +531,6 @@ class ConfigType extends AbstractType
             function (FormEvent $event) use ($formModifier) {
                 $formModifier($event);
             }
-        );
-
-        $builder->add(
-            'transifex_username',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.username',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'transifex_password',
-            PasswordType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.password',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
-                    'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
         );
 
         $builder->add(

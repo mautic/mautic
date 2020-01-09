@@ -18,10 +18,6 @@ use Mautic\StageBundle\Entity\LeadStageLog;
 
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * @param CorePermissions $security
-     * @param EntityManager   $entityManager
-     */
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
         parent::__construct($security, $entityManager);

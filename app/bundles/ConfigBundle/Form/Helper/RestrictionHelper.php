@@ -38,9 +38,7 @@ class RestrictionHelper
     /**
      * RestrictionHelper constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param array               $restrictedFields
-     * @param string              $defaultMode
+     * @param string $defaultMode
      */
     public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
     {
@@ -49,11 +47,6 @@ class RestrictionHelper
         $this->displayMode      = $mode;
     }
 
-    /**
-     * @param FormInterface $childType
-     * @param FormInterface $parentType
-     * @param array|null    $restrictedFields
-     */
     public function applyRestrictions(FormInterface $childType, FormInterface $parentType, array $restrictedFields = null)
     {
         if (null === $restrictedFields) {
@@ -76,9 +69,7 @@ class RestrictionHelper
     }
 
     /**
-     * @param string        $fieldName
-     * @param FormInterface $childType
-     * @param FormInterface $parentType
+     * @param string $fieldName
      */
     private function restrictField(FormInterface $childType, FormInterface $parentType)
     {

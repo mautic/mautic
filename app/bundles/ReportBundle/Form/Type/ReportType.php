@@ -216,9 +216,9 @@ class ReportType extends AbstractType
                     'filters',
                     ReportFiltersType::class,
                     [
-                        'type'    => FilterSelectorType::class,
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => FilterSelectorType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'filterList'   => $filters->choices,
                             'operatorList' => $filters->operatorChoices,
                             'required'     => false,
@@ -241,9 +241,9 @@ class ReportType extends AbstractType
                     'aggregators',
                     CollectionType::class,
                     [
-                        'type'    => AggregatorType::class,
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => AggregatorType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'columnList' => $groupByColumns->choices,
                             'required'   => false,
                         ],
@@ -258,9 +258,9 @@ class ReportType extends AbstractType
                     'tableOrder',
                     CollectionType::class,
                     [
-                        'type'    => TableOrderType::class,
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => TableOrderType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'columnList' => $columns->choices,
                             'required'   => false,
                         ],
@@ -432,9 +432,6 @@ class ReportType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

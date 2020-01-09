@@ -24,8 +24,6 @@ interface UserTokenRepositoryInterface
     public function isSecretUnique($secret);
 
     /**
-     * @param UserToken $token
-     *
      * @return bool
      */
     public function verify(UserToken $token);

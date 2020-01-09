@@ -23,9 +23,8 @@ trait BasicAuthKeysTrait
     use NotBlankIfPublishedConstraintTrait;
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $usernameLabel
-     * @param string               $passwordLabel
+     * @param string $usernameLabel
+     * @param string $passwordLabel
      */
     private function addKeyFields(FormBuilderInterface $builder, $usernameLabel = 'mautic.core.username', $passwordLabel = 'mautic.core.password'): void
     {

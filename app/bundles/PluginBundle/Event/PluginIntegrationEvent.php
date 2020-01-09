@@ -21,8 +21,6 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
 {
     /**
      * PluginIntegrationEvent constructor.
-     *
-     * @param AbstractIntegration $integration
      */
     public function __construct(AbstractIntegration $integration)
     {
@@ -37,9 +35,6 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
         return $this->integration->getIntegrationSettings();
     }
 
-    /**
-     * @param Integration $integration
-     */
     public function setEntity(Integration $integration)
     {
         $this->integration->setIntegrationSettings($integration);

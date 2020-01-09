@@ -29,8 +29,6 @@ class SendGridMailBase
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @return Mail
      */
     public function getSendGridMail(\Swift_Mime_SimpleMessage $message)
@@ -65,8 +63,6 @@ class SendGridMailBase
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @return string
      */
     private function getContentType(\Swift_Mime_SimpleMessage $message)

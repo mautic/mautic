@@ -23,10 +23,6 @@ class LeadMergeEvent extends Event
 
     private $loser;
 
-    /**
-     * @param Lead $victor
-     * @param Lead $loser
-     */
     public function __construct(Lead $victor, Lead $loser)
     {
         $this->victor = $victor;

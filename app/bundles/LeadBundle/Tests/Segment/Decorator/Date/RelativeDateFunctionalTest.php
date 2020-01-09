@@ -119,7 +119,6 @@ class RelativeDateFunctionalTest extends MauticWebTestCase
 
     /**
      * @param string $name
-     * @param Lead   $lead
      */
     private function checkSegmentResult($name, Lead $lead)
     {

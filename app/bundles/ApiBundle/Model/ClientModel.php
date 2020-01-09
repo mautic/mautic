@@ -35,9 +35,6 @@ class ClientModel extends FormModel
      */
     protected $session;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $request = $requestStack->getCurrentRequest();
@@ -55,9 +52,6 @@ class ClientModel extends FormModel
         $this->apiMode = $apiMode;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -151,8 +145,6 @@ class ClientModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
      * @return array
      */
     public function getUserClients(User $user)

@@ -17,8 +17,7 @@ use Mautic\PointBundle\Entity\Point;
 class PointEvent extends CommonEvent
 {
     /**
-     * @param Point $point
-     * @param bool  $isNew
+     * @param bool $isNew
      */
     public function __construct(Point &$point, $isNew = false)
     {
@@ -34,9 +33,6 @@ class PointEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param Point $point
-     */
     public function setPoint(Point $point)
     {
         $this->entity = $point;

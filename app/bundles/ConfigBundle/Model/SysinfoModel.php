@@ -40,10 +40,6 @@ class SysinfoModel
 
     /**
      * SysinfoModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TranslatorInterface  $translator
      */
     public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {

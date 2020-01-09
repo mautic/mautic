@@ -65,7 +65,6 @@ class RoleModel extends FormModel
     /**
      * Generate the role's permissions.
      *
-     * @param Role  $entity
      * @param array $rawPermissions (i.e. from request)
      */
     public function setRolePermissions(Role &$entity, $rawPermissions)
@@ -99,9 +98,7 @@ class RoleModel extends FormModel
 
         $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
         if (count($users)) {
-            throw new PreconditionRequiredHttpException(
-                $this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes')
-            );
+            throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }
 
         parent::deleteEntity($entity);

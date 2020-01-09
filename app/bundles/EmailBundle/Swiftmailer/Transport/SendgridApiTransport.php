@@ -78,8 +78,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
      * Recipient/sender data will be retrieved from the Message API.
      * The return value is the number of recipients who were accepted for delivery.
      *
-     * @param Swift_Mime_SimpleMessage $message
-     * @param string[]                 $failedRecipients An array of failures by-reference
+     * @param string[] $failedRecipients An array of failures by-reference
      *
      * @return int
      *
@@ -94,8 +93,6 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
 
     /**
      * Register a plugin in the Transport.
-     *
-     * @param Swift_Events_EventListener $plugin
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
     {
@@ -128,9 +125,8 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
     /**
      * Get the count for the max number of recipients per batch.
      *
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded Number of emails about to be added
-     * @param string         $type      Type of emails being added (to, cc, bcc)
+     * @param int    $toBeAdded Number of emails about to be added
+     * @param string $type      Type of emails being added (to, cc, bcc)
      *
      * @return int
      */
@@ -168,8 +164,6 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface,
 
     /**
      * Processes the response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {

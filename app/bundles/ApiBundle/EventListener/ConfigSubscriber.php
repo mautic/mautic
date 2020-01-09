@@ -41,9 +41,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigSave(ConfigEvent $event)
     {
         // Symfony craps out with integer for firewall settings

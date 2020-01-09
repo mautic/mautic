@@ -27,9 +27,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     protected $auth;
     protected $helper;
 
-    /**
-     * @param Integration $settings
-     */
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /
@@ -195,9 +192,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param \DateTime|null $startDate
-     * @param \DateTime|null $endDate
-     * @param                $leadId
+     * @param $leadId
      *
      * @return array
      */
@@ -531,7 +526,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array  $config
      * @param        $direction
      * @param string $priorityObject
      *
@@ -566,8 +560,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return array
      */
     protected function getSyncTimeframeDates(array $params)
@@ -651,8 +643,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $matchedFields
-     *
      * @return array
      */
     private function hydrateCompanyName(array $matchedFields)

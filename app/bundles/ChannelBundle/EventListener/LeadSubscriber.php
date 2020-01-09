@@ -35,11 +35,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $messageQueueRepository;
 
-    /**
-     * @param TranslatorInterface    $translator
-     * @param RouterInterface        $router
-     * @param MessageQueueRepository $messageQueueRepository
-     */
     public function __construct(
         TranslatorInterface $translator,
         RouterInterface $router,
@@ -62,8 +57,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -71,8 +64,7 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param                   $state
+     * @param $state
      */
     private function addChannelMessageEvents(LeadTimelineEvent $event)
     {

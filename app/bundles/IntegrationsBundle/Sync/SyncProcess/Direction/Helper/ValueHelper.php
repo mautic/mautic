@@ -36,12 +36,6 @@ class ValueHelper
     private $syncDirection;
 
     /**
-     * @param NormalizedValueDAO $normalizedValueDAO
-     * @param string             $fieldState
-     * @param string             $syncDirection
-     *
-     * @return NormalizedValueDAO
-     *
      * @throws InvalidValueException
      */
     public function getValueForIntegration(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO
@@ -56,12 +50,6 @@ class ValueHelper
     }
 
     /**
-     * @param NormalizedValueDAO $normalizedValueDAO
-     * @param string             $fieldState
-     * @param string             $syncDirection
-     *
-     * @return NormalizedValueDAO
-     *
      * @throws InvalidValueException
      */
     public function getValueForMautic(NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO
@@ -76,8 +64,6 @@ class ValueHelper
     }
 
     /**
-     * @param string $directionToIgnore
-     *
      * @return float|int|mixed|string
      *
      * @throws InvalidValueException

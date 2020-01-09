@@ -29,10 +29,6 @@ class SegmentSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -52,8 +48,6 @@ class SegmentSubscriber implements EventSubscriberInterface
 
     /**
      * Add a segment entry to the audit log.
-     *
-     * @param SegmentEvent $event
      */
     public function onSegmentPostSave(SegmentEvent $event)
     {
@@ -73,8 +67,6 @@ class SegmentSubscriber implements EventSubscriberInterface
 
     /**
      * Add a segment delete entry to the audit log.
-     *
-     * @param SegmentEvent $event
      */
     public function onSegmentDelete(SegmentEvent $event)
     {

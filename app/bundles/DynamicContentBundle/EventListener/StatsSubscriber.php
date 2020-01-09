@@ -19,10 +19,6 @@ use Mautic\DynamicContentBundle\Entity\Stat;
 
 class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * @param CorePermissions $security
-     * @param EntityManager   $entityManager
-     */
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
         parent::__construct($security, $entityManager);

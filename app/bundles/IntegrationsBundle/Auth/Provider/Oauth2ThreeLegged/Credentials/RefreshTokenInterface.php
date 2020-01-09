@@ -17,8 +17,5 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface RefreshTokenInterface extends AuthCredentialsInterface
 {
-    /**
-     * @return string|null
-     */
     public function getRefreshToken(): ?string;
 }

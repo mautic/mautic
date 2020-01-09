@@ -25,11 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 trait FieldsTypeTrait
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $integrationFields
-     * @param array                $mauticFields
-     * @param string               $fieldObject
+     * @param string $fieldObject
      * @param $limit
      * @param $start
      */
@@ -248,8 +244,7 @@ trait FieldsTypeTrait
     }
 
     /**
-     * @param OptionsResolver $resolver
-     * @param                 $object
+     * @param $object
      */
     protected function configureFieldOptions(OptionsResolver $resolver, $object)
     {
@@ -283,10 +278,6 @@ trait FieldsTypeTrait
         );
     }
 
-    /**
-     * @param FormView $view
-     * @param array    $options
-     */
     protected function buildFieldView(FormView $view, array $options)
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];

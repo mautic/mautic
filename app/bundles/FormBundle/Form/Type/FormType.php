@@ -41,10 +41,6 @@ class FormType extends AbstractType
      */
     private $security;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
         $this->translator = $translator;

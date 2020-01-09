@@ -58,13 +58,6 @@ class SearchSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param LeadModel           $leadModel
-     * @param EmailRepository     $emailRepository
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     * @param TemplatingHelper    $templating
-     */
     public function __construct(
         LeadModel $leadModel,
         EmailRepository $emailRepository,
@@ -92,9 +85,6 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
@@ -158,9 +148,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'MATCH_ONE')) {
@@ -172,8 +159,6 @@ class SearchSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadBuildSearchEvent $event
-     *
      * @throws \InvalidArgumentException
      */
     public function onBuildSearchCommands(LeadBuildSearchEvent $event)
@@ -223,9 +208,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailPendingQuery(LeadBuildSearchEvent $event)
     {
         $q       = $event->getQueryBuilder();
@@ -270,9 +252,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildPageHitSourceQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -291,9 +270,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildPageHitSourceIdQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -312,9 +288,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildPageHitIdQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -332,9 +305,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailQueuedQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -357,9 +327,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailSentQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -378,9 +345,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildEmailReadQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -402,9 +366,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildSmsSentQuery(LeadBuildSearchEvent $event)
     {
         $tables = [
@@ -423,25 +384,18 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildWebSentQuery(LeadBuildSearchEvent $event)
     {
         $this->buildNotificationSentQuery($event);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     */
     private function buildMobileSentQuery(LeadBuildSearchEvent $event)
     {
         $this->buildNotificationSentQuery($event, true);
     }
 
     /**
-     * @param LeadBuildSearchEvent $event
-     * @param bool                 $isMobile
+     * @param bool $isMobile
      */
     private function buildNotificationSentQuery(LeadBuildSearchEvent $event, $isMobile = false)
     {
@@ -470,11 +424,6 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildJoinQuery($event, $tables, $config);
     }
 
-    /**
-     * @param LeadBuildSearchEvent $event
-     * @param array                $tables
-     * @param array                $config
-     */
     private function buildJoinQuery(LeadBuildSearchEvent $event, array $tables, array $config)
     {
         if (!isset($config['column']) || 0 === count($tables)) {

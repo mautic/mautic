@@ -25,17 +25,11 @@ class ActivityListType extends AbstractType
      */
     private $leadModel;
 
-    /**
-     * @param LeadModel $leadModel
-     */
     public function __construct(LeadModel $leadModel)
     {
         $this->leadModel = $leadModel;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(

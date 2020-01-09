@@ -31,8 +31,6 @@ class AjaxController extends CommonAjaxController
     use AjaxLookupControllerTrait;
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function userListAction(Request $request)
@@ -52,8 +50,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getLeadIdsByFieldValueAction(Request $request)
@@ -95,8 +91,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function fieldListAction(Request $request)
@@ -159,8 +153,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Updates the cache and gets returns updated HTML.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateSocialProfileAction(Request $request)
@@ -221,8 +213,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Clears the cache for a network.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function clearSocialProfileAction(Request $request)
@@ -263,8 +253,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Updates the timeline events and gets returns updated HTML.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -320,8 +308,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function toggleLeadListAction(Request $request)
@@ -349,8 +335,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function togglePreferredLeadChannelAction(Request $request)
@@ -379,8 +363,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function toggleLeadCampaignAction(Request $request)
@@ -408,8 +390,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function toggleCompanyLeadAction(Request $request)
@@ -437,8 +417,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getImportProgressAction(Request $request)
@@ -455,8 +433,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function removeBounceStatusAction(Request $request)
@@ -490,8 +466,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the rows for new leads.
-     *
-     * @param Request $request
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -586,8 +560,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getEmailTemplateAction(Request $request)
@@ -619,8 +591,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateLeadTagsAction(Request $request)
@@ -656,8 +626,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function addLeadTagsAction(Request $request)
@@ -700,8 +668,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function addLeadUtmTagsAction(Request $request)
@@ -747,8 +713,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function reorderAction(Request $request)
@@ -771,8 +735,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateLeadFieldValuesAction(Request $request)
@@ -868,8 +830,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function setAsPrimaryCompanyAction(Request $request)

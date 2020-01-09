@@ -1501,9 +1501,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $campaignId
-     * @param      $status
+     * @param $campaignId
+     * @param $status
      *
      * @return array
      */
@@ -1884,9 +1883,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $config
-     * @param array $availableFields
-     * @param       $object
+     * @param $object
      *
      * @return array
      */
@@ -2488,8 +2485,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $config
+     * @param $config
      *
      * @return array
      */

@@ -33,8 +33,6 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
 
     /**
      * ExampleIntegration constructor.
-     *
-     * @param ExampleSyncDataExchange $syncDataExchange
      */
     public function __construct(ExampleSyncDataExchange $syncDataExchange)
     {
@@ -49,17 +47,11 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
         return self::NAME;
     }
 
-    /**
-     * @return bool
-     */
     public function isConfigured(): bool
     {
         return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isAuthorized(): bool
     {
         return true;
@@ -67,8 +59,6 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
 
     /**
      * Get if data priority is enabled in the integration or not default is false.
-     *
-     * @return bool
      */
     public function getDataPriority(): bool
     {
@@ -80,9 +70,6 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
         return $this->syncDataExchange;
     }
 
-    /**
-     * @return MappingManualDAO
-     */
     public function getMappingManual(): MappingManualDAO
     {
         // Generate mapping manual that will be passed to the sync service. This instructs the sync service how to map Mautic fields to integration fields

@@ -68,10 +68,9 @@ class ChartQuery extends AbstractChart
     /**
      * Construct a new ChartQuery object.
      *
-     * @param Connection $connection
-     * @param DateTime   $dateFrom
-     * @param DateTime   $dateTo
-     * @param string     $unit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
@@ -494,8 +493,6 @@ class ChartQuery extends AbstractChart
     /**
      * Fetch the count integet from a query.
      *
-     * @param QueryBuilder $query
-     *
      * @return int
      */
     public function fetchCount(QueryBuilder $query)
@@ -532,13 +529,12 @@ class ChartQuery extends AbstractChart
     /**
      * Modify the query to count how many rows is between a range of date diff in seconds.
      *
-     * @param QueryBuilder $query
-     * @param string       $dateColumn1
-     * @param string       $dateColumn2
-     * @param int          $startSecond
-     * @param int          $endSecond
-     * @param array        $filters     will be added to where claues
-     * @param string       $tablePrefix
+     * @param string $dateColumn1
+     * @param string $dateColumn2
+     * @param int    $startSecond
+     * @param int    $endSecond
+     * @param array  $filters     will be added to where claues
+     * @param string $tablePrefix
      */
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
     {

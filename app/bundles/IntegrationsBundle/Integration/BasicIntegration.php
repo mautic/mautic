@@ -21,9 +21,6 @@ abstract class BasicIntegration implements IntegrationInterface
     use BcIntegrationSettingsTrait;
     use ConfigurationTrait;
 
-    /**
-     * @return string
-     */
     public function getDisplayName(): string
     {
         return $this->getName();

@@ -54,8 +54,6 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
     /**
      * CatchExceptionMiddleware constructor.
-     *
-     * @param HttpKernelInterface $app
      */
     public function __construct(HttpKernelInterface $app)
     {
@@ -105,8 +103,6 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
     /**
      * Get the value for the Access-Control-Allow-Origin header
      * based on the Request and local configuration options.
-     *
-     * @param Request $request
      *
      * @return string|null
      */

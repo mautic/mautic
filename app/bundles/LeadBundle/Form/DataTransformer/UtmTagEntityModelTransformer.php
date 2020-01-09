@@ -42,10 +42,9 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
     private $isArray;
 
     /**
-     * @param EntityManager $em
-     * @param string        $repo
-     * @param string        $identifier
-     * @param bool          $isArray
+     * @param string $repo
+     * @param string $identifier
+     * @param bool   $isArray
      */
     public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
     {
@@ -99,10 +98,7 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
             ;
 
             if (null === $entity) {
-                throw new TransformationFailedException(sprintf(
-                    'UtmTag with "%s" does not exist!',
-                    $id
-                ));
+                throw new TransformationFailedException(sprintf('UtmTag with "%s" does not exist!', $id));
             }
 
             return $entity;
@@ -131,10 +127,7 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
         ]);
 
         if (!count($entities)) {
-            throw new TransformationFailedException(sprintf(
-                'UtmTags for "%s" does not exist!',
-                $id[0]
-            ));
+            throw new TransformationFailedException(sprintf('UtmTags for "%s" does not exist!', $id[0]));
         }
 
         return $entities;

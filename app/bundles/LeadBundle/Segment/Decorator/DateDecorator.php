@@ -23,11 +23,6 @@ class DateDecorator extends CustomMappedDecorator
      */
     private $coreParametersHelper;
 
-    /**
-     * @param ContactSegmentFilterOperator   $contactSegmentFilterOperator
-     * @param ContactSegmentFilterDictionary $contactSegmentFilterDictionary
-     * @param CoreParametersHelper           $coreParametersHelper
-     */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
@@ -38,8 +33,6 @@ class DateDecorator extends CustomMappedDecorator
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @throws \Exception
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)

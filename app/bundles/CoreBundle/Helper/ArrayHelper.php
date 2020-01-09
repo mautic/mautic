@@ -20,7 +20,6 @@ class ArrayHelper
      * If the $key exists in the $origin array then it will return its value.
      *
      * @param mixed $key
-     * @param array $origin
      * @param mixed $defaultValue
      *
      * @return mixed
@@ -35,7 +34,6 @@ class ArrayHelper
      * and unsets the $key from the $array.
      *
      * @param mixed $key
-     * @param array $origin
      * @param mixed $defaultValue
      *
      * @return mixed
@@ -51,9 +49,6 @@ class ArrayHelper
 
     /**
      * Selects keys defined in the $keys array and returns array that contains only those.
-     *
-     * @param array $keys
-     * @param array $origin
      *
      * @return array
      */

@@ -55,8 +55,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Used by search functions to search social profiles.
-     *
-     * @param array $fields
      */
     public function setAvailableSocialFields(array $fields)
     {
@@ -65,8 +63,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Used by search functions to search using aliases as commands.
-     *
-     * @param array $fields
      */
     public function setAvailableSearchFields(array $fields)
     {
@@ -75,17 +71,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Sets trigger model.
-     *
-     * @param TriggerModel $triggerModel
      */
     public function setTriggerModel(TriggerModel $triggerModel)
     {
         $this->triggerModel = $triggerModel;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -441,8 +432,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * Get a list of leads.
-     *
-     * @param array $args
      *
      * @return array
      */
@@ -1034,7 +1023,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Check lead owner.
      *
-     * @param Lead  $lead
      * @param array $ownerIds
      *
      * @return array|false
@@ -1062,8 +1050,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param array $contactIds
-     *
      * @return array
      */
     public function getContacts(array $contactIds)
@@ -1090,8 +1076,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param array $ids
-     *
      * @return ArrayCollection
      */
     public function getContactCollection(array $ids)
@@ -1174,11 +1158,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param array        $tables          $tables[0] should be primary table
-     * @param bool         $innerJoinTables
-     * @param null         $whereExpression
-     * @param null         $having
+     * @param array $tables          $tables[0] should be primary table
+     * @param bool  $innerJoinTables
+     * @param null  $whereExpression
+     * @param null  $having
      */
     public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
     {
@@ -1212,9 +1195,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param array $changes
-     * @param       $id
-     * @param int   $tries
+     * @param     $id
+     * @param int $tries
      */
     protected function updateContactPoints(array $changes, $id, $tries = 1)
     {

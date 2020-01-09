@@ -16,8 +16,6 @@ class RabbitMqConsumer implements ConsumerInterface
 
     /**
      * RabbitMqConsumer constructor.
-     *
-     * @param QueueService $queueService
      */
     public function __construct(QueueService $queueService)
     {

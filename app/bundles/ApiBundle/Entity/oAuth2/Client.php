@@ -75,9 +75,6 @@ class Client extends BaseClient
         $this->users = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -110,9 +107,6 @@ class Client extends BaseClient
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
@@ -199,8 +193,6 @@ class Client extends BaseClient
     /**
      * Add authCodes.
      *
-     * @param AuthCode $authCodes
-     *
      * @return Client
      */
     public function addAuthCode(AuthCode $authCodes)
@@ -212,8 +204,6 @@ class Client extends BaseClient
 
     /**
      * Remove authCodes.
-     *
-     * @param AuthCode $authCodes
      */
     public function removeAuthCode(AuthCode $authCodes)
     {
@@ -233,8 +223,6 @@ class Client extends BaseClient
     /**
      * Determines if a client attempting API access is already authorized by the user.
      *
-     * @param User $user
-     *
      * @return bool
      */
     public function isAuthorizedClient(User $user)
@@ -247,8 +235,6 @@ class Client extends BaseClient
     /**
      * Add users.
      *
-     * @param \Mautic\UserBundle\Entity\User $users
-     *
      * @return Client
      */
     public function addUser(\Mautic\UserBundle\Entity\User $users)
@@ -260,8 +246,6 @@ class Client extends BaseClient
 
     /**
      * Remove users.
-     *
-     * @param \Mautic\UserBundle\Entity\User $users
      */
     public function removeUser(\Mautic\UserBundle\Entity\User $users)
     {

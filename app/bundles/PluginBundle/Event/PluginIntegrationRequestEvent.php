@@ -56,13 +56,12 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
     /**
      * PluginIntegrationRequestEvent constructor.
      *
-     * @param AbstractIntegration $integration
-     * @param                     $url
-     * @param                     $parameters
-     * @param                     $headers
-     * @param                     $method
-     * @param                     $settings
-     * @param                     $authType
+     * @param $url
+     * @param $parameters
+     * @param $headers
+     * @param $method
+     * @param $settings
+     * @param $authType
      */
     public function __construct(AbstractIntegration $integration, $url, $parameters, $headers, $method, $settings, $authType)
     {
@@ -91,9 +90,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->parameters;
     }
 
-    /**
-     * @param array $parameters
-     */
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
@@ -147,9 +143,6 @@ class PluginIntegrationRequestEvent extends AbstractPluginIntegrationEvent
         return $this->headers;
     }
 
-    /**
-     * @param array $headers
-     */
     public function setHeaders(array $headers)
     {
         $this->headers = $headers;

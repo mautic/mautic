@@ -105,12 +105,6 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     /**
      * BuilderSubscriber constructor.
-     *
-     * @param CorePermissions           $security
-     * @param TokenHelper               $tokenHelper
-     * @param IntegrationHelper         $integrationHelper
-     * @param PageModel                 $pageModel
-     * @param BuilderTokenHelperFactory $builderTokenHelperFactory
      */
     public function __construct(
         CorePermissions $security,
@@ -148,8 +142,6 @@ class BuilderSubscriber implements EventSubscriberInterface
 
     /**
      * Add forms to available page tokens.
-     *
-     * @param Events\PageBuilderEvent $event
      */
     public function onPageBuild(Events\PageBuilderEvent $event)
     {
@@ -376,9 +368,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Events\PageDisplayEvent $event
-     */
     public function onPageDisplay(Events\PageDisplayEvent $event)
     {
         $content = $event->getContent();
@@ -556,8 +545,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Renders the HTML for the segment list.
      *
-     * @param array $params
-     *
      * @return string
      */
     private function renderSegmentList(array $params = [])
@@ -574,8 +561,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     private function renderCategoryList(array $params = [])
@@ -592,8 +577,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     private function renderPreferredChannel(array $params = [])
@@ -610,8 +593,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     private function renderChannelFrequency(array $params = [])
@@ -628,8 +609,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     private function renderSavePrefs(array $params = [])
@@ -646,8 +625,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $params
-     *
      * @return string
      */
     private function renderSuccessMessage(array $params = [])
@@ -735,9 +712,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         return $langbar;
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->tokensRequested([$this->pageTokenRegex])) {
@@ -746,9 +720,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $content      = $event->getContent();

@@ -79,12 +79,6 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 
     /**
      * MonitorTwitterBaseCommand constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     * @param IntegrationHelper        $integrationHelper
-     * @param TwitterCommandHelper     $twitterCommandHelper
-     * @param CoreParametersHelper     $coreParametersHelper
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
@@ -161,9 +155,6 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 
     /**
      * Main execution method. Gets the integration settings, processes the search criteria.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
      *
      * @return int|null
      */

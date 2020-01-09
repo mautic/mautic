@@ -53,9 +53,7 @@ class TransmissionDTO implements \JsonSerializable
     /**
      * TransmissionDTO constructor.
      *
-     * @param ContentDTO      $content
-     * @param string          $returnPath
-     * @param OptionsDTO|null $options
+     * @param string $returnPath
      */
     public function __construct(ContentDTO $content, $returnPath, OptionsDTO $options = null)
     {
@@ -65,8 +63,6 @@ class TransmissionDTO implements \JsonSerializable
     }
 
     /**
-     * @param RecipientDTO $recipientDTO
-     *
      * @return TransmissionDTO
      */
     public function addRecipient(RecipientDTO $recipientDTO)

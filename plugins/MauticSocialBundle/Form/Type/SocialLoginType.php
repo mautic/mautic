@@ -32,8 +32,6 @@ class SocialLoginType extends AbstractType
 
     /**
      * SocialLoginType constructor.
-     *
-     * @param IntegrationHelper $helper
      */
     public function __construct(IntegrationHelper $helper, FormModel $form, CoreParametersHelper $coreParametersHelper)
     {
@@ -42,10 +40,6 @@ class SocialLoginType extends AbstractType
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integrations       = '';

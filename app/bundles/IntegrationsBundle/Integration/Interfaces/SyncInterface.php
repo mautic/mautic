@@ -18,13 +18,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
 interface SyncInterface extends IntegrationInterface
 {
-    /**
-     * @return MappingManualDAO
-     */
     public function getMappingManual(): MappingManualDAO;
 
-    /**
-     * @return SyncDataExchangeInterface
-     */
     public function getSyncDataExchange(): SyncDataExchangeInterface;
 }

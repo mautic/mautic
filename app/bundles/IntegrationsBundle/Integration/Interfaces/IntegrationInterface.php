@@ -20,29 +20,16 @@ interface IntegrationInterface extends UnifiedIntegrationInterface
 {
     /**
      * Return the integration's name.
-     *
-     * @return string
      */
     public function getName(): string;
 
-    /**
-     * @return string
-     */
     public function getDisplayName(): string;
 
-    /**
-     * @return bool
-     */
     public function hasIntegrationConfiguration(): bool;
 
-    /**
-     * @return Integration
-     */
     public function getIntegrationConfiguration(): Integration;
 
     /**
-     * @param Integration $integration
-     *
      * @return mixed
      */
     public function setIntegrationConfiguration(Integration $integration);

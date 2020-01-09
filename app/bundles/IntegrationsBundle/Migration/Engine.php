@@ -39,12 +39,6 @@ class Engine
      */
     private $bundleName;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param string        $tablePrefix
-     * @param string        $pluginPath
-     * @param string        $bundleName
-     */
     public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath, string $bundleName)
     {
         $this->entityManager  = $entityManager;
@@ -118,9 +112,7 @@ class Engine
         $fileNames = @scandir($this->migrationsPath);
 
         if (false === $fileNames) {
-            throw new PathNotFoundException(
-                sprintf("'%s' directory not found", $this->migrationsPath)
-            );
+            throw new PathNotFoundException(sprintf("'%s' directory not found", $this->migrationsPath));
         }
 
         return array_diff($fileNames, ['.', '..']);

@@ -214,10 +214,6 @@ class OrderExecutionerTest extends TestCase
     }
 
     /**
-     * @param string $objectName
-     *
-     * @return OrderDAO
-     *
      * @throws \Exception
      */
     private function getSyncOrder(string $objectName): OrderDAO

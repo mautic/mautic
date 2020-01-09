@@ -43,18 +43,11 @@ class SyncDateHelper
      */
     private $lastObjectSyncDates = [];
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
 
-    /**
-     * @param \DateTimeInterface|null $fromDateTime
-     * @param \DateTimeInterface|null $toDateTime
-     */
     public function setSyncDateTimes(?\DateTimeInterface $fromDateTime = null, ?\DateTimeInterface $toDateTime = null): void
     {
         $this->syncFromDateTime    = $fromDateTime;
@@ -63,12 +56,6 @@ class SyncDateHelper
         $this->lastObjectSyncDates = [];
     }
 
-    /**
-     * @param string $integration
-     * @param string $object
-     *
-     * @return \DateTimeInterface
-     */
     public function getSyncFromDateTime(string $integration, string $object): \DateTimeInterface
     {
         if ($this->syncFromDateTime) {
@@ -95,9 +82,6 @@ class SyncDateHelper
         return $this->lastObjectSyncDates[$key];
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getSyncToDateTime(): \DateTimeInterface
     {
         if ($this->syncToDateTime) {
@@ -107,18 +91,12 @@ class SyncDateHelper
         return $this->syncDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getSyncDateTime(): ?\DateTimeInterface
     {
         return $this->syncDateTime;
     }
 
     /**
-     * @param string $integration
-     * @param string $object
-     *
      * @return \DateTimeImmutable|null
      */
     public function getLastSyncDateForObject(string $integration, string $object): ?\DateTimeInterface

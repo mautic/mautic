@@ -15,10 +15,6 @@ namespace Mautic\IntegrationsBundle\Sync\Exception;
 
 class ObjectNotSupportedException extends \Exception
 {
-    /**
-     * @param string $integration
-     * @param string $object
-     */
     public function __construct(string $integration, string $object)
     {
         parent::__construct("$integration does not support a $object object");

@@ -24,8 +24,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Count how many visitors are currently viewing a page.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function viewingVisitorsAction(Request $request)
@@ -43,8 +41,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Returns HTML of a new widget based on its values.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -73,8 +69,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Saves the new ordering of dashboard widgets.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateWidgetOrderingAction(Request $request)
@@ -89,8 +83,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Deletes the entity.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */

@@ -17,23 +17,11 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 
 interface CredentialsInterface extends AuthCredentialsInterface
 {
-    /**
-     * @return string
-     */
     public function getAuthorizationUrl(): string;
 
-    /**
-     * @return string
-     */
     public function getTokenUrl(): string;
 
-    /**
-     * @return string|null
-     */
     public function getClientId(): ?string;
 
-    /**
-     * @return string|null
-     */
     public function getClientSecret(): ?string;
 }

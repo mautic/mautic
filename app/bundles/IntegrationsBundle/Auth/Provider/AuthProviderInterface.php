@@ -17,16 +17,7 @@ use GuzzleHttp\ClientInterface;
 
 interface AuthProviderInterface
 {
-    /**
-     * @return string
-     */
     public function getAuthType(): string;
 
-    /**
-     * @param AuthCredentialsInterface $credentials
-     * @param AuthConfigInterface|null $config
-     *
-     * @return ClientInterface
-     */
     public function getClient(AuthCredentialsInterface $credentials, ?AuthConfigInterface $config = null): ClientInterface;
 }

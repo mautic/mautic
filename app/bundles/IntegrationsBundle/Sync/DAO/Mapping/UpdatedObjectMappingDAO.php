@@ -36,10 +36,9 @@ class UpdatedObjectMappingDAO
     private $objectModifiedDate;
 
     /**
-     * @param string             $integration
-     * @param string             $integrationObjectName
-     * @param mixed              $integrationObjectId
-     * @param \DateTimeInterface $objectModifiedDate
+     * @param string $integration
+     * @param string $integrationObjectName
+     * @param mixed  $integrationObjectId
      */
     public function __construct(
         $integration,
@@ -56,17 +55,11 @@ class UpdatedObjectMappingDAO
         ) : $objectModifiedDate;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegrationObjectName(): string
     {
         return $this->integrationObjectName;
@@ -80,9 +73,6 @@ class UpdatedObjectMappingDAO
         return $this->integrationObjectId;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getObjectModifiedDate(): \DateTimeInterface
     {
         return $this->objectModifiedDate;

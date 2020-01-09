@@ -21,8 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     * @param string  $name
+     * @param string $name
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -49,8 +48,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function reorderActionsAction(Request $request)
@@ -59,8 +56,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateFormFieldsAction(Request $request)

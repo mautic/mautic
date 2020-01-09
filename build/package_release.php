@@ -57,25 +57,25 @@ if (!isset($args['repackage'])) {
     passthru($systemGit.' ls-tree -r -t --name-only '.$gitSource, $releaseFiles);
     $releaseFiles = explode("\n", trim(ob_get_clean()));
 
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     chdir(__DIR__);
     system('cd '.__DIR__.'/packaging && composer install --no-dev --no-scripts --optimize-autoloader && cd ..', $result);
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     // Generate the bootstrap.php.cache file
     system(__DIR__.'/packaging/vendor/sensio/distribution-bundle/Resources/bin/build_bootstrap.php', $result);
-    if ($result !== 0) {
+    if (0 !== $result) {
         exit;
     }
 
     // Compile prod assets
-    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/app/console mautic:assets:generate -e prod', $result);
-    if ($result !== 0) {
+    system('cd '.__DIR__.'/packaging && php '.__DIR__.'/packaging/bin/console mautic:assets:generate -e prod', $result);
+    if (0 !== $result) {
         exit;
     }
 
@@ -110,11 +110,11 @@ if (!isset($args['repackage'])) {
             $folderPath     = explode('/', $filename);
             $baseFolderName = $folderPath[0];
 
-            if (!$vendorsChanged && $filename == 'composer.lock') {
+            if (!$vendorsChanged && 'composer.lock' == $filename) {
                 $vendorsChanged = true;
             }
 
-            if (substr($file, 0, 1) == 'D') {
+            if ('D' == substr($file, 0, 1)) {
                 if (!in_array($filename, $releaseFiles)) {
                     $deletedFiles[$filename] = true;
                 }

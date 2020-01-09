@@ -66,14 +66,6 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $entityManager;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param EmailModel           $emailModel
-     * @param TrackableModel       $trackableModel
-     * @param RedirectModel        $redirectModel
-     * @param TranslatorInterface  $translator
-     * @param EntityManager        $entityManager
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         EmailModel $emailModel,
@@ -110,9 +102,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param EmailBuilderEvent $event
-     */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -260,9 +249,6 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function onEmailGenerate(EmailSendEvent $event)
     {
         $idHash = $event->getIdHash();
@@ -306,8 +292,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param EmailSendEvent $event
-     *
      * @return array
      */
     public function convertUrlsToTokens(EmailSendEvent $event)
@@ -345,8 +329,7 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Parses content for URLs and tokens.
      *
-     * @param EmailSendEvent $event
-     * @param                $emailId
+     * @param $emailId
      *
      * @return mixed
      */

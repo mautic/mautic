@@ -418,8 +418,7 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @param array $args
-     * @param       $action
+     * @param $action
      */
     public function getPostActionRedirectArguments(array $args, $action)
     {

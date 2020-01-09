@@ -15,9 +15,6 @@ namespace Mautic\IntegrationsBundle\Sync\Exception;
 
 class InternalIdNotFoundException extends \Exception
 {
-    /**
-     * @param string $object
-     */
     public function __construct(string $object)
     {
         parent::__construct("ID for object $object not found");

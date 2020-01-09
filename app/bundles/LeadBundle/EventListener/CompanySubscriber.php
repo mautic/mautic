@@ -29,10 +29,6 @@ class CompanySubscriber implements EventSubscriberInterface
      */
     private $ipLookupHelper;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -52,8 +48,6 @@ class CompanySubscriber implements EventSubscriberInterface
 
     /**
      * Add a company entry to the audit log.
-     *
-     * @param Events\CompanyEvent $event
      */
     public function onCompanyPostSave(Events\CompanyEvent $event)
     {
@@ -73,8 +67,6 @@ class CompanySubscriber implements EventSubscriberInterface
 
     /**
      * Add a company delete entry to the audit log.
-     *
-     * @param Events\CompanyEvent $event
      */
     public function onCompanyDelete(Events\CompanyEvent $event)
     {

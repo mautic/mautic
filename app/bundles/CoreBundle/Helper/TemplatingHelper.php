@@ -23,9 +23,6 @@ class TemplatingHelper
      */
     protected $container;
 
-    /**
-     * @param Kernel $kernel
-     */
     public function __construct(Kernel $kernel)
     {
         $this->container = $kernel->getContainer();

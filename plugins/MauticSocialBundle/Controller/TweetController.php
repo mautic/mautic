@@ -113,7 +113,6 @@ class TweetController extends FormController
     /**
      * Set custom form themes, etc.
      *
-     * @param Form   $form
      * @param string $action
      *
      * @return \Symfony\Component\Form\FormView

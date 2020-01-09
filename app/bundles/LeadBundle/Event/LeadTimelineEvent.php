@@ -129,9 +129,6 @@ class LeadTimelineEvent extends Event
     /**
      * LeadTimelineEvent constructor.
      *
-     * @param Lead|null   $lead
-     * @param array       $filters
-     * @param array|null  $orderBy
      * @param int         $page
      * @param int         $limit       Limit per type
      * @param bool        $forTimeline
@@ -546,10 +543,7 @@ class LeadTimelineEvent extends Event
     /**
      * Calculate engagement counts only.
      *
-     * @param \DateTime       $dateFrom
-     * @param \DateTime       $dateTo
-     * @param null            $groupUnit
-     * @param ChartQuery|null $chartQuery
+     * @param null $groupUnit
      */
     public function setCountOnly(\DateTime $dateFrom, \DateTime $dateTo, $groupUnit = null, ChartQuery $chartQuery = null)
     {
@@ -616,8 +610,6 @@ class LeadTimelineEvent extends Event
     /**
      * Convert all snake case keys o camel case for API congruency.
      *
-     * @param array $details
-     *
      * @return array
      */
     private function prepareDetailsForAPI(array $details)
@@ -645,8 +637,6 @@ class LeadTimelineEvent extends Event
 
     /**
      * Generate something consistent for this event to identify this log entry.
-     *
-     * @param array $data
      */
     private function generateEventId(array $data)
     {

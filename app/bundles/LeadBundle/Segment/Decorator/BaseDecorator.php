@@ -31,8 +31,6 @@ class BaseDecorator implements FilterDecoratorInterface
 
     /**
      * BaseDecorator constructor.
-     *
-     * @param ContactSegmentFilterOperator $contactSegmentFilterOperator
      */
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator
@@ -41,8 +39,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string|null
      */
     public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -51,8 +47,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -65,8 +59,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -85,8 +77,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string
      */
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -95,8 +85,7 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     * @param array|string              $argument
+     * @param array|string $argument
      *
      * @return array|string
      */
@@ -115,8 +104,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -155,8 +142,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return bool
      */
     public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
@@ -165,8 +150,6 @@ class BaseDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)

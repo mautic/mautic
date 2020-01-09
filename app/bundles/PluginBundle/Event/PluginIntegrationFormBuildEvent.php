@@ -31,10 +31,6 @@ class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
 
     /**
      * PluginIntegrationFormBuildEvent constructor.
-     *
-     * @param AbstractIntegration $integration
-     * @param FormBuilder         $builder
-     * @param array               $options
      */
     public function __construct(AbstractIntegration $integration, FormBuilder $builder, array $options)
     {

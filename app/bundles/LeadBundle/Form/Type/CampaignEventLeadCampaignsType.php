@@ -26,9 +26,6 @@ class CampaignEventLeadCampaignsType extends AbstractType
      */
     protected $listModel;
 
-    /**
-     * @param ListModel $listModel
-     */
     public function __construct(ListModel $listModel)
     {
         $this->listModel = $listModel;

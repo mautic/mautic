@@ -118,8 +118,6 @@ class UserRepository extends CommonRepository
     /**
      * Get a list of users.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])

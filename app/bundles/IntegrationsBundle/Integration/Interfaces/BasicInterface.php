@@ -19,13 +19,8 @@ interface BasicInterface extends UnifiedIntegrationInterface
 {
     /**
      * Return the integration's name.
-     *
-     * @return string
      */
     public function getName(): string;
 
-    /**
-     * @return string
-     */
     public function getIcon(): string;
 }

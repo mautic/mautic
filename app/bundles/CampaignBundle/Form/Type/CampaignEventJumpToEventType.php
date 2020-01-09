@@ -21,10 +21,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CampaignEventJumpToEventType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $jumpProps = $builder->getData();

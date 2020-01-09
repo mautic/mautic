@@ -76,7 +76,6 @@ class HitRepository extends CommonRepository
      * Get a lead's page hits.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -378,9 +377,6 @@ class HitRepository extends CommonRepository
     /**
      * Get the dwell times for bunch of pages.
      *
-     * @param array $pageIds
-     * @param array $options
-     *
      * @return array
      */
     public function getDwellTimesForPages(array $pageIds, array $options)
@@ -433,7 +429,6 @@ class HitRepository extends CommonRepository
      * Get the dwell times for bunch of URLs.
      *
      * @param string $url
-     * @param array  $options
      *
      * @return array
      */

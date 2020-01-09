@@ -15,8 +15,5 @@ namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
 interface RedirectUriInterface
 {
-    /**
-     * @return string
-     */
     public function getRedirectUri(): string;
 }

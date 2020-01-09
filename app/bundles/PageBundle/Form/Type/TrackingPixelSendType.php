@@ -30,18 +30,12 @@ class TrackingPixelSendType extends AbstractType
 
     /**
      * TrackingPixelSendType constructor.
-     *
-     * @param TrackingHelper $trackingHelper
      */
     public function __construct(TrackingHelper $trackingHelper)
     {
         $this->trackingHelper = $trackingHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $trackingServices = $this->trackingHelper->getEnabledServices();

@@ -20,9 +20,6 @@ use Mautic\ReportBundle\Entity\Report;
 
 class LoadReportData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $reports = CsvHelper::csv_to_array(__DIR__.'/fakereportdata.csv');

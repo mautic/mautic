@@ -21,8 +21,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 class Version20191126093923 extends AbstractMauticMigration
 {
     /**
-     * @param Schema $schema
-     *
      * @throws SkipMigration
      * @throws SchemaException
      */
@@ -35,9 +33,6 @@ class Version20191126093923 extends AbstractMauticMigration
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function up(Schema $schema): void
     {
         $this->addSql("ALTER TABLE {$this->prefix}companies_leads DROP manually_added");

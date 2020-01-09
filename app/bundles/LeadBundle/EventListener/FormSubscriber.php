@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Event\FormBuilderEvent;
@@ -83,10 +82,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add a lead generation action to available form submit actions.
-     *
-     * @param FormBuilderEvent $event
-     *
-     * @throws BadConfigurationException
      */
     public function onFormBuilder(FormBuilderEvent $event)
     {

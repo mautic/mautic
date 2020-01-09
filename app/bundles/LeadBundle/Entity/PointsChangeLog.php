@@ -59,9 +59,6 @@ class PointsChangeLog
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -226,8 +223,6 @@ class PointsChangeLog
     /**
      * Set lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
      * @return PointsChangeLog
      */
     public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
@@ -249,8 +244,6 @@ class PointsChangeLog
 
     /**
      * Set ipAddress.
-     *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
      * @return PointsChangeLog
      */

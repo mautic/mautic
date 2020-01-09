@@ -63,11 +63,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     private $router;
 
-    /**
-     * @param SubmissionModel $formSubmissionModel
-     * @param FormModel       $formModel
-     * @param RouterInterface $router
-     */
     public function __construct(SubmissionModel $formSubmissionModel, FormModel $formModel, RouterInterface $router)
     {
         $this->formModel           = $formModel;
@@ -77,8 +72,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

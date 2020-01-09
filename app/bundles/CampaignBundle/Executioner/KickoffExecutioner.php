@@ -92,12 +92,6 @@ class KickoffExecutioner implements ExecutionerInterface
 
     /**
      * KickoffExecutioner constructor.
-     *
-     * @param LoggerInterface      $logger
-     * @param KickoffContactFinder $kickoffContactFinder
-     * @param TranslatorInterface  $translator
-     * @param EventExecutioner     $executioner
-     * @param EventScheduler       $scheduler
      */
     public function __construct(
         LoggerInterface $logger,
@@ -114,10 +108,6 @@ class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException

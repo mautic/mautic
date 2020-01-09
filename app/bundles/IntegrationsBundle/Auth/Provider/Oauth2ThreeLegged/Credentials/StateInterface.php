@@ -15,8 +15,5 @@ namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials;
 
 interface StateInterface
 {
-    /**
-     * @return string|null
-     */
     public function getState(): ?string;
 }

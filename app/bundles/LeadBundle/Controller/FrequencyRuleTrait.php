@@ -104,11 +104,9 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param Lead       $lead
-     * @param array|null $allChannels
-     * @param null       $leadChannels
-     * @param bool       $isPublic
-     * @param null       $frequencyRules
+     * @param null $leadChannels
+     * @param bool $isPublic
+     * @param null $frequencyRules
      *
      * @return array
      */
@@ -167,11 +165,8 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $formData
-     * @param array $allChannels
-     * @param       $leadChannels
-     * @param int   $currentChannelId
+     * @param     $leadChannels
+     * @param int $currentChannelId
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
     {

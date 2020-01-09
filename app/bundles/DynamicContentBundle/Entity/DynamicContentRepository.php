@@ -23,8 +23,6 @@ class DynamicContentRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])

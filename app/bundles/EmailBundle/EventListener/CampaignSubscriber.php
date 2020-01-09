@@ -61,12 +61,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param EmailModel          $emailModel
-     * @param EventModel          $eventModel
-     * @param SendEmailToUser     $sendEmailToUser
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EmailModel $emailModel,
         EventModel $eventModel,
@@ -96,9 +90,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addDecision(
@@ -182,8 +173,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger campaign event for opening of an email.
      *
-     * @param EmailOpenEvent $event
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws CannotProcessEventException
@@ -201,8 +190,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger campaign event for reply to an email.
      *
-     * @param EmailReplyEvent $event
-     *
      * @throws CannotProcessEventException
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
@@ -216,11 +203,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     *
-     * @return CampaignExecutionEvent
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         /** @var Email $eventDetails */
@@ -264,8 +246,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Triggers the action which sends email to contacts.
-     *
-     * @param PendingEvent $event
      *
      * @throws ORMException
      * @throws NoContactsFoundException
@@ -373,8 +353,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PendingEvent $event
-     *
      * @throws ORMException
      */
     public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event): void

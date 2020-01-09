@@ -30,9 +30,6 @@ class LoadCitrixData extends AbstractFixture implements OrderedFixtureInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $today = new \DateTime();

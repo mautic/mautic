@@ -1879,7 +1879,6 @@ trait FunctionalTesterActions
      * ?>
      * ```
      *
-     *
      * @param $cssOrXpath
      * @param $attribute
      *
@@ -3413,7 +3412,6 @@ trait FunctionalTesterActions
 
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
-     *
      *
      * @see \Mautic\CoreBundle\Helper\Functional::getParameterFromContainer()
      */

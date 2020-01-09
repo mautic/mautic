@@ -31,10 +31,6 @@ class TimelineSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param LeadEventLogRepository $eventLogRepository
-     * @param TranslatorInterface    $translator
-     */
     public function __construct(LeadEventLogRepository $eventLogRepository, TranslatorInterface $translator)
     {
         $this->eventLogRepository = $eventLogRepository;
@@ -52,13 +48,12 @@ class TimelineSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param                   $eventType
-     * @param                   $eventTypeName
-     * @param                   $icon
-     * @param null              $bundle
-     * @param null              $object
-     * @param null              $action
+     * @param      $eventType
+     * @param      $eventTypeName
+     * @param      $icon
+     * @param null $bundle
+     * @param null $object
+     * @param null $action
      */
     private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null): void
     {
@@ -87,10 +82,9 @@ class TimelineSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $log
-     * @param       $eventType
-     * @param       $eventTypeName
-     * @param       $icon
+     * @param $eventType
+     * @param $eventTypeName
+     * @param $icon
      *
      * @return array
      */
@@ -117,9 +111,6 @@ class TimelineSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     */
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(

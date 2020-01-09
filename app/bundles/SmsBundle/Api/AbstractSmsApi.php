@@ -23,8 +23,6 @@ abstract class AbstractSmsApi
 
     /**
      * AbstractSmsApi constructor.
-     *
-     * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
     {
@@ -32,7 +30,6 @@ abstract class AbstractSmsApi
     }
 
     /**
-     * @param Lead   $lead
      * @param string $content
      *
      * @return mixed
@@ -43,7 +40,6 @@ abstract class AbstractSmsApi
      * Convert a non-tracked url to a tracked url.
      *
      * @param string $url
-     * @param array  $clickthrough
      *
      * @return string
      */

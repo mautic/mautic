@@ -46,8 +46,6 @@ class ApiMetadataDriver implements DriverInterface
     private $currentPropertyName;
 
     /**
-     * @param ReflectionClass $class
-     *
      * @return \Metadata\ClassMetadata
      *
      * @throws ReflectionException
@@ -176,7 +174,6 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * Create properties.
      *
-     * @param array      $properties
      * @param bool|false $addToListGroup
      * @param bool|false $useGetter
      *
@@ -203,8 +200,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create properties and add to the List group.
-     *
-     * @param array $properties
      *
      * @return $this
      */

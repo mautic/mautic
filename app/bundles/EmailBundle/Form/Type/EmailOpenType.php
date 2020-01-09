@@ -17,10 +17,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailOpenType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $defaultOptions = [
@@ -45,9 +41,6 @@ class EmailOpenType extends AbstractType
         $builder->add('emails', EmailListType::class, $defaultOptions);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['list_options']);

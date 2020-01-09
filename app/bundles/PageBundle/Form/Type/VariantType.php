@@ -30,9 +30,6 @@ class VariantType extends AbstractType
      */
     private $pageModel;
 
-    /**
-     * @param PageModel $pageModel
-     */
     public function __construct(PageModel $pageModel)
     {
         $this->pageModel = $pageModel;

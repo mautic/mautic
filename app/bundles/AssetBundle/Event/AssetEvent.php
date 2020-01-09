@@ -20,8 +20,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class AssetEvent extends CommonEvent
 {
     /**
-     * @param Asset $asset
-     * @param bool  $isNew
+     * @param bool $isNew
      */
     public function __construct(Asset $asset, $isNew = false)
     {
@@ -41,8 +40,6 @@ class AssetEvent extends CommonEvent
 
     /**
      * Sets the Asset entity.
-     *
-     * @param Asset $asset
      */
     public function setAsset(Asset $asset)
     {

@@ -55,17 +55,11 @@ class IntegrationToken implements TokenInterface
         return $this->expiresAt;
     }
 
-    /**
-     * @return bool
-     */
     public function isExpired(): bool
     {
         return $this->expiresAt && $this->expiresAt < time();
     }
 
-    /**
-     * @return array
-     */
     public function getExtraData(): array
     {
         return $this->extraData;

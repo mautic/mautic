@@ -86,9 +86,6 @@ class Trigger extends FormEntity
         $this->events = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -121,9 +118,6 @@ class Trigger extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -237,8 +231,7 @@ class Trigger extends FormEntity
     /**
      * Add events.
      *
-     * @param              $key
-     * @param TriggerEvent $event
+     * @param $key
      *
      * @return Point
      */
@@ -254,8 +247,6 @@ class Trigger extends FormEntity
 
     /**
      * Remove events.
-     *
-     * @param TriggerEvent $event
      */
     public function removeTriggerEvent(TriggerEvent $event)
     {

@@ -17,8 +17,6 @@ interface ConfigFormAuthInterface
 {
     /**
      * Return the name of the form type service for the authorization tab which should include all the fields required for the API to work.
-     *
-     * @return string
      */
     public function getAuthConfigFormName(): string;
 }

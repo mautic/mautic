@@ -31,8 +31,6 @@ class CacheHelper
 
     /**
      * CacheHelper constructor.
-     *
-     * @param \AppKernel $kernel
      */
     public function __construct(\AppKernel $kernel)
     {

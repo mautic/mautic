@@ -57,11 +57,7 @@ class Unsubscribe implements ProcessorInterface
     /**
      * Bounce constructor.
      *
-     * @param \Swift_Transport $transport
-     * @param ContactFinder    $contactFinder
-     * @param StatRepository   $statRepository
-     * @param LeadModel        $leadModel
-     * @param LoggerInterface  $logger
+     * @param StatRepository $statRepository
      */
     public function __construct(
         \Swift_Transport $transport,

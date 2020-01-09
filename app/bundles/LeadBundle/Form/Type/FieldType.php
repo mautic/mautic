@@ -47,20 +47,12 @@ class FieldType extends AbstractType
      */
     private $leadFieldRepository;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LeadFieldRepository $leadFieldRepository
-     */
     public function __construct(TranslatorInterface $translator, LeadFieldRepository $leadFieldRepository)
     {
         $this->translator          = $translator;
         $this->leadFieldRepository = $leadFieldRepository;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
@@ -572,9 +564,6 @@ class FieldType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

@@ -70,9 +70,7 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * ReportBuilderEvent constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param ChannelListHelper   $channelListHelper
-     * @param string              $context
+     * @param string $context
      */
     public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
     {

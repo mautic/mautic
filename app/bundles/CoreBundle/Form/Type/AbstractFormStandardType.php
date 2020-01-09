@@ -33,18 +33,12 @@ abstract class AbstractFormStandardType extends AbstractType
      */
     protected $security;
 
-    /**
-     * @param CorePermissions $security
-     */
     public function setSecurity(CorePermissions $security)
     {
         $this->security = $security;
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws \Exception
      */
     public function buildForm(FormBuilderInterface $builder, array $options)

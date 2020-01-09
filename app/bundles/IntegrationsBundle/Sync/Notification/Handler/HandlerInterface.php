@@ -17,21 +17,10 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 
 interface HandlerInterface
 {
-    /**
-     * @return string
-     */
     public function getIntegration(): string;
 
-    /**
-     * @return string
-     */
     public function getSupportedObject(): string;
 
-    /**
-     * @param NotificationDAO $notificationDAO
-     * @param string          $integrationDisplayName
-     * @param string          $objectDisplayName
-     */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void;
 
     /**

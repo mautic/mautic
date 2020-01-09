@@ -33,8 +33,6 @@ class DeviceModel extends FormModel
 
     /**
      * DeviceModel constructor.
-     *
-     * @param LeadDeviceRepository $leadDeviceRepository
      */
     public function __construct(
         LeadDeviceRepository $leadDeviceRepository

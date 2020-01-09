@@ -20,18 +20,9 @@ use Mautic\IntegrationsBundle\Auth\Support\Oauth2\ConfigAccess\ConfigCredentials
 
 interface ConfigInterface extends AuthConfigInterface
 {
-    /**
-     * @return ConfigCredentialsSignerInterface
-     */
     public function getClientCredentialsSigner(): ConfigCredentialsSignerInterface;
 
-    /**
-     * @return TokenSignerInterface
-     */
     public function getAccessTokenSigner(): TokenSignerInterface;
 
-    /**
-     * @return TokenPersistenceInterface
-     */
     public function getAccessTokenPersistence(): TokenPersistenceInterface;
 }

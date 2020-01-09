@@ -47,12 +47,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $dispatcher;
 
-    /**
-     * @param LeadModel                $leadModel
-     * @param DynamicContentModel      $dynamicContentModel
-     * @param Session                  $session
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
     {
         $this->leadModel           = $leadModel;
@@ -117,8 +111,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return bool|CampaignExecutionEvent
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
@@ -148,9 +140,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $eventConfig = $event->getConfig();

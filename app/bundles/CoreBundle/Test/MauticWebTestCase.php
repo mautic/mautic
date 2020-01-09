@@ -292,7 +292,6 @@ class MauticWebTestCase extends WebTestCase
 
     /**
      * @param string $fixturesDir
-     * @param array  $fixtures
      * @param string $classPrefix
      * @param bool   $returnClassNames
      */

@@ -204,9 +204,6 @@ return [
                     'mautic.integrations.internal.object_provider',
                 ],
             ],
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
-            ],
             'mautic.integrations.auth_provider.api_key' => [
                 'class' => \Mautic\IntegrationsBundle\Auth\Provider\ApiKey\HttpFactory::class,
             ],

@@ -44,10 +44,6 @@ class ValidateEventCommand extends Command
 
     /**
      * ValidateEventCommand constructor.
-     *
-     * @param InactiveExecutioner $inactiveExecutioner
-     * @param TranslatorInterface $translator
-     * @param FormatterHelper     $formatterHelper
      */
     public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
@@ -89,9 +85,6 @@ class ValidateEventCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception

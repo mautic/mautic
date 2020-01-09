@@ -27,7 +27,6 @@ interface ObjectHelperInterface
     public function create(array $objects): array;
 
     /**
-     * @param array             $ids
      * @param ObjectChangeDAO[] $objects
      *
      * @return UpdatedObjectMappingDAO[]
@@ -35,26 +34,12 @@ interface ObjectHelperInterface
     public function update(array $ids, array $objects): array;
 
     /**
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int                $start
-     * @param int                $limit
-     *
-     * @return array
+     * @param int $start
+     * @param int $limit
      */
     public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array;
 
-    /**
-     * @param array $ids
-     *
-     * @return array
-     */
     public function findObjectsByIds(array $ids): array;
 
-    /**
-     * @param array $fields
-     *
-     * @return array
-     */
     public function findObjectsByFieldValues(array $fields): array;
 }

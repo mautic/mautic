@@ -75,7 +75,6 @@ class ContactLimiter
      * @param int|null $contactId
      * @param int|null $minContactId
      * @param int|null $maxContactId
-     * @param array    $contactIdList
      * @param int|null $threadId
      * @param int|null $maxThreads
      * @param int|null $campaignLimit

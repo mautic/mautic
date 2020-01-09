@@ -18,9 +18,6 @@ use Mautic\PageBundle\Entity\Hit;
 
 class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $hits = [

@@ -29,10 +29,6 @@ class SecuritySubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -49,9 +45,6 @@ class SecuritySubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param LoginEvent $event
-     */
     public function onSecurityInteractiveLogin(LoginEvent $event)
     {
         $userId   = (int) $event->getUser()->getId();

@@ -69,8 +69,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * TrackableModel constructor.
-     *
-     * @param RedirectModel $redirectModel
      */
     public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
     {
@@ -97,7 +95,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param Trackable  $trackable
      * @param array      $clickthrough
      * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
      * @param array      $utmTags
@@ -242,7 +239,6 @@ class TrackableModel extends AbstractCommonModel
      * Extract URLs from content and return as trackables.
      *
      * @param mixed      $content
-     * @param array      $contentTokens
      * @param null       $channel
      * @param null       $channelId
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
@@ -279,8 +275,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Converts array of Trackable or Redirect entities into {trackable} tokens.
-     *
-     * @param array $entities
      *
      * @return array
      */
@@ -839,8 +833,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Build query string while accounting for tokens that include an equal sign.
      *
-     * @param array $queryParts
-     *
      * @return mixed|string
      */
     protected function httpBuildQuery(array $queryParts)
@@ -870,10 +862,9 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param       $content
-     * @param       $channel
-     * @param       $channelId
-     * @param array $trackableTokens
+     * @param $content
+     * @param $channel
+     * @param $channelId
      *
      * @return string
      */

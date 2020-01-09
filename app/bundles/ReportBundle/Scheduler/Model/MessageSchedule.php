@@ -53,7 +53,6 @@ class MessageSchedule
     }
 
     /**
-     * @param Report $report
      * @param string $filePath
      *
      * @return string
@@ -78,8 +77,6 @@ class MessageSchedule
     }
 
     /**
-     * @param Report $report
-     *
      * @return string
      */
     public function getSubject(Report $report)

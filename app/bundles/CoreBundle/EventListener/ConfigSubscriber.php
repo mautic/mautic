@@ -31,10 +31,6 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    /**
-     * @param LanguageHelper       $languageHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(LanguageHelper $languageHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->languageHelper       = $languageHelper;

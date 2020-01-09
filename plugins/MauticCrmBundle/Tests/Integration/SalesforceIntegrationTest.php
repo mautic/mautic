@@ -1072,11 +1072,10 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $mockRepository
-     * @param                                          $max
-     * @param                                          $maxSfContacts
-     * @param                                          $maxSfLeads
-     * @param                                          $specificObject
+     * @param $max
+     * @param $maxSfContacts
+     * @param $maxSfLeads
+     * @param $specificObject
      */
     protected function setLeadsToUpdate(\PHPUnit_Framework_MockObject_MockObject $mockRepository, $max, $maxSfContacts, $maxSfLeads, $specificObject)
     {
@@ -1109,8 +1108,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $mockRepository
-     * @param int                                      $max
+     * @param int $max
      */
     protected function setLeadsToCreate(\PHPUnit_Framework_MockObject_MockObject $mockRepository, $max = 200)
     {

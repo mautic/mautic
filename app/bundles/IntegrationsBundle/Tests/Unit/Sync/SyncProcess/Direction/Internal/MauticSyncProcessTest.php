@@ -158,8 +158,6 @@ class MauticSyncProcessTest extends TestCase
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDAO
-     *
      * @return MauticSyncProcess
      */
     private function getSyncProcess(MappingManualDAO $mappingManualDAO)

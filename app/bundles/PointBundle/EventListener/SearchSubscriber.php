@@ -41,12 +41,6 @@ class SearchSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param PointModel       $pointModel
-     * @param TriggerModel     $pointTriggerModel
-     * @param CorePermissions  $security
-     * @param TemplatingHelper $templating
-     */
     public function __construct(
         PointModel $pointModel,
         TriggerModel $pointTriggerModel,
@@ -70,9 +64,6 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('point:points:view')) {
@@ -154,9 +145,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         $security = $this->security;

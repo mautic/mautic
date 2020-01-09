@@ -23,9 +23,6 @@ class RoleListType extends AbstractType
      */
     private $roleModel;
 
-    /**
-     * @param RoleModel $roleModel
-     */
     public function __construct(RoleModel $roleModel)
     {
         $this->roleModel = $roleModel;

@@ -35,11 +35,6 @@ class MaintenanceSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param Connection                   $db
-     * @param UserTokenRepositoryInterface $userTokenRepository
-     * @param TranslatorInterface          $translator
-     */
     public function __construct(
         Connection $db,
         UserTokenRepositoryInterface $userTokenRepository,
@@ -60,9 +55,6 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MaintenanceEvent $event
-     */
     public function onDataCleanup(MaintenanceEvent $event)
     {
         $this->cleanupData($event, 'audit_log');
@@ -73,8 +65,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param MaintenanceEvent $event
-     * @param string           $table
+     * @param string $table
      */
     private function cleanupData(MaintenanceEvent $event, $table)
     {

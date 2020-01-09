@@ -40,10 +40,6 @@ class CampaignType extends AbstractType
         $this->security   = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -142,9 +138,6 @@ class CampaignType extends AbstractType
         ]);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

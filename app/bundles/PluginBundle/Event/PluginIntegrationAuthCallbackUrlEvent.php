@@ -26,8 +26,7 @@ class PluginIntegrationAuthCallbackUrlEvent extends AbstractPluginIntegrationEve
     /**
      * PluginIntegrationAuthCallbackUrlEvent constructor.
      *
-     * @param AbstractIntegration $integration
-     * @param                     $callbackUrl
+     * @param $callbackUrl
      */
     public function __construct(AbstractIntegration $integration, $callbackUrl)
     {

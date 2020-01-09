@@ -244,9 +244,8 @@ class EventLogApiController extends CommonApiController
     }
 
     /**
-     * @param null  $data
-     * @param null  $statusCode
-     * @param array $headers
+     * @param null $data
+     * @param null $statusCode
      *
      * @return \FOS\RestBundle\View\View
      */

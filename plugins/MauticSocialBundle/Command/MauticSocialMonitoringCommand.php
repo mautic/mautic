@@ -58,10 +58,6 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100);
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input  = $input;

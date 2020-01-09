@@ -40,9 +40,6 @@ class RouteLoader extends Loader
 
     /**
      * RouteLoader constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param CoreParametersHelper     $parametersHelper
      */
     public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
     {

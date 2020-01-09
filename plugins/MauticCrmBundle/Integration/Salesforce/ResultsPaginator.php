@@ -54,8 +54,7 @@ class ResultsPaginator
     /**
      * ResultsPaginator constructor.
      *
-     * @param LoggerInterface $logger
-     * @param string          $salesforceBaseUrl
+     * @param string $salesforceBaseUrl
      */
     public function __construct(LoggerInterface $logger, $salesforceBaseUrl)
     {
@@ -64,8 +63,6 @@ class ResultsPaginator
     }
 
     /**
-     * @param array $results
-     *
      * @return $this
      *
      * @throws ApiErrorException

@@ -46,10 +46,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
      */
     protected $entityManager;
 
-    /**
-     * @param CorePermissions $security
-     * @param EntityManager   $entityManager
-     */
     public function __construct(
         CorePermissions $security,
         EntityManager $entityManager
@@ -68,9 +64,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param StatsEvent $event
-     */
     public function onStatsFetch(StatsEvent $event)
     {
         /** @var CommonRepository $repository */
@@ -131,8 +124,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     /**
      * Restrict stats based on contact permissions.
      *
-     * @param array $repoNames
-     *
      * @return $this
      */
     protected function addContactRestrictedRepositories(array $repoNames)
@@ -140,10 +131,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
         return $this->addRestrictedRepostories($repoNames, ['lead' => 'lead:leads']);
     }
 
-    /**
-     * @param array $repoNames
-     * @param array $permissions
-     */
     protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
         if (!is_array($repoNames)) {

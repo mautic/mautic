@@ -59,10 +59,6 @@ class ConfigEvent extends CommonEvent
      */
     private $normData;
 
-    /**
-     * @param array        $config
-     * @param ParameterBag $post
-     */
     public function __construct(array $config, ParameterBag $post)
     {
         $this->config = $config;
@@ -88,8 +84,7 @@ class ConfigEvent extends CommonEvent
     /**
      * Sets the config array.
      *
-     * @param array $config
-     * @param null  $key
+     * @param null $key
      */
     public function setConfig(array $config, $key = null)
     {
@@ -175,8 +170,6 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * @param UploadedFile $file
-     *
      * @return string
      */
     public function getFileContent(UploadedFile $file)
@@ -207,8 +200,6 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * @param array $normData
-     *
      * @return ConfigEvent
      */
     public function setOriginalNormData(array $normData)

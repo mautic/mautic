@@ -128,22 +128,6 @@ class LegacyEventModel extends CommonFormModel
 
     /**
      * LegacyEventModel constructor.
-     *
-     * @param UserModel              $userModel
-     * @param NotificationModel      $notificationModel
-     * @param CampaignModel          $campaignModel
-     * @param LeadModel              $leadModel
-     * @param IpLookupHelper         $ipLookupHelper
-     * @param RealTimeExecutioner    $realTimeExecutioner
-     * @param KickoffExecutioner     $kickoffExecutioner
-     * @param ScheduledExecutioner   $scheduledExecutioner
-     * @param InactiveExecutioner    $inactiveExecutioner
-     * @param EventExecutioner       $eventExecutioner
-     * @param EventCollector         $eventCollector
-     * @param ActionDispatcher       $actionDispatcher
-     * @param ConditionDispatcher    $conditionDispatcher
-     * @param DecisionDispatcher     $decisionDispatcher
-     * @param LeadEventLogRepository $leadEventLogRepository
      */
     public function __construct(
         UserModel $userModel,
@@ -184,13 +168,11 @@ class LegacyEventModel extends CommonFormModel
      *
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param Campaign             $campaign
-     * @param                      $totalEventCount
-     * @param int                  $limit
-     * @param bool                 $max
-     * @param OutputInterface|null $output
-     * @param null                 $leadId
-     * @param bool                 $returnCounts
+     * @param      $totalEventCount
+     * @param int  $limit
+     * @param bool $max
+     * @param null $leadId
+     * @param bool $returnCounts
      *
      * @return array
      */
@@ -224,12 +206,11 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param                      $campaign
-     * @param                      $totalEventCount
-     * @param int                  $limit
-     * @param bool                 $max
-     * @param OutputInterface|null $output
-     * @param bool                 $returnCounts
+     * @param      $campaign
+     * @param      $totalEventCount
+     * @param int  $limit
+     * @param bool $max
+     * @param bool $returnCounts
      *
      * @return array
      */
@@ -262,12 +243,11 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param                      $campaign
-     * @param int                  $totalEventCount
-     * @param int                  $limit
-     * @param bool                 $max
-     * @param OutputInterface|null $output
-     * @param bool                 $returnCounts
+     * @param      $campaign
+     * @param int  $totalEventCount
+     * @param int  $limit
+     * @param bool $max
+     * @param bool $returnCounts
      *
      * @return array
      */
@@ -382,12 +362,11 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param                   $event
-     * @param                   $settings
-     * @param null              $lead
-     * @param null              $eventDetails
-     * @param bool              $systemTriggered
-     * @param LeadEventLog|null $log
+     * @param      $event
+     * @param      $settings
+     * @param null $lead
+     * @param null $eventDetails
+     * @param bool $systemTriggered
      *
      * @return bool
      *
@@ -430,17 +409,16 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param                $event
-     * @param                $campaign
-     * @param                $lead
-     * @param null           $eventSettings
-     * @param bool           $allowNegative
-     * @param \DateTime|null $parentTriggeredDate
-     * @param null           $eventTriggerDate
-     * @param bool           $logExists
-     * @param int            $evaluatedEventCount
-     * @param int            $executedEventCount
-     * @param int            $totalEventCount
+     * @param      $event
+     * @param      $campaign
+     * @param      $lead
+     * @param null $eventSettings
+     * @param bool $allowNegative
+     * @param null $eventTriggerDate
+     * @param bool $logExists
+     * @param int  $evaluatedEventCount
+     * @param int  $executedEventCount
+     * @param int  $totalEventCount
      *
      * @return bool
      *
@@ -502,10 +480,9 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param Campaign $campaign
-     * @param int      $evaluatedEventCount
-     * @param int      $executedEventCount
-     * @param int      $totalEventCount
+     * @param int $evaluatedEventCount
+     * @param int $executedEventCount
+     * @param int $totalEventCount
      */
     public function triggerConditions(Campaign $campaign, &$evaluatedEventCount = 0, &$executedEventCount = 0, &$totalEventCount = 0)
     {
@@ -626,9 +603,8 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param LeadEventLog $log
-     * @param              $status
-     * @param null         $reason
+     * @param      $status
+     * @param null $reason
      */
     public function setEventStatus(LeadEventLog $log, $status, $reason = null)
     {
@@ -802,9 +778,8 @@ class LegacyEventModel extends CommonFormModel
     /**
      * @deprecated 2.13.0 to be removed in 3.0
      *
-     * @param Lead $lead
-     * @param      $campaignCreatedBy
-     * @param      $header
+     * @param $campaignCreatedBy
+     * @param $header
      */
     public function notifyOfFailure(Lead $lead, $campaignCreatedBy, $header)
     {

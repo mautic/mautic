@@ -44,8 +44,7 @@ class ImportRepository extends CommonRepository
     /**
      * Count how many imports with the status is there.
      *
-     * @param array $statuses
-     * @param int   $limit
+     * @param int $limit
      *
      * @return array
      */
@@ -66,8 +65,6 @@ class ImportRepository extends CommonRepository
 
     /**
      * Count how many imports with the status is there.
-     *
-     * @param array $statuses
      *
      * @return int
      */

@@ -23,8 +23,6 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 class DsnParser
 {
     /**
-     * @param Message $message
-     *
      * @return BouncedEmail
      *
      * @throws BounceNotFound

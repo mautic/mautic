@@ -33,10 +33,6 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param CompanyReportData $companyReportData
-     * @param RouterInterface   $router
-     */
     public function __construct(CompanyReportData $companyReportData, RouterInterface $router)
     {
         $this->companyReportData = $companyReportData;
@@ -57,8 +53,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -134,8 +128,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -154,9 +146,6 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($queryBuilder);
     }
 
-    /**
-     * @param ReportDataEvent $event
-     */
     public function onReportDisplay(ReportDataEvent $event)
     {
         $data = $event->getData();

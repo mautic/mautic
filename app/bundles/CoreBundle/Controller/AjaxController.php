@@ -119,9 +119,8 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param         $action
-     * @param Request $request
-     * @param null    $bundle
+     * @param      $action
+     * @param null $bundle
      *
      * @return JsonResponse
      */
@@ -135,8 +134,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function globalSearchAction(Request $request)
@@ -157,8 +154,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function commandListAction(Request $request)
@@ -188,8 +183,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function globalCommandListAction(Request $request)
@@ -236,8 +229,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function togglePublishStatusAction(Request $request)
@@ -312,8 +303,6 @@ class AjaxController extends CommonController
     /**
      * Unlock an entity locked by the current user.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function unlockEntityAction(Request $request)
@@ -341,8 +330,6 @@ class AjaxController extends CommonController
     /**
      * Sets the page layout to the update layout.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function updateSetUpdateLayoutAction(Request $request)
@@ -363,8 +350,6 @@ class AjaxController extends CommonController
 
     /**
      * Downloads the update package.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -407,8 +392,6 @@ class AjaxController extends CommonController
 
     /**
      * Extracts the update package.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -489,8 +472,6 @@ class AjaxController extends CommonController
 
     /**
      * Migrate the database to the latest version.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -626,8 +607,6 @@ class AjaxController extends CommonController
     /**
      * Finalize update.
      *
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     public function updateFinalizationAction(Request $request)
@@ -668,8 +647,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function updateUserStatusAction(Request $request)
@@ -692,8 +669,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function clearNotificationAction(Request $request)
@@ -708,8 +683,6 @@ class AjaxController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
      * @return JsonResponse
      */
     protected function getBuilderTokensAction(Request $request)
@@ -726,8 +699,6 @@ class AjaxController extends CommonController
 
     /**
      * Fetch remote data store.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */
@@ -773,8 +744,6 @@ class AjaxController extends CommonController
 
     /**
      * Fetch IP Lookup form.
-     *
-     * @param Request $request
      *
      * @return JsonResponse
      */

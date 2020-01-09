@@ -536,8 +536,6 @@ class CommonApiController extends FOSRestController implements MauticController
 
     /**
      * Initialize some variables.
-     *
-     * @param FilterControllerEvent $event
      */
     public function initialize(FilterControllerEvent $event)
     {
@@ -550,8 +548,6 @@ class CommonApiController extends FOSRestController implements MauticController
 
     /**
      * Creates new entity from provided params.
-     *
-     * @param array $params
      *
      * @return object
      */
@@ -641,49 +637,31 @@ class CommonApiController extends FOSRestController implements MauticController
         return $this->processForm($entity, $parameters, 'POST');
     }
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param MauticFactory $factory
-     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
-    /**
-     * @param Request $request
-     */
     public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param User $user
-     */
     public function setUser(User $user)
     {
         $this->user = $user;
@@ -713,9 +691,6 @@ class CommonApiController extends FOSRestController implements MauticController
         return $this->returnError($msg, Response::HTTP_FORBIDDEN);
     }
 
-    /**
-     * @param ExclusionStrategyInterface $strategy
-     */
     protected function addExclusionStrategy(ExclusionStrategyInterface $strategy)
     {
         $this->exclusionStrategies[] = $strategy;
@@ -1361,9 +1336,8 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * {@inheritdoc}
      *
-     * @param null  $data
-     * @param null  $statusCode
-     * @param array $headers
+     * @param null $data
+     * @param null $statusCode
      */
     protected function view($data = null, $statusCode = null, array $headers = [])
     {

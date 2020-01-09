@@ -94,8 +94,6 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 
     /**
      * Register a plugin in the Transport.
-     *
-     * @param \Swift_Events_EventListener $plugin
      */
     public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
@@ -115,8 +113,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int
      *
@@ -288,8 +285,6 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
     }
 
     /**
-     * @param MauticFactory $factory
-     *
      * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
      */
     public function setMauticFactory(MauticFactory $factory)

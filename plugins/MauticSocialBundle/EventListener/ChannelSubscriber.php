@@ -25,9 +25,6 @@ class ChannelSubscriber implements EventSubscriberInterface
      */
     private $helper;
 
-    /**
-     * @param IntegrationHelper $helper
-     */
     public function __construct(IntegrationHelper $helper)
     {
         $this->helper = $helper;
@@ -43,9 +40,6 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
         $integration = $this->helper->getIntegrationObject('Twitter');

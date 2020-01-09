@@ -17,11 +17,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 trait WriteCountTrait
 {
-    /**
-     * @param OutputInterface     $output
-     * @param TranslatorInterface $translator
-     * @param Counter             $counter
-     */
     private function writeCounts(OutputInterface $output, TranslatorInterface $translator, Counter $counter)
     {
         $output->writeln('');

@@ -140,20 +140,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * EmailModel constructor.
-     *
-     * @param IpLookupHelper     $ipLookupHelper
-     * @param ThemeHelper        $themeHelper
-     * @param Mailbox            $mailboxHelper
-     * @param MailHelper         $mailHelper
-     * @param LeadModel          $leadModel
-     * @param CompanyModel       $companyModel
-     * @param TrackableModel     $pageTrackableModel
-     * @param UserModel          $userModel
-     * @param MessageQueueModel  $messageQueueModel
-     * @param SendEmailToContact $sendModel
-     * @param DeviceTracker      $deviceTracker
-     * @param RedirectRepository $redirectRepository
-     * @param CacheStorageHelper $cacheStorageHelper
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -562,7 +548,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
      *
-     * @param Email|null   $email
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
      * @param string|null  $tokenFilter
      *
@@ -577,13 +562,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param           $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $options
-     * @param int|null  $companyId
-     * @param int|null  $campaignId
-     * @param int|null  $segmentId
+     * @param          $limit
+     * @param array    $options
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
@@ -642,13 +625,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $options
-     * @param int|null  $companyId
-     * @param int|null  $campaignId
-     * @param int|null  $segmentId
+     * @param int      $limit
+     * @param array    $options
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
@@ -708,10 +689,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get a stats for email by list.
      *
-     * @param                $email
-     * @param bool           $includeVariants
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
+     * @param      $email
+     * @param bool $includeVariants
      *
      * @return array
      */
@@ -906,11 +885,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param           $email
-     * @param bool      $includeVariants
-     * @param           $unit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
+     * @param      $email
+     * @param bool $includeVariants
+     * @param      $unit
      *
      * @return array
      */
@@ -943,7 +920,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get the number of leads this email will be sent to.
      *
-     * @param Email $email
      * @param mixed $listId          Leads for a specific lead list
      * @param bool  $countOnly       If true, return count otherwise array of leads
      * @param int   $limit           Max number of leads to retrieve
@@ -994,8 +970,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Email $email
-     * @param bool  $includeVariants
+     * @param bool $includeVariants
      *
      * @return array|int
      */
@@ -1015,7 +990,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead lists.
      *
-     * @param Email           $email
      * @param array           $lists
      * @param int             $limit
      * @param bool            $batch        True to process and batch all pending leads
@@ -1129,8 +1103,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Gets template, stats, weights, etc for an email in preparation to be sent.
      *
-     * @param Email $email
-     * @param bool  $includeVariants
+     * @param bool $includeVariants
      *
      * @return array
      */
@@ -1519,15 +1492,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
-     * @param Email     $email
      * @param array|int $users
      * @param array     $lead
-     * @param array     $tokens
-     * @param array     $assetAttachments
      * @param bool      $saveStat
-     * @param array     $to
-     * @param array     $cc
-     * @param array     $bcc
      *
      * @return mixed
      *
@@ -1658,10 +1625,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Dispatches EmailSendEvent so you could get tokens form it or tokenized content.
      *
-     * @param Email  $email
-     * @param array  $leadFields
      * @param string $idHash
-     * @param array  $tokens
      *
      * @return EmailSendEvent
      */
@@ -1685,7 +1649,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Stat $stat
      * @param      $comments
      * @param int  $reason
      * @param bool $flush
@@ -1782,8 +1745,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Joins the email table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -1795,12 +1756,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -1900,13 +1858,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Modifies the line chart query for the DNC.
      *
-     * @param ChartQuery $query
-     * @param array      $filter
-     * @param            $reason
-     * @param            $canViewOthers
-     * @param int|null   $companyId
-     * @param int|null   $campaignId
-     * @param int|null   $segmentId
+     * @param          $reason
+     * @param          $canViewOthers
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
@@ -1932,9 +1888,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $companyId
-     * @param string       $fromAlias
+     * @param int|null $companyId
+     * @param string   $fromAlias
      */
     private function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
     {
@@ -1959,9 +1914,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $campaignId
-     * @param string       $fromAlias
+     * @param int|null $campaignId
+     * @param string   $fromAlias
      */
     private function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
     {
@@ -1972,9 +1926,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $campaignId
-     * @param string       $fromAlias
+     * @param int|null $campaignId
+     * @param string   $fromAlias
      */
     private function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
     {
@@ -1985,9 +1938,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param int|null     $segmentId
-     * @param string       $fromAlias
+     * @param int|null $segmentId
+     * @param string   $fromAlias
      */
     private function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
     {

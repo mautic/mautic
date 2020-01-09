@@ -62,13 +62,6 @@ class ContactObjectHelper implements ObjectHelperInterface
      */
     private $dncModel;
 
-    /**
-     * @param LeadModel         $model
-     * @param LeadRepository    $repository
-     * @param Connection        $connection
-     * @param FieldModel        $fieldModel
-     * @param DoNotContactModel $dncModel
-     */
     public function __construct(LeadModel $model, LeadRepository $repository, Connection $connection, FieldModel $fieldModel, DoNotContactModel $dncModel)
     {
         $this->model      = $model;
@@ -133,7 +126,6 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param array             $ids
      * @param ObjectChangeDAO[] $objects
      *
      * @return UpdatedObjectMappingDAO[]
@@ -199,10 +191,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $updatedMappedObjects;
     }
 
-    /**
-     * @param Lead     $contact
-     * @param FieldDAO $field
-     */
     private function addUpdatedFieldToContact(Lead $contact, FieldDAO $field): void
     {
         $value = $field->getValue()->getNormalizedValue();
@@ -214,11 +202,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         $contact->addUpdatedField($field->getName(), $value);
     }
 
-    /**
-     * @param ReferenceValueDAO $value
-     *
-     * @return string|null
-     */
     private function getReferenceValueForField(ReferenceValueDAO $value): ?string
     {
         if (MauticSyncDataExchange::OBJECT_COMPANY === $value->getType() && 0 < $value->getValue()) {
@@ -234,12 +217,8 @@ class ContactObjectHelper implements ObjectHelperInterface
     /**
      * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int                $start
-     * @param int                $limit
-     *
-     * @return array
+     * @param int $start
+     * @param int $limit
      */
     public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
@@ -271,11 +250,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $qb->execute()->fetchAll();
     }
 
-    /**
-     * @param array $ids
-     *
-     * @return array
-     */
     public function findObjectsByIds(array $ids): array
     {
         if (!count($ids)) {
@@ -292,11 +266,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $qb->execute()->fetchAll();
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return array
-     */
     public function findObjectsByFieldValues(array $fields): array
     {
         $q = $this->connection->createQueryBuilder()
@@ -312,12 +281,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $q->execute()->fetchAll();
     }
 
-    /**
-     * @param int    $contactId
-     * @param string $channel
-     *
-     * @return int
-     */
     public function getDoNotContactStatus(int $contactId, string $channel): int
     {
         $q = $this->connection->createQueryBuilder();
@@ -343,11 +306,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         return (int) $status;
     }
 
-    /**
-     * @param array $objectIds
-     *
-     * @return array
-     */
     public function findOwnerIds(array $objectIds): array
     {
         if (empty($objectIds)) {
@@ -365,10 +323,6 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param int $id
-     *
-     * @return string
-     *
      * @throws ObjectNotFoundException
      */
     private function getCompanyNameById(int $id): string
@@ -388,9 +342,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $name;
     }
 
-    /**
-     * @return array
-     */
     private function getAvailableFields(): array
     {
         if (null === $this->availableFields) {
@@ -403,9 +354,7 @@ class ContactObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param Lead       $contact
      * @param FieldDAO[] $fields
-     * @param string     $integration
      */
     private function processPseudoFields(Lead $contact, array $fields, string $integration): void
     {

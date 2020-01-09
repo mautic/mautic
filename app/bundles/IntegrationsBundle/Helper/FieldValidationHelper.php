@@ -44,21 +44,12 @@ class FieldValidationHelper
      */
     private $fieldMappings;
 
-    /**
-     * @param FieldHelper         $fieldHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
     {
         $this->fieldHelper = $fieldHelper;
         $this->translator  = $translator;
     }
 
-    /**
-     * @param Form                    $form
-     * @param ConfigFormSyncInterface $integrationObject
-     * @param array                   $fieldMappings
-     */
     public function validateRequiredFields(Form $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {
         $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
@@ -92,10 +83,6 @@ class FieldValidationHelper
         }
     }
 
-    /**
-     * @param Form  $fieldMappingsForm
-     * @param array $missingFields
-     */
     private function validateIntegrationRequiredFields(Form $fieldMappingsForm, array $missingFields): void
     {
         $hasMissingFields  = false;
@@ -131,12 +118,6 @@ class FieldValidationHelper
         }
     }
 
-    /**
-     * @param string $object
-     * @param array  $mappedFields
-     *
-     * @return array
-     */
     private function findMissingIntegrationRequiredFieldMappings(string $object, array $mappedFields): array
     {
         $requiredFields = $this->integrationObject->getRequiredFieldsForMapping($object);
@@ -152,10 +133,6 @@ class FieldValidationHelper
     }
 
     /**
-     * @param Form   $fieldMappingsForm
-     * @param string $object
-     * @param array  $objectFieldMappings
-     *
      * @throws ObjectNotFoundException
      */
     private function validateMauticRequiredFields(Form $fieldMappingsForm, string $object, array $objectFieldMappings): void
@@ -179,11 +156,6 @@ class FieldValidationHelper
     }
 
     /**
-     * @param string $object
-     * @param array  $objectFieldMappings
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     private function findMissingInternalRequiredFieldMappings(string $object, array $objectFieldMappings): array

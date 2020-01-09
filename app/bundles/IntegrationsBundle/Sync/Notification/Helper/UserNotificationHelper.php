@@ -53,13 +53,6 @@ class UserNotificationHelper
      */
     private $objectDisplayName;
 
-    /**
-     * @param Writer              $writer
-     * @param UserHelper          $userHelper
-     * @param OwnerProvider       $ownerProvider
-     * @param RouteHelper         $routeHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         Writer $writer,
         UserHelper $userHelper,
@@ -75,13 +68,6 @@ class UserNotificationHelper
     }
 
     /**
-     * @param string $message
-     * @param string $integrationDisplayName
-     * @param string $objectDisplayName
-     * @param string $mauticObject
-     * @param int    $id
-     * @param string $linkText
-     *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
      */
@@ -111,10 +97,6 @@ class UserNotificationHelper
     }
 
     /**
-     * @param string $message
-     * @param string $link
-     * @param int    $userId
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     private function writeMessage(string $message, string $link, int $userId): void

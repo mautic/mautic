@@ -27,10 +27,6 @@ class DateRange
      */
     private $toDate;
 
-    /**
-     * @param DateTimeInterface|null $fromDate
-     * @param DateTimeInterface|null $toDate
-     */
     public function __construct(?DateTimeInterface $fromDate, ?DateTimeInterface $toDate)
     {
         $this->fromDate = $fromDate;

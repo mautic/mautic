@@ -41,20 +41,12 @@ class WidgetType extends AbstractType
      */
     protected $security;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param CorePermissions          $security
-     */
     public function __construct(EventDispatcherInterface $dispatcher, CorePermissions $security)
     {
         $this->dispatcher = $dispatcher;
         $this->security   = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(

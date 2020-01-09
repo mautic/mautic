@@ -35,11 +35,6 @@ class SearchSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param CampaignModel    $campaignModel
-     * @param CorePermissions  $security
-     * @param TemplatingHelper $templating
-     */
     public function __construct(
         CampaignModel $campaignModel,
         CorePermissions $security,
@@ -61,9 +56,6 @@ class SearchSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         if ($this->security->isGranted('campaign:campaigns:view')) {
@@ -104,9 +96,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         $security = $this->security;

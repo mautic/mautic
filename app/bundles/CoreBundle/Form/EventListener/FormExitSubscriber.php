@@ -49,9 +49,6 @@ class FormExitSubscriber implements EventSubscriberInterface
         return [FormEvents::PRE_SET_DATA => 'preSetData'];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;

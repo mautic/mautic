@@ -24,19 +24,11 @@ class TokenPersistenceFactory
      */
     private $integrationsHelper;
 
-    /**
-     * @param IntegrationsHelper $integrationsHelper
-     */
     public function __construct(IntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;
     }
 
-    /**
-     * @param Integration $integration
-     *
-     * @return TokenPersistence
-     */
     public function create(Integration $integration): TokenPersistence
     {
         $tokenPersistence = new TokenPersistence($this->integrationsHelper);

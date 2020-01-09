@@ -32,9 +32,6 @@ final class UserTokenService implements UserTokenServiceInterface
 
     /**
      * UserTokenService constructor.
-     *
-     * @param RandomHelperInterface        $randomHelper
-     * @param UserTokenRepositoryInterface $userTokenRepository
      */
     public function __construct(
         RandomHelperInterface $randomHelper,
@@ -45,8 +42,7 @@ final class UserTokenService implements UserTokenServiceInterface
     }
 
     /**
-     * @param UserToken $token
-     * @param int       $secretLength
+     * @param int $secretLength
      *
      * @return UserToken
      */
@@ -61,8 +57,6 @@ final class UserTokenService implements UserTokenServiceInterface
     }
 
     /**
-     * @param UserToken $token
-     *
      * @return bool
      */
     public function verify(UserToken $token)

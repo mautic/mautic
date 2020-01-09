@@ -29,8 +29,6 @@ class RedirectModel extends FormModel
 
     /**
      * RedirectModel constructor.
-     *
-     * @param UrlHelper $urlHelper
      */
     public function __construct(UrlHelper $urlHelper)
     {
@@ -60,10 +58,9 @@ class RedirectModel extends FormModel
     /**
      * Generate a Mautic redirect/passthrough URL.
      *
-     * @param Redirect $redirect
-     * @param array    $clickthrough
-     * @param bool     $shortenUrl
-     * @param array    $utmTags
+     * @param array $clickthrough
+     * @param bool  $shortenUrl
+     * @param array $utmTags
      *
      * @return string
      */
@@ -145,8 +142,6 @@ class RedirectModel extends FormModel
 
     /**
      * Get Redirect entities by an array of URLs.
-     *
-     * @param array $urls
      *
      * @return array
      */

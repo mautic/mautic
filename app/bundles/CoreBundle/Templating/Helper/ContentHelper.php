@@ -31,9 +31,6 @@ class ContentHelper extends Helper
 
     /**
      * UIHelper constructor.
-     *
-     * @param DelegatingEngine         $templating
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(DelegatingEngine $templating, EventDispatcherInterface $dispatcher)
     {

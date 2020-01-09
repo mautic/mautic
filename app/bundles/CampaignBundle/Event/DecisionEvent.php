@@ -43,9 +43,7 @@ class DecisionEvent extends CampaignExecutionEvent
     /**
      * DecisionEvent constructor.
      *
-     * @param AbstractEventAccessor $config
-     * @param LeadEventLog          $log
-     * @param mixed                 $passthrough
+     * @param mixed $passthrough
      */
     public function __construct(AbstractEventAccessor $config, LeadEventLog $log, $passthrough = null)
     {

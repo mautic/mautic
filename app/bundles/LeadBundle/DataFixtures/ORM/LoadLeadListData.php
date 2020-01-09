@@ -32,9 +32,6 @@ class LoadLeadListData extends AbstractFixture implements OrderedFixtureInterfac
         $this->segmentModel = $segmentModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $adminUser = $this->getReference('admin-user');

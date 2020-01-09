@@ -48,6 +48,8 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -127,22 +129,6 @@ class SubmissionModel extends CommonFormModel
      */
     private $dateHelper;
 
-    /**
-     * @param IpLookupHelper                 $ipLookupHelper
-     * @param TemplatingHelper               $templatingHelper
-     * @param FormModel                      $formModel
-     * @param PageModel                      $pageModel
-     * @param LeadModel                      $leadModel
-     * @param CampaignModel                  $campaignModel
-     * @param LeadFieldModel                 $leadFieldModel
-     * @param CompanyModel                   $companyModel
-     * @param FormFieldHelper                $fieldHelper
-     * @param UploadFieldValidator           $uploadFieldValidator
-     * @param FormUploader                   $formUploader
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
-     * @param FieldValueTransformer          $fieldValueTransformer
-     * @param DateHelper                     $dateHelper
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         TemplatingHelper $templatingHelper,
@@ -186,11 +172,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param         $post
-     * @param         $server
-     * @param Form    $form
-     * @param Request $request
-     * @param bool    $returnEvent
+     * @param      $post
+     * @param      $server
+     * @param bool $returnEvent
      *
      * @return bool|array
      *
@@ -575,10 +559,10 @@ class SubmissionModel extends CommonFormModel
 
                 return new Response($content);
             case 'xlsx':
-                if (class_exists('PHPExcel')) {
+                if (class_exists(Spreadsheet::class)) {
                     $response = new StreamedResponse(
                         function () use ($results, $form, $translator, $name, $viewOnlyFields) {
-                            $objPHPExcel = new \PHPExcel();
+                            $objPHPExcel = new Spreadsheet();
                             $objPHPExcel->getProperties()->setTitle($name);
 
                             $objPHPExcel->createSheet();
@@ -630,7 +614,7 @@ class SubmissionModel extends CommonFormModel
                                 ++$count;
                             }
 
-                            $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                            $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
                             $objWriter->setPreCalculateFormulas(false);
 
                             $objWriter->save('php://output');
@@ -645,7 +629,7 @@ class SubmissionModel extends CommonFormModel
 
                     return $response;
                 }
-                throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
             default:
                 return new Response();
         }
@@ -654,12 +638,10 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -761,7 +743,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Execute a form submit action.
      *
-     * @param SubmissionEvent $event
+     * @throws ValidationException
      */
     protected function executeFormActions(SubmissionEvent $event): void
     {
@@ -778,10 +760,6 @@ class SubmissionModel extends CommonFormModel
 
     /**
      * Create/update lead from form submit.
-     *
-     * @param Form  $form
-     * @param array $leadFieldMatches
-     * @param $leadFields
      *
      * @return Lead
      *
@@ -1006,8 +984,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * Validates a field value.
      *
-     * @param Field $field
-     * @param       $value
+     * @param $value
      *
      * @return bool|string True if valid; otherwise string with invalid reason
      */

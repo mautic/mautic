@@ -34,8 +34,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
 
     /**
      * CampaignActionChangeMembershipSubscriber constructor.
-     *
-     * @param MembershipManager $membershipManager
      */
     public function __construct(MembershipManager $membershipManager, CampaignModel $campaignModel)
     {
@@ -56,8 +54,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
 
     /**
      * Add change membership action.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function addAction(CampaignBuilderEvent $event)
     {
@@ -75,9 +71,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
         );
     }
 
-    /**
-     * @param PendingEvent $event
-     */
     public function changeMembership(PendingEvent $event)
     {
         $properties          = $event->getEvent()->getProperties();
@@ -114,9 +107,6 @@ class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterfa
     }
 
     /**
-     * @param array    $campaigns
-     * @param Campaign $executingCampaign
-     *
      * @return array
      */
     private function getCampaigns(array $campaigns, Campaign $executingCampaign)

@@ -33,10 +33,6 @@ class RouteHelper
      */
     private $dispatcher;
 
-    /**
-     * @param ObjectProvider           $objectProvider
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         ObjectProvider $objectProvider,
         EventDispatcherInterface $dispatcher
@@ -46,11 +42,6 @@ class RouteHelper
     }
 
     /**
-     * @param string $object
-     * @param int    $id
-     *
-     * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     public function getRoute(string $object, int $id): string
@@ -68,12 +59,6 @@ class RouteHelper
     }
 
     /**
-     * @param string $object
-     * @param int    $id
-     * @param string $linkText
-     *
-     * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     public function getLink(string $object, int $id, string $linkText): string
@@ -84,11 +69,6 @@ class RouteHelper
     }
 
     /**
-     * @param string $object
-     * @param array  $ids
-     *
-     * @return array
-     *
      * @throws ObjectNotSupportedException
      */
     public function getRoutes(string $object, array $ids): array
@@ -102,11 +82,6 @@ class RouteHelper
     }
 
     /**
-     * @param string $object
-     * @param array  $ids
-     *
-     * @return string
-     *
      * @throws ObjectNotSupportedException
      */
     public function getLinkCsv(string $object, array $ids): string

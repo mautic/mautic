@@ -59,12 +59,6 @@ class Reply implements ProcessorInterface
 
     /**
      * Reply constructor.
-     *
-     * @param StatRepository           $statRepository
-     * @param ContactFinder            $contactFinder
-     * @param LeadModel                $leadModel
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
      */
     public function __construct(
         StatRepository $statRepository,
@@ -134,9 +128,6 @@ class Reply implements ProcessorInterface
         $this->leadModel->clearEntities();
     }
 
-    /**
-     * @param Stat $stat
-     */
     protected function createReply(Stat $stat)
     {
         $replies = $stat->getReplies()->filter(
