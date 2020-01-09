@@ -13,7 +13,9 @@ namespace Mautic\QueueBundle;
 
 use Leezy\PheanstalkBundle\DependencyInjection\LeezyPheanstalkExtension;
 use Mautic\QueueBundle\Queue\QueueProtocol;
+use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -31,6 +33,21 @@ class MauticQueueBundle extends Bundle
         $this->localParams = $localParams;
     }
 
+    public function build(ContainerBuilder $container)
+    {
+        parent::build($container);
+
+        $queueProtocol = $this->getQueueProtocol();
+
+        if (QueueProtocol::RABBITMQ === $this->getQueueProtocol()) {
+            $container->addCompilerPass(new RegisterPartsPass());
+        }
+
+        if ($queueProtocol && file_exists(__DIR__.'/Config/'.$queueProtocol.'.php')) {
+            include __DIR__.'/Config/'.$queueProtocol.'.php';
+        }
+    }
+
     public function getContainerExtension()
     {
         if (null === $this->extension) {
@@ -43,11 +60,11 @@ class MauticQueueBundle extends Bundle
 
     public function createContainerExtension()
     {
-        if (empty($this->localParams['queue_protocol'])) {
+        $queueProtocol = $this->getQueueProtocol();
+
+        if (!$queueProtocol) {
             return null;
         }
-
-        $queueProtocol = $this->localParams['queue_protocol'];
 
         if (QueueProtocol::RABBITMQ === $queueProtocol) {
             return new OldSoundRabbitMqExtension();
@@ -56,5 +73,14 @@ class MauticQueueBundle extends Bundle
         if (QueueProtocol::BEANSTALKD === $queueProtocol) {
             return new LeezyPheanstalkExtension();
         }
+    }
+
+    private function getQueueProtocol(): string
+    {
+        if (empty($this->localParams['queue_protocol'])) {
+            return '';
+        }
+
+        return $this->localParams['queue_protocol'];
     }
 }
