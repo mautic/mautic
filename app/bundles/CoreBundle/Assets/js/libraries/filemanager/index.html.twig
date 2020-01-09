@@ -15,7 +15,11 @@
         var $f = jQuery('.elfinder').elfinder({
             url : '{{path('ef_connect', { 'instance': instance, 'homeFolder': homeFolder } )}}',
             lang : '{{locale}}',
-            onlyMimes: {{ onlyMimes|raw }}
+            onlyMimes: {{ onlyMimes|raw }},
+            getFileCallback : function(file) {
+                window.opener.document.fileManagerInsertImageCallback('textarea.editor', file.url);
+                window.close();
+            }
     });
 
         {% if fullscreen %}

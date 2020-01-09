@@ -1168,6 +1168,10 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    mQuery(selector).froalaEditor('image.insert', url);
+}
+
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
     Mautic.builderSlots = [];
