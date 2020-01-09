@@ -124,4 +124,19 @@ abstract class AbstractLookup
             'extra'        => $this->extra,
         ];
     }
+
+    /**
+     * Return whether Auth-Key is set or not.
+     *
+     * @return bool
+     */
+    public function authIsSet()
+    {
+        error_log($this->auth);
+        if ($this->auth != null) {
+            return true;
+        }
+
+        return false;
+    }
 }

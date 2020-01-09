@@ -748,10 +748,11 @@ class AjaxController extends CommonController
                     $dataArray['success'] = 1;
                     $dataArray['message'] = $this->container->get('translator')->trans('mautic.core.success');
                 } else {
-                    $remoteUrl = $ipService->getRemoteDateStoreDownloadUrl();
-                    $localPath = $ipService->getLocalDataStoreFilepath();
+                    $remoteUrl  = $ipService->getRemoteDateStoreDownloadUrl();
+                    $localPath  = $ipService->getLocalDataStoreFilepath();
+                    $authKeySet = $ipService->authIsSet();
 
-                    if ($remoteUrl && $localPath) {
+                    if ($remoteUrl && $localPath && $authKeySet) {
                         $dataArray['error'] = $this->container->get('translator')->trans(
                             'mautic.core.ip_lookup.remote_fetch_error',
                             [

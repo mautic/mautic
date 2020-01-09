@@ -64,6 +64,11 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
         try {
             $data = $connector->get($package);
+            if ($data->code != '200') {
+                $this->logger->error('Failed with Error '.$data->code.'. Unable to fetch IPLookUp-table from: '.$package);
+
+                return false;
+            }
         } catch (\Exception $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }

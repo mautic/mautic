@@ -50,10 +50,11 @@ EOT
             if ($ipService->downloadRemoteDataStore()) {
                 $output->writeln('<info>'.$translator->trans('mautic.core.success').'</info>');
             } else {
-                $remoteUrl = $ipService->getRemoteDateStoreDownloadUrl();
-                $localPath = $ipService->getLocalDataStoreFilepath();
+                $remoteUrl  = $ipService->getRemoteDateStoreDownloadUrl();
+                $localPath  = $ipService->getLocalDataStoreFilepath();
+                $authKeySet = $ipService->authIsSet();
 
-                if ($remoteUrl && $localPath) {
+                if ($remoteUrl && $localPath && $authKeySet) {
                     $output->writeln('<error>'.$translator->trans(
                         'mautic.core.ip_lookup.remote_fetch_error',
                         [
