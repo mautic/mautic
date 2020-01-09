@@ -48,7 +48,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     ];
 
     private $sugarDncKeys = ['email_opt_out', 'invalid_email'];
-    private $authorzationError;
+    private $authorizationError;
     private $userModel;
 
     /**
@@ -209,7 +209,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if (isset($this->keys['version']) && '6' == $this->keys['version']) {
             $success = $this->isAuthorized();
             if (!$success) {
-                return $this->authorzationError;
+                return $this->authorizationError;
             } else {
                 return false;
             }
@@ -436,7 +436,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
                         }
                     } else {
-                        throw new ApiErrorException($this->authorzationError);
+                        throw new ApiErrorException($this->authorizationError);
                     }
                 }
             }
@@ -752,7 +752,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             unset($response['module'], $response['name_value_list']);
             $error = $this->extractAuthKeys($response, 'id');
 
-            $this->authorzationError = $error;
+            $this->authorizationError = $error;
 
             return empty($error);
         } else {
