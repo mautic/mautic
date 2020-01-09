@@ -18,9 +18,6 @@ use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * Class MauticQueueBundle.
- */
 class MauticQueueBundle extends Bundle
 {
     /**
@@ -33,6 +30,9 @@ class MauticQueueBundle extends Bundle
         $this->localParams = $localParams;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
@@ -48,6 +48,9 @@ class MauticQueueBundle extends Bundle
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getContainerExtension()
     {
         if (null === $this->extension) {
@@ -58,6 +61,9 @@ class MauticQueueBundle extends Bundle
         return $this->extension ?: null;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createContainerExtension()
     {
         $queueProtocol = $this->getQueueProtocol();
