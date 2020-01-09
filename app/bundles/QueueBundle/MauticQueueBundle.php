@@ -11,6 +11,9 @@
 
 namespace Mautic\QueueBundle;
 
+use Leezy\PheanstalkBundle\DependencyInjection\LeezyPheanstalkExtension;
+use Mautic\QueueBundle\Queue\QueueProtocol;
+use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -18,4 +21,30 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MauticQueueBundle extends Bundle
 {
+    /**
+     * @var array
+     */
+    private $localParams;
+
+    public function __construct(array $localParams)
+    {
+        $this->localParams = $localParams;
+    }
+
+    public function createContainerExtension()
+    {
+        if (empty($this->localParams['queue_protocol'])) {
+            return null;
+        }
+
+        $queueProtocol = $this->localParams['queue_protocol'];
+
+        if (QueueProtocol::RABBITMQ === $queueProtocol) {
+            return new OldSoundRabbitMqExtension();
+        }
+
+        if (QueueProtocol::BEANSTALKD === $queueProtocol) {
+            return new LeezyPheanstalkExtension();
+        }
+    }
 }
