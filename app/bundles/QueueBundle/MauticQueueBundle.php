@@ -31,6 +31,16 @@ class MauticQueueBundle extends Bundle
         $this->localParams = $localParams;
     }
 
+    public function getContainerExtension()
+    {
+        if (null === $this->extension) {
+            $extension       = $this->createContainerExtension();
+            $this->extension = $extension;
+        }
+
+        return $this->extension ?: null;
+    }
+
     public function createContainerExtension()
     {
         if (empty($this->localParams['queue_protocol'])) {
