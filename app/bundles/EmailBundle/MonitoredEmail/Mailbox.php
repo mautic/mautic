@@ -282,7 +282,7 @@ class Mailbox
     public function getImapPath($settings)
     {
         if (!isset($settings['encryption'])) {
-            $settings['encryption'] = (!empty($ssl)) ? '/ssl' : '';
+            $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
         }
         $path     = "{{$settings['host']}:{$settings['port']}/imap{$settings['encryption']}}";
         $fullPath = $path;
