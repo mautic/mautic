@@ -113,7 +113,19 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailValidator->validate('jo^hn@gmail.com');
     }
 
-    public function testValidateEmailWithApostropheInIt()
+    public function testValidateEmailWithApostropheInTheMailboxPortion()
+    {
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->willReturn($this->event);
+
+        $this->emailValidator->validate('jo\'hn@gmail.com');
+        // No exception thrown, this is a valid test
+        $this->addToAssertionCount(1);
+    }
+
+    public function testValidateEmailWithApostropheInTheDomainPortion()
     {
         $this->expectException(InvalidEmailException::class);
         $this->emailValidator->validate('jo\'hn@gmail.com');
