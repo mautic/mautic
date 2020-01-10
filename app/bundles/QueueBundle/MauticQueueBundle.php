@@ -83,10 +83,6 @@ class MauticQueueBundle extends Bundle
 
     private function getQueueProtocol(): string
     {
-        if (empty($this->localParams['queue_protocol'])) {
-            return '';
-        }
-
-        return $this->localParams['queue_protocol'];
+        return empty($this->localParams['queue_protocol']) ? '' : $this->localParams['queue_protocol'];
     }
 }
