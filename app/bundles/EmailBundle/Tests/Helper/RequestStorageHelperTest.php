@@ -96,6 +96,6 @@ class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTransportNameFromKeyWithGlobalPrefix()
     {
-        $this->assertEquals(MomentumTransport::class, $this->helper->getTransportNameFromKey('mautic:Mautic|EmailBundle|Swiftmailer|Transport|MomentumTransport:webhook_request:5bfbe8ce671198.00044461'));
+        $this->assertEquals(MomentumTransport::class, $this->helper->getTransportNameFromKey('mautic:Mautic|EmailBundle|Swiftmailer|Transport|MomentumTransport;webhook_request;5bfbe8ce671198.00044461'));
     }
 }

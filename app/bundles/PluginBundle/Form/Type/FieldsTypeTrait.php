@@ -181,7 +181,7 @@ trait FieldsTypeTrait
                                 'choices_as_values' => true,
                                 'label'             => false,
                                 'data'              => $data,
-                                'empty_value'       => false,
+                                'placeholder'       => false,
                                 'attr'              => [
                                     'data-toggle'   => 'tooltip',
                                     'title'         => 'mautic.plugin.direction.data.update',
