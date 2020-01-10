@@ -50,14 +50,13 @@ class DoNotContactParts
     {
         switch ($this->type) {
             case 'bounced':
+            case DoNotContact::BOUNCED:
                 return DoNotContact::BOUNCED;
-                break;
             case 'manual':
+            case DoNotContact::MANUAL:
                 return DoNotContact::MANUAL;
-                break;
             default:
                 return DoNotContact::UNSUBSCRIBED;
-                break;
         }
     }
 }
