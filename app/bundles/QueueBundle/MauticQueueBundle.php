@@ -68,10 +68,6 @@ class MauticQueueBundle extends Bundle
     {
         $queueProtocol = $this->getQueueProtocol();
 
-        if (!$queueProtocol) {
-            return null;
-        }
-
         if (QueueProtocol::RABBITMQ === $queueProtocol) {
             return new OldSoundRabbitMqExtension();
         }
@@ -79,6 +75,8 @@ class MauticQueueBundle extends Bundle
         if (QueueProtocol::BEANSTALKD === $queueProtocol) {
             return new LeezyPheanstalkExtension();
         }
+
+        return null;
     }
 
     private function getQueueProtocol(): string
