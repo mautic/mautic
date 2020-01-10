@@ -39,7 +39,7 @@ class MauticQueueBundle extends Bundle
 
         $queueProtocol = $this->getQueueProtocol();
 
-        if (QueueProtocol::RABBITMQ === $this->getQueueProtocol()) {
+        if (QueueProtocol::RABBITMQ === $queueProtocol) {
             $container->addCompilerPass(new RegisterPartsPass());
         }
 
