@@ -41,8 +41,8 @@ class FormSubscriberTest extends TestCase
 
     public function setUp()
     {
-        $this->emailModel = $this->createMock(EmailModel::class);
-        $this->leadModel  = $this->createMock(LeadModel::class);
+        $this->emailModel     = $this->createMock(EmailModel::class);
+        $this->leadModel      = $this->createMock(LeadModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);
         $this->formSubscriber = new FormSubscriber(
             $this->emailModel,
@@ -177,7 +177,6 @@ class FormSubscriberTest extends TestCase
         $action->expects($this->once())
             ->method('getForm')
             ->willReturn($this->createMock(Form::class));
-
 
         $this->emailModel->expects($this->once())
             ->method('getEntity')
