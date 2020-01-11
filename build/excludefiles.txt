@@ -21,6 +21,7 @@ node_modules/*
 package.json
 package-lock.json
 README.md
+UPGRADE*.md
 tests/*
 vendor/babdev/*
 vendor/liip/*
