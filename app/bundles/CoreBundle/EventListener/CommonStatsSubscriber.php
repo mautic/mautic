@@ -133,10 +133,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
     protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
-        if (!is_array($repoNames)) {
-            $repoNames = [$repoNames];
-        }
-
         foreach ($repoNames as $repoName) {
             $repo                      = $this->entityManager->getRepository($repoName);
             $this->repositories[]      = $repo;

@@ -14,15 +14,13 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Client.
- */
 class Client extends BaseClient
 {
     /**
@@ -39,6 +37,11 @@ class Client extends BaseClient
      * @var ArrayCollection
      */
     protected $users;
+
+    /**
+     * @var ArrayCollection
+     */
+    protected $authCodes;
 
     /**
      * @var string
@@ -60,9 +63,6 @@ class Client extends BaseClient
      */
     protected $allowedGrantTypes;
 
-    /**
-     *  Construct.
-     */
     public function __construct()
     {
         parent::__construct();
@@ -72,7 +72,8 @@ class Client extends BaseClient
             OAuth2::GRANT_TYPE_REFRESH_TOKEN,
         ];
 
-        $this->users = new ArrayCollection();
+        $this->users     = new ArrayCollection();
+        $this->authCodes = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -80,12 +81,12 @@ class Client extends BaseClient
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('oauth2_clients')
-            ->setCustomRepositoryClass('Mautic\ApiBundle\Entity\oAuth2\ClientRepository')
+            ->setCustomRepositoryClass(ClientRepository::class)
             ->addIndex(['random_id'], 'client_id_search');
 
         $builder->addIdColumns('name', false);
 
-        $builder->createManyToMany('users', 'Mautic\UserBundle\Entity\User')
+        $builder->createManyToMany('users', User::class)
             ->setJoinTable('oauth2_user_client_xref')
             ->addInverseJoinColumn('user_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('client_id', 'id', false, false, 'CASCADE')
@@ -145,8 +146,6 @@ class Client extends BaseClient
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -155,8 +154,6 @@ class Client extends BaseClient
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Client
@@ -171,8 +168,6 @@ class Client extends BaseClient
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -191,8 +186,6 @@ class Client extends BaseClient
     }
 
     /**
-     * Add authCodes.
-     *
      * @return Client
      */
     public function addAuthCode(AuthCode $authCodes)
@@ -202,17 +195,12 @@ class Client extends BaseClient
         return $this;
     }
 
-    /**
-     * Remove authCodes.
-     */
     public function removeAuthCode(AuthCode $authCodes)
     {
         $this->authCodes->removeElement($authCodes);
     }
 
     /**
-     * Get authCodes.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getAuthCodes()
@@ -233,28 +221,21 @@ class Client extends BaseClient
     }
 
     /**
-     * Add users.
-     *
      * @return Client
      */
-    public function addUser(\Mautic\UserBundle\Entity\User $users)
+    public function addUser(User $users)
     {
         $this->users[] = $users;
 
         return $this;
     }
 
-    /**
-     * Remove users.
-     */
-    public function removeUser(\Mautic\UserBundle\Entity\User $users)
+    public function removeUser(User $users)
     {
         $this->users->removeElement($users);
     }
 
     /**
-     * Get users.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getUsers()

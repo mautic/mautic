@@ -25,9 +25,6 @@ use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CommonRepository.
- */
 class CommonRepository extends EntityRepository
 {
     /**
@@ -55,6 +52,11 @@ class CommonRepository extends EntityRepository
      * @var array
      */
     protected $usedParameterNames = [];
+
+    /**
+     * @var ExpressionBuilder|null
+     */
+    private $expressionBuilder;
 
     /**
      * @param string $alias
@@ -387,11 +389,11 @@ class CommonRepository extends EntityRepository
      */
     public function getExpressionBuilder()
     {
-        if (null === self::$expressionBuilder) {
-            self::$expressionBuilder = new ExpressionBuilder();
+        if (null === $this->expressionBuilder) {
+            $this->expressionBuilder = new ExpressionBuilder();
         }
 
-        return self::$expressionBuilder;
+        return $this->expressionBuilder;
     }
 
     /**
@@ -1338,9 +1340,9 @@ class CommonRepository extends EntityRepository
                     if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
                         $q->select($newSelect);
                     } elseif (false !== strpos($select, $this->getTableAlias().',')) {
-                        $q->select(str_replace($this->getTableAlias().',', $newSelect.','));
+                        $q->select(str_replace($this->getTableAlias().',', $newSelect.',', $select));
                     } elseif (false !== strpos($select, $this->getTableAlias().'.*,')) {
-                        $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.','));
+                        $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.',', $select));
                     }
                 }
             }

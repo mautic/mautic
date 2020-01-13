@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
@@ -18,9 +18,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class IpLookupHelperTest.
- */
 class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function __construct($name = null, array $data = [], $dataName = '')

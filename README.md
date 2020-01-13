@@ -1,5 +1,3 @@
-# This is the developer branch for 3.x in preparation for the Mautic Community Sprint in Amsterdam. It is completely and utterly broken so don't try to install it :-)
-
 Mautic Introduction
 ===========
 ![Mautic](https://www.mautic.org/media/images/github_readme.png "Mautic Open Source Marketing Automation")
@@ -203,7 +201,7 @@ running just the `acceptance`, `functional`, or `unit` test suites by adding one
 
 ### Static Analysis
 
-Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for some of its parts during continuous integration tests. If you want to test your specific contribution locally, install PHPSTAN globally with `composer global require phpstan/phpstan-shim`. Mautic cannot have PHPSTAN as its dev dependency, because it requires PHP7+. To run analysis on a specific bundle, run `~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/*Bundle`
+Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for static analysis. Run `composer phpstan` to run the analysis.
 
 ## FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.

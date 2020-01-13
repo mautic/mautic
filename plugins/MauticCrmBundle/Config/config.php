@@ -123,6 +123,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
+                    'mautic.user.model.user',
                 ],
             ],
             'mautic.integration.vtiger' => [
@@ -275,7 +276,8 @@ return [
         ],
         'forms' => [
             'mautic.form.type.connectwise.campaignaction' => [
-                'class' => MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType::class,
+                'class'     => MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType::class,
+                'arguments' => ['mautic.integration.connectwise'],
             ],
         ],
     ],

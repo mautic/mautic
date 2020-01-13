@@ -17,7 +17,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -681,7 +680,7 @@ class LegacyEventModel extends CommonFormModel
                     );
 
                     // Save some RAM for batch processing
-                    unset($now, $action, $dv, $dt);
+                    unset($now, $action);
 
                     //the event is to be scheduled based on the time interval
                     return $triggerOn;

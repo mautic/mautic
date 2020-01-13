@@ -17,9 +17,7 @@ use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Exception\SchemaException;
 
 /**
- * Class ColumnSchemaHelper.
- *
- * Used to manipulate the schema of an existing table
+ * Used to manipulate the schema of an existing table.
  */
 class ColumnSchemaHelper
 {
@@ -52,6 +50,8 @@ class ColumnSchemaHelper
      * @var Table
      */
     protected $toTable;
+
+    private $columns;
 
     /**
      * @param string $prefix

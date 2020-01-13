@@ -8,46 +8,41 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticCrmBundle\Integration;
+namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
+use MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\Translator;
 
-/**
- * Class ZohoIntegrationTest.
- */
 class ZohoIntegrationTest extends AbstractIntegrationTestCase
 {
     /** @var ZohoIntegration */
     private $integration;
 
-    /**
-     * Set up tests.
-     */
     protected function setUp()
     {
         parent::setUp();
 
         $encryptionHelper = $this->getMockBuilder(EncryptionHelper::class)
-                           ->disableOriginalConstructor()
-                           ->setMethods(['decrypt'])
-                           ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['decrypt'])
+            ->getMock();
         $encryptionHelper->expects($this->any())
-                   ->method('decrypt')
-                   ->willReturnArgument(0);
+            ->method('decrypt')
+            ->willReturnArgument(0);
         $translator = $this->getMockBuilder(Translator::class)
-                           ->disableOriginalConstructor()
-                           ->setMethods(['trans'])
-                           ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['trans'])
+            ->getMock();
         $translator->expects($this->any())
-                   ->method('trans')
-                   ->willReturnArgument(0);
+            ->method('trans')
+            ->willReturnArgument(0);
 
         $eventMock = $this->getMockBuilder(Event::class)
             ->disableOriginalConstructor()

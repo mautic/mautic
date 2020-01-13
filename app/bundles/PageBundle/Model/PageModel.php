@@ -949,9 +949,6 @@ class PageModel extends FormModel
      */
     public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
     {
-        $data['values'] = [];
-        $data['labels'] = [];
-
         $q = $this->em->getConnection()->createQueryBuilder();
 
         $q->select('count(h.id) as count, ds.device as device')
@@ -965,8 +962,7 @@ class PageModel extends FormModel
         $q->groupBy('ds.device');
 
         $results = $q->execute()->fetchAll();
-
-        $chart = new PieChart($data['labels']);
+        $chart   = new PieChart();
 
         if (empty($results)) {
             $results[] = [

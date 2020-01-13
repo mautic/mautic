@@ -11,16 +11,13 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * abstract StandardFormControllerInterface.
- */
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
@@ -193,7 +190,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function checkActionPermission($action, $entity = null, $objectId = null)
     {
+        /** @var CorePermissions $security */
         $security = $this->get('mautic.security');
+
+        $permissionUser = 0;
+
         if ($entity) {
             $permissionUser = method_exists($entity, 'getPermissionUser') ? $entity->getPermissionUser() : $entity->getCreatedBy();
         }

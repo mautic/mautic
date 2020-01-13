@@ -6,7 +6,7 @@
  * Time: 8:10 AM.
  */
 
-namespace MauticCrmBundle\Integration;
+namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;

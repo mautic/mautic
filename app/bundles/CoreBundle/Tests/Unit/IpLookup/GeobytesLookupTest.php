@@ -9,13 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\IpLookup;
+namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 
-/**
- * Class GeobytesLookupTest.
- */
 class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
 {
     private $cacheDir = __DIR__.'/../../../../../../var/cache/test';

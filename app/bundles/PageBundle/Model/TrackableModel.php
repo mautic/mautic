@@ -19,9 +19,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 
-/**
- * Class TrackableModel.
- */
 class TrackableModel extends AbstractCommonModel
 {
     /**
@@ -330,8 +327,6 @@ class TrackableModel extends AbstractCommonModel
             $secondPassReplace = $this->contentReplacements['second_pass'];
             $content           = str_ireplace($secondPassSearch, $secondPassReplace, $content);
         }
-
-        unset($firstSearch, $firstReplace, $secondSearch, $secondSearch);
 
         return $content;
     }
@@ -872,13 +867,16 @@ class TrackableModel extends AbstractCommonModel
     {
         // Reset content replacement arrays
         $this->contentReplacements = [
-            'first_pass'  => [
-                // Remove internal attributes
-                // Editor may convert to HTML4
-                'mautic:disable-tracking=""' => '',
-                // HTML5
-                'mautic:disable-tracking'    => '',
-            ],
+            // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
+            // I'm leaving the second one to keep current behaviour but leaving the first one commented
+            // out as it may be the one we want.
+            // 'first_pass'  => [
+            //     // Remove internal attributes
+            //     // Editor may convert to HTML4
+            //     'mautic:disable-tracking=""' => '',
+            //     // HTML5
+            //     'mautic:disable-tracking'    => '',
+            // ],
             'first_pass'  => [],
             'second_pass' => [],
         ];

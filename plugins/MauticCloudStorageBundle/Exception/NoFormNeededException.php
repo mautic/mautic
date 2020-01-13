@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticFullContactBundle\Exception;
+namespace MauticPlugin\MauticCloudStorageBundle\Exception;
 
 class NoFormNeededException extends \Exception
 {

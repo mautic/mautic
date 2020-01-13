@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestStorageHelperTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheStorageMock;
+    private $helper;
+
     protected function setUp()
     {
         parent::setUp();

@@ -34,7 +34,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array
      */
-    private $sampleMetadata = [];
+    private $sampleMetaData = [];
 
     /**
      * @var array

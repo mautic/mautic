@@ -95,42 +95,45 @@ class FormSubscriber implements EventSubscriberInterface
      */
     public function onFormSubmitActionSendEmail(SubmissionEvent $event): void
     {
-        if (false === $event->checkContext('email.send.user') || false === $event->checkContext('email.send.lead')) {
+        if (false === $event->checkContext('email.send.user') && false === $event->checkContext('email.send.lead')) {
             return;
         }
 
         $properties = $event->getAction()->getProperties();
         $emailId    = isset($properties['useremail']) ? (int) $properties['useremail']['email'] : (int) $properties['email'];
-        $form       = $event->getAction()->getForm();
         $email      = $this->emailModel->getEntity($emailId);
-        $feedback   = $event->getActionFeedback();
-        $tokens     = $event->getTokens();
 
-        if (null !== $email && $email->isPublished()) {
-            // Deal with Lead email
-            if (!empty($feedback['lead.create']['lead'])) {
-                // the lead was just created via the lead.create action
-                $currentLead = $feedback['lead.create']['lead'];
-            } else {
-                $currentLead = $this->contactTracker->getContact();
-            }
-
-            if ($currentLead instanceof Lead) {
-                $currentLead = $currentLead->getProfileFields();
-            }
-
-            if (isset($properties['user_id']) && $properties['user_id']) {
-                $this->emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead, $tokens);
-            } elseif (isset($currentLead)) {
-                if (isset($leadFields['email'])) {
-                    $options = [
-                        'source'    => ['form', $form->getId()],
-                        'tokens'    => $tokens,
-                        'ignoreDNC' => true,
-                    ];
-                    $this->emailModel->sendEmail($email, $currentLead, $options);
-                }
-            }
+        if (null === $email || false === $email->isPublished()) {
+            return;
         }
+
+        $currentLead = $this->getCurrentLead($event->getActionFeedback());
+
+        if (isset($properties['user_id']) && $properties['user_id']) {
+            $this->emailModel->sendEmailToUser($email, $properties['user_id'], $currentLead, $event->getTokens());
+        } elseif (isset($currentLead['email'])) {
+            $this->emailModel->sendEmail($email, $currentLead, [
+                'source'    => ['form', $event->getAction()->getForm()->getId()],
+                'tokens'    => $event->getTokens(),
+                'ignoreDNC' => true,
+            ]);
+        }
+    }
+
+    private function getCurrentLead(array $feedback): ?array
+    {
+        // Deal with Lead email
+        if (!empty($feedback['lead.create']['lead'])) {
+            // the lead was just created via the lead.create action
+            $currentLead = $feedback['lead.create']['lead'];
+        } else {
+            $currentLead = $this->contactTracker->getContact();
+        }
+
+        if ($currentLead instanceof Lead) {
+            $currentLead = $currentLead->getProfileFields();
+        }
+
+        return $currentLead;
     }
 }

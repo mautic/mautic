@@ -21,6 +21,11 @@ system('rm -f app/tests.bootstrap*');
 system('rm -rf app/bundles/*/Tests');
 system('rm -rf app/bundles/CoreBundle/Test');
 system('rm -rf app/cache/*');
+system('rm -rf app/logs/*');
+system('rm -rf var/cache/*');
+system('rm -rf var/logs/*');
+system('rm -rf var/spool/*');
+system('rm -rf var/tmp/*');
 system('rm -rf media/files/*');
 // Delete ElFinder's (filemanager) assets
 system('rm -rf media/assets/');
@@ -29,7 +34,6 @@ system('rm -f app/config/config_test.php');
 system('rm -f app/config/local*.php');
 system('rm -f app/config/routing_dev.php');
 system('rm -f app/config/security_test.php');
-system('rm -rf app/logs/*');
 
 // babdev/transifex
 system('rm -f vendor/babdev/transifex/.scrutinizer.yml');

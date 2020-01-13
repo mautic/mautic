@@ -430,7 +430,7 @@ class CoreSubscriber implements EventSubscriberInterface
                     }
                 }
             }
-            unset($bundles, $menuHelper);
+            unset($bundles);
 
             $icons = $event->getIcons();
             $session->set('mautic.menu.icons', $icons);

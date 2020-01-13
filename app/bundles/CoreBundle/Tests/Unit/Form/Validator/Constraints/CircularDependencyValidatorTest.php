@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Form\Validator\Constraints;
+namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
@@ -10,9 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
-/**
- * Exercises CircularDependencyValidator.
- */
 class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
