@@ -43,7 +43,7 @@ class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $tramslatorMock;
+    private $translatorMock;
 
     /**
      * @var ChannelActionModel

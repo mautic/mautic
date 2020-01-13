@@ -30,6 +30,8 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $containerMock;
     private $modelMock;
     private $emailMock;
+    private $routerMock;
+    private $flashBagMock;
     private $controller;
 
     protected function setUp()

@@ -88,7 +88,7 @@ class FormSubscriber implements EventSubscriberInterface
         $this->formModel       = $formModel;
         $this->submissionModel = $submissionModel;
         $this->translator      = $translator;
-        $this->em              = $entityManager;
+        $this->entityManager   = $entityManager;
         $this->templating      = $templating;
     }
 
@@ -146,7 +146,7 @@ class FormSubscriber implements EventSubscriberInterface
                             $field->setOrder(99999);
                             $field->setSaveResult(true);
                             $form->addField($actionAction, $field);
-                            $this->em->persist($form);
+                            $this->entityManager->persist($form);
                             /* @var FormModel $formModel */
                             $this->formModel->createTableSchema($form);
                         }
@@ -169,7 +169,7 @@ class FormSubscriber implements EventSubscriberInterface
                     $repo             = $this->submissionModel->getRepository();
                     $resultsTableName = $repo->getResultsTableName($form->getId(), $form->getAlias());
                     $tableKeys        = ['submission_id' => $submission->getId()];
-                    $this->em
+                    $this->entityManager
                         ->getConnection()
                         ->update($resultsTableName, $results, $tableKeys);
                 } else {

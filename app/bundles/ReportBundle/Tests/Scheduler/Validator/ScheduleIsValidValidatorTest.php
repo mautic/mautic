@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Tests\Validator;
+namespace Mautic\ReportBundle\Tests\Scheduler\Validator;
 
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;

@@ -16,6 +16,6 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Exception;
 
-class API extends FullContact_Exception_Base
+class NotImplementedException extends BaseException
 {
 }

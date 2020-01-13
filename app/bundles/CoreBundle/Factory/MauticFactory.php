@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -25,8 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Mautic's Factory.
- *
  * @deprecated 2.0 to be removed in 3.0
  */
 class MauticFactory
@@ -45,6 +42,8 @@ class MauticFactory
      * @var
      */
     private $entityManager = null;
+
+    private $requestStack;
 
     public function __construct(ContainerInterface $container)
     {

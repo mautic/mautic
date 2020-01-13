@@ -162,7 +162,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         // Save memory with batch processing
-        unset($event, $model, $leads, $list, $listCampaigns, $leadLists);
+        unset($event, $leads, $list, $listCampaigns, $leadLists);
     }
 
     /**

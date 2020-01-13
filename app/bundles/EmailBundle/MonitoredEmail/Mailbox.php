@@ -281,21 +281,14 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /* @var string $host */
-        /* @var int $port */
-        /* @var string $encryption */
-        /* @var string $folder */
-        /* @var string $user */
-        /* @var string $password */
-        extract($settings);
-        if (!isset($encryption)) {
-            $encryption = (!empty($ssl)) ? '/ssl' : '';
+        if (!isset($settings['encryption'])) {
+            $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
         }
-        $path     = "{{$host}:{$port}/imap{$encryption}}";
+        $path     = "{{$settings['host']}:{$settings['port']}/imap{$settings['encryption']}}";
         $fullPath = $path;
 
-        if (isset($folder)) {
-            $fullPath .= $folder;
+        if (isset($settings['folder'])) {
+            $fullPath .= $settings['folder'];
         }
 
         return ['path' => $path, 'full' => $fullPath];

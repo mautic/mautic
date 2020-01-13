@@ -17,6 +17,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ReloadFacade
 {
+    private $pluginModel;
+    private $reloadHelper;
+    private $translator;
+
     public function __construct(PluginModel $pluginModel, ReloadHelper $reloadHelper, TranslatorInterface $translator)
     {
         $this->pluginModel  = $pluginModel;
