@@ -140,7 +140,7 @@
                     if (settings.success != null) {
                         settings.success(data);
                     }
-                    var returnVar = field.val(unthis.chosen(chosenOptions ? chosenOptions : {}));
+                    var returnVar = field.val(untrimmed_val);
 
                     // Force width
                     div = $('<div />');
