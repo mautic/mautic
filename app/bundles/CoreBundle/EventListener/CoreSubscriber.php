@@ -217,11 +217,6 @@ class CoreSubscriber implements EventSubscriberInterface
         } else {
             $session->remove('mautic.user');
         }
-
-        //set a couple variables used by filemanager
-        $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
-        $session->set('mautic.basepath', $event->getRequest()->getBasePath());
-        $session->set('mautic.imagepath', $this->coreParametersHelper->getParameter('image_path'));
     }
 
     /**

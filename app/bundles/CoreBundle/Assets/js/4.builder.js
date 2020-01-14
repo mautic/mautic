@@ -209,7 +209,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + '/' + mauticAssetPrefix + 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/filemanager/index.html?type=Images',
+        mauticBasePath + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -1167,6 +1167,10 @@ Mautic.isSlotInitiated = function(slot) {
         return slot.is(params.slot);
     }) !== 'undefined';
 };
+
+window.document.fileManagerInsertImageCallback = function(selector, url) {
+    mQuery(selector).froalaEditor('image.insert', url);
+}
 
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
