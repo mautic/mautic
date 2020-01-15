@@ -48,7 +48,7 @@ class Connection
     {
         $this->logger->debug('About to query the Packagist API: '.$url);
 
-        $request  = new Request(RequestInterface::GET, $url, $this->getHeaders());
+        $request  = new Request('GET', $url, $this->getHeaders());
         $response = $this->httpClient->send($request);
         $body     = (string) $response->getBody();
 
