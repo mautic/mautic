@@ -73,7 +73,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
         $localTarget       = $this->getLocalDataStoreFilepath();
         $localTargetExt    = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
-        $localTargetFolder = strtolower(strtok($localTarget, '/'));
+        $localTargetFolder = substr($localTarget, 0, strripos($localTarget, '/'));
 
         try {
             $success = false;
@@ -88,8 +88,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     $temporaryPhar = $localTargetFolder.'.tar.gz';
                     file_put_contents($temporaryPhar, $data->body);
                     $pharData = new PharData($temporaryPhar);
-                    $pharData->decompress();
-                    $success = true;
+                    $success = $pharData->extractTo($localTargetFolder, null, true);
                     @unlink($temporaryPhar);
                     break;
 
@@ -175,7 +174,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     }
 
     /**
-     * Get if the string ends with
+     * Get if the string ends with.
      *
      * @return bool
      */
@@ -186,6 +185,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             return true;
         }
 
-        return (substr($haystack, -$length) === $needle);
+        return substr($haystack, -$length) === $needle;
     }
 }

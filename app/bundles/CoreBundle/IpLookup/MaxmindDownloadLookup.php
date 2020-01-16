@@ -78,4 +78,17 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
         } catch (\Exception $exception) {
         }
     }
+
+    public function downloadRemoteDataStore()
+    {
+        if(parent::downloadRemoteDataStore()){
+            $localTarget       = $this->getLocalDataStoreFilepath();
+            $localTargetFolder = substr($localTarget, 0, strripos($localTarget, '/'));
+            $directories = glob($localTargetFolder  . '/*' , GLOB_ONLYDIR);
+            rsort($directories);
+            copy($directories[0].'/'.'GeoLite2-City.mmdb', $localTarget);
+            return true;
+        }
+        return false;
+    }
 }
