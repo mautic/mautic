@@ -31,9 +31,9 @@ class Connection
     /**
      * @throws ApiException
      */
-    public function getPlugins(): array
+    public function getPlugins(int $page, int $limit, string $query = ''): array
     {
-        return $this->makeRequest('https://packagist.org/search.json?type=mautic-plugin');
+        return $this->makeRequest("https://packagist.org/search.json?page={$page}&per_page={$limit}&type=mautic-plugin&q={$query}");
     }
 
     /**
