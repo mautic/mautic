@@ -69,10 +69,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }
 
-        $tempTarget     = $this->cacheDir.'/'.basename($package);
-        $tempExt        = strtolower(pathinfo($package, PATHINFO_EXTENSION));
-        $localTarget    = $this->getLocalDataStoreFilepath();
-        $localTargetExt = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
+        $tempTarget        = $this->cacheDir.'/'.basename($package);
+        $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
+        $localTarget       = $this->getLocalDataStoreFilepath();
+        $localTargetExt    = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
         $localTargetFolder = strtolower(strtok($localTarget, '/'));
 
         try {
@@ -82,6 +82,15 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                 case $localTargetExt === $tempExt:
                     $success = (bool) file_put_contents($localTarget, $data->body);
 
+                    break;
+
+                case $this->endsWith($package, 'tar.gz'):
+                    $temporaryPhar = $localTargetFolder.'.tar.gz';
+                    file_put_contents($temporaryPhar, $data->body);
+                    $pharData = new PharData($temporaryPhar);
+                    $pharData->decompress();
+                    $success = true;
+                    @unlink($temporaryPhar);
                     break;
 
                 case 'gz' == $tempExt:
@@ -106,15 +115,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                         }
                     }
 
-                    break;
-
-                case 'tar.gz' == $tempExt:
-                    $temporaryPhar = $localTargetFolder.'.'.$tempExt;
-                    file_put_contents($temporaryPhar, $data->body);
-                    $pharData = new PharData($temporaryPhar);
-                    $pharData->decompress();
-                    $success = true;
-                    @unlink($temporaryPhar);
                     break;
 
                 case 'zip' == $tempExt:
@@ -172,5 +172,20 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             case 'G':
                 return $data * 1024 * 1024 * 1024;
         }
+    }
+
+    /**
+     * Get if the string ends with
+     *
+     * @return bool
+     */
+    private function endsWith($haystack, $needle)
+    {
+        $length = strlen($needle);
+        if ($length == 0) {
+            return true;
+        }
+
+        return (substr($haystack, -$length) === $needle);
     }
 }
