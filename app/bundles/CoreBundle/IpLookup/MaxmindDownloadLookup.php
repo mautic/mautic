@@ -28,7 +28,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
      */
     public function getLocalDataStoreFilepath()
     {
-        return $this->getDataDir().'/GeoLite2-City.mmdb';
+        return $this->getDataDir().'/GeoLite2-City/GeoLite2-City.mmdb';
     }
 
     /**
@@ -37,11 +37,12 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
     public function getRemoteDateStoreDownloadUrl()
     {
         if (!empty($this->auth)) {
-            $data = [];
+            $data                = [];
             $data['license_key'] = $this->auth;
-            $data['edition_id'] = 'GeoLite2-City';
-            $data['suffix'] = 'tar.gz';
-            $queryString = http_build_query($data);
+            $data['edition_id']  = 'GeoLite2-City';
+            $data['suffix']      = 'tar.gz';
+            $queryString         = http_build_query($data);
+
             return 'https://download.maxmind.com/app/geoip_download?'.$queryString;
         } else {
             $this->logger->warn('MaxMind license key is required.');

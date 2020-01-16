@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use Joomla\Http\HttpFactory;
+use PharData;
 
 /**
  * Class AbstractLocalDataLookup.
@@ -72,6 +73,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         $tempExt        = strtolower(pathinfo($package, PATHINFO_EXTENSION));
         $localTarget    = $this->getLocalDataStoreFilepath();
         $localTargetExt = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
+        $localTargetFolder = strtolower(strtok($localTarget, '/'));
 
         try {
             $success = false;
@@ -104,6 +106,15 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                         }
                     }
 
+                    break;
+
+                case 'tar.gz' == $tempExt:
+                    $temporaryPhar = $localTargetFolder.'.'.$tempExt;
+                    file_put_contents($temporaryPhar, $data->body);
+                    $pharData = new PharData($temporaryPhar);
+                    $pharData->decompress();
+                    $success = true;
+                    @unlink($temporaryPhar);
                     break;
 
                 case 'zip' == $tempExt:
