@@ -20,8 +20,10 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
 {
     public function testDownloadDataStore()
     {
+        $this->markTestSkipped('Download was blocked by Maxmind. You can run this test just if you add license key to auth.');
+
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup('license key', null, __DIR__.'/../../../../../cache/test');
 
         $result = $ipService->downloadRemoteDataStore();
 
@@ -30,6 +32,8 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
 
     public function testIpLookupSuccessful()
     {
+        $this->markTestSkipped('It can be tested just with testDownloadDataStore');
+
         // Keep the file contained to cache/test
         $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
 

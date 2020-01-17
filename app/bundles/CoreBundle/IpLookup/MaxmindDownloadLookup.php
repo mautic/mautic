@@ -28,7 +28,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
      */
     public function getLocalDataStoreFilepath()
     {
-        return $this->getDataDir().'/GeoLite2-City/GeoLite2-City.mmdb';
+        return $this->getDataDir().'/GeoLite2-City.mmdb';
     }
 
     /**
@@ -77,18 +77,5 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $this->zipcode   = $record->location->postalCode;
         } catch (\Exception $exception) {
         }
-    }
-
-    public function downloadRemoteDataStore()
-    {
-        if(parent::downloadRemoteDataStore()){
-            $localTarget       = $this->getLocalDataStoreFilepath();
-            $localTargetFolder = substr($localTarget, 0, strripos($localTarget, '/'));
-            $directories = glob($localTargetFolder  . '/*' , GLOB_ONLYDIR);
-            rsort($directories);
-            copy($directories[0].'/'.'GeoLite2-City.mmdb', $localTarget);
-            return true;
-        }
-        return false;
     }
 }

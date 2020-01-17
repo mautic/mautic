@@ -13,12 +13,24 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use Joomla\Http\HttpFactory;
 use PharData;
+use PharFileInfo;
+use RecursiveIteratorIterator;
 
 /**
  * Class AbstractLocalDataLookup.
  */
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
+    /**
+     * @const TAR_CACHE_FOLDER
+     */
+    const TAR_CACHE_FOLDER = 'unpack';
+
+    /**
+     * @const TAR_TEMP_FILE
+     */
+    const TAR_TEMP_FILE = 'temp.tar.gz';
+
     /**
      * Path to the local data store.
      *
@@ -73,7 +85,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
         $localTarget       = $this->getLocalDataStoreFilepath();
         $localTargetExt    = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
-        $localTargetFolder = substr($localTarget, 0, strripos($localTarget, '/'));
 
         try {
             $success = false;
@@ -85,11 +96,22 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     break;
 
                 case $this->endsWith($package, 'tar.gz'):
-                    $temporaryPhar = $localTargetFolder.'.tar.gz';
+                    $tempTargetFolder = $this->cacheDir.'/'.self::TAR_CACHE_FOLDER;
+                    $temporaryPhar    = $tempTargetFolder.'/'.self::TAR_TEMP_FILE;
+                    if (!is_dir($tempTargetFolder)) {
+                        // dir doesn't exist, make it
+                        mkdir($tempTargetFolder);
+                    }
                     file_put_contents($temporaryPhar, $data->body);
                     $pharData = new PharData($temporaryPhar);
-                    $success = $pharData->extractTo($localTargetFolder, null, true);
+                    foreach (new RecursiveIteratorIterator($pharData) as $file) {
+                        /* @var PharFileInfo $file*/
+                        if ($file->getBasename() === basename($localTarget)) {
+                            $success = copy($file->getPathname(), $localTarget);
+                        }
+                    }
                     @unlink($temporaryPhar);
+
                     break;
 
                 case 'gz' == $tempExt:
@@ -175,6 +197,9 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Get if the string ends with.
+     *
+     * @param string $haystack
+     * @param string $needle
      *
      * @return bool
      */
