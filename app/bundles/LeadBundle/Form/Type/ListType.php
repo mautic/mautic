@@ -59,18 +59,6 @@ class ListType extends AbstractType
     private $localeChoices       = [];
     private $categoriesChoices   = [];
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ListModel           $listModel
-     * @param EmailModel          $emailModel
-     * @param CorePermissions     $security
-     * @param LeadModel           $leadModel
-     * @param StageModel          $stageModel
-     * @param CategoryModel       $categoryModel
-     * @param UserHelper          $userHelper
-     * @param CampaignModel       $campaignModel
-     * @param AssetModel          $assetModel
-     */
     public function __construct(TranslatorInterface $translator, ListModel $listModel, EmailModel $emailModel, CorePermissions $security, LeadModel $leadModel, StageModel $stageModel, CategoryModel $categoryModel, UserHelper $userHelper, CampaignModel $campaignModel, AssetModel $assetModel)
     {
         $this->translator = $translator;
@@ -135,10 +123,6 @@ class ListType extends AbstractType
         $this->deviceOsChoices     = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
@@ -250,9 +234,6 @@ class ListType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

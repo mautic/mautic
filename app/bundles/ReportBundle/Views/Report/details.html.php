@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 $header = $view['translator']->trans(
     'mautic.report.report.header.view',
     ['%name%' => $view->escape($view['translator']->trans($report->getName()))]
@@ -52,7 +55,7 @@ if ('index' == $tmpl) {
                 'iconClass' => 'fa fa-file-text-o',
             ];
 
-            if (class_exists('PHPExcel')) {
+            if (class_exists(Spreadsheet::class)) {
                 $buttons[] = [
                     'attr' => [
                         'data-toggle' => 'download',
@@ -94,7 +97,7 @@ if ('index' == $tmpl) {
                 ],
                 'routeBase'         => 'report',
                 'langVar'           => 'report.report',
-                'postCustomButtons' => $buttons,
+                'customButtons'     => $buttons,
             ]
         )
     );

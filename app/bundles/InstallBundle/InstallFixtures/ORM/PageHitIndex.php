@@ -27,9 +27,6 @@ class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, C
         $this->container = $container;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $prefix = $this->container->getParameter('mautic.db_table_prefix');

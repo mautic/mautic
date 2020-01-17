@@ -45,8 +45,6 @@ class CsvHelper
     }
 
     /**
-     * @param array $headers
-     *
      * @return array
      */
     public static function sanitizeHeaders(array $headers)
@@ -55,8 +53,6 @@ class CsvHelper
     }
 
     /**
-     * @param array $headers
-     *
      * @return array
      */
     public static function convertHeadersIntoFields(array $headers)

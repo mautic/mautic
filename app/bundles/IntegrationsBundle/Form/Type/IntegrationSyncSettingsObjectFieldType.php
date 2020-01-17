@@ -24,9 +24,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IntegrationSyncSettingsObjectFieldType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws InvalidFormOptionException
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -43,7 +40,7 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
                 'label'          => false,
                 'choices'        => $options['mauticFields'],
                 'required'       => $field->showAsRequired(),
-                'empty_value'    => '',
+                'placeholder'    => '',
                 'error_bubbling' => false,
                 'attr'           => [
                     'class'            => 'form-control integration-mapped-field',
@@ -90,9 +87,6 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(

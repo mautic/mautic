@@ -64,6 +64,9 @@ $container->loadFromExtension('monolog', [
 $container->loadFromExtension('twig', [
     'cache'       => '%mautic.tmp_path%/%kernel.environment%/twig',
     'auto_reload' => true,
+    'paths'       => [
+        '%kernel.root_dir%/bundles' => 'bundles',
+    ],
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks

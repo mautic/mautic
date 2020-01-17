@@ -66,11 +66,6 @@ class DynamicContentType extends AbstractType
     /**
      * DynamicContentType constructor.
      *
-     * @param EntityManager       $entityManager
-     * @param ListModel           $listModel
-     * @param TranslatorInterface $translator
-     * @param LeadModel           $leadModel
-     *
      * @throws \InvalidArgumentException
      */
     public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel)
@@ -99,10 +94,6 @@ class DynamicContentType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
@@ -249,7 +240,7 @@ class DynamicContentType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => 'mautic.core.form.translation_parent.empty',
+                    'placeholder' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
                     'ignore_ids'  => [(int) $options['data']->getId()],
                 ]
@@ -326,8 +317,6 @@ class DynamicContentType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     public function configureOptions(OptionsResolver $resolver)

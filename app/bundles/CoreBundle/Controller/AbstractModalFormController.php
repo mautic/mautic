@@ -35,7 +35,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
 
     /**
      * @param      $data
-     * @param Form $form
      * @param      $action
      * @param null $objectId
      *
@@ -137,12 +136,12 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     }
 
     /**
-     * @param $args
-     * @param $action
+     * @param array       $args
+     * @param string|null $action
      *
      * @return mixed
      */
-    protected function getResponseVars($args, $action)
+    protected function getResponseVars($args, $action = null)
     {
         return $args;
     }
@@ -240,7 +239,6 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
     /**
      * @param      $isValid
      * @param      $data
-     * @param Form $form
      * @param      $action
      * @param bool $objectId
      */

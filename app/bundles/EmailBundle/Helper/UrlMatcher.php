@@ -14,8 +14,7 @@ namespace Mautic\EmailBundle\Helper;
 class UrlMatcher
 {
     /**
-     * @param array $urlsToCheckAgainst
-     * @param       $urlToFind
+     * @param $urlToFind
      *
      * @return bool
      */

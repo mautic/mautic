@@ -26,9 +26,6 @@ class ChannelSubscriber implements EventSubscriberInterface
      */
     private $integrationHelper;
 
-    /**
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;
@@ -44,9 +41,6 @@ class ChannelSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');

@@ -96,15 +96,6 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param LeadModel           $leadModel
-     * @param StageModel          $stageModel
-     * @param CampaignModel       $campaignModel
-     * @param CompanyModel        $companyModel
-     * @param CompanyReportData   $companyReportData
-     * @param FieldsBuilder       $fieldsBuilder
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         LeadModel $leadModel,
         StageModel $stageModel,
@@ -138,8 +129,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -222,8 +211,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -387,8 +374,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -656,11 +641,6 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
-     */
     private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $pointColumns = [
@@ -707,11 +687,6 @@ class ReportSubscriber implements EventSubscriberInterface
             ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
 
-    /**
-     * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
-     */
     private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $frequencyColumns = [
@@ -754,10 +729,7 @@ class ReportSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
-     * @param string             $type
+     * @param string $type
      */
     private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type)
     {
@@ -883,9 +855,6 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
-    /**
-     * @param ReportDataEvent $event
-     */
     public function onReportDisplay(ReportDataEvent $event)
     {
         $data = $event->getData();

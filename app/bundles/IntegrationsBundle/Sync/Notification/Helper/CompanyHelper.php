@@ -22,17 +22,12 @@ class CompanyHelper
      */
     private $connection;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
 
     /**
-     * @param int $id
-     *
      * @return string|bool
      */
     public function getCompanyName(int $id)

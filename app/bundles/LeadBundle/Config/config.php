@@ -328,15 +328,18 @@ return [
                 ],
             ],
             'mautic.lead.emailbundle.subscriber' => [
-                'class'     => \Mautic\LeadBundle\EventListener\EmailSubscriber::class,
+                'class'     => Mautic\LeadBundle\EventListener\EmailSubscriber::class,
                 'arguments' => [
-                    'mautic.factory',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.lead.formbundle.subscriber' => [
-                'class'     => \Mautic\LeadBundle\EventListener\FormSubscriber::class,
+                'class'     => Mautic\LeadBundle\EventListener\FormSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
             'mautic.lead.campaignbundle.subscriber' => [

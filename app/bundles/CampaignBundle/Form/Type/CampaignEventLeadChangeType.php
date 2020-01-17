@@ -20,10 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class CampaignEventLeadChangeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $data = (isset($options['data']['action'])) ? $options['data']['action'] : 'added';
@@ -36,7 +32,7 @@ class CampaignEventLeadChangeType extends AbstractType
             'multiple'          => false,
             'label_attr'        => ['class' => 'control-label'],
             'label'             => 'mautic.campaign.form.trigger_leadchanged',
-            'empty_value'       => false,
+            'placeholder'       => false,
             'required'          => false,
             'data'              => $data,
         ]);

@@ -27,18 +27,11 @@ class VariantType extends AbstractType
      */
     private $emailModel;
 
-    /**
-     * @param EmailModel $emailModel
-     */
     public function __construct(EmailModel $emailModel)
     {
         $this->emailModel = $emailModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('weight',
@@ -76,7 +69,7 @@ class VariantType extends AbstractType
                     'expanded'    => false,
                     'multiple'    => false,
                     'choices'     => $choices,
-                    'empty_value' => 'mautic.core.form.chooseone',
+                    'placeholder' => 'mautic.core.form.chooseone',
                     'constraints' => [
                         new NotBlank(
                             ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']

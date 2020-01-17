@@ -16,9 +16,6 @@ namespace Mautic\EmailBundle\EventListener;
 trait MatchFilterForLeadTrait
 {
     /**
-     * @param array $filter
-     * @param array $lead
-     *
      * @return bool
      */
     protected function matchFilterForLead(array $filter, array $lead)

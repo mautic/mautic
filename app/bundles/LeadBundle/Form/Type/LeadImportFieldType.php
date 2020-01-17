@@ -34,20 +34,12 @@ class LeadImportFieldType extends AbstractType
      */
     private $entityManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     */
     public function __construct(TranslatorInterface $translator, EntityManager $entityManager)
     {
         $this->translator    = $translator;
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $specialFields = [
@@ -172,9 +164,6 @@ class LeadImportFieldType extends AbstractType
         $builder->add('buttons', FormButtonsType::class, $buttons);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['lead_fields', 'import_fields', 'company_fields', 'object']);
@@ -191,7 +180,6 @@ class LeadImportFieldType extends AbstractType
 
     /**
      * @param string $fieldName
-     * @param array  $importFields
      *
      * @return string
      */

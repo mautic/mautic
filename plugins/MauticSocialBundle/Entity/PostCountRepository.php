@@ -20,8 +20,6 @@ class PostCountRepository extends CommonRepository
     /**
      * Get a list of entities.
      *
-     * @param array $args
-     *
      * @return Paginator
      */
     public function getEntities(array $args = [])
@@ -32,9 +30,7 @@ class PostCountRepository extends CommonRepository
     /**
      * Fetch Lead stats for some period of time.
      *
-     * @param int    $quantity of units
-     * @param string $unit     of time php.net/manual/en/class.dateinterval.php#dateinterval.props
-     * @param array  $options
+     * @param array $options
      *
      * @return mixed
      *

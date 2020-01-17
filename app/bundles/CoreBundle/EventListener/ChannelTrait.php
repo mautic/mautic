@@ -20,9 +20,6 @@ trait ChannelTrait
      */
     protected $modelFactory;
 
-    /**
-     * @param ModelFactory $modelFactory
-     */
     public function setModelFactory(ModelFactory $modelFactory)
     {
         $this->modelFactory = $modelFactory;

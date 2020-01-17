@@ -42,12 +42,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param EmailReplyRepositoryInterface $emailReplyRepository
-     * @param StatRepository                $statRepository
-     * @param TranslatorInterface           $translator
-     * @param RouterInterface               $router
-     */
     public function __construct(
         EmailReplyRepositoryInterface $emailReplyRepository,
         StatRepository $statRepository,
@@ -73,8 +67,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -84,9 +76,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->addEmailReplies($event);
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->statRepository->updateLead(
@@ -96,8 +85,7 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param                   $state
+     * @param $state
      */
     private function addEmailEvents(LeadTimelineEvent $event, $state)
     {
@@ -167,9 +155,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     */
     private function addEmailReplies(LeadTimelineEvent $event)
     {
         $eventTypeKey  = 'email.replied';

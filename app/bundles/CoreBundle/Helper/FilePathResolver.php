@@ -35,8 +35,7 @@ class FilePathResolver
     }
 
     /**
-     * @param string       $uploadDir
-     * @param UploadedFile $file
+     * @param string $uploadDir
      *
      * @return string
      *
@@ -93,8 +92,6 @@ class FilePathResolver
     }
 
     /**
-     * @param UploadedFile $file
-     *
      * @return string
      */
     private function getFileExtension(UploadedFile $file)

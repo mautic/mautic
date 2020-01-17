@@ -85,15 +85,6 @@ class ContactRequestHelper
 
     /**
      * ContactRequestHelper constructor.
-     *
-     * @param LeadModel                $leadModel
-     * @param ContactTracker           $contactTracker
-     * @param CoreParametersHelper     $coreParametersHelper
-     * @param IpLookupHelper           $ipLookupHelper
-     * @param LeadDeviceRepository     $leadDeviceRepository
-     * @param RequestStack             $requestStack
-     * @param Logger                   $logger
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         LeadModel $leadModel,
@@ -116,8 +107,6 @@ class ContactRequestHelper
     }
 
     /**
-     * @param array $queryFields
-     *
      * @return Lead
      */
     public function getContactFromQuery(array $queryFields = [])
@@ -190,8 +179,6 @@ class ContactRequestHelper
     /**
      * Identify a contact through a clickthrough URL.
      *
-     * @param array $clickthrough
-     *
      * @return Lead
      *
      * @throws ContactNotFoundException
@@ -211,9 +198,6 @@ class ContactRequestHelper
         throw new ContactNotFoundException();
     }
 
-    /**
-     * @param array $clickthrough
-     */
     private function setEmailFromClickthroughIdentification(array $clickthrough)
     {
         if (!$this->coreParametersHelper->getParameter('track_by_tracking_url') || !empty($queryFields['email'])) {
@@ -297,8 +281,6 @@ class ContactRequestHelper
     }
 
     /**
-     * @param Lead $foundContact
-     *
      * @return Lead
      */
     private function mergeWithTrackedContact(Lead $foundContact)

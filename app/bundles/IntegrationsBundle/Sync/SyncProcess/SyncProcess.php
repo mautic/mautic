@@ -101,20 +101,6 @@ class SyncProcess
      */
     private $syncService;
 
-    /**
-     * @param SyncDateHelper            $syncDateHelper
-     * @param MappingHelper             $mappingHelper
-     * @param RelationsHelper           $relationsHelper
-     * @param IntegrationSyncProcess    $integrationSyncProcess
-     * @param MauticSyncProcess         $mauticSyncProcess
-     * @param EventDispatcherInterface  $eventDispatcher
-     * @param Notifier                  $notifier
-     * @param MappingManualDAO          $mappingManualDAO
-     * @param SyncDataExchangeInterface $internalSyncDataExchange
-     * @param SyncDataExchangeInterface $integrationSyncDataExchange
-     * @param InputOptionsDAO           $inputOptionsDAO
-     * @param SyncService               $syncService
-     */
     public function __construct(
         SyncDateHelper $syncDateHelper,
         MappingHelper $mappingHelper,
@@ -288,9 +274,6 @@ class SyncProcess
         } while (true);
     }
 
-    /**
-     * @param ReportDAO $syncReport
-     */
     private function manageRelations(ReportDAO $syncReport): void
     {
         // Map relations
@@ -304,10 +287,6 @@ class SyncProcess
         }
     }
 
-    /**
-     * @param array     $objectsToSynchronize
-     * @param ReportDAO $syncReport
-     */
     private function synchronizeMissingObjects(array $objectsToSynchronize, ReportDAO $syncReport): void
     {
         $inputOptions = $this->getInputOptionsForObjects($objectsToSynchronize);
@@ -320,10 +299,6 @@ class SyncProcess
     }
 
     /**
-     * @param array $objectsToSynchronize
-     *
-     * @return InputOptionsDAO
-     *
      * @throws \Mautic\IntegrationsBundle\Exception\InvalidValueException
      */
     private function getInputOptionsForObjects(array $objectsToSynchronize): InputOptionsDAO
@@ -356,9 +331,6 @@ class SyncProcess
         $this->integrationSyncProcess = $currentSyncProcess;
     }
 
-    /**
-     * @return bool
-     */
     private function shouldStopIntegrationSync(): bool
     {
         // We don't want to iterate sync for specific ids
@@ -366,8 +338,6 @@ class SyncProcess
     }
 
     /**
-     * @param OrderDAO $syncOrder
-     *
      * @throws IntegrationNotFoundException
      * @throws HandlerNotSupportedException
      */

@@ -47,20 +47,12 @@ class FieldType extends AbstractType
      */
     private $leadFieldRepository;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LeadFieldRepository $leadFieldRepository
-     */
     public function __construct(TranslatorInterface $translator, LeadFieldRepository $leadFieldRepository)
     {
         $this->translator          = $translator;
         $this->leadFieldRepository = $leadFieldRepository;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
@@ -94,7 +86,7 @@ class FieldType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'label'       => 'mautic.lead.field.group',
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'disabled'    => $disabled,
             ]
@@ -113,7 +105,7 @@ class FieldType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.lead.field.type',
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'disabled'          => ($disabled || !$new),
                 'attr'              => [
                     'class'    => 'form-control',
@@ -203,7 +195,7 @@ class FieldType extends AbstractType
                 'required'    => false,
                 'mapped'      => false,
                 'data'        => '',
-                'empty_value' => ' x ',
+                'placeholder' => ' x ',
             ]
         );
 
@@ -317,7 +309,7 @@ class FieldType extends AbstractType
                             'data'        => $value,
                             'no_label'    => $noLabel,
                             'yes_label'   => $yesLabel,
-                            'empty_value' => ' x ',
+                            'placeholder' => ' x ',
                         ]
                     );
                     break;
@@ -442,7 +434,7 @@ class FieldType extends AbstractType
                 [
                     'label'         => 'mautic.core.order',
                     'class'         => 'MauticLeadBundle:LeadField',
-                    'property'      => 'label',
+                    'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
                     'query_builder' => function (EntityRepository $er) {
@@ -550,7 +542,7 @@ class FieldType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.lead.field.object',
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'attr'              => [
                     'class' => 'form-control',
                 ],
@@ -566,9 +558,6 @@ class FieldType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

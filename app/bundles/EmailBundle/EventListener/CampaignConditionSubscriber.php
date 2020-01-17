@@ -27,9 +27,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
      */
     private $validator;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EmailValidator $validator)
     {
         $this->validator = $validator;
@@ -46,9 +43,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $event->addCondition(
@@ -61,9 +55,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         try {

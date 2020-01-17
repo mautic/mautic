@@ -1,10 +1,9 @@
 <?php
 
-namespace Mautic\CoreBundle\Helper\RandomHelper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper\RandomHelper;
 
-/**
- * Class RandomHelperTest.
- */
+use Mautic\CoreBundle\Helper\RandomHelper\RandomHelper;
+
 class RandomHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

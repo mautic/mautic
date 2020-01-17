@@ -19,10 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusPropertiesType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $choices = [];
@@ -83,7 +79,7 @@ class FocusPropertiesType extends AbstractType
                             'onchange' => 'Mautic.focusUpdatePreview()',
                         ],
                         'required'    => false,
-                        'empty_value' => false,
+                        'placeholder' => false,
                     ]
                 );
 
@@ -124,7 +120,7 @@ class FocusPropertiesType extends AbstractType
                         'onchange' => 'Mautic.focusUpdatePreview()',
                     ],
                     'required'    => false,
-                    'empty_value' => false,
+                    'placeholder' => false,
                 ]
             );
         }

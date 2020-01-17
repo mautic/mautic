@@ -89,7 +89,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
     }
 
     /**
-     * @param array             $ids
      * @param ObjectChangeDAO[] $objects
      *
      * @return UpdatedObjectMappingDAO[]
@@ -145,12 +144,8 @@ class CompanyObjectHelper implements ObjectHelperInterface
     /**
      * Unfortunately the CompanyRepository doesn't give us what we need so we have to write our own queries.
      *
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param int                $start
-     * @param int                $limit
-     *
-     * @return array
+     * @param int $start
+     * @param int $limit
      */
     public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
     {
@@ -177,11 +172,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
         return $qb->execute()->fetchAll();
     }
 
-    /**
-     * @param array $ids
-     *
-     * @return array
-     */
     public function findObjectsByIds(array $ids): array
     {
         if (!count($ids)) {
@@ -198,11 +188,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
         return $qb->execute()->fetchAll();
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return array
-     */
     public function findObjectsByFieldValues(array $fields): array
     {
         $q = $this->connection->createQueryBuilder()
@@ -218,11 +203,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
         return $q->execute()->fetchAll();
     }
 
-    /**
-     * @param array $objectIds
-     *
-     * @return array
-     */
     public function findOwnerIds(array $objectIds): array
     {
         if (empty($objectIds)) {

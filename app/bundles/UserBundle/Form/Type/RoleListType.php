@@ -23,9 +23,6 @@ class RoleListType extends AbstractType
      */
     private $roleModel;
 
-    /**
-     * @param RoleModel $roleModel
-     */
     public function __construct(RoleModel $roleModel)
     {
         $this->roleModel = $roleModel;
@@ -42,7 +39,7 @@ class RoleListType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'required'          => false,
-                'empty_value'       => 'mautic.core.form.chooseone',
+                'placeholder'       => 'mautic.core.form.chooseone',
             ]
         );
     }

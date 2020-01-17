@@ -62,8 +62,7 @@ final class ContentDTO implements \JsonSerializable
     /**
      * ContentDTO constructor.
      *
-     * @param         $subject
-     * @param FromDTO $from
+     * @param $subject
      */
     public function __construct($subject, FromDTO $from)
     {
@@ -121,8 +120,6 @@ final class ContentDTO implements \JsonSerializable
     }
 
     /**
-     * @param AttachementDTO $attachementDTO
-     *
      * @return $this
      */
     public function addAttachment(AttachementDTO $attachementDTO)

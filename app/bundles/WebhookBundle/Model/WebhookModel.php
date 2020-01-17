@@ -100,11 +100,6 @@ class WebhookModel extends FormModel
      */
     protected $eventsOrderByDir;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param SerializerInterface  $serializer
-     * @param NotificationModel    $notificationModel
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         SerializerInterface $serializer,
@@ -118,10 +113,9 @@ class WebhookModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param      $entity
+     * @param      $formFactory
+     * @param null $action
      *
      * @return mixed
      *
@@ -213,9 +207,8 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param       $webhookEvents
-     * @param       $payload
-     * @param array $serializationGroups
+     * @param $webhookEvents
+     * @param $payload
      */
     public function queueWebhooks($webhookEvents, $payload, array $serializationGroups = [])
     {
@@ -241,10 +234,8 @@ class WebhookModel extends FormModel
     /**
      * Creates a WebhookQueue entity, sets the date and returns the created entity.
      *
-     * @param Webhook $webhook
-     * @param         $event
-     * @param         $payload
-     * @param array   $serializationGroups
+     * @param $event
+     * @param $payload
      *
      * @return WebhookQueue
      */
@@ -280,7 +271,6 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook      $webhook
      * @param WebhookQueue $queue
      *
      * @return bool
@@ -369,8 +359,6 @@ class WebhookModel extends FormModel
      * Look into the history and check if all the responses we care about had failed.
      * But let it run for a while after the user modified it. Lets not aggravate the user.
      *
-     * @param Webhook $webhook
-     *
      * @return bool
      */
     public function isSick(Webhook $webhook)
@@ -393,8 +381,6 @@ class WebhookModel extends FormModel
     /**
      * Unpublish the webhook so it will stop emit the requests
      * and notify user about it.
-     *
-     * @param Webhook $webhook
      */
     public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
     {
@@ -424,10 +410,9 @@ class WebhookModel extends FormModel
     /**
      * Add a log for the webhook response HTTP status and save it.
      *
-     * @param Webhook $webhook
-     * @param int     $statusCode
-     * @param float   $runtime    in seconds
-     * @param string  $note
+     * @param int    $statusCode
+     * @param float  $runtime    in seconds
+     * @param string $note
      */
     public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
     {
@@ -478,7 +463,6 @@ class WebhookModel extends FormModel
     /**
      * Get the payload from the webhook.
      *
-     * @param Webhook      $webhook
      * @param WebhookQueue $queue
      *
      * @return array
@@ -532,8 +516,6 @@ class WebhookModel extends FormModel
     /**
      * Get the queues and order by date so we get events.
      *
-     * @param Webhook $webhook
-     *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getWebhookQueues(Webhook $webhook)
@@ -563,8 +545,6 @@ class WebhookModel extends FormModel
 
     /**
      * Returns either Webhook's orderbyDir or the value from configuration as default.
-     *
-     * @param Webhook|null $webhook
      *
      * @return string
      */
@@ -628,7 +608,6 @@ class WebhookModel extends FormModel
     /**
      * @param       $payload
      * @param array $groups
-     * @param array $customExclusionStrategies
      *
      * @return mixed|string
      */
@@ -665,8 +644,6 @@ class WebhookModel extends FormModel
 
     /**
      * Sets all class properties from CoreParametersHelper.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {

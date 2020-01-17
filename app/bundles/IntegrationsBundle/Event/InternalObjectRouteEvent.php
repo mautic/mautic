@@ -33,43 +33,27 @@ class InternalObjectRouteEvent extends Event
      */
     private $route;
 
-    /**
-     * @param ObjectInterface $object
-     * @param int             $id
-     */
     public function __construct(ObjectInterface $object, int $id)
     {
         $this->object = $object;
         $this->id     = $id;
     }
 
-    /**
-     * @return ObjectInterface
-     */
     public function getObject(): ObjectInterface
     {
         return $this->object;
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getRoute(): ?string
     {
         return $this->route;
     }
 
-    /**
-     * @param string|null $route
-     */
     public function setRoute(?string $route): void
     {
         $this->route = $route;

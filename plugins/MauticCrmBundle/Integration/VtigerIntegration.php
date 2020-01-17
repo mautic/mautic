@@ -289,7 +289,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.vtiger.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );

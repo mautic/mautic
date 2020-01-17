@@ -41,12 +41,6 @@ class SearchSubscriber implements EventSubscriberInterface
      */
     private $templating;
 
-    /**
-     * @param UserModel        $userModel
-     * @param RoleModel        $roleModel
-     * @param CorePermissions  $security
-     * @param TemplatingHelper $templating
-     */
     public function __construct(
         UserModel $userModel,
         RoleModel $roleModel,
@@ -146,9 +140,6 @@ class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted('user:users:view')) {

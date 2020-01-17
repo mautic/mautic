@@ -32,9 +32,6 @@ class LoadAssetData extends AbstractFixture implements OrderedFixtureInterface
         $this->assetModel = $assetModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $asset = new Asset();

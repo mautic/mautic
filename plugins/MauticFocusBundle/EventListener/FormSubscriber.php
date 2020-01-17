@@ -23,9 +23,6 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private $model;
 
-    /**
-     * @param FocusModel $model
-     */
     public function __construct(FocusModel $model)
     {
         $this->model = $model;
@@ -44,8 +41,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\FormEvent $event
      */
     public function onFormPostSave(Events\FormEvent $event)
     {
@@ -74,8 +69,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\FormEvent $event
      */
     public function onFormDelete(Events\FormEvent $event)
     {

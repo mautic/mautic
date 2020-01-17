@@ -24,17 +24,11 @@ class LeadFieldsType extends AbstractType
      */
     protected $fieldModel;
 
-    /**
-     * @param FieldModel $fieldModel
-     */
     public function __construct(FieldModel $fieldModel)
     {
         $this->fieldModel = $fieldModel;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

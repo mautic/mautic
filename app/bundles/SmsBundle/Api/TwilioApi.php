@@ -39,11 +39,6 @@ class TwilioApi extends AbstractSmsApi
 
     /**
      * TwilioApi constructor.
-     *
-     * @param TrackableModel    $pageTrackableModel
-     * @param PhoneNumberHelper $phoneNumberHelper
-     * @param IntegrationHelper $integrationHelper
-     * @param Logger            $logger
      */
     public function __construct(TrackableModel $pageTrackableModel, PhoneNumberHelper $phoneNumberHelper, IntegrationHelper $integrationHelper, Logger $logger)
     {
@@ -80,7 +75,6 @@ class TwilioApi extends AbstractSmsApi
     }
 
     /**
-     * @param Lead   $lead
      * @param string $content
      *
      * @return bool|string

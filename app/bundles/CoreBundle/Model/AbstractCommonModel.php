@@ -14,7 +14,6 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -32,25 +31,6 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 abstract class AbstractCommonModel
 {
-    /**
-     * Do not use Factory in Models. There's a couple places where we
-     * still need to in core, but we are working on refactoring. This
-     * is completely temporary.
-     *
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @deprecated 2.0; to be removed in 3.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -91,49 +71,31 @@ abstract class AbstractCommonModel
      */
     protected $coreParametersHelper;
 
-    /**
-     * @param EntityManager $em
-     */
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;
     }
 
-    /**
-     * @param CorePermissions $security
-     */
     public function setSecurity(CorePermissions $security)
     {
         $this->security = $security;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param Router $router
-     */
     public function setRouter(Router $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -141,8 +103,6 @@ abstract class AbstractCommonModel
 
     /**
      * Initialize the user parameter for use in locking procedures.
-     *
-     * @param UserHelper $userHelper
      */
     public function setUserHelper(UserHelper $userHelper)
     {
@@ -151,8 +111,6 @@ abstract class AbstractCommonModel
 
     /**
      * Initialize the CoreParameters parameter.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {

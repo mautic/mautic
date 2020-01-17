@@ -24,17 +24,11 @@ class ConsoleTerminateListener
      */
     private $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * @param ConsoleTerminateEvent $event
-     */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
         $statusCode = $event->getExitCode();

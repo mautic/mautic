@@ -43,7 +43,7 @@ class LeadEventLog implements ChannelInterface
     private $campaign;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var IpAddress
      */
     private $ipAddress;
 
@@ -102,9 +102,6 @@ class LeadEventLog implements ChannelInterface
      */
     private $failedLog;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -234,8 +231,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param \DateTime|null $dateTriggered
-     *
      * @return $this
      */
     public function setDateTriggered(\DateTime $dateTriggered = null)
@@ -257,8 +252,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param IpAddress $ipAddress
-     *
      * @return $this
      */
     public function setIpAddress(IpAddress $ipAddress)
@@ -277,8 +270,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param LeadEntity $lead
-     *
      * @return $this
      */
     public function setLead(LeadEntity $lead)
@@ -376,8 +367,6 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @return $this
      */
     public function setCampaign(Campaign $campaign)

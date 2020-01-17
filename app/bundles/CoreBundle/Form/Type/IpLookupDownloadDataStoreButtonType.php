@@ -35,9 +35,6 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
 
     /**
      * IpLookupDownloadDataStoreButtonType constructor.
-     *
-     * @param DateHelper          $dateHelper
-     * @param TranslatorInterface $translator
      */
     public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {

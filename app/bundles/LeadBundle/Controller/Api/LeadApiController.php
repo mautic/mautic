@@ -37,9 +37,6 @@ class LeadApiController extends CommonApiController
 
     const MODEL_ID = 'lead.lead';
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel(self::MODEL_ID);
@@ -521,8 +518,6 @@ class LeadApiController extends CommonApiController
     /**
      * Creates new entity from provided params.
      *
-     * @param array $params
-     *
      * @return object
      */
     public function getNewEntity(array $params)
@@ -660,7 +655,6 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      *
-     * @param Form  $form
      * @param array $data
      *
      * @return bool

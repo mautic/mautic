@@ -27,9 +27,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $campaignEventModel;
 
-    /**
-     * @param EventModel $campaignEventModel
-     */
     public function __construct(EventModel $campaignEventModel)
     {
         $this->campaignEventModel = $campaignEventModel;
@@ -47,9 +44,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $trigger = [
@@ -66,8 +60,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger point actions for asset download.
-     *
-     * @param AssetLoadEvent $event
      */
     public function onAssetDownload(AssetLoadEvent $event)
     {
@@ -78,9 +70,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();

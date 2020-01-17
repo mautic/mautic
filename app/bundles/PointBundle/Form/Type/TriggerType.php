@@ -34,9 +34,6 @@ class TriggerType extends AbstractType
      */
     private $security;
 
-    /**
-     * @param CorePermissions $security
-     */
     public function __construct(CorePermissions $security)
     {
         $this->security = $security;
@@ -135,8 +132,10 @@ class TriggerType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
                 'data'      => $data,
+                'attr'      => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 

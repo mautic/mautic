@@ -63,6 +63,7 @@
 !/media/dashboards/*.json
 /media/files/*
 !/media/files/.htaccess
+/media/assets/*
 /media/images/*
 !/media/images/flags
 !/media/images/mejs

@@ -9,13 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 
-/**
- * Class InputHelperTest test.
- */
 class InputHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**

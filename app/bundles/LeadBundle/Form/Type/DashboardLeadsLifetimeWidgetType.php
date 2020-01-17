@@ -28,20 +28,12 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param ListModel           $segmentModel
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
     {
         $this->segmentModel = $segmentModel;
         $this->translator   = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $lists                                                       = $this->segmentModel->getUserLists();

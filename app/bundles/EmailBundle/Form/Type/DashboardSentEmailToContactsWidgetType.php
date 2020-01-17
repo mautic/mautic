@@ -10,10 +10,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DashboardSentEmailToContactsWidgetType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -38,7 +34,7 @@ class DashboardSentEmailToContactsWidgetType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
                 'multiple'    => false,
             ]

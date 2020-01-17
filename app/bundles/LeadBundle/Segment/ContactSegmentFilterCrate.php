@@ -58,8 +58,6 @@ class ContactSegmentFilterCrate
 
     /**
      * ContactSegmentFilterCrate constructor.
-     *
-     * @param array $filter
      */
     public function __construct(array $filter)
     {
@@ -187,9 +185,6 @@ class ContactSegmentFilterCrate
         return $this->sourceArray;
     }
 
-    /**
-     * @param array $filter
-     */
     private function setOperator(array $filter)
     {
         $operator = isset($filter['operator']) ? $filter['operator'] : null;

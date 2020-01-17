@@ -17,9 +17,6 @@ class RedirectListType extends AbstractType
      */
     private $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -36,7 +33,7 @@ class RedirectListType extends AbstractType
             'multiple'    => false,
             'label'       => 'mautic.page.form.redirecttype',
             'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
+            'placeholder' => false,
             'required'    => false,
             'attr'        => [
                 'class' => 'form-control',

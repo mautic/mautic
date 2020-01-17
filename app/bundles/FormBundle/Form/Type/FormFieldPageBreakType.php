@@ -29,8 +29,6 @@ class FormFieldPageBreakType extends AbstractType
 
     /**
      * FormFieldPageBreakType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

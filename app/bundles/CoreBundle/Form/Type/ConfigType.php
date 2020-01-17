@@ -72,12 +72,7 @@ class ConfigType extends AbstractType
     /**
      * ConfigType constructor.
      *
-     * @param TranslatorInterface $translator
-     * @param LanguageHelper      $langHelper
-     * @param IpLookupFactory     $ipLookupFactory
-     * @param array               $supportedLanguages
-     * @param array               $ipLookupServices
-     * @param AbstractLookup      $ipLookup
+     * @param AbstractLookup $ipLookup
      */
     public function __construct(
         TranslatorInterface $translator,
@@ -95,10 +90,6 @@ class ConfigType extends AbstractType
         $this->ipLookupServices    = $ipLookupServices;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('last_shown_tab', HiddenType::class);
@@ -135,7 +126,7 @@ class ConfigType extends AbstractType
                     'data-placeholder' => $this->translator->trans('mautic.core.config.form.webroot.dashboard'),
                 ],
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );
@@ -211,7 +202,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -306,7 +297,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
                 ],
                 'required'          => false,
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -321,7 +312,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.timezone.tooltip',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                'placeholder' => 'mautic.user.user.form.defaulttimezone',
                 'required'    => false,
             ]
         );
@@ -453,7 +444,7 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
                 ],
                 'required'          => false,
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -539,38 +530,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'transifex_username',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.username',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'transifex_password',
-            PasswordType::class,
-            [
-                'label'      => 'mautic.core.config.form.transifex.password',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
-                    'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'update_stability',
             ChoiceType::class,
             [
@@ -586,7 +545,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],
-                'empty_value'       => false,
+                'placeholder'       => false,
             ]
         );
 

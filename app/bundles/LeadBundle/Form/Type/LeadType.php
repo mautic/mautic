@@ -49,11 +49,6 @@ class LeadType extends AbstractType
      */
     private $entityManager;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param CompanyModel        $companyModel
-     * @param EntityManager       $entityManager
-     */
     public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
     {
         $this->translator    = $translator;
@@ -61,10 +56,6 @@ class LeadType extends AbstractType
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
@@ -217,9 +208,6 @@ class LeadType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

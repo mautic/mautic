@@ -125,16 +125,7 @@ class AppKernel extends Kernel
                 $db->connect();
             } catch (\Exception $e) {
                 error_log($e);
-                throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException(
-                    $this->getContainer()->get('translator')->trans(
-                        'mautic.core.db.connection.error',
-                        [
-                            '%code%' => $e->getCode(),
-                        ]
-                    ),
-                    0,
-                    $e
-                );
+                throw new \Mautic\CoreBundle\Exception\DatabaseConnectionException($this->getContainer()->get('translator')->trans('mautic.core.db.connection.error', ['%code%' => $e->getCode()]), 0, $e);
             }
         }
 
@@ -185,7 +176,7 @@ class AppKernel extends Kernel
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
-            new Mautic\QueueBundle\MauticQueueBundle(),
+            new Mautic\QueueBundle\MauticQueueBundle($this->getLocalParams()),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
@@ -198,6 +189,7 @@ class AppKernel extends Kernel
             // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
             new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
             new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
+            new FM\ElfinderBundle\FMElfinderBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles

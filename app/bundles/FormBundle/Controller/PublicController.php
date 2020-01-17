@@ -112,20 +112,8 @@ class PublicController extends CommonFormController
                         }
                     } elseif (!empty($result['callback'])) {
                         /** @var SubmissionEvent $submissionEvent */
-                        $submissionEvent = $result['callback'];
-
-                        // Return the first Response object if one is defined
-                        $firstResponseObject = false;
-                        if ($callbackResponses = $submissionEvent->getPostSubmitCallbackResponse()) {
-                            // Some submit actions already injected it's responses
-                            foreach ($callbackResponses as $key => $response) {
-                                if ($response instanceof Response) {
-                                    $firstResponseObject = $key;
-                                    break;
-                                }
-                            }
-                        }
-
+                        $submissionEvent   = $result['callback'];
+                        $callbackResponses = $submissionEvent->getPostSubmitCallbackResponse();
                         // These submit actions have requested a callback after all is said and done
                         $callbacksRequested = $submissionEvent->getPostSubmitCallback();
                         foreach ($callbacksRequested as $key => $callbackRequested) {
@@ -134,46 +122,18 @@ class PublicController extends CommonFormController
 
                             if (isset($callbackRequested['eventName'])) {
                                 $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
+                                $submissionEvent->setContext($key);
 
                                 $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
-                            } elseif (isset($callbackRequested['callback'])) {
-                                // @deprecated - to be removed in 3.0; use eventName instead - be sure to remove callback key support from SubmissionEvent::setPostSubmitCallback
-                                $callback = $callbackRequested['callback'];
-                                if (is_callable($callback)) {
-                                    if (is_array($callback)) {
-                                        $reflection = new \ReflectionMethod($callback[0], $callback[1]);
-                                    } elseif (false !== strpos($callback, '::')) {
-                                        $parts      = explode('::', $callback);
-                                        $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-                                    } else {
-                                        $reflection = new \ReflectionMethod(null, $callback);
-                                    }
+                            }
 
-                                    //add the factory to the arguments
-                                    $callbackRequested['factory'] = $this->factory;
-
-                                    $pass = [];
-                                    foreach ($reflection->getParameters() as $param) {
-                                        if (isset($callbackRequested[$param->getName()])) {
-                                            $pass[] = $callbackRequested[$param->getName()];
-                                        } else {
-                                            $pass[] = null;
-                                        }
-                                    }
-
-                                    $callbackResponses[$key] = $reflection->invokeArgs($this, $pass);
+                            if ($submissionEvent->isPropagationStopped() && $submissionEvent->hasPostSubmitResponse()) {
+                                if ($messengerMode) {
+                                    $callbackResponses[$key] = $submissionEvent->getPostSubmitResponse();
+                                } else {
+                                    return $submissionEvent->getPostSubmitResponse();
                                 }
                             }
-
-                            if (!$firstResponseObject && $callbackResponses[$key] instanceof Response) {
-                                $firstResponseObject = $key;
-                            }
-                        }
-
-                        if ($firstResponseObject && !$messengerMode && !$isAjax) {
-                            // Return the response given by the sbumit action
-
-                            return $callbackResponses[$firstResponseObject];
                         }
                     } elseif (isset($result['submission'])) {
                         /** @var SubmissionEvent $submissionEvent */
@@ -243,7 +203,6 @@ class PublicController extends CommonFormController
 
             if ($isAjax) {
                 // Post via ajax so return a json response
-
                 return new JsonResponse($data);
             } else {
                 $response = json_encode($data);

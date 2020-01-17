@@ -27,9 +27,6 @@ class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
      */
     private $objectMappingRepository;
 
-    /**
-     * @param ObjectMappingRepository $objectMappingRepository
-     */
     public function __construct(ObjectMappingRepository $objectMappingRepository)
     {
         $this->objectMappingRepository = $objectMappingRepository;
@@ -45,9 +42,6 @@ class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomTemplateEvent $event
-     */
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
         if ('MauticLeadBundle:Lead:lead.html.php' === $event->getTemplate()) {

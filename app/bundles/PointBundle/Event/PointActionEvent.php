@@ -27,10 +27,6 @@ class PointActionEvent extends CommonEvent
      */
     protected $lead;
 
-    /**
-     * @param Point $point
-     * @param Lead  $lead
-     */
     public function __construct(Point $point, Lead $lead)
     {
         $this->point = $point;
@@ -45,9 +41,6 @@ class PointActionEvent extends CommonEvent
         return $this->point;
     }
 
-    /**
-     * @param Point $point
-     */
     public function setPoint(Point $point)
     {
         $this->point = $point;
@@ -61,9 +54,6 @@ class PointActionEvent extends CommonEvent
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;

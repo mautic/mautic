@@ -172,6 +172,8 @@ $container->loadFromExtension(
         'firewalls'      => $firewalls,
         'access_control' => [
             ['path' => '^/api', 'roles' => 'IS_AUTHENTICATED_FULLY'],
+            ['path' => '^/efconnect', 'roles' => 'IS_AUTHENTICATED_FULLY'],
+            ['path' => '^/elfinder', 'roles' => 'IS_AUTHENTICATED_FULLY'],
         ],
     ]
 );

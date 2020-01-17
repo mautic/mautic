@@ -32,10 +32,6 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
      */
     private $companyReportData;
 
-    /**
-     * @param FieldsBuilder     $fieldsBuilder
-     * @param CompanyReportData $companyReportData
-     */
     public function __construct(
         FieldsBuilder $fieldsBuilder,
         CompanyReportData $companyReportData
@@ -57,8 +53,6 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -101,8 +95,6 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {

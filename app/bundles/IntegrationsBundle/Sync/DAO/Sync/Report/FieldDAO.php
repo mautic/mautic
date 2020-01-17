@@ -41,11 +41,6 @@ class FieldDAO
      */
     private $state;
 
-    /**
-     * @param string             $name
-     * @param NormalizedValueDAO $value
-     * @param string             $state
-     */
     public function __construct(string $name, NormalizedValueDAO $value, string $state = self::FIELD_CHANGED)
     {
         $this->name  = $name;
@@ -61,25 +56,17 @@ class FieldDAO
         return $this->name;
     }
 
-    /**
-     * @return NormalizedValueDAO
-     */
     public function getValue(): NormalizedValueDAO
     {
         return $this->value;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getChangeDateTime(): ?\DateTimeInterface
     {
         return $this->changeDateTime;
     }
 
     /**
-     * @param \DateTimeInterface $changeDateTime
-     *
      * @return FieldDAO
      */
     public function setChangeDateTime(\DateTimeInterface $changeDateTime): self
@@ -89,9 +76,6 @@ class FieldDAO
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getState(): string
     {
         return $this->state;

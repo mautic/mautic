@@ -41,9 +41,6 @@ class CategoryType extends AbstractType
 
     /**
      * CategoryType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param Session             $session
      */
     public function __construct(TranslatorInterface $translator, Session $session)
     {
@@ -51,10 +48,6 @@ class CategoryType extends AbstractType
         $this->session    = $session;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber());
@@ -154,9 +147,6 @@ class CategoryType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

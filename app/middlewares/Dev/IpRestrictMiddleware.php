@@ -35,8 +35,6 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
     /**
      * CatchExceptionMiddleware constructor.
-     *
-     * @param HttpKernelInterface $app
      */
     public function __construct(HttpKernelInterface $app)
     {

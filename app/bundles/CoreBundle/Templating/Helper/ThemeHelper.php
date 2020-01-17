@@ -41,8 +41,7 @@ class ThemeHelper
     private $config;
 
     /**
-     * @param PathsHelper $pathsHelper
-     * @param string      $theme
+     * @param string $theme
      *
      * @throws BadConfigurationException
      * @throws FileNotFoundException

@@ -41,11 +41,8 @@ class RemappedObjectDAO
     private $newObjectId;
 
     /**
-     * @param string $integration
-     * @param string $oldObjectName
-     * @param mixed  $oldObjectId
-     * @param string $newObjectName
-     * @param mixed  $newObjectId
+     * @param mixed $oldObjectId
+     * @param mixed $newObjectId
      */
     public function __construct(string $integration, string $oldObjectName, $oldObjectId, string $newObjectName, $newObjectId)
     {
@@ -56,17 +53,11 @@ class RemappedObjectDAO
         $this->newObjectId   = $newObjectId;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
     }
 
-    /**
-     * @return string
-     */
     public function getOldObjectName(): string
     {
         return $this->oldObjectName;
@@ -80,9 +71,6 @@ class RemappedObjectDAO
         return $this->oldObjectId;
     }
 
-    /**
-     * @return string
-     */
     public function getNewObjectName(): string
     {
         return $this->newObjectName;

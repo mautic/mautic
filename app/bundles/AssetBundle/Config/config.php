@@ -77,7 +77,16 @@ return [
                 ],
             ],
             'mautic.asset.formbundle.subscriber' => [
-                'class' => \Mautic\AssetBundle\EventListener\FormSubscriber::class,
+                'class'     => Mautic\AssetBundle\EventListener\FormSubscriber::class,
+                'arguments' => [
+                    'mautic.asset.model.asset',
+                    'translator',
+                    'mautic.helper.template.analytics',
+                    'templating.helper.assets',
+                    'mautic.helper.theme',
+                    'mautic.helper.templating',
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'mautic.asset.campaignbundle.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
@@ -95,10 +104,10 @@ return [
             'mautic.asset.builder.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
                 'arguments' => [
-                    'mautic.asset.helper.token',
-                    'mautic.lead.model.lead',
                     'mautic.security',
-                    'mautic.factory',
+                    'mautic.asset.helper.token',
+                    'mautic.tracker.contact',
+                    'mautic.helper.token_builder.factory',
                 ],
             ],
             'mautic.asset.leadbundle.subscriber' => [
@@ -186,19 +195,16 @@ return [
             'mautic.form.type.assetconfig' => [
                 'class' => \Mautic\AssetBundle\Form\Type\ConfigType::class,
             ],
-            'mautic.form.type.asset_dashboard_downloads_in_time_widget' => [
-                'class' => \Mautic\AssetBundle\Form\Type\DashboardDownloadsInTimeWidgetType::class,
-            ],
         ],
         'others' => [
             'mautic.asset.upload.error.handler' => [
-                'class'     => 'Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler',
+                'class'     => \Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
                 'arguments' => 'mautic.factory',
             ],
             // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => 'Mautic\AssetBundle\Controller\UploadController',
+            'oneup_uploader.controller.dropzone.class' => \Mautic\AssetBundle\Controller\UploadController::class,
             'mautic.asset.helper.token'                => [
-                'class'     => 'Mautic\AssetBundle\Helper\TokenHelper',
+                'class'     => \Mautic\AssetBundle\Helper\TokenHelper::class,
                 'arguments' => 'mautic.asset.model.asset',
             ],
         ],

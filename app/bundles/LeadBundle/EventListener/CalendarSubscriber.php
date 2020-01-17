@@ -36,11 +36,6 @@ class CalendarSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param Connection          $connection
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     */
     public function __construct(Connection $connection, TranslatorInterface $translator, RouterInterface $router)
     {
         $this->connection = $connection;
@@ -60,8 +55,6 @@ class CalendarSubscriber implements EventSubscriberInterface
 
     /**
      * Adds events to the calendar.
-     *
-     * @param CalendarGeneratorEvent $event
      */
     public function onCalendarGenerate(CalendarGeneratorEvent $event)
     {

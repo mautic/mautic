@@ -141,9 +141,6 @@ class VideoHit
      */
     private $query = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -578,8 +575,6 @@ class VideoHit
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return VideoHit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -656,8 +651,6 @@ class VideoHit
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return VideoHit
      */
     public function setLead(Lead $lead)
@@ -716,8 +709,6 @@ class VideoHit
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return VideoHit
      */
     public function setRedirect(Redirect $redirect)

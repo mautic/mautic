@@ -30,18 +30,12 @@ class MobileNotificationDetailsType extends AbstractType
 
     /**
      * MobileNotificationDetailsType constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');

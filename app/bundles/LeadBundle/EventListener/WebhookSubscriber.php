@@ -27,9 +27,6 @@ class WebhookSubscriber implements EventSubscriberInterface
      */
     private $webhookModel;
 
-    /**
-     * @param WebhookModel $webhookModel
-     */
     public function __construct(WebhookModel $webhookModel)
     {
         $this->webhookModel = $webhookModel;
@@ -51,8 +48,6 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param WebhookBuilderEvent $event
      */
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
@@ -102,9 +97,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadEvent $event
-     */
     public function onLeadNewUpdate(LeadEvent $event)
     {
         $lead = $event->getLead();
@@ -130,9 +122,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param PointsChangeEvent $event
-     */
     public function onLeadPointChange(PointsChangeEvent $event)
     {
         $this->webhookModel->queueWebhooksByType(
@@ -154,9 +143,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadEvent $event
-     */
     public function onLeadDelete(LeadEvent $event)
     {
         $lead = $event->getLead();
@@ -175,9 +161,6 @@ class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param ChannelSubscriptionChange $event
-     */
     public function onChannelSubscriptionChange(ChannelSubscriptionChange $event)
     {
         $this->webhookModel->queueWebhooksByType(

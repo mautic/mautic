@@ -82,14 +82,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $params;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param LeadModel      $leadModel
-     * @param FieldModel     $leadFieldModel
-     * @param CompanyModel   $companyModel
-     * @param CampaignModel  $campaignModel
-     * @param array          $params
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
@@ -131,8 +123,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
@@ -258,9 +248,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addCondition('lead.campaigns', $trigger);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionChangePoints(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.changepoints')) {
@@ -293,9 +280,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult($somethingHappened);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionChangeLists(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.changelist')) {
@@ -321,9 +305,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult($somethingHappened);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionUpdateLead(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.updatelead')) {
@@ -338,9 +319,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionChangeOwner(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext(self::ACTION_LEAD_CHANGE_OWNER)) {
@@ -358,9 +336,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionUpdateTags(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.changetags')) {
@@ -378,9 +353,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.addtocompany')) {
@@ -395,9 +367,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionChangeCompanyScore(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.scorecontactscompanies')) {
@@ -414,9 +383,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('lead.updatecompany')) {
@@ -455,9 +421,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
     {
         $lead   = $event->getLead();
@@ -542,10 +505,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Function to compare date value.
-     *
-     * @param Lead                   $lead
-     * @param CampaignExecutionEvent $event
-     * @param \DateTime              $triggerDate
      *
      * @return bool
      */

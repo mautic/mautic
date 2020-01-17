@@ -75,9 +75,6 @@ class Download
      */
     private $email;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -237,8 +234,6 @@ class Download
 
     /**
      * Set ipAddress.
-     *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
      *
      * @return Download
      */

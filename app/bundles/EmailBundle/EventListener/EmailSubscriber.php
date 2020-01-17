@@ -49,13 +49,6 @@ class EmailSubscriber implements EventSubscriberInterface
      */
     private $entityManager;
 
-    /**
-     * @param IpLookupHelper      $ipLookupHelper
-     * @param AuditLogModel       $auditLogModel
-     * @param EmailModel          $emailModel
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -86,8 +79,6 @@ class EmailSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\EmailEvent $event
      */
     public function onEmailPostSave(Events\EmailEvent $event)
     {
@@ -107,8 +98,6 @@ class EmailSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\EmailEvent $event
      */
     public function onEmailDelete(Events\EmailEvent $event)
     {
@@ -126,8 +115,6 @@ class EmailSubscriber implements EventSubscriberInterface
 
     /**
      * Process if an email has failed.
-     *
-     * @param Events\QueueEmailEvent $event
      */
     public function onEmailFailed(Events\QueueEmailEvent $event)
     {
@@ -147,8 +134,6 @@ class EmailSubscriber implements EventSubscriberInterface
 
     /**
      * Process if an email is resent.
-     *
-     * @param Events\QueueEmailEvent $event
      */
     public function onEmailResend(Events\QueueEmailEvent $event)
     {
@@ -180,8 +165,6 @@ class EmailSubscriber implements EventSubscriberInterface
     /**
      * This is default handling of email transport webhook requests.
      * For custom handling (queues) for specific transport use the same listener with priority higher than -255.
-     *
-     * @param TransportWebhookEvent $event
      */
     public function onTransportWebhook(TransportWebhookEvent $event)
     {

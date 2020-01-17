@@ -28,17 +28,11 @@ class FormLoadEvent extends Event
         $this->integrationConfiguration = $integration;
     }
 
-    /**
-     * @return Integration
-     */
     public function getIntegrationConfiguration(): Integration
     {
         return $this->integrationConfiguration;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integrationConfiguration->getName();

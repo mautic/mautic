@@ -39,10 +39,6 @@ class StageType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
         $this->translator = $translator;
@@ -98,8 +94,10 @@ class StageType extends AbstractType
         }
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'read_only' => $readonly,
-            'data'      => $data,
+            'data' => $data,
+            'attr' => [
+                'readonly' => $readonly,
+            ],
         ]);
 
         $builder->add('publishUp', DateTimeType::class, [

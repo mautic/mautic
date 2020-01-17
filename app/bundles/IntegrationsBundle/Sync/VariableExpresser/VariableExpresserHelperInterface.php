@@ -18,17 +18,10 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
 interface VariableExpresserHelperInterface
 {
-    /**
-     * @param EncodedValueDAO $EncodedValueDAO
-     *
-     * @return NormalizedValueDAO
-     */
     public function decodeVariable(EncodedValueDAO $EncodedValueDAO): NormalizedValueDAO;
 
     /**
      * @param mixed $var
-     *
-     * @return EncodedValueDAO
      */
     public function encodeVariable($var): EncodedValueDAO;
 }

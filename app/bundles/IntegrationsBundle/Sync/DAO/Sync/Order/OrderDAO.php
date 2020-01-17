@@ -88,9 +88,8 @@ class OrderDAO
     private $notifications = [];
 
     /**
-     * @param \DateTimeInterface $syncDateTime
-     * @param bool               $isFirstTimeSync
-     * @param string             $integration
+     * @param bool   $isFirstTimeSync
+     * @param string $integration
      */
     public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration)
     {
@@ -100,8 +99,6 @@ class OrderDAO
     }
 
     /**
-     * @param ObjectChangeDAO $objectChangeDAO
-     *
      * @return OrderDAO
      */
     public function addObjectChange(ObjectChangeDAO $objectChangeDAO): self
@@ -128,10 +125,6 @@ class OrderDAO
     }
 
     /**
-     * @param string $objectType
-     *
-     * @return array
-     *
      * @throws UnexpectedValueException
      */
     public function getChangedObjectsByObjectType(string $objectType): array
@@ -143,17 +136,11 @@ class OrderDAO
         throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
     }
 
-    /**
-     * @return array
-     */
     public function getIdentifiedObjects(): array
     {
         return $this->identifiedObjects;
     }
 
-    /**
-     * @return array
-     */
     public function getUnidentifiedObjects(): array
     {
         return $this->unidentifiedObjects;
@@ -162,10 +149,8 @@ class OrderDAO
     /**
      * Create a new mapping between the Mautic and Integration objects.
      *
-     * @param ObjectChangeDAO         $objectChangeDAO
-     * @param string                  $integrationObjectName
-     * @param string|int              $integrationObjectId
-     * @param \DateTimeInterface|null $objectModifiedDate
+     * @param string     $integrationObjectName
+     * @param string|int $integrationObjectId
      */
     public function addObjectMapping(
         ObjectChangeDAO $objectChangeDAO,
@@ -207,9 +192,6 @@ class OrderDAO
 
     /**
      * Update the last sync date of an existing mapping.
-     *
-     * @param ObjectChangeDAO         $objectChangeDAO
-     * @param \DateTimeInterface|null $objectModifiedDate
      */
     public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
     {
@@ -227,8 +209,6 @@ class OrderDAO
 
     /**
      * Mark an object as deleted in the integration so Mautic doesn't continue to attempt to sync it.
-     *
-     * @param ObjectChangeDAO $objectChangeDAO
      */
     public function deleteObject(ObjectChangeDAO $objectChangeDAO): void
     {
@@ -238,8 +218,6 @@ class OrderDAO
     /**
      * If there is a temporary issue with syncing the object, tell the sync engine to not wipe out the tracked changes on Mautic's object fields
      * so that they are attempted again for the next sync.
-     *
-     * @param ObjectChangeDAO $objectChangeDAO
      */
     public function retrySyncLater(ObjectChangeDAO $objectChangeDAO): void
     {
@@ -250,10 +228,6 @@ class OrderDAO
         $this->retryTheseLater[$objectChangeDAO->getMappedObject()][$objectChangeDAO->getMappedObjectId()] = $objectChangeDAO;
     }
 
-    /**
-     * @param ObjectChangeDAO $objectChangeDAO
-     * @param string          $message
-     */
     public function noteObjectSyncIssue(ObjectChangeDAO $objectChangeDAO, string $message): void
     {
         $this->notifications[] = new NotificationDAO($objectChangeDAO, $message);
@@ -323,11 +297,6 @@ class OrderDAO
         return $synced;
     }
 
-    /**
-     * @param string $object
-     *
-     * @return array
-     */
     public function getIdentifiedObjectIds(string $object): array
     {
         if (!array_key_exists($object, $this->identifiedObjects)) {
@@ -345,25 +314,16 @@ class OrderDAO
         return $this->syncDateTime;
     }
 
-    /**
-     * @return bool
-     */
     public function isFirstTimeSync(): bool
     {
         return $this->isFirstTimeSync;
     }
 
-    /**
-     * @return bool
-     */
     public function shouldSync(): bool
     {
         return !empty($this->changedObjects);
     }
 
-    /**
-     * @return int
-     */
     public function getObjectCount(): int
     {
         return $this->objectCounter;

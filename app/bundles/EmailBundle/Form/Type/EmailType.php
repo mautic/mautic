@@ -68,12 +68,6 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     * @param RequestStack        $requestStack
-     * @param StageModel          $stageModel
-     */
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
@@ -86,10 +80,6 @@ class EmailType extends AbstractType
         $this->stageModel   = $stageModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'headers' => 'clean']));
@@ -305,7 +295,7 @@ class EmailType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => '',
+                    'placeholder' => '',
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -326,7 +316,7 @@ class EmailType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => '',
+                    'placeholder' => '',
                 ]
             )
                 ->addModelTransformer($transformer)
@@ -362,7 +352,7 @@ class EmailType extends AbstractType
                 'required'       => false,
                 'multiple'       => false,
                 'email_type'     => 'list',
-                'empty_value'    => 'mautic.core.form.translation_parent.empty',
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
                 'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
                 'ignore_ids'     => [(int) $options['data']->getId()],
@@ -383,7 +373,7 @@ class EmailType extends AbstractType
                 ],
                 'required'       => false,
                 'multiple'       => false,
-                'empty_value'    => 'mautic.core.form.translation_parent.empty',
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
                 'variant_parent' => ($variantParent) ? $variantParent->getId() : null,
                 'email_type'     => 'template',
@@ -547,9 +537,6 @@ class EmailType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

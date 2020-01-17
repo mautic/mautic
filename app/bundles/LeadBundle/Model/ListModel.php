@@ -54,9 +54,6 @@ class ListModel extends FormModel
      */
     private $leadSegmentService;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegmentService)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -856,8 +853,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param LeadList $entity
-     *
      * @return array
      *
      * @throws \Exception
@@ -873,8 +868,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param LeadList $entity
-     *
      * @return mixed
      */
     public function getVersionOld(LeadList $entity)
@@ -892,10 +885,8 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param LeadList             $leadList
-     * @param int                  $limit
-     * @param bool                 $maxLeads
-     * @param OutputInterface|null $output
+     * @param int  $limit
+     * @param bool $maxLeads
      *
      * @return int
      *
@@ -1420,7 +1411,6 @@ class ListModel extends FormModel
      * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      *
      * @return array
      */
@@ -1481,13 +1471,11 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param           $unit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param           $dateFormat
-     * @param           $filter
-     * @param bool      $canViewOthers
-     * @param           $listName
+     * @param      $unit
+     * @param      $dateFormat
+     * @param      $filter
+     * @param bool $canViewOthers
+     * @param      $listName
      *
      * @return array
      */
@@ -1522,12 +1510,10 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param           $unit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param null      $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param       $unit
+     * @param null  $dateFormat
+     * @param array $filter
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -1589,12 +1575,10 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param           $unit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param null      $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param       $unit
+     * @param null  $dateFormat
+     * @param array $filter
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -1661,11 +1645,9 @@ class ListModel extends FormModel
     /**
      * Get line chart data of hits.
      *
-     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
      *
      * @return array
      */
@@ -1681,8 +1663,6 @@ class ListModel extends FormModel
 
     /**
      * Is custom field used in at least one defined segment?
-     *
-     * @param LeadField $field
      *
      * @return bool
      */

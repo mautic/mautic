@@ -85,9 +85,6 @@ class LeadDevice
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -240,9 +237,6 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
     public function setDeviceBrand($brand)
     {
         $this->deviceBrand = $brand;
@@ -416,8 +410,6 @@ class LeadDevice
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead)

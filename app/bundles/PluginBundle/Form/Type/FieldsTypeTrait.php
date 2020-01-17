@@ -25,11 +25,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 trait FieldsTypeTrait
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     * @param array                $integrationFields
-     * @param array                $mauticFields
-     * @param string               $fieldObject
+     * @param string $fieldObject
      * @param $limit
      * @param $start
      */
@@ -182,10 +178,10 @@ trait FieldsTypeTrait
                                     '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>'  => 0,
                                     '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>' => 1,
                                 ],
-                                    'label'             => false,
-                                'data'                  => $data,
-                                'empty_value'           => false,
-                                'attr'                  => [
+                                'label'             => false,
+                                'data'              => $data,
+                                'placeholder'       => false,
+                                'attr'              => [
                                     'data-toggle'   => 'tooltip',
                                     'title'         => 'mautic.plugin.direction.data.update',
                                     'disabled'      => $disabled,
@@ -216,7 +212,7 @@ trait FieldsTypeTrait
                                 'data-value'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
-                            ]
+                        ]
                     );
                     $form->add(
                         'i_'.$index,
@@ -246,8 +242,7 @@ trait FieldsTypeTrait
     }
 
     /**
-     * @param OptionsResolver $resolver
-     * @param                 $object
+     * @param $object
      */
     protected function configureFieldOptions(OptionsResolver $resolver, $object)
     {
@@ -281,10 +276,6 @@ trait FieldsTypeTrait
         );
     }
 
-    /**
-     * @param FormView $view
-     * @param array    $options
-     */
     protected function buildFieldView(FormView $view, array $options)
     {
         $view->vars['specialInstructions'] = $options['special_instructions'];

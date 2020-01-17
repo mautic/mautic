@@ -27,9 +27,6 @@ class TagType extends AbstractType
      */
     private $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
@@ -49,9 +46,6 @@ class TagType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -61,7 +55,7 @@ class TagType extends AbstractType
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('t')->orderBy('t.tag', 'ASC');
                 },
-                'property'        => 'tag',
+                'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,
                 'disabled'        => false,

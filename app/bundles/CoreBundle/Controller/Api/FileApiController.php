@@ -28,9 +28,6 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
         $this->entityNameOne     = 'file';
@@ -185,10 +182,7 @@ class FileApiController extends CommonApiController
             if (!file_exists($path)) {
                 if ($createDir) {
                     if (false === mkdir($path)) {
-                        throw new \InvalidArgumentException(
-                            $dir.'/'.$subdir.' subdirectory could not be created.',
-                            Response::HTTP_INTERNAL_SERVER_ERROR
-                        );
+                        throw new \InvalidArgumentException($dir.'/'.$subdir.' subdirectory could not be created.', Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
                 } else {
                     throw new \InvalidArgumentException($subdir.' doesn\'t exist in the '.$dir.' dir.');

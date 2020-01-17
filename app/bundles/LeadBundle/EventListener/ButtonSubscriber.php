@@ -30,10 +30,6 @@ class ButtonSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     */
     public function __construct(TranslatorInterface $translator, RouterInterface $router)
     {
         $this->translator = $translator;
@@ -47,9 +43,6 @@ class ButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectViewButtons(CustomButtonEvent $event)
     {
         if (0 === strpos($event->getRoute(), 'mautic_contact_index')) {

@@ -171,8 +171,6 @@ class IntegrationSyncProcessTest extends TestCase
     }
 
     /**
-     * @param MappingManualDAO $mappingManualDAO
-     *
      * @return IntegrationSyncProcess
      */
     private function getSyncProcess(MappingManualDAO $mappingManualDAO)

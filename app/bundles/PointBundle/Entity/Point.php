@@ -89,9 +89,6 @@ class Point extends FormEntity
         $this->log = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -125,9 +122,6 @@ class Point extends FormEntity
         $builder->addCategory();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -274,8 +268,6 @@ class Point extends FormEntity
     }
 
     /**
-     * @param LeadPointLog $log
-     *
      * @return self
      */
     public function addLog(LeadPointLog $log)
@@ -285,9 +277,6 @@ class Point extends FormEntity
         return $this;
     }
 
-    /**
-     * @param LeadPointLog $log
-     */
     public function removeLog(LeadPointLog $log)
     {
         $this->log->removeElement($log);

@@ -79,12 +79,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
      */
     protected $translator;
 
-    /**
-     * @param LeadModel           $leadModel
-     * @param ListModel           $leadListModel
-     * @param RouterInterface     $router
-     * @param TranslatorInterface $translator
-     */
     public function __construct(LeadModel $leadModel, ListModel $leadListModel, RouterInterface $router, TranslatorInterface $translator)
     {
         $this->leadModel     = $leadModel;
@@ -95,8 +89,6 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {

@@ -19,8 +19,6 @@ class PlainTextMessageHelper
     /**
      * Extract plain text from message.
      *
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @return string
      */
     public static function getPlainTextFromMessage(\Swift_Mime_SimpleMessage $message)
@@ -39,8 +37,6 @@ class PlainTextMessageHelper
 
     /**
      * Extract plain text from message.
-     *
-     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return string
      */

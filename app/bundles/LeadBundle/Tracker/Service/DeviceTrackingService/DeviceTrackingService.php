@@ -57,14 +57,6 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     private $security;
 
-    /**
-     * @param CookieHelper           $cookieHelper
-     * @param EntityManagerInterface $entityManager
-     * @param LeadDeviceRepository   $leadDeviceRepository
-     * @param RandomHelperInterface  $randomHelper
-     * @param RequestStack           $requestStack
-     * @param CorePermissions        $security
-     */
     public function __construct(
         CookieHelper $cookieHelper,
         EntityManagerInterface $entityManager,
@@ -112,8 +104,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     }
 
     /**
-     * @param LeadDevice $device
-     * @param bool       $replaceExistingTracking
+     * @param bool $replaceExistingTracking
      *
      * @return LeadDevice
      */
@@ -196,9 +187,6 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         return $generatedIdentifier;
     }
 
-    /**
-     * @param LeadDevice $device
-     */
     private function createTrackingCookies(LeadDevice $device)
     {
         // Device cookie

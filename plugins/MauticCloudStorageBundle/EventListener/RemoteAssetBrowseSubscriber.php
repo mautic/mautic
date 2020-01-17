@@ -30,8 +30,6 @@ class RemoteAssetBrowseSubscriber implements EventSubscriberInterface
 
     /**
      * Fetches the connector for an event's integration.
-     *
-     * @param Events\RemoteAssetBrowseEvent $event
      */
     public function onAssetRemoteBrowse(Events\RemoteAssetBrowseEvent $event)
     {

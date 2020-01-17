@@ -49,9 +49,6 @@ class ConfigBuilderEvent extends Event
 
     /**
      * ConfigBuilderEvent constructor.
-     *
-     * @param PathsHelper  $pathsHelper
-     * @param BundleHelper $bundleHelper
      */
     public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
     {
@@ -61,8 +58,6 @@ class ConfigBuilderEvent extends Event
 
     /**
      * Set new form to the forms array.
-     *
-     * @param array $form
      *
      * @return $this
      */

@@ -22,10 +22,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('queue_mode', ChoiceType::class, [
@@ -38,7 +34,7 @@ class ConfigType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.webhook.config.form.queue.mode.tooltip',
             ],
-            'empty_value' => false,
+            'placeholder' => false,
             'constraints' => [
                 new NotBlank(
                     [

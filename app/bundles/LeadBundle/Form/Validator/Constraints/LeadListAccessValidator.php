@@ -22,17 +22,13 @@ class LeadListAccessValidator extends ConstraintValidator
      */
     private $segmentModel;
 
-    /**
-     * @param ListModel $segmentModel
-     */
     public function __construct(ListModel $segmentModel)
     {
         $this->segmentModel = $segmentModel;
     }
 
     /**
-     * @param mixed      $value
-     * @param Constraint $constraint
+     * @param mixed $value
      */
     public function validate($value, Constraint $constraint)
     {

@@ -26,9 +26,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $campaignHelper;
 
-    /**
-     * @param CampaignHelper $campaignHelper
-     */
     public function __construct(CampaignHelper $campaignHelper)
     {
         $this->campaignHelper = $campaignHelper;
@@ -46,8 +43,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
@@ -64,8 +59,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param Events\CampaignBuilderEvent $event
      */
     public function onCampaignBuild(Events\CampaignBuilderEvent $event)
     {

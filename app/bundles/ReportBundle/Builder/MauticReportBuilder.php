@@ -115,11 +115,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
     /**
      * MauticReportBuilder constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param Connection               $db
-     * @param Report                   $entity
-     * @param ChannelListHelper        $channelListHelper
      */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
@@ -394,10 +389,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * @param array        $filters
-     * @param QueryBuilder $queryBuilder
-     * @param array        $filterDefinitions
-     *
      * @return bool
      */
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)

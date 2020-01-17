@@ -40,9 +40,6 @@ class RouteLoader extends Loader
 
     /**
      * RouteLoader constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param CoreParametersHelper     $parametersHelper
      */
     public function __construct(EventDispatcherInterface $dispatcher, CoreParametersHelper $parametersHelper)
     {
@@ -86,6 +83,9 @@ class RouteLoader extends Loader
 
         // OneupUploader (added behind our secure /s)
         $secureCollection->addCollection($this->import('.', 'uploader'));
+
+        // Elfinder file manager
+        $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yml'));
 
         //API
         if ($this->coreParameters->getParameter('api_enabled')) {

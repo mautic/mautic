@@ -13,9 +13,6 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
 
-/**
- * Class AbstractFormController.
- */
 abstract class AbstractFormController extends CommonController
 {
     use FormThemeTrait;
@@ -139,35 +136,30 @@ abstract class AbstractFormController extends CommonController
     /**
      * Checks to see if the form was cancelled.
      *
-     * @param Form $form
-     *
-     * @return int
+     * @return bool
      */
     protected function isFormCancelled(Form $form)
     {
-        $name = $form->getName();
+        $formData = $this->request->request->get($form->getName());
 
-        return false !== $this->request->request->get($name.'[buttons][cancel]', false, true);
+        return array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
     }
 
     /**
      * Checks to see if the form was applied or saved.
      *
-     * @param $form
-     *
      * @return bool
      */
-    protected function isFormApplied($form)
+    protected function isFormApplied(Form $form)
     {
-        $name = $form->getName();
+        $formData = $this->request->request->get($form->getName());
 
-        return false !== $this->request->request->get($name.'[buttons][apply]', false, true);
+        return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
     }
 
     /**
      * Binds form data, checks validity, and determines cancel request.
      *
-     * @param Form  $form
      * @param array $data
      *
      * @return bool
@@ -215,10 +207,6 @@ abstract class AbstractFormController extends CommonController
         return $this->get('mautic.helper.user')->getUser()->isAdmin();
     }
 
-    /**
-     * @param Form $copyFrom
-     * @param Form $copyTo
-     */
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
     {
         /** @var $error FormError */
@@ -237,8 +225,6 @@ abstract class AbstractFormController extends CommonController
     /**
      * generate $postActionVars with respect to available referer.
      *
-     * @param array $postActionVars
-     *
      * @return array $postActionVars
      */
     protected function refererPostActionVars($vars)
@@ -247,23 +233,18 @@ abstract class AbstractFormController extends CommonController
             return $vars;
         }
 
-        $returnUrl                              = !empty($this->request->server->get('HTTP_REFERER'))
-                                                ? $this->request->server->get('HTTP_REFERER')
-                                                : $returnUrl;
-        $vars['returnUrl']                      = $returnUrl;
+        $returnUrl         = !empty($this->request->server->get('HTTP_REFERER')) ? $this->request->server->get('HTTP_REFERER') : '';
+        $vars['returnUrl'] = $returnUrl;
 
-        $urlMatcher                             = explode('/s/', $returnUrl);
-        $actionRoute                            = $this->get('router')->match('/s/'.$urlMatcher[1]);
-        $objAction                              = isset($actionRoute['objectAction'])
-                                                ? $actionRoute['objectAction']
-                                                : 'index';
-        $routeCtrlr                             = explode('\\', $actionRoute['_controller']);
-        $vars['contentTemplate']                = isset($vars['contentTemplate'])
-                                                ? $vars['contentTemplate']
-                                                : $routeCtrlr[0].$routeCtrlr[1].':'.
-                                                ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).
-                                                ':'.$objAction;
-        $vars['passthroughVars']['activeLink']  = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
+        $urlMatcher  = explode('/s/', $returnUrl);
+        $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
+        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $routeCtrlr  = explode('\\', $actionRoute['_controller']);
+
+        $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
+        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+
+        $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
 
         if (isset($actionRoute['objectId']) && $actionRoute['objectId'] > 0) {
             $vars['viewParameters']['objectId'] = $actionRoute['objectId'];

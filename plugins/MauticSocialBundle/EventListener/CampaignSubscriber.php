@@ -38,11 +38,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param CampaignEventHelper $campaignEventHelper
-     * @param IntegrationHelper   $helper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         CampaignEventHelper $campaignEventHelper,
         IntegrationHelper $integrationHelper,
@@ -64,9 +59,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('Twitter');
@@ -85,9 +77,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignAction(CampaignExecutionEvent $event)
     {
         $event->setChannel('social.twitter');

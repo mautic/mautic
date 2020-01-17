@@ -29,9 +29,6 @@ class CompanyReportData
 
     /**
      * CompanyReportData constructor.
-     *
-     * @param FieldModel          $fieldModel
-     * @param TranslatorInterface $translator
      */
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
@@ -63,8 +60,6 @@ class CompanyReportData
     }
 
     /**
-     * @param ReportGeneratorEvent $event
-     *
      * @return bool
      */
     public function eventHasCompanyColumns(ReportGeneratorEvent $event)

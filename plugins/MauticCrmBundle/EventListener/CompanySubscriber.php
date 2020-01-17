@@ -30,9 +30,6 @@ class CompanySubscriber implements EventSubscriberInterface
      */
     private $companyExport;
 
-    /**
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(IntegrationHelper $integrationHelper, CompanyExport $companyExport)
     {
         $this->integrationHelper = $integrationHelper;

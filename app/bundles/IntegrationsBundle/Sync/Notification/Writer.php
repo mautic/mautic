@@ -35,11 +35,6 @@ class Writer
      */
     private $em;
 
-    /**
-     * @param NotificationModel      $notificationModel
-     * @param AuditLogModel          $auditLogModel
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(
         NotificationModel $notificationModel,
         AuditLogModel $auditLogModel,
@@ -51,10 +46,6 @@ class Writer
     }
 
     /**
-     * @param string $header
-     * @param string $message
-     * @param int    $userId
-     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function writeUserNotification(string $header, string $message, int $userId): void
@@ -70,13 +61,6 @@ class Writer
         );
     }
 
-    /**
-     * @param string   $bundle
-     * @param string   $object
-     * @param int|null $objectId
-     * @param string   $action
-     * @param array    $details
-     */
     public function writeAuditLogEntry(string $bundle, string $object, ?int $objectId, string $action, array $details): void
     {
         $log = [

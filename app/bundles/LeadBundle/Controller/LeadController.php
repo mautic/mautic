@@ -730,8 +730,6 @@ class LeadController extends FormController
 
     /**
      * Upload an asset.
-     *
-     * @param Lead $lead
      */
     private function uploadAvatar(Lead $lead)
     {

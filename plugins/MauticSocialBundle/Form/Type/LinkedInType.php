@@ -20,10 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class LinkedInType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('counter', ChoiceType::class, [

@@ -14,16 +14,10 @@ namespace Mautic\CoreBundle\Factory;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * Class ModelFactory.
- */
 class ModelFactory
 {
-    /**
-     * ModelFactory constructor.
-     *
-     * @param ContainerInterface $container
-     */
+    private $container;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

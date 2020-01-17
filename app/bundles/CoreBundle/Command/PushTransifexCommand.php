@@ -11,17 +11,38 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\CoreBundle\Exception\BadConfigurationException;
+use Mautic\CoreBundle\Factory\TransifexFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\Transifex\Connector\Resources;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * CLI Command to push language resources to Transifex.
  */
 class PushTransifexCommand extends ContainerAwareCommand
 {
+    private $transifexFactory;
+    private $translator;
+    private $coreParametersHelper;
+
+    public function __construct(
+        TransifexFactory $transifexFactory,
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        $this->transifexFactory     = $transifexFactory;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -52,41 +73,39 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
-        $username = $this->getContainer()->get('mautic.factory')->getParameter('transifex_username');
-        $password = $this->getContainer()->get('mautic.factory')->getParameter('transifex_password');
-
-        if (empty($username) || empty($password)) {
-            $output->writeln($translator->trans('mautic.core.command.transifex_no_credentials'));
-
-            return 0;
-        }
+        $this->translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         $options = $input->getOptions();
         $create  = $options['create'];
         $files   = $this->getLanguageFiles();
 
-        /** @var \BabDev\Transifex\Transifex $transifex */
-        $transifex = $this->getContainer()->get('transifex');
+        try {
+            $transifex = $this->transifexFactory->getTransifex();
+        } catch (BadConfigurationException $e) {
+            $output->writeln($this->translator->trans('mautic.core.command.transifex_no_credentials'));
+
+            return 1;
+        }
 
         foreach ($files as $bundle => $stringFiles) {
             foreach ($stringFiles as $file) {
                 $name  = $bundle.' '.str_replace('.ini', '', basename($file));
                 $alias = $this->stringURLUnicodeSlug($name);
-                $output->writeln($translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
+                $output->writeln($this->translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
+
+                /** @var Resources $resourcesConnector */
+                $resourcesConnector = $transifex->get('resources');
 
                 try {
                     if ($create) {
-                        $transifex->resources->createResource('mautic', $name, $alias, 'PHP_INI', ['file' => $file]);
-                        $output->writeln($translator->trans('mautic.core.command.transifex_resource_created'));
+                        $resourcesConnector->createResource('mautic', $name, $alias, 'PHP_INI', ['file' => $file]);
+                        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_created'));
                     } else {
-                        $transifex->resources->updateResourceContent('mautic', $alias, $file, 'file');
-                        $output->writeln($translator->trans('mautic.core.command.transifex_resource_updated'));
+                        $resourcesConnector->updateResourceContent('mautic', $alias, $file, 'file');
+                        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_updated'));
                     }
                 } catch (\Exception $exception) {
-                    $output->writeln($translator->trans('mautic.core.command.transifex_error_pushing_data', ['%message%' => $exception->getMessage()]));
+                    $output->writeln($this->translator->trans('mautic.core.command.transifex_error_pushing_data', ['%message%' => $exception->getMessage()]));
                 }
             }
         }

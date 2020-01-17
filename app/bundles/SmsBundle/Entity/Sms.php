@@ -93,7 +93,6 @@ class Sms extends FormEntity
         $this->id        = null;
         $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
-        $this->readCount = 0;
 
         parent::__clone();
     }
@@ -112,9 +111,6 @@ class Sms extends FormEntity
         $this->stats = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -160,9 +156,6 @@ class Sms extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -433,8 +426,6 @@ class Sms extends FormEntity
     /**
      * Add list.
      *
-     * @param LeadList $list
-     *
      * @return Sms
      */
     public function addList(LeadList $list)
@@ -446,8 +437,6 @@ class Sms extends FormEntity
 
     /**
      * Remove list.
-     *
-     * @param LeadList $list
      */
     public function removeList(LeadList $list)
     {

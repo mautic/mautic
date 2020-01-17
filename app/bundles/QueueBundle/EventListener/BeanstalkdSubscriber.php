@@ -18,6 +18,7 @@ use Mautic\QueueBundle\Queue\QueueService;
 use Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
@@ -44,10 +45,6 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
      */
     private $queueService;
 
-    /**
-     * @param ContainerInterface $container
-     * @param QueueService       $queueService
-     */
     public function __construct(ContainerInterface $container, QueueService $queueService)
     {
         // The container is needed due to non-required binding of pheanstalk
@@ -55,9 +52,6 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
         $this->queueService = $queueService;
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function publishMessage(Events\QueueEvent $event)
     {
         $this->container->get('leezy.pheanstalk')
@@ -66,8 +60,6 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
     }
 
     /**
-     * @param Events\QueueEvent $event
-     *
      * @throws Pheanstalk\Exception\ServerException
      */
     public function consumeMessage(Events\QueueEvent $event)
@@ -107,9 +99,6 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
         }
     }
 
-    /**
-     * @param Events\QueueConfigEvent $event
-     */
     public function buildConfig(Events\QueueConfigEvent $event)
     {
         $options        = $event->getOptions();
@@ -117,7 +106,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -139,7 +128,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -161,7 +150,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'beanstalkd_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.beanstalkd.timeout',
                 'label_attr' => ['class' => 'control-label'],

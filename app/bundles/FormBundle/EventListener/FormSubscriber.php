@@ -14,6 +14,7 @@ namespace Mautic\FormBundle\EventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -62,14 +63,6 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param AuditLogModel        $auditLogModel
-     * @param MailHelper           $mailer
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TranslatorInterface  $translator
-     * @param RouterInterface      $router
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -104,8 +97,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\FormEvent $event
      */
     public function onFormPostSave(Events\FormEvent $event)
     {
@@ -125,8 +116,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\FormEvent $event
      */
     public function onFormDelete(Events\FormEvent $event)
     {
@@ -144,12 +133,10 @@ class FormSubscriber implements EventSubscriberInterface
 
     /**
      * Add a simple email form.
-     *
-     * @param Events\FormBuilderEvent $event
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
-        $action = [
+        $event->addSubmitAction('form.email', [
             'group'              => 'mautic.email.actions',
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
@@ -160,11 +147,9 @@ class FormSubscriber implements EventSubscriberInterface
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
-        ];
+        ]);
 
-        $event->addSubmitAction('form.email', $action);
-
-        $action = [
+        $event->addSubmitAction('form.repost', [
             'group'              => 'mautic.form.actions',
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
@@ -177,14 +162,9 @@ class FormSubscriber implements EventSubscriberInterface
             ],
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
-        ];
-
-        $event->addSubmitAction('form.repost', $action);
+        ]);
     }
 
-    /**
-     * @param Events\SubmissionEvent $event
-     */
     public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event)
     {
         if (!$event->checkContext('form.email')) {
@@ -241,9 +221,6 @@ class FormSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Events\SubmissionEvent $event
-     */
     public function onFormSubmitActionRepost(Events\SubmissionEvent $event)
     {
         if (!$event->checkContext('form.repost')) {
@@ -359,9 +336,6 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Response $response
-     * @param array    $matchedFields
-     *
      * @return bool|mixed
      */
     private function parseResponse(Response $response, array $matchedFields = [])
@@ -373,8 +347,11 @@ class FormSubscriber implements EventSubscriberInterface
 
         if ($json = json_decode($body, true)) {
             $body = $json;
-        } elseif ($params = parse_str($body)) {
-            $body = $params;
+        } else {
+            parse_str($body, $output);
+            if ($output) {
+                $body = $output;
+            }
         }
 
         if (is_array($body)) {
@@ -447,11 +424,8 @@ class FormSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array     $config
-     * @param array     $tokens
-     * @param           $to
-     * @param Lead|null $lead
-     * @param bool      $internalSend
+     * @param      $to
+     * @param bool $internalSend
      */
     private function setMailer(array $config, array $tokens, $to, Lead $lead = null, $internalSend = true)
     {

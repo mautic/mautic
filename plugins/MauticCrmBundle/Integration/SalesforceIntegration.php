@@ -558,7 +558,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.sandbox',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
@@ -577,7 +577,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.updateOwner',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
@@ -595,7 +595,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -610,7 +610,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.update.dnc.by.date.label',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -629,7 +629,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -1495,9 +1495,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $campaignId
-     * @param      $status
+     * @param $campaignId
+     * @param $status
      *
      * @return array
      */
@@ -1771,7 +1770,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $mauticData
      * @param      $objectFields
      * @param      $object
-     * @param      $lead
      * @param null $objectId
      * @param null $sfRecord
      *
@@ -1878,9 +1876,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $config
-     * @param array $availableFields
-     * @param       $object
+     * @param $object
      *
      * @return array
      */
@@ -2173,7 +2169,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $processedLeads
      * @param      $trackedContacts
      * @param      $leadsToSync
-     * @param      $requiredFields
      * @param      $objectFields
      * @param      $mauticLeadFieldString
      * @param      $sfEntityRecords
@@ -2482,8 +2477,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $config
+     * @param $config
      *
      * @return array
      */
@@ -2535,8 +2529,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $config
+     * @param $config
      *
      * @return array
      */
@@ -2642,10 +2635,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Update the record in each system taking the last modified record.
      *
-     * @param $leadId
      * @param string $channel
      * @param string $sfObject
-     * @param array  $sfIds
      *
      * @return int
      *
@@ -2925,13 +2916,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param      $mauticData
-     * @param      $checkEmailsInSF
-     * @param      $processedLeads
-     * @param      $trackedContacts
-     * @param      $leadsToSync
-     * @param      $requiredFields
      * @param      $objectFields
-     * @param      $mauticLeadFieldString
      * @param      $sfEntityRecords
      * @param null $progress
      */
@@ -3029,7 +3014,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param $mauticData
-     * @param $checkIdsInSF
      * @param $processedCompanies
      * @param $objectFields
      */
@@ -3066,10 +3050,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $checkEmailsInSF
-     * @param $mauticLeadFieldString
      * @param $sfObject
-     * @param $trackedContacts
      * @param $limit
      * @param $fromDate
      * @param $toDate

@@ -33,8 +33,6 @@ class CategoryModel extends FormModel
 
     /**
      * CategoryModel constructor.
-     *
-     * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {

@@ -15,6 +15,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Form\Type\LeadListType;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -88,7 +89,7 @@ class MonitoringType extends AbstractType
                 'onchange' => 'Mautic.getNetworkFormAction(this)',
             ],
             'choices'           => array_flip((array) $options['networkTypes']), // passed from the controller
-            'empty_value'       => 'mautic.core.form.chooseone',
+            'placeholder'       => 'mautic.core.form.chooseone',
         ]);
 
         // if we have a network type value add in the form

@@ -51,9 +51,6 @@ class Log
      */
     private $note;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -93,8 +90,6 @@ class Log
     }
 
     /**
-     * @param Webhook $webhook
-     *
      * @return Log
      */
     public function setWebhook(Webhook $webhook)
@@ -133,8 +128,6 @@ class Log
     }
 
     /**
-     * @param DateTime $dateAdded
-     *
      * @return Log
      */
     public function setDateAdded(\DateTime $dateAdded)

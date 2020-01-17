@@ -36,8 +36,6 @@ class ResponseItem
     private $statHash;
 
     /**
-     * @param array $item
-     *
      * @throws ResponseItemException
      */
     public function __construct(array $item)

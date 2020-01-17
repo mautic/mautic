@@ -28,18 +28,12 @@ class CustomFormExtension extends AbstractTypeExtension
 
     /**
      * FormTypeCaptchaExtension constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Fetch plugin subscribers/listeners

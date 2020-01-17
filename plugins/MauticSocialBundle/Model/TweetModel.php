@@ -77,9 +77,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Create/update Tweet Stat and update sent count for Tweet.
      *
-     * @param Tweet  $tweet
-     * @param Lead   $lead
-     * @param array  $sendResponse
      * @param string $source
      * @param int    $sourceId
      *
@@ -140,7 +137,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet $entity
      * @param       $formFactory
      * @param null  $action
-     * @param array $options
      *
      * @return mixed
      *

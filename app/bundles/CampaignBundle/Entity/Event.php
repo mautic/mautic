@@ -178,9 +178,6 @@ class Event implements ChannelInterface
         $this->channelId = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -497,8 +494,6 @@ class Event implements ChannelInterface
     /**
      * Set campaign.
      *
-     * @param \Mautic\CampaignBundle\Entity\Campaign $campaign
-     *
      * @return Event
      */
     public function setCampaign(\Mautic\CampaignBundle\Entity\Campaign $campaign)
@@ -604,8 +599,6 @@ class Event implements ChannelInterface
     /**
      * Add log.
      *
-     * @param LeadEventLog $log
-     *
      * @return Event
      */
     public function addLog(LeadEventLog $log)
@@ -617,8 +610,6 @@ class Event implements ChannelInterface
 
     /**
      * Remove log.
-     *
-     * @param LeadEventLog $log
      */
     public function removeLog(LeadEventLog $log)
     {
@@ -638,7 +629,6 @@ class Event implements ChannelInterface
     /**
      * Get log for a contact and a rotation.
      *
-     * @param Contact $contact
      * @param $rotation
      *
      * @return LeadEventLog|null
@@ -956,8 +946,6 @@ class Event implements ChannelInterface
     /**
      * Used by the API.
      *
-     * @param Contact|null $contact
-     *
      * @return LeadEventLog[]|\Doctrine\Common\Collections\Collection|static
      */
     public function getContactLog(Contact $contact = null)
@@ -1076,8 +1064,6 @@ class Event implements ChannelInterface
 
     /**
      * Set the value of triggerRestrictedDaysOfWeek.
-     *
-     * @param array|null $triggerRestrictedDaysOfWeek
      *
      * @return self
      */

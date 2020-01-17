@@ -18,10 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FormSubmitActionUserEmailType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('useremail',

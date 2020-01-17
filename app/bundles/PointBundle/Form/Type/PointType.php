@@ -40,10 +40,6 @@ class PointType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
         $this->translator = $translator;
@@ -82,7 +78,7 @@ class PointType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $options['pointActions']['choices'],
-                'empty_value'       => '',
+                'placeholder'       => '',
                 'label'             => 'mautic.point.form.type',
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => [
@@ -141,8 +137,10 @@ class PointType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
-                'data'      => $data,
+                'data' => $data,
+                'attr' => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 

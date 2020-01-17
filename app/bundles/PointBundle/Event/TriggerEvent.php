@@ -27,8 +27,7 @@ class TriggerEvent extends CommonEvent
     protected $isNew;
 
     /**
-     * @param Trigger $trigger
-     * @param bool    $isNew
+     * @param bool $isNew
      */
     public function __construct(Trigger &$trigger, $isNew = false)
     {
@@ -44,9 +43,6 @@ class TriggerEvent extends CommonEvent
         return $this->entity;
     }
 
-    /**
-     * @param Trigger $trigger
-     */
     public function setTrigger(Trigger $trigger)
     {
         $this->entity = $trigger;

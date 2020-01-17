@@ -29,10 +29,6 @@ class ImportSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -52,8 +48,6 @@ class ImportSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param ImportEvent $event
      */
     public function onImportPostSave(ImportEvent $event)
     {
@@ -73,8 +67,6 @@ class ImportSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param ImportEvent $event
      */
     public function onImportDelete(ImportEvent $event)
     {

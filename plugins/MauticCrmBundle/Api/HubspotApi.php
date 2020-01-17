@@ -49,8 +49,6 @@ class HubspotApi extends CrmApi
     /**
      * Creates Hubspot lead.
      *
-     * @param array $data
-     *
      * @return mixed
      */
     public function createLead(array $data, $lead, $updateLink = false)
@@ -75,8 +73,6 @@ class HubspotApi extends CrmApi
     /**
      * gets Hubspot contact.
      *
-     * @param array $data
-     *
      * @return mixed
      */
     public function getContacts($params = [])
@@ -86,8 +82,6 @@ class HubspotApi extends CrmApi
 
     /**
      * gets Hubspot company.
-     *
-     * @param array $data
      *
      * @return mixed
      */

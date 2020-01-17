@@ -73,16 +73,6 @@ class FocusSubscriber implements EventSubscriberInterface
      */
     private $requestStack;
 
-    /**
-     * @param RouterInterface  $router
-     * @param IpLookupHelper   $ipLookupHelper
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     * @param FocusModel       $focusModel
-     * @param RequestStack     $requestStack
-     */
     public function __construct(
         RouterInterface $router,
         IpLookupHelper $ipLookupHelper,
@@ -142,8 +132,6 @@ class FocusSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param FocusEvent $event
      */
     public function onFocusPostSave(FocusEvent $event)
     {
@@ -163,8 +151,6 @@ class FocusSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param FocusEvent $event
      */
     public function onFocusDelete(FocusEvent $event)
     {
@@ -180,9 +166,6 @@ class FocusSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param MauticEvents\TokenReplacementEvent $event
-     */
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */

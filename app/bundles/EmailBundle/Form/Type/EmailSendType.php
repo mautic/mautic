@@ -29,18 +29,11 @@ class EmailSendType extends AbstractType
      */
     private $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -168,7 +161,7 @@ class EmailSendType extends AbstractType
                             'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'        => $data,
-                        'empty_value' => false,
+                        'placeholder' => false,
                     ]
                 );
 
@@ -192,9 +185,6 @@ class EmailSendType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

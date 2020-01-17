@@ -17,8 +17,6 @@ interface ConfigFormCallbackInterface
 {
     /**
      * Message ID used in form as description what for is used callback URL.
-     *
-     * @return string
      */
     public function getCallbackHelpMessageTranslationKey(): string;
 }

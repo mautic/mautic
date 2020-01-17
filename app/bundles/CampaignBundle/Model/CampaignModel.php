@@ -79,14 +79,6 @@ class CampaignModel extends CommonFormModel
 
     /**
      * CampaignModel constructor.
-     *
-     * @param LeadModel             $leadModel
-     * @param ListModel             $leadListModel
-     * @param FormModel             $formModel
-     * @param EventCollector        $eventCollector
-     * @param RemovedContactTracker $removedContactTracker
-     * @param MembershipManager     $membershipManager
-     * @param MembershipBuilder     $membershipBuilder
      */
     public function __construct(
         LeadModel $leadModel,
@@ -258,10 +250,9 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param Campaign $entity
-     * @param          $sessionEvents
-     * @param          $sessionConnections
-     * @param          $deletedEvents
+     * @param $sessionEvents
+     * @param $sessionConnections
+     * @param $deletedEvents
      *
      * @return array
      */
@@ -644,8 +635,6 @@ class CampaignModel extends CommonFormModel
     /**
      * Saves a campaign lead, logs the error if saving fails.
      *
-     * @param CampaignLead $campaignLead
-     *
      * @return bool
      */
     public function saveCampaignLead(CampaignLead $campaignLead)
@@ -710,12 +699,10 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of leads added to campaigns.
      *
-     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -740,11 +727,9 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of hits.
      *
-     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
+     * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
      *
      * @return array
      */
@@ -877,7 +862,6 @@ class CampaignModel extends CommonFormModel
      *
      * Add lead to the campaign.
      *
-     * @param Campaign  $campaign
      * @param           $lead
      * @param bool|true $manuallyAdded
      */
@@ -891,11 +875,9 @@ class CampaignModel extends CommonFormModel
     /**
      * @deprecated 2.14 to be removed in 3.0
      *
-     * @param Campaign $campaign
-     * @param array    $leads
-     * @param bool     $manuallyAdded
-     * @param bool     $batchProcess
-     * @param int      $searchListLead
+     * @param bool $manuallyAdded
+     * @param bool $batchProcess
+     * @param int  $searchListLead
      */
     public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
@@ -926,9 +908,8 @@ class CampaignModel extends CommonFormModel
      *
      * Remove lead from the campaign.
      *
-     * @param Campaign $campaign
-     * @param          $lead
-     * @param bool     $manuallyRemoved
+     * @param      $lead
+     * @param bool $manuallyRemoved
      */
     public function removeLead(Campaign $campaign, $lead, $manuallyRemoved = true)
     {
@@ -940,11 +921,9 @@ class CampaignModel extends CommonFormModel
     /**
      * @deprecated 2.14 to be removed in 3.0
      *
-     * @param Campaign $campaign
-     * @param array    $leads
-     * @param bool     $manuallyRemoved
-     * @param bool     $batchProcess
-     * @param bool     $skipFindOne
+     * @param bool $manuallyRemoved
+     * @param bool $batchProcess
+     * @param bool $skipFindOne
      */
     public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
     {
@@ -984,7 +963,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param Campaign        $campaign
      * @param int             $limit
      * @param bool            $maxLeads
      * @param OutputInterface $output
@@ -1009,8 +987,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @param array $contacts
-     *
      * @return ArrayCollection
      */
     private function getArrayCollectionOfContactsById(array $contacts)

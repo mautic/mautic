@@ -29,10 +29,6 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $configChangeLogger;
 
-    /**
-     * @param CoreParametersHelper $paramHelper
-     * @param ConfigChangeLogger   $configChangeLogger
-     */
     public function __construct(CoreParametersHelper $paramHelper, ConfigChangeLogger $configChangeLogger)
     {
         $this->paramHelper        = $paramHelper;
@@ -50,9 +46,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function escapePercentCharacters(ConfigEvent $event)
     {
         $config = $event->getConfig();
@@ -74,9 +67,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->setConfig($config);
     }
 
-    /**
-     * @param ConfigEvent $event
-     */
     public function onConfigPostSave(ConfigEvent $event)
     {
         if ($originalNormData = $event->getOriginalNormData()) {

@@ -66,7 +66,6 @@ class LeadEventLogRepository extends CommonRepository
      * Get a lead's page event log.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */
@@ -384,9 +383,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int            $eventId
-     * @param \DateTime      $now
-     * @param ContactLimiter $limiter
+     * @param int $eventId
      *
      * @return ArrayCollection
      *
@@ -434,8 +431,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param array $ids
-     *
      * @return ArrayCollection
      *
      * @throws \Doctrine\ORM\Query\QueryException
@@ -461,9 +456,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param int            $campaignId
-     * @param \DateTime      $date
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
      *
      * @return array
      */
@@ -504,8 +497,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param       $eventId
-     * @param array $contactIds
+     * @param $eventId
      *
      * @return array
      */
@@ -562,7 +554,6 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead   $campaignMember
      * @param string $message
      *
      * @throws \Doctrine\DBAL\DBALException

@@ -15,9 +15,6 @@ use Doctrine\DBAL\Connection;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 
-/**
- * Class CacheStorageHelper.
- */
 class CacheStorageHelper
 {
     const ADAPTOR_DATABASE = 'db';
@@ -59,14 +56,13 @@ class CacheStorageHelper
      */
     protected $defaultExpiration;
 
+    private $expirations = [];
+
     /**
-     * CacheStorageHelper constructor.
-     *
-     * @param                 $adaptor
-     * @param null            $namespace
-     * @param Connection|null $connection
-     * @param null            $cacheDir
-     * @param int             $defaultExpiration
+     * @param      $adaptor
+     * @param null $namespace
+     * @param null $cacheDir
+     * @param int  $defaultExpiration
      */
     public function __construct($adaptor, $namespace = null, Connection $connection = null, $cacheDir = null, $defaultExpiration = 0)
     {
@@ -181,10 +177,6 @@ class CacheStorageHelper
         return $this->cache[$namespace];
     }
 
-    /**
-     * @param $namespace
-     * @param $defaultExpiration
-     */
     protected function setCacheAdaptor()
     {
         switch ($this->adaptor) {

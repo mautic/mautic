@@ -58,21 +58,12 @@ class ObjectChangeGenerator
      */
     private $objectChange;
 
-    /**
-     * @param ValueHelper $valueHelper
-     */
     public function __construct(ValueHelper $valueHelper)
     {
         $this->valueHelper = $valueHelper;
     }
 
     /**
-     * @param ReportDAO        $syncReport
-     * @param MappingManualDAO $mappingManual
-     * @param ObjectMappingDAO $objectMapping
-     * @param ReportObjectDAO  $internalObject
-     * @param ReportObjectDAO  $integrationObject
-     *
      * @return ObjectChangeDAO
      *
      * @throws ObjectNotFoundException
@@ -134,8 +125,6 @@ class ObjectChangeGenerator
     }
 
     /**
-     * @param FieldMappingDAO $fieldMappingDAO
-     *
      * @throws ObjectNotFoundException
      */
     private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void

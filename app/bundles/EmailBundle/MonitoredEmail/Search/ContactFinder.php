@@ -36,10 +36,6 @@ class ContactFinder
 
     /**
      * ContactFinder constructor.
-     *
-     * @param StatRepository  $statRepository
-     * @param LeadRepository  $leadRepository
-     * @param LoggerInterface $logger
      */
     public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
     {

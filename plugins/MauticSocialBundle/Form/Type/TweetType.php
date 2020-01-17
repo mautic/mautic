@@ -32,18 +32,11 @@ class TweetType extends AbstractType
      */
     protected $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -109,7 +102,7 @@ class TweetType extends AbstractType
                 AssetListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -127,7 +120,7 @@ class TweetType extends AbstractType
                 'page_list',
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
-                    'empty_value' => 'mautic.social.monitoring.list.choose',
+                    'placeholder' => 'mautic.social.monitoring.list.choose',
                     'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
@@ -182,9 +175,6 @@ class TweetType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['update_select']);

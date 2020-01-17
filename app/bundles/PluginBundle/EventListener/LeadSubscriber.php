@@ -24,9 +24,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $pluginModel;
 
-    /**
-     * @param PluginModel $pluginModel
-     */
     public function __construct(PluginModel $pluginModel)
     {
         $this->pluginModel = $pluginModel;

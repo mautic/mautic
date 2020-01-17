@@ -27,11 +27,10 @@ class CookieHelper
     /**
      * CookieHelper constructor.
      *
-     * @param              $cookiePath
-     * @param              $cookieDomain
-     * @param              $cookieSecure
-     * @param              $cookieHttp
-     * @param RequestStack $requestStack
+     * @param $cookiePath
+     * @param $cookieDomain
+     * @param $cookieSecure
+     * @param $cookieHttp
      */
     public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
     {

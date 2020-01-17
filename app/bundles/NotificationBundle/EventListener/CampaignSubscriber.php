@@ -54,13 +54,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $dispatcher;
 
-    /**
-     * @param IntegrationHelper        $integrationHelper
-     * @param LeadModel                $leadModel
-     * @param NotificationModel        $notificationModel
-     * @param AbstractNotificationApi  $notificationApi
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         IntegrationHelper $integrationHelper,
         LeadModel $leadModel,
@@ -86,9 +79,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -133,8 +123,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CampaignExecutionEvent $event
-     *
      * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)

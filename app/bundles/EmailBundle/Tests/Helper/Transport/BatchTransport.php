@@ -35,8 +35,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      */
     public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
@@ -73,9 +72,8 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
+     * @param int    $toBeAdded
+     * @param string $type
      *
      * @return int
      */

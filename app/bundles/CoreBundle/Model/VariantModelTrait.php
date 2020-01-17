@@ -26,8 +26,6 @@ trait VariantModelTrait
 
     /**
      * Converts a variant to the main item and the original main item a variant.
-     *
-     * @param VariantEntityInterface $entity
      */
     public function convertVariant(VariantEntityInterface $entity)
     {
@@ -88,9 +86,7 @@ trait VariantModelTrait
     /**
      * Prepare a variant for saving.
      *
-     * @param VariantEntityInterface $entity
-     * @param array                  $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
-     * @param \DateTime|null         $variantStartDate
+     * @param array $resetVariantCounterMethods ['setVariantHits', 'setVariantSends', ...]
      */
     protected function preVariantSaveEntity(VariantEntityInterface $entity, array $resetVariantCounterMethods = [], \DateTime $variantStartDate = null)
     {
@@ -136,10 +132,8 @@ trait VariantModelTrait
     /**
      * Run post saving a variant aware entity.
      *
-     * @param VariantEntityInterface $entity
-     * @param bool                   $resetVariants
-     * @param array                  $relatedIds
-     * @param \DateTime|null         $variantStartDate
+     * @param bool  $resetVariants
+     * @param array $relatedIds
      */
     protected function postVariantSaveEntity(VariantEntityInterface $entity, $resetVariants = false, $relatedIds = [], \DateTime $variantStartDate = null)
     {

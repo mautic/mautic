@@ -29,10 +29,6 @@ class AssetSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -52,8 +48,6 @@ class AssetSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\AssetEvent $event
      */
     public function onAssetPostSave(Events\AssetEvent $event)
     {
@@ -73,8 +67,6 @@ class AssetSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\AssetEvent $event
      */
     public function onAssetDelete(Events\AssetEvent $event)
     {

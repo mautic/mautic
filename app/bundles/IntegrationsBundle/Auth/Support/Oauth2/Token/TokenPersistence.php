@@ -31,9 +31,6 @@ class TokenPersistence implements TokenPersistenceInterface
      */
     private $integration;
 
-    /**
-     * @param IntegrationsHelper $integrationsHelper
-     */
     public function __construct(IntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;
@@ -103,25 +100,18 @@ class TokenPersistence implements TokenPersistenceInterface
 
     /**
      * Returns true if a token exists (although it may not be valid).
-     *
-     * @return bool
      */
     public function hasToken(): bool
     {
         return !empty($this->getIntegration()->getApiKeys()['access_token']);
     }
 
-    /**
-     * @param Integration $integration
-     */
     public function setIntegration(Integration $integration): void
     {
         $this->integration = $integration;
     }
 
     /**
-     * @return Integration
-     *
      * @throws IntegrationNotSetException
      */
     private function getIntegration(): Integration

@@ -23,9 +23,6 @@ class MessageSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param AuditLogModel $auditLogModel
-     */
     public function __construct(
         AuditLogModel $auditLogModel
     ) {
@@ -45,8 +42,6 @@ class MessageSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param MessageEvent $event
      */
     public function onPostSave(MessageEvent $event)
     {
@@ -65,8 +60,6 @@ class MessageSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param MessageEvent $event
      */
     public function onDelete(MessageEvent $event)
     {

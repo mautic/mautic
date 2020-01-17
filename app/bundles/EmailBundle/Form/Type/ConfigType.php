@@ -39,20 +39,12 @@ class ConfigType extends AbstractType
      */
     private $transportType;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param TransportType       $transportType
-     */
     public function __construct(TranslatorInterface $translator, TransportType $transportType)
     {
         $this->translator    = $translator;
         $this->transportType = $transportType;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(
@@ -253,7 +245,7 @@ class ConfigType extends AbstractType
                     'tooltip'  => 'mautic.email.config.mailer.transport.tooltip',
                     'onchange' => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -335,7 +327,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.amazon_host.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -374,7 +366,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.auth.mode.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => 'mautic.email.config.mailer_auth_mode.none',
+                'placeholder' => 'mautic.email.config.mailer_auth_mode.none',
             ]
         );
 
@@ -464,7 +456,7 @@ class ConfigType extends AbstractType
                     'tooltip'      => 'mautic.email.config.mailer.encryption.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
-                'empty_value' => 'mautic.email.config.mailer_encryption.none',
+                'placeholder' => 'mautic.email.config.mailer_encryption.none',
             ]
         );
 
@@ -552,7 +544,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.spool.type.tooltip',
                 ],
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -801,9 +793,10 @@ class ConfigType extends AbstractType
      */
     private function getTransportChoices()
     {
-        $choices = $this->transportType->getTransportTypes();
+        $choices    = [];
+        $transports = $this->transportType->getTransportTypes();
 
-        foreach ($choices as $value => $label) {
+        foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;
         }
 

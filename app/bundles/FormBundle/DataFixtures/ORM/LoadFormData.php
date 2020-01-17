@@ -47,9 +47,6 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
         $this->actionModel    = $actionModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $forms        = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');

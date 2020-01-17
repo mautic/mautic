@@ -71,8 +71,6 @@ class CompositeExpression implements \Countable
     /**
      * Adds multiple parts to composite expression.
      *
-     * @param array $parts
-     *
      * @return self
      */
     public function addMultiple(array $parts = [])

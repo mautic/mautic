@@ -74,17 +74,6 @@ class PageSubscriber implements EventSubscriberInterface
      */
     private $contactRepository;
 
-    /**
-     * @param AssetsHelper       $assetsHelper
-     * @param IpLookupHelper     $ipLookupHelper
-     * @param AuditLogModel      $auditLogModel
-     * @param PageModel          $pageModel
-     * @param Logger             $logger
-     * @param HitRepository      $hitRepository
-     * @param PageRepository     $pageRepository
-     * @param RedirectRepository $redirectRepository
-     * @param LeadRepository     $contactRepository
-     */
     public function __construct(
         AssetsHelper $assetsHelper,
         IpLookupHelper $ipLookupHelper,
@@ -122,8 +111,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\PageEvent $event
      */
     public function onPagePostSave(Events\PageEvent $event)
     {
@@ -143,8 +130,6 @@ class PageSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\PageEvent $event
      */
     public function onPageDelete(Events\PageEvent $event)
     {
@@ -165,8 +150,6 @@ class PageSubscriber implements EventSubscriberInterface
      * - </head> : onPageDisplay_headClose
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
-     *
-     * @param Events\PageDisplayEvent $event
      */
     public function onPageDisplay(Events\PageDisplayEvent $event)
     {
@@ -218,9 +201,6 @@ class PageSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
-    /**
-     * @param QueueConsumerEvent $event
-     */
     public function onPageHit(QueueConsumerEvent $event)
     {
         $payload                = $event->getPayload();

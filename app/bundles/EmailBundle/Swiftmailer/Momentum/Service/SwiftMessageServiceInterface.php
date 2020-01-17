@@ -19,8 +19,6 @@ use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 interface SwiftMessageServiceInterface
 {
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @return TransmissionDTO
      */
     public function transformToTransmission(\Swift_Mime_SimpleMessage $message);

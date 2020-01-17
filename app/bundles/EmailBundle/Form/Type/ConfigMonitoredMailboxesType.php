@@ -31,18 +31,11 @@ class ConfigMonitoredMailboxesType extends AbstractType
      */
     private $imapHelper;
 
-    /**
-     * @param Mailbox $imapHelper
-     */
     public function __construct(Mailbox $imapHelper)
     {
         $this->imapHelper = $imapHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $monitoredShowOn = ('general' == $options['mailbox']) ? '{}'
@@ -120,7 +113,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                         'data-show-on' => $monitoredShowOn,
                         'tooltip'      => 'mautic.email.config.monitored_email_encryption.tooltip',
                     ],
-                    'empty_value' => 'mautic.email.config.mailer_encryption.none',
+                    'placeholder' => 'mautic.email.config.mailer_encryption.none',
                     'data'        => (isset($options['data']['encryption'])) ? $options['data']['encryption'] : '/ssl',
                 ]
             );

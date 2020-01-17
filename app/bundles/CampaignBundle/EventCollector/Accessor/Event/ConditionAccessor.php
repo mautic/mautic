@@ -18,8 +18,6 @@ class ConditionAccessor extends AbstractEventAccessor
 {
     /**
      * ConditionAccessor constructor.
-     *
-     * @param array $config
      */
     public function __construct(array $config)
     {

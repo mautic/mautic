@@ -201,26 +201,6 @@ class LeadModel extends FormModel
      */
     private $fieldsByGroup = [];
 
-    /**
-     * @param RequestStack         $requestStack
-     * @param CookieHelper         $cookieHelper
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param PathsHelper          $pathsHelper
-     * @param IntegrationHelper    $integrationHelper
-     * @param FieldModel           $leadFieldModel
-     * @param ListModel            $leadListModel
-     * @param FormFactory          $formFactory
-     * @param CompanyModel         $companyModel
-     * @param CategoryModel        $categoryModel
-     * @param ChannelListHelper    $channelListHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param EmailValidator       $emailValidator
-     * @param UserProvider         $userProvider
-     * @param ContactTracker       $contactTracker
-     * @param DeviceTracker        $deviceTracker
-     * @param LegacyLeadModel      $legacyLeadModel
-     * @param IpAddressModel       $ipAddressModel
-     */
     public function __construct(
         RequestStack $requestStack,
         CookieHelper $cookieHelper,
@@ -588,8 +568,6 @@ class LeadModel extends FormModel
     /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
-     * @param Lead       $lead
-     * @param array      $data
      * @param bool|false $overwriteWithBlank
      * @param bool|true  $fetchSocialProfiles
      * @param bool|false $bindWithForm        Send $data through the Lead form and only use valid data (should be used with request data)
@@ -797,8 +775,6 @@ class LeadModel extends FormModel
     /**
      * Obtains a list of leads based a list of IDs.
      *
-     * @param array $ids
-     *
      * @return Paginator
      */
     public function getLeadsByIds(array $ids)
@@ -817,8 +793,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $contact
-     *
      * @return bool
      */
     public function canEditContact(Lead $contact)
@@ -953,9 +927,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param array     $queryFields
-     * @param Lead|null $lead
-     * @param bool      $returnWithQueryFields
+     * @param bool $returnWithQueryFields
      *
      * @return array|Lead
      */
@@ -1020,7 +992,6 @@ class LeadModel extends FormModel
     /**
      * Get a list of segments this lead belongs to.
      *
-     * @param Lead $lead
      * @param bool $forLists
      * @param bool $arrayHydration
      * @param bool $isPublic
@@ -1036,8 +1007,6 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of companies this contact belongs to.
-     *
-     * @param Lead $lead
      *
      * @return mixed
      */
@@ -1121,7 +1090,6 @@ class LeadModel extends FormModel
     /**
      * @depreacated 2.6.0 to be removed in 3.0; use getFrequencyRules() instead
      *
-     * @param Lead $lead
      * @param null $channel
      *
      * @return mixed
@@ -1132,7 +1100,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead   $lead
      * @param string $channel
      *
      * @return mixed
@@ -1157,7 +1124,6 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param Lead $lead
      * @param null $data
      * @param null $leadLists
      *
@@ -1237,7 +1203,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
      * @param $categories
      * @param bool $manuallyAdded
      *
@@ -1302,8 +1267,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getLeadCategories(Lead $lead)
@@ -1612,8 +1575,6 @@ class LeadModel extends FormModel
     /**
      * Update a leads tags.
      *
-     * @param Lead       $lead
-     * @param array      $tags
      * @param bool|false $removeOrphans
      */
     public function setTags(Lead $lead, array $tags, $removeOrphans = false)
@@ -1662,9 +1623,6 @@ class LeadModel extends FormModel
 
     /**
      * Update a leads UTM tags.
-     *
-     * @param Lead   $lead
-     * @param UtmTag $utmTags
      */
     public function setUtmTags(Lead $lead, UtmTag $utmTags)
     {
@@ -1676,7 +1634,6 @@ class LeadModel extends FormModel
     /**
      * Add leads UTM tags via API.
      *
-     * @param Lead  $lead
      * @param array $params
      */
     public function addUTMTags(Lead $lead, $params)
@@ -1745,8 +1702,7 @@ class LeadModel extends FormModel
     /**
      * Removes a UtmTag set from a Lead.
      *
-     * @param Lead $lead
-     * @param int  $utmId
+     * @param int $utmId
      */
     public function removeUtmTags(Lead $lead, $utmId)
     {
@@ -1766,10 +1722,9 @@ class LeadModel extends FormModel
     /**
      * Modify tags with support to remove via a prefixed minus sign.
      *
-     * @param Lead $lead
-     * @param      $tags
-     * @param      $removeTags
-     * @param      $persist
+     * @param $tags
+     * @param $removeTags
+     * @param $persist
      * @param bool True if tags modified
      *
      * @return bool
@@ -1862,7 +1817,6 @@ class LeadModel extends FormModel
     /**
      * Modify companies for lead.
      *
-     * @param Lead $lead
      * @param $companies
      */
     public function modifyCompanies(Lead $lead, $companies)
@@ -2165,12 +2119,10 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead|null  $lead
-     * @param null       $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit
-     * @param bool       $forTimeline
+     * @param null $filters
+     * @param int  $page
+     * @param int  $limit
+     * @param bool $forTimeline
      *
      * @return array
      */
@@ -2211,11 +2163,7 @@ class LeadModel extends FormModel
     /**
      * Get engagement counts by time unit.
      *
-     * @param Lead            $lead
-     * @param \DateTime|null  $dateFrom
-     * @param \DateTime|null  $dateTo
-     * @param string          $unit
-     * @param ChartQuery|null $chartQuery
+     * @param string $unit
      *
      * @return array
      */
@@ -2230,8 +2178,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $company
+     * @param $company
      *
      * @return bool
      */
@@ -2261,8 +2208,6 @@ class LeadModel extends FormModel
     /**
      * Get contact channels.
      *
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getContactChannels(Lead $lead)
@@ -2281,8 +2226,6 @@ class LeadModel extends FormModel
 
     /**
      * Get contact channels.
-     *
-     * @param Lead $lead
      *
      * @return array
      */
@@ -2322,8 +2265,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return array
      */
     public function getPreferredChannel(Lead $lead)
@@ -2390,7 +2331,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
      * @param $score
      *
      * @return bool
@@ -2420,8 +2360,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead $lead
-     * @param      $ownerId
+     * @param $ownerId
      */
     public function updateLeadOwner(Lead $lead, $ownerId)
     {
@@ -2431,9 +2370,6 @@ class LeadModel extends FormModel
         parent::saveEntity($lead);
     }
 
-    /**
-     * @param Lead $lead
-     */
     private function processManipulator(Lead $lead)
     {
         if ($lead->isNewlyCreated() || $lead->wasAnonymous()) {
@@ -2460,8 +2396,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param IpAddress $ip
-     * @param bool      $persist
+     * @param bool $persist
      *
      * @return Lead
      */
@@ -2493,7 +2428,6 @@ class LeadModel extends FormModel
     /**
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
-     * @param Lead   $lead
      * @param string $channel
      *
      * @return int
@@ -2533,7 +2467,6 @@ class LeadModel extends FormModel
      *
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
-     * @param Lead      $lead
      * @param string    $channel
      * @param bool|true $persist
      *
@@ -2562,7 +2495,6 @@ class LeadModel extends FormModel
      *
      * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
      *
-     * @param Lead         $lead
      * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
      * @param int          $reason             Must be a class constant from the DoNotContact class
@@ -2663,8 +2595,6 @@ class LeadModel extends FormModel
      * Sets current lead.
      *
      * @deprecated 2.13.0 to be removed in 3.0; use ContactTracker::getContact instead
-     *
-     * @param Lead $lead
      */
     public function setCurrentLead(Lead $lead)
     {
@@ -2690,8 +2620,6 @@ class LeadModel extends FormModel
      *
      * @deprecated 2.13.0; to be removed in 3.0. Use \Mautic\LeadBundle\Deduplicate\ContactMerger instead
      *
-     * @param Lead $lead
-     * @param Lead $lead2
      * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
      *
      * @return Lead

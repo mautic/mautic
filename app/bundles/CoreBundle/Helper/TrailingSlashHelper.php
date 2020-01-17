@@ -22,8 +22,6 @@ class TrailingSlashHelper
 
     /**
      * TrailingSlashHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -31,8 +29,6 @@ class TrailingSlashHelper
     }
 
     /**
-     * @param Request $request
-     *
      * @return string
      */
     public function getSafeRedirectUrl(Request $request)

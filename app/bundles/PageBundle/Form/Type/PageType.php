@@ -61,12 +61,6 @@ class PageType extends AbstractType
      */
     private $canViewOther = false;
 
-    /**
-     * @param EntityManager   $entityManager
-     * @param PageModel       $pageModel
-     * @param CorePermissions $corePermissions
-     * @param UserHelper      $userHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         PageModel $pageModel,
@@ -120,7 +114,7 @@ class PageType extends AbstractType
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.page.form.template.help',
                 ],
-                'empty_value' => 'mautic.core.none',
+                'placeholder' => 'mautic.core.none',
                 'data'        => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
             ]
         );
@@ -209,7 +203,7 @@ class PageType extends AbstractType
                     ],
                     'required'    => false,
                     'multiple'    => false,
-                    'empty_value' => 'mautic.core.form.translation_parent.empty',
+                    'placeholder' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
                     'ignore_ids'  => [(int) $options['data']->getId()],
                 ]
@@ -273,7 +267,7 @@ class PageType extends AbstractType
                   'class'   => 'form-control',
                   'tooltip' => 'mautic.page.form.redirecttype.help',
               ],
-              'empty_value' => 'mautic.page.form.redirecttype.none',
+              'placeholder' => 'mautic.page.form.redirecttype.none',
           ]
         );
 

@@ -29,17 +29,12 @@ class ThemeListType extends AbstractType
 
     /**
      * ThemeListType constructor.
-     *
-     * @param ThemeHelper $helper
      */
     public function __construct(ThemeHelper $helper)
     {
         $this->themeHelper = $helper;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -54,7 +49,7 @@ class ThemeListType extends AbstractType
                 'multiple'          => false,
                 'label'             => 'mautic.core.form.theme',
                 'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [
                     'class' => 'form-control',

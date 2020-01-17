@@ -52,8 +52,6 @@ class CampaignBuilderEvent extends Event
 
     /**
      * CampaignBuilderEvent constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -112,8 +110,7 @@ class CampaignBuilderEvent extends Event
     /**
      * @deprecated - use addDecision instead
      *
-     * @param       $key
-     * @param array $decision
+     * @param $key
      */
     public function addLeadDecision($key, array $decision)
     {
@@ -182,8 +179,7 @@ class CampaignBuilderEvent extends Event
     /**
      * @deprecated use addCondition instead
      *
-     * @param       $key
-     * @param array $event
+     * @param $key
      */
     public function addLeadCondition($key, array $event)
     {

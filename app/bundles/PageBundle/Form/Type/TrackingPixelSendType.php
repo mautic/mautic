@@ -30,18 +30,12 @@ class TrackingPixelSendType extends AbstractType
 
     /**
      * TrackingPixelSendType constructor.
-     *
-     * @param TrackingHelper $trackingHelper
      */
     public function __construct(TrackingHelper $trackingHelper)
     {
         $this->trackingHelper = $trackingHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $trackingServices = $this->trackingHelper->getEnabledServices();
@@ -55,7 +49,7 @@ class TrackingPixelSendType extends AbstractType
             'expanded'    => false,
             'multiple'    => true,
             'choices'     => array_flip($trackingServices),
-            'empty_value' => 'mautic.core.form.chooseone',
+            'placeholder' => 'mautic.core.form.chooseone',
             'constraints' => [
                 new NotBlank(
                     ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']

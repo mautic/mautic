@@ -162,9 +162,6 @@ class Asset extends FormEntity
      */
     private $disallow = false;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -1166,13 +1163,10 @@ class Asset extends FormEntity
         $this->description = $description;
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback(['\\Mautic\\AssetBundle\\Entity\\Asset', 'validateFile']));
+        $metadata->addConstraint(new Assert\Callback([__CLASS__, 'validateFile']));
     }
 
     /**

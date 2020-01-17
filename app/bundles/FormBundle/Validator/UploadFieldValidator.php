@@ -33,9 +33,6 @@ class UploadFieldValidator
     }
 
     /**
-     * @param Field   $field
-     * @param Request $request
-     *
      * @return UploadedFile
      *
      * @throws FileValidationException

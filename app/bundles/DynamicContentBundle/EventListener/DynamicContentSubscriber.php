@@ -89,18 +89,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
      */
     private $security;
 
-    /**
-     * @param TrackableModel       $trackableModel
-     * @param PageTokenHelper      $pageTokenHelper
-     * @param AssetTokenHelper     $assetTokenHelper
-     * @param FormTokenHelper      $formTokenHelper
-     * @param FocusTokenHelper     $focusTokenHelper
-     * @param AuditLogModel        $auditLogModel
-     * @param LeadModel            $leadModel
-     * @param DynamicContentHelper $dynamicContentHelper
-     * @param DynamicContentModel  $dynamicContentModel
-     * @param CorePermissions      $security
-     */
     public function __construct(
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
@@ -140,8 +128,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\DynamicContentEvent $event
      */
     public function onPostSave(Events\DynamicContentEvent $event)
     {
@@ -160,8 +146,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\DynamicContentEvent $event
      */
     public function onDelete(Events\DynamicContentEvent $event)
     {
@@ -176,9 +160,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param MauticEvents\TokenReplacementEvent $event
-     */
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */
@@ -222,9 +203,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param PageDisplayEvent $event
-     */
     public function decodeTokens(PageDisplayEvent $event)
     {
         $lead = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;

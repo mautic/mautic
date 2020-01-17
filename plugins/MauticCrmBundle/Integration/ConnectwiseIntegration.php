@@ -22,8 +22,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * Class ConnectwiseIntegration.
- *
  * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
@@ -298,7 +296,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -314,7 +312,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.connectwise.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -340,9 +338,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'campaign_task',
                         IntegrationCampaignsTaskType::class,
                         [
-                            'label'  => false,
-                            'helper' => $this->factory->getHelper('integration'),
-                            'attr'   => [
+                            'label' => false,
+                            'attr'  => [
                                 'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                             ],
                             'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
@@ -476,9 +473,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Get Companies from connectwise.
-     *
-     * @param array $params
-     * @param null  $query
      */
     public function getCompanies(array $params = [])
     {

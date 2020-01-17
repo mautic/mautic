@@ -20,8 +20,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 class CategoryEvent extends CommonEvent
 {
     /**
-     * @param Category $category
-     * @param bool     $isNew
+     * @param bool $isNew
      */
     public function __construct(Category &$category, $isNew = false)
     {
@@ -41,8 +40,6 @@ class CategoryEvent extends CommonEvent
 
     /**
      * Sets the Category entity.
-     *
-     * @param Category $category
      */
     public function setCategory(Category $category)
     {

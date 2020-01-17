@@ -41,10 +41,6 @@ class FormType extends AbstractType
      */
     private $security;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param CorePermissions     $security
-     */
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
         $this->translator = $translator;
@@ -94,7 +90,7 @@ class FormType extends AbstractType
 
         $builder->add('template', ThemeListType::class, [
             'feature'     => 'form',
-            'empty_value' => ' ',
+            'placeholder' => ' ',
             'attr'        => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.form.template.help',
@@ -118,8 +114,10 @@ class FormType extends AbstractType
         }
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
-            'read_only' => $readonly,
-            'data'      => $data,
+            'data' => $data,
+            'attr' => [
+                'readonly' => $readonly,
+            ],
         ]);
 
         $builder->add('inKioskMode', YesNoButtonGroupType::class, [
@@ -189,7 +187,7 @@ class FormType extends AbstractType
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
             ],
             'required'    => false,
-            'empty_value' => false,
+            'placeholder' => false,
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';

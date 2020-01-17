@@ -34,8 +34,6 @@ class IntegrationConfigType extends AbstractType
 
     /**
      * IntegrationConfigType constructor.
-     *
-     * @param ConfigIntegrationsHelper $integrationsHelper
      */
     public function __construct(ConfigIntegrationsHelper $integrationsHelper)
     {
@@ -43,9 +41,6 @@ class IntegrationConfigType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws IntegrationNotFoundException
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -106,9 +101,6 @@ class IntegrationConfigType extends AbstractType
         $builder->setAction($options['action']);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(

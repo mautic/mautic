@@ -32,9 +32,6 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
         $this->roleModel = $roleModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         if (!$this->hasReference('admin-role')) {

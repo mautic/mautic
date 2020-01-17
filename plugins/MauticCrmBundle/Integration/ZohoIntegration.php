@@ -622,7 +622,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -639,7 +639,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                         'mautic.plugin.zoho.zone_china'  => 'zoho.com.cn',
                     ],
                     'label'             => 'mautic.plugin.zoho.zone_select',
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => true,
                     'attr'              => [
                         'tooltip' => 'mautic.plugin.zoho.zone.tooltip',
@@ -660,7 +660,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Zoho']),
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -1321,10 +1321,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
-     * @param        $object
-     * @param        $counter
-     * @param        $totalCounter
+     * @param $object
+     * @param $counter
      */
     private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
@@ -1335,10 +1333,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
-     * @param        $object
-     * @param        $counter
-     * @param        $totalCounter
+     * @param $object
+     * @param $counter
      */
     private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {

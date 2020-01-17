@@ -85,10 +85,6 @@ class ObjectChangeGenerator
 
     /**
      * ObjectChangeGenerator constructor.
-     *
-     * @param SyncJudgeInterface $syncJudge
-     * @param ValueHelper        $valueHelper
-     * @param FieldHelper        $fieldHelper
      */
     public function __construct(SyncJudgeInterface $syncJudge, ValueHelper $valueHelper, FieldHelper $fieldHelper)
     {
@@ -98,12 +94,6 @@ class ObjectChangeGenerator
     }
 
     /**
-     * @param ReportDAO        $syncReport
-     * @param MappingManualDAO $mappingManual
-     * @param ObjectMappingDAO $objectMapping
-     * @param ReportObjectDAO  $internalObject
-     * @param ReportObjectDAO  $integrationObject
-     *
      * @return ObjectChangeDAO
      *
      * @throws ObjectNotFoundException
@@ -165,8 +155,6 @@ class ObjectChangeGenerator
     }
 
     /**
-     * @param FieldMappingDAO $fieldMappingDAO
-     *
      * @throws ObjectNotFoundException
      */
     private function addFieldToObjectChange(FieldMappingDAO $fieldMappingDAO): void
@@ -244,11 +232,6 @@ class ObjectChangeGenerator
         );
     }
 
-    /**
-     * @param FieldMappingDAO             $fieldMappingDAO
-     * @param InformationChangeRequestDAO $integrationInformationChangeRequest
-     * @param string                      $fieldState
-     */
     private function judgeThenAddFieldToObjectChange(
         FieldMappingDAO $fieldMappingDAO,
         InformationChangeRequestDAO $integrationInformationChangeRequest,
@@ -335,12 +318,6 @@ class ObjectChangeGenerator
     }
 
     /**
-     * @param string                      $judgeMode
-     * @param FieldMappingDAO             $fieldMappingDAO
-     * @param InformationChangeRequestDAO $integrationInformationChangeRequest
-     * @param InformationChangeRequestDAO $internalInformationChangeRequest
-     * @param string                      $fieldState
-     *
      * @throws ConflictUnresolvedException
      */
     private function makeJudgement(
@@ -383,10 +360,6 @@ class ObjectChangeGenerator
     }
 
     /**
-     * @param string $object
-     * @param string $field
-     * @param string $integrationFieldState
-     *
      * @return string
      */
     private function getFieldState(string $object, string $field, string $integrationFieldState)

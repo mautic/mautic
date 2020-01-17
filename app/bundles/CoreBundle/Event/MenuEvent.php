@@ -39,8 +39,7 @@ class MenuEvent extends Event
     /**
      * MenuEvent constructor.
      *
-     * @param MenuHelper $menuHelper
-     * @param string     $type
+     * @param string $type
      */
     public function __construct(MenuHelper $menuHelper, $type = 'main')
     {
@@ -48,9 +47,6 @@ class MenuEvent extends Event
         $this->type   = $type;
     }
 
-    /**
-     * @param array $menuItems
-     */
     public function setMenuItems(array $menuItems)
     {
         $this->menuItems = $menuItems;
@@ -58,8 +54,6 @@ class MenuEvent extends Event
 
     /**
      * Add items to the menu.
-     *
-     * @param array $menuItems
      */
     public function addMenuItems(array $menuItems)
     {

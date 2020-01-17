@@ -198,10 +198,9 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param int            $campaignId
-     * @param int            $decisionId
-     * @param int            $parentDecisionId
-     * @param ContactLimiter $limiter
+     * @param int $campaignId
+     * @param int $decisionId
+     * @param int $parentDecisionId
      *
      * @return array
      */
@@ -278,10 +277,6 @@ class LeadRepository extends CommonRepository
     /**
      * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
      *
-     * @param int  $decisionId
-     * @param int  $parentDecisionId
-     * @param null $specificContactId
-     *
      * @return int
      */
     public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)
@@ -331,9 +326,6 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param array    $contactIds
-     * @param Campaign $campaign
-     *
      * @return array
      */
     public function getCampaignMembers(array $contactIds, Campaign $campaign)
@@ -362,8 +354,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param array $contactIds
-     * @param       $campaignId
+     * @param $campaignId
      *
      * @return array
      */
@@ -392,9 +383,8 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param ContactLimiter $limiter
-     * @param bool           $campaignCanBeRestarted
+     * @param      $campaignId
+     * @param bool $campaignCanBeRestarted
      *
      * @return CountResult
      */
@@ -427,9 +417,8 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param ContactLimiter $limiter
-     * @param bool           $campaignCanBeRestarted
+     * @param      $campaignId
+     * @param bool $campaignCanBeRestarted
      *
      * @return array
      */
@@ -467,8 +456,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param ContactLimiter $limiter
+     * @param $campaignId
      *
      * @return int
      */
@@ -496,8 +484,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param                $campaignId
-     * @param ContactLimiter $limiter
+     * @param $campaignId
      *
      * @return array
      */
@@ -533,8 +520,7 @@ class LeadRepository extends CommonRepository
      * Takes an array of contact ID's and increments
      * their current rotation in a campaign by 1.
      *
-     * @param array $contactIds
-     * @param int   $campaignId
+     * @param int $campaignId
      *
      * @return bool
      */
@@ -585,8 +571,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param              $campaignId
-     * @param QueryBuilder $qb
+     * @param $campaignId
      */
     private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb)
     {
@@ -605,10 +590,6 @@ class LeadRepository extends CommonRepository
         );
     }
 
-    /**
-     * @param array        $segments
-     * @param QueryBuilder $qb
-     */
     private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
     {
         if (0 === count($segments)) {
@@ -635,8 +616,7 @@ class LeadRepository extends CommonRepository
     /**
      * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
      *
-     * @param              $campaignId
-     * @param QueryBuilder $qb
+     * @param $campaignId
      */
     private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
     {

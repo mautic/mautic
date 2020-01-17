@@ -20,9 +20,6 @@ class ContactChannelsType extends AbstractType
      */
     private $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -61,7 +58,7 @@ class ContactChannelsType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.lead.list.frequency.preferred.channel',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'   => 'form-control',

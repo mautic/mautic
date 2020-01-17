@@ -44,11 +44,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $syncIntegrationsHelper;
 
-    /**
-     * @param FieldChangeRepository            $fieldChangeRepo
-     * @param VariableExpresserHelperInterface $variableExpressor
-     * @param SyncIntegrationsHelper           $syncIntegrationsHelper
-     */
     public function __construct(
         FieldChangeRepository $fieldChangeRepo,
         VariableExpresserHelperInterface $variableExpressor,
@@ -59,9 +54,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->syncIntegrationsHelper = $syncIntegrationsHelper;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -73,8 +65,6 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadEvent $event
-     *
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
@@ -125,17 +115,12 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Events\LeadEvent $event
-     */
     public function onLeadPostDelete(Events\LeadEvent $event): void
     {
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getLead()->deletedId, Lead::class);
     }
 
     /**
-     * @param Events\CompanyEvent $event
-     *
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
@@ -166,18 +151,13 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->recordFieldChanges($changes['fields'], $company->getId(), Company::class);
     }
 
-    /**
-     * @param Events\CompanyEvent $event
-     */
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
     {
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, Company::class);
     }
 
     /**
-     * @param array  $fieldChanges
-     * @param int    $objectId
-     * @param string $objectType
+     * @param int $objectId
      *
      * @throws IntegrationNotFoundException
      */

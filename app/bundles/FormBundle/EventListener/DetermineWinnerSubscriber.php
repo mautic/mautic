@@ -30,10 +30,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param SubmissionRepository $submissionRepository
-     * @param TranslatorInterface  $translator
-     */
     public function __construct(SubmissionRepository $submissionRepository, TranslatorInterface $translator)
     {
         $this->submissionRepository = $submissionRepository;
@@ -52,8 +48,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
     /**
      * Determines the winner of A/B test based on number of form submissions.
-     *
-     * @param DetermineWinnerEvent $event
      */
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event)
     {

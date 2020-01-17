@@ -43,10 +43,6 @@ class IntegrationsHelper
 
     /**
      * IntegrationsHelper constructor.
-     *
-     * @param IntegrationRepository    $integrationRepository
-     * @param EncryptionService        $encryptionService
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         IntegrationRepository $integrationRepository,
@@ -58,17 +54,12 @@ class IntegrationsHelper
         $this->eventDispatcher       = $eventDispatcher;
     }
 
-    /**
-     * @param IntegrationInterface $integration
-     */
     public function addIntegration(IntegrationInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
 
     /**
-     * @param string $integration
-     *
      * @return IntegrationInterface
      *
      * @throws IntegrationNotFoundException
@@ -85,9 +76,6 @@ class IntegrationsHelper
         return $this->integrations[$integration];
     }
 
-    /**
-     * @param Integration $configuration
-     */
     public function saveIntegrationConfiguration(Integration $configuration): void
     {
         // Encrypt the keys before saving
@@ -109,8 +97,6 @@ class IntegrationsHelper
     }
 
     /**
-     * @param IntegrationInterface $integration
-     *
      * @return Integration
      *
      * @throws IntegrationNotFoundException

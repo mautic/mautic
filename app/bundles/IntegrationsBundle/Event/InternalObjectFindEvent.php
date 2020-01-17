@@ -54,17 +54,11 @@ class InternalObjectFindEvent extends Event
      */
     private $fieldValues = [];
 
-    /**
-     * @param ObjectInterface $object
-     */
     public function __construct(ObjectInterface $object)
     {
         $this->object = $object;
     }
 
-    /**
-     * @return ObjectInterface
-     */
     public function getObject(): ObjectInterface
     {
         return $this->object;
@@ -86,81 +80,51 @@ class InternalObjectFindEvent extends Event
         $this->ids = $ids;
     }
 
-    /**
-     * @return array
-     */
     public function getFoundObjects(): array
     {
         return $this->foundObjects;
     }
 
-    /**
-     * @param array $foundObjects
-     */
     public function setFoundObjects(array $foundObjects): void
     {
         $this->foundObjects = $foundObjects;
     }
 
-    /**
-     * @return DateRange|null
-     */
     public function getDateRange(): ?DateRange
     {
         return $this->dateRange;
     }
 
-    /**
-     * @param DateRange|null $dateRange
-     */
     public function setDateRange(?DateRange $dateRange): void
     {
         $this->dateRange = $dateRange;
     }
 
-    /**
-     * @return int|null
-     */
     public function getStart(): ?int
     {
         return $this->start;
     }
 
-    /**
-     * @param int|null $start
-     */
     public function setStart(?int $start): void
     {
         $this->start = $start;
     }
 
-    /**
-     * @return int|null
-     */
     public function getLimit(): ?int
     {
         return $this->limit;
     }
 
-    /**
-     * @param int|null $limit
-     */
     public function setLimit(?int $limit): void
     {
         $this->limit = $limit;
     }
 
-    /**
-     * @return array
-     */
     public function getFieldValues(): array
     {
         return $this->fieldValues;
     }
 
-    /**
-     * @param array $fieldValues
-     */
     public function setFieldValues(array $fieldValues): void
     {
         $this->fieldValues = $fieldValues;

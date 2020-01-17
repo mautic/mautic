@@ -26,10 +26,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 abstract class AbstractPluginBundle extends PluginBundleBase
 {
     /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param array|null    $metadata
-     * @param Schema|null   $installedSchema
+     * @param array|null $metadata
      *
      * @throws Exception
      */

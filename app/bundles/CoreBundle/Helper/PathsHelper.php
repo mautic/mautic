@@ -70,9 +70,6 @@ class PathsHelper
 
     /**
      * PathsHelper constructor.
-     *
-     * @param UserHelper           $userHelper
-     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper)
     {

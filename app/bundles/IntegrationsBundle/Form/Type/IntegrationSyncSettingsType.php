@@ -24,9 +24,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class IntegrationSyncSettingsType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     *
      * @throws IntegrationNotFoundException
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -48,7 +45,7 @@ class IntegrationSyncSettingsType extends AbstractType
                 'multiple'    => true,
                 'label'       => 'mautic.integration.sync_objects',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => [],
+                'placeholder' => [],
                 'required'    => false,
             ]
         );
@@ -61,7 +58,7 @@ class IntegrationSyncSettingsType extends AbstractType
             [
                 'label'       => 'mautic.integration.sync.update_blanks',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'data'        => !empty($options['data']['updateBlanks'])
             ]
@@ -89,9 +86,6 @@ class IntegrationSyncSettingsType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(

@@ -36,8 +36,6 @@ class MauticCrmBundle extends PluginBundleBase
      * Fix: plugin installer doesn't find metadata entities for the plugin
      * PluginBundle/Controller/PluginController:410.
      *
-     * @param EntityManager $em
-     *
      * @return array|null
      */
     private static function getMetadata(EntityManager $em)

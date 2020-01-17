@@ -45,12 +45,6 @@ class NotificationSubscriber implements EventSubscriberInterface
      */
     private $auditLogModel;
 
-    /**
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     */
     public function __construct(AuditLogModel $auditLogModel, TrackableModel $trackableModel, PageTokenHelper $pageTokenHelper, AssetTokenHelper $assetTokenHelper)
     {
         $this->auditLogModel    = $auditLogModel;
@@ -73,8 +67,6 @@ class NotificationSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param NotificationEvent $event
      */
     public function onPostSave(NotificationEvent $event)
     {
@@ -93,8 +85,6 @@ class NotificationSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param NotificationEvent $event
      */
     public function onDelete(NotificationEvent $event)
     {
@@ -109,9 +99,6 @@ class NotificationSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param TokenReplacementEvent $event
-     */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
         /** @var Lead $lead */

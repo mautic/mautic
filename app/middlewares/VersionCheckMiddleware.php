@@ -27,9 +27,6 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
      */
     protected $app;
 
-    /**
-     * @param HttpKernelInterface $app
-     */
     public function __construct(HttpKernelInterface $app)
     {
         $this->app = $app;

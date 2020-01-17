@@ -75,13 +75,11 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param int|null  $createdByUserId
-     * @param int|null  $companyId
-     * @param int|null  $campaignId
-     * @param int|null  $segmentId
+     * @param int      $limit
+     * @param int|null $createdByUserId
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
@@ -178,7 +176,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $emailId
      * @param null $listId
      *
      * @return array
@@ -215,10 +212,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -228,10 +224,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -241,10 +236,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -254,11 +248,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param                 $column
-     * @param null            $emailIds
-     * @param null            $listId
-     * @param ChartQuery|null $chartQuery
-     * @param bool            $combined
+     * @param      $column
+     * @param null $emailIds
+     * @param null $listId
+     * @param bool $combined
      *
      * @return array|int
      */
@@ -433,8 +426,7 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's email stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *
@@ -624,9 +616,6 @@ class StatRepository extends CommonRepository
         $this->getEntityManager()->getConnection()->delete(MAUTIC_TABLE_PREFIX.'email_stats', ['id' => (int) $id]);
     }
 
-    /**
-     * @param array $ids
-     */
     public function deleteStats(array $ids)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -683,9 +672,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array $contacts
-     * @param       $emailId
-     * @param bool  $organizeByContact
+     * @param $emailId
      *
      * @return array Formatted as [contactId => sentCount]
      */

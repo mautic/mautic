@@ -29,27 +29,17 @@ class AuthIntegrationsHelper
      */
     private $integrationsHelper;
 
-    /**
-     * @param IntegrationsHelper $integrationsHelper
-     */
     public function __construct(IntegrationsHelper $integrationsHelper)
     {
         $this->integrationsHelper = $integrationsHelper;
     }
 
-    /**
-     * @param AuthenticationInterface $integration
-     */
     public function addIntegration(AuthenticationInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
 
     /**
-     * @param string $integration
-     *
-     * @return AuthenticationInterface
-     *
      * @throws IntegrationNotFoundException
      */
     public function getIntegration(string $integration): AuthenticationInterface
@@ -64,9 +54,6 @@ class AuthIntegrationsHelper
         return $this->integrations[$integration];
     }
 
-    /**
-     * @param Integration $integrationConfiguration
-     */
     public function saveIntegrationConfiguration(Integration $integrationConfiguration): void
     {
         $this->integrationsHelper->saveIntegrationConfiguration($integrationConfiguration);

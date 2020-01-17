@@ -539,8 +539,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @param array $logs
-     *
      * @return int
      */
     private function getNonActionPathTakenCount(array $logs)

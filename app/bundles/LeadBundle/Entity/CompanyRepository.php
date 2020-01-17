@@ -63,8 +63,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get a list of leads.
      *
-     * @param array $args
-     *
      * @return array
      */
     public function getEntities(array $args = [])
@@ -302,8 +300,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param array $contacts
-     *
      * @return array
      */
     public function getCompaniesForContacts(array $contacts)
@@ -381,10 +377,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     }
 
     /**
-     * @param CompositeExpression|null $expr
-     * @param array                    $parameters
-     * @param null                     $labelColumn
-     * @param string                   $valueColumn
+     * @param null   $labelColumn
+     * @param string $valueColumn
      *
      * @return array
      */

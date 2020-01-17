@@ -20,10 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PropertiesType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -119,7 +115,7 @@ class PropertiesType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 
@@ -155,7 +151,7 @@ class PropertiesType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => false,
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
 

@@ -118,9 +118,6 @@ class Report extends FormEntity implements SchedulerInterface
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -176,9 +173,6 @@ class Report extends FormEntity implements SchedulerInterface
         $builder->addNullableField('scheduleMonthFrequency', Type::STRING, 'schedule_month_frequency');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank([
@@ -405,9 +399,6 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->tableOrder;
     }
 
-    /**
-     * @param array $tableOrder
-     */
     public function setTableOrder(array $tableOrder)
     {
         $this->isChanged('tableOrder', $tableOrder);
@@ -423,9 +414,6 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->graphs;
     }
 
-    /**
-     * @param array $graphs
-     */
     public function setGraphs(array $graphs)
     {
         $this->isChanged('graphs', $graphs);
@@ -441,9 +429,6 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->groupBy;
     }
 
-    /**
-     * @param array $graphs
-     */
     public function setGroupBy(array $groupBy)
     {
         $this->isChanged('groupBy', $groupBy);
@@ -495,9 +480,6 @@ class Report extends FormEntity implements SchedulerInterface
         return array_merge($this->getColumns(), $this->getAggregatorColumns());
     }
 
-    /**
-     * @param array $aggregator
-     */
     public function setAggregators(array $aggregators)
     {
         $this->isChanged('aggregators', $aggregators);
@@ -505,9 +487,6 @@ class Report extends FormEntity implements SchedulerInterface
         $this->aggregators = $aggregators;
     }
 
-    /**
-     * @param array $settings
-     */
     public function setSettings(array $settings)
     {
         $this->isChanged('settings', $settings);

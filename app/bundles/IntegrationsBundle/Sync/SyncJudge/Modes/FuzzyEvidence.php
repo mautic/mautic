@@ -19,11 +19,6 @@ use Mautic\IntegrationsBundle\Sync\Exception\ConflictUnresolvedException;
 class FuzzyEvidence implements JudgementModeInterface
 {
     /**
-     * @param InformationChangeRequestDAO $leftChangeRequest
-     * @param InformationChangeRequestDAO $rightChangeRequest
-     *
-     * @return InformationChangeRequestDAO
-     *
      * @throws ConflictUnresolvedException
      */
     public static function adjudicate(

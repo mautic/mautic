@@ -19,9 +19,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AuthenticationIntegrationPass implements CompilerPassInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container): void
     {
         $taggedServices     = $container->findTaggedServiceIds('mautic.authentication_integration');

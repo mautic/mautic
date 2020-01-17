@@ -23,9 +23,6 @@ class UserListType extends AbstractType
      */
     private $userModel;
 
-    /**
-     * @param UserModel $userModel
-     */
     public function __construct(UserModel $userModel)
     {
         $this->userModel = $userModel;
@@ -42,7 +39,7 @@ class UserListType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => true,
                 'required'          => false,
-                'empty_value'       => 'mautic.core.form.chooseone',
+                'placeholder'       => 'mautic.core.form.chooseone',
             ]
         );
     }

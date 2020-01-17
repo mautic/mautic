@@ -68,10 +68,9 @@ class ChartQuery extends AbstractChart
     /**
      * Construct a new ChartQuery object.
      *
-     * @param Connection $connection
-     * @param DateTime   $dateFrom
-     * @param DateTime   $dateTo
-     * @param string     $unit
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
+     * @param string   $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
     {
@@ -296,10 +295,6 @@ class ChartQuery extends AbstractChart
     /**
      * Go through the raw data and add the missing times.
      *
-     * @param string $table   without prefix
-     * @param string $column  name. The column must be type of datetime
-     * @param array  $filters will be added to where claues
-     *
      * @return array
      */
     public function completeTimeData($rawData, $countAverage = false)
@@ -438,10 +433,9 @@ class ChartQuery extends AbstractChart
     /**
      * Modify the query to count occurences of a value in a column.
      *
-     * @param QueryBuilder $table        without prefix
-     * @param string       $uniqueColumn name
-     * @param array        $options      for special behavior
-     * @param string       $tablePrefix
+     * @param string $uniqueColumn name
+     * @param array  $options      for special behavior
+     * @param string $tablePrefix
      */
     public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = [], $tablePrefix = 't')
     {
@@ -494,8 +488,6 @@ class ChartQuery extends AbstractChart
     /**
      * Fetch the count integet from a query.
      *
-     * @param QueryBuilder $query
-     *
      * @return int
      */
     public function fetchCount(QueryBuilder $query)
@@ -532,13 +524,11 @@ class ChartQuery extends AbstractChart
     /**
      * Modify the query to count how many rows is between a range of date diff in seconds.
      *
-     * @param QueryBuilder $query
-     * @param string       $dateColumn1
-     * @param string       $dateColumn2
-     * @param int          $startSecond
-     * @param int          $endSecond
-     * @param array        $filters     will be added to where claues
-     * @param string       $tablePrefix
+     * @param string $dateColumn1
+     * @param string $dateColumn2
+     * @param int    $startSecond
+     * @param int    $endSecond
+     * @param string $tablePrefix
      */
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')
     {

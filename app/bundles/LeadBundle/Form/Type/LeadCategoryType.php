@@ -21,17 +21,11 @@ class LeadCategoryType extends AbstractType
 {
     private $categoryModel;
 
-    /**
-     * @param CategoryModel $categoryModel
-     */
     public function __construct(CategoryModel $categoryModel)
     {
         $this->categoryModel = $categoryModel;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

@@ -254,9 +254,8 @@ class MailHelper
     private $copies = [];
 
     /**
-     * @param MauticFactory $factory
-     * @param               $mailer
-     * @param null          $from
+     * @param      $mailer
+     * @param null $from
      */
     public function __construct(MauticFactory $factory, \Swift_Mailer $mailer, $from = null)
     {
@@ -437,6 +436,7 @@ class MailHelper
                     $this->transportStartTime = time();
                 }
 
+                $failures = null;
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
@@ -691,9 +691,8 @@ class MailHelper
      * Search and replace tokens
      * Adapted from \Swift_Plugins_DecoratorPlugin.
      *
-     * @param array          $search
-     * @param array          $replace
-     * @param \Swift_Message $message
+     * @param array $search
+     * @param array $replace
      */
     public static function searchReplaceTokens($search, $replace, \Swift_Message &$message)
     {
@@ -1291,7 +1290,6 @@ class MailHelper
 
     /**
      * @param array|Lead $lead
-     * @param bool       $internalSend Set to true if the email is not being sent to this lead
      */
     public function setLead($lead, $interalSend = false)
     {
@@ -1334,7 +1332,6 @@ class MailHelper
     }
 
     /**
-     * @param Email $email
      * @param bool  $allowBcc            Honor BCC if set in email
      * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
@@ -1452,8 +1449,7 @@ class MailHelper
     /**
      * Set custom headers.
      *
-     * @param array $headers
-     * @param bool  $merge
+     * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true)
     {
@@ -1517,8 +1513,6 @@ class MailHelper
 
     /**
      * Append tokens.
-     *
-     * @param array $tokens
      */
     public function addTokens(array $tokens)
     {
@@ -1527,8 +1521,6 @@ class MailHelper
 
     /**
      * Set tokens.
-     *
-     * @param array $tokens
      */
     public function setTokens(array $tokens)
     {
@@ -2128,8 +2120,7 @@ class MailHelper
     }
 
     /**
-     * @param       $name
-     * @param array $tokens
+     * @param $name
      *
      * @return array
      */
@@ -2162,22 +2153,16 @@ class MailHelper
         $invalidChar = strpbrk($address, '\'^&*%');
 
         if (false !== $invalidChar) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.
-                '] contains this invalid character: '.substr($invalidChar, 0, 1)
-            );
+            throw new \Swift_RfcComplianceException('Email address ['.$address.'] contains this invalid character: '.substr($invalidChar, 0, 1));
         }
 
         if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.'] is invalid'
-            );
+            throw new \Swift_RfcComplianceException('Email address ['.$address.'] is invalid');
         }
     }
 
     /**
-     * @param       $overrideFrom
-     * @param array $systemFrom
+     * @param $overrideFrom
      */
     private function setDefaultFrom($overrideFrom, array $systemFrom)
     {

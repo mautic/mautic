@@ -22,11 +22,6 @@ class HardEvidence implements JudgementModeInterface
     use DateComparisonTrait;
 
     /**
-     * @param InformationChangeRequestDAO $leftChangeRequest
-     * @param InformationChangeRequestDAO $rightChangeRequest
-     *
-     * @return InformationChangeRequestDAO
-     *
      * @throws ConflictUnresolvedException
      */
     public static function adjudicate(

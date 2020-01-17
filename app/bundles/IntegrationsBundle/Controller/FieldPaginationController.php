@@ -26,11 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 class FieldPaginationController extends CommonController
 {
     /**
-     * @param string  $integration
-     * @param string  $object
-     * @param int     $page
-     * @param Request $request
-     *
      * @return mixed
      */
     public function paginateAction(string $integration, string $object, int $page, Request $request)

@@ -29,9 +29,6 @@ class DoNotContact
 
     /**
      * DoNotContact constructor.
-     *
-     * @param LeadModel              $leadModel
-     * @param DoNotContactRepository $dncRepo
      */
     public function __construct(LeadModel $leadModel, DoNotContactRepository $dncRepo)
     {
@@ -141,7 +138,6 @@ class DoNotContact
     }
 
     /**
-     * @param Lead   $contact
      * @param string $channel
      *
      * @return int
@@ -176,7 +172,6 @@ class DoNotContact
     /**
      * @param      $channel
      * @param      $reason
-     * @param Lead $contact
      * @param null $comments
      *
      * @return DNC
@@ -204,8 +199,6 @@ class DoNotContact
     }
 
     /**
-     * @param DNC  $dnc
-     * @param Lead $contact
      * @param      $channel
      * @param      $reason
      * @param null $comments

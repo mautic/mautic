@@ -75,13 +75,6 @@ class PartialObjectReportBuilder
      */
     private $dispatcher;
 
-    /**
-     * @param FieldChangeRepository    $fieldChangeRepository
-     * @param FieldHelper              $fieldHelper
-     * @param FieldBuilder             $fieldBuilder
-     * @param ObjectProvider           $objectProvider
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         FieldChangeRepository $fieldChangeRepository,
         FieldHelper $fieldHelper,
@@ -96,11 +89,6 @@ class PartialObjectReportBuilder
         $this->dispatcher            = $dispatcher;
     }
 
-    /**
-     * @param RequestDAO $requestDAO
-     *
-     * @return ReportDAO
-     */
     public function buildReport(RequestDAO $requestDAO): ReportDAO
     {
         $this->syncReport = new ReportDAO(MauticSyncDataExchange::NAME);
@@ -148,9 +136,6 @@ class PartialObjectReportBuilder
     }
 
     /**
-     * @param array            $fieldChange
-     * @param RequestObjectDAO $objectDAO
-     *
      * @throws ObjectNotFoundException
      */
     private function processFieldChange(array $fieldChange, RequestObjectDAO $objectDAO): void
@@ -191,10 +176,6 @@ class PartialObjectReportBuilder
     }
 
     /**
-     * @param RequestObjectDAO $requestObjectDAO
-     *
-     * @return array
-     *
      * @throws ObjectNotFoundException
      */
     private function findObjectsWithMissingFields(RequestObjectDAO $requestObjectDAO): array
@@ -230,10 +211,6 @@ class PartialObjectReportBuilder
         return $event->getFoundObjects();
     }
 
-    /**
-     * @param array            $incompleteObjects
-     * @param RequestObjectDAO $requestObjectDAO
-     */
     private function completeObjectsWithMissingFields(array $incompleteObjects, RequestObjectDAO $requestObjectDAO): void
     {
         foreach ($incompleteObjects as $incompleteObject) {

@@ -30,18 +30,11 @@ class EmailType extends AbstractType
      */
     private $userHelper;
 
-    /**
-     * @param UserHelper $userHelper
-     */
     public function __construct(UserHelper $userHelper)
     {
         $this->userHelper = $userHelper;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));

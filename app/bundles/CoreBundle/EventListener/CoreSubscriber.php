@@ -158,8 +158,6 @@ class CoreSubscriber implements EventSubscriberInterface
 
     /**
      * Add mauticForms in js script tag for Froala.
-     *
-     * @param FilterControllerEvent $event
      */
     public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
     {
@@ -175,8 +173,6 @@ class CoreSubscriber implements EventSubscriberInterface
 
     /**
      * Set vars on login.
-     *
-     * @param InteractiveLoginEvent $event
      */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event)
     {
@@ -221,17 +217,10 @@ class CoreSubscriber implements EventSubscriberInterface
         } else {
             $session->remove('mautic.user');
         }
-
-        //set a couple variables used by filemanager
-        $session->set('mautic.docroot', $event->getRequest()->server->get('DOCUMENT_ROOT'));
-        $session->set('mautic.basepath', $event->getRequest()->getBasePath());
-        $session->set('mautic.imagepath', $this->coreParametersHelper->getParameter('image_path'));
     }
 
     /**
      * Populates namespace, bundle, controller, and action into request to be used throughout application.
-     *
-     * @param FilterControllerEvent $event
      */
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -299,9 +288,6 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param MenuEvent $event
-     */
     public function onBuildMenu(MenuEvent $event)
     {
         $name    = $event->getType();
@@ -319,9 +305,6 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param RouteEvent $event
-     */
     public function onBuildRoute(RouteEvent $event)
     {
         $type       = $event->getType();
@@ -418,9 +401,6 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param IconEvent $event
-     */
     public function onFetchIcons(IconEvent $event)
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
@@ -450,7 +430,7 @@ class CoreSubscriber implements EventSubscriberInterface
                     }
                 }
             }
-            unset($bundles, $menuHelper);
+            unset($bundles);
 
             $icons = $event->getIcons();
             $session->set('mautic.menu.icons', $icons);
@@ -460,10 +440,9 @@ class CoreSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param RouteCollection $collection
-     * @param                 $type
-     * @param                 $name
-     * @param                 $details
+     * @param $type
+     * @param $name
+     * @param $details
      */
     private function addRouteToCollection(RouteCollection $collection, $type, $name, $details)
     {

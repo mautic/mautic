@@ -20,10 +20,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class MergeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -34,7 +30,7 @@ class MergeType extends AbstractType
                 'label'             => 'mautic.lead.merge.select',
                 'label_attr'        => ['class' => 'control-label'],
                 'multiple'          => false,
-                'empty_value'       => '',
+                'placeholder'       => '',
                 'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.merge.select.modal.tooltip',
@@ -64,9 +60,6 @@ class MergeType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['leads']);

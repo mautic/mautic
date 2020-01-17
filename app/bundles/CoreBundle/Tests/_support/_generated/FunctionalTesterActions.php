@@ -1879,7 +1879,6 @@ trait FunctionalTesterActions
      * ?>
      * ```
      *
-     *
      * @param $cssOrXpath
      * @param $attribute
      *
@@ -2091,7 +2090,6 @@ trait FunctionalTesterActions
      * Unsets cookie with the given name.
      * You can set additional cookie params like `domain`, `path` in array passed as last argument.
      *
-     * @param $cookie
      * @param array $params
      *
      * @return mixed
@@ -3413,7 +3411,6 @@ trait FunctionalTesterActions
 
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
-     *
      *
      * @see \Mautic\CoreBundle\Helper\Functional::getParameterFromContainer()
      */

@@ -11,13 +11,18 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -30,30 +35,16 @@ use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CampaignSubscriber.
- */
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
     /**
      * @var EmailModel
      */
     private $emailModel;
-
-    /**
-     * @var EmailModel
-     */
-    private $messageQueueModel;
 
     /**
      * @var EventModel
@@ -70,25 +61,14 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param LeadModel         $leadModel
-     * @param EmailModel        $emailModel
-     * @param EventModel        $eventModel
-     * @param MessageQueueModel $messageQueueModel
-     * @param SendEmailToUser   $sendEmailToUser
-     */
     public function __construct(
-        LeadModel $leadModel,
         EmailModel $emailModel,
         EventModel $eventModel,
-        MessageQueueModel $messageQueueModel,
         SendEmailToUser $sendEmailToUser,
         TranslatorInterface $translator
     ) {
-        $this->leadModel          = $leadModel;
         $this->emailModel         = $emailModel;
         $this->campaignEventModel = $eventModel;
-        $this->messageQueueModel  = $messageQueueModel;
         $this->sendEmailToUser    = $sendEmailToUser;
         $this->translator         = $translator;
     }
@@ -103,8 +83,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
             EmailEvents::ON_CAMPAIGN_BATCH_ACTION   => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
-            ],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
@@ -112,10 +90,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addDecision(
             'email.open',
@@ -183,14 +158,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction(
             'email.send.to.user',
             [
-                'label'           => 'mautic.email.campaign.event.send.to.user',
-                'description'     => 'mautic.email.campaign.event.send.to.user_descr',
-                'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formType'        => EmailToUserType::class,
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_useremail_email'],
-                'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-                'channel'         => 'email',
-                'channelIdField'  => 'email',
+                'label'                => 'mautic.email.campaign.event.send.to.user',
+                'description'          => 'mautic.email.campaign.event.send.to.user_descr',
+                'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+                'formType'             => EmailToUserType::class,
+                'formTypeOptions'      => ['update_select' => 'campaignevent_properties_useremail_email'],
+                'formTheme'            => 'MauticEmailBundle:FormTheme\EmailSendList',
+                'channel'              => 'email',
+                'channelIdField'       => 'email',
             ]
         );
     }
@@ -198,9 +173,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger campaign event for opening of an email.
      *
-     * @param EmailOpenEvent $event
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
-    public function onEmailOpen(EmailOpenEvent $event)
+    public function onEmailOpen(EmailOpenEvent $event): void
     {
         $email = $event->getEmail();
 
@@ -212,9 +190,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger campaign event for reply to an email.
      *
-     * @param EmailReplyEvent $event
+     * @throws CannotProcessEventException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws NotSchedulableException
      */
-    public function onEmailReply(EmailReplyEvent $event)
+    public function onEmailReply(EmailReplyEvent $event): void
     {
         $email = $event->getEmail();
         if (null !== $email) {
@@ -222,10 +203,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         /** @var Email $eventDetails */
         $eventDetails = $event->getEventDetails();
@@ -269,11 +247,10 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Triggers the action which sends email to contacts.
      *
-     * @param PendingEvent $event
-     *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
+     * @throws NoContactsFoundException
      */
-    public function onCampaignTriggerActionSendEmailToContact(PendingEvent $event)
+    public function onCampaignTriggerActionSendEmailToContact(PendingEvent $event): void
     {
         if (!$event->checkContext('email.send')) {
             return;
@@ -376,24 +353,29 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Triggers the action which sends email to user, contact owner or specified email addresses.
-     *
-     * @param CampaignExecutionEvent $event
+     * @throws ORMException
      */
-    public function onCampaignTriggerActionSendEmailToUser(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event): void
     {
         if (!$event->checkContext('email.send.to.user')) {
             return;
         }
 
-        $config = $event->getConfig();
-        $lead   = $event->getLead();
+        $config   = $event->getEvent()->getProperties();
+        $contacts = $event->getContacts();
+        $pending  = $event->getPending();
 
-        try {
-            $this->sendEmailToUser->sendEmailToUsers($config, $lead);
-            $event->setResult(true);
-        } catch (EmailCouldNotBeSentException $e) {
-            $event->setFailed($e->getMessage());
+        /**
+         * @var int
+         * @var Lead $contact
+         */
+        foreach ($contacts as $logId => $contact) {
+            try {
+                $this->sendEmailToUser->sendEmailToUsers($config, $contact);
+                $event->pass($pending->get($logId));
+            } catch (EmailCouldNotBeSentException $e) {
+                $event->fail($pending->get($logId), $e->getMessage());
+            }
         }
     }
 }

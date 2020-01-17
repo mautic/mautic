@@ -24,18 +24,11 @@ class ReportWidgetType extends AbstractType
      */
     protected $model;
 
-    /**
-     * @param ReportModel $reportModel
-     */
     public function __construct(ReportModel $reportModel)
     {
         $this->model = $reportModel;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $choices = [];
@@ -62,7 +55,7 @@ class ReportWidgetType extends AbstractType
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.form.choose_graphs',
                 'label_attr'        => ['class' => 'control-label'],
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [
                     'class' => 'form-control',

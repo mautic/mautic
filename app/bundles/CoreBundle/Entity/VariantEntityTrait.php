@@ -68,8 +68,6 @@ trait VariantEntityTrait
     /**
      * Add variant.
      *
-     * @param VariantEntityInterface $child
-     *
      * @return $this
      */
     public function addVariantChild(VariantEntityInterface $child)
@@ -83,8 +81,6 @@ trait VariantEntityTrait
 
     /**
      * Remove variant.
-     *
-     * @param VariantEntityInterface $child
      */
     public function removeVariantChild(VariantEntityInterface $child)
     {

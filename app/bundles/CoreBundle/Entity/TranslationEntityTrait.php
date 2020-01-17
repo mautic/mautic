@@ -65,8 +65,6 @@ trait TranslationEntityTrait
     /**
      * Add translation.
      *
-     * @param TranslationEntityInterface $translationChildren
-     *
      * @return $this
      */
     public function addTranslationChild(TranslationEntityInterface $child)
@@ -80,8 +78,6 @@ trait TranslationEntityTrait
 
     /**
      * Remove translation.
-     *
-     * @param TranslationEntityInterface $child
      */
     public function removeTranslationChild(TranslationEntityInterface $child)
     {
@@ -100,8 +96,6 @@ trait TranslationEntityTrait
 
     /**
      * Set translation parent.
-     *
-     * @param TranslationEntityInterface $translationParent
      *
      * @return $this
      */

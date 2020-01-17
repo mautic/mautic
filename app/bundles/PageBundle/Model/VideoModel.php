@@ -37,9 +37,6 @@ class VideoModel extends FormModel
 
     /**
      * VideoModel constructor.
-     *
-     * @param LeadModel      $leadModel
-     * @param IpLookupHelper $ipLookupHelper
      */
     public function __construct(LeadModel $leadModel, IpLookupHelper $ipLookupHelper)
     {
@@ -72,7 +69,6 @@ class VideoModel extends FormModel
     }
 
     /**
-     * @param Lead   $lead
      * @param string $guid
      *
      * @return VideoHit

@@ -24,8 +24,6 @@ class SlotPreferredChannelType extends SlotType
 
     /**
      * ConfigType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {

@@ -29,9 +29,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         return [];
     }
 
-    /**
-     * @param Integration $settings
-     */
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /

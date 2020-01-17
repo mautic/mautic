@@ -44,9 +44,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
     /**
      * CampaignActionJumpToEvent constructor.
-     *
-     * @param EventRepository  $eventRepository
-     * @param EventExecutioner $eventExecutioner
      */
     public function __construct(EventRepository $eventRepository, EventExecutioner $eventExecutioner, TranslatorInterface $translator)
     {
@@ -69,8 +66,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
@@ -93,8 +88,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
     /**
      * Process campaign.jump_to_event actions.
-     *
-     * @param PendingEvent $campaignEvent
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
@@ -129,8 +122,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
      * This block specifically handles the campaign.jump_to_event properties
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
-     *
-     * @param CampaignEvent $campaignEvent
      */
     public function processCampaignEventsAfterSave(CampaignEvent $campaignEvent)
     {
@@ -165,7 +156,6 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     /**
      * Inspect a jump event and get its target.
      *
-     * @param Event $event
      * @param mixed $column
      *
      * @return Event|null

@@ -227,9 +227,7 @@ class PublicControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $request->attributes->set('ignore_mismatch', true);
 
-        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
-
-        $publicController = new \Mautic\PageBundle\Controller\PublicController($deviceTrackingService);
+        $publicController = new \Mautic\PageBundle\Controller\PublicController();
         $publicController->setContainer($container);
         $publicController->setRequest($request);
 

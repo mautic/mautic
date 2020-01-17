@@ -16,8 +16,6 @@ class ClickthroughHelper
     /**
      * Encode an array to append to a URL.
      *
-     * @param array $array
-     *
      * @return string
      */
     public static function encodeArrayForUrl(array $array)

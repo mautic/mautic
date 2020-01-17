@@ -54,57 +54,36 @@ class RelationDAO
         $this->relObjectIntegrationId = $relObjectIntegrationId;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectName(): string
     {
         return $this->objectName;
     }
 
-    /**
-     * @return string
-     */
     public function getRelObjectName(): string
     {
         return $this->relObjectName;
     }
 
-    /**
-     * @return string
-     */
     public function getRelFieldName(): string
     {
         return $this->relFieldName;
     }
 
-    /**
-     * @return string
-     */
     public function getObjectIntegrationId(): string
     {
         return $this->objectIntegrationId;
     }
 
-    /**
-     * @return string
-     */
     public function getRelObjectIntegrationId(): string
     {
         return $this->relObjectIntegrationId;
     }
 
-    /**
-     * @return int|null
-     */
     public function getRelObjectInternalId(): ?int
     {
         return $this->relObjectInternalId;
     }
 
-    /**
-     * @param int $relObjectInternalId
-     */
     public function setRelObjectInternalId(int $relObjectInternalId): void
     {
         $this->relObjectInternalId = $relObjectInternalId;

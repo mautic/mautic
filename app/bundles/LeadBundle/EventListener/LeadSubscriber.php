@@ -70,15 +70,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param IpLookupHelper            $ipLookupHelper
-     * @param AuditLogModel             $auditLogModel
-     * @param LeadChangeEventDispatcher $eventDispatcher
-     * @param DncReasonHelper           $dncReasonHelper
-     * @param EntityManager             $entityManager
-     * @param TranslatorInterface       $translator
-     * @param RouterInterface           $router
-     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -117,8 +108,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add a lead entry to the audit log.
-     *
-     * @param Events\LeadEvent $event
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
@@ -184,8 +173,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add a lead delete entry to the audit log.
-     *
-     * @param Events\LeadEvent $event
      */
     public function onLeadDelete(Events\LeadEvent $event)
     {
@@ -203,8 +190,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add a field entry to the audit log.
-     *
-     * @param Events\LeadFieldEvent $event
      */
     public function onFieldPostSave(Events\LeadFieldEvent $event)
     {
@@ -224,8 +209,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add a field delete entry to the audit log.
-     *
-     * @param Events\LeadFieldEvent $event
      */
     public function onFieldDelete(Events\LeadFieldEvent $event)
     {
@@ -243,8 +226,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add a note entry to the audit log.
-     *
-     * @param Events\LeadNoteEvent $event
      */
     public function onNotePostSave(Events\LeadNoteEvent $event)
     {
@@ -264,8 +245,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add a note delete entry to the audit log.
-     *
-     * @param Events\LeadNoteEvent $event
      */
     public function onNoteDelete(Events\LeadNoteEvent $event)
     {
@@ -281,9 +260,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param Events\LeadMergeEvent $event
-     */
     public function preLeadMerge(Events\LeadMergeEvent $event)
     {
         $this->entityManager->getRepository(LeadEventLog::class)->updateLead(
@@ -292,9 +268,6 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param Events\LeadMergeEvent $event
-     */
     public function onLeadMerge(Events\LeadMergeEvent $event)
     {
         $this->entityManager->getRepository(PointsChangeLog::class)->updateLead(
@@ -325,8 +298,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param Events\LeadTimelineEvent $event
      */
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
@@ -383,9 +354,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
@@ -426,9 +396,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
@@ -460,9 +429,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
@@ -496,9 +464,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
@@ -558,9 +525,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
@@ -630,9 +596,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Events\LeadTimelineEvent $event
-     * @param                          $eventTypeKey
-     * @param                          $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {

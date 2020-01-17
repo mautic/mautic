@@ -42,9 +42,6 @@ class QueueService
 
     /**
      * QueueService constructor.
-     *
-     * @param CoreParametersHelper     $coreParametersHelper
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $eventDispatcher, LoggerInterface $logger)
     {
@@ -55,7 +52,6 @@ class QueueService
 
     /**
      * @param string $queueName
-     * @param array  $payload
      */
     public function publishToQueue($queueName, array $payload = [])
     {
@@ -85,8 +81,7 @@ class QueueService
     }
 
     /**
-     * @param      $payload
-     * @param null $jobId
+     * @param $payload
      *
      * @return QueueConsumerEvent
      */

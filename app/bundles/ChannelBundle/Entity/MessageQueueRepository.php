@@ -82,8 +82,7 @@ class MessageQueueRepository extends CommonRepository
     }
 
     /**
-     * @param            $channel
-     * @param array|null $ids
+     * @param $channel
      *
      * @return bool|string
      */
@@ -119,7 +118,6 @@ class MessageQueueRepository extends CommonRepository
      * Get a lead's point log.
      *
      * @param int|null $leadId
-     * @param array    $options
      *
      * @return array
      */

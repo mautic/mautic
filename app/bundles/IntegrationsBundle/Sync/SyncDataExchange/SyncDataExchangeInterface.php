@@ -21,17 +21,11 @@ interface SyncDataExchangeInterface
 {
     /**
      * Sync to integration.
-     *
-     * @param RequestDAO $requestDAO
-     *
-     * @return ReportDAO
      */
     public function getSyncReport(RequestDAO $requestDAO): ReportDAO;
 
     /**
      * Sync from integration.
-     *
-     * @param OrderDAO $syncOrderDAO
      */
     public function executeSyncOrder(OrderDAO $syncOrderDAO);
 }

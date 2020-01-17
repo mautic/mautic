@@ -66,10 +66,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * CompanyModel constructor.
-     *
-     * @param FieldModel     $leadFieldModel
-     * @param Session        $session
-     * @param EmailValidator $validator
      */
     public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
     {
@@ -241,8 +237,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Populates custom field values for updating the company.
      *
-     * @param Company    $company
-     * @param array      $data
      * @param bool|false $overwriteWithBlank
      */
     public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)
@@ -496,7 +490,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear('Mautic\CompanyBundle\Entity\CompanyLead');
+        $this->em->clear(CompanyLead::class);
 
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $listId) {
@@ -507,7 +501,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        unset($lead, $deleteCompany, $persistCompany, $companies);
+        unset($lead, $deleteCompany, $companies);
     }
 
     /**

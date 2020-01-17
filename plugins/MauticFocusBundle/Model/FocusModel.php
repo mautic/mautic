@@ -66,13 +66,6 @@ class FocusModel extends FormModel
 
     /**
      * FocusModel constructor.
-     *
-     * @param \Mautic\FormBundle\Model\FormModel $formModel
-     * @param TrackableModel                     $trackableModel
-     * @param TemplatingHelper                   $templating
-     * @param EventDispatcherInterface           $dispatcher
-     * @param LeadModel                          $leadModel
-     * @param FieldModel                         $leadFieldModel
      */
     public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, FieldModel $leadFieldModel)
     {
@@ -177,9 +170,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param Focus $focus
-     * @param bool  $preview
-     *
      * @return string
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
@@ -244,7 +234,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param array  $focus
      * @param bool   $isPreview
      * @param string $url
      *
@@ -323,10 +312,9 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param Focus $focus
-     * @param       $type
-     * @param null  $data
-     * @param null  $lead
+     * @param      $type
+     * @param null $data
+     * @param null $lead
      *
      * @return Stat
      */
@@ -420,12 +408,9 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param Focus          $focus
-     * @param                $unit
-     * @param \DateTime|null $dateFrom
-     * @param \DateTime|null $dateTo
-     * @param null           $dateFormat
-     * @param bool           $canViewOthers
+     * @param      $unit
+     * @param null $dateFormat
+     * @param bool $canViewOthers
      *
      * @return array
      */
@@ -464,8 +449,6 @@ class FocusModel extends FormModel
 
     /**
      * Joins the email table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder $q)
     {

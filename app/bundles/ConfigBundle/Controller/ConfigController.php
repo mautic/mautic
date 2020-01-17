@@ -21,9 +21,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ConfigController.
- */
 class ConfigController extends FormController
 {
     /**

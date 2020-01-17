@@ -16,10 +16,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class PointActionAssetDownloadType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -30,7 +26,7 @@ class PointActionAssetDownloadType extends AbstractType
                 'multiple'    => true,
                 'label'       => 'mautic.asset.point.action.assets',
                 'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
+                'placeholder' => false,
                 'required'    => false,
                 'attr'        => [
                     'class'   => 'form-control',

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\MonitoredEmail;
+namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 

@@ -131,7 +131,7 @@ class OneSignalIntegration extends AbstractIntegration
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.integration.form.platforms',
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                 ]
             );

@@ -50,12 +50,6 @@ class CompanyType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param EntityManager       $entityManager
-     * @param CorePermissions     $security
-     * @param RouterInterface     $router
-     * @param TranslatorInterface $translator
-     */
     public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator)
     {
         $this->em         = $entityManager;

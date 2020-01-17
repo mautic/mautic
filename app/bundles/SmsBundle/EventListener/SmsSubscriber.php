@@ -51,13 +51,6 @@ class SmsSubscriber implements EventSubscriberInterface
      */
     private $smsHelper;
 
-    /**
-     * @param AuditLogModel    $auditLogModel
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     * @param SmsHelper        $smsHelper
-     */
     public function __construct(
         AuditLogModel $auditLogModel,
         TrackableModel $trackableModel,
@@ -86,8 +79,6 @@ class SmsSubscriber implements EventSubscriberInterface
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param SmsEvent $event
      */
     public function onPostSave(SmsEvent $event)
     {
@@ -106,8 +97,6 @@ class SmsSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param SmsEvent $event
      */
     public function onDelete(SmsEvent $event)
     {
@@ -122,9 +111,6 @@ class SmsSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * @param TokenReplacementEvent $event
-     */
     public function onTokenReplacement(TokenReplacementEvent $event)
     {
         /** @var Lead $lead */

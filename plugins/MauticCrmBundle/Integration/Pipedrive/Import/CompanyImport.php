@@ -17,9 +17,6 @@ class CompanyImport extends AbstractImport
 
     /**
      * CompanyImport constructor.
-     *
-     * @param EntityManager $em
-     * @param CompanyModel  $companyModel
      */
     public function __construct(EntityManager $em, CompanyModel $companyModel)
     {
@@ -29,8 +26,6 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -81,8 +76,6 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @return bool
      *
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -124,8 +117,6 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param array $data
-     *
      * @throws \Exception
      */
     public function delete(array $data = [])
@@ -178,8 +169,7 @@ class CompanyImport extends AbstractImport
     }
 
     /**
-     * @param         $integrationOwnerId
-     * @param Company $company
+     * @param $integrationOwnerId
      */
     private function addOwnerToCompany($integrationOwnerId, Company $company)
     {

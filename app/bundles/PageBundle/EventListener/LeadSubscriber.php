@@ -47,12 +47,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param PageModel           $pageModel
-     * @param VideoModel          $pageVideoModel
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     */
     public function __construct(
         PageModel $pageModel,
         VideoModel $pageVideoModel,
@@ -82,8 +76,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -187,8 +179,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerateVideo(LeadTimelineEvent $event)
     {
@@ -232,9 +222,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadChangeEvent $event
-     */
     public function onLeadChange(LeadChangeEvent $event)
     {
         $this->pageModel->getHitRepository()->updateLeadByTrackingId(
@@ -244,9 +231,6 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->pageModel->getHitRepository()->updateLead(

@@ -26,9 +26,7 @@ class WebhookQueueEvent extends CommonEvent
     protected $webhook;
 
     /**
-     * @param WebhookQueue $webhookQueue
-     * @param Webhook      $webhook
-     * @param bool         $isNew
+     * @param bool $isNew
      */
     public function __construct(WebhookQueue $webhookQueue, Webhook $webhook, $isNew = false)
     {
@@ -49,8 +47,6 @@ class WebhookQueueEvent extends CommonEvent
 
     /**
      * Sets the WebhookQueue entity.
-     *
-     * @param WebhookQueue $webhookQueue
      */
     public function setWebhookQueue(WebhookQueue $webhookQueue)
     {
@@ -69,8 +65,6 @@ class WebhookQueueEvent extends CommonEvent
 
     /**
      * Sets the Webhook entity.
-     *
-     * @param Webhook $webhook
      */
     public function setWebhook(Webhook $webhook)
     {

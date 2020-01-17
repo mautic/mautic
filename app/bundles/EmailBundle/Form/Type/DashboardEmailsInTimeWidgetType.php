@@ -20,10 +20,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class DashboardEmailsInTimeWidgetType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -52,7 +48,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'label'       => 'mautic.email.companyId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
                 'multiple'    => false,
                 'modal_route' => null,
@@ -67,7 +63,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
                 'multiple'    => false,
             ]
@@ -80,7 +76,7 @@ class DashboardEmailsInTimeWidgetType extends AbstractType
                 'label'       => 'mautic.email.segmentId.filter',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );

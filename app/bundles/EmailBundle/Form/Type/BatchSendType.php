@@ -17,10 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class BatchSendType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['batchlimit'])) ? 100 : (int) $options['data']['batchlimit'];

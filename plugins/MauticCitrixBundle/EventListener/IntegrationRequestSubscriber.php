@@ -31,8 +31,6 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param PluginIntegrationRequestEvent $requestEvent
-     *
      * @throws \Exception
      */
     public function getParameters(PluginIntegrationRequestEvent $requestEvent)
@@ -47,8 +45,6 @@ class IntegrationRequestSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $parameters
-     *
      * @return string
      *
      * @throws \Exception

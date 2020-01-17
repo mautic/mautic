@@ -74,57 +74,36 @@ class CommonController extends Controller implements MauticController
      */
     protected $translator;
 
-    /**
-     * @param Request $request
-     */
     public function setRequest(Request $request)
     {
         $this->request = $request;
     }
 
-    /**
-     * @param MauticFactory $factory
-     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
 
-    /**
-     * @param User $user
-     */
     public function setUser(User $user)
     {
         $this->user = $user;
     }
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
     public function initialize(FilterControllerEvent $event)
     {
     }
@@ -252,8 +231,6 @@ class CommonController extends Controller implements MauticController
 
     /**
      * Redirects URLs with trailing slashes in order to prevent 404s.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -445,8 +422,6 @@ class CommonController extends Controller implements MauticController
     /**
      * Get's the content of error page.
      *
-     * @param \Exception $e
-     *
      * @return Response
      */
     public function renderException(\Exception $e)
@@ -492,13 +467,7 @@ class CommonController extends Controller implements MauticController
         $anonymous = $this->get('mautic.security')->isAnonymous();
 
         if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException(
-                $this->translator->trans($msg,
-                    [
-                        '%url%' => $this->request->getRequestUri(),
-                    ]
-                )
-            );
+            throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->request->getRequestUri()]));
         }
 
         if ($batch) {
@@ -636,12 +605,11 @@ class CommonController extends Controller implements MauticController
     }
 
     /**
-     * @param                $message
-     * @param null           $type
-     * @param bool|true      $isRead
-     * @param null           $header
-     * @param null           $iconClass
-     * @param \DateTime|null $datetime
+     * @param           $message
+     * @param null      $type
+     * @param bool|true $isRead
+     * @param null      $header
+     * @param null      $iconClass
      */
     public function addNotification($message, $type = null, $isRead = true, $header = null, $iconClass = null, \DateTime $datetime = null)
     {
@@ -811,10 +779,7 @@ class CommonController extends Controller implements MauticController
      *
      * Overwrite in your controller if required.
      *
-     * @param AbstractCommonModel $model
-     * @param array               $args
-     * @param callable|null       $resultsCallback
-     * @param int|null            $start
+     * @param int|null $start
      *
      * @return array
      */

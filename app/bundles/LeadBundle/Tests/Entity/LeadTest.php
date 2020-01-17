@@ -303,7 +303,6 @@ class LeadTest extends \PHPUnit\Framework\TestCase
     /**
      * @param      $points
      * @param      $expected
-     * @param Lead $lead
      * @param bool $operator
      */
     private function adjustPointsTest($points, $expected, Lead $lead, $operator = false)

@@ -34,27 +34,17 @@ class InternalObjectCreateEvent extends Event
      */
     private $objectMappings = [];
 
-    /**
-     * @param ObjectInterface $object
-     * @param array           $createObjects
-     */
     public function __construct(ObjectInterface $object, array $createObjects)
     {
         $this->object        = $object;
         $this->createObjects = $createObjects;
     }
 
-    /**
-     * @return ObjectInterface
-     */
     public function getObject(): ObjectInterface
     {
         return $this->object;
     }
 
-    /**
-     * @return array
-     */
     public function getCreateObjects(): array
     {
         return $this->createObjects;

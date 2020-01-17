@@ -152,9 +152,6 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -230,9 +227,6 @@ class Form extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -261,8 +255,6 @@ class Form extends FormEntity
     }
 
     /**
-     * @param \Symfony\Component\Form\Form $form
-     *
      * @return array
      */
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
@@ -543,8 +535,7 @@ class Form extends FormEntity
     /**
      * Add a field.
      *
-     * @param       $key
-     * @param Field $field
+     * @param $key
      *
      * @return Form
      */
@@ -561,8 +552,7 @@ class Form extends FormEntity
     /**
      * Remove a field.
      *
-     * @param       $key
-     * @param Field $field
+     * @param $key
      */
     public function removeField($key, Field $field)
     {
@@ -629,8 +619,6 @@ class Form extends FormEntity
     /**
      * Add submissions.
      *
-     * @param Submission $submissions
-     *
      * @return Form
      */
     public function addSubmission(Submission $submissions)
@@ -642,8 +630,6 @@ class Form extends FormEntity
 
     /**
      * Remove submissions.
-     *
-     * @param Submission $submissions
      */
     public function removeSubmission(Submission $submissions)
     {
@@ -663,8 +649,7 @@ class Form extends FormEntity
     /**
      * Add actions.
      *
-     * @param        $key
-     * @param Action $action
+     * @param $key
      *
      * @return Form
      */
@@ -680,8 +665,6 @@ class Form extends FormEntity
 
     /**
      * Remove action.
-     *
-     * @param Action $action
      */
     public function removeAction(Action $action)
     {
@@ -699,7 +682,7 @@ class Form extends FormEntity
     /**
      * Get actions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Action[]
      */
     public function getActions()
     {

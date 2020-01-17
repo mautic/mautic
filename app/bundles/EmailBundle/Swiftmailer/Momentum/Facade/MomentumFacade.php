@@ -50,12 +50,6 @@ final class MomentumFacade implements MomentumFacadeInterface
 
     /**
      * MomentumFacade constructor.
-     *
-     * @param AdapterInterface               $adapter
-     * @param SwiftMessageServiceInterface   $swiftMessageService
-     * @param SwiftMessageValidatorInterface $swiftMessageValidator
-     * @param MomentumCallbackInterface      $momentumCallback
-     * @param Logger                         $logger
      */
     public function __construct(
         AdapterInterface $adapter,
@@ -72,8 +66,6 @@ final class MomentumFacade implements MomentumFacadeInterface
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @return mixed
      *
      * @throws \Swift_TransportException

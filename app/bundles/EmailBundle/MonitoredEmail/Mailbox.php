@@ -173,9 +173,6 @@ class Mailbox
 
     /**
      * Mailbox constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
-     * @param PathsHelper          $pathsHelper
      */
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
@@ -284,21 +281,14 @@ class Mailbox
      */
     public function getImapPath($settings)
     {
-        /* @var string $host */
-        /* @var int $port */
-        /* @var string $encryption */
-        /* @var string $folder */
-        /* @var string $user */
-        /* @var string $password */
-        extract($settings);
-        if (!isset($encryption)) {
-            $encryption = (!empty($ssl)) ? '/ssl' : '';
+        if (!isset($settings['encryption'])) {
+            $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
         }
-        $path     = "{{$host}:{$port}/imap{$encryption}}";
+        $path     = "{{$settings['host']}:{$settings['port']}/imap{$settings['encryption']}}";
         $fullPath = $path;
 
-        if (isset($folder)) {
-            $fullPath .= $folder;
+        if (isset($settings['folder'])) {
+            $fullPath .= $settings['folder'];
         }
 
         return ['path' => $path, 'full' => $fullPath];
@@ -306,8 +296,6 @@ class Mailbox
 
     /**
      * Override mailbox settings.
-     *
-     * @param array $settings
      */
     public function setMailboxSettings(array $settings)
     {
@@ -696,8 +684,7 @@ class Mailbox
     /**
      * Causes a store to add the specified flag to the flags set for the mails in the specified sequence.
      *
-     * @param array  $mailsIds
-     * @param string $flag     which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
+     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
      * @return bool
      */
@@ -709,8 +696,7 @@ class Mailbox
     /**
      * Cause a store to delete the specified flag to the flags set for the mails in the specified sequence.
      *
-     * @param array  $mailsIds
-     * @param string $flag     which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
+     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
      *
      * @return bool
      */
@@ -739,8 +725,6 @@ class Mailbox
      *  deleted - this mail is flagged for deletion
      *  seen - this mail is flagged as already read
      *  draft - this mail is flagged as being a draft
-     *
-     * @param array $mailsIds
      *
      * @return array
      */
@@ -944,7 +928,6 @@ class Mailbox
     }
 
     /**
-     * @param Message    $mail
      * @param            $partStructure
      * @param            $partNum
      * @param bool|true  $markAsSeen
@@ -1193,9 +1176,6 @@ class Mailbox
         }
     }
 
-    /**
-     * @param PathsHelper $pathsHelper
-     */
     private function createAttachmentsDir(PathsHelper $pathsHelper)
     {
         if (!isset($this->settings['use_attachments']) || !$this->settings['use_attachments']) {

@@ -33,9 +33,6 @@ class LoadCompanyData extends AbstractFixture implements OrderedFixtureInterface
         $this->companyModel = $companyModel;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $today     = new \DateTime();

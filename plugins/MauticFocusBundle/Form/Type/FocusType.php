@@ -38,18 +38,12 @@ class FocusType extends AbstractType
 
     /**
      * FocusType constructor.
-     *
-     * @param CorePermissions $security
      */
     public function __construct(CorePermissions $security)
     {
         $this->security = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html']));
@@ -178,8 +172,10 @@ class FocusType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'read_only' => $readonly,
-                'data'      => $data,
+                'data' => $data,
+                'attr' => [
+                    'readonly' => $readonly,
+                ],
             ]
         );
 
@@ -227,7 +223,7 @@ class FocusType extends AbstractType
             [
                 'label'       => 'mautic.focus.form.choose_form',
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'attr'        => [
                     'onchange' => 'Mautic.focusUpdatePreview()',
                 ],

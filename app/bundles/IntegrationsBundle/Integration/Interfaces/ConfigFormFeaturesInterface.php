@@ -20,8 +20,6 @@ interface ConfigFormFeaturesInterface
 
     /**
      * Return an array of value => label pairs for the features this integration supports.
-     *
-     * @return array
      */
     public function getSupportedFeatures(): array;
 }

@@ -20,10 +20,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContentType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -127,7 +123,7 @@ class ContentType extends AbstractType
                     'data-show-on' => '{"focus_html_mode_0":"checked"}',
                 ],
                 'required'    => false,
-                'empty_value' => false,
+                'placeholder' => false,
             ]
         );
     }

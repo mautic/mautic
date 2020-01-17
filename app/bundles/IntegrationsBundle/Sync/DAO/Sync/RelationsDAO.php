@@ -39,9 +39,6 @@ class RelationsDAO implements Iterator, Countable
         }
     }
 
-    /**
-     * @param RelationDAO $relation
-     */
     public function addRelation(RelationDAO $relation): void
     {
         $this->relations[] = $relation;

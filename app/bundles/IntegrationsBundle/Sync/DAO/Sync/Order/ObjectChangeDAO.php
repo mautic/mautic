@@ -79,18 +79,12 @@ class ObjectChangeDAO
         $this->changeDateTime = $changeDateTime;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegration(): string
     {
         return $this->integration;
     }
 
     /**
-     * @param FieldDAO $fieldDAO
-     * @param string   $state
-     *
      * @return ObjectChangeDAO
      */
     public function addField(FieldDAO $fieldDAO, string $state = ReportFieldDAO::FIELD_CHANGED): self
@@ -205,17 +199,11 @@ class ObjectChangeDAO
         return $this->fieldsByState[ReportFieldDAO::FIELD_UNCHANGED];
     }
 
-    /**
-     * @return bool
-     */
     public function shouldSync(): bool
     {
         return !empty(count($this->fields));
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getChangeDateTime(): \DateTimeInterface
     {
         return $this->changeDateTime;

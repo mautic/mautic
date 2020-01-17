@@ -36,9 +36,6 @@ class HttpFactory implements AuthProviderInterface
      */
     private $initializedClients = [];
 
-    /**
-     * @return string
-     */
     public function getAuthType(): string
     {
         return self::NAME;
@@ -47,8 +44,6 @@ class HttpFactory implements AuthProviderInterface
     /**
      * @param CredentialsInterface|AuthCredentialsInterface $credentials
      * @param AuthConfigInterface                           $config
-     *
-     * @return ClientInterface
      *
      * @throws PluginNotConfiguredException
      */
@@ -69,8 +64,6 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param CredentialsInterface $credentials
-     *
      * @return Client
      */
     private function buildClient(CredentialsInterface $credentials)
@@ -88,8 +81,6 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param CredentialsInterface $credentials
-     *
      * @return Oauth1
      */
     private function createOauth1(CredentialsInterface $credentials)
@@ -108,8 +99,6 @@ class HttpFactory implements AuthProviderInterface
     }
 
     /**
-     * @param CredentialsInterface $credentials
-     *
      * @return bool
      */
     private function credentialsAreConfigured(CredentialsInterface $credentials)

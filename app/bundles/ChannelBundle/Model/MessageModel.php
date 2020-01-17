@@ -47,9 +47,6 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * MessageModel constructor.
-     *
-     * @param ChannelListHelper $channelListHelper
-     * @param CampaignModel     $campaignModel
      */
     public function __construct(ChannelListHelper $channelListHelper, CampaignModel $campaignModel)
     {

@@ -36,11 +36,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $statRepository;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     * @param StatRepository      $statRepository
-     */
     public function __construct(
         TranslatorInterface $translator,
         RouterInterface $router,
@@ -64,8 +59,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -117,9 +110,6 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
         $this->statRepository->updateLead(

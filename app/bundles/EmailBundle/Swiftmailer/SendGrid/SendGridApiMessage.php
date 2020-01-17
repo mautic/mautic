@@ -52,8 +52,6 @@ class SendGridApiMessage
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     *
      * @return Mail
      */
     public function getMessage(\Swift_Mime_SimpleMessage $message)

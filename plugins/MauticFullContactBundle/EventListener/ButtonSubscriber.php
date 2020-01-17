@@ -37,11 +37,6 @@ class ButtonSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    /**
-     * @param IntegrationHelper   $helper
-     * @param TranslatorInterface $translator
-     * @param RouterInterface     $router
-     */
     public function __construct(
         IntegrationHelper $helper,
         TranslatorInterface $translator,
@@ -59,9 +54,6 @@ class ButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectViewButtons(CustomButtonEvent $event)
     {
         // get api_key from plugin settings

@@ -13,7 +13,6 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use GuzzleHttp\Client;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -22,9 +21,6 @@ use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SparkpostTransport.
- */
 class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**
@@ -53,11 +49,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $logger;
 
     /**
-     * @param string                    $apiKey
-     * @param TranslatorInterface       $translator
-     * @param TransportCallback         $transportCallback
-     * @param SparkpostFactoryInterface $sparkpostFactory
-     * @param LoggerInterface           $logger
+     * @param string $apiKey
      */
     public function __construct(
         $apiKey,
@@ -120,8 +112,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param \Swift_Mime_SimpleMessage $message
-     * @param null                      $failedRecipients
+     * @param null $failedRecipients
      *
      * @return int Number of messages sent
      *
@@ -171,8 +162,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * https://jsapi.apiary.io/apis/sparkpostapi/introduction/subaccounts-coming-to-an-api-near-you-in-april!.html.
-     *
-     * @param \Swift_Mime_SimpleMessage $message
      *
      * @return array SparkPost Send Message
      *
@@ -333,15 +322,17 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param \Swift_Message $message
-     * @param int            $toBeAdded
-     * @param string         $type
-     *
-     * @return int
+     * @param int    $toBeAdded
+     * @param string $type
      */
-    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to'): int
     {
-        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
+        // These getters could return null
+        $toCount  = $message->getTo() ? count($message->getTo()) : 0;
+        $ccCount  = $message->getCc() ? count($message->getCc()) : 0;
+        $bccCount = $message->getBcc() ? count($message->getBcc()) : 0;
+
+        return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
 
     /**
@@ -356,8 +347,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Handle response.
-     *
-     * @param Request $request
      */
     public function processCallbackRequest(Request $request)
     {
@@ -398,9 +387,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * Checks with Sparkpost whether the email template is valid.
      * Substitution data are taken from the first recipient.
      *
-     * @param Sparkpost $sparkPostClient
-     * @param array     $sparkPostMessage
-     *
      * @throws \UnexpectedValueException
      */
     protected function checkTemplateIsValid(Sparkpost $sparkPostClient, array $sparkPostMessage)
@@ -429,9 +415,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Check for SparkPost rejection for immediate error messages.
-     *
-     * @param array $message
-     * @param array $response
      */
     private function processImmediateSendFeedback(array $message, array $response)
     {
@@ -453,8 +436,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      *
      * @see https://www.sparkpost.com/blog/error-handling-transmissions-api
      *
-     * @param array $response
-     *
      * @return string
      */
     private function getErrorMessageFromResponseBody(array $response)
@@ -469,8 +450,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param       $hashId
-     * @param array $event
+     * @param $hashId
      */
     private function processCallbackByHashId($hashId, array $event)
     {
@@ -493,8 +473,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     }
 
     /**
-     * @param       $email
-     * @param array $event
+     * @param $email
      */
     private function processCallbackByEmailAddress($email, array $event)
     {

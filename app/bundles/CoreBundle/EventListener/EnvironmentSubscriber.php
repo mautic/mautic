@@ -36,10 +36,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
      */
     private $params;
 
-    /**
-     * @param CookieHelper $cookieHelper
-     * @param array        $params
-     */
     public function __construct(CookieHelper $cookieHelper, array $params)
     {
         $this->cookieHelper = $cookieHelper;
@@ -64,8 +60,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
 
     /**
      * Set timezone.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequestSetTimezone(GetResponseEvent $event)
     {
@@ -80,8 +74,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
 
     /**
      * Set default locale.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequestSetLocale(GetResponseEvent $event)
     {

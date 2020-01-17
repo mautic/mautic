@@ -45,10 +45,6 @@ class ConfigChangeLogger
      */
     private $originalNormData;
 
-    /**
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -56,8 +52,6 @@ class ConfigChangeLogger
     }
 
     /**
-     * @param array $originalNormData
-     *
      * @return ConfigChangeLogger
      */
     public function setOriginalNormData(array $originalNormData)
@@ -72,8 +66,6 @@ class ConfigChangeLogger
      * Diff is based on form normalized data before and after post.
      *
      * @see Form::getNormData()
-     *
-     * @param array $postNormData
      */
     public function log(array $postNormData)
     {
@@ -111,8 +103,6 @@ class ConfigChangeLogger
      * Some form data (AssetBundle) has 'parameters' inside array too.
      * Normalize all.
      *
-     * @param array $data
-     *
      * @return array
      */
     private function normalizeData(array $data)
@@ -133,8 +123,6 @@ class ConfigChangeLogger
 
     /**
      * Filter unused keys from post data.
-     *
-     * @param array $data
      *
      * @return array
      */

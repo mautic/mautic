@@ -49,12 +49,11 @@ class RouterSubscriber implements EventSubscriberInterface
     private $httpPort;
 
     /**
-     * @param RouterInterface $router
-     * @param string|null     $scheme
-     * @param string|null     $host
-     * @param string|null     $httpsPort
-     * @param string|null     $httpPort
-     * @param string|null     $baseUrl
+     * @param string|null $scheme
+     * @param string|null $host
+     * @param string|null $httpsPort
+     * @param string|null $httpPort
+     * @param string|null $baseUrl
      */
     public function __construct(RouterInterface $router, $scheme, $host, $httpsPort, $httpPort, $baseUrl)
     {
@@ -80,8 +79,6 @@ class RouterSubscriber implements EventSubscriberInterface
      * This forces generated routes to be the same as what is configured as Mautic's site_url
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
-     *
-     * @param GetResponseEvent $event
      */
     public function setRouterRequestContext(GetResponseEvent $event)
     {

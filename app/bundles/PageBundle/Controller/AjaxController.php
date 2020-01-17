@@ -25,8 +25,6 @@ class AjaxController extends CommonAjaxController
     use VariantAjaxControllerTrait;
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getAbTestFormAction(Request $request)
@@ -43,8 +41,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function pageListAction(Request $request)
@@ -64,8 +60,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function setBuilderContentAction(Request $request)

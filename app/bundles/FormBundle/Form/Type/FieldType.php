@@ -39,8 +39,6 @@ class FieldType extends AbstractType
 
     /**
      * FieldType constructor.
-     *
-     * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)
     {
@@ -392,7 +390,7 @@ class FieldType extends AbstractType
                 'leadField',
                 ChoiceType::class,
                 [
-                    'choices'           => array_flip($options['leadFields']),
+                    'choices'           => $options['leadFields'],
                     'choice_attr'       => function ($val, $key, $index) use ($options) {
                         $objects = ['lead', 'company'];
                         foreach ($objects as $object) {

@@ -44,10 +44,6 @@ class ObjectMappingDAO
      */
     private $fieldMappings = [];
 
-    /**
-     * @param string $internalObjectName
-     * @param string $integrationObjectName
-     */
     public function __construct(string $internalObjectName, string $integrationObjectName)
     {
         $this->internalObjectName    = $internalObjectName;
@@ -84,11 +80,6 @@ class ObjectMappingDAO
         return $this->fieldMappings;
     }
 
-    /**
-     * @param int $internalObjectId
-     *
-     * @return int|null
-     */
     public function getMappedIntegrationObjectId(int $internalObjectId): ?int
     {
         if (array_key_exists($internalObjectId, $this->internalIdMapping)) {
@@ -112,17 +103,11 @@ class ObjectMappingDAO
         return null;
     }
 
-    /**
-     * @return string
-     */
     public function getInternalObjectName(): string
     {
         return $this->internalObjectName;
     }
 
-    /**
-     * @return string
-     */
     public function getIntegrationObjectName(): string
     {
         return $this->integrationObjectName;

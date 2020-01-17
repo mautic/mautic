@@ -357,18 +357,20 @@ $container->loadFromExtension('jms_serializer', [
     ],
 ]);
 
-$container->loadFromExtension('doctrine_cache', [
-  'providers' => [
-    'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
-  ],
+$container->loadFromExtension('framework', [
+    'cache' => [
+        'pools' => [
+            'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
+        ],
+    ],
 ]);
 
 $api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'           => 0 == $api_rate_limiter_limit ? false : true,
-  'storage_engine'    => 'doctrine',
-  'doctrine_provider' => 'api_rate_limiter_cache',
-  'path_limits'       => [
+  'enabled'        => 0 == $api_rate_limiter_limit ? false : true,
+  'storage_engine' => 'cache',
+  'cache_service'  => 'api_rate_limiter_cache',
+  'path_limits'    => [
     [
       'path'   => '/api',
       'limit'  => '%mautic.api_rate_limiter_limit%',
@@ -427,3 +429,34 @@ $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
     $definitionConsoleExceptionListener
 );
+
+// ElFinder File Manager
+$elFinderPath = trim($container->getParameter('mautic.image_path'), '/');
+$elFinderUrl  = rtrim($container->getParameter('mautic.site_url'), '/').'/'.$elFinderPath;
+
+$container->loadFromExtension('fm_elfinder', [
+    'assets_path'            => 'media/assets',
+    'instances'              => [
+        'default' => [
+            'locale'          => 'LANG',
+            'editor'          => 'custom',
+            'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
+            'fullscreen'      => true,
+            'include_assets'  => true,
+            'relative_path'   => false,
+            'connector'       => [
+                'roots' => [
+                    'uploads' => [
+                        'driver'            => 'LocalFileSystem',
+                        'path'              => $elFinderPath,
+                        'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
+                        'upload_deny'       => ['all'],
+                        'upload_max_size'   => '2M',
+                        'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
+                        'url'               => $elFinderUrl, // We need to specify URL in case mod_rewrite is disabled
+                    ],
+                ],
+            ],
+        ],
+    ],
+]);

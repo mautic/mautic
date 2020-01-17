@@ -51,25 +51,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
         'organization'  => ['name'],
     ];
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param CacheStorageHelper       $cacheStorageHelper
-     * @param EntityManager            $entityManager
-     * @param Session                  $session
-     * @param RequestStack             $requestStack
-     * @param Router                   $router
-     * @param TranslatorInterface      $translator
-     * @param Logger                   $logger
-     * @param EncryptionHelper         $encryptionHelper
-     * @param LeadModel                $leadModel
-     * @param CompanyModel             $companyModel
-     * @param PathsHelper              $pathsHelper
-     * @param NotificationModel        $notificationModel
-     * @param FieldModel               $fieldModel
-     * @param IntegrationEntityModel   $integrationEntityModel
-     * @param Transport                $transport
-     * @param LeadExport               $leadExport
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -318,7 +299,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.pipedrive.form.objects_to_pull_from',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );
@@ -334,7 +315,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'multiple'          => true,
                     'label'             => 'mautic.pipedrive.add.edit.contact.import',
                     'label_attr'        => ['class' => ''],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                 ]
             );

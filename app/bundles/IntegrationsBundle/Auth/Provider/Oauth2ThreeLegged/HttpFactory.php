@@ -64,9 +64,6 @@ class HttpFactory implements AuthProviderInterface
      */
     private $initializedClients = [];
 
-    /**
-     * @return string
-     */
     public function getAuthType(): string
     {
         return self::NAME;
@@ -75,8 +72,6 @@ class HttpFactory implements AuthProviderInterface
     /**
      * @param AuthCredentialsInterface|CredentialsInterface                                                                   $credentials
      * @param ConfigCredentialsSignerInterface|ConfigTokenPersistenceInterface|ConfigTokenSignerInterface|AuthConfigInterface $config
-     *
-     * @return ClientInterface
      *
      * @throws PluginNotConfiguredException
      */
@@ -104,11 +99,6 @@ class HttpFactory implements AuthProviderInterface
         return $this->initializedClients[$credentials->getClientId()];
     }
 
-    /**
-     * @param CredentialsInterface $credentials
-     *
-     * @return bool
-     */
     protected function credentialsAreConfigured(CredentialsInterface $credentials): bool
     {
         if (empty($credentials->getAuthorizationUrl())) {
@@ -130,9 +120,6 @@ class HttpFactory implements AuthProviderInterface
         return true;
     }
 
-    /**
-     * @return HandlerStack
-     */
     private function getStackHandler(): HandlerStack
     {
         $reAuthConfig          = $this->getReAuthConfig();
@@ -148,9 +135,6 @@ class HttpFactory implements AuthProviderInterface
         return $stack;
     }
 
-    /**
-     * @return ClientInterface
-     */
     private function getReAuthClient(): ClientInterface
     {
         if ($this->reAuthClient) {
@@ -166,9 +150,6 @@ class HttpFactory implements AuthProviderInterface
         return $this->reAuthClient;
     }
 
-    /**
-     * @return array
-     */
     private function getReAuthConfig(): array
     {
         $config = [
@@ -192,9 +173,6 @@ class HttpFactory implements AuthProviderInterface
         return $config;
     }
 
-    /**
-     * @param OAuth2Middleware $oauth
-     */
     private function configureMiddleware(OAuth2Middleware $oauth): void
     {
         if (!$this->config) {

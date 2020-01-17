@@ -33,10 +33,6 @@ class PageListType extends AbstractType
      */
     private $canViewOther = false;
 
-    /**
-     * @param PageModel       $pageModel
-     * @param CorePermissions $corePermissions
-     */
     public function __construct(PageModel $pageModel, CorePermissions $corePermissions)
     {
         $this->model        = $pageModel;
@@ -69,7 +65,7 @@ class PageListType extends AbstractType
 
                     return $choices;
                 },
-                'empty_value'       => false,
+                'placeholder'       => false,
                 'expanded'          => false,
                 'multiple'          => true,
                 'required'          => false,

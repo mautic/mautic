@@ -76,17 +76,6 @@ final class SyncService implements SyncServiceInterface
      */
     private $notifier;
 
-    /**
-     * @param MauticSyncDataExchange   $internalSyncDataExchange
-     * @param SyncDateHelper           $syncDateHelper
-     * @param MappingHelper            $mappingHelper
-     * @param RelationsHelper          $relationsHelper
-     * @param SyncIntegrationsHelper   $syncIntegrationsHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param Notifier                 $notifier
-     * @param IntegrationSyncProcess   $integrationSyncProcess
-     * @param MauticSyncProcess        $mauticSyncProcess
-     */
     public function __construct(
         MauticSyncDataExchange $internalSyncDataExchange,
         SyncDateHelper $syncDateHelper,
@@ -110,8 +99,6 @@ final class SyncService implements SyncServiceInterface
     }
 
     /**
-     * @param InputOptionsDAO $inputOptionsDAO
-     *
      * @throws \Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException
      */
     public function processIntegrationSync(InputOptionsDAO $inputOptionsDAO): void
@@ -149,9 +136,6 @@ final class SyncService implements SyncServiceInterface
         }
     }
 
-    /**
-     * @param DebugLogger $logger
-     */
     public function initiateDebugLogger(DebugLogger $logger): void
     {
         // Yes it's a hack to prevent from having to pass the logger as a dependency into dozens of classes

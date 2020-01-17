@@ -32,11 +32,6 @@ class FormListType extends AbstractType
      */
     private $repo;
 
-    /**
-     * @param CorePermissions $security
-     * @param FormModel       $model
-     * @param UserHelper      $userHelper
-     */
     public function __construct(CorePermissions $security, FormModel $model, UserHelper $userHelper)
     {
         $this->viewOther = $security->isGranted('form:forms:viewother');
@@ -72,7 +67,7 @@ class FormListType extends AbstractType
             },
             'expanded'          => false,
             'multiple'          => true,
-            'empty_value'       => false,
+            'placeholder'       => false,
             'form_type'         => null,
         ]);
 

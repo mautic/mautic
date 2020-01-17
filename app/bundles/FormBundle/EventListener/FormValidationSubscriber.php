@@ -26,9 +26,6 @@ class FormValidationSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -47,8 +44,6 @@ class FormValidationSubscriber implements EventSubscriberInterface
 
     /**
      * Add a simple email form.
-     *
-     * @param Events\FormBuilderEvent $event
      */
     public function onFormBuilder(Events\FormBuilderEvent $event)
     {
@@ -64,8 +59,6 @@ class FormValidationSubscriber implements EventSubscriberInterface
 
     /**
      * Custom validation.
-     *
-     *@param Events\ValidationEvent $event
      */
     public function onFormValidate(Events\ValidationEvent $event)
     {

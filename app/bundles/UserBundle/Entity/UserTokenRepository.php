@@ -35,8 +35,6 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
     }
 
     /**
-     * @param UserToken $token
-     *
      * @return bool
      */
     public function verify(UserToken $token)

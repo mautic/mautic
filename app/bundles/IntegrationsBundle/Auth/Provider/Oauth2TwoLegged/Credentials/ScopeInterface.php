@@ -15,8 +15,5 @@ namespace Mautic\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials;
 
 interface ScopeInterface
 {
-    /**
-     * @return string|null
-     */
     public function getScope(): ?string;
 }

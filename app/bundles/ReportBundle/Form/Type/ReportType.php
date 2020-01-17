@@ -58,7 +58,7 @@ class ReportType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
         // Only add these fields if we're in edit mode
-        if (!$options['read_only']) {
+        if (!($options['attr']['readonly'] ?? false)) {
             $builder->add(
                 'name',
                 TextType::class,
@@ -137,7 +137,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.report.form.source',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'    => 'form-control',
@@ -213,9 +213,9 @@ class ReportType extends AbstractType
                     'filters',
                     ReportFiltersType::class,
                     [
-                        'type'    => FilterSelectorType::class,
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => FilterSelectorType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'filterList'   => $filters->choices,
                             'operatorList' => $filters->operatorChoices,
                             'required'     => false,
@@ -238,9 +238,9 @@ class ReportType extends AbstractType
                     'aggregators',
                     CollectionType::class,
                     [
-                        'type'    => AggregatorType::class,
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => AggregatorType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'columnList' => $groupByColumns->choices,
                             'required'   => false,
                         ],
@@ -255,9 +255,9 @@ class ReportType extends AbstractType
                     'tableOrder',
                     CollectionType::class,
                     [
-                        'type'    => TableOrderType::class,
-                        'label'   => false,
-                        'options' => [
+                        'entry_type'    => TableOrderType::class,
+                        'label'         => false,
+                        'entry_options' => [
                             'columnList' => $columns->choices,
                             'required'   => false,
                         ],
@@ -353,7 +353,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.every',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'                => 'form-control',
@@ -371,7 +371,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.day',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'                => 'form-control',
@@ -389,7 +389,7 @@ class ReportType extends AbstractType
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.month_frequency',
                     'label_attr'        => ['class' => 'control-label'],
-                    'empty_value'       => false,
+                    'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
                         'class'                => 'form-control',
@@ -424,9 +424,6 @@ class ReportType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

@@ -77,14 +77,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $contactRepository;
 
-    /**
-     * @param CampaignModel       $campaignModel
-     * @param LeadModel           $leadModel
-     * @param TranslatorInterface $translator
-     * @param EntityManager       $entityManager
-     * @param RouterInterface     $router
-     * @param CorePermissions     $security
-     */
     public function __construct(
         CampaignModel $campaignModel,
         LeadModel $leadModel,
@@ -119,8 +111,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Add/remove leads from campaigns based on batch lead list changes.
-     *
-     * @param ListChangeEvent $event
      */
     public function onLeadListBatchChange(ListChangeEvent $event)
     {
@@ -172,13 +162,11 @@ class LeadSubscriber implements EventSubscriberInterface
         }
 
         // Save memory with batch processing
-        unset($event, $model, $leads, $list, $listCampaigns, $leadLists);
+        unset($event, $leads, $list, $listCampaigns, $leadLists);
     }
 
     /**
      * Add/remove leads from campaigns based on lead list changes.
-     *
-     * @param ListChangeEvent $event
      */
     public function onLeadListChange(ListChangeEvent $event)
     {
@@ -228,8 +216,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -239,8 +225,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * Update records after lead merge.
-     *
-     * @param LeadMergeEvent $event
      */
     public function onLeadMerge(LeadMergeEvent $event)
     {
@@ -249,9 +233,8 @@ class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param                   $eventTypeKey
-     * @param                   $eventTypeName
+     * @param $eventTypeKey
+     * @param $eventTypeName
      */
     private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {

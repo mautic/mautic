@@ -15,6 +15,8 @@ use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RabbitMqSubscriber extends AbstractQueueSubscriber
@@ -34,18 +36,12 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
      */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         // The container is needed due to non-required binding of the producer & consumer
         $this->container = $container;
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function publishMessage(Events\QueueEvent $event)
     {
         $producer = $this->container->get('old_sound_rabbit_mq.mautic_producer');
@@ -55,9 +51,6 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
         ]);
     }
 
-    /**
-     * @param Events\QueueEvent $event
-     */
     public function consumeMessage(Events\QueueEvent $event)
     {
         $consumer = $this->container->get('old_sound_rabbit_mq.mautic_consumer');
@@ -70,9 +63,6 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
         $consumer->consume($event->getMessages());
     }
 
-    /**
-     * @param Events\QueueConfigEvent $event
-     */
     public function buildConfig(Events\QueueConfigEvent $event)
     {
         $options        = $event->getOptions();
@@ -80,7 +70,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_host',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.host',
                 'label_attr' => ['class' => 'control-label'],
@@ -102,7 +92,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_port',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.port',
                 'label_attr' => ['class' => 'control-label'],
@@ -124,7 +114,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_vhost',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.rabbitmq.vhost',
                 'label_attr' => ['class' => 'control-label'],
@@ -146,7 +136,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_user',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.queue.config.rabbitmq.user',
                 'label_attr' => ['class' => 'control-label'],
@@ -168,7 +158,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
 
         $event->addFormField(
             'rabbitmq_password',
-            'password',
+            PasswordType::class,
             [
                 'label'      => 'mautic.queue.config.rabbitmq.password',
                 'label_attr' => ['class' => 'control-label'],
