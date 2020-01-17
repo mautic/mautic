@@ -228,7 +228,6 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         $type,
                         [
-                            'choices'           => $choices,
                             'required'          => $required,
                             'label'             => $field['label'],
                             'data'              => $value,
