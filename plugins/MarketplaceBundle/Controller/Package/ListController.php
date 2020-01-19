@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MarketplaceBundle\Service\PluginCollector;
 use MauticPlugin\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -45,7 +46,7 @@ class ListController extends CommonController
         // }
 
         $request    = $this->requestStack->getCurrentRequest();
-        // $search     = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
+        $search     = InputHelper::clean($request->get('search', ''));
         // $limit      = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         // $orderBy    = $this->sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
         // $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
@@ -68,8 +69,8 @@ class ListController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    // 'searchValue'    => $search,
-                    'items'          => $this->pluginCollector->collectPackages(),
+                    'searchValue'    => $search,
+                    'items'          => $this->pluginCollector->collectPackages(1, 100, $search),
                     // 'count'          => // @todo,
                     // 'page'           => $page,
                     // 'limit'          => $limit,

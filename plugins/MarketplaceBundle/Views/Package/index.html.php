@@ -20,7 +20,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            // 'searchValue' => $searchValue,
+            'searchValue' => $searchValue,
             // 'action'      => $currentRoute,
         ]
     ); ?>
