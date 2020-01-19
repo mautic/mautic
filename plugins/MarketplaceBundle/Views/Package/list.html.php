@@ -126,17 +126,17 @@ if ('index' === $tmpl) {
     </div>
     <div class="panel-footer">
         <?php
-        // echo $view->render(
-        //     'MauticCoreBundle:Helper:pagination.html.php',
-        //     [
-        //         'totalItems' => $count,
-        //         'page'       => $page,
-        //         'limit'      => $limit,
-        //         'baseUrl'    => $view['router']->path(CustomObjectRouteProvider::ROUTE_LIST),
-        //         'sessionVar' => 'custom.object',
-        //         'routeBase'  => CustomObjectRouteProvider::ROUTE_LIST,
-        //     ]
-        // );
+        echo $view->render(
+            'MauticCoreBundle:Helper:pagination.html.php',
+            [
+                'totalItems' => $count,
+                'page'       => $page,
+                'limit'      => $limit,
+                'baseUrl'    => $view['router']->path(RouteProvider::ROUTE_LIST),
+                'sessionVar' => 'marketplace.package',
+                'routeBase'  => RouteProvider::ROUTE_LIST,
+            ]
+        );
         ?>
     </div>
 <?php else: ?>

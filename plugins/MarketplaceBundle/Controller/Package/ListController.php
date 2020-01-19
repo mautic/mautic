@@ -47,7 +47,7 @@ class ListController extends CommonController
 
         $request    = $this->requestStack->getCurrentRequest();
         $search     = InputHelper::clean($request->get('search', ''));
-        // $limit      = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
+        $limit      = (int) $request->get('limit', 30);
         // $orderBy    = $this->sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
         // $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
         $route      = $this->routeProvider->buildListRoute($page);
@@ -59,8 +59,6 @@ class ListController extends CommonController
         //     $this->sessionProvider->setOrderByDir($orderByDir);
         // }
 
-        // $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
-
         // $this->sessionProvider->setPage($page);
         // $this->sessionProvider->setPageLimit($limit);
         // $this->sessionProvider->setFilter($search);
@@ -70,10 +68,10 @@ class ListController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'    => $search,
-                    'items'          => $this->pluginCollector->collectPackages(1, 100, $search),
-                    // 'count'          => // @todo,
-                    // 'page'           => $page,
-                    // 'limit'          => $limit,
+                    'items'          => $this->pluginCollector->collectPackages($page, $limit, $search),
+                    'count'          => $this->pluginCollector->getTotal(),
+                    'page'           => $page,
+                    'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'MarketplaceBundle:Package:list.html.php',
