@@ -35,18 +35,18 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'marketplace.package',
-                        'orderBy'    => 'name',
+                        // 'sessionVar' => 'marketplace.package',
+                        // 'orderBy'    => 'name',
                         'text'       => 'mautic.core.name',
-                        'default'    => true,
+                        // 'default'    => true,
                     ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'marketplace.package',
-                        'orderBy'    => 'vendor',
+                        // 'sessionVar' => 'marketplace.package',
+                        // 'orderBy'    => 'vendor',
                         'text'       => 'marketplace.vendor',
                     ]
                 );
@@ -54,8 +54,8 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'marketplace.package',
-                        'orderBy'    => 'downloads',
+                        // 'sessionVar' => 'marketplace.package',
+                        // 'orderBy'    => 'downloads',
                         'text'       => 'marketplace.downloads',
                     ]
                 );
@@ -63,8 +63,8 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'marketplace.package',
-                        'orderBy'    => 'favers',
+                        // 'sessionVar' => 'marketplace.package',
+                        // 'orderBy'    => 'favers',
                         'text'       => 'marketplace.favers',
                     ]
                 );
