@@ -21,6 +21,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
     public function testDownloadDataStore()
     {
         if (empty($_ENV['MAXMIND_LICENSE_KEY'])) {
+            // The env variable MAXMIND_LICENSE_KEY. can be set in phpunit.xml
             $this->markTestSkipped('You can run this test just if you add license key to env variable MAXMIND_LICENSE_KEY.');
         }
 
