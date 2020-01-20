@@ -203,13 +203,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      *
      * @return bool
      */
-    private function endsWith(string $haystack, string $needle): bool
+    private function endsWith($haystack, $needle)
     {
-        $length = strlen($needle);
-        if ($length == 0) {
-            return true;
-        }
-
         return substr_compare($haystack, $needle, -strlen($needle)) === 0;
     }
 }
