@@ -96,6 +96,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     break;
 
                 case $this->endsWith($package, 'tar.gz'):
+                    /**
+                     * If tar.gz it loops whole folder structure and copy the file which has the same basename as
+                     * desired localTarget.
+                    */
                     $tempTargetFolder = $this->cacheDir.'/'.self::TAR_CACHE_FOLDER;
                     $temporaryPhar    = $tempTargetFolder.'/'.self::TAR_TEMP_FILE;
                     if (!is_dir($tempTargetFolder)) {
