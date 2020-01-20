@@ -132,6 +132,6 @@ abstract class AbstractLookup
      */
     public function authIsSet()
     {
-        return $this->auth !== null;
+        return !empty($this->auth);
     }
 }
