@@ -210,6 +210,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             return true;
         }
 
-        return substr($haystack, -$length) === $needle;
+        return substr_compare($haystack, $needle, -strlen($needle)) === 0;
     }
 }
