@@ -64,7 +64,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
         try {
             $data = $connector->get($package);
-            error_log(gettype($data->code));
             if ($data->code !== 200) {
                 $this->logger->error('Failed with Error '.(string) $data->code.'. Unable to fetch IPLookUp-table from: '.$package);
 
