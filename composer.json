@@ -113,7 +113,7 @@
         "symfony/phpunit-bridge": "~4.3.0",
         "phpunit/phpunit": "~7.5.0",
         "phpunit/phpunit-selenium": "~7.0.0",
-        "codeception/codeception": "~3.1.0",
+        "codeception/codeception": "^4.0",
 
         "liip/functional-test-bundle": "~3.3.0",
         "sensio/generator-bundle": "~3.1.0",
