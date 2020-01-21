@@ -58,6 +58,8 @@
         "symfony/swiftmailer-bundle": "~3.3",
         "symfony/polyfill-mbstring": "~1.0",
         "symfony/security-acl": "~3.0.0",
+        "symfony/polyfill-php73": "^1.13",
+        "symfony/polyfill-php74": "^1.13",
 
         "sensio/distribution-bundle": "~5.0",
         "sensio/framework-extra-bundle": "~3.0",
