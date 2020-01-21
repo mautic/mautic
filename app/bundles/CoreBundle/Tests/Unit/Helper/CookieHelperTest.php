@@ -37,6 +37,7 @@ class CookieHelperTest extends PHPUnit_Framework_TestCase
      * @testdox The helper is instantiated correctly when secure and contains SameSite = None
      *
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
@@ -61,6 +62,7 @@ class CookieHelperTest extends PHPUnit_Framework_TestCase
      * @testdox The helper is instantiated correctly when not secure and does not contain SameSite = None
      *
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      *
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::__construct
      * @covers \Mautic\CoreBundle\Helper\CookieHelper::setCookie
