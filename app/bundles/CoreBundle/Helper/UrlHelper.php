@@ -326,6 +326,8 @@ class UrlHelper
     }
 
     /**
+     * FILTER_VALIDATE_URL allow only alphanumerics [0-9a-zA-Z], the special characters "$-_.+!*'()," [not including the quotes - ed]. This validation passed also special characters in URL.
+     *
      * @param string $url
      *
      * @return bool
@@ -333,8 +335,8 @@ class UrlHelper
     public static function isValidateUrl($url)
     {
         $path         = parse_url($url, PHP_URL_PATH);
-        $encoded_path = array_map('urlencode', explode('/', $path));
-        $url          = str_replace($path, implode('/', $encoded_path), $url);
+        $encodedPath  = array_map('urlencode', explode('/', $path));
+        $url          = str_replace($path, implode('/', $encodedPath), $url);
 
         return filter_var($url, FILTER_VALIDATE_URL);
     }
