@@ -170,7 +170,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         // In case $matchedFields['tags'] === null ...
         $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
         // ...we must ensure we pass an [] to array_map
-        $tags = is_array($tags) ? $tags : [];
+        $tags = is_iterable($tags) ? $tags->toArray() : [];
 
         return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
