@@ -491,7 +491,7 @@ class PublicController extends CommonFormController
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
-        if (!UrlHelper::isValidateUrl($url)) {
+        if (!UrlHelper::isValidUrl($url)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404', ['%url%' => $url]));
         }
 
