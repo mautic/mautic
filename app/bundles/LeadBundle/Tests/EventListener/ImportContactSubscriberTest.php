@@ -4,22 +4,102 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\EventListener\ImportContactSubscriber;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class ImportContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var FieldList|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $fieldListMock;
+
+    /**
+     * @var CorePermissions|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $corePermissionsMock;
+
+    /**
+     * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $contactModelMock;
+
+    protected function setUp(): void
+    {
+        $this->fieldListMock = $this->createMock(FieldList::class);
+        $this->corePermissionsMock = $this->createMock(CorePermissions::class);
+        $this->contactModelMock = $this->createMock(LeadModel::class);
+    }
+
+    /**
+     * @testdox Test that the validator can work with an ArrayCollection for tags
+     *
+     * @covers \Mautic\LeadBundle\EventListener\ImportContactSubscriber::__construct
+     * @covers \Mautic\LeadBundle\EventListener\ImportContactSubscriber::onValidateImport
+     * @covers \Mautic\LeadBundle\EventListener\ImportContactSubscriber::handleValidateTags
+     */
+    public function testHandleValidateTags()
+    {
+        // Prepare the matchedFields array and mocks
+        $tagLabel = 'tagLabel';
+        $name = 'Bud';
+        $this->fieldListMock->method('getFieldList')
+            ->willReturn([]);
+        $tagMock = $this->createMock(Tag::class);
+        $tagMock->method('getTag')
+            ->willReturn($tagLabel);
+        $tagsCollectionMock = $this->createMock(ArrayCollection::class);
+        $tagsCollectionMock->method('toArray')
+            ->willReturn([$tagMock]);
+        $matchedFields = [
+            'name'=> $name,
+            'tags' => $tagsCollectionMock
+        ];
+        $formMock = $this->createMock(Form::class);
+        $formMock->method('getData')
+            ->willReturn($matchedFields);
+        $eventMock = $this->createMock(ImportValidateEvent::class);
+        $eventMock->expects($this->at(0))
+            ->method('importIsForRouteObject')
+            ->with('contacts')
+            ->willReturn(true);
+        $eventMock->expects($this->at(1))
+            ->method('getForm')
+            ->willReturn($formMock);
+        $eventMock->expects($this->at(2))
+            ->method('setOwnerId')
+            ->withAnyParameters();
+        $eventMock->expects($this->at(3))
+            ->method('setList')
+            ->withAnyParameters();
+        // Assert correct tags
+        $eventMock->expects($this->at(4))
+            ->method('setTags')
+            ->with([$tagLabel]);
+        // Assert correct fields
+        $eventMock->expects($this->at(5))
+            ->method('setMatchedFields')
+            ->with(['name'=> $name]);
+        // Start test
+        $importContactSubscriber = new ImportContactSubscriber($this->fieldListMock, $this->corePermissionsMock, $this->contactModelMock);
+        $importContactSubscriber->onValidateImport($eventMock);
+    }
+
     public function testOnImportInitForUknownObject(): void
     {
         $subscriber = new ImportContactSubscriber(
