@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Tag;
@@ -170,7 +171,7 @@ final class ImportContactSubscriber implements EventSubscriberInterface
         // In case $matchedFields['tags'] === null ...
         $tags = ArrayHelper::pickValue('tags', $matchedFields, []);
         // ...we must ensure we pass an [] to array_map
-        $tags = is_iterable($tags) ? $tags->toArray() : [];
+        $tags = $tags instanceof ArrayCollection ? $tags->toArray() : [];
 
         return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
