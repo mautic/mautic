@@ -7,9 +7,6 @@ use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class CookieHelper Test.
- */
 class CookieHelperTest extends PHPUnit_Framework_TestCase
 {
     /**
