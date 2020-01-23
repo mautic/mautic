@@ -21,25 +21,41 @@ class ParameterLoader
     private static $parameterBag;
 
     /**
+     * @var ParameterBag
+     */
+    private static $localParameterBag;
+
+    /**
      * @var array
      */
     private $defaultParameters = [];
+
+    /**
+     * @var array
+     */
+    private $localParameters = [];
 
     public function __construct(array $defaultParameters = [])
     {
         // This is loaded outside the container and inside the container so statically store to prevent
         // having to recompile multiple times
-        if (self::$parameterBag) {
+        if (self::$parameterBag && empty($defaultParameters)) {
             return;
         }
 
         $this->loadDefaultParameters($defaultParameters);
         $this->loadLocalParameters();
+        $this->createParameterBags();
     }
 
     public function getParameterBag(): ParameterBag
     {
         return self::$parameterBag;
+    }
+
+    public function getLocalParameterBag(): ParameterBag
+    {
+        return self::$localParameterBag;
     }
 
     public function loadIntoEnvironment()
@@ -84,7 +100,7 @@ class ParameterLoader
 
     private function loadDefaultParameters(array $defaultParameters): void
     {
-        $defaultParametersFile = __DIR__.'/../../../config/parameters_defaults.php';
+        $defaultParametersFile = $this->getDefaultParametersFile();
 
         if ($defaultParameters) {
             unset($defaultParameters['paths']);
@@ -106,7 +122,7 @@ class ParameterLoader
 
     private function loadLocalParameters(): void
     {
-        $compiledParameters = $this->defaultParameters;
+        $compiledParameters = [];
         $rootPath           = __DIR__.'/../../../';
         $localConfigFile    = self::getLocalConfigFile($rootPath);
 
@@ -120,14 +136,31 @@ class ParameterLoader
         }
 
         // Force local specific params
-        if (file_exists($rootPath.'/config/parameters_local.php')) {
+        $localParametersFile = $this->getLocalParametersFile();
+        if (file_exists($localParametersFile)) {
             /** @var array $parameters */
-            include $rootPath.'/config/parameters_local.php';
+            include $localParametersFile;
 
             //override default with forced
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 
-        self::$parameterBag = new ParameterBag($compiledParameters);
+        $this->localParameters = $compiledParameters;
+    }
+
+    private function createParameterBags(): void
+    {
+        self::$localParameterBag = new ParameterBag($this->localParameters);
+        self::$parameterBag      = new ParameterBag(array_merge($this->defaultParameters, $this->localParameters));
+    }
+
+    private function getLocalParametersFile(): string
+    {
+        return __DIR__.'/../../../config/parameters_local.php';
+    }
+
+    private function getDefaultParametersFile(): string
+    {
+        return __DIR__.'/../../../config/parameters_defaults.php';
     }
 }

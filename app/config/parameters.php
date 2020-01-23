@@ -85,6 +85,7 @@ foreach ($mauticParams as $k => $v) {
 
 // Store default parameters into the loader to generate a cached version
 $parameterImporter = new \Mautic\CoreBundle\Loader\ParameterLoader($mauticParams);
+$parameterImporter->loadIntoEnvironment();
 
 // Set the router URI for CLI
 $container->setParameter('router.request_context.host', '%env(MAUTIC_REQUEST_CONTEXT_HOST)%');
