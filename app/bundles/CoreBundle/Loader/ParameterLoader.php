@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Loader;
 
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
@@ -35,15 +36,15 @@ class ParameterLoader
      */
     private $localParameters = [];
 
-    public function __construct(array $defaultParameters = [])
+    public function __construct()
     {
         // This is loaded outside the container and inside the container so statically store to prevent
         // having to recompile multiple times
-        if (self::$parameterBag && empty($defaultParameters)) {
+        if (self::$parameterBag) {
             return;
         }
 
-        $this->loadDefaultParameters($defaultParameters);
+        $this->loadDefaultParameters();
         $this->loadLocalParameters();
         $this->createParameterBags();
     }
@@ -98,26 +99,24 @@ class ParameterLoader
         return $paths['local_config'];
     }
 
-    private function loadDefaultParameters(array $defaultParameters): void
+    private function loadDefaultParameters(): void
     {
-        $defaultParametersFile = $this->getDefaultParametersFile();
+        $finder = (new Finder())
+            ->files()
+            ->followLinks()
+            ->depth('== 0')
+            ->in(__DIR__.'/../../../bundles/*/Config')
+            ->in(__DIR__.'/../../../../plugins/*/Config')
+            ->name('config.php');
 
-        if ($defaultParameters) {
-            unset($defaultParameters['paths']);
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $file) {
+            /** @var array $config */
+            $config = include $file->getPathname();
 
-            // Write defaults to a file so that they can be reloaded by the kernel without recompiling from each bundle's config file
-            file_put_contents($defaultParametersFile, '<?php $defaultParameters = '.var_export($defaultParameters, true).';');
-
-            $this->defaultParameters = $defaultParameters;
-
-            return;
+            $parameters              = $config['parameters'] ?? [];
+            $this->defaultParameters = array_merge($this->defaultParameters, $parameters);
         }
-
-        if (file_exists($defaultParametersFile)) {
-            include $defaultParametersFile;
-        }
-
-        $this->defaultParameters = $defaultParameters;
     }
 
     private function loadLocalParameters(): void
@@ -157,10 +156,5 @@ class ParameterLoader
     private function getLocalParametersFile(): string
     {
         return __DIR__.'/../../../config/parameters_local.php';
-    }
-
-    private function getDefaultParametersFile(): string
-    {
-        return __DIR__.'/../../../config/parameters_defaults.php';
     }
 }

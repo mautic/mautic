@@ -83,10 +83,6 @@ foreach ($mauticParams as $k => $v) {
     $container->setParameter("mautic.{$k}", sprintf('%%env(%sMAUTIC_%s)%%', $type, mb_strtoupper($k)));
 }
 
-// Store default parameters into the loader to generate a cached version
-$parameterImporter = new \Mautic\CoreBundle\Loader\ParameterLoader($mauticParams);
-$parameterImporter->loadIntoEnvironment();
-
 // Set the router URI for CLI
 $container->setParameter('router.request_context.host', '%env(MAUTIC_REQUEST_CONTEXT_HOST)%');
 $container->setParameter('router.request_context.scheme', '%env(MAUTIC_REQUEST_CONTEXT_SCHEME)%');

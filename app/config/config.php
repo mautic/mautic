@@ -175,16 +175,16 @@ unset($setBundles, $setPluginBundles);
 $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 
 // Load parameters
-/** @var $parameterImporter \Mautic\CoreBundle\Loader\ParameterLoader */
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
+$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
 
 // Decide on secure cookie based on site_url setting
 // This cannot be set dynamically
-$siteUrl      = $parameterImporter->getParameterBag()->get('site_url');
+$siteUrl      = $configParameterBag->get('site_url');
 $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
 
 $container->loadFromExtension('framework', [
@@ -363,12 +363,12 @@ $container->loadFromExtension('jms_serializer', [
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
-            'api_rate_limiter_cache' => $parameterImporter->getParameterBag()->get('api_rate_limiter_cache'),
+            'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
         ],
     ],
 ]);
 
-$rateLimit = $parameterImporter->getParameterBag()->get('api_rate_limiter_limit');
+$rateLimit = $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
   'enabled'        => 0 === $rateLimit ? false : true,
   'storage_engine' => 'cache',
