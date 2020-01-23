@@ -39,8 +39,7 @@ class RedirectListType extends AbstractType
                 'class' => 'form-control',
             ],
             'feature'           => 'all',
-            'choices_as_values' => true,
-        ]);
+            ]);
 
         $resolver->setDefined(['feature']);
     }

@@ -68,9 +68,6 @@ class EventCollector
     }
 
     /**
-     * @param string $type
-     * @param string $key
-     *
      * @return AbstractEventAccessor
      */
     public function getEventConfig(Event $event)

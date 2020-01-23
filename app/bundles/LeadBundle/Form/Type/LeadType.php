@@ -77,7 +77,6 @@ class LeadType extends AbstractType
                 'preferred_profile_image',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => $imageChoices,
                     'label'             => 'mautic.lead.lead.field.preferred_profile',
                     'label_attr'        => ['class' => 'control-label'],

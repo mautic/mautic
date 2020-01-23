@@ -427,8 +427,6 @@ function download_package($update)
 }
 
 /**
- * @param $zipFile
- *
  * @return int
  */
 function extract_package($version)
@@ -462,8 +460,6 @@ function extract_package($version)
  * CLI suite.  So we'll go with Option B in this instance and just nuke the entire production cache and let Symfony rebuild it on the next
  * application cycle.
  *
- * @param array $status
- *
  * @return array
  */
 function clear_mautic_cache()
@@ -487,8 +483,7 @@ function clear_mautic_cache()
 }
 
 /**
- * @param       $command
- * @param array $args
+ * @param $command
  *
  * @return array
  *
@@ -666,8 +661,7 @@ function getVar($name, $default = '', $filter = FILTER_SANITIZE_STRING)
  * A typical update package will only include changed files in the bundles.  However, in this script we will assume that all of
  * the bundle resources are included here and recursively iterate over the bundles in batches to update the filesystem.
  *
- * @param array $status
- * @param int   $maxCount
+ * @param int $maxCount
  *
  * @return array
  */
@@ -813,8 +807,6 @@ function move_mautic_bundles(array $status, $maxCount = 5)
  * The "core" files are broken into groups for purposes of the update script: bundles, vendor, and everything else.  This step
  * will take care of the everything else.
  *
- * @param array $status
- *
  * @return array
  */
 function move_mautic_core(array $status)
@@ -890,8 +882,7 @@ function move_mautic_core(array $status)
  * between releases.  Therefore, this step will recursively iterate over the vendors in batches to remove each package completely
  * and replace it with the new version.
  *
- * @param array $status
- * @param int   $maxCount
+ * @param int $maxCount
  *
  * @return array
  */
@@ -1165,8 +1156,6 @@ function copy_directories($dir, &$errorLog, $createDest = true)
 
 /**
  * Processes the error log for each step.
- *
- * @param array $errorLog
  */
 function process_error_log(array $errorLog)
 {
@@ -1254,8 +1243,6 @@ function recursive_remove_directory($directory)
  * While packaging updates, the script will generate a list of deleted files in comparison to the previous version.  In this step,
  * we will process that list to remove files which are no longer included in the application.
  *
- * @param array $status
- *
  * @return array
  */
 function remove_mautic_deleted_files(array $status)
@@ -1308,8 +1295,6 @@ function remove_mautic_deleted_files(array $status)
 }
 
 /**
- * @param array $state
- *
  * @return string
  */
 function get_state_param(array $state)
@@ -1319,8 +1304,6 @@ function get_state_param(array $state)
 
 /**
  * Send the response back to the main application.
- *
- * @param array $status
  */
 function send_response(array $status)
 {

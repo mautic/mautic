@@ -95,7 +95,6 @@ class CitrixActionType extends AbstractType
                 ChoiceType::class,
                 [
                     'choices'           => array_flip($products),
-                    'choices_as_values' => true,
                     'expanded'          => false,
                     'label_attr'        => ['class' => 'control-label'],
                     'multiple'          => false,
@@ -123,7 +122,6 @@ class CitrixActionType extends AbstractType
                 ChoiceType::class,
                 [
                     'choices'           => $choices,
-                    'choices_as_values' => true,
                     'expanded'          => false,
                     'label_attr'        => ['class' => 'control-label'],
                     'multiple'          => false,
@@ -146,7 +144,6 @@ class CitrixActionType extends AbstractType
                 ChoiceType::class,
                 [
                     'choices'           => $choices,
-                    'choices_as_values' => true,
                     'expanded'          => false,
                     'label_attr'        => ['class' => 'control-label'],
                     'multiple'          => false,
@@ -170,7 +167,6 @@ class CitrixActionType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $choices,
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'label_attr'        => ['class' => 'control-label'],
                 'multiple'          => false,

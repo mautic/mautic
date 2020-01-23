@@ -113,8 +113,6 @@ class SendEmailToContact
 
     /**
      * SendEmailToContact constructor.
-     *
-     * @param StatRepository $statRepository
      */
     public function __construct(MailHelper $mailer, StatHelper $statHelper, DoNotContact $dncModel, TranslatorInterface $translator)
     {

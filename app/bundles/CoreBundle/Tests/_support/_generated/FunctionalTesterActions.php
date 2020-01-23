@@ -2090,7 +2090,6 @@ trait FunctionalTesterActions
      * Unsets cookie with the given name.
      * You can set additional cookie params like `domain`, `path` in array passed as last argument.
      *
-     * @param $cookie
      * @param array $params
      *
      * @return mixed

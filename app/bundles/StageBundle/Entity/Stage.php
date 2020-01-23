@@ -148,8 +148,6 @@ class Stage extends FormEntity
     /**
      * Set weight.
      *
-     * @param int $weight
-     *
      * @return int
      */
     public function setWeight($type)

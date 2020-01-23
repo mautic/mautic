@@ -133,7 +133,6 @@ class TokenHelper
 
     /**
      * @param $match
-     * @param $urlencode
      *
      * @return string
      */

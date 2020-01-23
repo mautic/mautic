@@ -84,8 +84,7 @@ class SlotSavePrefsButtonType extends SlotType
                     'M' => 1,
                     'L' => 2,
                 ],
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $builder->add(
@@ -104,8 +103,7 @@ class SlotSavePrefsButtonType extends SlotType
                     'mautic.core.center' => 1,
                     'mautic.core.right'  => 2,
                 ],
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $builder->add(

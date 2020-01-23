@@ -132,7 +132,6 @@ class ReportType extends AbstractType
                 'source',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => $tables,
                     'expanded'          => false,
                     'multiple'          => false,
@@ -176,7 +175,6 @@ class ReportType extends AbstractType
                     'columns',
                     ChoiceType::class,
                     [
-                        'choices_as_values' => true,
                         'choices'           => array_flip($columns->choices),
                         'label'             => false,
                         'label_attr'        => ['class' => 'control-label'],
@@ -196,7 +194,6 @@ class ReportType extends AbstractType
                     'groupBy',
                     ChoiceType::class,
                     [
-                        'choices_as_values' => true,
                         'choices'           => array_flip($groupByColumns->choices),
                         'label'             => false,
                         'label_attr'        => ['class' => 'control-label'],
@@ -287,8 +284,7 @@ class ReportType extends AbstractType
                             'mautic.core.form.yes'     => 1,
                             'mautic.core.filter.clear' => 2,
                         ],
-                        'choices_as_values' => true,
-                    ]
+                        ]
                 );
 
                 $graphList = $model->getGraphList($source);
@@ -303,7 +299,6 @@ class ReportType extends AbstractType
                     'graphs',
                     ChoiceType::class,
                     [
-                        'choices_as_values' => true,
                         'choices'           => array_flip($graphList->choices),
                         'label'             => 'mautic.report.report.form.graphs',
                         'label_attr'        => ['class' => 'control-label'],
@@ -353,7 +348,6 @@ class ReportType extends AbstractType
                 'scheduleUnit',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => SchedulerEnum::getUnitEnumForSelect(),
                     'expanded'          => false,
                     'multiple'          => false,
@@ -372,7 +366,6 @@ class ReportType extends AbstractType
                 'scheduleDay',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => SchedulerEnum::getDayEnumForSelect(),
                     'expanded'          => false,
                     'multiple'          => false,
@@ -391,7 +384,6 @@ class ReportType extends AbstractType
                 'scheduleMonthFrequency',
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => SchedulerEnum::getMonthFrequencyForSelect(),
                     'expanded'          => false,
                     'multiple'          => false,

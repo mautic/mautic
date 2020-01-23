@@ -71,7 +71,6 @@ class LeadImportFieldType extends AbstractType
                 $field,
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => $importChoiceFields,
                     'label'             => $label,
                     'required'          => false,

@@ -23,7 +23,6 @@ class IntegrationEntityRepository extends CommonRepository
      * @param      $integration
      * @param      $integrationEntity
      * @param      $internalEntity
-     * @param null $internalEntityId
      * @param null $startDate
      * @param null $endDate
      * @param bool $push
@@ -144,11 +143,9 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param      $integration
-     * @param      $integrationEntity
-     * @param      $internalEntity
-     * @param      $internalEntityId
-     * @param null $leadFields
+     * @param $integration
+     * @param $integrationEntity
+     * @param $internalEntity
      *
      * @return IntegrationEntity[]
      */
@@ -533,7 +530,6 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $integration
      * @param $internalEntity
      * @param $leadId
      *

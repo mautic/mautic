@@ -83,8 +83,7 @@ class CampaignEventSendWebhookType extends AbstractType
                 ],
                 'placeholder'       => false,
                 'required'          => false,
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $builder->add(

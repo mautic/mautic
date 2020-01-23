@@ -194,8 +194,6 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param array $leads
-     *
      * @return array
      *
      * @throws \Mautic\PluginBundle\Exception\ApiErrorException

@@ -170,7 +170,6 @@ class LookupHelper
 
     /**
      * @param $oid
-     * @param $type
      */
     public function validateRequest($oid)
     {

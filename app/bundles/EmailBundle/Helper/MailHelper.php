@@ -1290,7 +1290,6 @@ class MailHelper
 
     /**
      * @param array|Lead $lead
-     * @param bool       $internalSend Set to true if the email is not being sent to this lead
      */
     public function setLead($lead, $interalSend = false)
     {

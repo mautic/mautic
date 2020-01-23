@@ -45,9 +45,8 @@ class DynamicFiltersType extends AbstractType
                 switch ($definition['type']) {
                     case 'bool':
                     case 'boolean':
-                        $type                      = ButtonGroupType::class;
-                        $args['choices_as_values'] = true;
-                        $args['choices']           = [
+                        $type            = ButtonGroupType::class;
+                        $args['choices'] = [
                             [
                                 'mautic.core.form.no'      => false,
                                 'mautic.core.form.yes'     => true,
@@ -77,9 +76,8 @@ class DynamicFiltersType extends AbstractType
                         break;
                     case 'multiselect':
                     case 'select':
-                        $type                      = ChoiceType::class;
-                        $args['choices_as_values'] = true;
-                        $args['choices']           = array_flip($definition['list']);
+                        $type            = ChoiceType::class;
+                        $args['choices'] = array_flip($definition['list']);
                         break;
                     default:
                         $type = TextType::class;

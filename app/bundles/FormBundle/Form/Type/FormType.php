@@ -180,7 +180,6 @@ class FormType extends AbstractType
                 'mautic.form.form.postaction.redirect' => 'redirect',
                 'mautic.form.form.postaction.message'  => 'message',
             ],
-            'choices_as_values' => true,
             'label'             => 'mautic.form.form.postaction',
             'label_attr'        => ['class' => 'control-label'],
             'attr'              => [

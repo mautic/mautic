@@ -28,7 +28,6 @@ class IntegrationCampaignsType extends AbstractType
             ChoiceType::class,
                 [
                     'choices'           => array_flip($options['campaignContactStatus']),
-                    'choices_as_values' => true,
                     'attr'              => [
                         'class' => 'form-control', ],
                     'label'    => 'mautic.plugin.integration.campaigns.member.status',

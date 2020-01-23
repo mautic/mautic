@@ -27,9 +27,6 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
      */
     private $validator;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(EmailValidator $validator)
     {
         $this->validator = $validator;

@@ -248,7 +248,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
      * Add IP left join.
      *
      * @param        $prefix
-     * @param string $ipPrefix
      * @param string $leadPrefix
      *
      * @return $this

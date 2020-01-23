@@ -22,9 +22,6 @@ class ModifyLeadTagsType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $factory
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

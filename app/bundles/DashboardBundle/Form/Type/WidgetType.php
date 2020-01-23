@@ -70,7 +70,6 @@ class WidgetType extends AbstractType
             [
                 'label'             => 'mautic.dashboard.widget.form.type',
                 'choices'           => array_flip($event->getTypes()),
-                'choices_as_values' => true,
                 'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => 'mautic.core.select',
                 'attr'              => [
@@ -91,7 +90,6 @@ class WidgetType extends AbstractType
                     '75%'  => '75',
                     '100%' => '100',
                 ],
-                'choices_as_values' => true,
                 'empty_data'        => '100',
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
@@ -111,7 +109,6 @@ class WidgetType extends AbstractType
                     '560px' => '560',
                     '675px' => '675',
                 ],
-                'choices_as_values' => true,
                 'empty_data'        => '330',
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],

@@ -81,8 +81,7 @@ class QueueService
     }
 
     /**
-     * @param      $payload
-     * @param null $jobId
+     * @param $payload
      *
      * @return QueueConsumerEvent
      */

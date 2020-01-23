@@ -124,9 +124,6 @@ class ReportRepository extends CommonRepository
         return 'r';
     }
 
-    /**
-     * @param $viewOther
-     */
     public function findReportsWithGraphs($ownedBy = null)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

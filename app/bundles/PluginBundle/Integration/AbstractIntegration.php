@@ -2369,7 +2369,6 @@ abstract class AbstractIntegration
 
     /**
      * @param                 $leadsToSync
-     * @param                 $totalIgnored
      * @param bool|\Exception $error
      *
      * @return int Number ignored due to being duplicates
@@ -2609,10 +2608,7 @@ abstract class AbstractIntegration
     /**
      * Update the record in each system taking the last modified record.
      *
-     * @param $leadId
      * @param string $channel
-     * @param string $sfObject
-     * @param array  $sfIds
      *
      * @return int
      *

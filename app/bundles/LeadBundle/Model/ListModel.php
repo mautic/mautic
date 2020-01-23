@@ -1411,7 +1411,6 @@ class ListModel extends FormModel
      * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      *
      * @return array
      */

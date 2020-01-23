@@ -35,7 +35,6 @@ class CampaignLeadSourceType extends AbstractType
                     ChoiceType::class,
                     [
                         'choices'           => array_flip($options['source_choices']),
-                        'choices_as_values' => true,
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.lists',
                         'label_attr'        => ['class' => 'control-label'],
@@ -58,7 +57,6 @@ class CampaignLeadSourceType extends AbstractType
                     ChoiceType::class,
                     [
                         'choices'           => array_flip($options['source_choices']),
-                        'choices_as_values' => true,
                         'multiple'          => true,
                         'label'             => 'mautic.campaign.leadsource.forms',
                         'label_attr'        => ['class' => 'control-label'],

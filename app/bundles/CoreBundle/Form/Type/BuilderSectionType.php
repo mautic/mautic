@@ -86,7 +86,6 @@ class BuilderSectionType extends AbstractType
                     'repeat-space' => 'repeat-space',
                     'space-round'  => 'space-round',
                 ],
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.wrapper.background.repeat',
                 'label_attr'        => ['class' => 'control-label'],
                 'required'          => false,

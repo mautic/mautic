@@ -371,7 +371,6 @@ abstract class AbstractPermissions
             PermissionListType::class,
             [
                 'choices'           => $choices,
-                'choices_as_values' => true,
                 'label'             => $label,
                 'bundle'            => $bundle,
                 'level'             => $level,
@@ -417,7 +416,6 @@ abstract class AbstractPermissions
             PermissionListType::class,
             [
                 'choices'           => $choices,
-                'choices_as_values' => true,
                 'label'             => "mautic.$bundle.permissions.$level",
                 'data'              => (!empty($data[$level]) ? $data[$level] : []),
                 'bundle'            => $bundle,
@@ -490,7 +488,6 @@ abstract class AbstractPermissions
             PermissionListType::class,
             [
                 'choices'           => $choices,
-                'choices_as_values' => true,
                 'label'             => "mautic.$bundle.permissions.$level",
                 'data'              => (!empty($data[$level]) ? $data[$level] : []),
                 'bundle'            => $bundle,

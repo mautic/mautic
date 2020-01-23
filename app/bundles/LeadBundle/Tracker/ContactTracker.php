@@ -149,8 +149,6 @@ class ContactTracker
 
     /**
      * Set the contact and generate cookies for future tracking.
-     *
-     * @param Lead $lead
      */
     public function setTrackedContact(Lead $trackedContact)
     {

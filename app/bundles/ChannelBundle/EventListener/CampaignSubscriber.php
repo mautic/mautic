@@ -263,8 +263,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ArrayCollection $mmLogs
-     * @param                 $channel
+     * @param $channel
      */
     private function recordChannelMetadata(PendingEvent $pendingEvent, $channel)
     {

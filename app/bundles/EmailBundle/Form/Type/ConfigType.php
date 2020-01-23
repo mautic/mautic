@@ -237,7 +237,6 @@ class ConfigType extends AbstractType
             'mailer_transport',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => $this->getTransportChoices(),
                 'label'             => 'mautic.email.config.mailer.transport',
                 'required'          => false,
@@ -315,7 +314,6 @@ class ConfigType extends AbstractType
             'mailer_amazon_region',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'mautic.email.config.mailer.amazon_host.eu_west_1' => 'email-smtp.eu-west-1.amazonaws.com',
                     'mautic.email.config.mailer.amazon_host.us_east_1' => 'email-smtp.us-east-1.amazonaws.com',
@@ -354,7 +352,6 @@ class ConfigType extends AbstractType
             'mailer_auth_mode',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'mautic.email.config.mailer_auth_mode.plain'    => 'plain',
                     'mautic.email.config.mailer_auth_mode.login'    => 'login',
@@ -447,7 +444,6 @@ class ConfigType extends AbstractType
             'mailer_encryption',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'mautic.email.config.mailer_encryption.ssl' => 'ssl',
                     'mautic.email.config.mailer_encryption.tls' => 'tls',
@@ -537,7 +533,6 @@ class ConfigType extends AbstractType
             'mailer_spool_type',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'mautic.email.config.mailer_spool_type.memory' => 'memory',
                     'mautic.email.config.mailer_spool_type.file'   => 'file',
@@ -685,7 +680,6 @@ class ConfigType extends AbstractType
             'email_frequency_time',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'day'   => 'DAY',
                     'week'  => 'WEEK',

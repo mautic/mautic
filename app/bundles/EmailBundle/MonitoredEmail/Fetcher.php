@@ -52,8 +52,6 @@ class Fetcher
 
     /**
      * Fetcher constructor.
-     *
-     * @param array $mailboxes
      */
     public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {

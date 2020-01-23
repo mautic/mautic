@@ -23,7 +23,6 @@ class DashboardLeadsInTimeWidgetType extends AbstractType
             'flag',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'label'             => 'mautic.lead.list.filter',
                 'choices'           => [
                     'mautic.lead.show.all'                               => '',

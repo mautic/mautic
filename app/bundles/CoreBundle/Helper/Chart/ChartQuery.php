@@ -295,10 +295,6 @@ class ChartQuery extends AbstractChart
     /**
      * Go through the raw data and add the missing times.
      *
-     * @param string $table   without prefix
-     * @param string $column  name. The column must be type of datetime
-     * @param array  $filters will be added to where claues
-     *
      * @return array
      */
     public function completeTimeData($rawData, $countAverage = false)
@@ -437,10 +433,9 @@ class ChartQuery extends AbstractChart
     /**
      * Modify the query to count occurences of a value in a column.
      *
-     * @param QueryBuilder $table        without prefix
-     * @param string       $uniqueColumn name
-     * @param array        $options      for special behavior
-     * @param string       $tablePrefix
+     * @param string $uniqueColumn name
+     * @param array  $options      for special behavior
+     * @param string $tablePrefix
      */
     public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = [], $tablePrefix = 't')
     {
@@ -533,7 +528,6 @@ class ChartQuery extends AbstractChart
      * @param string $dateColumn2
      * @param int    $startSecond
      * @param int    $endSecond
-     * @param array  $filters     will be added to where claues
      * @param string $tablePrefix
      */
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't')

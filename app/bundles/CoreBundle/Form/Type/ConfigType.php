@@ -196,7 +196,6 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $this->getLanguageChoices(),
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.config.form.locale',
                 'required'          => false,
                 'attr'              => [
@@ -289,7 +288,6 @@ class ConfigType extends AbstractType
                     'mautic.core.pagination.50'  => 50,
                     'mautic.core.pagination.100' => 100,
                 ],
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.config.form.default.pagelimit',
@@ -437,7 +435,6 @@ class ConfigType extends AbstractType
                     $this->translator->transChoice('mautic.core.daterange.year', 1, ['%count%' => 1])  => '-1 year',
                     $this->translator->transChoice('mautic.core.daterange.year', 2, ['%count%' => 2])  => '-2 years',
                 ],
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.config.form.default.daterange_default',
@@ -456,7 +453,6 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => $this->getIpServicesChoices(),
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.config.form.ip.lookup.service',
                 'label_attr'        => [
                     'class' => 'control-label',
@@ -543,7 +539,6 @@ class ConfigType extends AbstractType
                     'mautic.core.config.update_stability.rc'     => 'rc',
                     'mautic.core.config.update_stability.stable' => 'stable',
                 ],
-                'choices_as_values' => true,
                 'label'             => 'mautic.core.config.form.update.stability',
                 'required'          => false,
                 'attr'              => [

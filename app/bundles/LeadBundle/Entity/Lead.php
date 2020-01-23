@@ -1104,8 +1104,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param LeadEventLog $eventLog
-     *
      * @return $this
      */
     public function addEventLog(LeadEventLog $log)

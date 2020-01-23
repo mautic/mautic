@@ -31,8 +31,6 @@ class TokenHelper
 
     /**
      * TokenHelper constructor.
-     *
-     * @param FormModel $model
      */
     public function __construct(FormModel $formModel, CorePermissions $security)
     {
@@ -42,7 +40,6 @@ class TokenHelper
 
     /**
      * @param $content
-     * @param $clickthrough
      *
      * @return array
      */

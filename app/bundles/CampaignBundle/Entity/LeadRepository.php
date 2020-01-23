@@ -277,10 +277,6 @@ class LeadRepository extends CommonRepository
     /**
      * This is approximate because the query that fetches contacts per decision is based on if the grandparent has been executed or not.
      *
-     * @param int  $decisionId
-     * @param int  $parentDecisionId
-     * @param null $specificContactId
-     *
      * @return int
      */
     public function getInactiveContactCount($campaignId, array $decisionIds, ContactLimiter $limiter)

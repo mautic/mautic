@@ -1025,7 +1025,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     '6.x/community' => '6',
                     '7.x'           => '7',
                 ],
-                'choices_as_values' => true,
                 'label'             => 'mautic.sugarcrm.form.version',
                 'constraints'       => [
                     new NotBlank([
@@ -1043,7 +1042,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.sugarcrm.updateOwner' => 'updateOwner',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.updateOwner',
@@ -1063,7 +1061,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.sugarcrm.updateDnc' => 'updateDnc',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.updateDnc',
@@ -1083,7 +1080,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
@@ -1102,7 +1098,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         'mautic.sugarcrm.object.contact' => 'Contacts',
                         'mautic.sugarcrm.object.company' => 'company',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.sugarcrm.form.objects_to_pull_from',
@@ -1117,7 +1112,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
-                    'choices_as_values' => true,
                     'label'             => 'mautic.salesforce.form.activity_included_events',
                     'label_attr'        => [
                         'class'       => 'control-label',
@@ -1624,7 +1618,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param      $mauticData
      * @param      $availableFields
-     * @param      $fieldsToUpdateInSfUpdate
      * @param      $object
      * @param      $lead
      * @param null $objectId

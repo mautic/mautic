@@ -29,7 +29,6 @@ class PermissionListType extends AbstractType
             'multiple'          => true,
             'expanded'          => true,
             'label_attr'        => ['class' => 'control-label'],
-            'choices_as_values' => true,
             'attr'              => function (Options $options) {
                 return [
                     'data-permission' => $options['bundle'].':'.$options['level'],

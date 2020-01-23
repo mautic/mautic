@@ -570,9 +570,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $fields
-     * @param $sfRecord
-     * @param $config
      * @param $objectFields
      */
     public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')

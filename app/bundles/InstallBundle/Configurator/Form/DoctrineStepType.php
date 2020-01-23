@@ -39,7 +39,6 @@ class DoctrineStepType extends AbstractType
             ChoiceType::class,
             [
                 'choices'           => array_flip(DoctrineStep::getDrivers()),
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.install.form.database.driver',

@@ -341,8 +341,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param DateTime $dateTweeted
-     *
      * @return $this
      */
     public function setSentCount($sentCount)
@@ -473,8 +471,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Category $page
-     *
      * @return $this
      */
     public function setCategory(Category $category)

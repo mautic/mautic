@@ -170,8 +170,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param bool $preview
-     *
      * @return string
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)

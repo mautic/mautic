@@ -72,8 +72,7 @@ class IntegrationsListType extends AbstractType
                         ['message' => 'mautic.core.value.required']
                     ),
                 ],
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $formModifier = function (FormInterface $form, $data) use ($integrationObjects) {

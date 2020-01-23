@@ -41,8 +41,6 @@ class LeadMergeEvent extends Event
 
     /**
      * Returns the loser (loser merges into the victor).
-     *
-     * @param Lead $lead
      */
     public function getLoser()
     {

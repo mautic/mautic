@@ -470,8 +470,6 @@ class CommonApiController extends FOSRestController implements MauticController
     /**
      * Adds the repository alias to the column name if it doesn't exist.
      *
-     * @param string $column name
-     *
      * @return string $column name with alias prefix
      */
     protected function addAliasIfNotPresent($columns, $alias)

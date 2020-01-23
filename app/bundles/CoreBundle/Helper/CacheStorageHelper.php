@@ -177,10 +177,6 @@ class CacheStorageHelper
         return $this->cache[$namespace];
     }
 
-    /**
-     * @param $namespace
-     * @param $defaultExpiration
-     */
     protected function setCacheAdaptor()
     {
         switch ($this->adaptor) {

@@ -42,8 +42,6 @@ class Mapper
 
     /**
      * Mapper constructor.
-     *
-     * @param $object
      */
     public function __construct(array $fields)
     {

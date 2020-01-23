@@ -73,7 +73,6 @@ class FieldType extends AbstractType
             'group',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'mautic.lead.field.group.core'         => 'core',
                     'mautic.lead.field.group.social'       => 'social',
@@ -102,7 +101,6 @@ class FieldType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => $fieldHelper->getChoiceList(),
                 'expanded'          => false,
                 'multiple'          => false,
@@ -153,7 +151,6 @@ class FieldType extends AbstractType
                 'default_template_'.$listType,
                 ChoiceType::class,
                 [
-                    'choices_as_values' => true,
                     'choices'           => $choices,
                     'label'             => 'mautic.core.defaultvalue',
                     'label_attr'        => ['class' => 'control-label'],
@@ -261,7 +258,6 @@ class FieldType extends AbstractType
                         'defaultValue',
                         ChoiceType::class,
                         [
-                            'choices_as_values' => true,
                             'label'             => 'mautic.core.defaultvalue',
                             'label_attr'        => ['class' => 'control-label is-chosen'],
                             'attr'              => ['class' => 'form-control'],
@@ -278,7 +274,6 @@ class FieldType extends AbstractType
                         'defaultValue',
                         ChoiceType::class,
                         [
-                            'choices_as_values' => true,
                             'choices'           => $listChoices[$type],
                             'label'             => 'mautic.core.defaultvalue',
                             'label_attr'        => ['class' => 'control-label'],
@@ -540,7 +535,6 @@ class FieldType extends AbstractType
             'object',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     'mautic.lead.contact'    => 'lead',
                     'mautic.company.company' => 'company',

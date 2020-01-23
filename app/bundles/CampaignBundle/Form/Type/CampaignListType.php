@@ -69,7 +69,6 @@ class CampaignListType extends AbstractType
 
                     return $choices;
                 },
-                'choices_as_values' => true,
                 'placeholder'       => false,
                 'expanded'          => false,
                 'multiple'          => true,

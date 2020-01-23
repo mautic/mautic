@@ -74,10 +74,6 @@ class Reply implements ProcessorInterface
         $this->logger        = $logger;
     }
 
-    /**
-     * @param $mailId
-     * @param $refid
-     */
     public function process(Message $message)
     {
         $this->message = $message;

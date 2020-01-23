@@ -176,7 +176,6 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $emailId
      * @param null $listId
      *
      * @return array
@@ -673,8 +672,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $emailId
-     * @param bool $organizeByContact
+     * @param $emailId
      *
      * @return array Formatted as [contactId => sentCount]
      */

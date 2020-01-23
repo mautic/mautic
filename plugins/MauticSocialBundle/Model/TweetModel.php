@@ -137,7 +137,6 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet $entity
      * @param       $formFactory
      * @param null  $action
-     * @param array $options
      *
      * @return mixed
      *

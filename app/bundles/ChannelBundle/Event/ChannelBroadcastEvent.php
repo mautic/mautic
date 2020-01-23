@@ -75,9 +75,6 @@ class ChannelBroadcastEvent extends Event
 
     /**
      * MaintenanceEvent constructor.
-     *
-     * @param int  $daysOld
-     * @param bool $dryRun
      */
     public function __construct($channel, $channelId, OutputInterface $output)
     {

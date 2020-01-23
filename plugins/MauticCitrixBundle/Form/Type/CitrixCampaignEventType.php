@@ -77,8 +77,7 @@ class CitrixCampaignEventType extends AbstractType
             [
                 'label'             => $this->translator->trans('plugin.citrix.decision.criteria'),
                 'choices'           => array_flip($choices),
-                'choices_as_values' => true,
-            ]
+                ]
         );
 
         $choices = array_replace(
@@ -92,7 +91,6 @@ class CitrixCampaignEventType extends AbstractType
             [
                 'label'             => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
                 'choices'           => array_flip($choices),
-                'choices_as_values' => true,
                 'multiple'          => true,
             ]
         );

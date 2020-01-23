@@ -262,8 +262,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $setHtml
-     *
      * @return Focus
      */
     public function setEditor($editor)
@@ -284,8 +282,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $setHtml
-     *
      * @return Focus
      */
     public function setHtml($html)
@@ -306,8 +302,6 @@ class Focus extends FormEntity
     }
 
     /**
-     * @param mixed $html
-     *
      * @return Focus
      */
     public function setHtmlMode($htmlMode)

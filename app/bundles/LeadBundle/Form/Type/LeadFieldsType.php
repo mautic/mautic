@@ -32,7 +32,6 @@ class LeadFieldsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices_as_values' => true,
             'choices'           => function (Options $options) {
                 $fieldList = array_flip($this->fieldModel->getFieldList());
                 if ($options['with_tags']) {

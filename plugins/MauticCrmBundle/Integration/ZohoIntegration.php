@@ -618,7 +618,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
@@ -639,7 +638,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                         'mautic.plugin.zoho.zone_japan'  => 'zoho.co.jp',
                         'mautic.plugin.zoho.zone_china'  => 'zoho.com.cn',
                     ],
-                    'choices_as_values' => true,
                     'label'             => 'mautic.plugin.zoho.zone_select',
                     'placeholder'       => false,
                     'required'          => true,
@@ -658,7 +656,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                         'mautic.zoho.object.contact' => 'Contacts',
                         'mautic.zoho.object.account' => 'company',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Zoho']),
@@ -1326,7 +1323,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param $object
      * @param $counter
-     * @param $totalCounter
      */
     private function updateContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {
@@ -1339,7 +1335,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param $object
      * @param $counter
-     * @param $totalCounter
      */
     private function createContactInZoho(Mapper $mapper, $object, &$counter, &$errorCounter)
     {

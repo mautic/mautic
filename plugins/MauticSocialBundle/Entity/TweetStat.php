@@ -269,9 +269,6 @@ class TweetStat
         $this->retryCount = $retryCount;
     }
 
-    /**
-     * @param mixed $retryCount
-     */
     public function retryCountUp()
     {
         $this->setRetryCount($this->getRetryCount() + 1);

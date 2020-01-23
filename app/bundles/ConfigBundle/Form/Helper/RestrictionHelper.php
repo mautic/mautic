@@ -37,8 +37,6 @@ class RestrictionHelper
 
     /**
      * RestrictionHelper constructor.
-     *
-     * @param string $defaultMode
      */
     public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
     {
@@ -68,9 +66,6 @@ class RestrictionHelper
         }
     }
 
-    /**
-     * @param string $fieldName
-     */
     private function restrictField(FormInterface $childType, FormInterface $parentType)
     {
         switch ($this->displayMode) {

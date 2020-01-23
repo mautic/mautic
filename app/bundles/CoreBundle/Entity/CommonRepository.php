@@ -871,9 +871,6 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
      * @return array
      */
     protected function addAdvancedSearchWhereClause($qb, $filters)

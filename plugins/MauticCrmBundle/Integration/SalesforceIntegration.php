@@ -554,7 +554,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.salesforce.sandbox' => 'sandbox',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.sandbox',
@@ -574,7 +573,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.salesforce.updateOwner' => 'updateOwner',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.updateOwner',
@@ -593,7 +591,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.blanks' => 'updateBlanks',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
@@ -609,7 +606,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'mautic.integrations.update.dnc.by.date' => 'updateDncByDate',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.update.dnc.by.date.label',
@@ -629,7 +625,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         'mautic.salesforce.object.company'  => 'company',
                         'mautic.salesforce.object.activity' => 'Activity',
                     ],
-                    'choices_as_values' => true,
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.objects_to_pull_from',
@@ -644,7 +639,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ChoiceType::class,
                 [
                     'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
-                    'choices_as_values' => true,
                     'label'             => 'mautic.salesforce.form.activity_included_events',
                     'label_attr'        => [
                         'class'       => 'control-label',
@@ -1776,7 +1770,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $mauticData
      * @param      $objectFields
      * @param      $object
-     * @param      $lead
      * @param null $objectId
      * @param null $sfRecord
      *
@@ -2176,7 +2169,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $processedLeads
      * @param      $trackedContacts
      * @param      $leadsToSync
-     * @param      $requiredFields
      * @param      $objectFields
      * @param      $mauticLeadFieldString
      * @param      $sfEntityRecords
@@ -2537,8 +2529,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead $lead
-     * @param      $config
+     * @param $config
      *
      * @return array
      */
@@ -2644,10 +2635,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * Update the record in each system taking the last modified record.
      *
-     * @param $leadId
      * @param string $channel
      * @param string $sfObject
-     * @param array  $sfIds
      *
      * @return int
      *
@@ -2927,13 +2916,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param      $mauticData
-     * @param      $checkEmailsInSF
-     * @param      $processedLeads
-     * @param      $trackedContacts
-     * @param      $leadsToSync
-     * @param      $requiredFields
      * @param      $objectFields
-     * @param      $mauticLeadFieldString
      * @param      $sfEntityRecords
      * @param null $progress
      */
@@ -3031,7 +3014,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param $mauticData
-     * @param $checkIdsInSF
      * @param $processedCompanies
      * @param $objectFields
      */
@@ -3068,10 +3050,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $checkEmailsInSF
-     * @param $mauticLeadFieldString
      * @param $sfObject
-     * @param $trackedContacts
      * @param $limit
      * @param $fromDate
      * @param $toDate

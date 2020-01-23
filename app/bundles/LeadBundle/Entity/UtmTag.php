@@ -144,8 +144,6 @@ class UtmTag
     /**
      * Set date added.
      *
-     * @param \DateTime $dateHit
-     *
      * @return UtmTag
      */
     public function setDateAdded(\DateTime $date)

@@ -125,9 +125,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    /**
-     * @param array|null $paths
-     */
     protected function installDatabaseFixtures(array $classNames = [])
     {
         $this->loadFixtures($classNames);

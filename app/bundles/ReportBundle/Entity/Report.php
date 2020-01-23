@@ -429,9 +429,6 @@ class Report extends FormEntity implements SchedulerInterface
         return $this->groupBy;
     }
 
-    /**
-     * @param array $graphs
-     */
     public function setGroupBy(array $groupBy)
     {
         $this->isChanged('groupBy', $groupBy);
@@ -483,9 +480,6 @@ class Report extends FormEntity implements SchedulerInterface
         return array_merge($this->getColumns(), $this->getAggregatorColumns());
     }
 
-    /**
-     * @param array $aggregator
-     */
     public function setAggregators(array $aggregators)
     {
         $this->isChanged('aggregators', $aggregators);

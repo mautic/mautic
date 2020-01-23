@@ -178,7 +178,6 @@ trait FieldsTypeTrait
                                     '<btn class="btn-nospin fa fa-arrow-circle-left"></btn>'  => 0,
                                     '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>' => 1,
                                 ],
-                                'choices_as_values' => true,
                                 'label'             => false,
                                 'data'              => $data,
                                 'placeholder'       => false,
@@ -213,7 +212,6 @@ trait FieldsTypeTrait
                                 'data-value'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
-                            'choices_as_values' => true,
                         ]
                     );
                     $form->add(

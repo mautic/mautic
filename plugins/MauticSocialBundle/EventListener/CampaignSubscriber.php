@@ -38,9 +38,6 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @param IntegrationHelper $helper
-     */
     public function __construct(
         CampaignEventHelper $campaignEventHelper,
         IntegrationHelper $integrationHelper,

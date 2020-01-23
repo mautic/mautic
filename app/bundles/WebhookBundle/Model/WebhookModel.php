@@ -113,10 +113,9 @@ class WebhookModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param      $entity
+     * @param      $formFactory
+     * @param null $action
      *
      * @return mixed
      *

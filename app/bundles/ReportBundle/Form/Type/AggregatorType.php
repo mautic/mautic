@@ -40,7 +40,6 @@ class AggregatorType extends AbstractType
             'function',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => [
                     $this->translator->trans('mautic.report.report.label.aggregators.count') => 'COUNT',
                     $this->translator->trans('mautic.report.report.label.aggregators.avg')   => 'AVG',
@@ -65,7 +64,6 @@ class AggregatorType extends AbstractType
             'column',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => array_flip($options['columnList']),
                 'expanded'          => false,
                 'multiple'          => false,

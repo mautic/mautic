@@ -55,8 +55,7 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param null  $id
+     * @param null $id
      *
      * @return array
      */
@@ -93,9 +92,6 @@ class PipedriveApi extends CrmApi
         return $this->getResponseData($response);
     }
 
-    /**
-     * @param $data
-     */
     public function deleteLead($id)
     {
         $params   = $this->getRequestParameters();
@@ -169,8 +165,6 @@ class PipedriveApi extends CrmApi
     }
 
     /**
-     * @param array $objects
-     *
      * @return array
      */
     public function getFields($object = null)

@@ -88,8 +88,6 @@ class Progress
     /**
      * Set total value.
      *
-     * @param int $total
-     *
      * @return Progress
      */
     public function setDone($done)

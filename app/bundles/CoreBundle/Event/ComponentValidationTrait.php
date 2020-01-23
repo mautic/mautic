@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 
 trait ComponentValidationTrait
 {
-    /**
-     * @param array $methods
-     */
     private function verifyComponent(array $keys, array $component, array $callbacks = [])
     {
         foreach ($keys as $k) {

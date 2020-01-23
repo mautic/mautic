@@ -55,10 +55,9 @@ trait PushToIntegrationTrait
     /**
      * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
      *
-     * @param IntegrationHelper $helper
-     * @param                   $config
-     * @param                   $lead
-     * @param                   $errors
+     * @param $config
+     * @param $lead
+     * @param $errors
      *
      * @return bool
      */

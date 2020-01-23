@@ -58,7 +58,6 @@ class StageListType extends AbstractType
             'multiple'          => true,
             'required'          => false,
             'placeholder'       => 'mautic.core.form.chooseone',
-            'choices_as_values' => true,
         ]);
     }
 

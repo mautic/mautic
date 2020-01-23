@@ -65,7 +65,6 @@ class FormListType extends AbstractType
 
                 return $choices;
             },
-            'choices_as_values' => true,
             'expanded'          => false,
             'multiple'          => true,
             'placeholder'       => false,

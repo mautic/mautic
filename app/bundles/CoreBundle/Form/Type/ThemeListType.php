@@ -45,7 +45,6 @@ class ThemeListType extends AbstractType
 
                     return array_flip($themes);
                 },
-                'choices_as_values' => true,
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.form.theme',

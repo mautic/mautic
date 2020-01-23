@@ -237,9 +237,6 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
     public function setDeviceBrand($brand)
     {
         $this->deviceBrand = $brand;

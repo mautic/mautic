@@ -47,7 +47,6 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
                 'label'             => 'mautic.lead.list.filter',
                 'multiple'          => true,
                 'choices'           => $segments,
-                'choices_as_values' => true,
                 'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
                 'required'          => false,

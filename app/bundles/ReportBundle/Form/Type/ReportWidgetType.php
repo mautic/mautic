@@ -50,7 +50,6 @@ class ReportWidgetType extends AbstractType
             'graph',
             ChoiceType::class,
             [
-                'choices_as_values' => true,
                 'choices'           => $choices,
                 'expanded'          => false,
                 'multiple'          => false,

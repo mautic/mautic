@@ -408,9 +408,6 @@ class Notification extends FormEntity
         return $this->button;
     }
 
-    /**
-     * @param string $heading
-     */
     public function setButton($button)
     {
         $this->isChanged('button', $button);

@@ -80,7 +80,6 @@ class CategoryListType extends AbstractType
 
                 return $choices;
             },
-            'choices_as_values' => true,
             'label'             => 'mautic.core.category',
             'label_attr'        => ['class' => 'control-label'],
             'multiple'          => false,

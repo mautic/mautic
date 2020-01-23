@@ -939,11 +939,8 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits.
      *
-     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
      *
      * @return array
      */

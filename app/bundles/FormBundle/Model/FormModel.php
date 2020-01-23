@@ -1068,8 +1068,6 @@ class FormModel extends CommonFormModel
 
     /**
      * Finds out whether the.
-     *
-     * @param Field $field
      */
     private function addLeadFieldOptions(Field $formField)
     {
