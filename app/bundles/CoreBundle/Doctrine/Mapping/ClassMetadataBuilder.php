@@ -29,7 +29,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Max length of indexed VARCHAR fields for UTF8MB4 encoding.
      */
-    public const MAX_VARCHAR_INDEXED_LENGHT = 191;
+    public const MAX_VARCHAR_INDEXED_LENGTH = 191;
 
     public function __construct(ClassMetadataInfo $cm)
     {
@@ -330,8 +330,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $field->columnName($columnName);
         }
 
-        if ($this->isIndexedVarchar($columnName, $type)) {
-            $field->length(self::MAX_VARCHAR_INDEXED_LENGHT);
+        if ($this->isIndexedVarchar($columnName ?? $name, $type)) {
+            $field->length(self::MAX_VARCHAR_INDEXED_LENGTH);
         }
 
         $field->build();
@@ -358,8 +358,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $field->nullable();
         }
 
-        if ($this->isIndexedVarchar($columnName, $type)) {
-            $field->length(self::MAX_VARCHAR_INDEXED_LENGHT);
+        if ($this->isIndexedVarchar($columnName ?? $name, $type)) {
+            $field->length(self::MAX_VARCHAR_INDEXED_LENGTH);
         }
 
         $field->build();
@@ -378,7 +378,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     public function addField($name, $type, array $mapping = [])
     {
         if ($this->isIndexedVarchar($name, $type)) {
-            $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGHT;
+            $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGTH;
         }
 
         return parent::addField($name, $type, $mapping);
@@ -392,7 +392,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
         ];
 
         if ($this->isIndexedVarchar($name, $type)) {
-            $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGHT;
+            $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGTH;
         }
 
         return new FieldBuilder($this, $mapping);
@@ -425,7 +425,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * UTF8MB4 encoding needs max lenght of 191 instead of 255 that UTF8 needed. Doctrine does not take care of it by itself.
+     * UTF8MB4 encoding needs max length of 191 instead of 255 that UTF8 needed. Doctrine does not take care of it by itself.
      */
     public function isIndexedVarchar(string $name, string $type): bool
     {
