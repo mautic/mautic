@@ -163,7 +163,7 @@ system('find . -name ".git*" -prune -exec rm -rf {} \\;');
 system('find . -name .DS_Store -exec rm -rf {} \\;');
 
 // Delete test directories
-system('find . -type d -name Test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" -prune -exec rm -rf {} \\;');
-system('find . -type d -name test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" -prune -exec rm -rf {} \\;');
+system('find . -type d -name Test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" ! -path "./vendor/twig/twig/src/Node/Expression/Test" ! -path "./vendor/twig/twig/src/Test" -prune -exec rm -rf {} \\;');
+system('find . -type d -name test ! -path "./vendor/twig/twig/lib/Twig/Node/Expression/Test" ! -path "./vendor/twig/twig/lib/Twig/Test" ! -path "./vendor/twig/twig/src/Node/Expression/Test" ! -path "./vendor/twig/twig/src/Test" -prune -exec rm -rf {} \\;');
 system('find . -type d -name Tests -prune -exec rm -rf {} \\;');
 system('find . -type d -name tests -prune -exec rm -rf {} \\;');
