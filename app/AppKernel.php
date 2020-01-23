@@ -10,9 +10,11 @@
  */
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\QueueBundle\Queue\QueueProtocol;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -53,14 +55,19 @@ class AppKernel extends Kernel
     const EXTRA_VERSION = '-alpha';
 
     /**
-     * @var array
+     * @var bool|null
      */
-    private $pluginBundles = [];
+    private $installed;
 
     /**
      * @var array
      */
     private $localParameters = [];
+
+    /**
+     * @var ParameterLoader|null
+     */
+    private $parameterLoader;
 
     /**
      * Constructor.
@@ -81,10 +88,7 @@ class AppKernel extends Kernel
         parent::__construct($environment, $debug);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true): Response
     {
         if (false !== strpos($request->getRequestUri(), 'installer') || !$this->isInstalled()) {
             defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
@@ -136,10 +140,7 @@ class AppKernel extends Kernel
         return parent::handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function registerBundles()
+    public function registerBundles(): array
     {
         $bundles = [
             // Symfony/Core Bundles
@@ -160,6 +161,12 @@ class AppKernel extends Kernel
             new Symfony\Bundle\TwigBundle\TwigBundle(),
             new Debril\RssAtomBundle\DebrilRssAtomBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+            new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
+            new LightSaml\SpBundle\LightSamlSpBundle(),
+            new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
+            new FM\ElfinderBundle\FMElfinderBundle(),
+
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
@@ -180,23 +187,25 @@ class AppKernel extends Kernel
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
-            new Mautic\QueueBundle\MauticQueueBundle($this->getLocalParams()),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle(),
-            new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
-            new LightSaml\SpBundle\LightSamlSpBundle(),
-            new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
-            new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
-            // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
-            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
-            new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
-            new FM\ElfinderBundle\FMElfinderBundle(),
         ];
 
-        //dynamically register Mautic Plugin Bundles
+        $queueProtocol = $this->getParameterLoader()->getLocalParameterBag()->get('queue_protocol', '');
+        $bundles[]     = new Mautic\QueueBundle\MauticQueueBundle($queueProtocol);
+        switch ($queueProtocol) {
+            case QueueProtocol::RABBITMQ:
+                $bundles[] = new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle();
+                break;
+            case QueueProtocol::BEANSTALKD:
+                $bundles[] = new Leezy\PheanstalkBundle\LeezyPheanstalkBundle();
+                break;
+        }
+
+        // dynamically register Mautic Plugin Bundles
         $searchPath = dirname(__DIR__).'/plugins';
         $finder     = new \Symfony\Component\Finder\Finder();
         $finder->files()
@@ -249,42 +258,33 @@ class AppKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function boot()
+    public function boot(): void
     {
         if (true === $this->booted) {
             return;
         }
 
+        $parameterLoader = $this->getParameterLoader();
+
         if (!defined('MAUTIC_TABLE_PREFIX')) {
             //set the table prefix before boot
-            $localParams = $this->getLocalParams();
-            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
-            define('MAUTIC_TABLE_PREFIX', $prefix);
+            define('MAUTIC_TABLE_PREFIX', $parameterLoader->getLocalParameterBag()->get('db_table_prefix', ''));
         }
 
         // init bundles
         $this->initializeBundles();
 
-        // load parameters into the environment
-        $localParams = $this->getLocalParams();
+        // load parameters with defaults into the environment
+        $parameterLoader->loadIntoEnvironment();
 
         // init container
         $this->initializeContainer();
 
-        // If in console, set the table prefix since handle() is not executed
-        if (defined('IN_MAUTIC_CONSOLE') && !defined('MAUTIC_TABLE_PREFIX')) {
-            $prefix      = isset($localParams['db_table_prefix']) ? $localParams['db_table_prefix'] : '';
-            define('MAUTIC_TABLE_PREFIX', $prefix);
-        }
-
-        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
-
+        // boot bundles
         foreach ($this->getBundles() as $name => $bundle) {
             $bundle->setContainer($this->container);
             $bundle->boot();
         }
-
-        $this->pluginBundles = $registeredPluginBundles;
 
         $this->booted = true;
     }
@@ -292,42 +292,36 @@ class AppKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    public function registerContainerConfiguration(LoaderInterface $loader)
+    public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.php');
     }
 
     /**
      * Retrieves the application's version number.
-     *
-     * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return MAUTIC_VERSION;
     }
 
     /**
      * Checks if the application has been installed.
-     *
-     * @return bool
      */
-    protected function isInstalled()
+    protected function isInstalled(): bool
     {
-        static $isInstalled = null;
+        if (null === $this->installed) {
+            $localParameters = $this->getParameterLoader()->getLocalParameterBag();
+            $dbDriver        = $localParameters->get('db_driver');
+            $mailerFromName  = $localParameters->get('mailer_from_name');
 
-        if (null === $isInstalled) {
-            $params      = $this->getLocalParams();
-            $isInstalled = (is_array($params) && !empty($params['db_driver']) && !empty($params['mailer_from_name']));
+            $this->installed = !empty($dbDriver) && !empty($mailerFromName);
         }
 
-        return $isInstalled;
+        return $this->installed;
     }
 
-    /**
-     * @return string
-     */
-    public function getRootDir()
+    public function getRootDir(): string
     {
         return __DIR__;
     }
@@ -337,56 +331,28 @@ class AppKernel extends Kernel
      *
      * @api
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
-        $parameters = $this->getLocalParams();
-        if (isset($parameters['cache_path'])) {
-            $envFolder = ('/' != substr($parameters['cache_path'], -1)) ? '/'.$this->environment : $this->environment;
+        if ($cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path')) {
+            $envFolder = ('/' != substr($cachePath, -1)) ? '/'.$this->environment : $this->environment;
 
-            return str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $this->getRootDir(), $parameters['cache_path'].$envFolder);
+            return str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $this->getRootDir(), $cachePath.$envFolder);
         }
 
         return dirname(__DIR__).'/var/cache/'.$this->getEnvironment();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @api
-     */
-    public function getLogDir()
+    public function getLogDir(): string
     {
-        $parameters = $this->getLocalParams();
-        if (isset($parameters['log_path'])) {
-            return str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $this->getRootDir(), $parameters['log_path']);
+        if ($logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path')) {
+            return str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $this->getRootDir(), $logPath);
         }
 
         return dirname(__DIR__).'/var/logs';
     }
 
     /**
-     * Get Mautic's local configuration file.
-     *
-     * @return array
-     */
-    public function getLocalParams()
-    {
-        if (!empty($this->localParameters)) {
-            return $this->localParameters;
-        }
-
-        $parameterImporter = new ParameterLoader();
-        $parameterImporter->loadIntoEnvironment();
-
-        $this->localParameters = $parameterImporter->getParameterBag()->all();
-
-        return $this->localParameters;
-    }
-
-    /**
      * Get local config file.
-     *
-     * @return string
      */
     public function getLocalConfigFile(): string
     {
@@ -394,5 +360,14 @@ class AppKernel extends Kernel
         $root = $this->getRootDir();
 
         return ParameterLoader::getLocalConfigFile($root);
+    }
+
+    private function getParameterLoader(): ParameterLoader
+    {
+        if ($this->parameterLoader) {
+            return $this->parameterLoader;
+        }
+
+        return $this->parameterLoader = new ParameterLoader();
     }
 }

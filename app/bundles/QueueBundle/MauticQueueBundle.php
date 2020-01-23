@@ -16,71 +16,57 @@ use Mautic\QueueBundle\Queue\QueueProtocol;
 use OldSound\RabbitMqBundle\DependencyInjection\Compiler\RegisterPartsPass;
 use OldSound\RabbitMqBundle\DependencyInjection\OldSoundRabbitMqExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class MauticQueueBundle extends Bundle
 {
     /**
-     * @var array
+     * @var string
      */
-    private $localParams;
+    private $queueProtocol;
 
-    public function __construct(array $localParams)
+    public function __construct(string $queueProtocol)
     {
-        $this->localParams = $localParams;
+        $this->queueProtocol = $queueProtocol;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
-        $queueProtocol = $this->getQueueProtocol();
+        if (!$this->queueProtocol) {
+            return;
+        }
 
-        if (QueueProtocol::RABBITMQ === $queueProtocol) {
+        if (QueueProtocol::RABBITMQ === $this->queueProtocol) {
             $container->addCompilerPass(new RegisterPartsPass());
         }
 
-        if ($queueProtocol && file_exists(__DIR__.'/Config/'.$queueProtocol.'.php')) {
-            include __DIR__.'/Config/'.$queueProtocol.'.php';
+        if (file_exists(__DIR__.'/Config/'.$this->queueProtocol.'.php')) {
+            include __DIR__.'/Config/'.$this->queueProtocol.'.php';
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getContainerExtension()
+    public function getContainerExtension(): ?Extension
     {
         if (null === $this->extension) {
-            $extension       = $this->createContainerExtension();
-            $this->extension = $extension;
+            $this->extension = $this->createContainerExtension();
         }
 
-        return $this->extension ?: null;
+        return $this->extension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createContainerExtension()
+    public function createContainerExtension(): ?Extension
     {
-        $queueProtocol = $this->getQueueProtocol();
-
-        if (QueueProtocol::RABBITMQ === $queueProtocol) {
+        if (QueueProtocol::RABBITMQ === $this->queueProtocol) {
             return new OldSoundRabbitMqExtension();
         }
 
-        if (QueueProtocol::BEANSTALKD === $queueProtocol) {
+        if (QueueProtocol::BEANSTALKD === $this->queueProtocol) {
             return new LeezyPheanstalkExtension();
         }
 
         return null;
-    }
-
-    private function getQueueProtocol(): string
-    {
-        return empty($this->localParams['queue_protocol']) ? '' : $this->localParams['queue_protocol'];
     }
 }
