@@ -263,7 +263,7 @@ class FieldType extends AbstractType
                     'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.attr',
-                        'maxlength' => '255',
+                        'maxlength' => '191',
                     ],
                     'required' => false,
                 ]
@@ -280,7 +280,7 @@ class FieldType extends AbstractType
                     'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.attr',
-                        'maxlength' => '255',
+                        'maxlength' => '191',
                     ],
                     'required' => false,
                 ]
@@ -297,7 +297,7 @@ class FieldType extends AbstractType
                     'attr'       => [
                         'class'     => 'form-control',
                         'tooltip'   => 'mautic.form.field.help.container_attr',
-                        'maxlength' => '255',
+                        'maxlength' => '191',
                     ],
                     'required' => false,
                 ]

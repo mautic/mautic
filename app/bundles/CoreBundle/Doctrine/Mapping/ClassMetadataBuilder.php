@@ -11,20 +11,26 @@
 
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder as OrmClassMetadataBuilder;
+use Doctrine\ORM\Mapping\Builder\FieldBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class ClassMetadataBuilder.
- *
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
- * See @link https://github.com/doctrine/doctrine2/pull/1326/
+ * See @link https://github.com/doctrine/doctrine2/pull/1326/.
  */
 class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
+    /**
+     * Max length of indexed VARCHAR fields for UTF8MB4 encoding.
+     */
+    public const MAX_VARCHAR_INDEXED_LENGHT = 191;
+
     public function __construct(ClassMetadataInfo $cm)
     {
         parent::__construct($cm);
@@ -122,7 +128,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addId()
     {
-        $this->createField('id', 'integer')
+        $this->createField('id', Types::INTEGER)
             ->makePrimaryKey()
             ->generatedValue()
             ->build();
@@ -157,12 +163,12 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
         $this->addId();
 
         if ($nameColumn) {
-            $this->createField($nameColumn, 'string')
+            $this->createField($nameColumn, Types::STRING)
                 ->build();
         }
 
         if ($descriptionColumn) {
-            $this->createField($descriptionColumn, 'text')
+            $this->createField($descriptionColumn, Types::TEXT)
                 ->nullable()
                 ->build();
         }
@@ -193,12 +199,12 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addPublishDates()
     {
-        $this->createField('publishUp', 'datetime')
+        $this->createField('publishUp', Types::DATETIME_MUTABLE)
             ->columnName('publish_up')
             ->nullable()
             ->build();
 
-        $this->createField('publishDown', 'datetime')
+        $this->createField('publishDown', Types::DATETIME_MUTABLE)
             ->columnName('publish_down')
             ->nullable()
             ->build();
@@ -215,7 +221,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addDateAdded($nullable = false)
     {
-        $dateAdded = $this->createField('dateAdded', 'datetime')
+        $dateAdded = $this->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added');
 
         if ($nullable) {
@@ -239,7 +245,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addContact($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
     {
-        $lead = $this->createManyToOne('contact', 'Mautic\LeadBundle\Entity\Lead');
+        $lead = $this->createManyToOne('contact', Lead::class);
 
         if ($isPrimaryKey) {
             $lead->makePrimaryKey();
@@ -270,7 +276,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
     {
-        $lead = $this->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead');
+        $lead = $this->createManyToOne('lead', Lead::class);
 
         if ($isPrimaryKey) {
             $lead->makePrimaryKey();
@@ -315,13 +321,17 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      *
      * @return $this
      */
-    public function addNullableField($name, $type = 'string', $columnName = null)
+    public function addNullableField($name, $type = Types::STRING, $columnName = null)
     {
         $field = $this->createField($name, $type)
             ->nullable();
 
         if (null !== $columnName) {
             $field->columnName($columnName);
+        }
+
+        if ($this->isIndexedVarchar($columnName, $type)) {
+            $field->length(self::MAX_VARCHAR_INDEXED_LENGHT);
         }
 
         $field->build();
@@ -348,9 +358,8 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $field->nullable();
         }
 
-        // all indexed
-        if ($type === 'string' || isset($this->getClassMetadata()->table['indexes'][$columnName])) {
-            $field->length(191);
+        if ($this->isIndexedVarchar($columnName, $type)) {
+            $field->length(self::MAX_VARCHAR_INDEXED_LENGHT);
         }
 
         $field->build();
@@ -368,7 +377,25 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      */
     public function addField($name, $type, array $mapping = [])
     {
+        if ($this->isIndexedVarchar($name, $type)) {
+            $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGHT;
+        }
+
         return parent::addField($name, $type, $mapping);
+    }
+
+    public function createField($name, $type)
+    {
+        $mapping = [
+            'fieldName' => $name,
+            'type'      => $type,
+        ];
+
+        if ($this->isIndexedVarchar($name, $type)) {
+            $mapping['length'] = self::MAX_VARCHAR_INDEXED_LENGHT;
+        }
+
+        return new FieldBuilder($this, $mapping);
     }
 
     /**
@@ -395,5 +422,13 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
         ];
 
         return $this;
+    }
+
+    /**
+     * UTF8MB4 encoding needs max lenght of 191 instead of 255 that UTF8 needed. Doctrine does not take care of it by itself.
+     */
+    public function isIndexedVarchar(string $name, string $type): bool
+    {
+        return Types::STRING === $type || isset($this->getClassMetadata()->table['indexes'][$name]);
     }
 }

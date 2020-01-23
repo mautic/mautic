@@ -29,7 +29,7 @@ class MultiselectType extends AbstractType
             'multiple'          => true,
             'choices_as_values' => true,
             'expanded'          => false,
-            'constraints'       => new Length(['max' => 255]),
+            'constraints'       => new Length(['max' => 191]),
         ]);
     }
 

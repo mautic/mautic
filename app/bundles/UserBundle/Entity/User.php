@@ -144,7 +144,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $builder->addId();
 
         $builder->createField('username', 'string')
-            ->length(255)
+            ->length(191)
             ->unique()
             ->build();
 
@@ -154,21 +154,21 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
         $builder->createField('firstName', 'string')
             ->columnName('first_name')
-            ->length(255)
+            ->length(191)
             ->build();
 
         $builder->createField('lastName', 'string')
             ->columnName('last_name')
-            ->length(255)
+            ->length(191)
             ->build();
 
         $builder->createField('email', 'string')
-            ->length(255)
+            ->length(191)
             ->unique()
             ->build();
 
         $builder->createField('position', 'string')
-            ->length(255)
+            ->length(191)
             ->nullable()
             ->build();
 

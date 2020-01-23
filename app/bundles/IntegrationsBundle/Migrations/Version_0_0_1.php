@@ -48,7 +48,7 @@ class Version_0_0_1 extends AbstractMigration
 
         $this->addSql("
             ALTER TABLE `{$this->concatPrefix($this->table)}`
-            ADD `integration_reference_id` varchar(255) NULL AFTER `internal_object_name`
+            ADD `integration_reference_id` varchar(191) NULL AFTER `internal_object_name`
         ");
 
         $this->addSql("
