@@ -147,7 +147,7 @@ class ContactObjectHelperTest extends TestCase
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with(
-                'SELECT c.companyname FROM companies c WHERE c.id = :id',
+                'SELECT c.companyname FROM '.MAUTIC_TABLE_PREFIX.'companies c WHERE c.id = :id',
                 ['id' => $companyId]
             )
             ->willReturn($statement);
