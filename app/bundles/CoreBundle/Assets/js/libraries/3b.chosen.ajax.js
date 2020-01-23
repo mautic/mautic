@@ -69,9 +69,6 @@
                             return selected_values.push($(this).val() + "-" + $(this).text());
                         }
                     });
-                    select.find('optgroup:empty').each(function () {
-                        //return $(this).remove();
-                    });
 
                     items = callback != null ? callback(data, field) : data;
                     nbItems = 0;
