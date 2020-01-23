@@ -50,6 +50,16 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
+            'mautic.install.fixture.page_hit' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\PageHitIndex::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.report_data' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
         ],
         'forms' => [
             \Mautic\InstallBundle\Configurator\Form\CheckStepType::class => [

@@ -30,7 +30,7 @@ class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, C
     public function load(ObjectManager $manager)
     {
         $prefix = $this->container->getParameter('mautic.db_table_prefix');
-        $manager->getConnection()->exec("CREATE INDEX {$prefix}page_hit_url ON {$prefix}page_hits (url(128))");
+        $manager->getConnection()->exec("CREATE INDEX IF NOT EXISTS {$prefix}page_hit_url ON {$prefix}page_hits (url(128))");
         $manager->flush();
     }
 
