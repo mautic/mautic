@@ -90,8 +90,9 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 }
 
                 $indexesToAdd[$object][$alias] = $field;
-
-                $this->addReference('leadfield-'.$alias, $entity);
+                if(!$this->hasReference('leadfield-'.$alias)){
+                    $this->addReference('leadfield-'.$alias, $entity);
+                }
                 ++$order;
             }
 
