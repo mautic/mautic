@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command : Synchronizes registrant information from Citrix products.
  *
- * php app/console mautic:citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
+ * php bin/console mautic:citrix:sync [--product=webinar|meeting|assist|training [--id=%productId%]]
  */
 class SyncCommand extends ModeratedCommand
 {

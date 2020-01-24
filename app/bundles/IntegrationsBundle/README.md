@@ -34,17 +34,17 @@ interface UnifiedIntegrationInterface
 
 ### Sync command
 
-`$ app/console mautic:integrations:sync Magento --first-time-sync --start-datetime="2019-09-12T12:00:00"`
+`$ bin/console mautic:integrations:sync Magento --first-time-sync --start-datetime="2019-09-12T12:00:00"`
 
 This is how you should use it when you configure an integration (Magento in this case) and run the sync for the first time. Specify also from what date it should look for the entities to sync. This way you can controll how big batch of records you will sync with one command. If you want to sync with multiple chunks by date ranges, `--end-datetime` option will be helpful too.
 
 The sync command in basic use looks like this:
 
-`$ app/console mautic:integrations:sync Magento`
+`$ bin/console mautic:integrations:sync Magento`
 
 It will sync all new records from and to Mautic for Magento. There is no need to specify the date range as Mautic is smart enough to read the start date from the records it has already synchronized. And the end date is "now".
 
-`$ app/console mautic:integrations:sync Magento --disable-pull --mautic-object-id=contact:12 --mautic-object-id=contact:13`
+`$ bin/console mautic:integrations:sync Magento --disable-pull --mautic-object-id=contact:12 --mautic-object-id=contact:13`
 
 There is also option to force sync of specific objects. With the `--disable-pull` flag the sync will skip the pull process. If some `--mautic-object-id` options are set it will not sync by a date range but rather only the IDs you will specify. `--disable-push` only disables the push. Pulling specific records by ID is not implemented yet.
 
