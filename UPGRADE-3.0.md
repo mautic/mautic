@@ -8,7 +8,8 @@
 
 # New features
 
-*   The Integrations Bundle that was being developed in a separate repository ([https://github.com/mautic-inc/plugin-integrations](https://github.com/mautic-inc/plugin-integrations)) was moved into the core bundles into app/bundles directory. It is meant to replace the current way how integrations are being handled by the Plugin Bundle.
+* The Integrations Bundle that was being developed in a separate repository ([https://github.com/mautic-inc/plugin-integrations](https://github.com/mautic-inc/plugin-integrations)) was moved into the core bundles into app/bundles directory. It is meant to replace the current way how integrations are being handled by the Plugin Bundle.
+* Mautic's Configuration is no longer dependent on Symfony's container. This means the container file does not have to be deleted and rebuilt after saving Mautic's Configuration. However, this also means that any parameter that is used in a cache compiler pass is no longer compatible with the UI and must be manually configured in local.php. See Configuration below for more information and BC changes as a result.
 
 # Backwards compatibility breaking changes
 
@@ -27,7 +28,7 @@
 
 ### Configuration
 
-If you have `api_rate_limiter_cache` present in you `app/config/local.php`, you need to change value to :
+If you have `api_rate_limiter_cache` present in you `app/config/local.php`, you need to change the value to:
 
 ```
 'api_rate_limiter_cache'            => [
@@ -35,6 +36,14 @@ If you have `api_rate_limiter_cache` present in you `app/config/local.php`, you 
 ],
 ```
 
+#### Removing the Container as a Configuration Dependency
+Mautic's Configuration is no longer dependent on the Symfony container. This means that any parameter that has to be used in a cache compiler pass is no longer compatible with the UI. These "advanced" configuration options have to be manually set in the local.php file then delete Mautic's cache. For example, the QueueBundle must now be manually configured due to its dependency on cache compilers.
+
+The following changes were made to support this:
+1. `%mautic.parameters%` is no longer available to services. Use the `CoreParametersHelper` instead.
+2. `CoreParametersHelper` is no limited to _just_ Mautic configuration parameters. It can no longer be used to fetch other Symfony parameters. Pass them as needed to the constructor of the service.
+3. Email spooling was not compatible with dynamic environment variables. Thus a new service was created to delegate whether an email should be spooled or sent immediately.
+4. Mautic\CoreBundle\Helper\CacheHelper::clearCache(), clearContainerFile(), clearTranslationCache(), and clearRoutingCache() were removed.
 
 ### PHPUNIT tests
 
