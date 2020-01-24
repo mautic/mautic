@@ -6,8 +6,8 @@
 .travis.yml
 *.git*
 *.idea*
+app/console
 app/phpunit.xml.dist
-build/*
 bin/codecept
 bin/doctrine
 bin/doctrine.php
@@ -20,6 +20,7 @@ bin/phpstan.phar
 bin/phpunit
 bin/security-checker
 bin/simple-phpunit
+build/*
 codeception.yml
 composer.json
 composer.lock
