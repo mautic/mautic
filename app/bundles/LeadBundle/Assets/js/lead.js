@@ -1,4 +1,10 @@
 //LeadBundle
+Mautic.companyOnLoad = function (container, response) {
+
+    if (mQuery(container + ' #list-search').length) {
+        Mautic.activateSearchAutocomplete('list-search', 'lead.company');
+    }
+}
 Mautic.leadOnLoad = function (container, response) {
     Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
         if(mQuery('a.quickadd').length) {
