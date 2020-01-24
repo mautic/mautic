@@ -29,12 +29,12 @@ class ParameterLoader
     /**
      * @var array
      */
-    private $defaultParameters = [];
+    private static $defaultParameters = [];
 
     /**
      * @var array
      */
-    private $localParameters = [];
+    private static $localParameters = [];
 
     public function __construct()
     {
@@ -62,12 +62,12 @@ class ParameterLoader
     public function loadIntoEnvironment()
     {
         $envVariables      = new ParameterBag();
-        $defaultParameters = new ParameterBag($this->defaultParameters);
+        $defaultParameters = new ParameterBag(self::$defaultParameters);
 
-        // Load from configuration file first
+        // Load from local configuration file first
         EnvVars\ConfigEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
 
-        // Load the others
+        // Load special values used in Mautic configuration files in app/config
         EnvVars\ApiEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
         EnvVars\LogEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
         EnvVars\MigrationsEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
@@ -115,7 +115,7 @@ class ParameterLoader
             $config = include $file->getPathname();
 
             $parameters              = $config['parameters'] ?? [];
-            $this->defaultParameters = array_merge($this->defaultParameters, $parameters);
+            self::$defaultParameters = array_merge(self::$defaultParameters, $parameters);
         }
     }
 
@@ -144,13 +144,13 @@ class ParameterLoader
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 
-        $this->localParameters = $compiledParameters;
+        self::$localParameters = $compiledParameters;
     }
 
     private function createParameterBags(): void
     {
-        self::$localParameterBag = new ParameterBag($this->localParameters);
-        self::$parameterBag      = new ParameterBag(array_merge($this->defaultParameters, $this->localParameters));
+        self::$localParameterBag = new ParameterBag(self::$localParameters);
+        self::$parameterBag      = new ParameterBag(array_merge(self::$defaultParameters, self::$localParameters));
     }
 
     private function getLocalParametersFile(): string
