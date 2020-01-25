@@ -43,9 +43,6 @@ class DelegatingSpool extends \Swift_FileSpool
     /**
      * DelegatingSpool constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param \Swift_Transport     $realTransport
-     *
      * @throws \Swift_IoException
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, \Swift_Transport $realTransport)
@@ -58,10 +55,7 @@ class DelegatingSpool extends \Swift_FileSpool
     }
 
     /**
-     * @param Swift_Mime_SimpleMessage $message
-     * @param string[]|null            $failedRecipients
-     *
-     * @return int
+     * @param string[]|null $failedRecipients
      *
      * @throws \Swift_IoException
      */
