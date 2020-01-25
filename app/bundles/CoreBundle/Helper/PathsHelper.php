@@ -87,6 +87,11 @@ class PathsHelper
         /** @var array $paths */
         $root = $rootDir;
         include $root.'/config/paths_helper.php';
+
+        if (!isset($paths)) {
+            throw new \Exception('$paths not found');
+        }
+
         $this->paths = $paths;
     }
 
