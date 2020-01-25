@@ -57,7 +57,7 @@ class MauticQueueBundle extends Bundle
         return $this->extension;
     }
 
-    public function createContainerExtension(): ?Extension
+    protected function createContainerExtension(): ?Extension
     {
         if (QueueProtocol::RABBITMQ === $this->queueProtocol) {
             return new OldSoundRabbitMqExtension();
