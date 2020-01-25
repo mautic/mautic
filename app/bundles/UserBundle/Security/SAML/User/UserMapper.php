@@ -26,8 +26,6 @@ class UserMapper implements UsernameMapperInterface
 
     /**
      * UserMapper constructor.
-     *
-     * @param array $attributes
      */
     public function __construct(array $attributes)
     {
@@ -45,12 +43,7 @@ class UserMapper implements UsernameMapperInterface
         return $user;
     }
 
-    /**
-     * @param Response $response
-     *
-     * @return string|null
-     */
-    public function getUsername(Response $response)
+    public function getUsername(Response $response): ?string
     {
         $user = $this->getUser($response);
 
@@ -58,13 +51,11 @@ class UserMapper implements UsernameMapperInterface
     }
 
     /**
-     * @param Assertion $assertion
-     *
      * @return string|null
      */
     private function setValuesFromAssertion(Assertion $assertion, User $user): void
     {
-        $attributes = $this->extractAttributes($assertion, $user);
+        $attributes = $this->extractAttributes($assertion);
 
         // use email as the user by default
         if (isset($attributes['email'])) {
@@ -83,7 +74,7 @@ class UserMapper implements UsernameMapperInterface
         }
     }
 
-    private function extractAttributes(Assertion $assertion, User $user): array
+    private function extractAttributes(Assertion $assertion): array
     {
         $attributes = [];
 
