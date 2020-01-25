@@ -41,6 +41,8 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
+        var_dump($clientResponse);
+
         // Assert status codes
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
         $contactId1 = $response['contacts'][0]['id'];
@@ -128,6 +130,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
+
+        var_dump($clientResponse);
+
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
 
@@ -160,6 +165,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/contacts/new', $payload);
         $clientResponse = $this->client->getResponse();
+
+        var_dump($clientResponse);
+
         $response       = json_decode($clientResponse->getContent(), true);
         $contactId      = $response['contact']['id'];
 
