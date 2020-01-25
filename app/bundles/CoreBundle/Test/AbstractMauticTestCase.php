@@ -66,7 +66,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->mockServices();
     }
 
-    protected function tearDown(): void
+    protected function tearDown()
     {
         static::$class = null;
 
