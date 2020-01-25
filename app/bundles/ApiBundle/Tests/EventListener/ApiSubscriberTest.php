@@ -14,31 +14,32 @@ namespace Mautic\ApiBundle\Tests\EventListener;
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ApiSubscriberTest extends CommonMocks
 {
     /**
-     * @var CoreParametersHelper|PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|MockObject
      */
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface|PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 
     /**
-     * @var Request|PHPUnit_Framework_MockObject_MockObject
+     * @var Request|MockObject
      */
     private $request;
 
     /**
-     * @var GetResponseEvent|PHPUnit_Framework_MockObject_MockObject
+     * @var GetResponseEvent|MockObject
      */
     private $event;
 
@@ -93,7 +94,15 @@ class ApiSubscriberTest extends CommonMocks
             ->with('api_enabled')
             ->willReturn(false);
 
-        $this->expectException(AccessDeniedHttpException::class);
+        $this->event->expects($this->once())
+            ->method('setResponse')
+            ->with($this->isInstanceOf(JsonResponse::class))
+            ->willReturnCallback(
+                function (JsonResponse $response) {
+                    $this->assertEquals(403, $response->getStatusCode());
+                }
+            );
+
         $this->subscriber->onKernelRequest($this->event);
     }
 

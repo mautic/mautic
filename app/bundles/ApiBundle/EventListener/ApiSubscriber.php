@@ -73,7 +73,22 @@ class ApiSubscriber implements EventSubscriberInterface
         // Prevent access to API if disabled
         $apiEnabled = $this->coreParametersHelper->getParameter('api_enabled');
         if (!$apiEnabled) {
-            throw new AccessDeniedHttpException($this->translator->trans('mautic.api.error.api.disabled'));
+            $response   = new JsonResponse(
+                [
+                    'errors' => [
+                        [
+                            'message' => $this->translator->trans('mautic.api.error.api.disabled'),
+                            'code'    => 403,
+                            'type'    => 'api_disabled',
+                        ],
+                    ],
+                ],
+                403
+            );
+
+            $event->setResponse($response);
+
+            return;
         }
 
         // Prevent access via basic auth if it is disabled
@@ -81,7 +96,20 @@ class ApiSubscriber implements EventSubscriberInterface
         $basicAuthEnabled = $this->coreParametersHelper->getParameter('api_enable_basic_auth');
 
         if ($hasBasicAuth && !$basicAuthEnabled) {
-            throw new AccessDeniedHttpException($this->translator->trans('mautic.api.error.basic.auth.disabled'));
+            $response   = new JsonResponse(
+                [
+                    'errors' => [
+                        [
+                            'message' => $this->translator->trans('mautic.api.error.basic.auth.disabled'),
+                            'code'    => 403,
+                            'type'    => 'access_denied',
+                        ],
+                    ],
+                ],
+                403
+            );
+
+            $event->setResponse($response);
         }
     }
 
