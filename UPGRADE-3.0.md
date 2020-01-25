@@ -41,7 +41,7 @@ Mautic's Configuration is no longer dependent on the Symfony container. This mea
 
 The following changes were made to support this:
 1. `%mautic.parameters%` is no longer available to services. Use the `CoreParametersHelper` instead.
-2. `CoreParametersHelper` is no limited to _just_ Mautic configuration parameters. It can no longer be used to fetch other Symfony parameters. Pass them as needed to the constructor of the service.
+2. `CoreParametersHelper` is now limited to _just_ Mautic configuration parameters. It can no longer be used to fetch other Symfony parameters, `paths`, `mautic.bundles`, or `mautic.plugin.bundles`. Pass them as needed to the constructor of the service, use the BundleHelper or the PathsHelper instead.
 3. Email spooling was not compatible with dynamic environment variables. Thus a new service was created to delegate whether an email should be spooled or sent immediately.
 4. Mautic\CoreBundle\Helper\CacheHelper::clearCache(), clearContainerFile(), clearTranslationCache(), and clearRoutingCache() were removed.
 
