@@ -152,6 +152,12 @@ class ParameterLoader
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 
+        // Load from environment
+        $envParameters = getenv('MAUTIC_CONFIG_PARAMETERS');
+        if ($envParameters) {
+            $compiledParameters = array_merge($compiledParameters, json_decode($envParameters, true));
+        }
+
         $this->localParameters = $compiledParameters;
     }
 

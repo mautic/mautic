@@ -18,6 +18,9 @@ class ParameterLoaderTest extends TestCase
 {
     public function testParametersAreLoaded(): void
     {
+        $envParameters = json_encode(['default_daterange_filter' => '-1 day']);
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
+
         $loader = new ParameterLoader(__DIR__.'/TestRoot');
         $loader->loadIntoEnvironment();
 
@@ -28,5 +31,10 @@ class ParameterLoaderTest extends TestCase
 
         $this->assertEquals('foobar.com', $parameterBag->get('mailer_host'));
         $this->assertEquals('foobar.com', getenv('MAUTIC_MAILER_HOST'));
+
+        $this->assertEquals('-1 day', $parameterBag->get('default_daterange_filter'));
+        $this->assertEquals('-1 day', getenv('MAUTIC_DEFAULT_DATERANGE_FILTER'));
+
+        putenv('MAUTIC_CONFIG_PARAMETERS=');
     }
 }
