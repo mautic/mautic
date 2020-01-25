@@ -18,7 +18,6 @@ class ConfigEnvVars implements EnvVarsInterface
     public static function load(ParameterBag $config, ParameterBag $defaultConfig, ParameterBag $envVars): void
     {
         foreach ($config->all() as $key => $value) {
-            // BC for M2
             if (!empty($value) && is_string($value) && preg_match('/getenv\((.*?)\)/', $value, $match)) {
                 $value = (string) getenv($match[1]);
             }

@@ -17,32 +17,33 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class ParameterLoader
 {
     /**
-     * @var ParameterBag
+     * @var string
      */
-    private static $parameterBag;
+    private $rootPath;
 
     /**
      * @var ParameterBag
      */
-    private static $localParameterBag;
+    private $parameterBag;
+
+    /**
+     * @var ParameterBag
+     */
+    private $localParameterBag;
+
+    /**
+     * @var array
+     */
+    private $localParameters = [];
 
     /**
      * @var array
      */
     private static $defaultParameters = [];
 
-    /**
-     * @var array
-     */
-    private static $localParameters = [];
-
-    public function __construct()
+    public function __construct(string $configRootPath = __DIR__.'/../../../')
     {
-        // This is loaded outside the container and inside the container so statically store to prevent
-        // having to recompile multiple times
-        if (self::$parameterBag) {
-            return;
-        }
+        $this->rootPath = $configRootPath;
 
         $this->loadDefaultParameters();
         $this->loadLocalParameters();
@@ -51,12 +52,12 @@ class ParameterLoader
 
     public function getParameterBag(): ParameterBag
     {
-        return self::$parameterBag;
+        return $this->parameterBag;
     }
 
     public function getLocalParameterBag(): ParameterBag
     {
-        return self::$localParameterBag;
+        return $this->localParameterBag;
     }
 
     public function loadIntoEnvironment()
@@ -65,16 +66,16 @@ class ParameterLoader
         $defaultParameters = new ParameterBag(self::$defaultParameters);
 
         // Load from local configuration file first
-        EnvVars\ConfigEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
+        EnvVars\ConfigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load special values used in Mautic configuration files in app/config
-        EnvVars\ApiEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
-        EnvVars\LogEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
-        EnvVars\MigrationsEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
-        EnvVars\SAMLEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
-        EnvVars\SessionEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
-        EnvVars\SiteUrlEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
-        EnvVars\TwigEnvVars::load(self::$parameterBag, $defaultParameters, $envVariables);
+        EnvVars\ApiEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        EnvVars\LogEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        EnvVars\MigrationsEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        EnvVars\SAMLEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        EnvVars\SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        EnvVars\SiteUrlEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
+        EnvVars\TwigEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
         $dotenv = new \Symfony\Component\Dotenv\Dotenv();
@@ -89,18 +90,26 @@ class ParameterLoader
         include $root.'/config/paths.php';
 
         if (!isset($paths['local_config'])) {
-            return $root.'/config/local.php';
+            self::$defaultParameters['local_config_path'] = $root.'/config/local.php';
+
+            return self::$defaultParameters['local_config_path'];
         }
 
         $paths['local_config'] = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $root, $paths['local_config']);
 
-        defined('MAUTIC_LOCAL_CONFIG_FILE') or define('MAUTIC_LOCAL_CONFIG_FILE', $paths['local_config']);
+        self::$defaultParameters['local_config_path'] = $paths['local_config'];
 
-        return $paths['local_config'];
+        return self::$defaultParameters['local_config_path'];
     }
 
     private function loadDefaultParameters(): void
     {
+        if (self::$defaultParameters) {
+            // This is loaded within and outside the container so use static variable to prevent recompiling
+            // multiple times
+            return;
+        }
+
         $finder = (new Finder())
             ->files()
             ->followLinks()
@@ -122,8 +131,7 @@ class ParameterLoader
     private function loadLocalParameters(): void
     {
         $compiledParameters = [];
-        $rootPath           = __DIR__.'/../../../';
-        $localConfigFile    = self::getLocalConfigFile($rootPath);
+        $localConfigFile    = self::getLocalConfigFile($this->rootPath);
 
         // Load parameters array from local configuration
         if (file_exists($localConfigFile)) {
@@ -144,17 +152,17 @@ class ParameterLoader
             $compiledParameters = array_merge($compiledParameters, $parameters);
         }
 
-        self::$localParameters = $compiledParameters;
+        $this->localParameters = $compiledParameters;
     }
 
     private function createParameterBags(): void
     {
-        self::$localParameterBag = new ParameterBag(self::$localParameters);
-        self::$parameterBag      = new ParameterBag(array_merge(self::$defaultParameters, self::$localParameters));
+        $this->localParameterBag = new ParameterBag($this->localParameters);
+        $this->parameterBag      = new ParameterBag(array_merge(self::$defaultParameters, $this->localParameters));
     }
 
     private function getLocalParametersFile(): string
     {
-        return __DIR__.'/../../../config/parameters_local.php';
+        return $this->rootPath.'/config/parameters_local.php';
     }
 }

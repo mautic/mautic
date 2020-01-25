@@ -91,7 +91,7 @@ $firewalls = [
 
             // Environment variables will overwrite these with the standard login URLs if SAML is disabled
             'login_path'      => '%env(MAUTIC_SAML_LOGIN_PATH)%', // '/s/saml/login',,
-            'check_path'      => '%env(MAUTIC_SAML_CHECK_PATH)%', // '/s/saml/login_check',
+            'check_path'      => '%env(MAUTIC_SAML_LOGIN_CHECK_PATH)%', // '/s/saml/login_check',
         ],
         'simple_form' => [
             'authenticator'        => 'mautic.user.form_authenticator',
