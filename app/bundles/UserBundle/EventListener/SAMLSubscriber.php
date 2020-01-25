@@ -45,8 +45,6 @@ class SAMLSubscriber implements EventSubscriberInterface
 
     /**
      * Block access to SAML URLs if SAML is disabled.
-     *
-     * @param GetResponseEvent $event
      */
     public function onKernelRequest(GetResponseEvent $event): void
     {

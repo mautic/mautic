@@ -54,8 +54,6 @@ class IdStore implements IdStoreInterface
     /**
      * @param string $entityId
      * @param string $id
-     *
-     * @return bool
      */
     public function has($entityId, $id): bool
     {

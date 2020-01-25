@@ -55,8 +55,6 @@ class ClientSubscriber implements EventSubscriberInterface
 
     /**
      * Add a client change entry to the audit log.
-     *
-     * @param Events\ClientEvent $event
      */
     public function onClientPostSave(Events\ClientEvent $event): void
     {
@@ -78,8 +76,6 @@ class ClientSubscriber implements EventSubscriberInterface
 
     /**
      * Add a role delete entry to the audit log.
-     *
-     * @param Events\ClientEvent $event
      */
     public function onClientDelete(Events\ClientEvent $event): void
     {

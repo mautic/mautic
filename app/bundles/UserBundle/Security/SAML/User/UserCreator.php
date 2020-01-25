@@ -98,8 +98,6 @@ class UserCreator implements UserCreatorInterface
     }
 
     /**
-     * @param User $user
-     *
      * @throws BadCredentialsException
      */
     private function validateUser(User $user): void
