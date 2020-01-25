@@ -97,10 +97,10 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getParameter')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
-                    return 'mautic.track_private_ip_ranges' === $param ? true : $defaultValue;
+                    return 'track_private_ip_ranges' === $param ? true : $defaultValue;
                 }
             );
-        $ip      = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
+        $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
         $this->assertEquals('192.168.0.1', $ip->getIpAddress());
     }
