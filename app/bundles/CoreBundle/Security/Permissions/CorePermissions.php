@@ -187,7 +187,7 @@ class CorePermissions
                 $entity->setName($name);
 
                 $bit   = 0;
-                $class = $this->getPermissionObject($bundle, true);
+                $class = $this->getPermissionObject($bundle);
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
@@ -283,7 +283,7 @@ class CorePermissions
             return in_array(0, $permissions) ? false : true;
         } elseif ('MATCH_ONE' == $mode) {
             //grant if any of the permissions were granted
-            return in_array(1, $permissions) ? true : false;
+            return in_array(1, $permissions) && true;
         } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
         } else {

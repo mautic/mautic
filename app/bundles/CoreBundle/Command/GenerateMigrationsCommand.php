@@ -122,7 +122,7 @@ EOT
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
 
-    protected function generateMigration(InputInterface $input, $version, $up = null, $down = null)
+    protected function generateMigration(InputInterface $input, $version)
     {
         $code = str_replace(['<version>', '<year>'], [$version, date('Y')], self::$_template);
         $code = preg_replace('/^ +$/m', '', $code);

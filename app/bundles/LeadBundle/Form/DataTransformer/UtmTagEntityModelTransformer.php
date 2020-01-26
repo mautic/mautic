@@ -32,11 +32,6 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
     private $repository;
 
     /**
-     * @var string
-     */
-    private $id;
-
-    /**
      * @var bool
      */
     private $isArray;
@@ -50,7 +45,6 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
     {
         $this->em         = $em;
         $this->repository = $repo;
-        $this->id         = $identifier;
         $this->isArray    = $isArray;
     }
 
@@ -150,6 +144,5 @@ class UtmTagEntityModelTransformer implements DataTransformerInterface
      */
     public function setIdentifier($id)
     {
-        $this->id = $id;
     }
 }

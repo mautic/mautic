@@ -319,7 +319,7 @@ class FormModel extends CommonFormModel
 
         //match sessionId with field Id to update mapped fields
         $fieldIds = [];
-        foreach ($savedFields as $id => $field) {
+        foreach ($savedFields as $field) {
             $fieldIds[$field->getSessionId()] = $field->getId();
         }
 
@@ -940,9 +940,7 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**

@@ -39,7 +39,7 @@ class AssetApiController extends CommonApiController
      *
      * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(&$entity)
     {
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)

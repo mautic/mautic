@@ -15,7 +15,7 @@ echo $view->render(
         'inForm'   => (isset($inForm)) ? $inForm : false,
         'type'     => 'email',
         'id'       => $id,
-        'deleted'  => (!empty($deleted)) ? true : false,
+        'deleted'  => !empty($deleted) && true,
         'formId'   => (isset($formId)) ? $formId : 0,
         'formName' => (isset($formName)) ? $formName : '',
     ]

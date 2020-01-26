@@ -66,9 +66,6 @@ abstract class AbstractFormController extends CommonController
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
         $date                   = $entity->getCheckedOut();
-        $returnUrl              = !empty($postActionVars['returnUrl'])
-                                ? urlencode($postActionVars['returnUrl'])
-                                : urlencode($this->generateUrl('mautic_dashboard_index'));
         $postActionVars         = $this->refererPostActionVars($postActionVars);
         $returnUrl              = $postActionVars['returnUrl'];
         $override               = '';
@@ -164,7 +161,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(Form $form)
     {
         //bind request to the form
         $form->handleRequest($this->request);

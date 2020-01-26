@@ -521,7 +521,7 @@ class CommonApiController extends FOSRestController implements MauticController
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
@@ -672,7 +672,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return Response
      */
-    public function postActionRedirect($args = [])
+    public function postActionRedirect()
     {
         return $this->notFound('mautic.contact.error.notfound');
     }
@@ -915,7 +915,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return mixed
      */
-    protected function prePopulateForm(&$entity, $parameters, $action = 'edit')
+    protected function prePopulateForm()
     {
     }
 
@@ -941,7 +941,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(&$entity)
     {
     }
 

@@ -71,7 +71,7 @@ class AjaxController extends CommonAjaxController
                 $stats['sent'] += $batchSentCount;
                 $stats['failed'] += $batchFailedCount;
 
-                foreach ($batchFailedRecipients as $list => $emails) {
+                foreach ($batchFailedRecipients as $emails) {
                     $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
                 }
 
@@ -257,23 +257,20 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function sendTestEmailAction(Request $request)
+    protected function sendTestEmailAction()
     {
         /** @var MailHelper $mailer */
         $mailer = $this->get('mautic.helper.mailer');
         /** @var Translator $translator */
         $translator = $this->get('translator');
-
         $mailer->setSubject($translator->trans('mautic.email.config.mailer.transport.test_send.subject'));
         $mailer->setBody($translator->trans('mautic.email.config.mailer.transport.test_send.body'));
-
         $user         = $this->get('mautic.helper.user')->getUser();
         $userFullName = trim($user->getFirstName().' '.$user->getLastName());
         if (empty($userFullName)) {
             $userFullName = null;
         }
         $mailer->setTo([$user->getEmail() => $userFullName]);
-
         $success = 1;
         $message = $translator->trans('mautic.core.success');
         if (!$mailer->send(true)) {

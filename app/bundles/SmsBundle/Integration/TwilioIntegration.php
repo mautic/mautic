@@ -109,7 +109,7 @@ class TwilioIntegration extends AbstractIntegration
                     'attr'  => [
                         'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
                     ],
-                    'data'=> !empty($data['disable_trackable_urls']) ? true : false,
+                    'data'=> !empty($data['disable_trackable_urls']) && true,
                 ]
             );
             $builder->add('frequency_number', NumberType::class,

@@ -50,7 +50,7 @@ abstract class AbstractClientFactory implements AuthProviderInterface
         return $this->buildClient($credentials);
     }
 
-    abstract protected function buildClient(CredentialsInterface $credentials): ClientInterface;
+    abstract protected function buildClient(): ClientInterface;
 
-    abstract protected function credentialsAreConfigured(CredentialsInterface $credentials): bool;
+    abstract protected function credentialsAreConfigured(): bool;
 }

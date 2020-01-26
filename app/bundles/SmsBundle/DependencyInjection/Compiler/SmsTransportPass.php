@@ -21,11 +21,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
 {
-    /**
-     * @var RepeatedPass
-     */
-    private $repeatedPass;
-
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('mautic.sms.transport_chain')) {
@@ -46,6 +41,5 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
 
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
-        $this->repeatedPass = $repeatedPass;
     }
 }

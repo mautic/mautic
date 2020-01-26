@@ -145,7 +145,7 @@ class ContactSegmentQueryBuilder
      *
      * @throws QueryException
      */
-    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId, $batchRestrictions)
+    public function addNewContactsRestrictions(QueryBuilder $queryBuilder, $segmentId)
     {
         $parts     = $queryBuilder->getQueryParts();
         $setHaving = (count($parts['groupBy']) || !is_null($parts['having']));

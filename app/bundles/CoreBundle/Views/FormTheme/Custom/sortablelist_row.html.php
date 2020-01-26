@@ -25,7 +25,7 @@ $datePrototype = (isset($list->vars['prototype'])) ?
     printf('%s="%s" ', $view->escape($k), $view->escape($v));
 }?>>
         <?php endif; ?>
-            <?php foreach ($list->children as $key => $item): ?>
+            <?php foreach ($list->children as $item): ?>
             <?php echo $view['form']->block($item, 'sortablelist_entry_row'); ?>
             <?php endforeach; ?>
         </div>

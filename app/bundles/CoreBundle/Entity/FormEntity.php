@@ -30,7 +30,7 @@ class FormEntity extends CommonEntity
     /**
      * @var \DateTime|null
      */
-    private $dateAdded = null;
+    private $dateAdded;
 
     /**
      * @var int|null
@@ -201,7 +201,7 @@ class FormEntity extends CommonEntity
                 }
             }
 
-            return ('published' == $status) ? true : false;
+            return 'published' == $status && true;
         }
 
         return $this->getIsPublished();
@@ -444,7 +444,7 @@ class FormEntity extends CommonEntity
 
         $id = $this->getId();
 
-        return (empty($id)) ? true : false;
+        return empty($id) && true;
     }
 
     /**

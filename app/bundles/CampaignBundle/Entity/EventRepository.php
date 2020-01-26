@@ -52,7 +52,7 @@ class EventRepository extends LegacyEventRepository
      *
      * @return array
      */
-    public function getContactPendingEvents($contactId, $type)
+    public function getContactPendingEvents()
     {
         // Limit to events that hasn't been executed or scheduled yet
         $eventQb = $this->getEntityManager()->createQueryBuilder();
@@ -65,7 +65,6 @@ class EventRepository extends LegacyEventRepository
                     $eventQb->expr()->eq('log_event.rotation', 'l.rotation')
                 )
             );
-
         // Limit to events that has no parent or whose parent has already been executed
         $parentQb = $this->getEntityManager()->createQueryBuilder();
         $parentQb->select('parent_log_event.id')
@@ -76,7 +75,6 @@ class EventRepository extends LegacyEventRepository
                 $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation'),
                 $parentQb->expr()->eq('parent_log_event.isScheduled', 0)
             );
-
         $q = $this->createQueryBuilder('e', 'e.id');
         $q->select('e,c')
             ->innerJoin('e.campaign', 'c')
@@ -197,9 +195,7 @@ class EventRepository extends LegacyEventRepository
             );
         }
 
-        $events = $q->getQuery()->getArrayResult();
-
-        return $events;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -286,9 +282,7 @@ class EventRepository extends LegacyEventRepository
 
         $q->where($expr);
 
-        $results = $q->getQuery()->getResult();
-
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**

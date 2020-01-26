@@ -38,15 +38,9 @@ class ReportType extends AbstractType
      */
     private $reportModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(ReportModel $reportModel, TranslatorInterface $translator)
     {
         $this->reportModel = $reportModel;
-        $this->translator  = $translator;
     }
 
     /**

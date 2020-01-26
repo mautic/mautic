@@ -242,14 +242,12 @@ abstract class AbstractCommonModel
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
 
-        $url .= (!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '';
-
-        return $url;
+        return $url.((!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
     }
 
     /**
@@ -326,7 +324,7 @@ abstract class AbstractCommonModel
      *
      * @return object|null
      */
-    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+    public function getEntityByAlias($alias, $lang = null)
     {
     }
 }

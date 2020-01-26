@@ -19,20 +19,9 @@ use Psr\Log\LoggerInterface;
 class ChannelPreferences
 {
     /**
-     * @var
-     */
-    private $channel;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var Event
      */
     private $event;
-
     /**
      * @var ArrayCollection[]
      */
@@ -45,8 +34,6 @@ class ChannelPreferences
      */
     public function __construct($channel, Event $event, LoggerInterface $logger)
     {
-        $this->channel = $channel;
-        $this->logger  = $logger;
         $this->event   = $event;
     }
 
@@ -99,7 +86,7 @@ class ChannelPreferences
          * @var int
          * @var ArrayCollection|LeadEventLog[] $logs
          */
-        foreach ($this->organizedByPriority as $priority => $logs) {
+        foreach ($this->organizedByPriority as $logs) {
             $logs->remove($log->getId());
         }
 

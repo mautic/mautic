@@ -100,9 +100,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -166,9 +164,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setParameter('internalEntityIds', $internalEntityIds);
 
-        $results = $q->getQuery()->getResult();
-
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**
@@ -366,36 +362,20 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         if ($fromDate) {
-            if ($toDate) {
-                $q->andWhere(
-                    $q->expr()->orX(
-                        $q->expr()->andX(
-                            $q->expr()->isNotNull('l.date_modified'),
-                            $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
-                        ),
-                        $q->expr()->andX(
-                            $q->expr()->isNull('l.date_modified'),
-                            $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
-                        )
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->andX(
+                        $q->expr()->isNotNull('l.date_modified'),
+                        $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                    ),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('l.date_modified'),
+                        $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
                     )
                 )
-                    ->setParameter('dateFrom', $fromDate)
-                    ->setParameter('dateTo', $toDate);
-            } else {
-                $q->andWhere(
-                    $q->expr()->orX(
-                        $q->expr()->andX(
-                            $q->expr()->isNotNull('l.date_modified'),
-                            $q->expr()->gte('l.date_modified', ':dateFrom')
-                        ),
-                        $q->expr()->andX(
-                            $q->expr()->isNull('l.date_modified'),
-                            $q->expr()->gte('l.date_added', ':dateFrom')
-                        )
-                    )
-                )
-                    ->setParameter('dateFrom', $fromDate);
-            }
+            )
+                ->setParameter('dateFrom', $fromDate)
+                ->setParameter('dateTo', $toDate);
         } elseif ($toDate) {
             $q->andWhere(
                 $q->expr()->orX(

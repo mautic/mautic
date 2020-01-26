@@ -32,18 +32,13 @@ class Event
     private $webhook;
 
     /**
-     * @var ArrayCollection
-     */
-    private $queues;
-
-    /**
      * @var string
      */
     private $eventType;
 
     public function __construct()
     {
-        $this->queues = new ArrayCollection();
+        new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)

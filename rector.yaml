@@ -4,7 +4,11 @@ parameters:
 
     paths:
         - app/bundles
-        - app/config
-        - app/middlewares
-        - app/migrations
-        - plugins
+
+    exclude_paths:
+        - '*/tests/*'
+        - '*/Tests/*'
+        - '*/Test/*'
+        - '*/test/*'
+        - '*/InstallFixtures/*'
+        - '*/Fixtures/*'

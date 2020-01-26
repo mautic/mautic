@@ -99,7 +99,7 @@ class FileApiController extends CommonApiController
                 }
             }
         } else {
-            return $this->returnError(ucfirst($dir).' dir is not readable', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError(ucfirst($dir).' dir is not readable');
         }
 
         $view = $this->view([$this->entityNameMulti => $fnames]);
@@ -125,7 +125,7 @@ class FileApiController extends CommonApiController
         if (!file_exists($filePath)) {
             return $this->returnError('File does not exist', Response::HTTP_NOT_FOUND);
         } elseif (!is_writable($filePath)) {
-            return $this->returnError('File is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError('File is not writable');
         } else {
             unlink($filePath);
             $response['success'] = true;

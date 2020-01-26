@@ -29,7 +29,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     /**
      * @var null
      */
-    protected $selects = null;
+    protected $selects;
 
     /**
      * @var array

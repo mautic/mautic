@@ -24,12 +24,10 @@ class EventHelper
      *
      * @return int
      */
-    public static function engageStageAction($lead, $action)
+    public static function engageStageAction()
     {
         static $initiated = [];
 
-        $stagesChange = 0;
-
-        return $stagesChange;
+        return 0;
     }
 }

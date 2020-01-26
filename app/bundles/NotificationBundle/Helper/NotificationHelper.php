@@ -126,7 +126,7 @@ class NotificationHelper
             }
 
             $server        = $this->request->getCurrentRequest()->server;
-            $https         = ('https' == parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME)) ? true : false;
+            $https         = 'https' == parse_url($server->get('HTTP_REFERER'), PHP_URL_SCHEME) && true;
             $subdomainName = '';
 
             if (!$https && $notificationSubdomainName) {

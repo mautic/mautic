@@ -42,7 +42,7 @@ $showValues = [
     <?php endif; ?>
     <?php if (!empty($bodyItems)) : ?>
         <tbody>
-            <?php foreach ($bodyItems as $id => $row) : ?>
+            <?php foreach ($bodyItems as $row) : ?>
                 <tr>
                     <?php if (is_array($row)) : ?>
                         <?php foreach ($row as $key => $item) : ?>

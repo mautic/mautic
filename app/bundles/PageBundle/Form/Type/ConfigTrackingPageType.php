@@ -33,7 +33,7 @@ class ConfigTrackingPageType extends AbstractType
 
         $builder->add('track_by_fingerprint', YesNoButtonGroupType::class, [
             'label' => 'mautic.page.config.form.track.by.fingerprint',
-            'data'  => isset($options['data']['track_by_fingerprint']) ? (bool) $options['data']['track_by_fingerprint'] : false,
+            'data'  => isset($options['data']['track_by_fingerprint']) && (bool) $options['data']['track_by_fingerprint'],
             'attr'  => [
                 'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
             ],
@@ -56,7 +56,7 @@ class ConfigTrackingPageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.track_contact_by_ip',
-                'data'  => isset($options['data']['track_contact_by_ip']) ? (bool) $options['data']['track_contact_by_ip'] : false,
+                'data'  => isset($options['data']['track_contact_by_ip']) && (bool) $options['data']['track_contact_by_ip'],
                 'attr'  => [
                     'tooltip'      => 'mautic.page.config.form.track_contact_by_ip.tooltip',
                     'data-show-on' => '{"config_trackingconfig_anonymize_ip_1":"checked"}',

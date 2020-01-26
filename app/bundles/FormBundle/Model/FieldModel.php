@@ -55,7 +55,7 @@ class FieldModel extends CommonFormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        list($fields, $choices)               = $this->getObjectFields('lead');
+        list($fields, $choices)               = $this->getObjectFields();
         list($companyFields, $companyChoices) = $this->getObjectFields('company');
 
         // Only show the lead fields not already used

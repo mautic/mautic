@@ -136,7 +136,7 @@ final class SyncService implements SyncServiceInterface
         }
     }
 
-    public function initiateDebugLogger(DebugLogger $logger): void
+    public function initiateDebugLogger(): void
     {
         // Yes it's a hack to prevent from having to pass the logger as a dependency into dozens of classes
         // So not doing anything with the logger, just need Symfony to initiate the service

@@ -33,11 +33,6 @@ class ConfigBuilderEvent extends Event
     ];
 
     /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
-
-    /**
      * @var BundleHelper
      */
     private $bundleHelper;
@@ -52,7 +47,6 @@ class ConfigBuilderEvent extends Event
      */
     public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
     {
-        $this->pathsHelper  = $pathsHelper;
         $this->bundleHelper = $bundleHelper;
     }
 

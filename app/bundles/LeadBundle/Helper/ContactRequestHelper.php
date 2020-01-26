@@ -151,9 +151,7 @@ class ContactRequestHelper
         }
 
         try {
-            $contact = $this->getContactFromClickthrough($clickthrough);
-
-            return $contact;
+            return $this->getContactFromClickthrough($clickthrough);
         } catch (ContactNotFoundException $exception) {
         }
 

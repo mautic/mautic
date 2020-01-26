@@ -45,17 +45,15 @@ class PageSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay()
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
         $settings          = $integrationObject->getIntegrationSettings();
         $features          = $settings->getFeatureSettings();
-
-        $script = '';
+        $script            = '';
         if (!in_array('landing_page_enabled', $features)) {
             $script = 'disable_notification = true;';
         }
-
         $this->assetsHelper->addScriptDeclaration($script, 'onPageDisplay_headClose');
     }
 }

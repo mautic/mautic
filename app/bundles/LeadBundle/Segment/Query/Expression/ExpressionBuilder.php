@@ -437,7 +437,7 @@ class ExpressionBuilder
      *
      * @return string
      */
-    public function func($func, $x, $y = null)
+    public function func($func, $x)
     {
         $functionArguments = func_get_args();
         $additionArguments = array_splice($functionArguments, 2);

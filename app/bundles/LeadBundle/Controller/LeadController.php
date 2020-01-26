@@ -154,7 +154,7 @@ class LeadController extends FormController
         $lists = $this->getModel('lead.list')->getUserLists();
 
         //check to see if in a single list
-        $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
+        $inSingleList = 1 === substr_count($search, "$listCommand:") && true;
         $list         = [];
         if ($inSingleList) {
             preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
@@ -1266,7 +1266,7 @@ class LeadController extends FormController
             $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
-                $campaigns[$c['id']]['inCampaign'] = (isset($leadsCampaigns[$c['id']])) ? true : false;
+                $campaigns[$c['id']]['inCampaign'] = isset($leadsCampaigns[$c['id']]) && true;
             }
         } else {
             $campaigns = [];
@@ -1457,11 +1457,10 @@ class LeadController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function batchCampaignsAction($objectId = 0)
+    public function batchCampaignsAction()
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->getModel('campaign');
-
         if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
@@ -1583,7 +1582,7 @@ class LeadController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function batchDncAction($objectId = 0)
+    public function batchDncAction()
     {
         if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -1674,7 +1673,7 @@ class LeadController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function batchStagesAction($objectId = 0)
+    public function batchStagesAction()
     {
         if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -1781,7 +1780,7 @@ class LeadController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function batchOwnersAction($objectId = 0)
+    public function batchOwnersAction()
     {
         if ('POST' == $this->request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */

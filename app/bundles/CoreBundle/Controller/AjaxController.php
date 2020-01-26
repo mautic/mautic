@@ -185,7 +185,7 @@ class AjaxController extends CommonController
     /**
      * @return JsonResponse
      */
-    protected function globalCommandListAction(Request $request)
+    protected function globalCommandListAction()
     {
         $dispatcher = $this->get('event_dispatcher');
         $event      = new CommandListEvent();
@@ -194,7 +194,7 @@ class AjaxController extends CommonController
         $translator  = $this->get('translator');
         $dataArray   = [];
         $dupChecker  = [];
-        foreach ($allCommands as $header => $commands) {
+        foreach ($allCommands as $commands) {
             //@todo if/when figure out a way for typeahead dynamic headers
             //$header = $translator->trans($header);
             //$dataArray[$header] = array();
@@ -332,13 +332,12 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function updateSetUpdateLayoutAction(Request $request)
+    protected function updateSetUpdateLayoutAction()
     {
         $dataArray = [
             'success' => 1,
             'content' => $this->renderView('MauticCoreBundle:Update:update.html.php'),
         ];
-
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
@@ -353,18 +352,15 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function updateDownloadPackageAction(Request $request)
+    protected function updateDownloadPackageAction()
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
-
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->factory->getHelper('update');
-
         // Fetch the update package
         $update  = $updateHelper->fetchData();
         $package = $updateHelper->fetchPackage($update['package']);
-
         if ($package['error']) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans('mautic.core.update.error', ['%error%' => $translator->trans($package['message'])]);
@@ -395,21 +391,17 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function updateExtractPackageAction(Request $request)
+    protected function updateExtractPackageAction()
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
-
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->factory->getHelper('update');
-
         // Fetch the package data
         $update  = $updateHelper->fetchData();
         $zipFile = $this->factory->getSystemPath('cache').'/'.basename($update['package']);
-
         $zipper  = new \ZipArchive();
         $archive = $zipper->open($zipFile);
-
         if (true !== $archive) {
             // Get the exact error
             switch ($archive) {
@@ -609,15 +601,13 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    public function updateFinalizationAction(Request $request)
+    public function updateFinalizationAction()
     {
         $dataArray  = ['success' => 0];
         $translator = $this->translator;
-
         // Here as a just in case it's needed for a future upgrade
         $dataArray['success'] = 1;
         $dataArray['message'] = $translator->trans('mautic.core.update.update_successful', ['%version%' => $this->factory->getVersion()]);
-
         // Check for a post install message
         if ($postMessage = $this->container->get('session')->get('post_upgrade_message', false)) {
             $this->container->get('session')->remove('post_upgrade_message');
@@ -630,16 +620,13 @@ class AjaxController extends CommonController
                 $dataArray['postmessage'] = $postMessage;
             }
         }
-
         // Execute the mautic.post_upgrade event
         $this->dispatcher->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
-
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
         $cookieHelper = $this->factory->getHelper('cookie');
         $cookieHelper->deleteCookie('mautic_update');
-
         // Set a redirect to force a page reload to get new menu items, assets, etc
         $dataArray['redirect'] = $this->get('router')->generate('mautic_core_update');
 

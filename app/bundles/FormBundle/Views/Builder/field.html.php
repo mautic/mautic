@@ -138,7 +138,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                             ?>
                             <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                 <?php
-                                foreach ($group->choices as $subGroup => $fields):
+                                foreach ($group->choices as $fields):
                                     foreach ($fields->choices as $field) :
                                         $attr       = (!empty($field->attr)) ? $field->attr : [];
                                         $attrString = '';

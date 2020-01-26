@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function setIntegrationFilterAction(Request $request)
+    protected function setIntegrationFilterAction()
     {
         $session      = $this->get('session');
         $pluginFilter = InputHelper::int($this->request->get('plugin'));

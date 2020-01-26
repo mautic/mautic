@@ -48,7 +48,7 @@ class LeadTimelineEvent extends Event
     /**
      * @var array|null
      */
-    protected $orderBy = null;
+    protected $orderBy;
 
     /**
      * Lead entity for the lead the timeline is being generated for.

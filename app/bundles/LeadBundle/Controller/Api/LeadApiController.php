@@ -349,7 +349,7 @@ class LeadApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
@@ -647,7 +647,7 @@ class LeadApiController extends CommonApiController
      *
      * @return bool
      */
-    protected function isFormCancelled($form = null)
+    protected function isFormCancelled()
     {
         return false;
     }

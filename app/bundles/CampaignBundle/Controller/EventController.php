@@ -198,9 +198,8 @@ class EventController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
 
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->ajaxAction(
                 [
@@ -472,9 +471,7 @@ class EventController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 
     /**
@@ -543,8 +540,6 @@ class EventController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

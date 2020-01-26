@@ -59,7 +59,7 @@ class PageApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(&$entity)
     {
         $entity->url = $this->model->generateUrl($entity);
     }

@@ -47,7 +47,7 @@
                 <p class="fs-12 dark-sm"><small> <?php echo $view['date']->toFull($log['dateAdded']); ?></small></p>
             </div>
         </li>
-        <?php endforeach; ?>
+<?php endforeach; ?>
     </ul>
 </div>
 <?php endif; ?>

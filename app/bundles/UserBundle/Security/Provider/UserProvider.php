@@ -209,9 +209,7 @@ class UserProvider implements UserProviderInterface
         } catch (UsernameNotFoundException $exception) {
             // Try by email
             try {
-                $user = $this->loadUserByUsername($user->getEmail());
-
-                return $user;
+                return $this->loadUserByUsername($user->getEmail());
             } catch (UsernameNotFoundException $exception) {
             }
         }

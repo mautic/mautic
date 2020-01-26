@@ -52,14 +52,8 @@ class FileHelper
         //missing breaks are important
         switch (strtoupper($sSuffix)) {
             case 'P':
-                $iValue *= 1024;
-                // no break
             case 'T':
-                $iValue *= 1024;
-                // no break
             case 'G':
-                $iValue *= 1024;
-                // no break
             case 'M':
                 $iValue *= 1024;
                 // no break

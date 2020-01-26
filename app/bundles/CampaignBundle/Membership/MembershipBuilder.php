@@ -40,11 +40,6 @@ class MembershipBuilder
     private $leadRepository;
 
     /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -87,7 +82,6 @@ class MembershipBuilder
         $this->manager                  = $manager;
         $this->campaignMemberRepository = $campaignMemberRepository;
         $this->leadRepository           = $leadRepository;
-        $this->eventDispatcher          = $eventDispatcher;
         $this->translator               = $translator;
     }
 

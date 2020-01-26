@@ -61,11 +61,6 @@ class LegacyEventModel extends CommonFormModel
     private $scheduledExecutioner;
 
     /**
-     * @var InactiveExecutioner
-     */
-    private $inactiveExecutioner;
-
-    /**
      * @var EventExecutioner
      */
     private $eventExecutioner;
@@ -153,7 +148,6 @@ class LegacyEventModel extends CommonFormModel
         $this->realTimeExecutioner    = $realTimeExecutioner;
         $this->kickoffExecutioner     = $kickoffExecutioner;
         $this->scheduledExecutioner   = $scheduledExecutioner;
-        $this->inactiveExecutioner    = $inactiveExecutioner;
         $this->eventExecutioner       = $eventExecutioner;
         $this->eventCollector         = $eventCollector;
         $this->actionDispatcher       = $actionDispatcher;

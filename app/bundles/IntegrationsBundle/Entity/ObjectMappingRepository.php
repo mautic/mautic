@@ -26,7 +26,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return array|null
      */
-    public function getInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName)
+    public function getInternalObject()
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')
@@ -43,7 +43,6 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('integrationObjectName', $integrationObjectName)
             ->setParameter('integrationObjectId', $integrationObjectId)
             ->setParameter('internalObjectName', $internalObjectName);
-
         $result = $qb->execute()->fetch();
 
         return $result ?: null;
@@ -57,7 +56,7 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return array|null
      */
-    public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName)
+    public function getIntegrationObject()
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')
@@ -74,7 +73,6 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectName', $internalObjectName)
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('integrationObjectName', $integrationObjectName);
-
         $result = $qb->execute()->fetch();
 
         return $result ?: null;
@@ -89,10 +87,9 @@ class ObjectMappingRepository extends CommonRepository
      *
      * @return int
      */
-    public function updateIntegrationObject($integration, $oldObjectName, $oldObjectId, $newObjectName, $newObjectId)
+    public function updateIntegrationObject()
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
         $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
             ->set('integration_object_name', ':newObjectName')
             ->set('integration_object_id', ':newObjectId')

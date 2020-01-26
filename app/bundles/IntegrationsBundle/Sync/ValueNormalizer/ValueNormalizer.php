@@ -36,7 +36,6 @@ final class ValueNormalizer implements ValueNormalizerInterface
             case NormalizedValueDAO::INT_TYPE:
                 return new NormalizedValueDAO($type, $value, (int) $value);
             case NormalizedValueDAO::FLOAT_TYPE:
-                return new NormalizedValueDAO($type, $value, (float) $value);
             case NormalizedValueDAO::DOUBLE_TYPE:
                 return new NormalizedValueDAO($type, $value, (float) $value);
             case NormalizedValueDAO::DATE_TYPE:

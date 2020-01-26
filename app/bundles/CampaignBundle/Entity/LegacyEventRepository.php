@@ -48,9 +48,8 @@ class LegacyEventRepository extends CommonRepository
             $q->select('COUNT(o) as event_count');
 
             $results = $results = $q->getQuery()->getArrayResult();
-            $count   = $results[0]['event_count'];
 
-            return $count;
+            return $results[0]['event_count'];
         }
 
         $q->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
@@ -174,9 +173,7 @@ class LegacyEventRepository extends CommonRepository
             );
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -257,9 +254,7 @@ class LegacyEventRepository extends CommonRepository
             ->where($q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId))
             ->andWhere($q->expr()->in('e.eventType', ['action', 'condition']));
 
-        $events = $q->getQuery()->getArrayResult();
-
-        return $events;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**

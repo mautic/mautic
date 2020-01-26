@@ -28,11 +28,6 @@ class InactiveContactFinder
     private $leadRepository;
 
     /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
      * @var CampaignLeadRepository
      */
     private $campaignLeadRepository;
@@ -57,7 +52,6 @@ class InactiveContactFinder
         LoggerInterface $logger
     ) {
         $this->leadRepository         = $leadRepository;
-        $this->campaignRepository     = $campaignRepository;
         $this->campaignLeadRepository = $campaignLeadRepository;
         $this->logger                 = $logger;
     }

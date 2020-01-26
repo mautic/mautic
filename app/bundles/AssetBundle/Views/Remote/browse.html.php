@@ -52,7 +52,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.asset.remo
                 <!--/ end: container -->
             </div>
             <!--/ end: box layout -->
-        <?php endif; ?>
+<?php endif; ?>
 <?php if ('index' == $tmpl) : ?>
     </div>
 </div>

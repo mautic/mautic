@@ -157,7 +157,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function inTokenizationMode()
     {
-        return (null !== $this->helper) ? $this->helper->inTokenizationMode() : false;
+        return null !== $this->helper && $this->helper->inTokenizationMode();
     }
 
     /**

@@ -55,7 +55,7 @@ class RestrictionHelper
         if (array_key_exists($fieldName, $restrictedFields)) {
             if (is_array($restrictedFields[$fieldName])) {
                 // Part of the collection of fields are restricted
-                foreach ($childType as $childFieldName => $grandchild) {
+                foreach ($childType as $grandchild) {
                     $this->applyRestrictions($grandchild, $childType, $restrictedFields[$fieldName]);
                 }
 

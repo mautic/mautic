@@ -76,11 +76,6 @@ class KickoffExecutioner implements ExecutionerInterface
     private $progressBar;
 
     /**
-     * @var int
-     */
-    private $batchCounter = 0;
-
-    /**
      * @var ArrayCollection
      */
     private $rootEvents;
@@ -146,7 +141,6 @@ class KickoffExecutioner implements ExecutionerInterface
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
         $this->progressBar  = null;
-        $this->batchCounter = 0;
 
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();

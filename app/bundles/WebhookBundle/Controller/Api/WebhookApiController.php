@@ -42,7 +42,7 @@ class WebhookApiController extends CommonApiController
      *
      * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(&$entity)
     {
         // We have to use this hack to have a simple array instead of the one the serializer gives us
         $entity->buildTriggers();

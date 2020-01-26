@@ -354,19 +354,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Adds Field. Overridden for IDE suggestions when stringing methods in entity class.
-     *
-     * @param string $name
-     * @param string $type
-     *
-     * @return $this
-     */
-    public function addField($name, $type, array $mapping = [])
-    {
-        return parent::addField($name, $type, $mapping);
-    }
-
-    /**
      * Add partial index.
      *
      * @param $name

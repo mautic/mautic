@@ -122,9 +122,7 @@ class CampaignRepository extends CommonRepository
             )->setParameter('manuallyRemoved', false);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -279,9 +277,7 @@ class CampaignRepository extends CommonRepository
             $q->expr()->eq('f.id', $formId)
         );
 
-        $campaigns = $q->getQuery()->getResult();
-
-        return $campaigns;
+        return $q->getQuery()->getResult();
     }
 
     /**
@@ -535,9 +531,7 @@ class CampaignRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**

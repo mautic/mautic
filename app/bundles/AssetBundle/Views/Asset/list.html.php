@@ -75,7 +75,7 @@ if ('index' == $tmpl) {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $k => $item): ?>
+            <?php foreach ($items as $item): ?>
                 <tr>
                     <td>
                         <?php

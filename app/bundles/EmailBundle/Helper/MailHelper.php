@@ -53,12 +53,12 @@ class MailHelper
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
      */
-    protected $templating = null;
+    protected $templating;
 
     /**
      * @var null
      */
-    protected $dispatcher = null;
+    protected $dispatcher;
 
     /**
      * @var \Swift_Plugins_Loggers_ArrayLogger
@@ -93,7 +93,7 @@ class MailHelper
     /**
      * @var array|Lead
      */
-    protected $lead = null;
+    protected $lead;
 
     /**
      * @var bool
@@ -103,7 +103,7 @@ class MailHelper
     /**
      * @var null
      */
-    protected $idHash = null;
+    protected $idHash;
 
     /**
      * @var bool
@@ -123,7 +123,7 @@ class MailHelper
     /**
      * @var Email|null
      */
-    protected $email = null;
+    protected $email;
 
     /**
      * @var array
@@ -193,11 +193,6 @@ class MailHelper
      * @var array
      */
     protected $headers = [];
-
-    /**
-     * @var array
-     */
-    private $systemHeaders = [];
 
     /**
      * @var array
@@ -667,7 +662,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->headers             = [];
-            $this->systemHeaders       = [];
+            [];
             $this->source              = [];
             $this->assets              = [];
             $this->globalTokens        = [];

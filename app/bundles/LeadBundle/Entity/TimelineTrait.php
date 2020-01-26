@@ -48,9 +48,8 @@ trait TimelineTrait
             $cq->applyDateFilters($query, $column, $tablePrefix);
 
             $data = $query->execute()->fetchAll();
-            $data = $cq->completeTimeData($data);
 
-            return $data;
+            return $cq->completeTimeData($data);
         }
 
         if (!empty($options['fromDate']) && !empty($options['toDate'])) {

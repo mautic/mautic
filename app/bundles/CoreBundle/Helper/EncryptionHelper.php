@@ -31,9 +31,7 @@ class EncryptionHelper
      * EncryptionHelper constructor.
      */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        SymmetricCipherInterface $possibleCipher1,
-        SymmetricCipherInterface $possibleCipher2 = null
+        CoreParametersHelper $coreParametersHelper
     ) {
         $nonCipherArgs = 1;
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {

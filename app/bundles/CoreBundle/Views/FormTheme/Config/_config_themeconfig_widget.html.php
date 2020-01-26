@@ -15,7 +15,7 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.themeconfig'); ?></h3>
     </div>
     <div class="panel-body">
-        <?php foreach ($form->children as $name => $f): ?>
+        <?php foreach ($form->children as $f): ?>
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($f); ?>

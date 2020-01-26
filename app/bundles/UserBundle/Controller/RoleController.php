@@ -179,7 +179,7 @@ class RoleController extends FormController
                     ],
                 ]);
             } else {
-                return $this->editAction($entity->getId(), true);
+                return $this->editAction($entity->getId());
             }
         }
 

@@ -39,7 +39,7 @@ class UrlHelper
      *
      * @param null $shortnerServiceUrl
      */
-    public function __construct(Http $http = null, $shortnerServiceUrl = null, Logger $logger = null)
+    public function __construct(Http $http = null, $shortnerServiceUrl = null)
     {
         $this->http               = $http;
         $this->shortnerServiceUrl = $shortnerServiceUrl;
@@ -136,8 +136,6 @@ class UrlHelper
         }
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
-        for ($n = 1; $n > 0; $abs = preg_replace($re, '/', $abs, -1, $n)) {
-        }
 
         /* absolute URL is ready! */
         return $scheme.'://'.$abs;
@@ -201,9 +199,8 @@ class UrlHelper
         }
 
         $url = self::sanitizeUrlScheme($url);
-        $url = self::sanitizeUrlQuery($url);
 
-        return $url;
+        return self::sanitizeUrlQuery($url);
     }
 
     /**

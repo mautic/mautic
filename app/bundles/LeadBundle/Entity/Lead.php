@@ -138,7 +138,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var int|null
      */
-    private $updatedPoints = null;
+    private $updatedPoints;
 
     /**
      * @var ArrayCollection
@@ -148,12 +148,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var null
      */
-    private $actualPoints = null;
-
-    /**
-     * @var ArrayCollection
-     */
-    private $companyChangeLog;
+    private $actualPoints;
 
     /**
      * @var ArrayCollection
@@ -200,7 +195,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var LeadManipulator
      */
-    private $manipulator = null;
+    private $manipulator;
 
     /**
      * Sets if the IP was just created by LeadModel::getCurrentLead().
@@ -242,11 +237,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var ArrayCollection
      */
-    private $stageChangeLog;
-
-    /**
-     * @var ArrayCollection
-     */
     private $utmtags;
 
     /**
@@ -274,9 +264,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->doNotContact     = new ArrayCollection();
         $this->pointsChangeLog  = new ArrayCollection();
         $this->tags             = new ArrayCollection();
-        $this->stageChangeLog   = new ArrayCollection();
+        new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
-        $this->companyChangeLog = new ArrayCollection();
+        new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -986,8 +976,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function stageChangeLog(StagesChangeLog $stageChangeLog)
     {
-        $this->stageChangeLog[] = $stageChangeLog;
-
         return $this;
     }
 
@@ -1040,8 +1028,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog)
     {
-        $this->companyChangeLog[] = $companyChangeLog;
-
         return $this;
     }
 

@@ -28,20 +28,13 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var DynamicContentModel
      */
     private $dynamicContentModel;
-
     /**
      * @var Session
      */
     private $session;
-
     /**
      * @var EventDispatcherInterface
      */
@@ -49,7 +42,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function __construct(LeadModel $leadModel, DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
     {
-        $this->leadModel           = $leadModel;
         $this->dynamicContentModel = $dynamicContentModel;
         $this->session             = $session;
         $this->dispatcher          = $dispatcher;

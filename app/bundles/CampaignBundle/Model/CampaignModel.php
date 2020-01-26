@@ -183,9 +183,7 @@ class CampaignModel extends CommonFormModel
             return new Campaign();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -681,9 +679,8 @@ class CampaignModel extends CommonFormModel
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
-        $leads      = $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
 
-        return $leads;
+        return $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
     }
 
     /**
@@ -836,7 +833,7 @@ class CampaignModel extends CommonFormModel
      *
      * @return bool
      */
-    public function setChannelFromEventProperties($entity, $properties, &$eventSettings)
+    public function setChannelFromEventProperties($entity)
     {
         @trigger_error('Deprecated 2.14 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead', E_USER_DEPRECATED);
 
@@ -879,7 +876,7 @@ class CampaignModel extends CommonFormModel
      * @param bool $batchProcess
      * @param int  $searchListLead
      */
-    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
+    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false)
     {
         @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
 
@@ -925,7 +922,7 @@ class CampaignModel extends CommonFormModel
      * @param bool $batchProcess
      * @param bool $skipFindOne
      */
-    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
+    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false)
     {
         @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
 

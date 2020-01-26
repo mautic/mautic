@@ -50,9 +50,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                 break;
         }
 
-        $url .= "/{$this->ip}";
-
-        return $url;
+        return $url."/{$this->ip}";
     }
 
     /**

@@ -20,16 +20,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class EnvironmentSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CookieHelper
-     */
-    private $cookieHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
      * System params.
      *
      * @var array
@@ -38,7 +28,6 @@ class EnvironmentSubscriber implements EventSubscriberInterface
 
     public function __construct(CookieHelper $cookieHelper, array $params)
     {
-        $this->cookieHelper = $cookieHelper;
         $this->params       = $params;
     }
 

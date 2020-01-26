@@ -36,7 +36,7 @@ $verticalContentColWidth = 12 - (int) $verticalTabColWidth;
     <ul<?php echo (isset($deletable) && is_string($deletable)) ? ' data-delete-action="'.$deletable.'" ' : ''; ?>
         <?php echo (isset($sortable) && is_string($sortable)) ? ' data-sort-action="'.$sortable.'" ' : ''; ?>
             class="<?php echo (!empty($deletable)) ? 'nav-deletable ' : ''; ?>nav nav-tabs <?php echo (!empty($vertical)) ? 'tabs-'.$vertical.' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal bg-auto'; ?><?php echo !empty($sortable) ? ' sortable' : ''; ?>">
-        <?php foreach ($tabs as $tabKey => $tab): ?>
+        <?php foreach ($tabs as $tab): ?>
             <?php
             $class = (!empty($tab['class'])) ? ' '.$tab['class'] : '';
             if (isset($tab['attr']) && is_array($tab['attr'])) {

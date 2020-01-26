@@ -117,7 +117,7 @@ abstract class PluginBundleBase extends Bundle
      *
      * @param null $metadata
      */
-    public static function onPluginUninstall(Plugin $plugin, MauticFactory $factory, $metadata = null)
+    public static function onPluginUninstall()
     {
     }
 

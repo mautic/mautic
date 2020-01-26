@@ -26,15 +26,13 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function viewingVisitorsAction(Request $request)
+    protected function viewingVisitorsAction()
     {
         $dataArray = ['success' => 0];
-
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
         $pageRepository               = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPageBundle:Hit');
         $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
-
-        $dataArray['success'] = 1;
+        $dataArray['success']         = 1;
 
         return $this->sendJsonResponse($dataArray);
     }

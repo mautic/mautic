@@ -24,7 +24,7 @@ final class FromDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $name = null;
+    private $name;
 
     /**
      * FromDTO constructor.

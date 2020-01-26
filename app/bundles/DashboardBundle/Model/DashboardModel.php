@@ -101,9 +101,7 @@ class DashboardModel extends FormModel
             return new Widget();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

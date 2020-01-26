@@ -22,7 +22,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
      *
      * @return mixed
      */
-    abstract protected function getFormData($action, $objectId);
+    abstract protected function getFormData();
 
     /**
      * @param      $data
@@ -31,7 +31,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
      *
      * @return Form
      */
-    abstract protected function getActionForm($data, $action, $objectId = null);
+    abstract protected function getActionForm();
 
     /**
      * @param      $data
@@ -40,7 +40,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
      *
      * @return mixed
      */
-    abstract protected function processFormData($data, Form $form, $action, $objectId = null);
+    abstract protected function processFormData();
 
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -141,7 +141,7 @@ abstract class AbstractModalFormController extends AbstractStandardFormControlle
      *
      * @return mixed
      */
-    protected function getResponseVars($args, $action = null)
+    protected function getResponseVars($args)
     {
         return $args;
     }

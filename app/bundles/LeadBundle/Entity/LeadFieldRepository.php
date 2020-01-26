@@ -334,7 +334,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return bool
      */
-    public function compareDateMonthValue($lead, $field, $value)
+    public function compareDateMonthValue()
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -349,7 +349,6 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('month', $value->format('m'))
             ->setParameter('day', $value->format('d'));
-
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);

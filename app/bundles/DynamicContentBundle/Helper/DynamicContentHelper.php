@@ -101,9 +101,7 @@ class DynamicContentHelper
                 continue;
             }
             if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
-                $slotContent = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
-
-                return $slotContent;
+                return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
             }
         }
 

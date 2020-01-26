@@ -117,7 +117,7 @@ abstract class AbstractPermissions
             $permissionLevels[$bundle] = [];
             if (isset($permissions[$bundle])) {
                 if ($this->isEnabled()) {
-                    foreach ($permissions[$bundle] as $permId => $details) {
+                    foreach ($permissions[$bundle] as $details) {
                         $permName    = $details['name'];
                         $permBitwise = $details['bitwise'];
                         //ensure the permission still exists
@@ -212,7 +212,7 @@ abstract class AbstractPermissions
             //otherwise test for specific level
             $result = ($this->permissions[$name][$level] & $userPermissions[$name]);
 
-            return ($result) ? true : false;
+            return $result && true;
         }
     }
 
@@ -311,7 +311,7 @@ abstract class AbstractPermissions
     /**
      * Gives the bundle an opportunity to change how JavaScript calculates permissions granted.
      */
-    public function parseForJavascript(array &$perms)
+    public function parseForJavascript()
     {
     }
 

@@ -41,7 +41,7 @@ class IntegrationsListType extends AbstractType
         $integrationObjects = $this->integrationHelper->getIntegrationObjects(null, $options['supported_features'], true);
         $integrations       = ['' => ''];
 
-        foreach ($integrationObjects as $name => $object) {
+        foreach ($integrationObjects as $object) {
             $settings = $object->getIntegrationSettings();
 
             if ($settings->isPublished()) {

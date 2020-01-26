@@ -38,11 +38,6 @@ class MenuRenderer implements RendererInterface
     private $defaultOptions;
 
     /**
-     * @var string
-     */
-    private $charset;
-
-    /**
      * MenuRenderer constructor.
      *
      * @param $charset
@@ -67,7 +62,6 @@ class MenuRenderer implements RendererInterface
             ],
             $defaultOptions
         );
-        $this->charset        = $charset;
     }
 
     /**

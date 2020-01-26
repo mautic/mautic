@@ -83,7 +83,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
             return $this;
         }
 
-        foreach ($buttons as $key => $button) {
+        foreach ($buttons as $button) {
             if (!isset($button['priority'])) {
                 $button['priority'] = 0;
             }

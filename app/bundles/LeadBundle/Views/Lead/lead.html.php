@@ -587,7 +587,7 @@ $view['slots']->set(
             <div class="panel-title">
                 <?php echo $view['translator']->trans('mautic.lead.lead.companies'); ?>
             </div>
-            <?php foreach ($companies as $key => $company): ?>
+            <?php foreach ($companies as $company): ?>
             <h5 class="pull-left mt-xs mr-xs">
                 <span class="label label-success">
                     <i id="company-<?php echo $company['id']; ?>" 

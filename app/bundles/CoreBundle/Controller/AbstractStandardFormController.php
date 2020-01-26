@@ -188,7 +188,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return bool|mixed
      */
-    protected function checkActionPermission($action, $entity = null, $objectId = null)
+    protected function checkActionPermission($action, $entity = null)
     {
         /** @var CorePermissions $security */
         $security = $this->get('mautic.security');
@@ -661,7 +661,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getPostActionControllerAction($action)
+    protected function getPostActionControllerAction()
     {
         return 'index';
     }

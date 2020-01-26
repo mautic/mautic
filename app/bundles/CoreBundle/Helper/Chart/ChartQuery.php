@@ -478,7 +478,7 @@ class ChartQuery extends AbstractChart
      *
      * @return int
      */
-    public function count($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [])
+    public function count($table, $uniqueColumn, $dateColumn = null, $filters = [])
     {
         $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
 

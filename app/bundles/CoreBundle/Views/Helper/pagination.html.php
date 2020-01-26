@@ -121,8 +121,7 @@ foreach ($responsiveViewports as $viewport):
                 $class  = ($page <= 1) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
-                    <?php ?>
-                    <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
+                                        <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
                         <i class="fa fa-angle-double-left"></i>
                     </a>
                 </li>
@@ -133,8 +132,7 @@ foreach ($responsiveViewports as $viewport):
                 $class  = (($page - 1) <= 0) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
-                    <?php ?>
-                    <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
+                                        <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
                         <i class="fa fa-angle-left"></i>
                     </a>
                 </li>
@@ -168,8 +166,7 @@ foreach ($responsiveViewports as $viewport):
                 $class  = (($page + 1) > $totalPages) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
-                    <?php ?>
-                    <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
+                                        <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
                         <i class="fa fa-angle-right"></i>
                     </a>
                 </li>
@@ -180,8 +177,7 @@ foreach ($responsiveViewports as $viewport):
                 $class  = ($page === $totalPages) ? ' class="disabled"' : '';
                 ?>
                 <li<?php echo $class; ?>>
-                    <?php ?>
-                    <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
+                                        <a <?php echo $action; ?><?php echo $data.$formExit; ?>>
                         <i class="fa fa-angle-double-right"></i>
                     </a>
                 </li>

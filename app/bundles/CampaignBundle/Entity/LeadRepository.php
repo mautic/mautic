@@ -118,9 +118,7 @@ class LeadRepository extends CommonRepository
                 ->setParameter('eventId', $eventId);
         }
 
-        $result = $q->getQuery()->getResult();
-
-        return $result;
+        return $q->getQuery()->getResult();
     }
 
     /**

@@ -87,7 +87,7 @@ class AvatarHelper extends Helper
      *
      * @return mixed
      */
-    public function getDefaultAvatar($absolute = false)
+    public function getDefaultAvatar()
     {
         $img = $this->pathsHelper->getSystemPath('assets').'/images/avatar.png';
 

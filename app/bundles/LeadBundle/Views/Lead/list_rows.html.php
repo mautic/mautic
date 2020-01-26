@@ -118,4 +118,4 @@
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>
-        <?php endforeach; ?>
+<?php endforeach; ?>

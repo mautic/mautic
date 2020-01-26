@@ -31,11 +31,6 @@ class CompanyType extends AbstractType
     use EntityFieldsBuildFormTrait;
 
     /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    /**
      * @var EntityManager
      */
     private $em;
@@ -53,7 +48,6 @@ class CompanyType extends AbstractType
     public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator)
     {
         $this->em         = $entityManager;
-        $this->security   = $security;
         $this->router     = $router;
         $this->translator = $translator;
     }

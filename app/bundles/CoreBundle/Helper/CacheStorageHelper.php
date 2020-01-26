@@ -56,8 +56,6 @@ class CacheStorageHelper
      */
     protected $defaultExpiration;
 
-    private $expirations = [];
-
     /**
      * @param      $adaptor
      * @param null $namespace
@@ -117,7 +115,6 @@ class CacheStorageHelper
         if (0 === $maxAge) {
             return false;
         } elseif (null !== $maxAge) {
-            $this->expirations[$name] = (int) $maxAge;
         }
 
         $cacheItem = $this->cacheAdaptor->getItem($name);

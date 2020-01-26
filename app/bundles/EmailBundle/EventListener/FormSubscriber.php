@@ -32,11 +32,6 @@ class FormSubscriber implements EventSubscriberInterface
     private $emailModel;
 
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var ContactTracker
      */
     private $contactTracker;
@@ -47,7 +42,6 @@ class FormSubscriber implements EventSubscriberInterface
         ContactTracker $contactTracker
     ) {
         $this->emailModel     = $emailModel;
-        $this->leadModel      = $leadModel;
         $this->contactTracker = $contactTracker;
     }
 

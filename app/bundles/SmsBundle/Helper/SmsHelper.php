@@ -119,6 +119,6 @@ class SmsHelper
         $integration = $this->integrationHelper->getIntegrationObject('Twilio');
         $settings    = $integration->getIntegrationSettings()->getFeatureSettings();
 
-        return !empty($settings['disable_trackable_urls']) ? true : false;
+        return !empty($settings['disable_trackable_urls']) && true;
     }
 }

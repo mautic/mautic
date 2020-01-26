@@ -104,19 +104,17 @@ class ImportController extends FormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function cancelAction($objectId)
+    public function cancelAction()
     {
         $session     = $this->get('session');
         $fullPath    = $this->getFullCsvPath();
         $importModel = $this->getModel($this->getModelName());
         $import      = $importModel->getEntity($session->get('mautic.lead.import.id', null));
-
         if ($import && $import->getId()) {
             $import->setStatus($import::STOPPED)
                 ->setIsPublished(false);
             $importModel->saveEntity($import);
         }
-
         $this->resetImport($fullPath);
 
         return $this->indexAction();
@@ -129,18 +127,16 @@ class ImportController extends FormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function queueAction($objectId)
+    public function queueAction()
     {
         $session     = $this->get('session');
         $fullPath    = $this->getFullCsvPath();
         $importModel = $this->getModel($this->getModelName());
         $import      = $importModel->getEntity($session->get('mautic.lead.import.id', null));
-
         if ($import) {
             $import->setStatus($import::QUEUED);
             $importModel->saveEntity($import);
         }
-
         $this->resetImport($fullPath, false);
 
         return $this->indexAction();

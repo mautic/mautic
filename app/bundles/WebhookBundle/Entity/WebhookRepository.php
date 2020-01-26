@@ -19,16 +19,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class WebhookRepository extends CommonRepository
 {
     /**
-     * Get a list of entities.
-     *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
-     */
-    public function getEntities(array $args = [])
-    {
-        return parent::getEntities($args);
-    }
-
-    /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *

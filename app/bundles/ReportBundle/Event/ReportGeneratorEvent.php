@@ -49,7 +49,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * @var ExpressionBuilder|null
      */
-    private $filterExpression = null;
+    private $filterExpression;
 
     /**
      * @var ChannelListHelper

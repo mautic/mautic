@@ -30,11 +30,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CategoryType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var Session
      */
     private $session;
@@ -44,7 +39,6 @@ class CategoryType extends AbstractType
      */
     public function __construct(TranslatorInterface $translator, Session $session)
     {
-        $this->translator = $translator;
         $this->session    = $session;
     }
 

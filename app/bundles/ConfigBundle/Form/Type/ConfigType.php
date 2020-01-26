@@ -58,7 +58,7 @@ class ConfigType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
 
-                foreach ($form as $config => $configForm) {
+                foreach ($form as $configForm) {
                     foreach ($configForm as $child) {
                         $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }

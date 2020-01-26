@@ -698,7 +698,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function parseCallbackResponse($data, $postAuthorization = false)
+    public function parseCallbackResponse($data)
     {
         if (!$parsed = json_decode($data, true)) {
             parse_str($data, $parsed);
@@ -930,9 +930,7 @@ abstract class AbstractIntegration
         if (!empty($settings['return_raw'])) {
             return $result;
         } else {
-            $response = $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
-
-            return $response;
+            return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
         }
     }
 
@@ -1441,7 +1439,7 @@ abstract class AbstractIntegration
      *
      * @return string
      */
-    public function getBearerToken($inAuthorization = false)
+    public function getBearerToken()
     {
         return '';
     }
@@ -1454,7 +1452,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getPublicActivity($identifier, &$socialCache)
+    public function getPublicActivity()
     {
         return [];
     }
@@ -1467,7 +1465,7 @@ abstract class AbstractIntegration
      *
      * @return array
      */
-    public function getUserData($identifier, &$socialCache)
+    public function getUserData()
     {
         return [];
     }
@@ -1946,7 +1944,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function convertLeadFieldKey($key, $field)
+    public function convertLeadFieldKey($key)
     {
         return $key;
     }
@@ -2011,7 +2009,6 @@ abstract class AbstractIntegration
                     $info[$field] = $values;
                     break;
                 case 'object':
-                    $values = $values;
                     foreach ($fieldDetails['fields'] as $f) {
                         if (isset($values->$f)) {
                             $fn = $this->matchFieldName($field, $f);
@@ -2023,8 +2020,7 @@ abstract class AbstractIntegration
                 case 'array_object':
                     $objects = [];
                     if (!empty($values)) {
-                        foreach ($values as $k => $v) {
-                            $v = $v;
+                        foreach ($values as $v) {
                             if (isset($v->value)) {
                                 $objects[] = $v->value;
                             }
@@ -2514,7 +2510,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function prepareFieldsForSync($fields, $keys, $object = null)
+    public function prepareFieldsForSync($fields)
     {
         return $fields;
     }
@@ -2614,7 +2610,7 @@ abstract class AbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $records)
     {
         return $records;
     }

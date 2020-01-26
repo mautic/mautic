@@ -224,7 +224,7 @@ $showActions = count($activeFormActions);
                                 </li>
                             <?php endforeach; ?>
                         </ul>
-                    <?php endforeach; ?>
+<?php endforeach; ?>
                 </div>
                 <!--/ #actions-container -->
             <?php endif; ?>

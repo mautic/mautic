@@ -34,7 +34,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($graph['data'] as $rowKey => $row) : ?>
+                        <?php foreach ($graph['data'] as $row) : ?>
                         <tr>
                             <?php foreach ($row as $cellName => $cell) : ?>
                                 <?php if (array_key_exists('id', $graph['data'][0]) && 'title' == $cellName && isset($graph['link'])) : ?>
@@ -52,7 +52,7 @@
                     </tbody>
                 </table>
             </div>
-        <?php else : ?>
+<?php else : ?>
             <div class="panel-body">
                 <p class="text-muted"><?php echo $view['translator']->trans('mautic.report.table.noresults'); ?></p>
             </div>

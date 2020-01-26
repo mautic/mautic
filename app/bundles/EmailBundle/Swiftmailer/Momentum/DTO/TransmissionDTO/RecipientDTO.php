@@ -21,7 +21,7 @@ final class RecipientDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $returnPath = null;
+    private $returnPath;
 
     /**
      * @var AddressDTO

@@ -733,7 +733,7 @@ class ReportModel extends FormModel
             $options = MauticReportBuilder::OPERATORS[$operator];
         }
 
-        foreach ($options as $value => &$label) {
+        foreach ($options as &$label) {
             $label = $this->translator->trans($label);
         }
 

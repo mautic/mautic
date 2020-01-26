@@ -82,16 +82,13 @@ if ('index' == $tmpl) {
                             case 'mautic.install.pcre.version': ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%pcreversion%' => (float) PCRE_VERSION]); ?></li>
                                 <?php break;
-                            case 'mautic.install.php.version.not.supported': ?>
-                                <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%phpversion%' => PHP_VERSION]); ?></li>
-                                <?php break;
+                            case 'mautic.install.php.version.not.supported':
                             case 'mautic.install.php.version.has.only.security.support': ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message, ['%phpversion%' => PHP_VERSION]); ?></li>
                                 <?php break;
                             default: ?>
                                 <li class="list-group-item"><?php echo $view['translator']->trans($message); ?></li>
-                                <?php break; ?>
-                        <?php endswitch; ?>
+                                <?php break;<?php endswitch; ?>
                     <?php endforeach; ?>
                 </ul>
             </div>

@@ -25,7 +25,7 @@ trait VariantEntityTrait
     /**
      * @var Page
      **/
-    private $variantParent = null;
+    private $variantParent;
 
     /**
      * @var array
@@ -130,7 +130,7 @@ trait VariantEntityTrait
      */
     public function removeVariantParent()
     {
-        $this->setVariantParent(null);
+        $this->setVariantParent();
     }
 
     /**

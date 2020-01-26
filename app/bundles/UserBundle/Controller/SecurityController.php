@@ -96,7 +96,7 @@ class SecurityController extends CommonController
                 $msg = $error;
             }
 
-            $this->addFlash($msg, [], 'error', null, false);
+            $this->addFlash($msg, 'error', null);
         }
         $this->request->query->set('tmpl', 'login');
 
@@ -132,7 +132,7 @@ class SecurityController extends CommonController
      *
      * @return RedirectResponse
      */
-    public function ssoLoginAction($integration)
+    public function ssoLoginAction()
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
@@ -144,10 +144,9 @@ class SecurityController extends CommonController
      *
      * @return RedirectResponse
      */
-    public function ssoLoginCheckAction($integration)
+    public function ssoLoginCheckAction()
     {
         // The plugin should be handling this in it's listener
-
         return new RedirectResponse($this->generateUrl('login'));
     }
 }

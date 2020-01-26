@@ -194,7 +194,7 @@ class AssetGenerationHelper
                     ],
                 ];
             } else {
-                foreach ($assets as $type => &$typeAssets) {
+                foreach ($assets as &$typeAssets) {
                     $typeAssets = array_keys($typeAssets);
                 }
             }

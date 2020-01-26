@@ -24,12 +24,11 @@ class SysinfoController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($page = 1)
+    public function indexAction()
     {
         if (!$this->user->isAdmin() || $this->coreParametersHelper->getParameter('sysinfo_disabled')) {
             return $this->accessDenied();
         }
-
         /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
         $model   = $this->getModel('config.sysinfo');
         $phpInfo = $model->getPhpInfo();

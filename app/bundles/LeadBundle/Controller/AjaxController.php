@@ -419,10 +419,9 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function getImportProgressAction(Request $request)
+    protected function getImportProgressAction()
     {
         $dataArray = ['success' => 1];
-
         if ($this->get('mautic.security')->isGranted('lead:leads:create')) {
             $session               = $this->get('session');
             $dataArray['progress'] = $session->get('mautic.lead.import.progress', [0, 0]);

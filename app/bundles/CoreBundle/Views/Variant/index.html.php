@@ -62,7 +62,7 @@ $totalWeight = 0;
         );
     endif;
     if (count($variants['children'])):
-        foreach ($variants['children'] as $id => $variant) :
+        foreach ($variants['children'] as $variant) :
             echo $view->render('MauticCoreBundle:Variant:row.html.php',
                 [
                     'totalWeight'   => &$totalWeight,

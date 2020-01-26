@@ -80,7 +80,7 @@ class FormController extends AbstractStandardFormController
      *
      * @return array
      */
-    public function customizeViewArguments($args, $action)
+    public function customizeViewArguments($args)
     {
         return $args;
     }

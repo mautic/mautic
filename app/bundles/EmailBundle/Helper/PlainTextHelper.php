@@ -493,7 +493,7 @@ class PlainTextHelper
      *
      * @return string
      */
-    protected function pregPreCallback(/* @noinspection PhpUnusedParameterInspection */ $matches)
+    protected function pregPreCallback()
     {
         return $this->preContent;
     }
@@ -537,9 +537,7 @@ class PlainTextHelper
             $str = strtoupper($str);
         }
 
-        $str = htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
-
-        return $str;
+        return htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
     }
 
     /**

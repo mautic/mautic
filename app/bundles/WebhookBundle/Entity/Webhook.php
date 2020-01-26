@@ -69,22 +69,9 @@ class Webhook extends FormEntity
     private $logs;
 
     /**
-     * @var array
-     */
-    private $removedEvents = [];
-
-    /**
      * @var
      */
     private $payload;
-
-    /**
-     * Holds a simplified array of events, just an array of event types.
-     * It's used for API serializaiton.
-     *
-     * @var array
-     */
-    private $triggers = [];
 
     /**
      * ASC or DESC order for fetching order of the events when queue mode is on.
@@ -354,7 +341,7 @@ class Webhook extends FormEntity
     public function buildTriggers()
     {
         foreach ($this->events as $event) {
-            $this->triggers[] = $event->getEventType();
+            $event->getEventType();
         }
     }
 
@@ -429,7 +416,6 @@ class Webhook extends FormEntity
     public function removeEvent(Event $event)
     {
         $this->isChanged('events', $event);
-        $this->removedEvents[] = $event;
         $this->events->removeElement($event);
 
         return $this;

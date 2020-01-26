@@ -199,7 +199,7 @@ class DateHelper extends Helper
      *
      * @return string $formatedRange
      */
-    public function formatRange($range, $format = null)
+    public function formatRange($range)
     {
         if ($range instanceof \DateInterval) {
             $formated  = [];
