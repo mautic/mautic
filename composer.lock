@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "299f27e22890bf63cae0468e2e0bde31",
+    "content-hash": "2646123bdd8999811c745f775c5412c8",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -6639,6 +6639,7 @@
                 }
             ],
             "description": "Allows installation of Components via Composer.",
+            "abandoned": "oomphinc/composer-installers-extender",
             "time": "2015-08-10T12:35:38+00:00"
         },
         {
@@ -12972,6 +12973,42 @@
                 "response"
             ],
             "time": "2019-04-30T12:38:16+00:00"
+        },
+        {
+            "name": "rector/rector-prefixed",
+            "version": "v0.6.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rectorphp/rector-prefixed.git",
+                "reference": "ae05be8b96f27a842dce90087a98a539faaa043c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rectorphp/rector-prefixed/zipball/ae05be8b96f27a842dce90087a98a539faaa043c",
+                "reference": "ae05be8b96f27a842dce90087a98a539faaa043c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2"
+            },
+            "conflict": {
+                "nikic/php-parser": "<4.3",
+                "phpstan/phpstan": "<0.12"
+            },
+            "replace": {
+                "rector/rector": "self.version"
+            },
+            "bin": [
+                "rector",
+                "rector.phar"
+            ],
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Prefixed version of Rector compiled in PHAR",
+            "time": "2020-01-20T12:58:06+00:00"
         },
         {
             "name": "ricardofiorani/guzzle-psr18-adapter",

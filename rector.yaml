@@ -1,0 +1,10 @@
+parameters:
+    sets:
+        - dead-code
+
+    paths:
+        - app/bundles
+        - app/config
+        - app/middlewares
+        - app/migrations
+        - plugins
