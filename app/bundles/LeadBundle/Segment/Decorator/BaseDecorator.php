@@ -70,7 +70,6 @@ class BaseDecorator implements FilterDecoratorInterface
             case 'endsWith':
             case 'contains':
                 return 'like';
-                break;
         }
 
         return $operator;
