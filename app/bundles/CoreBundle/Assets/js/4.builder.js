@@ -424,7 +424,7 @@ Mautic.updateIframeContent = function(iframeId, content, slot) {
         }
     } else if (slot) {
         slot.html(content);
-        Mautic.emptyPlaceholder(slot.parent());
+        Mautic.setEmptySlotPlaceholder(slot.parent());
     }
 };
 
@@ -582,8 +582,7 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
 };
 
 /**
- * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
- * reading it back. This is async process.
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and reading it back. This is async process.
  *
  * @param  object   content
  * @param  Function callback(clonedContent)
@@ -1279,7 +1278,7 @@ Mautic.initSlotListeners = function() {
             }
 
             slot.append(slotToolbar);
-            Mautic.emptyPlaceholder(slot);
+            Mautic.setEmptySlotPlaceholder(slot);
         }, function() {
             if (Mautic.sortActive) {
                 // don't activate while sorting
@@ -1468,7 +1467,7 @@ Mautic.initSlotListeners = function() {
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
-                        Mautic.emptyPlaceholder(clickedSlot);
+                        Mautic.setEmptySlotPlaceholder(clickedSlot);
                     }
                 });
 
@@ -2026,8 +2025,12 @@ Mautic.getDynamicContentMaxId = function() {
     return maxId;
 };
 
-Mautic.emptyPlaceholder = function (slot) {
-    if ((slot.text()).trim() == '') {
+Mautic.setEmptySlotPlaceholder = function (slot) {
+    var clonedSlot = slot.clone();
+    clonedSlot.find('div[data-slot-focus="true"]').remove()
+    clonedSlot.find('div[data-slot-toolbar="true"]').remove()
+
+    if ((clonedSlot.text()).trim() == '') {
         slot.addClass('empty');
     } else {
         slot.removeClass('empty');
