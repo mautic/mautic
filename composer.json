@@ -155,7 +155,8 @@
         "test": "bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
         "phpstan": "bin/phpstan analyse app/bundles plugins",
         "cs": "bin/php-cs-fixer fix -v --dry-run --diff",
-        "fixcs": "bin/php-cs-fixer fix -v"
+        "fixcs": "bin/php-cs-fixer fix -v",
+        "rector": "bin/rector process --config rector.yaml"
     },
     "config": {
         "bin-dir": "bin",
