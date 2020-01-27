@@ -48,6 +48,7 @@
 !/vendor/.htaccess
 
 /bin/*
+!/bin/.htaccess
 !/bin/console
 
 /bundles
