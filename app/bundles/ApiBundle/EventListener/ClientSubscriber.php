@@ -26,22 +26,15 @@ class ClientSubscriber implements EventSubscriberInterface
     private $ipLookupHelper;
 
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
      * @var AuditLogModel
      */
     private $auditLogModel;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        CoreParametersHelper $coreParametersHelper,
         AuditLogModel $auditLogModel
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->auditLogModel        = $auditLogModel;
     }
 

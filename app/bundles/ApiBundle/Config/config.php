@@ -126,7 +126,6 @@ return [
                 'class'     => \Mautic\ApiBundle\EventListener\ClientSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'mautic.helper.core_parameters',
                     'mautic.core.model.auditlog',
                 ],
             ],
