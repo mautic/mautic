@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\CacheHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -241,15 +242,14 @@ EOT
         $cacheHelper->nukeCache();
 
         // Update languages
-        $supportedLanguages = $this->getContainer()->get('mautic.factory')->getParameter('supported_languages');
+        /** @var LanguageHelper $languageHelper */
+        $languageHelper     = $this->getContainer()->get('mautic.helper.language');
+        $supportedLanguages = $languageHelper->getSupportedLanguages();
 
         // If there is only one language, assume it is 'en_US' and skip this
         if (count($supportedLanguages) > 1) {
             $progressBar->setMessage($translator->trans('mautic.core.command.update.step.update_languages'.'                  '));
             $progressBar->advance();
-
-            /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-            $languageHelper = $this->getContainer()->get('mautic.factory')->getHelper('language');
 
             // First, update the cached language data
             $result = $languageHelper->fetchLanguages(true);

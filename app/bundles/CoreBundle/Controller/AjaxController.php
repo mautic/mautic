@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
@@ -511,13 +512,12 @@ class AjaxController extends CommonController
         }
 
         // Update languages
-        $supportedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
+        /** @var LanguageHelper $languageHelper */
+        $languageHelper     = $this->container->get('mautic.helper.language');
+        $supportedLanguages = $languageHelper->getSupportedLanguages();
 
         // If there is only one language, assume it is 'en_US' and skip this
         if (count($supportedLanguages) > 1) {
-            /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-            $languageHelper = $this->factory->getHelper('language');
-
             // First, update the cached language data
             $result = $languageHelper->fetchLanguages(true);
 

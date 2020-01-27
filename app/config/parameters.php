@@ -55,7 +55,7 @@ foreach ($installedLocales as $dir) {
 }
 unset($defaultLocalesDir, $installedLocales, $extractLocales);
 
-$mauticParams['supported_languages'] = $locales;
+$container->setParameter('mautic.supported_languages', $locales);
 
 // Set the paths
 $mauticParams['paths'] = $paths;

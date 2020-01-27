@@ -165,7 +165,6 @@ return [
                     'translator',
                     'mautic.user.model.user',
                     'mautic.helper.language',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.type.role' => [

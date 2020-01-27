@@ -69,16 +69,10 @@ class ConfigType extends AbstractType
      */
     private $ipLookupServices;
 
-    /**
-     * ConfigType constructor.
-     *
-     * @param AbstractLookup $ipLookup
-     */
     public function __construct(
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
-        array $supportedLanguages,
         array $ipLookupServices,
         AbstractLookup $ipLookup = null
     ) {
@@ -86,7 +80,7 @@ class ConfigType extends AbstractType
         $this->langHelper          = $langHelper;
         $this->ipLookupFactory     = $ipLookupFactory;
         $this->ipLookup            = $ipLookup;
-        $this->supportedLanguages  = $supportedLanguages;
+        $this->supportedLanguages  = $langHelper->getSupportedLanguages();
         $this->ipLookupServices    = $ipLookupServices;
     }
 

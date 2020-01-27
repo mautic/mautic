@@ -147,11 +147,17 @@ class LanguageHelperTest extends \PHPUnit\Framework\TestCase
         @unlink($this->tmpPath.'/es.zip');
     }
 
+    public function testSupportedLanguagesAreReturned()
+    {
+        $helper = $this->getHelper();
+        $this->assertEquals(['es' => 'Spanish'], $helper->getSupportedLanguages());
+    }
+
     /**
      * @return LanguageHelper
      */
     private function getHelper()
     {
-        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->connector);
+        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->connector, ['es' => 'Spanish']);
     }
 }

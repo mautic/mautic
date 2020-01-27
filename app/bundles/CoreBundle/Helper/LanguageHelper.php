@@ -50,17 +50,28 @@ class LanguageHelper
      */
     private $coreParametersHelper;
 
-    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector)
+    /**
+     * @var array
+     */
+    private $supportedLanguages = [];
+
+    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector, array $supportedLanguages)
     {
         $this->pathsHelper          = $pathsHelper;
         $this->logger               = $logger;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->connector            = $connector;
+        $this->supportedLanguages   = $supportedLanguages;
 
         $this->installer = new Installer($this->pathsHelper->getSystemPath('translations_root').'/translations');
 
         // Moved to outside environment folder so that it doesn't get wiped on each config update
         $this->cacheFile = $pathsHelper->getSystemPath('cache').'/../languageList.txt';
+    }
+
+    public function getSupportedLanguages(): array
+    {
+        return $this->supportedLanguages;
     }
 
     /**

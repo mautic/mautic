@@ -259,7 +259,6 @@ return [
                     'translator',
                     'mautic.helper.language',
                     'mautic.ip_lookup.factory',
-                    '%mautic.supported_languages%',
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
                 ],
@@ -759,6 +758,7 @@ return [
                     'monolog.logger.mautic',
                     'mautic.helper.core_parameters',
                     'mautic.http.connector',
+                    '%mautic.supported_languages%',
                 ],
             ],
             'mautic.helper.url' => [

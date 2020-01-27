@@ -70,9 +70,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->unsetIfEmpty('transifex_password');
 
         // Check if the selected locale has been downloaded already, fetch it if not
-        $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
-
-        if (!array_key_exists($values['coreconfig']['locale'], $installedLanguages)) {
+        if (!array_key_exists($values['coreconfig']['locale'], $this->languageHelper->getSupportedLanguages())) {
             $fetchLanguage = $this->languageHelper->extractLanguagePackage($values['coreconfig']['locale']);
 
             // If there is an error, fall back to 'en_US' as it is our system default
