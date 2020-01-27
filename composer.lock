@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "299f27e22890bf63cae0468e2e0bde31",
+    "content-hash": "1deb69510e32075bfe17276a99e06916",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -6322,6 +6322,55 @@
             "time": "2017-02-14T16:28:37+00:00"
         },
         {
+            "name": "psr/http-client",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "496a823ef742b632934724bf769560c2a5c7c44e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/496a823ef742b632934724bf769560c2a5c7c44e",
+                "reference": "496a823ef742b632934724bf769560c2a5c7c44e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "time": "2018-10-30T23:29:13+00:00"
+        },
+        {
             "name": "psr/http-message",
             "version": "1.0.1",
             "source": {
@@ -6594,6 +6643,63 @@
             "time": "2019-12-17T08:18:51+00:00"
         },
         {
+            "name": "ricardofiorani/guzzle-psr18-adapter",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ricardofiorani/guzzle-psr18-adapter.git",
+                "reference": "438353d87054237569932ed52552eed831ad7801"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ricardofiorani/guzzle-psr18-adapter/zipball/438353d87054237569932ed52552eed831ad7801",
+                "reference": "438353d87054237569932ed52552eed831ad7801",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "php": "^7.1",
+                "psr/http-client": "^1.0"
+            },
+            "provide": {
+                "psr/http-client": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.3",
+                "spryker/code-sniffer": "^0.12.4 || ^0.14.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "RicardoFiorani\\GuzzlePsr18Adapter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ricardo Fiorani",
+                    "email": "ricardo.fiorani@gmail.com",
+                    "homepage": "https://github.com/ricardofiorani",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Guzzle PSR-18 adapter",
+            "homepage": "https://github.com/ricardofiorani/guzzle-psr18-adapter",
+            "keywords": [
+                "Guzzle",
+                "psr-18"
+            ],
+            "time": "2019-10-08T16:06:31+00:00"
+        },
+        {
             "name": "robloach/component-installer",
             "version": "0.2.3",
             "source": {
@@ -6639,6 +6745,7 @@
                 }
             ],
             "description": "Allows installation of Components via Composer.",
+            "abandoned": "oomphinc/composer-installers-extender",
             "time": "2015-08-10T12:35:38+00:00"
         },
         {
@@ -12873,55 +12980,6 @@
             "time": "2019-07-02T20:42:44+00:00"
         },
         {
-            "name": "psr/http-client",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/http-client.git",
-                "reference": "496a823ef742b632934724bf769560c2a5c7c44e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-client/zipball/496a823ef742b632934724bf769560c2a5c7c44e",
-                "reference": "496a823ef742b632934724bf769560c2a5c7c44e",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.0",
-                "psr/http-message": "^1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Http\\Client\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for HTTP clients",
-            "homepage": "https://github.com/php-fig/http-client",
-            "keywords": [
-                "http",
-                "http-client",
-                "psr",
-                "psr-18"
-            ],
-            "time": "2018-10-30T23:29:13+00:00"
-        },
-        {
             "name": "psr/http-factory",
             "version": "1.0.1",
             "source": {
@@ -12972,63 +13030,6 @@
                 "response"
             ],
             "time": "2019-04-30T12:38:16+00:00"
-        },
-        {
-            "name": "ricardofiorani/guzzle-psr18-adapter",
-            "version": "v1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ricardofiorani/guzzle-psr18-adapter.git",
-                "reference": "438353d87054237569932ed52552eed831ad7801"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ricardofiorani/guzzle-psr18-adapter/zipball/438353d87054237569932ed52552eed831ad7801",
-                "reference": "438353d87054237569932ed52552eed831ad7801",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^6.3",
-                "php": "^7.1",
-                "psr/http-client": "^1.0"
-            },
-            "provide": {
-                "psr/http-client": "^1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7.3",
-                "spryker/code-sniffer": "^0.12.4 || ^0.14.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "RicardoFiorani\\GuzzlePsr18Adapter\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ricardo Fiorani",
-                    "email": "ricardo.fiorani@gmail.com",
-                    "homepage": "https://github.com/ricardofiorani",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A Guzzle PSR-18 adapter",
-            "homepage": "https://github.com/ricardofiorani/guzzle-psr18-adapter",
-            "keywords": [
-                "Guzzle",
-                "psr-18"
-            ],
-            "time": "2019-10-08T16:06:31+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
