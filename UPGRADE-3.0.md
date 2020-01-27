@@ -41,7 +41,7 @@ Mautic's Configuration is no longer dependent on the Symfony container. This mea
 
 The following changes were made to support this:
 1. `%mautic.parameters%` is no longer available to services. Use the `CoreParametersHelper` instead.
-2. `CoreParametersHelper` is now limited to _just_ Mautic configuration parameters. It can no longer be used to fetch other Symfony parameters, `paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. Pass them as needed to the constructor of the service, use the BundleHelper, LanguageHelper, or the PathsHelper instead.
+2. `CoreParametersHelper` is now limited to _just_ Mautic configuration parameters. It can no longer be used to fetch other Symfony parameters, `mautic.paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. Pass them as needed to the constructor of the service, use the BundleHelper, LanguageHelper, or the PathsHelper instead.
 3. Email spooling was not compatible with dynamic environment variables. Thus a new service was created to delegate whether an email should be spooled or sent immediately.
 4. Mautic\CoreBundle\Helper\CacheHelper::clearCache(), clearContainerFile(), clearTranslationCache(), and clearRoutingCache() were removed.
 
@@ -108,8 +108,8 @@ All fixtures must be defined as services in a bundle's config.php
 *   EventPass removed as it was not needed after the CommonSubscriber was removed.
 *   BabDev/Transifex/* classes were replaced with Mautic/Transifex/*
 *   Mautic\CoreBundle\IpLookup\MaxmindLookup was renamed to Mautic\CoreBundle\IpLookup\AbstractMaxmindLookup and set as abstract class
-*   \Mautic\CoreBundle\CoreParametersHelper can no longer be used to fetch other Symfony parameters, `paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. 
-    * For Symfony parametser: Pass them as needed to the constructor of the service
+*   \Mautic\CoreBundle\CoreParametersHelper can no longer be used to fetch other Symfony parameters, `mautic.paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. 
+    * For Symfony parameters: Pass them as needed to the constructor of the service
     * For `mautic.bundles` or `mautic.plugin.bundles` use \Mautic\CoreBundle\Helper\BundleHelper::getMauticBundles() or getPluginBundles() instead
     * For `mautic.supported_languages`, use \Mautic\CoreBundle\Helper\LanguageHelper::getSupportedLanguages()
     * For `mautic.paths`, use \Mautic\CoreBundle\Helper\PathsHelper::getSystemPath() instead
