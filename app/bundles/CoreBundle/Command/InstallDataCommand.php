@@ -107,7 +107,6 @@ EOT
             '--append' => true,
             '--env'    => $env,
             '--quiet'  => true,
-            '--group'  => ['group_install'],
         ];
 
         $input      = new ArrayInput($args);
