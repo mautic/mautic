@@ -2,8 +2,7 @@
 services:
     Rector\DeadCode\Rector\Array_\RemoveDuplicatedArrayKeyRector:
     Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector:
-    # Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector:
-    # Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector:
+    Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector:
     # Rector\DeadCode\Rector\Class_\RemoveSetterOnlyPropertyAndMethodCallRector:
     # Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector:
     # Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector:
@@ -30,6 +29,10 @@ services:
     # Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector:
     # Rector\PHPUnit\Rector\ClassMethod\RemoveEmptyTestMethodRector:
     # Rector\DeadCode\Rector\Stmt\RemoveDeadStmtRector:
+
+    # Rectors with issues:
+        # see https://github.com/rectorphp/rector/issues/2765
+        # Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector:
 
 parameters:
     # Enable the dead code set once all the above rectors pass.
