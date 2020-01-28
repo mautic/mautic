@@ -73,10 +73,10 @@ class SetContactAvatarFormSubscriber extends CommonSubscriber
                 case 'file':
                     $properties = $field->getProperties();
                     if (empty($properties[FormFieldFileType::PROPERTY_PREFERED_PROFILE_IMAGE])) {
-                        continue;
+                        break;
                     }
                     if (empty($results[$field->getAlias()])) {
-                        continue;
+                        break;
                     }
                     try {
                         $filePath = $this->uploader->getCompleteFilePath($field, $results[$field->getAlias()]);
