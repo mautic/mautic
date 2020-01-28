@@ -1680,7 +1680,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $email   = $stat->getEmail();
             $channel = ($email) ? ['email' => $email->getId()] : 'email';
 
-            return $this->doNotContact->addDncForContact($lead->getId(), $channel, $comments, $reason, $flush);
+            return $this->doNotContact->addDncForContact($lead->getId(), $channel, $reason, $comments, $flush);
         }
 
         return false;

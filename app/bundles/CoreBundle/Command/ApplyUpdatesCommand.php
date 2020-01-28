@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * CLI Command to update the application.
@@ -59,7 +60,7 @@ class ApplyUpdatesCommand extends ContainerAwareCommand
      */
     private $progressBar;
 
-    public function __construct(Translator $translator, CoreParametersHelper $coreParametersHelper, StepProvider $stepProvider)
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, StepProvider $stepProvider)
     {
         parent::__construct();
 
