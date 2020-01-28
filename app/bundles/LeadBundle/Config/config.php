@@ -865,6 +865,31 @@ return [
                 'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
                 'tag'       => 'validator.constraint_validator',
             ],
+            'mautic.lead.segment.stat.dependencies' => [
+                'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class,
+                'arguments' => [
+                    '@doctrine.orm.entity_manager',
+                    'mautic.email.model.email',
+                    'mautic.campaign.model.campaign',
+                    'mautic.form.model.action',
+                    'mautic.lead.model.list',
+                    'mautic.point.model.triggerevent',
+                    'mautic.report.model.report',
+                ],
+            ],
+            'mautic.lead.segment.stat.chart.query.factory' => [
+                'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory::class,
+                'arguments' => [
+                ],
+            ],
+            'mautic.lead.segment.stat.campaign.share' => [
+                'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare::class,
+                'arguments' => [
+                    'mautic.campaign.model.campaign',
+                    'mautic.helper.cache_storage',
+                    '@doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -1036,6 +1061,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.lead_segment_service',
+                    'mautic.lead.segment.stat.chart.query.factory',
                 ],
             ],
             'mautic.lead.repository.lead_segment_filter_descriptor' => [

@@ -780,6 +780,37 @@ class ReportModel extends FormModel
     }
 
     /**
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $search = 'lll.leadlist_id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['column'] == $search && $eachFilter['value'] == $segmentId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
+    /**
      * @return \Doctrine\DBAL\Connection
      */
     private function getConnection()
