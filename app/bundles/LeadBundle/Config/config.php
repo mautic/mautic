@@ -389,6 +389,14 @@ return [
                     'mautic.email.model.email',
                 ],
             ],
+            'mautic.lead.formbundle.contact.avatar.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\SetContactAvatarFormSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.template.avatar',
+                    'mautic.form.helper.form_uploader',
+                    'mautic.lead.model.lead',
+                ],
+            ],
             'mautic.lead.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\LeadBundle\EventListener\CampaignSubscriber',
                 'arguments' => [

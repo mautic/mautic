@@ -11,13 +11,17 @@
 
 namespace Mautic\LeadBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Exception\ContactNotFoundException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\Helper\Helper;
 
 class AvatarHelper extends Helper
 {
+    private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
     /**
      * @var MauticFactory
      */
@@ -29,6 +33,37 @@ class AvatarHelper extends Helper
     public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    /**
+     * @param Lead   $lead
+     * @param string $filePath
+     *
+     * @throws FileNotFoundException
+     */
+    public function createAvatarFromFile(Lead $lead = null, $filePath)
+    {
+        if (!$lead) {
+            throw new ContactNotFoundException();
+        }
+
+        if (!file_exists($filePath)) {
+            throw new FileNotFoundException();
+        }
+
+        $avatarDir = $this->getAvatarPath(true);
+
+        if (!file_exists($avatarDir)) {
+            mkdir($avatarDir);
+        }
+
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        if (!in_array($ext, $this->imageTypes)) {
+            throw new \Exception('File is not image');
+        }
+
+        $fs = new Filesystem();
+        $fs->copy($filePath, $avatarDir.DIRECTORY_SEPARATOR.'avatar'.$lead->getId(), true);
     }
 
     /**
