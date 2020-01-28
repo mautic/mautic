@@ -407,6 +407,13 @@ return [
                    'mautic.campaign.helper.removed_contact_tracker',
                 ],
             ],
+            'mautic.lead.campaignbundle.action_dnc.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber::class,
+                'arguments' => [
+                   'mautic.lead.model.dnc',
+                   'mautic.lead.model.lead',
+                ],
+            ],
             'mautic.lead.reportbundle.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
@@ -774,6 +781,12 @@ return [
             'mautic.form.type.config.form' => [
                 'class' => Mautic\LeadBundle\Form\Type\ConfigType::class,
                 'alias' => 'leadconfig',
+            ],
+            'mautic.form.type.preference.channels' => [
+                'class'     => \Mautic\LeadBundle\Form\Type\PreferenceChannelsType::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
             ],
         ],
         'other' => [
