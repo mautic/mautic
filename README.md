@@ -82,7 +82,7 @@ By contributing to this project, you accept and agree to the [Contributor Agreem
 Each time you update Mautic's source after the initial setup/installation via a new checkout, download, git pull, etc; you will need to clear the cache. To do so, run the following command:
 
     $ cd /your/mautic/directory
-    $ php app/console cache:clear
+    $ php bin/console cache:clear
 
 (Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to add the <code>--env=dev</code> from the command).
 
@@ -96,17 +96,17 @@ Before running these commands, please make a backup of your database.
 
 If updating from <a href="https://github.com/mautic/mautic/releases">a tagged release</a> to <a href="https://github.com/mautic/mautic/releases">a tagged release</a>, schema changes will be included in a migrations file. To apply the changes, run
 
-    $ php app/console doctrine:migrations:migrate
+    $ php bin/console doctrine:migrations:migrate
 
 If you are updating to the latest source (remember this is alpha), first run
 
-    $ php app/console doctrine:schema:update --dump-sql
+    $ php bin/console doctrine:schema:update --dump-sql
 
 This will list out the queries Doctrine wants to execute in order to get the schema up-to-date (no queries are actually executed). Review the queries to ensure there is nothing detrimental to your data. If you have doubts about a query, submit an issue here and we'll verify it.
 
 If you're satisfied with the queries, execute them with
 
-    $ php app/console doctrine:schema:update --force
+    $ php bin/console doctrine:schema:update --force
 
 Your schema should now be up-to-date with the source.
 
@@ -116,7 +116,7 @@ Mautic downloaded from GitHub has the development environment. You can access it
 
 This development environment will display the PHP errors, warnings and notices directly as the output so you don't have to open the log to see them. It will also load for example translations without cache, so every change you make will be visible without clearing it. The only changes which require clearing the cache are in the `config.php` files.
 
-In case of assets like JS, CSS, the source files are loaded instead of concatenated, minified files. This way the changes in those files will be directly visible on refresh. If you'd wanted to see the change in the production environment, you'd have to have run the `app/console mautic:assets:generate` command.
+In case of assets like JS, CSS, the source files are loaded instead of concatenated, minified files. This way the changes in those files will be directly visible on refresh. If you'd wanted to see the change in the production environment, you'd have to have run the `bin/console mautic:assets:generate` command.
 
 In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
 
@@ -132,7 +132,7 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 2. Read the description and steps to test. If it's a bug fix, follow the steps to ensure you can recreate the issue.
 3. Use the development environment (above) for testing.
 3. [Apply the PR](https://help.github.com/articles/checking-out-pull-requests-locally/#modifying-an-inactive-pull-request-locally)
-4. Clear cache for development environment (`rm -rf app/cache/*` or `app/console cache:clear -e dev`).
+4. Clear cache for development environment (`rm -rf app/cache/*` or `bin/console cache:clear -e dev`).
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment about how the test went. If there is a problem, provide as much information as possible including error log messages.
 
