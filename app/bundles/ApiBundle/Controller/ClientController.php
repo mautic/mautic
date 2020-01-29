@@ -12,10 +12,10 @@
 namespace Mautic\ApiBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class ClientController.
- */
 class ClientController extends FormController
 {
     /**
@@ -23,7 +23,7 @@ class ClientController extends FormController
      *
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
@@ -121,7 +121,7 @@ class ClientController extends FormController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function authorizedClientsAction()
     {
@@ -134,7 +134,7 @@ class ClientController extends FormController
     /**
      * @param int $clientId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function revokeAction($clientId)
     {
@@ -183,7 +183,7 @@ class ClientController extends FormController
     /**
      * @param mixed $objectId
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function newAction($objectId = 0)
     {
@@ -278,7 +278,7 @@ class ClientController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -384,7 +384,7 @@ class ClientController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
