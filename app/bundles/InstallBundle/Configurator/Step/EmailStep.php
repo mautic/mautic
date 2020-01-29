@@ -36,7 +36,7 @@ class EmailStep implements StepInterface
      *
      * @var string
      */
-    public $mailer_transport = 'mail';
+    public $mailer_transport = 'smtp';
 
     /**
      * SMTP host
