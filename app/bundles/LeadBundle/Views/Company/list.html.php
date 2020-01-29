@@ -153,7 +153,7 @@ if ($tmpl == 'index') {
                             'mautic_contact_index',
                             [
                                 'search' => $view['translator']->trans('mautic.lead.lead.searchcommand.company').':"'
-                                    .$view->escape($fields['core']['companyname']['value']).'"',
+                                    .$fields['core']['companyname']['value'].'"',
                             ]
                         ); ?>" data-toggle="ajax"<?php echo ($leadCounts[$item->getId()] == 0) ? 'disabled=disabled' : ''; ?>>
                             <?php echo $view['translator']->transChoice(
