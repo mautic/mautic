@@ -46,7 +46,7 @@ if ($standalone || IN_CLI) {
 // Get local parameters
 $localParameters = get_local_config();
 if (isset($localParameters['cache_path'])) {
-    $cacheDir = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod');
+    $cacheDir = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod');
 } else {
     $cacheDir = MAUTIC_APP_ROOT.'/cache/prod';
 }
@@ -61,7 +61,7 @@ if (isset($_COOKIE['mautic_session_name'])) {
     $sessionValue = $_COOKIE[$_COOKIE['mautic_session_name']];
 
     include MAUTIC_APP_ROOT.'/config/paths.php';
-    $localConfigPath = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], MAUTIC_APP_ROOT, $paths['local_config']);
+    $localConfigPath = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
 
     $newSessionName = md5(md5($localConfigPath).$localParameters['secret_key']);
 
@@ -315,7 +315,7 @@ function get_local_config()
         include MAUTIC_APP_ROOT.'/config/paths.php';
 
         // Include local config to get cache_path
-        $localConfig = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], MAUTIC_APP_ROOT, $paths['local_config']);
+        $localConfig = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
 
         /** @var array $parameters */
         include $localConfig;

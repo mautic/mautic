@@ -30,7 +30,7 @@ trait ConfigAwareTrait
         include $root.'/config/paths.php';
 
         $localParameters = [];
-        $localConfig     = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $root, $paths['local_config']);
+        $localConfig     = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
 
         if (file_exists($localConfig)) {
             /** @var $parameters */

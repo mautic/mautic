@@ -107,11 +107,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], dirname($this->kernelRoot), $this->cache_path))) {
+        if (!is_writable(str_replace('%kernel.root_dir%', dirname($this->kernelRoot), $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], dirname($this->kernelRoot), $this->log_path))) {
+        if (!is_writable(str_replace('%kernel.root_dir%', dirname($this->kernelRoot), $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 

@@ -88,6 +88,6 @@ class DelegatingSpool extends \Swift_FileSpool
             return $rootPath.'../var/spool';
         }
 
-        return str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $rootPath, $filePath);
+        return str_replace('%kernel.root_dir%', $rootPath, $filePath);
     }
 }

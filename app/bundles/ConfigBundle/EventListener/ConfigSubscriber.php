@@ -15,6 +15,8 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ConfigSubscriber implements EventSubscriberInterface
@@ -29,10 +31,16 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     private $configChangeLogger;
 
-    public function __construct(CoreParametersHelper $paramHelper, ConfigChangeLogger $configChangeLogger)
+    /**
+     * @var Container
+     */
+    private $container;
+
+    public function __construct(CoreParametersHelper $paramHelper, Container $container, ConfigChangeLogger $configChangeLogger)
     {
         $this->paramHelper        = $paramHelper;
         $this->configChangeLogger = $configChangeLogger;
+        $this->container          = $container;
     }
 
     /**
@@ -51,8 +59,16 @@ class ConfigSubscriber implements EventSubscriberInterface
         $config = $event->getConfig();
 
         $escapeInvalidReference = function ($reference) {
-            // only escape when the referenced variable doesn't exist
-            if (null === $this->paramHelper->getParameter($reference[1])) {
+            // only escape when the referenced variable doesn't exist as either a Mautic config parameter or Symfony container parameter
+
+            try {
+                $this->container->getParameter($reference[1]);
+
+                return $reference[0];
+            } catch (ParameterNotFoundException $exception) {
+            }
+
+            if (!$this->paramHelper->hasParameter($reference[1])) {
                 return '%'.$reference[0].'%';
             }
 
