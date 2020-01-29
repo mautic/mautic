@@ -157,7 +157,7 @@ class PublicController extends CommonFormController
         }
 
         if (empty($template) && empty($formTemplate)) {
-            $template = $this->coreParametersHelper->getParameter('theme');
+            $template = $this->coreParametersHelper->get('theme');
         } elseif (!empty($formTemplate)) {
             $template = $formTemplate;
         }
@@ -345,7 +345,7 @@ class PublicController extends CommonFormController
 
             $model->removeDoNotContact($stat->getEmailAddress());
 
-            $message = $this->coreParametersHelper->getParameter('resubscribe_message');
+            $message = $this->coreParametersHelper->get('resubscribe_message');
             if (!$message) {
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
@@ -371,7 +371,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
+        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
         $theme = $this->factory->getTheme($template);
 
@@ -382,7 +382,7 @@ class PublicController extends CommonFormController
         // Ensure template still exists
         $theme = $this->factory->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
-            $template = $this->coreParametersHelper->getParameter('theme');
+            $template = $this->coreParametersHelper->get('theme');
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
@@ -742,7 +742,7 @@ class PublicController extends CommonFormController
     {
         $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-        $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
+        $message = $this->coreParametersHelper->get('unsubscribe_message');
         if (!$message) {
             $message = $translator->trans(
                 'mautic.email.unsubscribed.success',

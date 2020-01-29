@@ -194,7 +194,7 @@ class ConfigType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['entityId'] = $this->parameters->getParameter('mautic.saml_idp_entity_id');
+        $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
     /**

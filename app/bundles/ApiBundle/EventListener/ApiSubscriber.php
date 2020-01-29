@@ -71,7 +71,7 @@ class ApiSubscriber implements EventSubscriberInterface
         }
 
         // Prevent access to API if disabled
-        $apiEnabled = $this->coreParametersHelper->getParameter('api_enabled');
+        $apiEnabled = $this->coreParametersHelper->get('api_enabled');
         if (!$apiEnabled) {
             $response   = new JsonResponse(
                 [
@@ -93,7 +93,7 @@ class ApiSubscriber implements EventSubscriberInterface
 
         // Prevent access via basic auth if it is disabled
         $hasBasicAuth     = RequestHelper::hasBasicAuth($request);
-        $basicAuthEnabled = $this->coreParametersHelper->getParameter('api_enable_basic_auth');
+        $basicAuthEnabled = $this->coreParametersHelper->get('api_enable_basic_auth');
 
         if ($hasBasicAuth && !$basicAuthEnabled) {
             $response   = new JsonResponse(
@@ -159,7 +159,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
 
                 if ($hasBasicAuth) {
-                    if ($this->coreParametersHelper->getParameter('api_enable_basic_auth')) {
+                    if ($this->coreParametersHelper->get('api_enable_basic_auth')) {
                         $message = $this->translator->trans('mautic.api.error.basic.auth.invalid.credentials');
                     } else {
                         $message = $this->translator->trans('mautic.api.error.basic.auth.disabled');

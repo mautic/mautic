@@ -159,7 +159,7 @@ class ContactRequestHelper
 
         /* @var Lead $foundContact */
         if (!empty($this->queryFields)) {
-            list($foundContact, $this->publiclyUpdatableFieldValues) = $this->leadModel->checkForDuplicateContact(
+            [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
                 $this->trackedContact,
                 true,
@@ -198,7 +198,7 @@ class ContactRequestHelper
 
     private function setEmailFromClickthroughIdentification(array $clickthrough)
     {
-        if (!$this->coreParametersHelper->getParameter('track_by_tracking_url') || !empty($queryFields['email'])) {
+        if (!$this->coreParametersHelper->get('track_by_tracking_url') || !empty($queryFields['email'])) {
             return;
         }
 
@@ -223,7 +223,7 @@ class ContactRequestHelper
      */
     private function getContactByFingerprint()
     {
-        if (!$this->coreParametersHelper->getParameter('track_by_fingerprint')) {
+        if (!$this->coreParametersHelper->get('track_by_fingerprint')) {
             // Track by fingerprint is disabled so just use tracked lead
             throw new ContactNotFoundException();
         }

@@ -60,7 +60,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($l['ip'], $this->coreParametersHelper->getParameter('parameters'));
+            $ipAddress->setIpAddress($l['ip'], $this->coreParametersHelper->get('parameters'));
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);

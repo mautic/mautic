@@ -59,7 +59,7 @@ class SAMLSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $samlEnabled = (bool) $this->coreParametersHelper->getParameter('saml_idp_metadata');
+        $samlEnabled = (bool) $this->coreParametersHelper->get('saml_idp_metadata');
         if ($samlEnabled) {
             return;
         }

@@ -50,7 +50,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
     public function has($entityId): bool
     {
         // SAML is not enabled
-        if (!$this->coreParametersHelper->getParameter('saml_idp_metadata')) {
+        if (!$this->coreParametersHelper->get('saml_idp_metadata')) {
             return false;
         }
 
@@ -78,7 +78,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
 
     private function createEntityDescriptor(): void
     {
-        $xml = base64_decode($this->coreParametersHelper->getParameter('saml_idp_metadata'));
+        $xml = base64_decode($this->coreParametersHelper->get('saml_idp_metadata'));
 
         $this->entityDescriptor = EntityDescriptor::loadXml($xml);
     }

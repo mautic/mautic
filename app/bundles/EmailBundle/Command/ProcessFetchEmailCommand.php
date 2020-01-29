@@ -73,7 +73,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $limit     = $input->getOption('message-limit');
-        $mailboxes = $this->parametersHelper->getParameter('monitored_email');
+        $mailboxes = $this->parametersHelper->get('monitored_email');
         unset($mailboxes['general']);
         $mailboxes = array_keys($mailboxes);
 

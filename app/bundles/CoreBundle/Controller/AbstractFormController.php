@@ -109,9 +109,9 @@ abstract class AbstractFormController extends CommonController
                         'returnUrl'    => $returnUrl,
                     ]
                 ),
-                '%date%'     => $date->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
-                '%time%'     => $date->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
-                '%datetime%' => $date->format($this->coreParametersHelper->getParameter('date_format_full')),
+                '%date%'     => $date->format($this->coreParametersHelper->get('date_format_dateonly')),
+                '%time%'     => $date->format($this->coreParametersHelper->get('date_format_timeonly')),
+                '%datetime%' => $date->format($this->coreParametersHelper->get('date_format_full')),
                 '%override%' => $override,
             ],
         ];

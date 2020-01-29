@@ -47,7 +47,7 @@ class DelegatingSpool extends \Swift_FileSpool
      */
     public function __construct(CoreParametersHelper $coreParametersHelper, \Swift_Transport $realTransport)
     {
-        $this->fileSpoolEnabled     = 'file' === $coreParametersHelper->getParameter('mailer_spool_type');
+        $this->fileSpoolEnabled     = 'file' === $coreParametersHelper->get('mailer_spool_type');
         $this->realTransport        = $realTransport;
         $this->coreParametersHelper = $coreParametersHelper;
 
@@ -81,7 +81,7 @@ class DelegatingSpool extends \Swift_FileSpool
 
     private function getSpoolDir(): string
     {
-        $filePath = $this->coreParametersHelper->getParameter('mailer_spool_path');
+        $filePath = $this->coreParametersHelper->get('mailer_spool_path');
         $rootPath = realpath(__DIR__.'/../../../../');
 
         if (!$filePath) {

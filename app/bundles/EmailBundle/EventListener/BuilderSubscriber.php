@@ -260,7 +260,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $idHash = uniqid();
         }
 
-        $unsubscribeText = $this->coreParametersHelper->getParameter('unsubscribe_text');
+        $unsubscribeText = $this->coreParametersHelper->get('unsubscribe_text');
         if (!$unsubscribeText) {
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
@@ -269,7 +269,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
 
-        $webviewText = $this->coreParametersHelper->getParameter('webview_text');
+        $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
@@ -283,8 +283,8 @@ class BuilderSubscriber implements EventSubscriberInterface
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]));
         }
 
-        $signatureText = $this->coreParametersHelper->getParameter('default_signature_text');
-        $fromName      = $this->coreParametersHelper->getParameter('mailer_from_name');
+        $signatureText = $this->coreParametersHelper->get('default_signature_text');
+        $fromName      = $this->coreParametersHelper->get('mailer_from_name');
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
@@ -296,7 +296,7 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     public function convertUrlsToTokens(EmailSendEvent $event)
     {
-        if ($event->isInternalSend() || $this->coreParametersHelper->getParameter('disable_trackable_urls')) {
+        if ($event->isInternalSend() || $this->coreParametersHelper->get('disable_trackable_urls')) {
             // Don't convert urls
             return;
         }
@@ -344,14 +344,14 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             $contentTokens = $event->getTokens();
 
-            list($content, $trackables) = $this->pageTrackableModel->parseContentForTrackables(
+            [$content, $trackables] = $this->pageTrackableModel->parseContentForTrackables(
                 [$html, $text],
                 $contentTokens,
                 ($emailId) ? 'email' : null,
                 $emailId
             );
 
-            list($html, $text) = $content;
+            [$html, $text] = $content;
             unset($content);
 
             if ($html) {

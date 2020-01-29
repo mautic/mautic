@@ -60,7 +60,7 @@ class PageController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $this->get('session')->get('mautic.page.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.page.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;

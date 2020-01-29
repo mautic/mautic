@@ -196,13 +196,13 @@ class CoreSubscriber implements EventSubscriberInterface
                 // firewall setting the known user
                 $tz = $user->getTimezone();
                 if (empty($tz)) {
-                    $tz = $this->coreParametersHelper->getParameter('default_timezone');
+                    $tz = $this->coreParametersHelper->get('default_timezone');
                 }
                 $session->set('_timezone', $tz);
 
                 $locale = $user->getLocale();
                 if (empty($locale)) {
-                    $locale = $this->coreParametersHelper->getParameter('locale');
+                    $locale = $this->coreParametersHelper->get('locale');
                 }
                 $session->set('_locale', $locale);
             }

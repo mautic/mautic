@@ -69,7 +69,7 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->translator->setLocale($this->coreParametersHelper->getParameter('locale'));
+        $this->translator->setLocale($this->coreParametersHelper->get('locale'));
 
         $options        = $input->getOptions();
         $languageFilter = $options['language'];

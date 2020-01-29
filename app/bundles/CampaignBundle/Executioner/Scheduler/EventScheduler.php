@@ -154,7 +154,7 @@ class EventScheduler
 
     public function rescheduleFailure(LeadEventLog $log)
     {
-        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
+        if (!$interval = $this->coreParametersHelper->get('campaign_time_wait_on_event_false')) {
             return;
         }
 
@@ -171,7 +171,7 @@ class EventScheduler
 
     public function rescheduleFailures(ArrayCollection $logs)
     {
-        if (!$interval = $this->coreParametersHelper->getParameter('campaign_time_wait_on_event_false')) {
+        if (!$interval = $this->coreParametersHelper->get('campaign_time_wait_on_event_false')) {
             return;
         }
 

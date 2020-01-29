@@ -58,7 +58,7 @@ class FormController extends CommonFormController
         $session = $this->get('session');
 
         //set limits
-        $limit = $session->get('mautic.form.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.form.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;

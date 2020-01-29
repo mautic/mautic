@@ -50,7 +50,7 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
     public function has($entityId): bool
     {
         // SAML is not enabled
-        if (!$this->coreParametersHelper->getParameter('saml_idp_metadata')) {
+        if (!$this->coreParametersHelper->get('saml_idp_metadata')) {
             return false;
         }
 

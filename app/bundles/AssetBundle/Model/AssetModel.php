@@ -100,7 +100,7 @@ class AssetModel extends FormModel
         $this->deviceCreatorService   = $deviceCreatorService;
         $this->deviceDetectorFactory  = $deviceDetectorFactory;
         $this->deviceTrackingService  = $deviceTrackingService;
-        $this->maxAssetSize           = $coreParametersHelper->getParameter('max_size');
+        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
     }
 
     /**

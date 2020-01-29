@@ -61,9 +61,9 @@ class CredentialsStore implements CredentialStoreInterface
     private function delegateAndCreateCredentials(): void
     {
         // Credentials are required or SP will cause a never ending login loop as it throws an exception
-        $samlEnabled = (bool) $this->coreParametersHelper->getParameter('saml_idp_metadata');
+        $samlEnabled = (bool) $this->coreParametersHelper->get('saml_idp_metadata');
 
-        if (!$samlEnabled || !$certificateContent = $this->coreParametersHelper->getParameter('saml_idp_own_certificate')) {
+        if (!$samlEnabled || !$certificateContent = $this->coreParametersHelper->get('saml_idp_own_certificate')) {
             $this->credentials = $this->createDefaultCredentials();
 
             return;
@@ -74,9 +74,9 @@ class CredentialsStore implements CredentialStoreInterface
 
     private function createOwnCredentials(): X509Credential
     {
-        $certificateContent = base64_decode($this->coreParametersHelper->getParameter('saml_idp_own_certificate'));
-        $privateKeyContent  = base64_decode($this->coreParametersHelper->getParameter('saml_idp_own_private_key'));
-        $keyPassword        = (string) $this->coreParametersHelper->getParameter('saml_idp_own_password');
+        $certificateContent = base64_decode($this->coreParametersHelper->get('saml_idp_own_certificate'));
+        $privateKeyContent  = base64_decode($this->coreParametersHelper->get('saml_idp_own_private_key'));
+        $keyPassword        = (string) $this->coreParametersHelper->get('saml_idp_own_password');
 
         return $this->createCredentials($certificateContent, $privateKeyContent, $keyPassword);
     }

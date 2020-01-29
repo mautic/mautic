@@ -299,7 +299,7 @@ class ContactTracker
             return $this->createNewContact($ip, false);
         }
 
-        if ($this->coreParametersHelper->getParameter('track_contact_by_ip') && $this->coreParametersHelper->getParameter('anonymize_ip')) {
+        if ($this->coreParametersHelper->get('track_contact_by_ip') && $this->coreParametersHelper->get('anonymize_ip')) {
             /** @var Lead[] $leads */
             $leads = $this->leadRepository->getLeadsByIp($ip->getIpAddress());
             if (count($leads)) {

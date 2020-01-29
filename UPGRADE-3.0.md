@@ -113,6 +113,7 @@ All fixtures must be defined as services in a bundle's config.php
     * For `mautic.bundles` or `mautic.plugin.bundles` use \Mautic\CoreBundle\Helper\BundleHelper::getMauticBundles() or getPluginBundles() instead
     * For `mautic.supported_languages`, use \Mautic\CoreBundle\Helper\LanguageHelper::getSupportedLanguages()
     * For `mautic.paths`, use \Mautic\CoreBundle\Helper\PathsHelper::getSystemPath() instead
+    * \Mautic\CoreBundle\CoreParametersHelper::getParameter has been deprecated in favor of \Mautic\CoreBundle\CoreParametersHelper::get()
     
 ### ApiBundle
 

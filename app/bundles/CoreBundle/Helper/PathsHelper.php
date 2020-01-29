@@ -75,11 +75,11 @@ class PathsHelper
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $this->user                   = $userHelper->getUser();
-        $this->theme                  = $coreParametersHelper->getParameter('theme');
-        $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->getParameter('image_path'));
-        $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_dir'));
-        $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->getParameter('tmp_path'));
-        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->getParameter('dashboard_import_user_dir'));
+        $this->theme                  = $coreParametersHelper->get('theme');
+        $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->get('image_path'));
+        $this->dashboardImportDir     = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_dir'));
+        $this->temporaryDir           = $this->removeTrailingSlash($coreParametersHelper->get('tmp_path'));
+        $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
         $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
         $this->kernelRootDir          = $this->removeTrailingSlash($rootDir);

@@ -55,7 +55,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->getParameter('default_timezone')));
+        date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->get('default_timezone')));
     }
 
     /**
@@ -73,7 +73,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            $request->setLocale($request->getSession()->get('_locale', $this->coreParametersHelper->getParameter('locale')));
+            $request->setLocale($request->getSession()->get('_locale', $this->coreParametersHelper->get('locale')));
         }
     }
 }

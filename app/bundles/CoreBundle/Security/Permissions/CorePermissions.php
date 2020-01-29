@@ -447,7 +447,7 @@ class CorePermissions
      */
     protected function getParams()
     {
-        return $this->coreParametersHelper->allParameters();
+        return $this->coreParametersHelper->all();
     }
 
     /**

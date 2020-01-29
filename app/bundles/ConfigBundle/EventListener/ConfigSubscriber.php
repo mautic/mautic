@@ -68,7 +68,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             } catch (ParameterNotFoundException $exception) {
             }
 
-            if (!$this->paramHelper->hasParameter($reference[1])) {
+            if (!$this->paramHelper->has($reference[1])) {
                 return '%'.$reference[0].'%';
             }
 

@@ -371,7 +371,7 @@ class IntegrationHelper
     public function getIntegrationCount($plugin)
     {
         if (!is_array($plugin)) {
-            $plugins = $this->coreParametersHelper->getParameter('plugin.bundles');
+            $plugins = $this->coreParametersHelper->get('plugin.bundles');
             if (array_key_exists($plugin, $plugins)) {
                 $plugin = $plugins[$plugin];
             } else {

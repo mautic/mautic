@@ -247,7 +247,7 @@ class MenuHelper
      */
     protected function getParameter($name)
     {
-        return $this->coreParametersHelper->getParameter($name, false);
+        return $this->coreParametersHelper->get($name, false);
     }
 
     /**

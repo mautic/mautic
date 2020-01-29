@@ -58,7 +58,7 @@ class SmsController extends FormController
         $session = $this->get('session');
 
         //set limits
-        $limit = $session->get('mautic.sms.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.sms.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;

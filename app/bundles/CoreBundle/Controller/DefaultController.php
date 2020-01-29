@@ -27,7 +27,7 @@ class DefaultController extends CommonController
      */
     public function indexAction(Request $request)
     {
-        $root = $this->coreParametersHelper->getParameter('webroot');
+        $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
             return $this->redirect($this->generateUrl('mautic_dashboard_index'));

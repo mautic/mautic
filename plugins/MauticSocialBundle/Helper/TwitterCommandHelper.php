@@ -99,8 +99,8 @@ class TwitterCommandHelper
         $this->translator      = $translator;
         $this->em              = $em;
 
-        $this->translator->setLocale($coreParametersHelper->getParameter('locale', 'en_US'));
-        $this->twitterHandleField = $coreParametersHelper->getParameter('twitter_handle_field', 'twitter');
+        $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
+        $this->twitterHandleField = $coreParametersHelper->get('twitter_handle_field', 'twitter');
     }
 
     /**

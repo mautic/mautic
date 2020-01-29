@@ -176,7 +176,7 @@ class Mailbox
      */
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
-        $this->mailboxes = $parametersHelper->getParameter('monitored_email', []);
+        $this->mailboxes = $parametersHelper->get('monitored_email', []);
 
         if (isset($this->mailboxes['general'])) {
             $this->settings = $this->mailboxes['general'];
