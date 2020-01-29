@@ -70,7 +70,7 @@ class LeadController extends FormController
         $model   = $this->getModel('lead');
         $session = $this->get('session');
         //set limits
-        $limit = $session->get('mautic.lead.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'));
+        $limit = $session->get('mautic.lead.limit', $this->get('mautic.helper.core_parameters')->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;

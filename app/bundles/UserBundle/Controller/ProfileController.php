@@ -32,7 +32,7 @@ class ProfileController extends FormController
 
         //set some permissions
         $permissions = [
-            'apiAccess' => ($this->get('mautic.helper.core_parameters')->getParameter('api_enabled')) ?
+            'apiAccess' => ($this->get('mautic.helper.core_parameters')->get('api_enabled')) ?
                 $this->get('mautic.security')->isGranted('api:access:full')
                 : 0,
             'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
@@ -194,13 +194,13 @@ class ProfileController extends FormController
                     // Update timezone and locale
                     $tz = $me->getTimezone();
                     if (empty($tz)) {
-                        $tz = $this->get('mautic.helper.core_parameters')->getParameter('default_timezone');
+                        $tz = $this->get('mautic.helper.core_parameters')->get('default_timezone');
                     }
                     $this->get('session')->set('_timezone', $tz);
 
                     $locale = $me->getLocale();
                     if (empty($locale)) {
-                        $locale = $this->get('mautic.helper.core_parameters')->getParameter('locale');
+                        $locale = $this->get('mautic.helper.core_parameters')->get('locale');
                     }
                     $this->get('session')->set('_locale', $locale);
 

@@ -184,7 +184,7 @@ class PublicController extends CommonFormController
                 $successSessionName .= ".{$lead->getId()}";
             }
 
-            if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
+            if (!$this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
@@ -192,11 +192,11 @@ class PublicController extends CommonFormController
                 $viewParameters = [
                     'lead'                         => $lead,
                     'idHash'                       => $idHash,
-                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_frequency'),
-                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_pause_dates'),
-                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferred_channels'),
-                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_categories'),
-                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
+                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->get('show_contact_frequency'),
+                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->get('show_contact_pause_dates'),
+                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->get('show_contact_preferred_channels'),
+                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->get('show_contact_categories'),
+                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
                 ];
 
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);

@@ -207,7 +207,7 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $content  = $this->get('mautic.helper.core_parameters')->getParameter($objectId);
+        $content  = $this->get('mautic.helper.core_parameters')->get($objectId);
         $filename = $this->request->get('filename', $objectId);
 
         if ($decoded = base64_decode($content)) {
