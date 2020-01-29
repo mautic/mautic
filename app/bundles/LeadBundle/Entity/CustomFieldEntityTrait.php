@@ -250,6 +250,10 @@ trait CustomFieldEntityTrait
             ];
 
             foreach ($this->fields as $group => $fields) {
+                if ('all' === $group) {
+                    continue;
+                }
+
                 foreach ($fields as $alias => $field) {
                     $fieldValues[$alias] = $field['value'];
                 }

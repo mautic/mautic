@@ -682,6 +682,9 @@ class LeadModel extends FormModel
 
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
+            if ('all' === $group) {
+                continue;
+            }
             foreach ($groupFields as $alias => &$field) {
                 if (!isset($field['value'])) {
                     $field['value'] = null;
