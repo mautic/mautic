@@ -12,6 +12,8 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Class CoreParametersHelper.
@@ -19,18 +21,31 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 class CoreParametersHelper
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\ParameterBag
+     * @var ParameterBag
      */
     private $parameters;
 
-    public function __construct()
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
+     * @var array
+     */
+    private $resolvedParameters;
+
+    public function __construct(ContainerInterface $container)
     {
         $loader = new ParameterLoader();
 
         $this->parameters = $loader->getParameterBag();
+        $this->container  = $container;
+
+        $this->resolveParameters();
     }
 
-    public function getParameter($name, $default = null)
+    public function get($name, $default = null)
     {
         $name = $this->stripMauticPrefix($name);
 
@@ -39,21 +54,44 @@ class CoreParametersHelper
             return MAUTIC_TABLE_PREFIX;
         }
 
+        // First check the container so that Symfony will resolve container parameters within Mautic config values
+        $containerName = sprintf('mautic.%s', $name);
+        if ($this->container->hasParameter($containerName)) {
+            return $this->container->getParameter($containerName);
+        }
+
         return $this->parameters->get($name, $default);
     }
 
-    public function hasParameter($name): bool
+    public function has($name): bool
     {
         return $this->parameters->has($this->stripMauticPrefix($name));
     }
 
-    public function allParameters(): array
+    public function all(): array
     {
-        return $this->parameters->all();
+        return $this->resolvedParameters;
+    }
+
+    /**
+     * @deprecated 3.0.0 to be removed in 4.0; use get() instead
+     */
+    public function getParameter($name, $default = null)
+    {
+        return $this->get($name, $default);
     }
 
     private function stripMauticPrefix(string $name): string
     {
         return str_replace('mautic.', '', $name);
+    }
+
+    private function resolveParameters(): void
+    {
+        $all = $this->parameters->keys();
+
+        foreach ($all as $key => $value) {
+            $this->resolvedParameters[$key] = $this->get($key, $value);
+        }
     }
 }

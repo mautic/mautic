@@ -466,9 +466,9 @@ return [
                 ],
             ],
             'mautic.helper.core_parameters' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CoreParametersHelper',
+                'class'     => \Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
-                    '%kernel.root_dir%',
+                    'service_container',
                 ],
                 'serviceAlias' => 'mautic.config',
             ],
