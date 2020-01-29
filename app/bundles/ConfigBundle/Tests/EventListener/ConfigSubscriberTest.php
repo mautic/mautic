@@ -95,7 +95,7 @@ class ConfigSubscriberTest extends TestCase
             )
         );
 
-        $this->coreParametersHelper->method('hasParameter')->will(
+        $this->coreParametersHelper->method('has')->will(
             $this->returnCallback(
                 function ($param) {
                     return 'mautic.something' === $param;
