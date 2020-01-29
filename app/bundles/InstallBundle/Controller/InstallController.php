@@ -207,7 +207,7 @@ class InstallController extends CommonController
                 // Merge final things into the config, wipe the container, and we're done!
                 $finalConfigVars = [
                     'secret_key' => EncryptionHelper::generateKey(),
-                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBaseUrl(),
+                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBasePath(),
                 ];
 
                 if (!$this->saveConfiguration($finalConfigVars, null)) {
