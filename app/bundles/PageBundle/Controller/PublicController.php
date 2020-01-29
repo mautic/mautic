@@ -428,7 +428,7 @@ class PublicController extends CommonFormController
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        $logger->debug('Executing Redirect: '.(string) $redirect);
+        $logger->debug('Executing Redirect: '.$redirect);
 
         if (null === $redirect || !$redirect->isPublished(false)) {
             $logger->debug('Redirect with tracking_id of '.$redirectId.' not found');

@@ -1158,9 +1158,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $query = 'SELECT '.implode(', ', $this->sqlParts['select']);
 
         $query .= ($this->sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '')
+            .(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '')
             .($this->sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $this->sqlParts['groupBy']) : '')
-            .(null !== $this->sqlParts['having'] ? ' HAVING '.((string) $this->sqlParts['having']) : '')
+            .(null !== $this->sqlParts['having'] ? ' HAVING '.($this->sqlParts['having']) : '')
             .($this->sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $this->sqlParts['orderBy']) : '');
 
         if ($this->isLimitQuery()) {
@@ -1246,7 +1246,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
         $query = 'UPDATE '.$table
             .' SET '.implode(', ', $this->sqlParts['set'])
-            .(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '');
+            .(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
 
         return $query;
     }
@@ -1259,7 +1259,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private function getSQLForDelete()
     {
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
-        $query = 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '');
+        $query = 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
 
         return $query;
     }
@@ -1363,7 +1363,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                 }
                 $sql .= ' '.strtoupper($join['joinType'])
                     .' JOIN '.$join['joinTable'].' '.$join['joinAlias']
-                    .' ON '.((string) $join['joinCondition']);
+                    .' ON '.($join['joinCondition']);
                 $knownAliases[$join['joinAlias']] = true;
             }
 
