@@ -27,39 +27,6 @@ foreach ($bundles as $bundle) {
     }
 }
 
-// Find available translations
-$locales = [];
-
-$extractLocales = function ($dir) use (&$locales) {
-    $locale = $dir->getFilename();
-
-    // Check config
-    $configFile = $dir->getRealpath().'/config.json';
-    if (file_exists($configFile)) {
-        $config           = json_decode(file_get_contents($configFile), true);
-        $locales[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
-    }
-};
-
-$defaultLocalesDir = new \Symfony\Component\Finder\Finder();
-$defaultLocalesDir->directories()->in($root.'/bundles/CoreBundle/Translations')->ignoreDotFiles(true)->depth('== 0');
-foreach ($defaultLocalesDir as $dir) {
-    $extractLocales($dir);
-}
-
-$installedLocales = new \Symfony\Component\Finder\Finder();
-$installedLocales->directories()->in($root.'/../'.$paths['translations'])->ignoreDotFiles(true)->depth('== 0');
-
-foreach ($installedLocales as $dir) {
-    $extractLocales($dir);
-}
-unset($defaultLocalesDir, $installedLocales, $extractLocales);
-
-$container->setParameter('mautic.supported_languages', $locales);
-
-// Set the paths
-$mauticParams['paths'] = $paths;
-
 // Set the parameters in the container with env processors
 foreach ($mauticParams as $k => $v) {
     switch (true) {
@@ -79,8 +46,8 @@ foreach ($mauticParams as $k => $v) {
             $type = 'nullable:';
     }
 
-    // Add to the container
-    $container->setParameter("mautic.{$k}", sprintf('%%env(%sMAUTIC_%s)%%', $type, mb_strtoupper($k)));
+    // Add to the container with the applicable processor
+    $container->setParameter("mautic.{$k}", sprintf('%%env(%sresolve:MAUTIC_%s)%%', $type, mb_strtoupper($k)));
 }
 
 // Set the router URI for CLI
