@@ -5,7 +5,7 @@ services:
     Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector:
     Rector\DeadCode\Rector\Class_\RemoveSetterOnlyPropertyAndMethodCallRector:
     Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector:
-    # Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector:
+    Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector:
     # Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector:
     # Rector\DeadCode\Rector\Expression\SimplifyMirrorAssignRector:
     # Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector:
