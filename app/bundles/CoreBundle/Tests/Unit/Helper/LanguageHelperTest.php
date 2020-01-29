@@ -85,7 +85,7 @@ class LanguageHelperTest extends \PHPUnit\Framework\TestCase
     public function testLanguageListIsFetchedAndWritten()
     {
         $langFile = $this->tmpPath.'/../languageList.txt';
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(['language_list_file'], ['translations_list_url'])
             ->willReturnOnConsecutiveCalls(
                 '',
@@ -122,7 +122,7 @@ class LanguageHelperTest extends \PHPUnit\Framework\TestCase
         $langFile  = $this->tmpPath.'/../languageList.txt';
         file_put_contents($langFile, json_encode($languages));
 
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->with('translations_fetch_url')
             ->willReturn('https://languages.test/');
 
@@ -158,6 +158,6 @@ class LanguageHelperTest extends \PHPUnit\Framework\TestCase
      */
     private function getHelper()
     {
-        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->connector, ['es' => 'Spanish']);
+        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->connector);
     }
 }

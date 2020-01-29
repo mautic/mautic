@@ -74,7 +74,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($mockCompanyLeadRepo);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $mockCoreParametersHelper->method('getParameter')
+        $mockCoreParametersHelper->method('get')
             ->with('default_timezone')
             ->willReturn('UTC');
 

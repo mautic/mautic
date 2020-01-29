@@ -46,13 +46,13 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEventsOrderbyDirWhenNotSetInWebhook()
     {
-        $this->parametersHelperMock->method('getParameter')->willReturn('DESC');
+        $this->parametersHelperMock->method('get')->willReturn('DESC');
         $this->assertEquals('DESC', $this->initModel()->getEventsOrderbyDir());
     }
 
     public function testGetEventsOrderbyDirWhenWebhookNotProvided()
     {
-        $this->parametersHelperMock->method('getParameter')->willReturn('DESC');
+        $this->parametersHelperMock->method('get')->willReturn('DESC');
         $this->assertEquals('DESC', $this->initModel()->getEventsOrderbyDir());
     }
 
@@ -79,7 +79,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
 
         $this->parametersHelperMock->expects($this->at(4))
-            ->method('getParameter')
+            ->method('get')
             ->with('queue_mode')
             ->willReturn(WebhookModel::COMMAND_PROCESS);
 
@@ -119,7 +119,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
         $this->parametersHelperMock->expects($this->at(4))
-            ->method('getParameter')
+            ->method('get')
             ->with('queue_mode')
             ->willReturn(WebhookModel::IMMEDIATE_PROCESS);
 

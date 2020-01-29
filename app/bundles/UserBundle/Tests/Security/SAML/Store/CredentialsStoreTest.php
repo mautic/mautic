@@ -48,7 +48,7 @@ class CredentialsStoreTest extends TestCase
 
     public function testDefaultCredentialsAreUsedIfCustomCertificateIsNotProvided()
     {
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(['saml_idp_metadata'], ['saml_idp_own_certificate'])
             ->willReturnOnConsecutiveCalls('1', '');
 
@@ -62,7 +62,7 @@ class CredentialsStoreTest extends TestCase
 
     public function testOwnCredentialsAreUsedIfProvided()
     {
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(
                 ['saml_idp_metadata'],
                 ['saml_idp_own_certificate'],

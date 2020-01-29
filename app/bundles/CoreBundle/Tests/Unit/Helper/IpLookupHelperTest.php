@@ -94,7 +94,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $mockCoreParametersHelper->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
                     return 'track_private_ip_ranges' === $param ? true : $defaultValue;
@@ -142,7 +142,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
             $mockCoreParametersHelper->expects($this->any())
-                ->method('getParameter')
+                ->method('get')
                 ->willReturn(null);
         }
 

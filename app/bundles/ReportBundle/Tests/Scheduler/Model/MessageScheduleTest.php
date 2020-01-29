@@ -55,7 +55,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
@@ -114,7 +114,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
@@ -167,7 +167,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 
@@ -208,7 +208,7 @@ class MessageScheduleTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fileSize);
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_max_filesize_in_bytes')
             ->willReturn($limit);
 

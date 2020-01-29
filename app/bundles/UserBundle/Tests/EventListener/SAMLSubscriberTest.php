@@ -63,7 +63,7 @@ class SAMLSubscriberTest extends TestCase
             ->willReturn($request);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('saml_idp_metadata')
             ->willReturn('');
 
@@ -92,7 +92,7 @@ class SAMLSubscriberTest extends TestCase
             ->willReturn($request);
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('saml_idp_metadata')
             ->willReturn('1');
 

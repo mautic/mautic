@@ -207,7 +207,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parameterHelper->method('getParameter')
+        $parameterHelper->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
                     return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;
@@ -276,7 +276,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parameterHelper->method('getParameter')
+        $parameterHelper->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
                     return array_key_exists($param, $this->config) ? $this->config[$param] : $defaultValue;

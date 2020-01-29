@@ -70,7 +70,7 @@ class ApiSubscriberTest extends CommonMocks
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->assertNull($this->subscriber->onKernelRequest($this->event));
     }
@@ -90,7 +90,7 @@ class ApiSubscriberTest extends CommonMocks
             ->willReturn('/api/endpoint');
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('api_enabled')
             ->willReturn(false);
 
@@ -121,7 +121,7 @@ class ApiSubscriberTest extends CommonMocks
             ->willReturn('/api/endpoint');
 
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(['api_enabled'], ['api_enable_basic_auth'])
             ->willReturnOnConsecutiveCalls(true, true);
 

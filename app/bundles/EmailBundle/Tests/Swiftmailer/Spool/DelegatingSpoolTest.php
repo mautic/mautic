@@ -47,7 +47,7 @@ class DelegatingSpoolTest extends TestCase
         $spoolPath = __DIR__.'/tmp';
 
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(['mailer_spool_type'], ['mailer_spool_path'])
             ->willReturnOnConsecutiveCalls('file', $spoolPath);
 
@@ -80,7 +80,7 @@ class DelegatingSpoolTest extends TestCase
         $spoolPath = __DIR__.'/tmp';
 
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(['mailer_spool_type'], ['mailer_spool_path'])
             ->willReturnOnConsecutiveCalls('memory', $spoolPath);
 

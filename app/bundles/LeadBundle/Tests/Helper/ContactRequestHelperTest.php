@@ -162,7 +162,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function testLandingPageClickthroughIdentifiesLeadIfEnabled()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(true);
 
@@ -205,12 +205,12 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function testLandingPageClickthroughDoesNotIdentifyLeadIfDisabled()
     {
         $this->coreParametersHelper->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_fingerprint')
             ->willReturn(false);
 
@@ -239,12 +239,12 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function testIdentifyContactByFingerprintIfEnabled()
     {
         $this->coreParametersHelper->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_fingerprint')
             ->willReturn(true);
 
@@ -289,12 +289,12 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function testTrackedIdentifiedVisitorIsNotTrackedByFingerprint()
     {
         $this->coreParametersHelper->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_fingerprint')
             ->willReturn(true);
 
@@ -327,12 +327,12 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function testFingerprintIsNotUsedToIdentifyLeadIfDisabled()
     {
         $this->coreParametersHelper->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_tracking_url')
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->at(1))
-            ->method('getParameter')
+            ->method('get')
             ->with('track_by_fingerprint')
             ->willReturn(false);
 

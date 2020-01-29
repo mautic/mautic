@@ -50,7 +50,7 @@ class ThemeHelperTest extends \PHPUnit\Framework\TestCase
         $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParameterHelper->method('getParameter')
+        $this->coreParameterHelper->method('get')
             ->with('theme_import_allowed_extensions')
             ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
     }

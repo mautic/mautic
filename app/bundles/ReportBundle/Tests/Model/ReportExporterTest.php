@@ -46,7 +46,7 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_batch_size')
             ->willReturn(2); //Batch size
 

@@ -43,7 +43,7 @@ class TrustOptionsStoreTest extends TestCase
     public function testHasTrustOptionsIfSamlConfiguredAndEntityIdMatches()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('saml_idp_metadata')
             ->willReturn('1');
 
@@ -53,7 +53,7 @@ class TrustOptionsStoreTest extends TestCase
     public function testNotHaveTrustOptionsIfSamlDisabled()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('saml_idp_metadata')
             ->willReturn('');
 
@@ -63,7 +63,7 @@ class TrustOptionsStoreTest extends TestCase
     public function testNotHaveTrustOptionsIfEntityIdDoesNotMatch()
     {
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('saml_idp_metadata')
             ->willReturn('1');
 

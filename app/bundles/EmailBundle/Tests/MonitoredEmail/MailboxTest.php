@@ -68,7 +68,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -115,7 +115,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -153,7 +153,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
@@ -180,7 +180,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $parametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->will($this->returnValue($config));
 
         $pathsHelper = $this->getMockBuilder(PathsHelper::class)
