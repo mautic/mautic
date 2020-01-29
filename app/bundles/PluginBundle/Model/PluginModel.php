@@ -89,7 +89,7 @@ class PluginModel extends FormModel
      */
     public function getAllPluginsConfig()
     {
-        return $this->coreParametersHelper->getParameter('plugin.bundles');
+        return $this->coreParametersHelper->getParameter('plugin.bundles', []);
     }
 
     /**
