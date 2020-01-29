@@ -45,5 +45,4 @@ jobs:
         IFS='
         '
         CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")
-        bin/php-cs-fixer fix --config=.php_cs -v --dry-run --stop-on-violation --using-cache=no
-
+        bin/php-cs-fixer fix --config=.php_cs -v --dry-run --stop-on-violation --using-cache=no ${CHANGED_FILES}
