@@ -25,7 +25,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
     private $router;
-    private $session;
 
     /**
      * Constructor.
@@ -35,7 +34,6 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     public function __construct(RouterInterface $router, Session $session)
     {
         $this->router  = $router;
-        $this->session = $session;
     }
 
     /**

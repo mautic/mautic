@@ -197,11 +197,6 @@ class MailHelper
     /**
      * @var array
      */
-    private $systemHeaders = [];
-
-    /**
-     * @var array
-     */
     protected $body = [
         'content'     => '',
         'contentType' => 'text/html',
@@ -667,7 +662,7 @@ class MailHelper
             $this->queueEnabled        = false;
             $this->from                = $this->systemFrom;
             $this->headers             = [];
-            $this->systemHeaders       = [];
+            [];
             $this->source              = [];
             $this->assets              = [];
             $this->globalTokens        = [];

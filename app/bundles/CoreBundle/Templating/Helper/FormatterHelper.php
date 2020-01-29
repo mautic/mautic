@@ -23,15 +23,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FormatterHelper extends Helper
 {
     /**
-     * @var AppVersion
-     */
-    private $appVersion;
-
-    /**
      * @var DateHelper
      */
     private $dateHelper;
-
     /**
      * @var TranslatorInterface
      */
@@ -39,7 +33,6 @@ class FormatterHelper extends Helper
 
     public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
     {
-        $this->appVersion = $appVersion;
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;
     }

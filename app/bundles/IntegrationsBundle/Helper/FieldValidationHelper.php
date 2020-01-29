@@ -39,11 +39,6 @@ class FieldValidationHelper
      */
     private $integrationObject;
 
-    /**
-     * @var array
-     */
-    private $fieldMappings;
-
     public function __construct(FieldHelper $fieldHelper, TranslatorInterface $translator)
     {
         $this->fieldHelper = $fieldHelper;
@@ -65,7 +60,6 @@ class FieldValidationHelper
         }
 
         $this->integrationObject = $integrationObject;
-        $this->fieldMappings     = $fieldMappings;
 
         $settings = $integrationConfiguration->getFeatureSettings();
         foreach ($settings['sync']['objects'] as $object) {

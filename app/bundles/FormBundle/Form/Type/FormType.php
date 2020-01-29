@@ -32,18 +32,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FormType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var CorePermissions
      */
     private $security;
 
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->translator = $translator;
         $this->security   = $security;
     }
 

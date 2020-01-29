@@ -35,14 +35,8 @@ class PointType extends AbstractType
      */
     private $security;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {
-        $this->translator = $translator;
         $this->security   = $security;
     }
 

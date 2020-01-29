@@ -43,8 +43,6 @@ class MauticFactory
      */
     private $entityManager = null;
 
-    private $requestStack;
-
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -216,7 +214,6 @@ class MauticFactory
             $request      = Request::createFromGlobals();
             $requestStack = new RequestStack();
             $requestStack->push($request);
-            $this->requestStack = $requestStack;
         }
 
         return $request;

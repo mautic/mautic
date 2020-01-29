@@ -42,14 +42,8 @@ class UserStep implements StepInterface
      */
     public $password;
 
-    /**
-     * @var Session
-     */
-    private $session;
-
     public function __construct(Session $session)
     {
-        $this->session = $session;
     }
 
     /**

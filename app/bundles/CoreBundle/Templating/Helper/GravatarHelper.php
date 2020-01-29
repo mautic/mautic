@@ -34,16 +34,6 @@ class GravatarHelper extends Helper
     private $devHosts = [];
 
     /**
-     * @var string
-     */
-    private $imageDir;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetHelper;
-
-    /**
      * @var AvatarHelper
      */
     private $avatarHelper;
@@ -64,8 +54,7 @@ class GravatarHelper extends Helper
         RequestStack $requestStack
     ) {
         $this->devMode      = MAUTIC_ENV === 'dev';
-        $this->imageDir     = $pathsHelper->getSystemPath('images');
-        $this->assetHelper  = $assetHelper;
+        $pathsHelper->getSystemPath('images');
         $this->avatarHelper = $avatarHelper;
         $this->requestStack = $requestStack;
         $this->devHosts     = (array) $coreParametersHelper->getParameter('dev_hosts');
