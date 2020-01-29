@@ -15,7 +15,6 @@ use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
@@ -27,10 +26,12 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Model\StageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TypeOperatorSubscriber extends CommonSubscriber
+class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
@@ -64,13 +65,19 @@ class TypeOperatorSubscriber extends CommonSubscriber
      */
     private $categoryModel;
 
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
     public function __construct(
         LeadModel $leadModel,
         ListModel $listModel,
         CampaignModel $campaignModel,
         EmailModel $emailModel,
         StageModel $stageModel,
-        CategoryModel $categoryModel
+        CategoryModel $categoryModel,
+        TranslatorInterface $translator
     ) {
         $this->leadModel     = $leadModel;
         $this->listModel     = $listModel;
@@ -78,6 +85,7 @@ class TypeOperatorSubscriber extends CommonSubscriber
         $this->emailModel    = $emailModel;
         $this->stageModel    = $stageModel;
         $this->categoryModel = $categoryModel;
+        $this->translator    = $translator;
     }
 
     /**

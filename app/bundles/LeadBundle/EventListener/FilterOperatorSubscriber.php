@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
@@ -20,8 +19,10 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class FilterOperatorSubscriber extends CommonSubscriber
+class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     /**
      * @var OperatorOptions
@@ -38,14 +39,21 @@ class FilterOperatorSubscriber extends CommonSubscriber
      */
     private $typeOperatorProvider;
 
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
     public function __construct(
         OperatorOptions $operatorOptions,
         LeadFieldRepository $leadFieldRepository,
-        TypeOperatorProvider $typeOperatorProvider
+        TypeOperatorProvider $typeOperatorProvider,
+        TranslatorInterface $translator
     ) {
         $this->operatorOptions      = $operatorOptions;
         $this->leadFieldRepository  = $leadFieldRepository;
         $this->typeOperatorProvider = $typeOperatorProvider;
+        $this->translator           = $translator;
     }
 
     /**
