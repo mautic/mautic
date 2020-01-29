@@ -59,7 +59,7 @@ class RouteLoader extends Loader
         $collection = $event->getCollection();
 
         // Force all links to be SSL if the site_url parameter is SSL
-        $siteUrl  = $this->coreParameters->getParameter('site_url');
+        $siteUrl  = $this->coreParameters->get('site_url');
         $forceSSL = false;
         if (!empty($siteUrl)) {
             $parts    = parse_url($siteUrl);
@@ -82,7 +82,7 @@ class RouteLoader extends Loader
         $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yml'));
 
         //API
-        if ($this->coreParameters->getParameter('api_enabled')) {
+        if ($this->coreParameters->get('api_enabled')) {
             $event = new RouteEvent($this, 'api');
             $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
             $apiCollection = $event->getCollection();
