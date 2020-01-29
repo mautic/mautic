@@ -21,7 +21,7 @@ class SessionEnvVars implements EnvVarsInterface
         $localConfigFile = $defaultConfig->get('local_config_path', uniqid());
         $secretKey       = $config->get('secret_key');
 
-        $key         = $secretKey ? $secretKey : uniqid();
+        $key         = $secretKey ? $secretKey : 'mautic';
         $sessionName = md5(md5($localConfigFile).$key);
         $envVars->set('MAUTIC_SESSION_NAME', $sessionName);
     }
