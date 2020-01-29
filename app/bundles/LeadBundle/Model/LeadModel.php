@@ -862,22 +862,24 @@ class LeadModel extends FormModel
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
                 if ($field->isPublished() and $field->getObject() === 'Lead') {
-                    $group                          = $field->getGroup();
-                    $array[$group][$alias]['id']    = $field->getId();
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field->getLabel();
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['type']  = $field->getType();
+                    $group                                = $field->getGroup();
+                    $array[$group][$alias]['id']          = $field->getId();
+                    $array[$group][$alias]['group']       = $group;
+                    $array[$group][$alias]['label']       = $field->getLabel();
+                    $array[$group][$alias]['alias']       = $alias;
+                    $array[$group][$alias]['type']        = $field->getType();
+                    $array[$group][$alias]['properties']  = $field->getProperties();
                 }
             } else {
                 $alias = $field['alias'];
                 if ($field['isPublished'] and $field['object'] === 'lead') {
-                    $group                          = $field['group'];
-                    $array[$group][$alias]['id']    = $field['id'];
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field['label'];
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['type']  = $field['type'];
+                    $group                                = $field['group'];
+                    $array[$group][$alias]['id']          = $field['id'];
+                    $array[$group][$alias]['group']       = $group;
+                    $array[$group][$alias]['label']       = $field['label'];
+                    $array[$group][$alias]['alias']       = $alias;
+                    $array[$group][$alias]['type']        = $field['type'];
+                    $array[$group][$alias]['properties']  = $field['properties'];
                 }
             }
         }
