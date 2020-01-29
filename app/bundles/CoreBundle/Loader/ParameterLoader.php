@@ -70,7 +70,6 @@ class ParameterLoader
 
         // Load special values used in Mautic configuration files in app/config
         EnvVars\ApiEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
-        EnvVars\LogEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\MigrationsEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\SAMLEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
         EnvVars\SessionEnvVars::load($this->parameterBag, $defaultParameters, $envVariables);
@@ -95,7 +94,7 @@ class ParameterLoader
             return self::$defaultParameters['local_config_path'];
         }
 
-        $paths['local_config'] = str_replace(['%%kernel.root_dir%%', '%kernel.root_dir%'], $root, $paths['local_config']);
+        $paths['local_config'] = str_replace('%kernel.root_dir%', $root, $paths['local_config']);
 
         self::$defaultParameters['local_config_path'] = $paths['local_config'];
 

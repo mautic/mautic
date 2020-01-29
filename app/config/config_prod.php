@@ -24,18 +24,15 @@ $container->loadFromExtension("doctrine", array(
 ));
 */
 
-$debugMode = $container->getParameter('kernel.debug');
-
 $container->loadFromExtension('monolog', [
     'channels' => [
         'mautic',
     ],
     'handlers' => [
         'main' => [
-            'formatter'    => $debugMode ? 'mautic.monolog.fulltrace.formatter' : '%env(MAUTIC_LOG_MAIN_FORMATTER)%',
             'type'         => 'fingers_crossed',
             'buffer_size'  => '200',
-            'action_level' => $debugMode ? 'debug' : '%env(MAUTIC_LOG_MAIN_ACTION_LEVEL)%',
+            'action_level' => 'error',
             'handler'      => 'nested',
             'channels'     => [
                 '!mautic',
@@ -44,18 +41,15 @@ $container->loadFromExtension('monolog', [
         'nested' => [
             'type'      => 'rotating_file',
             'path'      => '%kernel.logs_dir%/%kernel.environment%.php',
-            'level'     => $debugMode ? 'debug' : '%env(MAUTIC_LOG_NESTED_ACTION_LEVEL)%',
+            'level'     => 'error',
             'max_files' => 7,
         ],
         'mautic' => [
-            'formatter' => $debugMode ? 'mautic.monolog.fulltrace.formatter' : '%env(MAUTIC_LOG_MAUTIC_FORMATTER)%',
-            'type'      => 'rotating_file',
-            'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.php',
-            'level'     => $debugMode ? 'debug' : '%env(MAUTIC_LOG_MAUTIC_ACTION_LEVEL)%',
+            'type'      => 'service',
+            'id'        => 'mautic.monolog.handler',
             'channels'  => [
                 'mautic',
             ],
-            'max_files' => 7,
         ],
     ],
 ]);

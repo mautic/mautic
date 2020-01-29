@@ -896,6 +896,14 @@ return [
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
+            // Logger
+            'mautic.monolog.handler' => [
+                'class'     => \Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.monolog.fulltrace.formatter',
+                ],
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
@@ -985,6 +993,8 @@ return [
         'webroot'                         => '',
         'cache_path'                      => '%kernel.root_dir%/../var/cache',
         'log_path'                        => '%kernel.root_dir%/../var/logs',
+        'max_log_files'                   => 7,
+        'log_file_name'                   => 'mautic_%kernel.environment%.php',
         'image_path'                      => 'media/images',
         'tmp_path'                        => '%kernel.root_dir%/..var/tmp',
         'theme'                           => 'blank',
