@@ -258,5 +258,7 @@ class TableSchemaHelper
         } else {
             $this->schema = new Schema([], [], $this->sm->createSchemaConfig());
         }
+
+        return $this->schema;
     }
 }
