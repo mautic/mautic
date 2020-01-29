@@ -1,6 +1,7 @@
 <?php
 
 include __DIR__.'/paths_helper.php';
+include __DIR__.'/array_helper.php';
 
 $ormMappings        =
 $serializerMappings =
@@ -26,6 +27,25 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
+
+        // Remove optional services (has argument optional = true) if not exist
+        if (isset($config['services'])) {
+            foreach (flatten($config['services']) as $element) {
+                $key = array_pop($element['keys']);
+                $val = $element['value'];
+                if ($key === 'optional' and $val === true) {
+                    if (array_key_exists('class', deep_array_get($config['services'], $element['keys']))){
+                        $class = deep_array_get($config['services'], array_merge($element['keys'], ['class']));
+                    }
+                    else{
+                        $class = '';
+                    }
+                    if (!class_exists($class)) {
+                        deep_array_unset($config['services'],$element['keys']);
+                    }
+                }
+            }
+        }
 
         // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
         if (isset($config['services'])) {
