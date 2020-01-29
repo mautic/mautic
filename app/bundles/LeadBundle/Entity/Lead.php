@@ -992,6 +992,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * @return StagesChangeLog
+     */
+    public function getStageChangeLog()
+    {
+        return $this->stageChangeLog;
+    }
+
+    /**
      * Remove pointsChangeLog.
      */
     public function removePointsChangeLog(PointsChangeLog $pointsChangeLog)
@@ -1043,6 +1051,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->companyChangeLog[] = $companyChangeLog;
 
         return $this;
+    }
+
+    /**
+     * @return CompanyChangeLog
+     */
+    public function getCompanyChangeLog()
+    {
+        return $this->companyChangeLog;
     }
 
     /**
