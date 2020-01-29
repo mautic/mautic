@@ -146,7 +146,7 @@ class Log
     }
 
     /**
-     * Strips tags and keeps first 254 characters so it would fit in the varchar 255 limit.
+     * Strips tags and keeps first 254 characters so it would fit in the varchar 191 limit.
      *
      * @param string $note
      *
@@ -154,7 +154,7 @@ class Log
      */
     public function setNote($note)
     {
-        $this->note = substr(strip_tags($note), 0, 254);
+        $this->note = substr(strip_tags($note), 0, 190);
 
         return $this;
     }

@@ -141,7 +141,7 @@ class Webhook extends FormEntity
 
         $builder->createField('webhookUrl', Type::STRING)
             ->columnName('webhook_url')
-            ->length(255)
+            ->length(191)
             ->build();
 
         $builder->addNullableField('eventsOrderbyDir', Type::STRING, 'events_orderby_dir');

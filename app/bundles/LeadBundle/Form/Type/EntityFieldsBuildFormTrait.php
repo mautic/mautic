@@ -259,10 +259,10 @@ trait EntityFieldsBuildFormTrait
                             );
                             break;
                         case TextType::class:
-                            $constraints[] = new Length(['max' => 255]);
+                            $constraints[] = new Length(['max' => 191]);
                             break;
                         case MultiselectType::class:
-                            $constraints[] = new Length(['max' => 255]);
+                            $constraints[] = new Length(['max' => 191]);
                             break;
                         break;
                     }

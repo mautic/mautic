@@ -51,7 +51,7 @@ trait TranslationMigrationTrait
         }
 
         if ($languageColumnName && !$table->hasColumn($languageColumnName)) {
-            $this->addSql("ALTER TABLE $tableName ADD COLUMN `lang` varchar(255) NULL");
+            $this->addSql("ALTER TABLE $tableName ADD COLUMN `lang` varchar(191) NULL");
         }
     }
 }

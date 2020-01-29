@@ -131,7 +131,7 @@ class RequestStorageHelper
         $key       = uniqid($transportName.self::KEY_SEPARATOR, true);
         $keyLength = strlen($key);
 
-        if ($keyLength > 255) {
+        if ($keyLength > 191) {
             throw new \LengthException(sprintf('Key %s must be shorter than 256 characters. It has %d characters', $key, $keyLength));
         }
 

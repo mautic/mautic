@@ -218,10 +218,10 @@ $dbalSettings = [
     'dbname'                => '%mautic.db_name%',
     'user'                  => '%mautic.db_user%',
     'password'              => '%mautic.db_password%',
-    'charset'               => 'UTF8',
+    'charset'               => 'utf8mb4',
     'default_table_options' => [
-        'charset'    => 'utf8',
-        'collate'    => 'utf8_unicode_ci',
+        'charset'    => 'utf8mb4',
+        'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
     'types'    => [
