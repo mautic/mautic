@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ('index' == $tmpl) {
+if ('index' === $tmpl) {
     $view->extend('MauticInstallBundle:Install:content.html.php');
 }
 ?>
@@ -43,7 +43,7 @@ if ('index' == $tmpl) {
             <?php echo $view['form']->row($form['mailer_transport']); ?>
         </div>
     </div>
-    <?php $hide = ('smtp' == $form['mailer_transport']->vars['data']) ? '' : ' class="hide"'; ?>
+    <?php $hide = ('smtp' === $form['mailer_transport']->vars['data']) ? '' : ' class="hide"'; ?>
     <div id="smtpSettings"<?php echo $hide; ?>>
         <div class="row">
             <div class="col-sm-9">
@@ -66,7 +66,7 @@ if ('index' == $tmpl) {
     <?php
     $authMode = $form['mailer_auth_mode']->vars['data'];
     $mailer   = $form['mailer_transport']->vars['data'];
-    $hide     = (!in_array($mailer, ['sendmail', 'smtp']) || ('smtp' == $mailer && !empty($authMode))) ? '' : ' class="hide"';
+    $hide     = (!in_array($mailer, ['sendmail', 'smtp']) || ('smtp' === $mailer && !empty($authMode))) ? '' : ' class="hide"';
     ?>
     <div id="authDetails"<?php echo $hide; ?>>
         <div class="row">
