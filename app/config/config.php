@@ -33,15 +33,12 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
             foreach (flatten($config['services']) as $element) {
                 $key = array_pop($element['keys']);
                 $val = $element['value'];
-                if ($key === 'optional' and $val === true) {
-                    if (array_key_exists('class', deep_array_get($config['services'], $element['keys']))){
+                if ('optional' === $key and true === $val) {
+                    if (array_key_exists('class', deep_array_get($config['services'], $element['keys']))) {
                         $class = deep_array_get($config['services'], array_merge($element['keys'], ['class']));
-                    }
-                    else{
-                        $class = '';
-                    }
-                    if (!class_exists($class)) {
-                        deep_array_unset($config['services'],$element['keys']);
+                        if (!class_exists($class)) {
+                            deep_array_unset($config['services'], $element['keys']);
+                        }
                     }
                 }
             }
