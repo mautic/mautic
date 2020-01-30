@@ -70,6 +70,13 @@ class EmailStep implements StepInterface
     public $mailer_password;
 
     /**
+     * Mailer API key if applicable.
+     *
+     * @var string
+     */
+    public $mailer_api_key;
+
+    /**
      * SMTP encryption
      * Required in step.
      *
