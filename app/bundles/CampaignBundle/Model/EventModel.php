@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -21,8 +22,6 @@ use Mautic\CoreBundle\Model\FormModel;
 class EventModel extends FormModel
 {
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\CampaignBundle\Entity\EventRepository
      */
     public function getRepository()
@@ -31,8 +30,6 @@ class EventModel extends FormModel
     }
 
     /**
-     * Get CampaignRepository.
-     *
      * @return \Mautic\CampaignBundle\Entity\CampaignRepository
      */
     public function getCampaignRepository()
@@ -77,8 +74,6 @@ class EventModel extends FormModel
     }
 
     /**
-     * Delete events.
-     *
      * @param $currentEvents
      * @param $deletedEvents
      */
