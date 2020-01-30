@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class LeadFieldRepository extends CommonRepository
 {
@@ -120,30 +121,16 @@ class LeadFieldRepository extends CommonRepository
                 ->execute()->fetchAll();
     }
 
-    /**
-     * @return todo
-     */
-    public function getListablePublishedFields()
+    public function getListablePublishedFields(): ArrayCollection
     {
-        return $this->getEntities(
-            [
-                'filter' => [
-                    'where' => [
-                        [
-                            'expr' => 'eq',
-                            'col'  => 'f.isListable',
-                            'val'  => true,
-                        ],
-                        [
-                            'expr' => 'eq',
-                            'col'  => 'f.isPublished',
-                            'val'  => true,
-                        ],
-                    ],
-                ],
-                'orderBy' => 'f.object',
-            ]
-        );
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder->select($this->getTableAlias());
+        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");
+        $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
+        $queryBuilder->orderBy("{$this->getTableAlias()}.object");
+
+        return new ArrayCollection($queryBuilder->getQuery()->execute());
     }
 
     /**

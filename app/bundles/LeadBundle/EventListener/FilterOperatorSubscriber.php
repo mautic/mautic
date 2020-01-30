@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
@@ -59,7 +60,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE => ['onListOperatorsGenerate', 0],
@@ -71,35 +72,33 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onListOperatorsGenerate(LeadListFiltersOperatorsEvent $event)
+    public function onListOperatorsGenerate(LeadListFiltersOperatorsEvent $event): void
     {
         foreach ($this->operatorOptions->getFilterExpressionFunctionsNonStatic() as $operatorName => $operatorOptions) {
             $event->addOperator($operatorName, $operatorOptions);
         }
     }
 
-    public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event)
+    public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
-        $fields = $this->leadFieldRepository->getListablePublishedFields();
-
-        foreach ($fields as $field) {
+        $this->leadFieldRepository->getListablePublishedFields()->map(function(LeadField $field) use ($event) {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
-            if (in_array($type, ['select', 'multiselect', 'boolean'])) {
-                if ('boolean' == $type) {
-                    //create a lookup list with ID
-                    $properties['list'] = [
-                        0 => $properties['no'],
-                        1 => $properties['yes'],
-                    ];
-                } else {
-                    $properties['callback'] = 'activateLeadFieldTypeahead';
-                    $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
-                        FormFieldHelper::FORMAT_ARRAY,
-                        FormFieldHelper::parseList($properties['list'])
-                    ) : '';
-                }
+
+            if ('boolean' == $type) {
+                $properties['list'] = [
+                    0 => $properties['no'],
+                    1 => $properties['yes'],
+                ];
+            }
+
+            if (in_array($type, ['select', 'multiselect'])) {
+                $properties['callback'] = 'activateLeadFieldTypeahead';
+                $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
+                    FormFieldHelper::FORMAT_ARRAY,
+                    FormFieldHelper::parseList($properties['list'])
+                ) : '';
             }
 
             try {
@@ -114,10 +113,10 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => $field->getObject(),
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
             ]);
-        }
+        });
     }
 
-    public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event)
+    public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
         $staticFields = [
             'date_added' => [
