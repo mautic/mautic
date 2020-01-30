@@ -291,6 +291,16 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
+     * @return array|bool
+     */
+    public function getOwner()
+    {
+        $contact = $this->getLead();
+
+        return $this->helper->getContactOwner($contact);
+    }
+
+    /**
      * @return string
      */
     public function getIdHash()

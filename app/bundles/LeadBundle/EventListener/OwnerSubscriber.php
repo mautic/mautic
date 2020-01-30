@@ -72,9 +72,7 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     public function onEmailDisplay(EmailSendEvent $event)
     {
-        $contact = $event->getLead();
-
-        $event->addTokens($this->getGeneratedTokens($contact));
+        $this->onEmailGenerate($event);
     }
 
     /**
@@ -82,9 +80,7 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        $contact = $event->getLead();
-
-        $event->addTokens($this->getGeneratedTokens($contact));
+        $event->addTokens($this->getGeneratedTokens($event));
     }
 
     /**
@@ -94,12 +90,15 @@ class OwnerSubscriber implements EventSubscriberInterface
      * * If contact[owner_id] === null, then we should blank out tokens
      * * If contact[owner_id] > 0 AND User exists, then we should fill in tokens
      *
-     * @param array $contact
+     * @param EmailSendEvent $event
      *
      * @return array
      */
-    private function getGeneratedTokens(array $contact)
+    private function getGeneratedTokens(EmailSendEvent $event)
     {
+        $contact = $event->getLead();
+        $owner   = $event->getOwner();
+
         if (isset($contact['owner_id']) === false) {
             return $this->getEmptyTokens();
         }
@@ -108,7 +107,6 @@ class OwnerSubscriber implements EventSubscriberInterface
             return $this->getFakeTokens();
         }
 
-        $owner = $this->leadModel->getRepository()->getLeadOwner($contact['owner_id']);
         if ($owner === false) {
             return $this->getEmptyTokens();
         }
