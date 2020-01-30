@@ -520,8 +520,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         switch ($type) {
             case 'companyfield':
             case 'lead.company':
-                $expr = null;
-
                 if ('lead.company' === $type) {
                     $column    = 'companyname';
                     $filterVal = $filter;

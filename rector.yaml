@@ -12,8 +12,8 @@ services:
     Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector:
     Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector:
     Rector\DeadCode\Rector\Foreach_\RemoveUnusedForeachKeyRector:
-    # Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector:
-    # Rector\DeadCode\Rector\ClassMethod\RemoveOverriddenValuesRector:
+    Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector:
+    Rector\DeadCode\Rector\ClassMethod\RemoveOverriddenValuesRector:
     # Rector\DeadCode\Rector\MethodCall\RemoveDefaultArgumentValueRector:
     # Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateConstantRector:
     # Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector:
