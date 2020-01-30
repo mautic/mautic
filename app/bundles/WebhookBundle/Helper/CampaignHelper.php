@@ -91,6 +91,9 @@ class CampaignHelper
             case 'post':
             case 'put':
             case 'patch':
+                if($headers['content-type'] == 'application/json') {
+                    $payload = json_encode($payload);
+                }
                 $response = $this->connector->$method($url, $payload, $headers, $timeout);
                 break;
             case 'delete':
