@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -133,6 +134,7 @@ class FormTestAbstract extends WebTestCase
         $pageModel                = $this->createMock(PageModel::class);
         $leadModel                = $this->createMock(LeadModel::class);
         $campaignModel            = $this->createMock(CampaignModel::class);
+        $membershipManager        = $this->createMock(MembershipManager::class);
         $leadFieldModel           = $this->createMock(LeadFieldModel::class);
         $companyModel             = $this->createMock(CompanyModel::class);
         $fieldHelper              = $this->createMock(FormFieldHelper::class);
@@ -210,6 +212,7 @@ class FormTestAbstract extends WebTestCase
             $pageModel,
             $leadModel,
             $campaignModel,
+            $membershipManager,
             $leadFieldModel,
             $companyModel,
             $fieldHelper,
