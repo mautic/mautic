@@ -996,7 +996,7 @@ return [
         'max_log_files'                   => 7,
         'log_file_name'                   => 'mautic_%kernel.environment%.php',
         'image_path'                      => 'media/images',
-        'tmp_path'                        => '%kernel.root_dir%/..var/tmp',
+        'tmp_path'                        => '%kernel.root_dir%/../var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
