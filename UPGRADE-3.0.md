@@ -124,11 +124,16 @@ All fixtures must be defined as services in a bundle's config.php
     *   Mautic/CampaignBundle/Model/LegacyEventModel 
 *   Deprecated methods removed:
     *   CampaignEventHelper::addRemoveLead()
+    *   CampaignBuilderEvent::addLeadDecision(). Use CampaignBuilderEvent::addDecision() instead.
+    *   CampaignBuilderEvent::getLeadDecisions(). Use CampaignBuilderEvent::getDecisions() instead.
+    *   CampaignBuilderEvent::addLeadCondition(). Use CampaignBuilderEvent::addCondition() instead.
+    *   CampaignBuilderEvent::getLeadConditions(). Use CampaignBuilderEvent::getConditions() instead.
     *   LeadRepository::getLeadsWithFields()
     *   CampaignRepository::getCampaignLeadIds()
     *   CampaignRepository::getCampaignLeadsFromLists()
     *   CampaignRepository::getCampaignOrphanLeads()
     *   LeadEventLogRepository::removeScheduledEvents()
+    *   LeadRepository::getLeadsWithFields(). Use MauticLeadBundle\Entity\LeadRepository\getEntityContacts() instead.
     *   CampaignModel::removeScheduledEvents()
     *   CampaignModel::setChannelFromEventProperties(). Use \Mautic\CampaignBundle\Helper\ChannelExtractor instead.
     *   CampaignModel::getRemovedLeads(). Use RemovedContactTracker::getRemovedContacts() instead.
