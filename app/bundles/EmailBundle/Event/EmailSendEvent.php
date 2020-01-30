@@ -297,7 +297,7 @@ class EmailSendEvent extends CommonEvent
     {
         $contact = $this->getLead();
 
-        return $this->helper->getContactOwner($contact);
+        return $this->helper ? $this->helper->getContactOwner($contact) : [];
     }
 
     /**

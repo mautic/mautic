@@ -22,7 +22,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     /**
      * @var string
      */
-    private static $ownerFieldSprintf = '{ownerfield=%s}';
+    private $ownerFieldSprintf = '{ownerfield=%s}';
 
     /**
      * @var TranslatorInterface
@@ -56,9 +56,10 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $event->addToken(self::buildToken('email'), $this->buildLabel('email'));
-        $event->addToken(self::buildToken('first_name'), $this->buildLabel('firstname'));
-        $event->addToken(self::buildToken('last_name'), $this->buildLabel('lastname'));
+        $event->addToken($this->buildToken('email'), $this->buildLabel('email'));
+        $event->addToken($this->buildToken('first_name'), $this->buildLabel('firstname'));
+        $event->addToken($this->buildToken('last_name'), $this->buildLabel('lastname'));
+        $event->addToken($this->buildToken('position'), $this->buildLabel('position'));
     }
 
     /**
@@ -106,9 +107,10 @@ class OwnerSubscriber implements EventSubscriberInterface
         }
 
         return [
-            self::buildToken('email')      => (string) $owner['email'],
-            self::buildToken('first_name') => (string) $owner['first_name'],
-            self::buildToken('last_name')  => (string) $owner['last_name'],
+            $this->buildToken('email')      => (string) $owner['email'],
+            $this->buildToken('first_name') => (string) $owner['first_name'],
+            $this->buildToken('last_name')  => (string) $owner['last_name'],
+            $this->buildToken('position')   => (string) $owner['position'],
         ];
     }
 
@@ -120,9 +122,10 @@ class OwnerSubscriber implements EventSubscriberInterface
     private function getEmptyTokens()
     {
         return [
-            self::buildToken('email')      => '',
-            self::buildToken('first_name') => '',
-            self::buildToken('last_name')  => '',
+            $this->buildToken('email')      => '',
+            $this->buildToken('first_name') => '',
+            $this->buildToken('last_name')  => '',
+            $this->buildToken('position')   => '',
         ];
     }
 
@@ -134,9 +137,10 @@ class OwnerSubscriber implements EventSubscriberInterface
     private function getFakeTokens()
     {
         return [
-            self::buildToken('email')      => '['.$this->buildLabel('email').']',
-            self::buildToken('first_name') => '['.$this->buildLabel('firstname').']',
-            self::buildToken('last_name')  => '['.$this->buildLabel('lastname').']',
+            $this->buildToken('email')      => '['.$this->buildLabel('email').']',
+            $this->buildToken('first_name') => '['.$this->buildLabel('firstname').']',
+            $this->buildToken('last_name')  => '['.$this->buildLabel('lastname').']',
+            $this->buildToken('position')   => '['.$this->buildLabel('position').']',
         ];
     }
 
@@ -147,9 +151,9 @@ class OwnerSubscriber implements EventSubscriberInterface
      *
      * @return string
      */
-    private static function buildToken($field)
+    private function buildToken($field)
     {
-        return sprintf(self::$ownerFieldSprintf, $field);
+        return sprintf($this->ownerFieldSprintf, $field);
     }
 
     /**
