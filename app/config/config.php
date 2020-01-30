@@ -1,7 +1,6 @@
 <?php
 
 include __DIR__.'/paths_helper.php';
-include __DIR__.'/array_helper.php';
 
 $ormMappings        =
 $serializerMappings =
@@ -28,20 +27,22 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
 
-        // Remove optional services (has argument optional = true) if not exist
+        // Remove optional services (has argument optional = true) if the service class does not exist
         if (isset($config['services'])) {
-            foreach (flatten($config['services']) as $element) {
-                $key = array_pop($element['keys']);
-                $val = $element['value'];
-                if ('optional' === $key and true === $val) {
-                    if (array_key_exists('class', deep_array_get($config['services'], $element['keys']))) {
-                        $class = deep_array_get($config['services'], array_merge($element['keys'], ['class']));
-                        if (!class_exists($class)) {
-                            deep_array_unset($config['services'], $element['keys']);
-                        }
-                    }
-                }
-            }
+            $config['services'] = (new \Tightenco\Collect\Support\Collection($config['services']))
+                ->mapWithKeys(function (array $serviceGroup, string $groupName) {
+                    $serviceGroup = (new \Tightenco\Collect\Support\Collection($serviceGroup))
+                        ->reject(function ($serviceDefinition) {
+                            // Rejects services defined as optional where the service class does not exist.
+                            return is_array($serviceDefinition)
+                                && isset($serviceDefinition['optional'])
+                                && true === $serviceDefinition['optional']
+                                && isset($serviceDefinition['class'])
+                                && false === class_exists($serviceDefinition['class']);
+                        })->toArray();
+
+                    return [$groupName => $serviceGroup];
+                })->toArray();
         }
 
         // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
