@@ -598,11 +598,6 @@ return [
                     'mautic.lead.provider.typeOperator',
                     'mautic.lead.model.list',
                 ],
-                'methodCalls' => [
-                    'setConnection' => [
-                        'database_connection',
-                    ],
-                ],
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\FieldType::class,
