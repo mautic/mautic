@@ -321,7 +321,6 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
-                    'mautic.campaign.repository.campaign',
                     'mautic.campaign.repository.lead',
                     'monolog.logger.mautic',
                 ],
@@ -544,7 +543,6 @@ return [
                     'mautic.campaign.membership.manager',
                     'mautic.campaign.repository.lead',
                     'mautic.lead.repository.lead',
-                    'event_dispatcher',
                     'translator',
                 ],
             ],

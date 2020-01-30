@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class MembershipBuilder
@@ -69,14 +68,10 @@ class MembershipBuilder
      */
     private $progressBar;
 
-    /**
-     * MembershipBuilder constructor.
-     */
     public function __construct(
         MembershipManager $manager,
         CampaignMemberRepository $campaignMemberRepository,
         LeadRepository $leadRepository,
-        EventDispatcherInterface $eventDispatcher,
         TranslatorInterface $translator
     ) {
         $this->manager                  = $manager;
