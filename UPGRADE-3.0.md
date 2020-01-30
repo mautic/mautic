@@ -136,6 +136,7 @@ All fixtures must be defined as services in a bundle's config.php
     *   CampaignModel::addLeads(). Use MembershipManager::addContacts() instead.
     *   CampaignModel::getEvents(). Use EventCollector::getEvents() instead.
     *   CampaignModel::batchSleep()
+    *   Mautic\CampaignBundle\Executioner\Result\Responses::getResponseArray()
 *   Deprecated tests removed:
     *   Mautic/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest
 

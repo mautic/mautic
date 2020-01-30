@@ -56,10 +56,12 @@ class DynamicContentHelper
      */
     public function getDynamicContentForLead($slot, $lead)
     {
+        $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getResponseArray();
+
         // Attempt campaign slots first
-        $response = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getResponseArray();
-        if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
-            return array_shift($response['action']['dwc.push_content']);
+        $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
+        if (!empty($dwcActionResponse)) {
+            return array_shift($dwcActionResponse);
         }
 
         // Attempt stored content second
