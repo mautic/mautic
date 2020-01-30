@@ -11,7 +11,7 @@
 
 namespace Mautic\DynamicContentBundle\Tests\Helper;
 
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -62,10 +62,10 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             ])
             ->willReturn(false);
 
-        $mockEventModel = $this->createMock(EventModel::class);
-        $mockDispatcher = $this->createMock(EventDispatcher::class);
+        $realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $mockDispatcher      = $this->createMock(EventDispatcher::class);
 
-        $fixture = new DynamicContentHelper($mockModel, $mockEventModel, $mockDispatcher);
+        $fixture = new DynamicContentHelper($mockModel, $realTimeExecutioner, $mockDispatcher);
 
         // Only get published
         $this->assertTrue($fixture->getDwcsBySlotName('test', true));
