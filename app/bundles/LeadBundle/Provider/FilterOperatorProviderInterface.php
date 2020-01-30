@@ -15,8 +15,6 @@ interface FilterOperatorProviderInterface
 {
     /**
      * Finds all operators and reutrn them in an array.
-     *
-     * @return array
      */
-    public function getAllOperators();
+    public function getAllOperators(): array;
 }

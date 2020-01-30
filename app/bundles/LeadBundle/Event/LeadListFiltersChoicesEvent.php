@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class LeadListFiltersChoicesEvent.
- */
 class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
@@ -96,12 +93,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         }
     }
 
-    /**
-     * @param string $object
-     * @param string $choiceKey
-     * @param array  $choiceConfig
-     */
-    public function setChoice($object, $choiceKey, array $choiceConfig)
+    public function setChoice(string $object, string $choiceKey, array $choiceConfig): void
     {
         if (!isset($this->choices[$object])) {
             $this->choices[$object] = [];

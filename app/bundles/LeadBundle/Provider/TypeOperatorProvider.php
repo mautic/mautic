@@ -81,7 +81,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getChoicesForField(string $fieldType, string $fieldAlias)
+    public function getChoicesForField(string $fieldType, string $fieldAlias): array
     {
         $aliasChoices = $this->getAllChoicesForListFieldAliases();
         $typeChoices  = $this->getAllChoicesForListFieldTypes();
@@ -100,7 +100,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getOperatorsForFieldType($fieldType)
+    public function getOperatorsForFieldType(string $fieldType): array
     {
         // This condition can be removed after strict types will be implemented.
         if (!is_string($fieldType)) {
@@ -123,10 +123,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         return $this->cachedTypeOperatorsChoices[$fieldType];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllTypeOperators()
+    public function getAllTypeOperators(): array
     {
         if (empty($this->cachedTypeOperators)) {
             $event = new TypeOperatorsEvent();
@@ -139,19 +136,13 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         return $this->cachedTypeOperators;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllChoicesForListFieldTypes()
+    public function getAllChoicesForListFieldTypes(): array
     {
         $this->lookForFieldChoices();
 
         return $this->cachedTypeChoices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAllChoicesForListFieldAliases()
     {
         $this->lookForFieldChoices();
@@ -159,9 +150,6 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         return $this->cachedAliasChoices;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function adjustFilterPropertiesType(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails): FormInterface
     {
         $event = new FilterPropertiesTypeEvent($form, $fieldAlias, $fieldObject, $operator, $fieldDetails);

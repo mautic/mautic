@@ -88,10 +88,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
         $this->translator    = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE           => ['onTypeOperatorsCollect', 0],
@@ -100,7 +97,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onTypeOperatorsCollect(TypeOperatorsEvent $event)
+    public function onTypeOperatorsCollect(TypeOperatorsEvent $event): void
     {
         // Subscribe basic field types.
         foreach ($this->typeOperators as $typeName => $operatorOptions) {
@@ -120,7 +117,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onTypeListCollect(ListFieldChoicesEvent $event)
+    public function onTypeListCollect(ListFieldChoicesEvent $event): void
     {
         $event->setChoicesForFieldType(
             'boolean',
@@ -145,7 +142,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
     }
 
-    public function onSegmentFilterForm(FilterPropertiesTypeEvent $event)
+    public function onSegmentFilterForm(FilterPropertiesTypeEvent $event): void
     {
         $form     = $event->getFilterPropertiesForm();
         $choices  = $event->getFieldChoices();

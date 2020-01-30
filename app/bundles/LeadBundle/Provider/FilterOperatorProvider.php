@@ -33,10 +33,6 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
      */
     private $cachedOperators = [];
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator
@@ -45,10 +41,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllOperators()
+    public function getAllOperators(): array
     {
         if (empty($this->cachedOperators)) {
             $event = new LeadListFiltersOperatorsEvent([], $this->translator);
@@ -61,12 +54,7 @@ final class FilterOperatorProvider implements FilterOperatorProviderInterface
         return $this->cachedOperators;
     }
 
-    /**
-     * @param array $operators
-     *
-     * @return array
-     */
-    private function translateOperatorLabels(array $operators)
+    private function translateOperatorLabels(array $operators): array
     {
         foreach ($operators as $key => $operatorSettings) {
             $operators[$key]['label'] = $this->translator->trans($operatorSettings['label']);

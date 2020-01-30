@@ -18,24 +18,14 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class TypeOperatorsEvent extends Event
 {
-    /**
-     * @var array
-     */
     private $operators = [];
 
-    /**
-     * @param string $fieldType
-     * @param array  $operators
-     */
-    public function setOperatorsForFieldType($fieldType, array $operators)
+    public function setOperatorsForFieldType(string $fieldType, array $operators): void
     {
         $this->operators[$fieldType] = $operators;
     }
 
-    /**
-     * @return array
-     */
-    public function getOperatorsForAllFieldTypes()
+    public function getOperatorsForAllFieldTypes(): array
     {
         return $this->operators;
     }

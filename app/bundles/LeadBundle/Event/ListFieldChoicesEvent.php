@@ -18,46 +18,26 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class ListFieldChoicesEvent extends Event
 {
-    /**
-     * @var array
-     */
     private $choicesForTypes = [];
 
-    /**
-     * @var array
-     */
     private $choicesForAliases = [];
 
-    /**
-     * @param string $fieldType
-     * @param array  $choices
-     */
-    public function setChoicesForFieldType(string $fieldType, array $choices)
+    public function setChoicesForFieldType(string $fieldType, array $choices): void
     {
         $this->choicesForTypes[$fieldType] = $choices;
     }
 
-    /**
-     * @param string $fieldType
-     * @param array  $choices
-     */
-    public function setChoicesForFieldAlias(string $fieldAlias, array $choices)
+    public function setChoicesForFieldAlias(string $fieldAlias, array $choices): void
     {
         $this->choicesForAliases[$fieldAlias] = $choices;
     }
 
-    /**
-     * @return array
-     */
-    public function getChoicesForAllListFieldTypes()
+    public function getChoicesForAllListFieldTypes(): array
     {
         return $this->choicesForTypes;
     }
 
-    /**
-     * @return array
-     */
-    public function getChoicesForAllListFieldAliases()
+    public function getChoicesForAllListFieldAliases(): array
     {
         return $this->choicesForAliases;
     }
