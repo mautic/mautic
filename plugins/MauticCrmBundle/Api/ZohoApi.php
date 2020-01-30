@@ -8,12 +8,12 @@ class ZohoApi extends CrmApi
 {
     /**
      * @param string $operation
-     * @param array  $parameters
      * @param string $method
      * @param bool   $json
      * @param array  $settings
      *
      * @return array
+     *
      * @throws ApiErrorException
      */
     protected function request($operation, array $parameters = [], $method = 'GET', $json = false, $settings = [])
@@ -45,11 +45,12 @@ class ZohoApi extends CrmApi
      * @param string $object
      *
      * @return array
+     *
      * @throws ApiErrorException
      */
     public function getLeadFields($object = 'Leads')
     {
-        if ($object == 'company') {
+        if ('company' == $object) {
             $object = 'Accounts'; // Zoho object name
         }
 
@@ -57,10 +58,10 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param array  $data
      * @param string $object
      *
      * @return array
+     *
      * @throws ApiErrorException
      */
     public function createLead(array $data, $object = 'Leads')
@@ -71,10 +72,10 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param array  $data
      * @param string $object
      *
      * @return array
+     *
      * @throws ApiErrorException
      */
     public function updateLead(array $data, $object = 'Leads')
@@ -85,11 +86,11 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     * @param string      $object
-     * @param null  $id
+     * @param string $object
+     * @param null   $id
      *
      * @return array
+     *
      * @throws ApiErrorException
      */
     public function getLeads(array $params, $object, $id = null)
@@ -102,7 +103,7 @@ class ZohoApi extends CrmApi
         $settings = [];
         if ($params['lastModifiedTime']) {
             $settings['headers'] = [
-                'If-Modified-Since' => $params['lastModifiedTime']
+                'If-Modified-Since' => $params['lastModifiedTime'],
             ];
         }
 
@@ -122,10 +123,10 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param array $params
-     * @param null  $id
+     * @param null $id
      *
      * @return array
+     *
      * @throws ApiErrorException
      */
     public function getCompanies(array $params, $id = null)
@@ -137,7 +138,7 @@ class ZohoApi extends CrmApi
         $settings = [];
         if ($params['lastModifiedTime']) {
             $settings['headers'] = [
-                'If-Modified-Since' => $params['lastModifiedTime']
+                'If-Modified-Since' => $params['lastModifiedTime'],
             ];
         }
 
@@ -153,11 +154,12 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param string       $searchColumn
-     * @param string       $searchValue
+     * @param string $searchColumn
+     * @param string $searchValue
      * @param string $object
      *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function getSearchRecords($searchColumn, $searchValue, $object = 'Leads')
