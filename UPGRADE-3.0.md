@@ -139,6 +139,8 @@ All fixtures must be defined as services in a bundle's config.php
     *   Mautic\CampaignBundle\Executioner\Result\Responses::getResponseArray()
 *   Deprecated tests removed:
     *   Mautic/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest
+*   Commands
+    *   Deprecated option `--negative-only` removed for command `mautic:campaigns:trigger`. Use `--inactive-only` instead.
 
 ### CategoryBundle
 
