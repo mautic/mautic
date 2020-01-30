@@ -18,9 +18,6 @@ use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Helper\Helper;
 
-/**
- * Class GravatarHelper.
- */
 class GravatarHelper extends Helper
 {
     /**
@@ -43,12 +40,8 @@ class GravatarHelper extends Helper
      */
     private $requestStack;
 
-    /**
-     * GravatarHelper constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
-        AssetsHelper $assetHelper,
         AvatarHelper $avatarHelper,
         CoreParametersHelper $coreParametersHelper,
         RequestStack $requestStack

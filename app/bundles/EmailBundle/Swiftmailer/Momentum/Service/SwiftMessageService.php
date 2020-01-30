@@ -15,11 +15,7 @@ use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\Metadata\MetadataProcessor;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class SwiftMessageService.
- */
 final class SwiftMessageService implements SwiftMessageServiceInterface
 {
     private $reservedKeys = [
@@ -32,13 +28,6 @@ final class SwiftMessageService implements SwiftMessageServiceInterface
         'Reply-To',
         'BCC',
     ];
-
-    /**
-     * MomentumSwiftMessageService constructor.
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
-    }
 
     /**
      * @return TransmissionDTO

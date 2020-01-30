@@ -17,9 +17,6 @@ use Knp\Menu\Renderer\RendererInterface;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 
-/**
- * Class MenuRenderer.
- */
 class MenuRenderer implements RendererInterface
 {
     /**
@@ -37,12 +34,7 @@ class MenuRenderer implements RendererInterface
      */
     private $defaultOptions;
 
-    /**
-     * MenuRenderer constructor.
-     *
-     * @param $charset
-     */
-    public function __construct(MatcherInterface $matcher, TemplatingHelper $templatingHelper, $charset, array $defaultOptions = [])
+    public function __construct(MatcherInterface $matcher, TemplatingHelper $templatingHelper, array $defaultOptions = [])
     {
         $this->engine         = $templatingHelper->getTemplating();
         $this->matcher        = $matcher;

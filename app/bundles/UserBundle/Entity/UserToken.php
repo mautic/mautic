@@ -14,27 +14,33 @@ namespace Mautic\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class UserToken.
- */
 class UserToken
 {
+    /**
+     * @var int
+     */
+    private $id;
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var string
      */
     private $authorizator;
+
     /**
      * @var string
      */
     private $secret;
+
     /**
      * @var \DateTime|null
      */
     private $expiration = null;
+
     /**
      * @var bool
      */

@@ -53,4 +53,4 @@ parameters:
         - 'app/bundles/WebhookBundle/Entity/Webhook.php' # Rector doesn't understand the JMS serialization hacks.
 
     exclude_rectors:
-        - 'Rector\CodeQuality\Rector\If_\RemoveUnusedParameterRector' # Causes BC breaks and broken services. Use only manually with caution.
+        - 'Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector' # Causes BC breaks and broken services. Use only manually with caution.

@@ -14,7 +14,6 @@ namespace Mautic\LeadBundle\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\UserListType;
@@ -45,7 +44,7 @@ class CompanyType extends AbstractType
      */
     protected $translator;
 
-    public function __construct(EntityManager $entityManager, CorePermissions $security, RouterInterface $router, TranslatorInterface $translator)
+    public function __construct(EntityManager $entityManager, RouterInterface $router, TranslatorInterface $translator)
     {
         $this->em         = $entityManager;
         $this->router     = $router;

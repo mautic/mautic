@@ -14,7 +14,6 @@ namespace Mautic\UserBundle\Security\Authentication;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -26,21 +25,12 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
 {
     private $router;
 
-    /**
-     * Constructor.
-     *
-     * @author    Joe Sexton <joe@webtipblog.com>
-     */
-    public function __construct(RouterInterface $router, Session $session)
+    public function __construct(RouterInterface $router)
     {
         $this->router  = $router;
     }
 
     /**
-     * onAuthenticationSuccess.
-     *
-     * @author    Joe Sexton <joe@webtipblog.com>
-     *
      * @return Response
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token)
@@ -64,10 +54,6 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     }
 
     /**
-     * onAuthenticationFailure.
-     *
-     * @author    Joe Sexton <joe@webtipblog.com>
-     *
      * @return Response
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)

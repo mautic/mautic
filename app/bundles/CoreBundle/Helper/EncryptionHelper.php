@@ -16,9 +16,6 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-/**
- * Class EncryptionHelper.
- */
 class EncryptionHelper
 {
     /** @var SymmetricCipherInterface[] */
@@ -27,13 +24,8 @@ class EncryptionHelper
     /** @var string */
     private $key;
 
-    /**
-     * EncryptionHelper constructor.
-     */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        SymmetricCipherInterface $possibleCipher1,
-        SymmetricCipherInterface $possibleCipher2 = null
+        CoreParametersHelper $coreParametersHelper
     ) {
         $nonCipherArgs = 1;
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {

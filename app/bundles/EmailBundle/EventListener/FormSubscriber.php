@@ -12,7 +12,6 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\ORMException;
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -20,7 +19,6 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -38,7 +36,6 @@ class FormSubscriber implements EventSubscriberInterface
 
     public function __construct(
         EmailModel $emailModel,
-        LeadModel $leadModel,
         ContactTracker $contactTracker
     ) {
         $this->emailModel     = $emailModel;

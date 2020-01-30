@@ -107,7 +107,6 @@ return [
                 'arguments' => [
                     '%mautic.sms_transport%',
                     'mautic.helper.integration',
-                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.sms.transport.twilio' => [

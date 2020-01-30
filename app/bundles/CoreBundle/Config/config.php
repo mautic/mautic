@@ -171,7 +171,6 @@ return [
             'mautic.core.environment.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.cookie',
                     '%mautic.parameters%',
                 ],
             ],
@@ -377,7 +376,6 @@ return [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
-                    'templating.helper.assets',
                     'mautic.helper.template.avatar',
                     'mautic.helper.core_parameters',
                     'request_stack',
@@ -422,7 +420,6 @@ return [
             'mautic.helper.template.formatter' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\FormatterHelper::class,
                 'arguments' => [
-                    'mautic.helper.app_version',
                     'mautic.helper.template.date',
                     'translator',
                 ],
@@ -739,7 +736,7 @@ return [
                 ],
             ],
             'mautic.helper.encryption' => [
-                'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
+                'class'     => \Mautic\CoreBundle\Helper\EncryptionHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
@@ -755,7 +752,7 @@ return [
                 ],
             ],
             'mautic.helper.url' => [
-                'class'     => 'Mautic\CoreBundle\Helper\UrlHelper',
+                'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
                 'arguments' => [
                     'mautic.http.connector',
                     '%mautic.link_shortener_url%',
@@ -783,7 +780,6 @@ return [
                 'arguments' => [
                     'knp_menu.matcher',
                     'mautic.helper.templating',
-                    '%kernel.charset%',
                 ],
                 'tag'   => 'knp_menu.renderer',
                 'alias' => 'mautic',

@@ -11,15 +11,11 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class FormatHelper.
- */
 class FormatterHelper extends Helper
 {
     /**
@@ -31,7 +27,7 @@ class FormatterHelper extends Helper
      */
     private $translator;
 
-    public function __construct(AppVersion $appVersion, DateHelper $dateHelper, TranslatorInterface $translator)
+    public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
         $this->dateHelper = $dateHelper;
         $this->translator = $translator;

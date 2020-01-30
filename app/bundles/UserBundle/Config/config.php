@@ -269,10 +269,9 @@ return [
                 'public' => false,
             ],
             'mautic.security.authentication_handler' => [
-                'class'     => 'Mautic\UserBundle\Security\Authentication\AuthenticationHandler',
+                'class'     => \Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,
                 'arguments' => [
                     'router',
-                    'session',
                 ],
             ],
             'mautic.security.logout_handler' => [

@@ -22,11 +22,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class CategoryType.
- */
 class CategoryType extends AbstractType
 {
     /**
@@ -34,12 +30,9 @@ class CategoryType extends AbstractType
      */
     private $session;
 
-    /**
-     * CategoryType constructor.
-     */
-    public function __construct(TranslatorInterface $translator, Session $session)
+    public function __construct(Session $session)
     {
-        $this->session    = $session;
+        $this->session = $session;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

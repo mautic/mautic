@@ -123,7 +123,6 @@ return [
                 'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
                 'arguments' => [
                     'mautic.report.model.report',
-                    'translator',
                 ],
             ],
             'mautic.form.type.filter_selector' => [
