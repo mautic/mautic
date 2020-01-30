@@ -2011,7 +2011,6 @@ abstract class AbstractIntegration
                     $info[$field] = $values;
                     break;
                 case 'object':
-                    $values = $values;
                     foreach ($fieldDetails['fields'] as $f) {
                         if (isset($values->$f)) {
                             $fn = $this->matchFieldName($field, $f);
@@ -2024,7 +2023,6 @@ abstract class AbstractIntegration
                     $objects = [];
                     if (!empty($values)) {
                         foreach ($values as $k => $v) {
-                            $v = $v;
                             if (isset($v->value)) {
                                 $objects[] = $v->value;
                             }

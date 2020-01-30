@@ -120,8 +120,6 @@ class LineChart extends AbstractChart implements ChartInterface
                 $date->add($oneUnit);
             }
         }
-
-        $this->labels = $this->labels;
     }
 
     /**

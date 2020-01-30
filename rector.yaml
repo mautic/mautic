@@ -6,7 +6,7 @@ services:
     Rector\DeadCode\Rector\Class_\RemoveSetterOnlyPropertyAndMethodCallRector:
     Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector:
     Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector:
-    # Rector\DeadCode\Rector\Expression\SimplifyMirrorAssignRector:
+    Rector\DeadCode\Rector\Expression\SimplifyMirrorAssignRector:
     # Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector:
     # Rector\DeadCode\Rector\Assign\RemoveDoubleAssignRector:
     # Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector:
@@ -51,6 +51,7 @@ parameters:
         - '*.html.php'
         - 'app/bundles/LeadBundle/Entity/LeadField.php' # Rector doesn't understand the lifecycle method.
         - 'app/bundles/WebhookBundle/Entity/Webhook.php' # Rector doesn't understand the JMS serialization hacks.
+        - 'app/bundles/UserBundle/Entity/UserToken.php' # Rector doesn't understand the private prop $id is useful there.
 
     exclude_rectors:
         - 'Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector' # Causes BC breaks and broken services. Use only manually with caution.

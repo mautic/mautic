@@ -97,8 +97,6 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
 
                     if (!$type instanceof StringType) {
                         unset($uniqueFields[$name]);
-                    } elseif (isset($uniqueFields[$name])) {
-                        $uniqueFields[$name] = $uniqueFields[$name];
                     }
                 }
 
