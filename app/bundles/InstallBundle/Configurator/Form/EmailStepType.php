@@ -312,7 +312,7 @@ class EmailStepType extends AbstractType
             $choices[$this->translator->trans($label)] = $value;
         }
 
-        asort($choices, SORT_NATURAL);
+        ksort($choices, SORT_NATURAL);
 
         return $choices;
     }
