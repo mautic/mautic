@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -75,8 +76,11 @@ class EventController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
+        /** @var EventCollector $eventCollector */
+        $eventCollector = $this->get('mautic.campaign.event_collector');
+
         //fire the builder event
-        $events = $this->getModel('campaign')->getEvents();
+        $events = $eventCollector->getEvents();
         $form   = $this->get('form.factory')->create(
             EventType::class,
             $event,
@@ -277,9 +281,12 @@ class EventController extends CommonFormController
          * the supported events for this type because we already made
          * sure that we're accessing a supported event type above.
          *
-         * ->getEvents() returns translated labels & descriptions
+         * Method getEvents() returns translated labels & descriptions
          */
-        $supportedEvents = $this->getModel('campaign')->getEvents()[$event['eventType']];
+
+        /** @var EventCollector $eventCollector */
+        $eventCollector  = $this->get('mautic.campaign.event_collector');
+        $supportedEvents = $eventCollector->getEvents()[$event['eventType']];
         $form            = $this->get('form.factory')->create(
             EventType::class,
             $event,
@@ -442,7 +449,9 @@ class EventController extends CommonFormController
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ('POST' == $this->request->getMethod() && null !== $event) {
-            $events            = $this->getModel('campaign')->getEvents();
+            /** @var EventCollector $eventCollector */
+            $eventCollector    = $this->get('mautic.campaign.event_collector');
+            $events            = $eventCollector->getEvents();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             // Add the field to the delete list
@@ -507,7 +516,9 @@ class EventController extends CommonFormController
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ('POST' == $this->request->getMethod() && null !== $event) {
-            $events            = $this->getModel('campaign')->getEvents();
+            /** @var EventCollector $eventCollector */
+            $eventCollector    = $this->get('mautic.campaign.event_collector');
+            $events            = $eventCollector->getEvents();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list

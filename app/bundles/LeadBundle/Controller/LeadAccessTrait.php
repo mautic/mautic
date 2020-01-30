@@ -26,7 +26,7 @@ trait LeadAccessTrait
      * @param bool   $isPlugin
      * @param string $intgegration
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Lead
      */
     protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {

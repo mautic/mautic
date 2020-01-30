@@ -125,9 +125,6 @@ class LegacyEventModel extends CommonFormModel
      */
     protected $leadEventLogRepository;
 
-    /**
-     * LegacyEventModel constructor.
-     */
     public function __construct(
         UserModel $userModel,
         NotificationModel $notificationModel,
@@ -485,7 +482,7 @@ class LegacyEventModel extends CommonFormModel
      */
     public function triggerConditions(Campaign $campaign, &$evaluatedEventCount = 0, &$executedEventCount = 0, &$totalEventCount = 0)
     {
-        $eventSettings   = $this->campaignModel->getEvents();
+        $eventSettings   = $this->eventCollector->getEvents();
         $repo            = $this->getRepository();
         $sleepBatchCount = 0;
         $limit           = 100;

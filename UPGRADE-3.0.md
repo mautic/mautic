@@ -123,11 +123,19 @@ All fixtures must be defined as services in a bundle's config.php
     *   Mautic/CampaignBundle/Event/CampaignScheduledEvent 
     *   Mautic/CampaignBundle/Model/LegacyEventModel 
 *   Deprecated methods removed:
-    *   CampaignEventHelper::addRemoveLead
-    *   LeadRepository::getLeadsWithFields
-    *   CampaignRepository::getCampaignLeadIds
-    *   CampaignRepository::getCampaignLeadsFromLists
-    *   CampaignRepository::getCampaignOrphanLeads
+    *   CampaignEventHelper::addRemoveLead()
+    *   LeadRepository::getLeadsWithFields()
+    *   CampaignRepository::getCampaignLeadIds()
+    *   CampaignRepository::getCampaignLeadsFromLists()
+    *   CampaignRepository::getCampaignOrphanLeads()
+    *   LeadEventLogRepository::removeScheduledEvents()
+    *   CampaignModel::removeScheduledEvents()
+    *   CampaignModel::setChannelFromEventProperties(). Use \Mautic\CampaignBundle\Helper\ChannelExtractor instead.
+    *   CampaignModel::getRemovedLeads(). Use RemovedContactTracker::getRemovedContacts() instead.
+    *   CampaignModel::addLead(). Use MembershipManager::addContact() instead.
+    *   CampaignModel::addLeads(). Use MembershipManager::addContacts() instead.
+    *   CampaignModel::getEvents(). Use EventCollector::getEvents() instead.
+    *   CampaignModel::batchSleep()
 *   Deprecated tests removed:
     *   Mautic/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest
 

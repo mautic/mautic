@@ -135,6 +135,8 @@ return [
             'mautic.campaign.leadbundle.subscriber'     => [
                 'class'     => \Mautic\CampaignBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
+                    'mautic.campaign.membership.manager',
+                    'mautic.campaign.event_collector',
                     'mautic.campaign.model.campaign',
                     'mautic.lead.model.lead',
                     'translator',

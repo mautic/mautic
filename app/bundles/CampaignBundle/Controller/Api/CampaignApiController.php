@@ -12,26 +12,31 @@
 namespace Mautic\CampaignBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
-/**
- * Class CampaignApiController.
- */
 class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
+    /**
+     * @var MembershipManager
+     */
+    private $membershipManager;
+
     public function initialize(FilterControllerEvent $event)
     {
-        $this->model            = $this->getModel('campaign');
-        $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
-        $this->entityNameOne    = 'campaign';
-        $this->entityNameMulti  = 'campaigns';
-        $this->permissionBase   = 'campaign:campaigns';
-        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+        $this->model             = $this->getModel('campaign');
+        $this->membershipManager = $this->get('mautic.campaign.membership.manager');
+        $this->entityClass       = Campaign::class;
+        $this->entityNameOne     = 'campaign';
+        $this->entityNameMulti   = 'campaigns';
+        $this->permissionBase    = 'campaign:campaigns';
+        $this->serializerGroups  = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
 
         parent::initialize($event);
     }
@@ -59,7 +64,7 @@ class CampaignApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
-            $this->model->addLead($entity, $leadId);
+            $this->membershipManager->addContact($lead, $entity);
 
             $view = $this->view(['success' => 1], Response::HTTP_OK);
 
@@ -88,7 +93,7 @@ class CampaignApiController extends CommonApiController
                 return $lead;
             }
 
-            $this->model->removeLead($entity, $leadId);
+            $this->membershipManager->removeContact($lead, $entity);
 
             $view = $this->view(['success' => 1], Response::HTTP_OK);
 

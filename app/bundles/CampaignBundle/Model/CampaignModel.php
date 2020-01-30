@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -36,10 +35,6 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class CampaignModel
- * {@inheritdoc}
- */
 class CampaignModel extends CommonFormModel
 {
     /**
@@ -77,9 +72,6 @@ class CampaignModel extends CommonFormModel
      */
     private $membershipBuilder;
 
-    /**
-     * CampaignModel constructor.
-     */
     public function __construct(
         LeadModel $leadModel,
         ListModel $leadListModel,
@@ -258,11 +250,9 @@ class CampaignModel extends CommonFormModel
      */
     public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents)
     {
-        $eventSettings  = $this->getEvents();
         $existingEvents = $entity->getEvents()->toArray();
-        $events         =
-        $hierarchy      =
-        $parentUpdated  = [];
+        $events         = [];
+        $hierarchy      = [];
 
         foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingEvents[$properties['id']])) ? false : true;
@@ -284,7 +274,7 @@ class CampaignModel extends CommonFormModel
                 }
             }
 
-            $this->setChannelFromEventProperties($event, $properties, $eventSettings[$properties['eventType']]);
+            ChannelExtractor::setChannel($event, $event, $this->eventCollector->getEventConfig($event));
 
             $event->setCampaign($entity);
             $events[$properties['id']] = $event;
@@ -814,155 +804,6 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
-     * @deprecated 2.14.0 to be removed in 3.0; use EventCollector instead
-     *
-     * Gets array of custom events from bundles subscribed CampaignEvents::CAMPAIGN_ON_BUILD.
-     *
-     * @param string|null $type Specific type of events to retreive
-     *
-     * @return mixed
-     */
-    public function getEvents($type = null)
-    {
-        return $this->eventCollector->getEventsArray($type);
-    }
-
-    /**
-     * @deprecated 2.14.0 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead
-     *
-     * @param $entity
-     * @param $properties
-     * @param $eventSettings
-     *
-     * @return bool
-     */
-    public function setChannelFromEventProperties($entity, $properties, &$eventSettings)
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0; use \Mautic\CampaignBundle\Helper\ChannelExtractor instead', E_USER_DEPRECATED);
-
-        ChannelExtractor::setChannel($entity, $entity, $this->eventCollector->getEventConfig($entity));
-
-        return true;
-    }
-
-    /**
-     * @return array
-     *
-     * @deprecated 2.14.0 to be removed in 3.0
-     */
-    public function getRemovedLeads()
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0; use RemovedContactTracker instead', E_USER_DEPRECATED);
-
-        return  $this->removedContactTracker->getRemovedContacts();
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * Add lead to the campaign.
-     *
-     * @param           $lead
-     * @param bool|true $manuallyAdded
-     */
-    public function addLead(Campaign $campaign, $lead, $manuallyAdded = true)
-    {
-        $this->addLeads($campaign, [$lead], $manuallyAdded);
-
-        unset($campaign, $lead);
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * @param bool $manuallyAdded
-     * @param bool $batchProcess
-     * @param int  $searchListLead
-     */
-    public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
-
-        if (!reset($leads) instanceof Lead) {
-            $leadIds = [];
-
-            // This is an array of lead IDs but we now need Lead entities
-            foreach ($leads as $lead) {
-                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
-            }
-
-            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
-        }
-
-        $arrayCollection = $this->getArrayCollectionOfContactsById($leads);
-
-        $this->membershipManager->addContacts($arrayCollection, $campaign, $manuallyAdded);
-
-        if ($batchProcess) {
-            $this->leadModel->getRepository()->detachEntities($leads);
-        }
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * Remove lead from the campaign.
-     *
-     * @param      $lead
-     * @param bool $manuallyRemoved
-     */
-    public function removeLead(Campaign $campaign, $lead, $manuallyRemoved = true)
-    {
-        $this->removeLeads($campaign, [$lead], $manuallyRemoved);
-
-        unset($campaign, $lead);
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * @param bool $manuallyRemoved
-     * @param bool $batchProcess
-     * @param bool $skipFindOne
-     */
-    public function removeLeads(Campaign $campaign, array $leads, $manuallyRemoved = false, $batchProcess = false, $skipFindOne = false)
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0; use MembershipManager instead', E_USER_DEPRECATED);
-
-        if (!reset($leads) instanceof Lead) {
-            $leadIds = [];
-
-            // This is an array of lead IDs but we now need Lead entities
-            foreach ($leads as $lead) {
-                $leadIds[] = (is_array($lead) && isset($lead['id'])) ? (int) $lead['id'] : (int) $lead;
-            }
-
-            $leads = $this->leadModel->getRepository()->getEntities(['ids' => $leadIds, 'ignore_paginator' => true]);
-        }
-
-        $arrayCollection = $this->getArrayCollectionOfContactsById($leads);
-
-        $this->membershipManager->removeContacts($arrayCollection, $campaign, !$manuallyRemoved);
-
-        if ($batchProcess) {
-            $this->leadModel->getRepository()->detachEntities($leads);
-        }
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * @param Campaign $campaign
-     * @param          $lead
-     */
-    public function removeScheduledEvents($campaign, $lead)
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0', E_USER_DEPRECATED);
-
-        $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->removeScheduledEvents($campaign->getId(), $lead->getId());
-    }
-
-    /**
      * @param int             $limit
      * @param bool            $maxLeads
      * @param OutputInterface $output
@@ -974,30 +815,5 @@ class CampaignModel extends CommonFormModel
         $contactLimiter = new ContactLimiter($limit);
 
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
-    }
-
-    /**
-     * Batch sleep according to settings.
-     *
-     * @deprecated 2.14.0 to be removed in 3.0
-     */
-    protected function batchSleep()
-    {
-        @trigger_error('Deprecated 2.14 to be removed in 3.0', E_USER_DEPRECATED);
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    private function getArrayCollectionOfContactsById(array $contacts)
-    {
-        $keyById = [];
-
-        /** @var Lead $contact */
-        foreach ($contacts as $contact) {
-            $keyById[$contact->getId()] = $contact;
-        }
-
-        return new ArrayCollection($keyById);
     }
 }
