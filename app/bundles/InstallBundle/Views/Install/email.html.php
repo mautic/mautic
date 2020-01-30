@@ -66,7 +66,7 @@ if ('index' == $tmpl) {
     <?php
     $authMode = $form['mailer_auth_mode']->vars['data'];
     $mailer   = $form['mailer_transport']->vars['data'];
-    $hide     = (!in_array($mailer, ['mail', 'sendmail']) || ('smtp' == $mailer && !empty($authMode))) ? '' : ' class="hide"';
+    $hide     = (!in_array($mailer, ['mail', 'sendmail', 'smtp']) || ('smtp' == $mailer && !empty($authMode))) ? '' : ' class="hide"';
     ?>
     <div id="authDetails"<?php echo $hide; ?>>
         <div class="row">
