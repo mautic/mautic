@@ -55,7 +55,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
         $messagesByContact = [];
 
         /** @var MessageQueue $message */
-        foreach ($messages as $id => $message) {
+        foreach ($messages as $message) {
             if ($sms && $message->getLead() && $sms->isPublished()) {
                 $contact = $message->getLead();
                 $mobile  = $contact->getMobile();

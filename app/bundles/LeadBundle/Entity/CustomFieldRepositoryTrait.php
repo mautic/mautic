@@ -231,7 +231,7 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntities($entities)
     {
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
             $this->saveEntity($entity);
         }

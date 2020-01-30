@@ -113,7 +113,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                                     //The select box needs values to be [value] => label format so make sure we have that style then put it in
                                     $options[$field->getAlias()][$option['value']] = $option['label'];
                                 } elseif (is_array($option)) {
-                                    foreach ($option as $optgroup => $opt) {
+                                    foreach ($option as $opt) {
                                         $options[$field->getAlias()][$opt] = $opt;
                                     }
                                 } elseif (!is_array($option)) {

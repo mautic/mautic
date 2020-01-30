@@ -792,7 +792,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $prateek  = explode('+', $string);
                 $imploder = [];
 
-                foreach ($prateek as $key => $value) {
+                foreach ($prateek as $value) {
                     $list       = $this->getEntityManager()->getRepository(LeadList::class)->findOneByAlias($value);
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }

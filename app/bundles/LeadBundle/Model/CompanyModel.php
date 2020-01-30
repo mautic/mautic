@@ -98,7 +98,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function saveEntities($entities, $unlock = true)
     {
         // Update leads primary company name
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             $this->setEntityDefaultValues($entity, 'company');
             $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
         }
@@ -259,7 +259,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         //update existing values
-        foreach ($fieldValues as $group => &$groupFields) {
+        foreach ($fieldValues as &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
                 if (!isset($field['value'])) {
                     $field['value'] = null;
@@ -313,7 +313,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         //make sure they are ints
-        foreach ($companies as $k => &$l) {
+        foreach ($companies as &$l) {
             $l = (int) $l;
 
             if (!isset($companyLeadAdd[$l])) {
@@ -421,7 +421,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         if (!$companies instanceof Company) {
             //make sure they are ints
             $searchForCompanies = [];
-            foreach ($companies as $k => &$l) {
+            foreach ($companies as &$l) {
                 $l = (int) $l;
                 if (!isset($companyLeadRemove[$l])) {
                     $searchForCompanies[] = $l;

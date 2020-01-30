@@ -300,7 +300,7 @@ class WebhookModel extends FormModel
             $response = $http->post($webhook->getWebhookUrl(), $payload, $headers, $this->webhookTimeout);
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
-            foreach ($this->webhookQueueIdList as $id => $queue) {
+            foreach ($this->webhookQueueIdList as $queue) {
                 $webhook->removeQueue($queue);
             }
 

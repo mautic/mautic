@@ -261,7 +261,7 @@ class LeadModel extends FormModel
             $repo->setAvailableSocialFields($socialFields);
 
             $searchFields = [];
-            foreach ($fields as $group => $groupFields) {
+            foreach ($fields as $groupFields) {
                 $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
             $repo->setAvailableSearchFields($searchFields);
@@ -662,7 +662,7 @@ class LeadModel extends FormModel
         }
 
         //update existing values
-        foreach ($fieldValues as $group => &$groupFields) {
+        foreach ($fieldValues as &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
                 if (!isset($field['value'])) {
                     $field['value'] = null;
@@ -879,7 +879,7 @@ class LeadModel extends FormModel
     public function flattenFields($fields)
     {
         $flat = [];
-        foreach ($fields as $group => $fields) {
+        foreach ($fields as $fields) {
             foreach ($fields as $field) {
                 $flat[$field['alias']] = $field['value'];
             }
@@ -1583,7 +1583,7 @@ class LeadModel extends FormModel
         $currentTags  = $lead->getTags();
         $leadModified = $tagsDeleted = false;
 
-        foreach ($currentTags as $tagName => $tag) {
+        foreach ($currentTags as $tag) {
             if (!in_array($tag->getId(), $tags)) {
                 // Tag has been removed
                 $lead->removeTag($tag);
@@ -1824,7 +1824,7 @@ class LeadModel extends FormModel
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
-        foreach ($leadCompanies as $key => $leadCompany) {
+        foreach ($leadCompanies as $leadCompany) {
             if (false === array_search($leadCompany['company_id'], $companies)) {
                 $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
             }

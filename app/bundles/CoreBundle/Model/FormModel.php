@@ -154,7 +154,7 @@ class FormModel extends AbstractCommonModel
         $this->em->flush();
 
         // Dispatch post events after everything has been flushed
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             $this->dispatchEvent('post_save', $entity, $isNew, $event);
         }
     }

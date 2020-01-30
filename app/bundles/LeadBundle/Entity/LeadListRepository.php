@@ -442,7 +442,7 @@ class LeadListRepository extends CommonRepository
         $groupExpr = $q->expr()->andX();
 
         $defaultObject = $object;
-        foreach ($filters as $k => $details) {
+        foreach ($filters as $details) {
             $object = $defaultObject;
             if (!empty($details['object'])) {
                 $object = $details['object'];

@@ -1117,7 +1117,7 @@ class ListModel extends FormModel
         if (!$lists instanceof LeadList) {
             //make sure they are ints
             $searchForLists = [];
-            foreach ($lists as $k => &$l) {
+            foreach ($lists as &$l) {
                 $l = (int) $l;
                 if (!isset($this->leadChangeLists[$l])) {
                     $searchForLists[] = $l;
@@ -1250,7 +1250,7 @@ class ListModel extends FormModel
         if (!$lists instanceof LeadList) {
             //make sure they are ints
             $searchForLists = [];
-            foreach ($lists as $k => &$l) {
+            foreach ($lists as &$l) {
                 $l = (int) $l;
                 if (!isset($this->leadChangeLists[$l])) {
                     $searchForLists[] = $l;

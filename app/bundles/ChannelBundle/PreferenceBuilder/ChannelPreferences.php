@@ -87,7 +87,7 @@ class ChannelPreferences
          * @var int
          * @var ArrayCollection|LeadEventLog[] $logs
          */
-        foreach ($this->organizedByPriority as $priority => $logs) {
+        foreach ($this->organizedByPriority as $logs) {
             $logs->remove($log->getId());
         }
 

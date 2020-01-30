@@ -53,7 +53,7 @@ class SchemaHelper
         ini_set('display_errors', 0);
 
         // Support for env variables
-        foreach ($dbParams as $k => &$v) {
+        foreach ($dbParams as &$v) {
             if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
                 $v = (string) getenv($match[1]);
             }

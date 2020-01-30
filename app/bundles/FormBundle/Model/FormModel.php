@@ -319,7 +319,7 @@ class FormModel extends CommonFormModel
 
         //match sessionId with field Id to update mapped fields
         $fieldIds = [];
-        foreach ($savedFields as $id => $field) {
+        foreach ($savedFields as $field) {
             $fieldIds[$field->getSessionId()] = $field->getId();
         }
 

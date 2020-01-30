@@ -101,7 +101,7 @@ class PageSubscriber implements EventSubscriberInterface
         preg_match_all($regex, $content, $matches);
 
         if (count($matches[0])) {
-            foreach ($matches[1] as $k => $id) {
+            foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
                 if (null !== $form &&
                     (

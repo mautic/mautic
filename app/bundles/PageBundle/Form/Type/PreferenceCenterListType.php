@@ -61,7 +61,7 @@ class PreferenceCenterListType extends AbstractType
                     // sort by language
                     ksort($choices);
 
-                    foreach ($choices as $lang => &$pages) {
+                    foreach ($choices as &$pages) {
                         ksort($pages);
                     }
 

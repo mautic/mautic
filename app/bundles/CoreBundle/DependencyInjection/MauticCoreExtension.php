@@ -315,7 +315,7 @@ class MauticCoreExtension extends Extension
             // To be added during compilation
             $definitionArguments[] = '';
         } elseif (is_array($argument) || is_object($argument)) {
-            foreach ($argument as $k => &$v) {
+            foreach ($argument as &$v) {
                 if (0 === strpos($v, '%')) {
                     $v = str_replace('%%', '%', $v);
                     $v = $container->getParameter(substr($v, 1, -1));

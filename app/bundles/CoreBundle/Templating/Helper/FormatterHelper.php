@@ -60,7 +60,7 @@ class FormatterHelper extends Helper
                 }
 
                 $stringParts = [];
-                foreach ($val as $k => $v) {
+                foreach ($val as $v) {
                     if (is_array($v)) {
                         $stringParts = $this->_($v, 'array', $textOnly, $round + 1);
                     } else {

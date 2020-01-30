@@ -42,7 +42,7 @@ class IpAddressModel
      */
     public function saveIpAddressesReferencesForContact(Lead $contact)
     {
-        foreach ($contact->getIpAddresses() as $key => $ipAddress) {
+        foreach ($contact->getIpAddresses() as $ipAddress) {
             $this->insertIpAddressReference($contact, $ipAddress);
         }
     }

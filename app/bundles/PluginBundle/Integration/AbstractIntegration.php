@@ -2022,7 +2022,7 @@ abstract class AbstractIntegration
                 case 'array_object':
                     $objects = [];
                     if (!empty($values)) {
-                        foreach ($values as $k => $v) {
+                        foreach ($values as $v) {
                             if (isset($v->value)) {
                                 $objects[] = $v->value;
                             }

@@ -59,7 +59,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
             ];
 
         /** @var MessageQueue $message */
-        foreach ($messages as $id => $message) {
+        foreach ($messages as $message) {
             if ($email && $message->getLead() && $email->isPublished()) {
                 $contact = $message->getLead()->getProfileFields();
                 if (empty($contact['email'])) {

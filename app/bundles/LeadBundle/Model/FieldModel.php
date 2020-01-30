@@ -833,7 +833,7 @@ class FieldModel extends FormModel
 
             if ($byGroup) {
                 // Sort each group by translation
-                foreach ($leadFields as $group => &$fieldGroup) {
+                foreach ($leadFields as &$fieldGroup) {
                     uasort($fieldGroup, 'strnatcmp');
                 }
             }

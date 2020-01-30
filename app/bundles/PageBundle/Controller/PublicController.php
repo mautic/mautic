@@ -165,7 +165,7 @@ class PublicController extends CommonFormController
                             $totalHits += $variants[$id]['hits'];
 
                             //determine variant to show
-                            foreach ($variants as $id => &$variant) {
+                            foreach ($variants as &$variant) {
                                 $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : $variant['weight'];
                             }
 

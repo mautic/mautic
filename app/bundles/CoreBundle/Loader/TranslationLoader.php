@@ -51,7 +51,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         $catalogue = new MessageCatalogue($locale);
 
         //Bundle translations
-        foreach ($bundles as $name => $bundle) {
+        foreach ($bundles as $bundle) {
             //load translations
             $translations = $bundle['directory'].'/Translations/'.$locale;
             if (file_exists($translations)) {

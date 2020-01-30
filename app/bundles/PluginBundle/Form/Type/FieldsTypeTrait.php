@@ -106,12 +106,12 @@ trait FieldsTypeTrait
                 };
 
                 $fields = [];
-                foreach ($requiredFields as $groupName => $groupedFields) {
+                foreach ($requiredFields as $groupedFields) {
                     uasort($groupedFields, $sortFieldsFunction);
 
                     $fields = array_merge($fields, $groupedFields);
                 }
-                foreach ($optionalFields as $groupName => $groupedFields) {
+                foreach ($optionalFields as $groupedFields) {
                     uasort($groupedFields, $sortFieldsFunction);
 
                     $fields = array_merge($fields, $groupedFields);
