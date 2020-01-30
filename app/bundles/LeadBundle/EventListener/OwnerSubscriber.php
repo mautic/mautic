@@ -95,15 +95,11 @@ class OwnerSubscriber implements EventSubscriberInterface
         $contact = $event->getLead();
         $owner   = $event->getOwner();
 
-        if (isset($contact['owner_id']) === false) {
-            return $this->getEmptyTokens();
-        }
-
-        if ($contact['owner_id'] === 0) {
+        if ($event->isInternalSend()) {
             return $this->getFakeTokens();
         }
 
-        if ($owner === false) {
+        if (empty($contact['owner_id'])) {
             return $this->getEmptyTokens();
         }
 
