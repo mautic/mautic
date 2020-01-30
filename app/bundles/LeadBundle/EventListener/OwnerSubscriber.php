@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -107,10 +108,10 @@ class OwnerSubscriber implements EventSubscriberInterface
         }
 
         return [
-            $this->buildToken('email')      => (string) $owner['email'],
-            $this->buildToken('first_name') => (string) $owner['first_name'],
-            $this->buildToken('last_name')  => (string) $owner['last_name'],
-            $this->buildToken('position')   => (string) $owner['position'],
+            $this->buildToken('email')      => ArrayHelper::getValue('email', $owner),
+            $this->buildToken('first_name') => ArrayHelper::getValue('first_name', $owner),
+            $this->buildToken('last_name')  => ArrayHelper::getValue('last_name', $owner),
+            $this->buildToken('position')   => ArrayHelper::getValue('position', $owner),
         ];
     }
 
