@@ -141,6 +141,9 @@ All fixtures must be defined as services in a bundle's config.php
     *   Mautic/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest
 *   Commands
     *   Deprecated option `--negative-only` removed for command `mautic:campaigns:trigger`. Use `--inactive-only` instead.
+*   Routes
+    * `/api/campaigns/{id}/contact/add/{leadId}` route removed. Use `/api/campaigns/{id}/contact/{leadId}/add` instead.
+    * `/api/campaigns/{id}/contact/remove/{leadId}` route removed. Use `/api/campaigns/{id}/contact/{leadId}/remove` instead.
 
 ### CategoryBundle
 
