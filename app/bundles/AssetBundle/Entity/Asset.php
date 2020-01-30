@@ -655,13 +655,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Set uniqueDownloadCount.
      *
      * @param int $uniqueDownloadCount
