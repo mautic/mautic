@@ -21,8 +21,8 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedExcept
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
@@ -47,9 +47,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $emailModel;
 
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    private $campaignEventModel;
+    private $realTimeExecutioner;
 
     /**
      * @var SendEmailToUser
@@ -63,14 +63,14 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function __construct(
         EmailModel $emailModel,
-        EventModel $eventModel,
+        RealTimeExecutioner $realTimeExecutioner,
         SendEmailToUser $sendEmailToUser,
         TranslatorInterface $translator
     ) {
-        $this->emailModel         = $emailModel;
-        $this->campaignEventModel = $eventModel;
-        $this->sendEmailToUser    = $sendEmailToUser;
-        $this->translator         = $translator;
+        $this->emailModel          = $emailModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
+        $this->sendEmailToUser     = $sendEmailToUser;
+        $this->translator          = $translator;
     }
 
     /**
@@ -183,7 +183,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $email = $event->getEmail();
 
         if (null !== $email) {
-            $this->campaignEventModel->triggerEvent('email.open', $email, 'email', $email->getId());
+            $this->realTimeExecutioner->execute('email.open', $email, 'email', $email->getId());
         }
     }
 
@@ -199,7 +199,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $email = $event->getEmail();
         if (null !== $email) {
-            $this->campaignEventModel->triggerEvent('email.reply', $email, 'email', $email->getId());
+            $this->realTimeExecutioner->execute('email.reply', $email, 'email', $email->getId());
         }
     }
 

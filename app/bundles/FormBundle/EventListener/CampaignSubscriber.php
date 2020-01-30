@@ -14,7 +14,7 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
@@ -36,15 +36,15 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $formSubmissionModel;
 
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    private $campaignEventModel;
+    private $realTimeExecutioner;
 
-    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, EventModel $campaignEventModel)
+    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, RealTimeExecutioner $realTimeExecutioner)
     {
         $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
-        $this->campaignEventModel  = $campaignEventModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**
@@ -89,7 +89,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function onFormSubmit(SubmissionEvent $event)
     {
         $form = $event->getSubmission()->getForm();
-        $this->campaignEventModel->triggerEvent('form.submit', $form, 'form', $form->getId());
+        $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
 
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)

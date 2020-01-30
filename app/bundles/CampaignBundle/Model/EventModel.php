@@ -11,15 +11,14 @@
 
 namespace Mautic\CampaignBundle\Model;
 
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\FormModel;
 
-/**
- * Class EventModel.
- */
-class EventModel extends LegacyEventModel
+class EventModel extends FormModel
 {
     /**
      * {@inheritdoc}
@@ -28,7 +27,7 @@ class EventModel extends LegacyEventModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Event');
+        return $this->em->getRepository(Event::class);
     }
 
     /**
@@ -38,7 +37,7 @@ class EventModel extends LegacyEventModel
      */
     public function getCampaignRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Campaign');
+        return $this->em->getRepository(Campaign::class);
     }
 
     /**
@@ -46,7 +45,7 @@ class EventModel extends LegacyEventModel
      */
     public function getLeadEventLogRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**

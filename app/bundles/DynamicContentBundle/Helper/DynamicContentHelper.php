@@ -11,7 +11,7 @@
 
 namespace Mautic\DynamicContentBundle\Helper;
 
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -27,9 +27,9 @@ class DynamicContentHelper
     use MatchFilterForLeadTrait;
 
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    protected $campaignEventModel;
+    protected $realTimeExecutioner;
 
     /**
      * @var ContainerAwareEventDispatcher
@@ -41,13 +41,10 @@ class DynamicContentHelper
      */
     protected $dynamicContentModel;
 
-    /**
-     * DynamicContentHelper constructor.
-     */
-    public function __construct(DynamicContentModel $dynamicContentModel, EventModel $campaignEventModel, EventDispatcherInterface $dispatcher)
+    public function __construct(DynamicContentModel $dynamicContentModel, RealTimeExecutioner $realTimeExecutioner, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
-        $this->campaignEventModel  = $campaignEventModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
         $this->dispatcher          = $dispatcher;
     }
 
@@ -60,7 +57,7 @@ class DynamicContentHelper
     public function getDynamicContentForLead($slot, $lead)
     {
         // Attempt campaign slots first
-        $response = $this->campaignEventModel->triggerEvent('dwc.decision', $slot, 'dynamicContent');
+        $response = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getResponseArray();
         if (is_array($response) && !empty($response['action']['dwc.push_content'])) {
             return array_shift($response['action']['dwc.push_content']);
         }

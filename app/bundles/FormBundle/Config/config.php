@@ -208,7 +208,7 @@ return [
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                 ],
             ],
             'mautic.form.leadbundle.subscriber' => [
