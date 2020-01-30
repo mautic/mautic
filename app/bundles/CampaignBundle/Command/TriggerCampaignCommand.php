@@ -227,7 +227,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->output       = $quiet ? new NullOutput() : $output;
         $this->kickoffOnly  = $input->getOption('kickoff-only');
         $this->scheduleOnly = $input->getOption('scheduled-only');
-        $this->inactiveOnly = $input->getOption('inactive-only') || $input->getOption('negative-only');
+        $this->inactiveOnly = $input->getOption('inactive-only');
 
         $batchLimit    = $input->getOption('batch-limit');
         $campaignLimit = $input->getOption('campaign-limit');
