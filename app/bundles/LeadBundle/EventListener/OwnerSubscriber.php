@@ -103,6 +103,10 @@ class OwnerSubscriber implements EventSubscriberInterface
             return $this->getEmptyTokens();
         }
 
+        if (!is_array($owner)) {
+            return $this->getEmptyTokens();
+        }
+
         return [
             $this->buildToken('email')      => ArrayHelper::getValue('email', $owner),
             $this->buildToken('first_name') => ArrayHelper::getValue('first_name', $owner),
