@@ -537,9 +537,7 @@ class PlainTextHelper
             $str = strtoupper($str);
         }
 
-        $str = htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
-
-        return $str;
+        return htmlspecialchars($str, ENT_COMPAT, self::ENCODING);
     }
 
     /**

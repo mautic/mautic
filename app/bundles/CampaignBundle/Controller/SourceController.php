@@ -272,8 +272,6 @@ class SourceController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

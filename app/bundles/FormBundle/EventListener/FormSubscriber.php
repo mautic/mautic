@@ -408,9 +408,8 @@ class FormSubscriber implements EventSubscriberInterface
             }
             $output .= '</td></tr>';
         }
-        $output .= '</table>';
 
-        return $output;
+        return $output.'</table>';
     }
 
     /**

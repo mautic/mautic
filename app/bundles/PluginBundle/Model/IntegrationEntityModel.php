@@ -37,7 +37,7 @@ class IntegrationEntityModel extends FormModel
 
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
-        $syncedRecords = $integrationEntityRepo->getIntegrationsEntityId(
+        return $integrationEntityRepo->getIntegrationsEntityId(
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),
@@ -49,8 +49,6 @@ class IntegrationEntityModel extends FormModel
             0,
             $formattedRecords
         );
-
-        return $syncedRecords;
     }
 
     public function getRecordList($integrationObject)
@@ -73,9 +71,8 @@ class IntegrationEntityModel extends FormModel
         }
 
         $csList = is_array($recordList) ? implode('", "', array_keys($recordList)) : $recordList;
-        $csList = '"'.$csList.'"';
 
-        return $csList;
+        return '"'.$csList.'"';
     }
 
     public function getMauticContactsById($mauticContactIds, $integrationName, $internalObject)
@@ -84,7 +81,8 @@ class IntegrationEntityModel extends FormModel
             return [];
         }
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $mauticContacts        = $integrationEntityRepo->getIntegrationsEntityId(
+
+        return $integrationEntityRepo->getIntegrationsEntityId(
             $integrationName,
             null,
             $internalObject,
@@ -96,8 +94,6 @@ class IntegrationEntityModel extends FormModel
             0,
             $formattedRecords
         );
-
-        return $mauticContacts;
     }
 
     /**

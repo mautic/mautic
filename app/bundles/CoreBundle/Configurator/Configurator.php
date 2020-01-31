@@ -233,9 +233,7 @@ class Configurator
             }
         }
 
-        $string .= ");\n";
-
-        return $string;
+        return $string.");\n";
     }
 
     /**
@@ -268,9 +266,8 @@ class Configurator
                 $string .= ",\n".str_repeat("\t", $level + 1);
             }
         }
-        $string .= "\n".str_repeat("\t", $level).')';
 
-        return $string;
+        return $string.("\n".str_repeat("\t", $level).')');
     }
 
     /**

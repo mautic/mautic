@@ -187,9 +187,7 @@ class WebhookModel extends FormModel
      */
     public function getEventWebooksByType($type)
     {
-        $results = $this->getEventRepository()->getEntitiesByEventType($type);
-
-        return $results;
+        return $this->getEventRepository()->getEntitiesByEventType($type);
     }
 
     /**

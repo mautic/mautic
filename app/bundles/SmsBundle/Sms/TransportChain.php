@@ -89,9 +89,7 @@ class TransportChain
      */
     public function sendSms(Lead $lead, $content)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content);
-
-        return $response;
+        return $this->getPrimaryTransport()->sendSms($lead, $content);
     }
 
     /**

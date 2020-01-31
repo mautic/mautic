@@ -185,9 +185,7 @@ class ListModel extends FormModel
             return new LeadList();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

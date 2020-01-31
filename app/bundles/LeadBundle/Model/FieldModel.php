@@ -359,9 +359,7 @@ class FieldModel extends FormModel
             return new LeadField();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -381,7 +379,7 @@ class FieldModel extends FormModel
      */
     public function getLeadFields()
     {
-        $leadFields = $this->getEntities([
+        return $this->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -392,8 +390,6 @@ class FieldModel extends FormModel
                 ],
             ],
         ]);
-
-        return $leadFields;
     }
 
     /**
@@ -401,7 +397,7 @@ class FieldModel extends FormModel
      */
     public function getCompanyFields()
     {
-        $companyFields = $this->getEntities([
+        return $this->getEntities([
             'filter' => [
                 'force' => [
                     [
@@ -412,8 +408,6 @@ class FieldModel extends FormModel
                 ],
             ],
         ]);
-
-        return $companyFields;
     }
 
     /**

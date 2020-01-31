@@ -1244,11 +1244,10 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private function getSQLForUpdate()
     {
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
-        $query = 'UPDATE '.$table
+
+        return 'UPDATE '.$table
             .' SET '.implode(', ', $this->sqlParts['set'])
             .(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
-
-        return $query;
     }
 
     /**
@@ -1259,9 +1258,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private function getSQLForDelete()
     {
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
-        $query = 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
 
-        return $query;
+        return 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
     }
 
     /**

@@ -175,9 +175,7 @@ class CampaignModel extends CommonFormModel
             return new Campaign();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -671,9 +669,8 @@ class CampaignModel extends CommonFormModel
     {
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
-        $leads      = $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
 
-        return $leads;
+        return $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
     }
 
     /**

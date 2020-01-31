@@ -957,9 +957,7 @@ class Asset extends FormEntity
             return '';
         }
 
-        $type = $this->loadFile()->getMimeType();
-
-        return $type;
+        return $this->loadFile()->getMimeType();
     }
 
     /**

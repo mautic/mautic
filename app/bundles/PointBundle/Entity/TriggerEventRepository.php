@@ -63,9 +63,7 @@ class TriggerEventRepository extends CommonRepository
         $q->where($expr)
             ->setParameter('type', $type);
 
-        $results = $q->getQuery()->getResult();
-
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**

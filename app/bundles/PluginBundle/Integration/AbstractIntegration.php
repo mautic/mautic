@@ -930,9 +930,7 @@ abstract class AbstractIntegration
         if (!empty($settings['return_raw'])) {
             return $result;
         } else {
-            $response = $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
-
-            return $response;
+            return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
         }
     }
 

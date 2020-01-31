@@ -383,9 +383,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $case .= ' WHEN '.$data['column'].' IS NOT NULL THEN '.$data['column'];
         }
 
-        $case .= ' ELSE NULL END ';
-
-        return $case;
+        return $case.' ELSE NULL END ';
     }
 
     /**

@@ -75,10 +75,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getEntitiesDbalQueryBuilder()
     {
-        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'companies', $this->getTableAlias());
-
-        return $dq;
     }
 
     /**
@@ -126,9 +124,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         if ($companyId) {
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
-        $results = $q->execute()->fetchAll();
 
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -354,9 +351,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -371,9 +366,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**

@@ -182,9 +182,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;
-        $companies = $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
 
-        return $companies;
+        return $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
     }
 
     /**

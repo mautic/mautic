@@ -196,9 +196,8 @@ class UrlHelper
 
         $url = self::sanitizeUrlScheme($url);
         $url = self::sanitizeUrlPath($url);
-        $url = self::sanitizeUrlQuery($url);
 
-        return $url;
+        return self::sanitizeUrlQuery($url);
     }
 
     /**
