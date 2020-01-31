@@ -43,11 +43,11 @@ class FilterPropertiesTypeEvent extends Event
 
     public function __construct(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails)
     {
-        $this->form          = $form;
-        $this->fieldAlias    = $fieldAlias;
-        $this->fieldObject   = $fieldObject;
-        $this->operator      = $operator;
-        $this->fieldDetails  = $fieldDetails;
+        $this->form         = $form;
+        $this->fieldAlias   = $fieldAlias;
+        $this->fieldObject  = $fieldObject;
+        $this->operator     = $operator;
+        $this->fieldDetails = $fieldDetails;
     }
 
     public function getFilterPropertiesForm(): FormInterface

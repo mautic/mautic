@@ -44,11 +44,18 @@ trait FilterTrait
      */
     public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
     {
-        $data        = $event->getData();
-        $form        = $event->getForm();
-        $options     = $form->getConfig()->getOptions();
-        $fieldType   = isset($data['type']) ? $data['type'] : '';
-        $fieldName   = isset($data['field']) ? $data['field'] : '';
+        $data    = $event->getData();
+        $form    = $event->getForm();
+        $options = $form->getConfig()->getOptions();
+
+        if (!isset($data['type'])) {
+            $data['type']     = TextType::class;
+            $data['field']    = '';
+            $data['operator'] = null;
+        }
+
+        $fieldType   = $data['type'];
+        $fieldName   = $data['field'];
         $type        = TextType::class;
         $attr        = ['class' => 'form-control'];
         $displayType = HiddenType::class;
