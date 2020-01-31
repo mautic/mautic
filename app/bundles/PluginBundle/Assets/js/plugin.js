@@ -166,10 +166,14 @@ Mautic.filterIntegrations = function(update) {
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
                 .on("fa.sidebar.minimize", function() {
-                    window.nativeIntegrationsShuffleInstance.update();
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 })
                 .on("fa.sidebar.maximize", function() {
-                    window.nativeIntegrationsShuffleInstance.update();
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 });
 
             // This delay is needed so that the tab has time to render and the sizes are correctly calculated
