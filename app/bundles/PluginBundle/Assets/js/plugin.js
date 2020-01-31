@@ -182,10 +182,6 @@ Mautic.filterIntegrations = function(update) {
     }
 };
 
-mQuery('html').on('click', function(event) {
-    console.log(event);
-})
-
 Mautic.getIntegrationLeadFields = function (integration, el, settings) {
 
     if (typeof settings == 'undefined') {
