@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\Lead;
 interface TransportInterface
 {
     /**
-     * @param Lead   $lead
      * @param string $content
      *
      * @return bool

@@ -25,8 +25,6 @@ class PreferenceChannelsType extends AbstractType
 
     /**
      * ModifyDNCActionType constructor.
-     *
-     * @param LeadModel $leadModel
      */
     public function __construct(LeadModel $leadModel)
     {

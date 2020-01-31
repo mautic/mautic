@@ -38,8 +38,6 @@ class Configuration
 
     /**
      * Configuration constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
      */
     public function __construct(IntegrationHelper $integrationHelper)
     {

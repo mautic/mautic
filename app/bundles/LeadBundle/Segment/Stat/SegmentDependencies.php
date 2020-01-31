@@ -61,14 +61,6 @@ class SegmentDependencies
 
     /**
      * SegmentUsageHelper constructor.
-     *
-     * @param EntityManager     $entityManager
-     * @param EmailModel        $emailModel
-     * @param CampaignModel     $campaignModel
-     * @param ActionModel       $actionModel
-     * @param ListModel         $listModel
-     * @param TriggerEventModel $triggerEventModel
-     * @param ReportModel       $reportModel
      */
     public function __construct(EntityManager $entityManager, EmailModel $emailModel, CampaignModel $campaignModel, ActionModel $actionModel, ListModel $listModel, TriggerEventModel $triggerEventModel, ReportModel $reportModel)
     {

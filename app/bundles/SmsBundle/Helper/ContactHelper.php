@@ -36,10 +36,6 @@ class ContactHelper
 
     /**
      * ContactHelper constructor.
-     *
-     * @param LeadRepository    $leadRepository
-     * @param Connection        $connection
-     * @param PhoneNumberHelper $phoneNumberHelper
      */
     public function __construct(
         LeadRepository $leadRepository,
@@ -78,7 +74,7 @@ class ContactHelper
             ->fetchAll();
 
         $ids = array_column($foundContacts, 'id');
-        if (count($ids) === 0) {
+        if (0 === count($ids)) {
             throw new NumberNotFoundException($number);
         }
 

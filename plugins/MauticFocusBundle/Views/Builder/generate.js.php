@@ -95,7 +95,7 @@ switch ($style) {
 
             // Register click events for toggling bar, closing windows, etc
             registerClickEvents: function () {
-                <?php if ($style == 'bar'): ?>
+                <?php if ('bar' == $style): ?>
                 var isTop = Focus.hasClass(Focus.iframeFocus, 'mf-bar-top');
                 Focus.setDefaultBarPosition(isTop);
 

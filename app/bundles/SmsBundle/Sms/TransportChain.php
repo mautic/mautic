@@ -40,9 +40,7 @@ class TransportChain
     /**
      * TransportChain constructor.
      *
-     * @param string            $primaryTransport
-     * @param IntegrationHelper $integrationHelper
-     * @param Logger            $logger
+     * @param string $primaryTransport
      */
     public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
     {
@@ -53,10 +51,9 @@ class TransportChain
     }
 
     /**
-     * @param string             $alias
-     * @param TransportInterface $transport
-     * @param string             $translatableAlias
-     * @param string             $integrationAlias
+     * @param string $alias
+     * @param string $translatableAlias
+     * @param string $integrationAlias
      *
      * @return $this
      */
@@ -85,7 +82,7 @@ class TransportChain
             return array_shift($enabled);
         }
 
-        if (count($enabled) === 0) {
+        if (0 === count($enabled)) {
             throw new PrimaryTransportNotEnabledException('Primary SMS transport is not enabled');
         }
 

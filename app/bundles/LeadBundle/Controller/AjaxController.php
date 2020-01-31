@@ -848,9 +848,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function getCampaignShareStatsAction(Request $request)
     {
         $ids      = $request->get('ids');

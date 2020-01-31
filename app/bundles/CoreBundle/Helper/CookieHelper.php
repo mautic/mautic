@@ -78,7 +78,7 @@ class CookieHelper
 
         // If https, SameSite equals None
         $sameSiteNoneText = '';
-        if ($secure === true or ($secure === null and $this->secure === true)) {
+        if (true === $secure or (null === $secure and true === $this->secure)) {
             $sameSiteNoneText = self::SAME_SITE_NONE;
         }
 
@@ -86,10 +86,10 @@ class CookieHelper
             $name,
             $value,
             ($expire) ? (int) (time() + $expire) : null,
-            (($path == null) ? $this->path : $path).$sameSiteNoneText,
-            ($domain == null) ? $this->domain : $domain,
-            ($secure == null) ? $this->secure : $secure,
-            ($httponly == null) ? $this->httponly : $httponly
+            ((null == $path) ? $this->path : $path).$sameSiteNoneText,
+            (null == $domain) ? $this->domain : $domain,
+            (null == $secure) ? $this->secure : $secure,
+            (null == $httponly) ? $this->httponly : $httponly
         );
     }
 

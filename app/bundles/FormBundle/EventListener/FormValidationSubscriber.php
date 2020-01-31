@@ -36,7 +36,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
 
     public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
-        $this->translator = $translator;
+        $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -90,14 +90,11 @@ class FormValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Events\ValidationEvent $event
-     */
     private function fieldEmailValidation(Events\ValidationEvent $event)
     {
         $field = $event->getField();
         $value = $event->getValue();
-        if ($field->getType() === 'email' && !empty($field->getValidation()['donotsubmit'])) {
+        if ('email' === $field->getType() && !empty($field->getValidation()['donotsubmit'])) {
             // Check the domains using shell wildcard patterns
             $donotSubmitFilter = function ($doNotSubmitArray) use ($value) {
                 return fnmatch($doNotSubmitArray, $value, FNM_CASEFOLD);
@@ -109,15 +106,12 @@ class FormValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param Events\ValidationEvent $event
-     */
     private function fieldTelValidation(Events\ValidationEvent $event)
     {
         $field = $event->getField();
         $value = $event->getValue();
 
-        if ($field->getType() === 'tel' && !empty($field->getValidation()['international'])) {
+        if ('tel' === $field->getType() && !empty($field->getValidation()['international'])) {
             $phoneUtil = PhoneNumberUtil::getInstance();
             try {
                 $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);

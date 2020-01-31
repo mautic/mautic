@@ -61,9 +61,6 @@ class ArrayHelper
 
     /**
      * Sum between two array.
-     *
-     * @param array $a1
-     * @param array $b2
      */
     public static function sum(array $a1, array $b2)
     {
@@ -72,9 +69,6 @@ class ArrayHelper
 
     /**
      * SUBSTRACT between two array.
-     *
-     * @param array $a1
-     * @param array $b2
      *
      * @return array
      */
@@ -86,9 +80,7 @@ class ArrayHelper
     /**
      *  SUM/SUBSTRACT between two arrays.
      *
-     * @param array $a1
-     * @param array $b2
-     * @param bool  $subtracted
+     * @param bool $subtracted
      *
      * @return array
      */

@@ -11,8 +11,8 @@
 
 namespace Mautic\LeadBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -73,8 +73,6 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return mixed
      */
     public function getAvatar(Lead $lead)

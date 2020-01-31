@@ -537,7 +537,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     }
 
                     // prepare next loop
-                    $oparams['page'] += 1;
+                    ++$oparams['page'];
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -611,7 +611,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     }
 
                     // prepare next loop
-                    $oparams['page'] += 1;
+                    ++$oparams['page'];
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -666,7 +666,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $authType = $this->getAuthenticationType();
 
-        if ($authType == 'oauth2') {
+        if ('oauth2' == $authType) {
             $callback    = $this->getAuthCallbackUrl();
             $clientIdKey = $this->getClientIdKey();
             $state       = $this->getAuthLoginState();
@@ -822,12 +822,12 @@ class ZohoIntegration extends CrmAbstractIntegration
                         /** @var array $opts */
                         $opts = $leadObject['fields'];
                         foreach ($opts as $field) {
-                            if ($field['read_only'] == true) {
+                            if (true == $field['read_only']) {
                                 continue;
                             }
 
                             $is_required = false;
-                            if ($field['system_mandatory'] == true) {
+                            if (true == $field['system_mandatory']) {
                                 $is_required = true;
                             }
 
@@ -1195,10 +1195,9 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array       $response
-     * @param string      $zObject
-     * @param bool        $createIntegrationEntity
-     * @param Mapper|null $mapper
+     * @param array  $response
+     * @param string $zObject
+     * @param bool   $createIntegrationEntity
      *
      * @return int
      *
@@ -1215,7 +1214,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         foreach ($rows as $key => $row) {
             $mauticId = $mapper->getContactIdByKey($key);
 
-            if ($row['code'] === 'SUCCESS' && $createIntegrationEntity) {
+            if ('SUCCESS' === $row['code'] && $createIntegrationEntity) {
                 $zohoId = $row['details']['id'];
                 $this->logger->debug('CREATE INTEGRATION ENTITY: '.$zohoId);
                 $integrationId = $this->getIntegrationEntityRepository()->getIntegrationsEntityId(
@@ -1270,8 +1269,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param   $data
-     * @param   $fields
+     * @param $data
+     * @param $fields
      *
      * @return array
      */
@@ -1296,7 +1295,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter
@@ -1310,7 +1308,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Mapper $mapper
      * @param string $object
      * @param int    $counter
      * @param int    $errorCounter

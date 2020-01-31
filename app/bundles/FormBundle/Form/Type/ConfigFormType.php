@@ -17,10 +17,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ConfigFormType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $arrayLinebreakTransformer = new ArrayLinebreakTransformer();

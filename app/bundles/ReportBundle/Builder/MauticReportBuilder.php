@@ -496,8 +496,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
         if ($groupExpr->count()) {
             $groups[] = $groupExpr;
         }
-        
-        if (count($groups) === 1) {
+
+        if (1 === count($groups)) {
             // Only one andX expression
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {

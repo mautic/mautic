@@ -437,7 +437,7 @@ class MailHelper
                 }
 
                 $failures = null;
-                
+
                 if ($this->factory->getParameter('mailer_convert_embed_images')) {
                     $convertedContent = $this->convertEmbedImages($this->message->getBody());
                     $this->message->setBody($convertedContent);
@@ -992,7 +992,7 @@ class MailHelper
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             $replaces = [];
             foreach ($matches[1] as $match) {
-                if (strpos($match, 'cid:') === false) {
+                if (false === strpos($match, 'cid:')) {
                     $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }

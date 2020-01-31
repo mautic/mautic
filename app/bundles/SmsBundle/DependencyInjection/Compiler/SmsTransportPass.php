@@ -31,9 +31,6 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
      */
     private $container;
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
@@ -42,9 +39,6 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
         $this->registerCallbacks();
     }
 
-    /**
-     * @param RepeatedPass $repeatedPass
-     */
     public function setRepeatedPass(RepeatedPass $repeatedPass)
     {
         $this->repeatedPass = $repeatedPass;
