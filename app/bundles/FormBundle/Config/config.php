@@ -164,6 +164,9 @@ return [
 
     'services' => [
         'events' => [
+            'mautic.core.configbundle.subscriber.form' => [
+                'class'     => \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
+            ],
             'mautic.form.subscriber' => [
                 'class'     => FormSubscriber::class,
                 'arguments' => [
@@ -179,6 +182,7 @@ return [
                 'class'     => FormValidationSubscriber::class,
                 'arguments' => [
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.pagebundle.subscriber' => [
@@ -263,6 +267,10 @@ return [
             ],
         ],
         'forms' => [
+            'mautic.form.type.formconfig' => [
+                'class'     => \Mautic\FormBundle\Form\Type\ConfigFormType::class,
+                    'alias' => 'formconfig',
+            ],
             'mautic.form.type.form' => [
                 'class'     => FormType::class,
                 'arguments' => [
@@ -288,6 +296,12 @@ return [
             ],
             'mautic.form.type.field_propertytel' => [
                 'class'     => FormFieldTelType::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.field_propertyemail' => [
+                'class'     => \Mautic\FormBundle\Form\Type\FormFieldEmailType::class,
                 'arguments' => [
                     'translator',
                 ],
@@ -460,5 +474,6 @@ return [
     'parameters' => [
         'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
         'blacklisted_extensions' => ['php', 'sh'],
+        'do_not_submit_emails'   => [],
     ],
 ];

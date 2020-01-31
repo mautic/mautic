@@ -58,4 +58,48 @@ class ArrayHelper
             return in_array($key, $keys, true);
         }, ARRAY_FILTER_USE_BOTH);
     }
+
+    /**
+     * Sum between two array.
+     *
+     * @param array $a1
+     * @param array $b2
+     */
+    public static function sum(array $a1, array $b2)
+    {
+        return self::sumOrSub($a1, $b2);
+    }
+
+    /**
+     * SUBSTRACT between two array.
+     *
+     * @param array $a1
+     * @param array $b2
+     *
+     * @return array
+     */
+    public static function sub(array $a1, array $b2)
+    {
+        return self::sumOrSub($a1, $b2, true);
+    }
+
+    /**
+     *  SUM/SUBSTRACT between two arrays.
+     *
+     * @param array $a1
+     * @param array $b2
+     * @param bool  $subtracted
+     *
+     * @return array
+     */
+    private static function sumOrSub(array $a1, array $b2, $subtracted = false)
+    {
+        return  array_map(function ($x, $y) use ($subtracted) {
+            if ($subtracted) {
+                return $x - $y;
+            } else {
+                return $x + $y;
+            }
+        }, $a1, $b2);
+    }
 }

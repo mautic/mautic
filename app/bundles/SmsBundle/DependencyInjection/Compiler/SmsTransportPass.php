@@ -26,14 +26,38 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
      */
     private $repeatedPass;
 
+    /**
+     * @var ContainerBuilder
+     */
+    private $container;
+
+    /**
+     * @param ContainerBuilder $container
+     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('mautic.sms.transport_chain')) {
+        $this->container = $container;
+
+        $this->registerTransports();
+        $this->registerCallbacks();
+    }
+
+    /**
+     * @param RepeatedPass $repeatedPass
+     */
+    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    {
+        $this->repeatedPass = $repeatedPass;
+    }
+
+    private function registerTransports()
+    {
+        if (!$this->container->has('mautic.sms.transport_chain')) {
             return;
         }
 
-        $definition     = $container->getDefinition('mautic.sms.transport_chain');
-        $taggedServices = $container->findTaggedServiceIds('mautic.sms_transport');
+        $definition     = $this->container->getDefinition('mautic.sms.transport_chain');
+        $taggedServices = $this->container->findTaggedServiceIds('mautic.sms_transport');
         foreach ($taggedServices as $id => $tags) {
             $definition->addMethodCall('addTransport', [
                 $id,
@@ -44,8 +68,18 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
         }
     }
 
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
+    private function registerCallbacks()
     {
-        $this->repeatedPass = $repeatedPass;
+        if (!$this->container->has('mautic.sms.callback_handler_container')) {
+            return;
+        }
+
+        $definition     = $this->container->getDefinition('mautic.sms.callback_handler_container');
+        $taggedServices = $this->container->findTaggedServiceIds('mautic.sms_callback_handler');
+        foreach ($taggedServices as $id => $tags) {
+            $definition->addMethodCall('registerHandler', [
+                new Reference($id),
+            ]);
+        }
     }
 }

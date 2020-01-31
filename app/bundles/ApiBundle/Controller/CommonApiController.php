@@ -13,10 +13,11 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use FOS\RestBundle\Context\Context;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
+use Mautic\ApiBundle\ApiEvents;
+use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CategoryBundle\Entity\Category;
@@ -1148,6 +1149,14 @@ class CommonApiController extends FOSRestController implements MauticController
                 return $preSaveError;
             }
 
+            try {
+                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_PRE_SAVE)) {
+                    $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_PRE_SAVE, new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request));
+                }
+            } catch (\Exception $e) {
+                return $this->returnError($e->getMessage(), $e->getCode());
+            }
+
             $this->model->saveEntity($entity);
             $headers = [];
             //return the newly created entities location if applicable
@@ -1159,6 +1168,14 @@ class CommonApiController extends FOSRestController implements MauticController
                     array_merge(['id' => $entity->getId()], $this->routeParams),
                     true
                 );
+            }
+
+            try {
+                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_POST_SAVE)) {
+                    $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_POST_SAVE, new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request));
+                }
+            } catch (\Exception $e) {
+                return $this->returnError($e->getMessage(), $e->getCode());
             }
 
             $this->preSerializeEntity($entity, $action);

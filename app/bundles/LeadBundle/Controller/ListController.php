@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ListController extends FormController
 {
@@ -763,31 +764,42 @@ class ListController extends FormController
         ) {
             return $this->accessDenied();
         }
-        $translator      = $this->get('translator');
-        $dateRangeValues = $this->request->get('daterange', []);
-        $action          = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        $stats           = $this->getModel('lead.list')->getSegmentContactsLineChartData(
+        /** @var TranslatorInterface $translator */
+        $translator = $this->get('translator');
+        /** @var ListModel $listModel */
+        $listModel                    = $this->getModel('lead.list');
+        $dateRangeValues              = $this->request->get('daterange', []);
+        $action                       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm                = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $segmentContactsLineChartData = $listModel->getSegmentContactsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
-           ['leadlist_id' => ['value'          => $objectId,
-                            'list_column_name' => 't.lead_id', ], 't.leadlist_id' => $objectId]
+            [
+                'leadlist_id'   => [
+                    'value'            => $objectId,
+                    'list_column_name' => 't.lead_id',
+                ],
+                't.leadlist_id' => $objectId,
+            ]
         );
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
             'viewParameters' => [
-                'list'        => $list,
-                'permissions' => $security->isGranted([
+                'usageStats'     => $this->get('mautic.lead.segment.stat.dependencies')->getChannelsIds($list->getId()),
+                'campaignStats'  => $this->get('mautic.lead.segment.stat.campaign.share')->getCampaignList($list->getId()),
+                'stats'          => $segmentContactsLineChartData,
+                'list'           => $list,
+                'segmentCount'   => $listModel->getRepository()->getLeadCount($list->getId()),
+                'permissions'    => $security->isGranted([
                     'lead:leads:editown',
                     'lead:lists:viewother',
                     'lead:lists:editother',
                     'lead:lists:deleteother',
                 ], 'RETURN_ARRAY'),
                 'security'      => $security,
-                'stats'         => $stats,
                 'dateRangeForm' => $dateRangeForm->createView(),
                 'events'        => [
                     'filters' => $filters,

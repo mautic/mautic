@@ -51,7 +51,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 '--timeout',
                 '-t',
                 InputOption::VALUE_REQUIRED,
-                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead afer the specified number of seconds and will execute anyway. This is disabled by default.',
+                'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead after the specified number of seconds and will execute anyway. This is disabled by default.',
                 false
             )
             ->addOption(

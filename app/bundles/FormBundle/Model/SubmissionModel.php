@@ -351,18 +351,10 @@ class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        // Create/update lead
-        if (!empty($leadFieldMatches)) {
-            $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
-        }
+        // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
+        $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
-        $lead          = $this->leadModel->getCurrentLead();
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
-
-        //set tracking ID for stats purposes to determine unique hits
-        $submission->setTrackingId($trackingId)
-            ->setLead($lead);
+        $lead = $this->leadModel->getCurrentLead();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
@@ -380,6 +372,18 @@ class SubmissionModel extends CommonFormModel
             return ['errors' => $validationErrors];
         }
 
+        // Create/update lead
+        if (!empty($leadFieldMatches)) {
+            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
+        }
+
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+
+        //set tracking ID for stats purposes to determine unique hits
+        $submission->setTrackingId($trackingId)
+            ->setLead($lead);
+
         /*
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
@@ -395,6 +399,9 @@ class SubmissionModel extends CommonFormModel
 
             return ['errors' => $validationErrors];
         }
+
+        // set results after uploader what can change file name if file name exists
+        $submissionEvent->setResults($submission->getResults());
 
         // Save the submission
         $this->saveEntity($submission);

@@ -20,7 +20,9 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -844,5 +846,25 @@ class AjaxController extends CommonAjaxController
         $dataArray = array_merge($dataArray, $primaryCompany);
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function getCampaignShareStatsAction(Request $request)
+    {
+        $ids      = $request->get('ids');
+        $entityid = $request->get('entityId');
+        /** @var SegmentCampaignShare $segmentCampaignShareService */
+        $segmentCampaignShareService = $this->get('mautic.lead.segment.stat.campaign.share');
+
+        $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);
+
+        $data = [
+            'success' => 1,
+            'stats'   => $data,
+        ];
+
+        return new JsonResponse($data);
     }
 }

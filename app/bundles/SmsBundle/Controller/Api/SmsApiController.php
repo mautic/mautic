@@ -44,24 +44,6 @@ class SmsApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of emails.
-     *
-     * @return Response
-     */
-    public function receiveAction()
-    {
-        $body = $this->request->get('Body');
-        $from = $this->request->get('From');
-
-        if ('STOP' === $body && $this->factory->getHelper('sms')->unsubscribe($from)) {
-            return new Response('<Response><Sms>You have been unsubscribed.</Sms></Response>', 200, ['Content-Type' => 'text/xml; charset=utf-8']);
-        }
-
-        // Return an empty response
-        return new Response();
-    }
-
-    /**
      * @param $id
      * @param $contactId
      *

@@ -35,5 +35,6 @@
 
     <php>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
+        <env name="MAXMIND_LICENSE_KEY" value=""/>
     </php>
 </phpunit>

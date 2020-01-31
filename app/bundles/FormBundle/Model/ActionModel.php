@@ -72,4 +72,36 @@ class ActionModel extends CommonFormModel
 
         return $formFactory->create(ActionType::class, $entity->convertToArray(), $options);
     }
+
+    /**
+     * Get segments which are dependent on given segment.
+     *
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getFormsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'LIKE', 'value'=>'lead.changelist'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $properties = $entity->getProperties();
+            foreach ($properties as $property) {
+                if (in_array($segmentId, $property)) {
+                    $dependents[] = $entity->getForm()->getId();
+                }
+            }
+        }
+
+        return $dependents;
+    }
 }

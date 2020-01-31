@@ -13,12 +13,25 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
+use PharData;
+use PharFileInfo;
+use RecursiveIteratorIterator;
 
 /**
  * Class AbstractLocalDataLookup.
  */
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
+    /**
+     * @const TAR_CACHE_FOLDER
+     */
+    const TAR_CACHE_FOLDER = 'unpack';
+
+    /**
+     * @const TAR_TEMP_FILE
+     */
+    const TAR_TEMP_FILE = 'temp.tar.gz';
+
     /**
      * Path to the local data store.
      *
@@ -69,10 +82,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
         }
 
-        $tempTarget     = $this->cacheDir.'/'.basename($package);
-        $tempExt        = strtolower(pathinfo($package, PATHINFO_EXTENSION));
-        $localTarget    = $this->getLocalDataStoreFilepath();
-        $localTargetExt = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
+        $tempTarget        = $this->cacheDir.'/'.basename($package);
+        $tempExt           = strtolower(pathinfo($package, PATHINFO_EXTENSION));
+        $localTarget       = $this->getLocalDataStoreFilepath();
+        $localTargetExt    = strtolower(pathinfo($localTarget, PATHINFO_EXTENSION));
 
         try {
             $success = false;
@@ -80,6 +93,29 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             switch (true) {
                 case $localTargetExt === $tempExt:
                     $success = (bool) file_put_contents($localTarget, $data->body);
+
+                    break;
+
+                case $this->endsWith($package, 'tar.gz'):
+                    /**
+                     * If tar.gz it loops whole folder structure and copy the file which has the same basename as
+                     * desired localTarget.
+                     */
+                    $tempTargetFolder = $this->cacheDir.'/'.self::TAR_CACHE_FOLDER;
+                    $temporaryPhar    = $tempTargetFolder.'/'.self::TAR_TEMP_FILE;
+                    if (!is_dir($tempTargetFolder)) {
+                        // dir doesn't exist, make it
+                        mkdir($tempTargetFolder);
+                    }
+                    file_put_contents($temporaryPhar, $data->body);
+                    $pharData = new PharData($temporaryPhar);
+                    foreach (new RecursiveIteratorIterator($pharData) as $file) {
+                        /** @var PharFileInfo $file*/
+                        if ($file->getBasename() === basename($localTarget)) {
+                            $success = copy($file->getPathname(), $localTarget);
+                        }
+                    }
+                    @unlink($temporaryPhar);
 
                     break;
 
@@ -162,5 +198,18 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             case 'G':
                 return $data * 1024 * 1024 * 1024;
         }
+    }
+
+    /**
+     * Get if the string ends with.
+     *
+     * @param string $haystack
+     * @param string $needle
+     *
+     * @return bool
+     */
+    private function endsWith($haystack, $needle)
+    {
+        return substr_compare($haystack, $needle, -strlen($needle)) === 0;
     }
 }
