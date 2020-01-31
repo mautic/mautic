@@ -172,13 +172,19 @@ Mautic.filterIntegrations = function(update) {
                     window.nativeIntegrationsShuffleInstance.update();
                 });
 
-            mQuery('#native-plugins').click(function() {
-                alert(2)
-                window.nativeIntegrationsShuffleInstance.update();
+            // This delay is needed so that the tab has time to render and the sizes are correctly calculated
+            mQuery('#plugin-nav-tabs a').click(function () {
+                setTimeout(function() {
+                    window.nativeIntegrationsShuffleInstance.update();
+                }, 500);
             });
         }, 500);
     }
 };
+
+mQuery('html').on('click', function(event) {
+    console.log(event);
+})
 
 Mautic.getIntegrationLeadFields = function (integration, el, settings) {
 
