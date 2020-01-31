@@ -138,7 +138,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var int|null
      */
-    private $updatedPoints = null;
+    private $updatedPoints;
 
     /**
      * @var ArrayCollection
@@ -148,7 +148,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var null
      */
-    private $actualPoints = null;
+    private $actualPoints;
 
     /**
      * @var ArrayCollection
@@ -200,7 +200,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * @var LeadManipulator
      */
-    private $manipulator = null;
+    private $manipulator;
 
     /**
      * Sets if the IP was just created by LeadModel::getCurrentLead().

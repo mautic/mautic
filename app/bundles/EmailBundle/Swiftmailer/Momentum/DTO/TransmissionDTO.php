@@ -23,7 +23,7 @@ class TransmissionDTO implements \JsonSerializable
     /**
      * @var OptionsDTO|null
      */
-    private $options = null;
+    private $options;
 
     /**
      * @var RecipientDTO[]
@@ -33,12 +33,12 @@ class TransmissionDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $campaignId = null;
+    private $campaignId;
 
     /**
      * @var string|null
      */
-    private $description = null;
+    private $description;
 
     /**
      * @var string

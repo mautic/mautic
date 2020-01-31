@@ -25,7 +25,7 @@ trait VariantEntityTrait
     /**
      * @var Page
      **/
-    private $variantParent = null;
+    private $variantParent;
 
     /**
      * @var array

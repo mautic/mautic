@@ -38,7 +38,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * @var CorePermissions
      */
-    protected $security = null;
+    protected $security;
 
     public function __construct(TranslatorInterface $translator)
     {

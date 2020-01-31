@@ -49,7 +49,7 @@ class SendEmailToContact
     /**
      * @var string|null
      */
-    private $singleEmailMode = null;
+    private $singleEmailMode;
 
     /**
      * @var array

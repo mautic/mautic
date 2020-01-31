@@ -32,7 +32,7 @@ trait TranslationEntityTrait
     /**
      * @var TranslationEntityInterface
      **/
-    private $translationParent = null;
+    private $translationParent;
 
     /**
      * @var string

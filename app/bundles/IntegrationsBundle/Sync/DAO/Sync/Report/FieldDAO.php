@@ -34,7 +34,7 @@ class FieldDAO
     /**
      * @var \DateTimeInterface|null
      */
-    private $changeDateTime = null;
+    private $changeDateTime;
 
     /**
      * @var string

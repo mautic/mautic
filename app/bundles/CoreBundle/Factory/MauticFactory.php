@@ -36,12 +36,12 @@ class MauticFactory
     /**
      * @var
      */
-    private $database = null;
+    private $database;
 
     /**
      * @var
      */
-    private $entityManager = null;
+    private $entityManager;
 
     public function __construct(ContainerInterface $container)
     {

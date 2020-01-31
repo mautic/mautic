@@ -18,11 +18,11 @@ services:
     Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector:
     Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector:
     Rector\DeadCode\Rector\Instanceof_\RemoveDuplicatedInstanceOfRector:
-    # Rector\DeadCode\Rector\FunctionLike\RemoveCodeAfterReturnRector:
-    # Rector\DeadCode\Rector\Class_\RemoveUnusedDoctrineEntityMethodAndPropertyRector:
-    # Rector\DeadCode\Rector\ClassMethod\RemoveDeadConstructorRector:
-    # Rector\DeadCode\Rector\Property\RemoveNullPropertyInitializationRector:
-    # Rector\DeadCode\Rector\FunctionLike\RemoveDeadReturnRector:
+    Rector\DeadCode\Rector\FunctionLike\RemoveCodeAfterReturnRector:
+    Rector\DeadCode\Rector\Class_\RemoveUnusedDoctrineEntityMethodAndPropertyRector:
+    Rector\DeadCode\Rector\ClassMethod\RemoveDeadConstructorRector:
+    Rector\DeadCode\Rector\Property\RemoveNullPropertyInitializationRector:
+    Rector\DeadCode\Rector\FunctionLike\RemoveDeadReturnRector:
     # Rector\DeadCode\Rector\If_\SimplifyIfElseWithSameContentRector:
     # Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector:
     # Rector\PHPUnit\Rector\ClassMethod\RemoveEmptyTestMethodRector:

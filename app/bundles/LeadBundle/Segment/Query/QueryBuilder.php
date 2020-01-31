@@ -130,14 +130,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      *
      * @var int
      */
-    private $firstResult = null;
+    private $firstResult;
 
     /**
      * The maximum number of results to retrieve.
      *
      * @var int
      */
-    private $maxResults = null;
+    private $maxResults;
 
     /**
      * The counter of bound parameters used with {@see bindValue).
