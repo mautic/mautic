@@ -2042,7 +2042,7 @@ class MailHelper
      *
      * @return bool|array
      */
-    public function getContactOwner(&$contact)
+    protected function getContactOwner(&$contact)
     {
         $owner = false;
 
