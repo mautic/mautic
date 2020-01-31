@@ -286,11 +286,10 @@ class MauticCoreExtension extends Extension
 
         foreach ($menus as $alias => $options) {
             $container->setDefinition('mautic.menu_renderer.'.$alias, new Definition(
-                'Mautic\CoreBundle\Menu\MenuRenderer',
+                \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
                     new Reference('mautic.helper.templating'),
-                    '%kernel.charset%',
                     $options,
                 ]
             ))
