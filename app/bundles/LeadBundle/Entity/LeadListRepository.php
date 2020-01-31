@@ -333,13 +333,6 @@ class LeadListRepository extends CommonRepository
         return ($returnArray) ? $return : $return[$listIds[0]];
     }
 
-    private function format_period($inputSeconds)
-    {
-        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
-
-        return $now->format('H:i:s.u');
-    }
-
     /**
      * @param null   $listId
      * @param bool   $isNot

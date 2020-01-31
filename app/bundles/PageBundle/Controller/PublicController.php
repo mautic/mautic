@@ -486,38 +486,6 @@ class PublicController extends CommonFormController
     /**
      * @param string $url
      *
-     * @return string
-     */
-    private function replaceAssetTokenUrl($url)
-    {
-        if ($this->urlIsToken($url)) {
-            $tokens = $this->get('mautic.asset.helper.token')->findAssetTokens($url);
-
-            return isset($tokens[$url]) ? $tokens[$url] : $url;
-        }
-
-        return $url;
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private function replacePageTokenUrl($url)
-    {
-        if ($this->urlIsToken($url)) {
-            $tokens = $this->get('mautic.page.helper.token')->findPageTokens($url);
-
-            return isset($tokens[$url]) ? $tokens[$url] : $url;
-        }
-
-        return $url;
-    }
-
-    /**
-     * @param string $url
-     *
      * @return bool
      */
     private function urlIsToken($url)
