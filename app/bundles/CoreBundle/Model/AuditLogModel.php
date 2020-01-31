@@ -70,11 +70,11 @@ class AuditLogModel extends AbstractCommonModel
     /**
      * Get the audit log for specific object.
      *
-     * @param      $object
-     * @param      $id
-     * @param null $afterDate
-     * @param int  $limit
-     * @param null $bundle
+     * @param string                  $object
+     * @param string|int              $id
+     * @param \DateTimeInterface|null $afterDate
+     * @param int                     $limit
+     * @param string|null             $bundle
      *
      * @return mixed
      */

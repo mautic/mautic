@@ -18,11 +18,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CookieHelper
 {
-    private $path     = null;
-    private $domain   = null;
-    private $secure   = false;
-    private $httponly = false;
-    private $request  = null;
+    const SAME_SITE_NONE = '; samesite=none';
+    private $path        = null;
+    private $domain      = null;
+    private $secure      = false;
+    private $httponly    = false;
+    private $request     = null;
 
     /**
      * CookieHelper constructor.
@@ -76,11 +77,17 @@ class CookieHelper
             return true;
         }
 
+        // If https, SameSite equals None
+        $sameSiteNoneText = '';
+        if ($secure === true or ($secure === null and $this->secure === true)) {
+            $sameSiteNoneText = self::SAME_SITE_NONE;
+        }
+
         setcookie(
             $name,
             $value,
             ($expire) ? (int) (time() + $expire) : null,
-            ($path == null) ? $this->path : $path,
+            (($path == null) ? $this->path : $path).$sameSiteNoneText,
             ($domain == null) ? $this->domain : $domain,
             ($secure == null) ? $this->secure : $secure,
             ($httponly == null) ? $this->httponly : $httponly

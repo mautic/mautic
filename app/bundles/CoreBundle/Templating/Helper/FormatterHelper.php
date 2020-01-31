@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -68,7 +69,7 @@ class FormatterHelper extends Helper
             case 'array':
                 if (!is_array($val)) {
                     //assume that it's serialized
-                    $unserialized = unserialize($val);
+                    $unserialized = Serializer::decode($val);
                     if ($unserialized) {
                         $val = $unserialized;
                     }

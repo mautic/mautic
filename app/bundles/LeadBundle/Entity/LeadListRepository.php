@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -676,7 +677,9 @@ class LeadListRepository extends CommonRepository
                         $v         = $v['value'];
                         break;
                     } else {
-                        continue;
+                        // This was previously a "continue" which would act the same as a break in PHP <7.3
+                        // causing the parameter to be set anyway. A continue 2 is more likely the intention.
+                        continue 2;
                     }
                     // no break
                 case is_bool($v):
@@ -1480,7 +1483,7 @@ class LeadListRepository extends CommonRepository
                                 continue;
                             }
 
-                            $listFilters = unserialize($list['filters']);
+                            $listFilters = Serializer::decode($list['filters']);
                             if (empty($listFilters)) {
                                 // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
                                 $subQb = $this->createFilterExpressionSubQuery(
@@ -1725,7 +1728,7 @@ class LeadListRepository extends CommonRepository
                 default:
                     if (!$column) {
                         // Column no longer exists so continue
-                        continue;
+                        break;
                     }
 
                     if ('company' === $object) {

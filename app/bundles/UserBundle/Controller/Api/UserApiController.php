@@ -32,7 +32,7 @@ class UserApiController extends CommonApiController
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
-
+        $this->dataInputMasks   = ['signature' => 'html'];
         parent::initialize($event);
     }
 

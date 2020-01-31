@@ -352,7 +352,7 @@ class InactiveExecutioner implements ExecutionerInterface
 
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$event->getId().
-                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s')
+                ' to be executed on '.$eventExecutionDate->format('Y-m-d H:i:s e')
             );
 
             if ($this->scheduler->shouldSchedule($eventExecutionDate, $executionDate)) {

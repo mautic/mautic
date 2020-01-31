@@ -527,7 +527,7 @@ class LeadModel extends FormModel
                 }
             }
 
-            if (!$entity->getCompany() && !empty($details['organization'])) {
+            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->getParameter('ip_lookup_create_organization', false)) {
                 $entity->addUpdatedField('company', $details['organization']);
             }
         }
@@ -682,6 +682,9 @@ class LeadModel extends FormModel
 
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
+            if ('all' === $group) {
+                continue;
+            }
             foreach ($groupFields as $alias => &$field) {
                 if (!isset($field['value'])) {
                     $field['value'] = null;
@@ -859,22 +862,24 @@ class LeadModel extends FormModel
             if ($field instanceof LeadField) {
                 $alias = $field->getAlias();
                 if ($field->isPublished() and $field->getObject() === 'Lead') {
-                    $group                          = $field->getGroup();
-                    $array[$group][$alias]['id']    = $field->getId();
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field->getLabel();
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['type']  = $field->getType();
+                    $group                                = $field->getGroup();
+                    $array[$group][$alias]['id']          = $field->getId();
+                    $array[$group][$alias]['group']       = $group;
+                    $array[$group][$alias]['label']       = $field->getLabel();
+                    $array[$group][$alias]['alias']       = $alias;
+                    $array[$group][$alias]['type']        = $field->getType();
+                    $array[$group][$alias]['properties']  = $field->getProperties();
                 }
             } else {
                 $alias = $field['alias'];
                 if ($field['isPublished'] and $field['object'] === 'lead') {
-                    $group                          = $field['group'];
-                    $array[$group][$alias]['id']    = $field['id'];
-                    $array[$group][$alias]['group'] = $group;
-                    $array[$group][$alias]['label'] = $field['label'];
-                    $array[$group][$alias]['alias'] = $alias;
-                    $array[$group][$alias]['type']  = $field['type'];
+                    $group                                = $field['group'];
+                    $array[$group][$alias]['id']          = $field['id'];
+                    $array[$group][$alias]['group']       = $group;
+                    $array[$group][$alias]['label']       = $field['label'];
+                    $array[$group][$alias]['alias']       = $alias;
+                    $array[$group][$alias]['type']        = $field['type'];
+                    $array[$group][$alias]['properties']  = $field['properties'];
                 }
             }
         }
@@ -1439,8 +1444,11 @@ class LeadModel extends FormModel
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
             foreach ($addresses as $address) {
-                $ipAddress = new IpAddress();
-                $ipAddress->setIpAddress(trim($address));
+                $address = trim($address);
+                if (!$ipAddress = $this->ipAddressModel->findOneByIpAddress($address)) {
+                    $ipAddress = new IpAddress();
+                    $ipAddress->setIpAddress($address);
+                }
                 $lead->addIpAddress($ipAddress);
             }
         }
@@ -1501,18 +1509,23 @@ class LeadModel extends FormModel
         unset($fieldData['stage']);
 
         // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
-            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
-            if ($doNotEmail) {
+        if (!empty($fields['doNotEmail']) && isset($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
+            $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (null !== $doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
                     '%user%' => $this->userHelper->getUser()->getUsername(),
                 ]);
 
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
-                $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                if ($doNotEmail) {
+                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                } else {
+                    $this->removeDncForLead($lead, 'email', true);
+                }
             }
         }
+
         unset($fieldData['doNotEmail']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {

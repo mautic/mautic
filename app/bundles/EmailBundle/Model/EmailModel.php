@@ -401,11 +401,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
             $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
 
-            if ($queued) {
+            if ($queued !== false) {
                 $entity->setQueuedCount($queued);
             }
 
-            if ($pending) {
+            if ($pending !== false) {
                 $entity->setPendingCount($pending);
             }
         }
@@ -977,7 +977,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $countWithMaxMin
         );
 
-        if ($storeToCache && !empty($total)) {
+        if ($storeToCache) {
             if ($countOnly && $countWithMaxMin) {
                 $toStore = $total['count'];
             } elseif ($countOnly) {
@@ -1006,10 +1006,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         $queued = (int) $this->messageQueueModel->getQueuedChannelCount('email', $ids);
-
-        if ($queued) {
-            $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
-        }
+        $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
     }
@@ -1484,7 +1481,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->sendModel->finalFlush();
 
         // Get the errors to return
-        $errorMessages  = array_merge($errors, $this->sendModel->getErrors());
+        $errorMessages  = $errors + $this->sendModel->getErrors();
         $failedContacts = $this->sendModel->getFailedContacts();
 
         // Get sent counts to update email stats
@@ -1563,7 +1560,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             return false;
         }
 
-        $mailer = $this->mailHelper->getMailer();
+        $mailer            = $this->mailHelper->getMailer();
+        if (!isset($lead['companies'])) {
+            $lead['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($lead['id']);
+        }
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
@@ -2430,5 +2430,34 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         unset($mailer);
 
         return $errors;
+    }
+
+    /**
+     * @param $segmentId
+     *
+     * @return array
+     */
+    public function getEmailsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $entities =  $this->getEntities(
+            [
+                'filter'         => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'eq',
+                            'value'  => $segmentId,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $ids = [];
+        foreach ($entities as $entity) {
+            $ids[] = $entity->getId();
+        }
+
+        return $ids;
     }
 }

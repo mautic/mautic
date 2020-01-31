@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d865a55c8f4f76edea7f41ffb0d5223f",
+    "content-hash": "76ca1f3e88950d50351be721720c3e0a",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -196,6 +196,50 @@
                 "tls"
             ],
             "time": "2017-11-29T09:37:33+00:00"
+        },
+        {
+            "name": "cweagans/composer-patches",
+            "version": "1.6.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cweagans/composer-patches.git",
+                "reference": "2ec4f00ff5fb64de584c8c4aea53bf9053ecb0b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cweagans/composer-patches/zipball/2ec4f00ff5fb64de584c8c4aea53bf9053ecb0b3",
+                "reference": "2ec4f00ff5fb64de584c8c4aea53bf9053ecb0b3",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0",
+                "phpunit/phpunit": "~4.6"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "cweagans\\Composer\\Patches"
+            },
+            "autoload": {
+                "psr-4": {
+                    "cweagans\\Composer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Cameron Eagans",
+                    "email": "me@cweagans.net"
+                }
+            ],
+            "description": "Provides a way to patch Composer packages.",
+            "time": "2018-05-11T18:00:16+00:00"
         },
         {
             "name": "debril/rss-atom-bundle",
@@ -827,7 +871,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2017-09-29T14:39:10+00:00"
+            "time": "2017-10-12T17:23:29+00:00"
         },
         {
             "name": "doctrine/doctrine-fixtures-bundle",
@@ -1226,6 +1270,9 @@
             "extra": {
                 "branch-alias": {
                     "dev-master": "2.6.x-dev"
+                },
+                "patches_applied": {
+                    "#6991 Support PHP 7.3 without dropping support for 5.6/7.0": "https://github.com/doctrine/doctrine2/commit/07fc401d255a4cdb4a557147d1c8a3fc7a0c718d.diff"
                 }
             },
             "autoload": {
@@ -2731,7 +2778,7 @@
                     "homepage": "http://github.com/knplabs/Gaufrette/contributors"
                 },
                 {
-                    "name": "KNPLabs Team",
+                    "name": "KnpLabs Team",
                     "homepage": "http://knplabs.com"
                 }
             ],
@@ -3145,7 +3192,7 @@
                 "geolocation",
                 "maxmind"
             ],
-            "time": "2017-01-19T23:49:38+00:00"
+            "time": "2017-10-27T19:15:33+00:00"
         },
         {
             "name": "maxmind/web-service-common",
@@ -6541,17 +6588,11 @@
         },
         {
             "name": "symfony/intl",
-            "version": "v2.8.34",
+            "version": "v2.8.51",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/intl.git",
-                "reference": "847da8b0460d6119e571982037093df43aed9b21"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/intl/zipball/847da8b0460d6119e571982037093df43aed9b21",
-                "reference": "847da8b0460d6119e571982037093df43aed9b21",
-                "shasum": ""
+                "url": "https://github.com/mautic/intl.git",
+                "reference": "236c4eb3d12813f766d6b52d23b5677bf0a9840f"
             },
             "require": {
                 "php": ">=5.3.9",
@@ -6581,7 +6622,6 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -6613,7 +6653,7 @@
                 "l10n",
                 "localization"
             ],
-            "time": "2018-01-03T07:36:31+00:00"
+            "time": "2019-04-25T07:50:25+00:00"
         },
         {
             "name": "symfony/monolog-bridge",
@@ -7755,7 +7795,7 @@
             ],
             "description": "Symfony SwiftmailerBundle",
             "homepage": "http://symfony.com",
-            "time": "2017-07-22T07:18:13+00:00"
+            "time": "2017-10-19T01:06:41+00:00"
         },
         {
             "name": "symfony/templating",
@@ -8212,30 +8252,30 @@
         },
         {
             "name": "twilio/sdk",
-            "version": "4.12.1",
+            "version": "5.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twilio/twilio-php.git",
-                "reference": "0a88c48262fbee1c3841f721f46439d3de450b95"
+                "reference": "0144b6f9f643cbe20f58d78bb2e0e6b1ea5d6856"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/0a88c48262fbee1c3841f721f46439d3de450b95",
-                "reference": "0a88c48262fbee1c3841f721f46439d3de450b95",
+                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/0144b6f9f643cbe20f58d78bb2e0e6b1ea5d6856",
+                "reference": "0144b6f9f643cbe20f58d78bb2e0e6b1ea5d6856",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.1"
+                "php": ">=5.5.0"
             },
             "require-dev": {
-                "mockery/mockery": ">=0.7.2",
+                "apigen/apigen": "^4.1",
                 "phpunit/phpunit": "4.5.*"
             },
             "type": "library",
             "autoload": {
-                "files": [
-                    "Services/Twilio.php"
-                ]
+                "psr-4": {
+                    "Twilio\\": "Twilio/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -8243,12 +8283,8 @@
             ],
             "authors": [
                 {
-                    "name": "Kevin Burke",
-                    "email": "kevin@twilio.com"
-                },
-                {
-                    "name": "Kyle Conroy",
-                    "email": "kyle+pear@twilio.com"
+                    "name": "Twilio API Team",
+                    "email": "api@twilio.com"
                 }
             ],
             "description": "A PHP wrapper for Twilio's API",
@@ -8258,7 +8294,7 @@
                 "sms",
                 "twilio"
             ],
-            "time": "2017-11-17T22:59:03+00:00"
+            "time": "2018-11-16T20:15:31+00:00"
         },
         {
             "name": "willdurand/jsonp-callback-validator",
@@ -8696,6 +8732,50 @@
             "time": "2016-08-30T16:08:34+00:00"
         },
         {
+            "name": "composer/xdebug-handler",
+            "version": "1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/xdebug-handler.git",
+                "reference": "d17708133b6c276d6e42ef887a877866b909d892"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/d17708133b6c276d6e42ef887a877866b909d892",
+                "reference": "d17708133b6c276d6e42ef887a877866b909d892",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Composer\\XdebugHandler\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "John Stevenson",
+                    "email": "john-stevenson@blueyonder.co.uk"
+                }
+            ],
+            "description": "Restarts a process without xdebug.",
+            "keywords": [
+                "Xdebug",
+                "performance"
+            ],
+            "time": "2019-01-28T20:25:53+00:00"
+        },
+        {
             "name": "facebook/webdriver",
             "version": "1.5.0",
             "source": {
@@ -8752,24 +8832,24 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.2.16",
+            "version": "v2.2.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "f67918efb38a186c6c731e46e52eab4fee329a49"
+                "reference": "f1631f0747ad2a9dd3de8d7873b71f6573f8d0c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/f67918efb38a186c6c731e46e52eab4fee329a49",
-                "reference": "f67918efb38a186c6c731e46e52eab4fee329a49",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/f1631f0747ad2a9dd3de8d7873b71f6573f8d0c2",
+                "reference": "f1631f0747ad2a9dd3de8d7873b71f6573f8d0c2",
                 "shasum": ""
             },
             "require": {
                 "composer/semver": "^1.4",
+                "composer/xdebug-handler": "^1.0",
                 "doctrine/annotations": "^1.2",
                 "ext-json": "*",
                 "ext-tokenizer": "*",
-                "gecko-packages/gecko-php-unit": "^2.0",
                 "php": "^5.3.6 || >=7.0 <7.3",
                 "sebastian/diff": "^1.4",
                 "symfony/console": "^2.4 || ^3.0 || ^4.0",
@@ -8788,9 +8868,9 @@
                 "hhvm": "<3.18"
             },
             "require-dev": {
-                "johnkary/phpunit-speedtrap": "^1.0.1",
+                "johnkary/phpunit-speedtrap": "^1.0.1 || ^2.0 || ^3.0",
                 "justinrainbow/json-schema": "^5.0",
-                "keradus/cli-executor": "^1.0",
+                "keradus/cli-executor": "^1.1",
                 "mikey179/vfsstream": "^1.6",
                 "php-coveralls/php-coveralls": "^1.0.2",
                 "phpunit/phpunit": "^4.8.35 || ^5.4.3",
@@ -8798,17 +8878,14 @@
             },
             "suggest": {
                 "ext-mbstring": "For handling non-UTF8 characters in cache signature.",
+                "php-cs-fixer/phpunit-constraint-isidenticalstring": "For IsIdenticalString constraint.",
+                "php-cs-fixer/phpunit-constraint-xmlmatchesxsd": "For XmlMatchesXsd constraint.",
                 "symfony/polyfill-mbstring": "When enabling `ext-mbstring` is not possible."
             },
             "bin": [
                 "php-cs-fixer"
             ],
             "type": "application",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.2-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "PhpCsFixer\\": "src/"
@@ -8839,7 +8916,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2018-02-03T08:20:15+00:00"
+            "time": "2018-06-02T17:26:04+00:00"
         },
         {
             "name": "gecko-packages/gecko-php-unit",
@@ -9009,7 +9086,7 @@
                 "object",
                 "object graph"
             ],
-            "time": "2017-04-12T18:52:22+00:00"
+            "time": "2017-10-19T19:58:43+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -9273,6 +9350,7 @@
                 "testing",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2016-12-02T14:39:14+00:00"
         },
         {
@@ -9663,6 +9741,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2017-06-30T09:13:00+00:00"
         },
         {
@@ -10641,7 +10720,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.6.19 <7.3"
+        "php": ">=5.6.19 <7.4"
     },
     "platform-dev": [],
     "platform-overrides": {
