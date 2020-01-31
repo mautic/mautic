@@ -1,41 +1,6 @@
-# Let's go rector by rector from the dead code set to have greater control over.
-services:
-    Rector\DeadCode\Rector\Array_\RemoveDuplicatedArrayKeyRector:
-    Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector:
-    Rector\DeadCode\Rector\Switch_\RemoveDuplicatedCaseInSwitchRector:
-    Rector\DeadCode\Rector\Class_\RemoveSetterOnlyPropertyAndMethodCallRector:
-    Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector:
-    Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector:
-    Rector\DeadCode\Rector\Expression\SimplifyMirrorAssignRector:
-    Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector:
-    Rector\DeadCode\Rector\Assign\RemoveDoubleAssignRector:
-    Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector:
-    Rector\DeadCode\Rector\StaticCall\RemoveParentCallWithoutParentRector:
-    Rector\DeadCode\Rector\Foreach_\RemoveUnusedForeachKeyRector:
-    Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector:
-    Rector\DeadCode\Rector\ClassMethod\RemoveOverriddenValuesRector:
-    Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateConstantRector:
-    Rector\CodeQuality\Rector\Return_\SimplifyUselessVariableRector:
-    Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector:
-    Rector\DeadCode\Rector\Instanceof_\RemoveDuplicatedInstanceOfRector:
-    Rector\DeadCode\Rector\FunctionLike\RemoveCodeAfterReturnRector:
-    Rector\DeadCode\Rector\Class_\RemoveUnusedDoctrineEntityMethodAndPropertyRector:
-    Rector\DeadCode\Rector\ClassMethod\RemoveDeadConstructorRector:
-    Rector\DeadCode\Rector\Property\RemoveNullPropertyInitializationRector:
-    Rector\DeadCode\Rector\FunctionLike\RemoveDeadReturnRector:
-    # Rector\DeadCode\Rector\If_\SimplifyIfElseWithSameContentRector:
-    # Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector:
-    # Rector\PHPUnit\Rector\ClassMethod\RemoveEmptyTestMethodRector:
-    # Rector\DeadCode\Rector\Stmt\RemoveDeadStmtRector:
-
-    # Rectors with issues:
-        # see https://github.com/rectorphp/rector/issues/2765
-        # Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector:
-
 parameters:
-    # Enable the dead code set once all the above rectors pass.
-    # sets:
-    #     - dead-code
+    sets:
+        - dead-code
 
     paths:
         - app/bundles
@@ -55,3 +20,6 @@ parameters:
     exclude_rectors:
         - 'Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector' # Causes BC breaks and broken services. Use only manually with caution.
         - 'Rector\DeadCode\Rector\MethodCall\RemoveDefaultArgumentValueRector' # Doesn't play nicely every time.
+        - 'Rector\DeadCode\Rector\If_\SimplifyIfElseWithSameContentRector' # Removes code that is not the same.
+        - 'Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector' # Problematic with some copy-pasted code.
+        - 'Rector\DeadCode\Rector\Ternary\TernaryToBooleanOrFalseToBooleanAndRector' # see https://github.com/rectorphp/rector/issues/2765
