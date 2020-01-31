@@ -103,7 +103,7 @@ class EmailStep implements StepInterface
      *
      * @var string
      */
-    public $mailer_spool_path = '%kernel.root_dir%/var/spool';
+    public $mailer_spool_path = '%kernel.root_dir%/../var/spool';
 
     public function __construct(Session $session)
     {
