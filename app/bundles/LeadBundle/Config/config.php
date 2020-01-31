@@ -336,6 +336,7 @@ return [
             'mautic.lead.emailbundle.subscriber.owner' => [
                 'class'     => \Mautic\LeadBundle\EventListener\OwnerSubscriber::class,
                 'arguments' => [
+                    'mautic.lead.model.lead',
                     'translator',
                 ],
             ],
