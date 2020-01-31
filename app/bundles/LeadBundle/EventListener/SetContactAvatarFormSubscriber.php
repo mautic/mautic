@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
@@ -19,8 +18,9 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SetContactAvatarFormSubscriber extends CommonSubscriber
+class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AvatarHelper
@@ -37,13 +37,6 @@ class SetContactAvatarFormSubscriber extends CommonSubscriber
      */
     private $leadModel;
 
-    /**
-     * SetContactAvatarFormSubscriber constructor.
-     *
-     * @param AvatarHelper $avatarHelper
-     * @param FormUploader $uploader
-     * @param LeadModel    $leadModel
-     */
     public function __construct(AvatarHelper $avatarHelper, FormUploader $uploader, LeadModel $leadModel)
     {
         $this->avatarHelper = $avatarHelper;

@@ -351,9 +351,6 @@ class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
-        $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
-
         $lead = $this->leadModel->getCurrentLead();
 
         // Remove validation errors if the field is not visible
@@ -378,7 +375,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
+        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)

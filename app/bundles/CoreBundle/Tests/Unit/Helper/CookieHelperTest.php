@@ -3,11 +3,10 @@
 namespace Mautic\CoreBundle\Tests\unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CookieHelperTest extends PHPUnit_Framework_TestCase
+class CookieHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var RequestStack|\PHPUnit_Framework_MockObject_MockObject
@@ -93,7 +92,7 @@ class CookieHelperTest extends PHPUnit_Framework_TestCase
         $headers = xdebug_get_headers();
         // see http://tools.ietf.org/html/rfc6265#section-4.1.1
         foreach ($headers as $header) {
-            if (strpos($header, 'Set-Cookie: ') === 0) {
+            if (0 === strpos($header, 'Set-Cookie: ')) {
                 $value = str_replace('&', urlencode('&'), substr($header, 12));
                 parse_str(current(explode(';', $value, 1)), $pair);
                 $cookies = array_merge_recursive($cookies, $pair);
