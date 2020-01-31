@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -31,13 +32,25 @@ class OwnerSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * @var array
+     */
+    private $owners;
+
+    /**
      * OwnerSubscriber constructor.
      *
+     * @param LeadModel           $leadModel
      * @param TranslatorInterface $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(LeadModel $leadModel, TranslatorInterface $translator)
     {
         $this->translator = $translator;
+        $this->leadModel  = $leadModel;
     }
 
     /**
@@ -93,7 +106,6 @@ class OwnerSubscriber implements EventSubscriberInterface
     private function getGeneratedTokens(EmailSendEvent $event)
     {
         $contact = $event->getLead();
-        $owner   = $event->getOwner();
 
         if ($event->isInternalSend()) {
             return $this->getFakeTokens();
@@ -103,7 +115,9 @@ class OwnerSubscriber implements EventSubscriberInterface
             return $this->getEmptyTokens();
         }
 
-        if (!is_array($owner)) {
+        $owner = $this->getOwner($contact['owner_id']);
+
+        if (!$owner) {
             return $this->getEmptyTokens();
         }
 
@@ -171,5 +185,19 @@ class OwnerSubscriber implements EventSubscriberInterface
             $this->translator->trans('mautic.lead.list.filter.owner'),
             $this->translator->trans('mautic.core.'.$field)
         );
+    }
+
+    /**
+     * @param $ownerId
+     *
+     * @return array|null
+     */
+    private function getOwner($ownerId)
+    {
+        if (!isset($this->owners[$ownerId])) {
+            $this->owners[$ownerId] = $this->leadModel->getRepository()->getLeadOwner($ownerId);
+        }
+
+        return $this->owners[$ownerId];
     }
 }
