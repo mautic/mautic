@@ -95,7 +95,7 @@ class EventLogApiController extends CommonApiController
             if (null == $campaign || !$campaign->getId()) {
                 return $this->notFound();
             }
-            if (!$this->checkEntityAccess($campaign, 'view')) {
+            if (!$this->checkEntityAccess($campaign)) {
                 return $this->accessDenied();
             }
             // Check that contact is part of the campaign

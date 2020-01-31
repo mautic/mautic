@@ -78,7 +78,7 @@ class EmailApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
@@ -113,7 +113,7 @@ class EmailApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            if (!$this->checkEntityAccess($entity, 'view')) {
+            if (!$this->checkEntityAccess($entity)) {
                 return $this->accessDenied();
             }
 

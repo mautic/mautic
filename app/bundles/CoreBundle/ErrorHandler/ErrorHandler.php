@@ -128,7 +128,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         {
             if (!self::$handler) {
                 // Handler has not been created so likely coming in through browser-kit client for tests
-                self::register('prod');
+                self::register();
             }
 
             return self::$handler;
@@ -530,7 +530,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ('dev' == self::$environment && !empty($error['previous'])) {
-                $previousContent = '<div><h4>Previous Exceptions</h4>'.$this->generateResponse($error['previous'], true).'</div>';
+                $previousContent = '<div><h4>Previous Exceptions</h4>'.$this->generateResponse($error['previous']).'</div>';
                 $content         = str_replace('<div id="previous"></div>', $previousContent, $content);
             }
 

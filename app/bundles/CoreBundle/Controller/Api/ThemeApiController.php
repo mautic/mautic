@@ -72,14 +72,12 @@ class ThemeApiController extends CommonApiController
                     $response['success'] = $this->themeHelper->install($dir.'/'.$fileName);
                 } catch (\Exception $e) {
                     return $this->returnError(
-                        $this->translator->trans($e->getMessage(), [], 'validators'),
-                        Response::HTTP_INTERNAL_SERVER_ERROR
+                        $this->translator->trans($e->getMessage(), [], 'validators')
                     );
                 }
             } else {
                 return $this->returnError(
-                    $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators'),
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
                 );
             }
         }
@@ -105,7 +103,7 @@ class ThemeApiController extends CommonApiController
         try {
             $themeZip = $this->themeHelper->zip($theme);
         } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError($e->getMessage());
         }
 
         if (!$themeZip) {
@@ -113,8 +111,7 @@ class ThemeApiController extends CommonApiController
                 $this->translator->trans(
                     'mautic.core.dir.not.accesssible',
                     ['%dir%' => $theme]
-                ),
-                Response::HTTP_INTERNAL_SERVER_ERROR
+                )
             );
         }
 
@@ -138,7 +135,7 @@ class ThemeApiController extends CommonApiController
         try {
             $themes = $this->themeHelper->getInstalledThemes('all', true, false, false);
         } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError($e->getMessage());
         }
 
         $view = $this->view(['themes' => $themes]);
@@ -163,7 +160,7 @@ class ThemeApiController extends CommonApiController
             $this->themeHelper->delete($theme);
             $response = ['success' => true];
         } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError($e->getMessage());
         }
 
         $view = $this->view($response);

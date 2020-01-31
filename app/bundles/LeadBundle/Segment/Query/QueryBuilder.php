@@ -507,7 +507,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
         $selects = is_array($select) ? $select : func_get_args();
 
-        return $this->add('select', $selects, false);
+        return $this->add('select', $selects);
     }
 
     /**
@@ -906,7 +906,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
         $groupBy = is_array($groupBy) ? $groupBy : func_get_args();
 
-        return $this->add('groupBy', $groupBy, false);
+        return $this->add('groupBy', $groupBy);
     }
 
     /**
@@ -1059,7 +1059,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function orderBy($sort, $order = null)
     {
-        return $this->add('orderBy', $sort.' '.(!$order ? 'ASC' : $order), false);
+        return $this->add('orderBy', $sort.' '.(!$order ? 'ASC' : $order));
     }
 
     /**

@@ -213,7 +213,7 @@ class FormModel extends AbstractCommonModel
         }
 
         //hit up event listeners
-        $event = $this->dispatchEvent('pre_save', $entity, false);
+        $event = $this->dispatchEvent('pre_save', $entity);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, false, $event);
 

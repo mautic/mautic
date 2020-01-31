@@ -187,7 +187,7 @@ class CorePermissions
                 $entity->setName($name);
 
                 $bit   = 0;
-                $class = $this->getPermissionObject($bundle, true);
+                $class = $this->getPermissionObject($bundle);
 
                 foreach ($perms as $perm) {
                     //get the bit for the perm
