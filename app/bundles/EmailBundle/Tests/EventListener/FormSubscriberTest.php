@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Guzzle\Tests\Service\Mock\Command\Sub\Sub;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\EventListener\FormSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -10,7 +9,6 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -25,11 +23,6 @@ class FormSubscriberTest extends TestCase
     protected $emailModel;
 
     /**
-     * @var MockObject|LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var MockObject|ContactTracker
      */
     protected $contactTracker;
@@ -42,11 +35,9 @@ class FormSubscriberTest extends TestCase
     public function setUp()
     {
         $this->emailModel     = $this->createMock(EmailModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);
         $this->formSubscriber = new FormSubscriber(
             $this->emailModel,
-            $this->leadModel,
             $this->contactTracker
         );
     }
