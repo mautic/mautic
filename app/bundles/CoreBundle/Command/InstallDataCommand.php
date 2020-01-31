@@ -59,9 +59,9 @@ EOT
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         if (!$force) {
-            $helper = $this->getHelper('question');
-            $questionString = $translator->trans('mautic.core.command.install_data_confirm').' (y = '.$translator->trans('mautic.core.form.yes'). ', n = '.$translator->trans('mautic.core.form.no').'): ';
-            $question = new ConfirmationQuestion($questionString, false);
+            $helper         = $this->getHelper('question');
+            $questionString = $translator->trans('mautic.core.command.install_data_confirm').' (y = '.$translator->trans('mautic.core.form.yes').', n = '.$translator->trans('mautic.core.form.no').'): ';
+            $question       = new ConfirmationQuestion($questionString, false);
 
             if (!$helper->ask($input, $output, $question)) {
                 return 0;

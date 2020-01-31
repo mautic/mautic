@@ -42,9 +42,8 @@ class PageHitIndex extends AbstractFixture implements OrderedFixtureInterface, C
         $prefix = $this->container->getParameter('mautic.db_table_prefix');
         try {
             $manager->getConnection()->exec("CREATE INDEX {$prefix}page_hit_url ON {$prefix}page_hits (url(128))");
-        }
-        catch (DriverException $exception) {
-            if($exception->getErrorCode() !== 1061) {
+        } catch (DriverException $exception) {
+            if (1061 !== $exception->getErrorCode()) {
                 // If not 'Index already exists' error, throw the error
                 throw $exception;
             }
