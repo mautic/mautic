@@ -37,6 +37,16 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
      * @var ChannelListHelper
      */
     private $channelListHelper;
