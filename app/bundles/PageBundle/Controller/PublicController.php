@@ -484,16 +484,6 @@ class PublicController extends CommonFormController
     }
 
     /**
-     * @param string $url
-     *
-     * @return bool
-     */
-    private function urlIsToken($url)
-    {
-        return '{' === substr($url, 0, 1);
-    }
-
-    /**
      * PreProcess page slots for public view.
      *
      * @deprecated - to be removed in 3.0
