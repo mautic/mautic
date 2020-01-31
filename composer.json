@@ -127,7 +127,7 @@
         "liip/test-fixtures-bundle": "^1.6",
         "kamermans/guzzle-oauth2-subscriber": "^1.0",
         "phpstan/phpstan": "^0.12.3",
-        "rector/rector-prefixed": "^0.6.13"
+        "rector/rector-prefixed": "0.6.13"
     },
     "repositories": [
         {

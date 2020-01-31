@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "deec0f855ce84849bf33a88ccd365a08",
+    "content-hash": "39be17365e2ba11aafc35169e3c0cbbd",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -13034,16 +13034,16 @@
         },
         {
             "name": "rector/rector-prefixed",
-            "version": "v0.6.14",
+            "version": "v0.6.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector-prefixed.git",
-                "reference": "1f258861787a3071630a293fc1b820b3b92ad034"
+                "reference": "ae05be8b96f27a842dce90087a98a539faaa043c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector-prefixed/zipball/1f258861787a3071630a293fc1b820b3b92ad034",
-                "reference": "1f258861787a3071630a293fc1b820b3b92ad034",
+                "url": "https://api.github.com/repos/rectorphp/rector-prefixed/zipball/ae05be8b96f27a842dce90087a98a539faaa043c",
+                "reference": "ae05be8b96f27a842dce90087a98a539faaa043c",
                 "shasum": ""
             },
             "require": {
@@ -13066,7 +13066,7 @@
                 "MIT"
             ],
             "description": "Prefixed version of Rector compiled in PHAR",
-            "time": "2020-01-29T16:30:24+00:00"
+            "time": "2020-01-20T12:58:06+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -13686,6 +13686,7 @@
                 }
             ],
             "description": "This bundle generates code for you",
+            "abandoned": true,
             "time": "2017-12-07T15:36:41+00:00"
         },
         {
