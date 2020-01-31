@@ -22,12 +22,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 class RemoverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadEventLogRepository;
 

@@ -22,32 +22,32 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CorePermissions|\PHPUnit_Framework_MockObject_MockObject
+     * @var CorePermissions|\PHPUnit\Framework\MockObject\MockObject
      */
     private $security;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $entityManager;
 
     /**
-     * @var User|\PHPUnit_Framework_MockObject_MockObject
+     * @var User|\PHPUnit\Framework\MockObject\MockObject
      */
     private $user;
 
     /**
-     * @var CommonRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var CommonRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $repository;
 
     /**
-     * @var StatsEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @var StatsEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     private $statsEvent;
 
     /**
-     * @var CommonStatsSubscriber|\PHPUnit_Framework_MockObject_MockObject
+     * @var CommonStatsSubscriber|\PHPUnit\Framework\MockObject\MockObject
      */
     private $subscirber;
 

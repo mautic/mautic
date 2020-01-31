@@ -25,17 +25,17 @@ use Symfony\Component\Routing\Router;
 class FieldBuilderTest extends TestCase
 {
     /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     private $router;
 
     /**
-     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldHelper;
 
     /**
-     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactObjectHelper;
 

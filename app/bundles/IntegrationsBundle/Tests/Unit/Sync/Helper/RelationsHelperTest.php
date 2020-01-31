@@ -29,7 +29,7 @@ use PHPUnit\Framework\TestCase;
 class RelationsHelperTest extends TestCase
 {
     /**
-     * @var MappingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mappingHelper;
 
@@ -39,12 +39,12 @@ class RelationsHelperTest extends TestCase
     private $relationsHelper;
 
     /**
-     * @var ReportDAO|\PHPUnit_Framework_MockObject_MockObject
+     * @var ReportDAO|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncReport;
 
     /**
-     * @var MappingManualDAO|\PHPUnit_Framework_MockObject_MockObject
+     * @var MappingManualDAO|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mappingManual;
 

@@ -597,7 +597,7 @@ TEXT;
      * @param array $doNotTrack
      * @param array $urlFieldsForPlaintext
      *
-     * @return TrackableModel|\PHPUnit_Framework_MockObject_MockObject
+     * @return TrackableModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getModel($doNotTrack = [], $urlFieldsForPlaintext = [])
     {

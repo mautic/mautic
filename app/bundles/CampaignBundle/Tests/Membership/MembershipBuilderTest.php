@@ -24,27 +24,27 @@ use Symfony\Component\Translation\TranslatorInterface;
 class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MembershipManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var MembershipManager|\PHPUnit\Framework\MockObject\MockObject
      */
     private $manager;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $campaignMemberRepository;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Mautic\LeadBundle\Entity\LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 

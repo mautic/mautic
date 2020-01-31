@@ -28,27 +28,27 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class ScheduledExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadEventLogRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadEventLogRepository
      */
     private $repository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Translator
+     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
     private $executioner;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
     private $scheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ScheduledContactFinder
+     * @var \PHPUnit\Framework\MockObject\MockObject|ScheduledContactFinder
      */
     private $contactFinder;
 

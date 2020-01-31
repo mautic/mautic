@@ -29,42 +29,42 @@ use Psr\Log\NullLogger;
 class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventRepository
      */
     private $eventRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
     private $executioner;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|DecisionExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|DecisionExecutioner
      */
     private $decisionExecutioner;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventCollector
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
      */
     private $eventCollector;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
     private $eventScheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContactTracker
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
      */
     private $contactTracker;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
     private $leadRepository;
 

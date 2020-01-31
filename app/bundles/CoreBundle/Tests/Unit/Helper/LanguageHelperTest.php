@@ -21,22 +21,22 @@ use Symfony\Component\Filesystem\Filesystem;
 class LanguageHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $pathsHelper;
 
     /**
-     * @var Logger|\PHPUnit_Framework_MockObject_MockObject
+     * @var Logger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParametersHelper;
 
     /**
-     * @var Http|\PHPUnit_Framework_MockObject_MockObject
+     * @var Http|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connector;
 

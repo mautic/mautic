@@ -26,7 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 
@@ -36,7 +36,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
     private $logger;
 
     /**
-     * @var ContactTracker|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactTracker;
 

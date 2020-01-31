@@ -30,17 +30,17 @@ use PHPUnit\Framework\TestCase;
 class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var SyncJudgeInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SyncJudgeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncJudge;
 
     /**
-     * @var ValueHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $valueHelper;
 
     /**
-     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldHelper;
 

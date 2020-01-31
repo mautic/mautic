@@ -25,17 +25,17 @@ use Psr\Log\NullLogger;
 class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
      */
     private $leadRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CampaignRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
      */
     private $campaignRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CampaignLeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignLeadRepository
      */
     private $campaignLeadRepository;
 

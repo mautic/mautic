@@ -46,7 +46,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MessageModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|MessageModel
      */
     private $messageModel;
 
@@ -56,22 +56,22 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     private $eventDispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventCollector
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
      */
     private $eventCollector;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Translator
+     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
     private $scheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LegacyEventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject|LegacyEventDispatcher
      */
     private $legacyDispatcher;
 
@@ -301,7 +301,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Event|\PHPUnit_Framework_MockObject_MockObject
+     * @return Event|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent()
     {

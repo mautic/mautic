@@ -31,17 +31,17 @@ class OrderExecutionerTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var MappingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mappingHelper;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dispatcher;
 
     /**
-     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectProvider;
 

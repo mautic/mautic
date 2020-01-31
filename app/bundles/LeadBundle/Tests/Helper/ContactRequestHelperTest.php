@@ -30,47 +30,47 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ContactTracker
+     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
      */
     private $contactTracker;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|CoreParametersHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
      */
     private $coreParametersHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|IpLookupHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|IpLookupHelper
      */
     private $ipLookupHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadDeviceRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadDeviceRepository
      */
     private $leadDeviceRepository;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
+     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
     private $requestStack;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
      */
     private $logger;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Lead
+     * @var \PHPUnit\Framework\MockObject\MockObject|Lead
      */
     private $trackedContact;
 

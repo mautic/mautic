@@ -25,17 +25,17 @@ use PHPUnit\Framework\TestCase;
 class CompanyObjectHelperTest extends TestCase
 {
     /**
-     * @var CompanyModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $model;
 
     /**
-     * @var CompanyRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $repository;
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connection;
 

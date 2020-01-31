@@ -40,22 +40,22 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @var EmailModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $emailModel;
 
     /**
-     * @var EventModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventModel;
 
     /**
-     * @var SendEmailToUser|\PHPUnit_Framework_MockObject_MockObject
+     * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
     private $sendEmailToUser;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 

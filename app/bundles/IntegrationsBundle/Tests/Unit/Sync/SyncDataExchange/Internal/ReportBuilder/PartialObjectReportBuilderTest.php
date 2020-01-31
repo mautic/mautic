@@ -39,27 +39,27 @@ class PartialObjectReportBuilderTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var FieldChangeRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldChangeRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldChangeRepository;
 
     /**
-     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldHelper;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dispatcher;
 
     /**
-     * @var FieldBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldBuilder;
 
     /**
-     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectProvider;
 
