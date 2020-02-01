@@ -48,7 +48,10 @@ class CustomFieldColumn
             $columnExists = $leadsSchema->checkColumnExists($leadField->getAlias(), $leadField->isNew());
 
             if ($columnExists && $this->customFieldIndex->isUpdatePending($leadField)) {
-                $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                try {
+                    $this->fieldColumnDispatcher->dispatchPreUpdateColumnEvent($leadField);
+                } catch (NoListenerException $e) {
+                }
                 $this->processUpdateLeadColumn($leadField);
             }
 
@@ -58,7 +61,6 @@ class CustomFieldColumn
         } catch (SchemaException) {
             // We use slightly different error message if the column already exists in this case.
             throw new SchemaException($this->translator->trans('mautic.lead.field.column.already.exists', ['%field%' => $leadField->getName()], 'validators'));
-        } catch (NoListenerException) {
         }
 
         try {
@@ -117,7 +119,7 @@ class CustomFieldColumn
             $this->leadFieldSaver->saveLeadFieldEntity($leadField, true);
         }
 
-        if ($leadField->isIsIndex()) {
+        if ($leadField->isIsIndex() || $leadField->getIsUniqueIdentifier()) {
             $this->customFieldIndex->addIndexOnColumn($leadField);
         }
     }
@@ -138,5 +140,7 @@ class CustomFieldColumn
         } elseif (!$leadField->isIsIndex() && $hasIndex) {
             $this->customFieldIndex->dropIndexOnColumn($leadField);
         }
+
+        $this->customFieldIndex->updateUniqueIdentifierIndex($leadField);
     }
 }
