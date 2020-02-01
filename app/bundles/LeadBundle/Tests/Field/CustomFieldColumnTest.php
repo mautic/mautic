@@ -199,6 +199,92 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $this->customFieldColumn->processCreateLeadColumn($leadField);
     }
 
+    public function testNoErrorWithAddColumnIndexForUniqueIdentifier(): void
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->willReturn($columnSchemaHelper);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('checkColumnExists')
+            ->willReturn(false);
+
+        $leadField = new LeadField();
+        $leadField->setIsUniqueIdentifier(true);
+
+        $schemaDefinition->expects($this->once())
+            ->method('getSchemaDefinitionNonStatic')
+            ->willReturn(['type' => 'string']);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('addColumn');
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('executeChanges');
+
+        $leadFieldSaver->expects($this->once())
+            ->method('saveLeadFieldEntity')
+            ->with($leadField, true);
+
+        $customFieldIndex->expects($this->once())
+            ->method('addIndexOnColumn')
+            ->with($leadField);
+
+        $customFieldColumn->processCreateLeadColumn($leadField);
+    }
+
+    public function testNoErrorWithAddColumnWithoutIndexOrUniqueIdentifier()
+    {
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $schemaDefinition      = $this->createMock(SchemaDefinition::class);
+        $logger                = $this->createMock(Logger::class);
+        $leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
+        $customFieldIndex      = $this->createMock(CustomFieldIndex::class);
+        $fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
+
+        $customFieldColumn = new CustomFieldColumn($columnSchemaHelper, $schemaDefinition, $logger, $leadFieldSaver, $customFieldIndex, $fieldColumnDispatcher, $translator);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('setName')
+            ->willReturn($columnSchemaHelper);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('checkColumnExists')
+            ->willReturn(false);
+
+        $leadField = new LeadField();
+
+        $schemaDefinition->expects($this->once())
+            ->method('getSchemaDefinitionNonStatic')
+            ->willReturn(['type' => 'string']);
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('addColumn');
+
+        $columnSchemaHelper->expects($this->once())
+            ->method('executeChanges');
+
+        $leadFieldSaver->expects($this->once())
+            ->method('saveLeadFieldEntity')
+            ->with($leadField, true);
+
+        $customFieldIndex->expects($this->never())
+            ->method('addIndexOnColumn');
+
+        $customFieldColumn->processCreateLeadColumn($leadField);
+    }
+
     public function testNoErrorWithUpdateAddColumnIndex(): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
