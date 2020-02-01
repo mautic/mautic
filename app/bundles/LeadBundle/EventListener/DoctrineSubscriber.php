@@ -42,7 +42,7 @@ class DoctrineSubscriber implements EventSubscriber
 
                 // get a list of fields
                 $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
-                    ->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
+                    ->select('f.alias, f.is_unique_identifer as is_unique, f.is_index, f.type, f.object')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
@@ -52,18 +52,18 @@ class DoctrineSubscriber implements EventSubscriber
                 // Compile which ones are unique identifiers
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
-                foreach ($fields as $f) {
-                    if ($f['is_unique'] && 'email' !== $f['alias']) {
-                        $uniqueFields[$f['alias']] = $f['alias'];
+                foreach ($fields as $field) {
+                    if ($field['is_unique'] && 'email' !== $field['alias']) {
+                        $uniqueFields[$field['alias']] = $field['alias'];
                     }
-                    $columnDef = SchemaDefinition::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
+                    $columnDef = SchemaDefinition::getSchemaDefinition($field['alias'], $field['type'], !empty($field['is_unique']));
 
-                    if (!$table->hasColumn($f['alias'])) {
+                    if (!$table->hasColumn($field['alias'])) {
                         $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
                     }
 
-                    if ('text' != $columnDef['type']) {
-                        $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
+                    if (!empty($columnDef['is_unique'])) {
+                        $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
                     }
                 }
 
