@@ -185,6 +185,7 @@ class IndexSchemaHelper
 
     /**
      * @param LeadField $leadField
+     *
      * @return bool
      *
      * @throws SchemaException

@@ -104,16 +104,14 @@ class CustomFieldIndex
 
     public function hasMatchingUniqueIdentifierIndex(LeadField $leadField)
     {
-        $hasIndex = $this->indexSchemaHelper->hasUniqueIdentifierIndex($leadField);
+        $hasIndex           = $this->indexSchemaHelper->hasUniqueIdentifierIndex($leadField);
         $isUniqueIdentifier = $leadField->getIsUniqueIdentifier();
 
-        if ($isUniqueIdentifier && !$hasIndex)
-        {
+        if ($isUniqueIdentifier && !$hasIndex) {
             return false;
         }
 
-        if (!$isUniqueIdentifier && $hasIndex)
-        {
+        if (!$isUniqueIdentifier && $hasIndex) {
             return false;
         }
 
