@@ -386,3 +386,4 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   choice_list must be changed to choices, and the value of class ChoiceType has to be replaced with choices and an array with _labels_ as keys; there’s a bug in Symfony 2.8 that you also have to set ‘choices_as_values’ => true to ensure that labels and values are correct. 
 *   Some use of choices for ChoiceType in Mautic 2 is dependent on the Symfony 2.8 bc break and need to have the key/values flipped. See [https://symfony.com/doc/2.8/reference/forms/types/choice.html#choices-as-values](https://symfony.com/doc/2.8/reference/forms/types/choice.html#choices-as-values)
 *   $view[‘router’]->generate() in PHP templates has to be changed to $view[‘router’]->url()
+*   [sensio/generator-bundle](https://packagist.org/packages/sensio/generator-bundle) package was removed from the dev dependencies as it's abandoned.
