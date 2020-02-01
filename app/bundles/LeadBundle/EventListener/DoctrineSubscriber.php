@@ -50,10 +50,9 @@ class DoctrineSubscriber implements EventSubscriber
                     ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
-                // Email will always be included first
-                $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];
+                $uniqueFields = [];
                 foreach ($fields as $field) {
-                    if ($field['is_unique'] && 'email' !== $field['alias']) {
+                    if ($field['is_unique']) {
                         $uniqueFields[$field['alias']] = $field['alias'];
                     }
                     $columnDef = SchemaDefinition::getSchemaDefinition($field['alias'], $field['type'], !empty($field['is_unique']));
@@ -62,7 +61,7 @@ class DoctrineSubscriber implements EventSubscriber
                         $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
                     }
 
-                    if (!empty($columnDef['is_unique'])) {
+                    if (!empty($field['is_unique']) || !empty($field['is_index'])) {
                         $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
                     }
                 }
@@ -81,6 +80,7 @@ class DoctrineSubscriber implements EventSubscriber
 
                 if (count($uniqueFields) > 1) {
                     // Only use three to prevent max key length errors
+                    asort($uniqueFields);
                     $uniqueFields = array_slice($uniqueFields, 0, 3);
                     $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
                 }
