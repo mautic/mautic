@@ -564,9 +564,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $constraints = [
-            new IsFalse(['message' => 'mautic.lead.field.form.index.error', 'groups' => 'uniqueIndex']),
-        ];
+        $constraints = [];
 
         if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
             $constraints[] = new IsFalse(['message' => 'mautic.lead.field.form.index_count.error']);
@@ -647,10 +645,6 @@ class FieldType extends AbstractType
                     $data = $form->getData();
 
                     $groups = ['Default'];
-
-                    if ($data->getIsUniqueIdentifier()) {
-                        $groups[] = 'uniqueIndex';
-                    }
 
                     if (in_array($data->getType(), $this->indexableFieldsWithLimits)) {
                         $groups[] = 'indexableFieldWithLimits';
