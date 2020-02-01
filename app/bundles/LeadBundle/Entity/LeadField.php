@@ -646,6 +646,10 @@ class LeadField extends FormEntity implements CacheInvalidateInterface
      */
     public function setIsUniqueIdentifer($isUniqueIdentifer)
     {
+        if ($isUniqueIdentifer) {
+            $this->isIndex = true;
+        }
+
         $this->isUniqueIdentifer = $this->isUniqueIdentifier = $isUniqueIdentifer;
 
         return $this;
