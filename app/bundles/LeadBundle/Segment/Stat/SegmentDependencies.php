@@ -67,9 +67,8 @@ class SegmentDependencies
      */
     public function getChannelsIds($segmentId)
     {
-        $this->segmentId = $segmentId;
-        $usage           = [];
-        $usage[]         = [
+        $usage   = [];
+        $usage[] = [
             'label' => 'mautic.email.emails',
             'route' => 'mautic_email_index',
             'ids'   => $this->emailModel->getEmailsIdsWithDependenciesOnSegment($segmentId),
