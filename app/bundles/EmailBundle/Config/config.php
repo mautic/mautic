@@ -168,7 +168,7 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                     'mautic.email.model.send_email_to_user',
                     'translator',
                 ],
@@ -242,7 +242,7 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\PageSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                     'request_stack',
                 ],
             ],

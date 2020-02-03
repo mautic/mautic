@@ -123,13 +123,32 @@ All fixtures must be defined as services in a bundle's config.php
     *   Mautic/CampaignBundle/Event/CampaignScheduledEvent 
     *   Mautic/CampaignBundle/Model/LegacyEventModel 
 *   Deprecated methods removed:
-    *   CampaignEventHelper::addRemoveLead
-    *   LeadRepository::getLeadsWithFields
-    *   CampaignRepository::getCampaignLeadIds
-    *   CampaignRepository::getCampaignLeadsFromLists
-    *   CampaignRepository::getCampaignOrphanLeads
+    *   CampaignEventHelper::addRemoveLead()
+    *   CampaignBuilderEvent::addLeadDecision(). Use CampaignBuilderEvent::addDecision() instead.
+    *   CampaignBuilderEvent::getLeadDecisions(). Use CampaignBuilderEvent::getDecisions() instead.
+    *   CampaignBuilderEvent::addLeadCondition(). Use CampaignBuilderEvent::addCondition() instead.
+    *   CampaignBuilderEvent::getLeadConditions(). Use CampaignBuilderEvent::getConditions() instead.
+    *   LeadRepository::getLeadsWithFields()
+    *   CampaignRepository::getCampaignLeadIds()
+    *   CampaignRepository::getCampaignLeadsFromLists()
+    *   CampaignRepository::getCampaignOrphanLeads()
+    *   LeadEventLogRepository::removeScheduledEvents()
+    *   LeadRepository::getLeadsWithFields(). Use MauticLeadBundle\Entity\LeadRepository\getEntityContacts() instead.
+    *   CampaignModel::removeScheduledEvents()
+    *   CampaignModel::setChannelFromEventProperties(). Use \Mautic\CampaignBundle\Helper\ChannelExtractor instead.
+    *   CampaignModel::getRemovedLeads(). Use RemovedContactTracker::getRemovedContacts() instead.
+    *   CampaignModel::addLead(). Use MembershipManager::addContact() instead.
+    *   CampaignModel::addLeads(). Use MembershipManager::addContacts() instead.
+    *   CampaignModel::getEvents(). Use EventCollector::getEvents() instead.
+    *   CampaignModel::batchSleep()
+    *   Mautic\CampaignBundle\Executioner\Result\Responses::getResponseArray()
 *   Deprecated tests removed:
     *   Mautic/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest
+*   Commands
+    *   Deprecated option `--negative-only` removed for command `mautic:campaigns:trigger`. Use `--inactive-only` instead.
+*   Routes
+    * `/api/campaigns/{id}/contact/add/{leadId}` route removed. Use `/api/campaigns/{id}/contact/{leadId}/add` instead.
+    * `/api/campaigns/{id}/contact/remove/{leadId}` route removed. Use `/api/campaigns/{id}/contact/{leadId}/remove` instead.
 
 ### CategoryBundle
 

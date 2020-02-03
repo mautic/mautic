@@ -18,9 +18,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
-/**
- * LeadEventLogRepository.
- */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -601,21 +598,5 @@ SQL;
                 ]
             )
             ->execute();
-    }
-
-    /**
-     * @deprecated 2.14 to be removed in 3.0
-     *
-     * @param $campaignId
-     * @param $leadId
-     */
-    public function removeScheduledEvents($campaignId, $leadId)
-    {
-        $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'lead_id'      => (int) $leadId,
-            'campaign_id'  => (int) $campaignId,
-            'is_scheduled' => 1,
-        ]);
     }
 }

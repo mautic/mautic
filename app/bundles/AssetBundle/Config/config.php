@@ -91,7 +91,7 @@ return [
             'mautic.asset.campaignbundle.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [

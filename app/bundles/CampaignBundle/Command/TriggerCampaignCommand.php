@@ -30,9 +30,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class TriggerCampaignCommand.
- */
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
@@ -107,9 +104,6 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private $campaign;
 
-    /**
-     * TriggerCampaignCommand constructor.
-     */
     public function __construct(
         CampaignRepository $campaignRepository,
         EventDispatcherInterface $dispatcher,
@@ -217,13 +211,6 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set batch size of contacts to process per round. Defaults to 100.',
                 100
-            )
-            // @deprecated 2.13.0 to be removed in 3.0; use inactive-only instead
-            ->addOption(
-                '--negative-only',
-                null,
-                InputOption::VALUE_NONE,
-                'Just execute the inactive events'
             );
 
         parent::configure();
@@ -240,7 +227,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->output       = $quiet ? new NullOutput() : $output;
         $this->kickoffOnly  = $input->getOption('kickoff-only');
         $this->scheduleOnly = $input->getOption('scheduled-only');
-        $this->inactiveOnly = $input->getOption('inactive-only') || $input->getOption('negative-only');
+        $this->inactiveOnly = $input->getOption('inactive-only');
 
         $batchLimit    = $input->getOption('batch-limit');
         $campaignLimit = $input->getOption('campaign-limit');

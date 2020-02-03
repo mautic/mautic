@@ -16,7 +16,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -45,9 +45,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     private $emailModel;
 
     /**
-     * @var EventModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var RealTimeExecutioner|\PHPUnit_Framework_MockObject_MockObject
      */
-    private $eventModel;
+    private $realTimeExecutioner;
 
     /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
@@ -68,14 +68,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->emailModel      = $this->createMock(EmailModel::class);
-        $this->eventModel      = $this->createMock(EventModel::class);
-        $this->sendEmailToUser = $this->createMock(SendEmailToUser::class);
-        $this->translator      = $this->createMock(TranslatorInterface::class);
+        $this->emailModel          = $this->createMock(EmailModel::class);
+        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
+        $this->translator          = $this->createMock(TranslatorInterface::class);
 
         $this->subscriber = new CampaignSubscriber(
             $this->emailModel,
-            $this->eventModel,
+            $this->realTimeExecutioner,
             $this->sendEmailToUser,
             $this->translator
         );

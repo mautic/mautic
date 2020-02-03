@@ -212,7 +212,7 @@ return [
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
-                    'mautic.campaign.model.event',
+                    'mautic.campaign.executioner.realtime',
                 ],
             ],
             'mautic.form.leadbundle.subscriber' => [
@@ -381,6 +381,7 @@ return [
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.campaign',
+                    'mautic.campaign.membership.manager',
                     'mautic.lead.model.field',
                     'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',

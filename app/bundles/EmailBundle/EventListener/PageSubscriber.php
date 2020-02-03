@@ -11,7 +11,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
@@ -26,20 +26,20 @@ class PageSubscriber implements EventSubscriberInterface
     private $emailModel;
 
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    private $campaignEventModel;
+    private $realTimeExecutioner;
 
     /**
      * @var RequestStack
      */
     private $requestStack;
 
-    public function __construct(EmailModel $emailModel, EventModel $campaignEventModel, RequestStack $requestStack)
+    public function __construct(EmailModel $emailModel, RealTimeExecutioner $realTimeExecutioner, RequestStack $requestStack)
     {
-        $this->emailModel         = $emailModel;
-        $this->campaignEventModel = $campaignEventModel;
-        $this->requestStack       = $requestStack;
+        $this->emailModel          = $emailModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
+        $this->requestStack        = $requestStack;
     }
 
     /**
@@ -62,7 +62,7 @@ class PageSubscriber implements EventSubscriberInterface
 
         if ($redirect && $email = $hit->getEmail()) {
             //click trigger condition
-            $this->campaignEventModel->triggerEvent('email.click', $hit, 'email', $email->getId());
+            $this->realTimeExecutioner->execute('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
 
