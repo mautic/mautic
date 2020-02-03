@@ -119,7 +119,6 @@
         "codeception/codeception": "^4.0",
 
         "liip/functional-test-bundle": "~3.3.0",
-        "sensio/generator-bundle": "~3.1.0",
         "mautic/transifex": "^4.0",
         "http-interop/http-factory-guzzle": "^1.0",
         "webfactory/exceptions-bundle": "~4.3",
