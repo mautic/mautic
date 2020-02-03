@@ -140,18 +140,19 @@ Mautic.filterIntegrations = function(update) {
     }
 
     //activate shuffles
-    if (mQuery('.shuffle-integrations').length) {
+    if (mQuery('.native-integrations').length) {
         //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
         setTimeout(function () {
             var Shuffle = window.Shuffle,
-                element = document.querySelector('.shuffle-integrations'),
+                element = document.querySelector('.native-integrations'),
                 shuffleOptions = {
                     itemSelector: '.shuffle-item'
                 };
 
-            var shuffleInstance = new Shuffle(element, shuffleOptions);
+            // Using global variable to make it available outside of the scope of this function
+            window.nativeIntegrationsShuffleInstance = new Shuffle(element, shuffleOptions);
 
-            shuffleInstance.filter(function($el) {
+            window.nativeIntegrationsShuffleInstance.filter(function($el) {
                 if (filter) {
                     return mQuery($el).hasClass('plugin' + filter);
                 } else {
@@ -165,11 +166,22 @@ Mautic.filterIntegrations = function(update) {
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
                 .on("fa.sidebar.minimize", function() {
-                    shuffleInstance.update();
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 })
                 .on("fa.sidebar.maximize", function() {
-                    shuffleInstance.update();
-                })
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
+                });
+
+            // This delay is needed so that the tab has time to render and the sizes are correctly calculated
+            mQuery('#plugin-nav-tabs a').click(function () {
+                setTimeout(function() {
+                    window.nativeIntegrationsShuffleInstance.update();
+                }, 500);
+            });
         }, 500);
     }
 };

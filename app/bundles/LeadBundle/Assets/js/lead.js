@@ -1153,10 +1153,21 @@ Mautic.updateLeadList = function () {
                 if (response.indexMode == 'list') {
                     mQuery('#leadTable tbody').prepend(response.leads);
                 } else {
-                    var items = mQuery(response.leads);
-                    mQuery('.shuffle-grid').prepend(items);
-                    mQuery('.shuffle-grid').shuffle('appended', items);
-                    mQuery('.shuffle-grid').shuffle('update');
+                    if (mQuery('.shuffle-grid').length) {
+                        //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
+                        var Shuffle = window.Shuffle,
+                            element = document.querySelector('.shuffle-grid'),
+                            shuffleOptions = {
+                                itemSelector: '.shuffle-item'
+                            };
+
+                        // Using global variable to make it available outside of the scope of this function
+                        window.leadsShuffleInstance = new Shuffle(element, shuffleOptions);
+                        var items = mQuery(response.leads);
+                        mQuery('.shuffle-grid').prepend(items);
+                        window.leadsShuffleInstance.shuffle('appended', items.children(shuffleOptions.itemSelector).toArray());
+                        window.leadsShuffleInstance.shuffle('update');
+                    }
 
                     mQuery('#liveModeButton').data('max-id', response.maxId);
                 }
