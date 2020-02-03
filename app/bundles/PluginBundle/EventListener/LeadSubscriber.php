@@ -50,9 +50,8 @@ class LeadSubscriber implements EventSubscriberInterface
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
-        $success = false;
 
-        return $success;
+        return false;
     }
 
     /*
@@ -64,9 +63,8 @@ class LeadSubscriber implements EventSubscriberInterface
         $company               = $event->getCompany();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('company%', $company->getId());
-        $success = false;
 
-        return $success;
+        return false;
     }
 
     /*

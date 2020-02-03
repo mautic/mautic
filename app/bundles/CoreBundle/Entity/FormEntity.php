@@ -30,7 +30,7 @@ class FormEntity extends CommonEntity
     /**
      * @var \DateTime|null
      */
-    private $dateAdded = null;
+    private $dateAdded;
 
     /**
      * @var int|null

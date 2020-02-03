@@ -522,7 +522,7 @@ class CommonApiController extends FOSRestController implements MauticController
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 

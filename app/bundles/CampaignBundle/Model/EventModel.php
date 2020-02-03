@@ -68,9 +68,7 @@ class EventModel extends FormModel
             return new Event();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

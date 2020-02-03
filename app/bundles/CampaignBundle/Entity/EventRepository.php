@@ -196,9 +196,7 @@ class EventRepository extends CommonRepository
             );
         }
 
-        $events = $q->getQuery()->getArrayResult();
-
-        return $events;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -285,9 +283,7 @@ class EventRepository extends CommonRepository
 
         $q->where($expr);
 
-        $results = $q->getQuery()->getResult();
-
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**

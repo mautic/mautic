@@ -173,7 +173,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         // replace line brakes with <br> for textarea values
         if ($tokens = $event->getTokens()) {
-            foreach ($tokens as $token => &$value) {
+            foreach ($tokens as &$value) {
                 $value = nl2br(html_entity_decode($value, ENT_QUOTES));
             }
         }
@@ -408,9 +408,8 @@ class FormSubscriber implements EventSubscriberInterface
             }
             $output .= '</td></tr>';
         }
-        $output .= '</table>';
 
-        return $output;
+        return $output.'</table>';
     }
 
     /**

@@ -31,11 +31,6 @@ class ConfigEvent extends CommonEvent
     private $config;
 
     /**
-     * @param \Symfony\Component\HttpFoundation\ParameterBag $post
-     */
-    private $post;
-
-    /**
      * @var array
      */
     private $errors = [];
@@ -62,7 +57,6 @@ class ConfigEvent extends CommonEvent
     public function __construct(array $config, ParameterBag $post)
     {
         $this->config = $config;
-        $this->post   = $post;
     }
 
     /**

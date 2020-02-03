@@ -28,7 +28,7 @@ trait MatchFilterForLeadTrait
         $groups   = [];
         $groupNum = 0;
 
-        foreach ($filter as $key => $data) {
+        foreach ($filter as $data) {
             $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
@@ -161,7 +161,7 @@ trait MatchFilterForLeadTrait
                     break;
                 case 'in':
                     $leadValMatched = false;
-                    foreach ($leadVal as $k => $v) {
+                    foreach ($leadVal as $v) {
                         if (in_array($v, $filterVal)) {
                             $leadValMatched = true;
                             // Break once we find a match
@@ -173,7 +173,7 @@ trait MatchFilterForLeadTrait
                 case '!in':
                     $leadValNotMatched = true;
 
-                    foreach ($leadVal as $k => $v) {
+                    foreach ($leadVal as $v) {
                         if (in_array($v, $filterVal)) {
                             $leadValNotMatched = false;
                             // Break once we find a match

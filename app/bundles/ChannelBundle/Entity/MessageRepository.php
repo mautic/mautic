@@ -64,9 +64,7 @@ class MessageRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -108,8 +106,6 @@ class MessageRepository extends CommonRepository
             ->setParameter('channelId', $channelId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        $result = $q->execute()->fetch();
-
-        return $result;
+        return $q->execute()->fetch();
     }
 }

@@ -196,7 +196,7 @@ class MenuHelper
                     array_merge($items['children'], $this->orphans[$type][$key]);
                 unset($this->orphans[$type][$key]);
             } elseif (isset($items['children'])) {
-                foreach ($items['children'] as $subKey => $subItems) {
+                foreach ($items['children'] as $subItems) {
                     $this->placeOrphans($subItems, false, $depth + 1, $type);
                 }
             }

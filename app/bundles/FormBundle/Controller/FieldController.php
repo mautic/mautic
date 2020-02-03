@@ -165,9 +165,8 @@ class FieldController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
 
-            return $response;
+            return new JsonResponse($passthroughVars);
         }
 
         return $this->ajaxAction([
@@ -308,9 +307,8 @@ class FieldController extends CommonFormController
             if ($closeModal) {
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
-                $response                      = new JsonResponse($passthroughVars);
 
-                return $response;
+                return new JsonResponse($passthroughVars);
             }
 
             return $this->ajaxAction(
@@ -322,9 +320,7 @@ class FieldController extends CommonFormController
             );
         }
 
-        $response = new JsonResponse(['success' => 0]);
-
-        return $response;
+        return new JsonResponse(['success' => 0]);
     }
 
     /**

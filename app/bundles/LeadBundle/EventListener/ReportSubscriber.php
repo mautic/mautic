@@ -874,7 +874,7 @@ class ReportSubscriber implements EventSubscriberInterface
             self::CONTEXT_CONTACT_MESSAGE_FREQUENCY,
         ])) {
             if (isset($data[0]['channel']) || isset($data[0]['channel_action']) || (isset($data[0]['activity_count']) && isset($data[0]['attribution']))) {
-                foreach ($data as $key => &$row) {
+                foreach ($data as &$row) {
                     if (isset($row['channel'])) {
                         $row['channel'] = $this->channels[$row['channel']];
                     }

@@ -164,9 +164,7 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
                 break;
         }
 
-        $localName = strtoupper($localName);
-
-        return $localName;
+        return strtoupper($localName);
     }
 
     /**

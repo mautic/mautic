@@ -135,8 +135,6 @@ class AuthController extends FormController
         );
         $oauthUrl = $event->getAuthUrl();
 
-        $response = new RedirectResponse($oauthUrl);
-
-        return $response;
+        return new RedirectResponse($oauthUrl);
     }
 }

@@ -25,7 +25,7 @@ class BuilderEvent extends Event
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
     protected $translator;
-    protected $entity = null;
+    protected $entity;
     protected $requested;
     protected $tokenFilter;
     protected $tokenFilterText;

@@ -217,11 +217,11 @@ class PluginController extends FormController
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             // Ungroup the fields
                             $mauticLeadFields = [];
-                            foreach ($leadFields as $group => $groupFields) {
+                            foreach ($leadFields as $groupFields) {
                                 $mauticLeadFields = array_merge($mauticLeadFields, $groupFields);
                             }
                             $mauticCompanyFields = [];
-                            foreach ($companyFields as $group => $groupFields) {
+                            foreach ($companyFields as $groupFields) {
                                 $mauticCompanyFields = array_merge($mauticCompanyFields, $groupFields);
                             }
 

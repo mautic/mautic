@@ -105,9 +105,8 @@ return [
         ],
         'forms' => [
             'mautic.stage.type.form' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageType',
+                'class'     => \Mautic\StageBundle\Form\Type\StageType::class,
                 'arguments' => [
-                    'translator',
                     'mautic.security',
                 ],
             ],

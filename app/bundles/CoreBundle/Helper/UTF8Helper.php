@@ -286,9 +286,8 @@ class UTF8Helper
             $last = $text;
             $text = self::toUTF8(static::utf8_decode($text, $option));
         }
-        $text = self::toUTF8(static::utf8_decode($text, $option));
 
-        return $text;
+        return self::toUTF8(static::utf8_decode($text, $option));
     }
 
     public static function UTF8FixWin1252Chars($text)

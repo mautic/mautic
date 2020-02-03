@@ -154,7 +154,7 @@ class FormModel extends AbstractCommonModel
         $this->em->flush();
 
         // Dispatch post events after everything has been flushed
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             $this->dispatchEvent('post_save', $entity, $isNew, $event);
         }
     }
@@ -213,7 +213,7 @@ class FormModel extends AbstractCommonModel
         }
 
         //hit up event listeners
-        $event = $this->dispatchEvent('pre_save', $entity, false);
+        $event = $this->dispatchEvent('pre_save', $entity);
         $this->getRepository()->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, false, $event);
 
@@ -375,12 +375,11 @@ class FormModel extends AbstractCommonModel
         }
 
         $nameGetter = $this->getNameGetter();
-        $subject    = $this->translator->trans($msg, [
+
+        return $this->translator->trans($msg, [
             '%entityName%' => $entity->$nameGetter(),
             '%entityId%'   => $entity->getId(),
         ]);
-
-        return $subject;
     }
 
     /**

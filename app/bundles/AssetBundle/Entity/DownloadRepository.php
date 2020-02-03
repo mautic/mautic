@@ -99,9 +99,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -124,9 +122,7 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**

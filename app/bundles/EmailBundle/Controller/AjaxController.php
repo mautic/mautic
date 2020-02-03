@@ -71,7 +71,7 @@ class AjaxController extends CommonAjaxController
                 $stats['sent'] += $batchSentCount;
                 $stats['failed'] += $batchFailedCount;
 
-                foreach ($batchFailedRecipients as $list => $emails) {
+                foreach ($batchFailedRecipients as $emails) {
                     $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
                 }
 

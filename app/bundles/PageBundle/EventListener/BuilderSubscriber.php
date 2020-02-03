@@ -92,8 +92,6 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $shareButtonsRegex   = '{sharebuttons}';
     private $titleRegex          = '{pagetitle}';
     private $descriptionRegex    = '{pagemetadescription}';
-    private $emailIsInternalSend = false;
-    private $emailEntity         = null;
 
     const segmentListRegex  = '{segmentlist}';
     const categoryListRegex = '{categorylist}';
@@ -725,11 +723,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $content      = $event->getContent();
         $plainText    = $event->getPlainText();
         $clickthrough = $event->shouldAppendClickthrough() ? $event->generateClickthrough() : [];
-
-        $this->emailIsInternalSend = $event->isInternalSend();
-        $this->emailEntity         = $event->getEmail();
-
-        $tokens = $this->tokenHelper->findPageTokens($content.$plainText, $clickthrough);
+        $tokens       = $this->tokenHelper->findPageTokens($content.$plainText, $clickthrough);
 
         $event->addTokens($tokens);
     }

@@ -79,9 +79,7 @@ class FrequencyRuleRepository extends CommonRepository
             $q->having("(count(ch.$statContactColumn) >= fr.frequency_number $havingAnd)");
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -153,8 +151,6 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('leadId', $leadId);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 }

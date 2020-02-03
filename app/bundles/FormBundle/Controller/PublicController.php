@@ -171,7 +171,7 @@ class PublicController extends CommonFormController
                 }
 
                 if (!empty($callbackResponses)) {
-                    foreach ($callbackResponses as $key => $response) {
+                    foreach ($callbackResponses as $response) {
                         // Convert the responses to something useful for a JS response
                         if ($response instanceof RedirectResponse && !isset($data['redirect'])) {
                             $data['redirect'] = $response->getTargetUrl();

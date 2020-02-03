@@ -131,9 +131,8 @@ class TriggerEventController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
 
-            return $response;
+            return new JsonResponse($passthroughVars);
         }
 
         return $this->ajaxAction([
@@ -249,9 +248,8 @@ class TriggerEventController extends CommonFormController
             if ($closeModal) {
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
-                $response                      = new JsonResponse($passthroughVars);
 
-                return $response;
+                return new JsonResponse($passthroughVars);
             }
 
             return $this->ajaxAction([
@@ -261,9 +259,7 @@ class TriggerEventController extends CommonFormController
             ]);
         }
 
-        $response = new JsonResponse(['success' => 0]);
-
-        return $response;
+        return new JsonResponse(['success' => 0]);
     }
 
     /**
@@ -324,9 +320,7 @@ class TriggerEventController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 
     /**
@@ -388,8 +382,6 @@ class TriggerEventController extends CommonFormController
             $dataArray = ['success' => 0];
         }
 
-        $response = new JsonResponse($dataArray);
-
-        return $response;
+        return new JsonResponse($dataArray);
     }
 }

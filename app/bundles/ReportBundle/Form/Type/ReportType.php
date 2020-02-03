@@ -29,7 +29,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportType extends AbstractType
 {
@@ -38,15 +37,9 @@ class ReportType extends AbstractType
      */
     private $reportModel;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(ReportModel $reportModel, TranslatorInterface $translator)
+    public function __construct(ReportModel $reportModel)
     {
         $this->reportModel = $reportModel;
-        $this->translator  = $translator;
     }
 
     /**

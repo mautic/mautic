@@ -18,7 +18,6 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
@@ -39,11 +38,6 @@ class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
     private $leadRepository;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $eventDispatcher;
-
-    /**
      * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
@@ -53,7 +47,6 @@ class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $this->manager                  = $this->createMock(MembershipManager::class);
         $this->campaignMemberRepository = $this->createMock(LeadRepository::class);
         $this->leadRepository           = $this->createMock(\Mautic\LeadBundle\Entity\LeadRepository::class);
-        $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->translator               = $this->createMock(TranslatorInterface::class);
     }
 
@@ -139,7 +132,6 @@ class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
             $this->manager,
             $this->campaignMemberRepository,
             $this->leadRepository,
-            $this->eventDispatcher,
             $this->translator
         );
     }

@@ -85,9 +85,8 @@ return [
                 ],
             ],
             'mautic.form.type.category_form' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
+                'class'     => \Mautic\CategoryBundle\Form\Type\CategoryType::class,
                 'arguments' => [
-                    'translator',
                     'session',
                 ],
             ],

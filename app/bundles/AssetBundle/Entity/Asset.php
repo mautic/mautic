@@ -655,13 +655,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Set uniqueDownloadCount.
      *
      * @param int $uniqueDownloadCount
@@ -964,9 +957,7 @@ class Asset extends FormEntity
             return '';
         }
 
-        $type = $this->loadFile()->getMimeType();
-
-        return $type;
+        return $this->loadFile()->getMimeType();
     }
 
     /**
@@ -1330,14 +1321,8 @@ class Asset extends FormEntity
 
         switch (strtolower(substr($size, -1))) {
             case 't':
-                $max *= 1024;
-                // no break
             case 'g':
-                $max *= 1024;
-                // no break
             case 'm':
-                $max *= 1024;
-                // no break
             case 'k':
                 $max *= 1024;
         }

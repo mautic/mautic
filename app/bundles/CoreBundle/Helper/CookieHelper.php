@@ -13,21 +13,16 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class CookieHelper.
- */
 class CookieHelper
 {
     const SAME_SITE_NONE = '; samesite=none';
-    private $path        = null;
-    private $domain      = null;
-    private $secure      = false;
-    private $httponly    = false;
-    private $request     = null;
+    private $path;
+    private $domain;
+    private $secure   = false;
+    private $httponly = false;
+    private $request;
 
     /**
-     * CookieHelper constructor.
-     *
      * @param $cookiePath
      * @param $cookieDomain
      * @param $cookieSecure

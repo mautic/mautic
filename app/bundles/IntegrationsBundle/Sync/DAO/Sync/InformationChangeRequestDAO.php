@@ -45,12 +45,12 @@ class InformationChangeRequestDAO
     /**
      * @var \DateTimeInterface|null
      */
-    private $possibleChangeDateTime = null;
+    private $possibleChangeDateTime;
 
     /**
      * @var \DateTimeInterface|null
      */
-    private $certainChangeDateTime = null;
+    private $certainChangeDateTime;
 
     /**
      * @param string $integration

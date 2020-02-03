@@ -729,7 +729,7 @@ class CommonRepository extends EntityRepository
         $columns = $this->getClassMetadata()->getColumnNames();
 
         if ($associations = $this->getClassMetadata()->getAssociationMappings()) {
-            foreach ($associations as $property => $association) {
+            foreach ($associations as $association) {
                 if (!empty($association['joinColumnFieldNames'])) {
                     $columns = array_merge($columns, array_values($association['joinColumnFieldNames']));
                 }
@@ -1078,7 +1078,7 @@ class CommonRepository extends EntityRepository
                 // Find the category prefix
                 $joins     = $q->getDQLPart('join');
                 $catPrefix = false;
-                foreach ($joins as $joinPrefix => $joinStatements) {
+                foreach ($joins as $joinStatements) {
                     /** @var Query\Expr\Join $join */
                     foreach ($joinStatements as $join) {
                         if (false !== strpos($join->getJoin(), '.category')) {
@@ -1694,7 +1694,7 @@ class CommonRepository extends EntityRepository
 
     private function convertOrmPropertiesToColumns(array &$filters, array $properties)
     {
-        foreach ($filters as $k => &$f) {
+        foreach ($filters as &$f) {
             $key   = (isset($f['col'])) ? 'col' : 'column';
             $col   = $f[$key];
             $alias = '';

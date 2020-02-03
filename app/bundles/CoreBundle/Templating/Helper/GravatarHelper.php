@@ -18,9 +18,6 @@ use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Templating\Helper\Helper;
 
-/**
- * Class GravatarHelper.
- */
 class GravatarHelper extends Helper
 {
     /**
@@ -34,16 +31,6 @@ class GravatarHelper extends Helper
     private $devHosts = [];
 
     /**
-     * @var string
-     */
-    private $imageDir;
-
-    /**
-     * @var AssetsHelper
-     */
-    private $assetHelper;
-
-    /**
      * @var AvatarHelper
      */
     private $avatarHelper;
@@ -53,19 +40,14 @@ class GravatarHelper extends Helper
      */
     private $requestStack;
 
-    /**
-     * GravatarHelper constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
-        AssetsHelper $assetHelper,
         AvatarHelper $avatarHelper,
         CoreParametersHelper $coreParametersHelper,
         RequestStack $requestStack
     ) {
         $this->devMode      = MAUTIC_ENV === 'dev';
-        $this->imageDir     = $pathsHelper->getSystemPath('images');
-        $this->assetHelper  = $assetHelper;
+        $pathsHelper->getSystemPath('images');
         $this->avatarHelper = $avatarHelper;
         $this->requestStack = $requestStack;
         $this->devHosts     = (array) $coreParametersHelper->getParameter('dev_hosts');
@@ -99,9 +81,8 @@ class GravatarHelper extends Helper
         }
 
         $default = (false !== strpos($default, '.') && 0 !== strpos($default, 'http')) ? UrlHelper::rel2abs($default) : $default;
-        $url .= '&d='.urlencode($default);
 
-        return $url;
+        return $url.('&d='.urlencode($default));
     }
 
     /**

@@ -137,9 +137,7 @@ return [
         'forms' => [
             'mautic.point.type.form' => [
                 'class'     => \Mautic\PointBundle\Form\Type\PointType::class,
-                'arguments' => [
-                  'translator',
-                  'mautic.security', ],
+                'arguments' => ['mautic.security'],
             ],
             'mautic.point.type.action' => [
                 'class' => \Mautic\PointBundle\Form\Type\PointActionType::class,

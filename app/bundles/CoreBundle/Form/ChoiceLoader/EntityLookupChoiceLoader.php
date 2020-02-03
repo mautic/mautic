@@ -198,7 +198,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     {
         $prepped   = $choices;
         $isGrouped = false;
-        foreach ($prepped as $key => &$choice) {
+        foreach ($prepped as &$choice) {
             if (is_array($choice)) {
                 $isGrouped = true;
                 $choice    = $this->prepareChoices($choice);

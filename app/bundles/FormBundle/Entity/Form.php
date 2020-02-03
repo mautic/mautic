@@ -133,7 +133,7 @@ class Form extends FormEntity
      *
      * @var bool
      */
-    private $usesProgressiveProfiling = null;
+    private $usesProgressiveProfiling;
 
     public function __clone()
     {

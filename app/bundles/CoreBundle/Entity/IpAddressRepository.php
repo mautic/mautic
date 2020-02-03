@@ -101,8 +101,6 @@ SQL;
         $types  = [':limit' => \PDO::PARAM_INT];
         $stmt   = $this->_em->getConnection()->executeQuery($sql, $params, $types);
 
-        $deletedCount = $stmt->rowCount();
-
-        return $deletedCount;
+        return $stmt->rowCount();
     }
 }

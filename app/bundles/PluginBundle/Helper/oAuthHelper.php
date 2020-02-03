@@ -159,9 +159,8 @@ class oAuthHelper
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
-        $r .= implode(', ', $values);
 
-        return $r;
+        return $r.implode(', ', $values);
     }
 
     /**

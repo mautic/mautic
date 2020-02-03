@@ -98,7 +98,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 
         //import actions
         $actions = CsvHelper::csv_to_array(__DIR__.'/fakeactiondata.csv');
-        foreach ($actions as $count => $rows) {
+        foreach ($actions as $rows) {
             $action = new Action();
             foreach ($rows as $col => $val) {
                 if ('NULL' != $val) {

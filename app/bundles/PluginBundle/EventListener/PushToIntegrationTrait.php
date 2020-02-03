@@ -74,7 +74,7 @@ trait PushToIntegrationTrait
          * @var string
          * @var AbstractIntegration $s
          */
-        foreach ($services as $name => $s) {
+        foreach ($services as $s) {
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;

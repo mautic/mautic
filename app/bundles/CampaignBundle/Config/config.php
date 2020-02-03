@@ -228,16 +228,14 @@ return [
                 'arguments' => 'translator',
             ],
         ],
-        'models'       => [
-            'mautic.campaign.model.campaign'  => [
+        'models' => [
+            'mautic.campaign.model.campaign' => [
                 'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.list',
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
-                    'mautic.campaign.helper.removed_contact_tracker',
-                    'mautic.campaign.membership.manager',
                     'mautic.campaign.membership.builder',
                 ],
             ],
@@ -321,7 +319,6 @@ return [
                 'class'     => \Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder::class,
                 'arguments' => [
                     'mautic.lead.repository.lead',
-                    'mautic.campaign.repository.campaign',
                     'mautic.campaign.repository.lead',
                     'monolog.logger.mautic',
                 ],
@@ -544,7 +541,6 @@ return [
                     'mautic.campaign.membership.manager',
                     'mautic.campaign.repository.lead',
                     'mautic.lead.repository.lead',
-                    'event_dispatcher',
                     'translator',
                 ],
             ],

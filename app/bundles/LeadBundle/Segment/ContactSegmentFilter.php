@@ -208,7 +208,7 @@ class ContactSegmentFilter
 
     public function __toString()
     {
-        $debug = sprintf(
+        return sprintf(
             'table: %s,  %s on %s %s %s',
                 $this->getTable(),
             $this->getField(),
@@ -216,8 +216,6 @@ class ContactSegmentFilter
             $this->getOperator(),
             json_encode($this->getParameterValue())
         );
-
-        return $debug;
     }
 
     public function getRelationJoinTable()

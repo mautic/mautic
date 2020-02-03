@@ -76,9 +76,7 @@ class MessageQueueRepository extends CommonRepository
             }
         }
 
-        $results = $q->getQuery()->getResult();
-
-        return $results;
+        return $q->getQuery()->getResult();
     }
 
     /**

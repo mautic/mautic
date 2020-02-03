@@ -48,7 +48,5 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
         } catch (AuthenticationException $e) {
             throw $e;
         }
-
-        throw new HttpException(401);
     }
 }

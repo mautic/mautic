@@ -708,9 +708,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -744,9 +742,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**

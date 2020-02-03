@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
@@ -30,28 +29,14 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
     private $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|CampaignLeadRepository
      */
     private $campaignLeadRepository;
 
     protected function setUp()
     {
-        $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->campaignRepository = $this->getMockBuilder(CampaignRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->campaignLeadRepository = $this->getMockBuilder(CampaignLeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->leadRepository         = $this->createMock(LeadRepository::class);
+        $this->campaignLeadRepository = $this->createMock(CampaignLeadRepository::class);
     }
 
     public function testNoContactsFoundExceptionIsThrown()
@@ -116,7 +101,6 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
     {
         return new InactiveContactFinder(
             $this->leadRepository,
-            $this->campaignRepository,
             $this->campaignLeadRepository,
             new NullLogger()
         );

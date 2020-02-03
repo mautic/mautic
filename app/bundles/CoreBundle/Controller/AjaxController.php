@@ -194,7 +194,7 @@ class AjaxController extends CommonController
         $translator  = $this->get('translator');
         $dataArray   = [];
         $dupChecker  = [];
-        foreach ($allCommands as $header => $commands) {
+        foreach ($allCommands as $commands) {
             //@todo if/when figure out a way for typeahead dynamic headers
             //$header = $translator->trans($header);
             //$dataArray[$header] = array();

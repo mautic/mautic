@@ -122,7 +122,7 @@ class Event implements ChannelInterface
     /**
      * @var Event
      **/
-    private $parent = null;
+    private $parent;
 
     /**
      * @var string

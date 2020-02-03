@@ -101,7 +101,7 @@ trait CustomFieldEntityTrait
     {
         if ($ungroup && isset($this->fields['core'])) {
             $return = [];
-            foreach ($this->fields as $group => $fields) {
+            foreach ($this->fields as $fields) {
                 $return += $fields;
             }
 
@@ -226,7 +226,7 @@ trait CustomFieldEntityTrait
             return $this->fields[$group][$key];
         }
 
-        foreach ($this->fields as $group => $groupFields) {
+        foreach ($this->fields as $groupFields) {
             foreach ($groupFields as $name => $details) {
                 if ($name == $key) {
                     return $details;

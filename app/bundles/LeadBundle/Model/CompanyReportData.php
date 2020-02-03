@@ -54,9 +54,7 @@ class CompanyReportData
             ],
         ]);
 
-        $companyColumns = array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
-
-        return $companyColumns;
+        return array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
     }
 
     /**

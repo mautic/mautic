@@ -32,22 +32,22 @@ final class ContentDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $html = null;
+    private $html;
 
     /**
      * @var string|null
      */
-    private $inlineCss = null;
+    private $inlineCss;
 
     /**
      * @var string|null
      */
-    private $text = null;
+    private $text;
 
     /**
      * @var string|null
      */
-    private $replyTo = null;
+    private $replyTo;
 
     /**
      * @var array

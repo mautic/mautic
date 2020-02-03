@@ -127,7 +127,7 @@ class ReportDAO
     {
         $returnedObjects = [];
         if (null === $objectName) {
-            foreach ($this->objects as $objectName => $objects) {
+            foreach ($this->objects as $objects) {
                 foreach ($objects as $object) {
                     $returnedObjects[] = $object;
                 }

@@ -34,7 +34,7 @@ class StatsEvent extends Event
      *
      * @var array|null
      */
-    protected $select = null;
+    protected $select;
 
     /**
      * The page where to start with.

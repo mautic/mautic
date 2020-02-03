@@ -418,9 +418,7 @@ class StatRepository extends CommonRepository
             $q->andWhere('s.list_id = '.(int) $listId);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -546,9 +544,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $results = $query->execute()->fetchAll();
-
-        return $results;
+        return $query->execute()->fetchAll();
     }
 
     /**
@@ -666,9 +662,7 @@ class StatRepository extends CommonRepository
             ->setParameter(':email', $emailId)
             ->setParameter(':contacts', $contacts);
 
-        $results = $query->execute()->fetch();
-
-        return $results;
+        return $query->execute()->fetch();
     }
 
     /**
