@@ -228,12 +228,10 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
     {
-        $options = [
+        return [
             'updateSelect' => $updateSelect,
             'id'           => $entity->getId(),
             'name'         => $entity->$nameMethod(),
         ];
-
-        return $options;
     }
 }

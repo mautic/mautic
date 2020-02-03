@@ -173,9 +173,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
     public function getAuthLoginUrl()
     {
         $url = parent::getAuthLoginUrl();
-        $url .= '&resource='.urlencode($this->keys['resource']);
 
-        return $url;
+        return $url.('&resource='.urlencode($this->keys['resource']));
     }
 
     /**
@@ -280,7 +279,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($dynamicsObjects) && is_array($dynamicsObjects)) {
-                    foreach ($dynamicsObjects as $key => $dynamicsObject) {
+                    foreach ($dynamicsObjects as $dynamicsObject) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -843,7 +842,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         // update contacts
         $leadData = [];
         $rowNum   = 0;
-        foreach ($leadsToUpdateInD as $email => $lead) {
+        foreach ($leadsToUpdateInD as $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
@@ -880,7 +879,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         // create  contacts
         $leadData = [];
         $rowNum   = 0;
-        foreach ($leadsToCreateInD as $email => $lead) {
+        foreach ($leadsToCreateInD as $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();

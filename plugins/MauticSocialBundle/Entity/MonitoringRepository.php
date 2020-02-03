@@ -14,21 +14,8 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * Class MonitoringRepository.
- */
 class MonitoringRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
-    {
-        return parent::getEntities($args);
-    }
-
     /**
      * @param array $args
      *

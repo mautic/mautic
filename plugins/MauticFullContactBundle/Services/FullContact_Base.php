@@ -30,22 +30,22 @@ class FullContact_Base
     const REQUEST_LATENCY = 0.2;
     const USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
-    private $_next_req_time = null;
+    private $_next_req_time;
 
 //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
     protected $_version     = 'v2';
     protected $_resourceUri = '';
 
-    protected $_apiKey           = null;
-    protected $_webhookUrl       = null;
-    protected $_webhookId        = null;
+    protected $_apiKey;
+    protected $_webhookUrl;
+    protected $_webhookId;
     protected $_webhookJson      = false;
     protected $_supportedMethods = [];
 
-    public $response_obj  = null;
-    public $response_code = null;
-    public $response_json = null;
+    public $response_obj;
+    public $response_code;
+    public $response_json;
 
     /**
      * Slow down calls to the FullContact API if needed.

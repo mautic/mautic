@@ -98,8 +98,6 @@ return [
             'mautic.focus.campaignbundle.subscriber' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.campaign.model.event',
-                    'mautic.focus.model.focus',
                     'mautic.page.helper.tracking',
                     'router',
                 ],

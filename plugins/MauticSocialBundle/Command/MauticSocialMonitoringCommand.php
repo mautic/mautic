@@ -123,9 +123,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
             ];
         }
 
-        $monitorList = $this->monitorRepo->getPublishedEntities($filter);
-
-        return $monitorList;
+        return $this->monitorRepo->getPublishedEntities($filter);
     }
 
     /**

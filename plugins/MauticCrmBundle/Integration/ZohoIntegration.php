@@ -779,7 +779,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($zohoObjects) && is_array($zohoObjects)) {
-                    foreach ($zohoObjects as $key => $zohoObject) {
+                    foreach ($zohoObjects as $zohoObject) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$zohoObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
@@ -1045,7 +1045,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         foreach (['Leads', 'Contacts'] as $zObject) {
             $counter = 1;
             $mapper->setObject($zObject);
-            foreach ($leadsToUpdateInZ as $email => $lead) {
+            foreach ($leadsToUpdateInZ as $lead) {
                 if ($zObject !== $lead['integration_entity']) {
                     continue;
                 }
@@ -1080,7 +1080,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         foreach (['Leads', 'Contacts'] as $zObject) {
             $counter = 1;
             $mapper->setObject($zObject);
-            foreach ($leadsToCreateInZ as $email => $lead) {
+            foreach ($leadsToCreateInZ as $lead) {
                 if ($zObject !== $lead['integration_entity']) {
                     continue;
                 }
@@ -1289,9 +1289,8 @@ class ZohoIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
         $selectColumns   = implode(',', array_keys($availableFields[$object]));
         $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
-        $parsedRecords   = $this->parseZohoRecord($records, array_merge($availableFields[$object], ['LEADID' => ['dv'=>'LEADID']]), $object);
 
-        return $parsedRecords;
+        return $this->parseZohoRecord($records, array_merge($availableFields[$object], ['LEADID' => ['dv'=>'LEADID']]), $object);
     }
 
     /**
@@ -1363,9 +1362,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $fields = array_flip($fieldsToUpdate);
         }
 
-        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
-
-        return $fieldsToUpdate;
+        return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
     /**

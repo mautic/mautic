@@ -716,7 +716,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
-        $mappedData = $this->populateLeadData(
+
+        return $this->populateLeadData(
             $lead,
             [
                 'leadFields'       => $leadFields,
@@ -728,8 +729,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 'communicationItems' => $communicationItems,
             ]
         );
-
-        return $mappedData;
     }
 
     /**
@@ -860,9 +859,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $fields = array_flip($fieldsToUpdate);
         }
 
-        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
-
-        return $fieldsToUpdate;
+        return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
     /**
@@ -1027,7 +1024,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     {
         $recordList = [];
 
-        foreach ($records as $i => $record) {
+        foreach ($records as $record) {
             if ($index && isset($record[$index])) {
                 $record = $record[$index];
             }

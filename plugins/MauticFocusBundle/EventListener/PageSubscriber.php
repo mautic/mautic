@@ -86,7 +86,7 @@ class PageSubscriber implements EventSubscriberInterface
         preg_match_all($regex, $content, $matches);
 
         if (count($matches[0])) {
-            foreach ($matches[1] as $k => $id) {
+            foreach ($matches[1] as $id) {
                 $focus = $this->model->getEntity($id);
                 if (null !== $focus
                     && (
