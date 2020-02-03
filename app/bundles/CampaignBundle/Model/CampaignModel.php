@@ -21,9 +21,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Form\Type\CampaignType;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
-use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Membership\MembershipBuilder;
-use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -58,16 +56,6 @@ class CampaignModel extends CommonFormModel
     private $eventCollector;
 
     /**
-     * @var RemovedContactTracker
-     */
-    private $removedContactTracker;
-
-    /**
-     * @var MembershipManager
-     */
-    private $membershipManager;
-
-    /**
      * @var MembershipBuilder
      */
     private $membershipBuilder;
@@ -77,17 +65,13 @@ class CampaignModel extends CommonFormModel
         ListModel $leadListModel,
         FormModel $formModel,
         EventCollector $eventCollector,
-        RemovedContactTracker $removedContactTracker,
-        MembershipManager $membershipManager,
         MembershipBuilder $membershipBuilder
     ) {
-        $this->leadModel             = $leadModel;
-        $this->leadListModel         = $leadListModel;
-        $this->formModel             = $formModel;
-        $this->eventCollector        = $eventCollector;
-        $this->removedContactTracker = $removedContactTracker;
-        $this->membershipManager     = $membershipManager;
-        $this->membershipBuilder     = $membershipBuilder;
+        $this->leadModel         = $leadModel;
+        $this->leadListModel     = $leadListModel;
+        $this->formModel         = $formModel;
+        $this->eventCollector    = $eventCollector;
+        $this->membershipBuilder = $membershipBuilder;
     }
 
     /**
