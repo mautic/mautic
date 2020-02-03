@@ -22,11 +22,6 @@ class CacheHelper
     private $cacheDir;
 
     /**
-     * @var string
-     */
-    private $rootDir;
-
-    /**
      * @var Session
      */
     private $session;
@@ -36,11 +31,10 @@ class CacheHelper
      */
     private $configFile;
 
-    public function __construct(string $cacheDir, string $rootDir, ?Session $session, PathsHelper $pathsHelper)
+    public function __construct(string $cacheDir, ?Session $session, PathsHelper $pathsHelper)
     {
         $this->cacheDir   = $cacheDir;
         $this->session    = $session;
-        $this->rootDir    = $rootDir;
         $this->configFile = $pathsHelper->getLocalConfigurationFile();
     }
 

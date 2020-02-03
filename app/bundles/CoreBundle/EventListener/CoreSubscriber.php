@@ -98,13 +98,6 @@ class CoreSubscriber implements EventSubscriberInterface
     private $formRepository;
 
     /**
-     * System parameters.
-     *
-     * @var array
-     */
-    private $params;
-
-    /**
      * @var MauticFactory
      */
     private $factory;

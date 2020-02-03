@@ -177,7 +177,6 @@ return [
                 'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.language',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.configbundle.subscriber.theme' => [
@@ -719,7 +718,6 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
                     '%kernel.cache_dir%',
-                    '%kernel.root_dir%',
                     'session',
                     'mautic.helper.paths',
                 ],
