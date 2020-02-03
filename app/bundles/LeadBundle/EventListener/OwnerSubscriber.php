@@ -72,7 +72,7 @@ class OwnerSubscriber implements EventSubscriberInterface
     {
         $event->addToken($this->buildToken('email'), $this->buildLabel('email'));
         $event->addToken($this->buildToken('firstname'), $this->buildLabel('firstname'));
-        $event->addToken($this->buildToken('firstname'), $this->buildLabel('lastname'));
+        $event->addToken($this->buildToken('lastname'), $this->buildLabel('lastname'));
         $event->addToken($this->buildToken('position'), $this->buildLabel('position'));
         $event->addToken($this->buildToken('signature'), $this->buildLabel('signature'));
     }

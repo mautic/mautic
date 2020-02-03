@@ -76,8 +76,8 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $tokens = $event->getTokens();
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
     public function testOnEmailGenerate()
@@ -91,12 +91,12 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
         $tokens = $event->getTokens();
 
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
 
         $this->assertEquals('owner3@owner.com', $tokens['{ownerfield=email}']);
-        $this->assertEquals('John', $tokens['{ownerfield=first_name}']);
-        $this->assertEquals('S&#39;mith', $tokens['{ownerfield=last_name}']);
+        $this->assertEquals('John', $tokens['{ownerfield=firstname}']);
+        $this->assertEquals('S&#39;mith', $tokens['{ownerfield=lastname}']);
     }
 
     public function testOnEmailGenerateWithFakeOwner()
@@ -109,8 +109,8 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $tokens = $event->getTokens();
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
     public function testOnEmailGenerateWithNoOwner()
@@ -123,12 +123,12 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $tokens = $event->getTokens();
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
 
         $this->assertEquals('', $tokens['{ownerfield=email}']);
-        $this->assertEquals('', $tokens['{ownerfield=first_name}']);
-        $this->assertEquals('', $tokens['{ownerfield=last_name}']);
+        $this->assertEquals('', $tokens['{ownerfield=firstname}']);
+        $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
     public function testOnEmailDisplay()
@@ -141,8 +141,8 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $tokens = $event->getTokens();
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
     public function testOnEmailDisplayWithFakeOwner()
@@ -155,8 +155,8 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $tokens = $event->getTokens();
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
 
     public function testOnEmailDisplayWithNoOwner()
@@ -169,12 +169,12 @@ class OwnerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $tokens = $event->getTokens();
         $this->assertArrayHasKey('{ownerfield=email}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=first_name}', $tokens);
-        $this->assertArrayHasKey('{ownerfield=last_name}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
+        $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
 
         $this->assertEquals('', $tokens['{ownerfield=email}']);
-        $this->assertEquals('', $tokens['{ownerfield=first_name}']);
-        $this->assertEquals('', $tokens['{ownerfield=last_name}']);
+        $this->assertEquals('', $tokens['{ownerfield=firstname}']);
+        $this->assertEquals('', $tokens['{ownerfield=lastname}']);
     }
 
     /**
