@@ -48,8 +48,8 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertNull($this->envVars->get('MAUTIC_REQUEST_CONTEXT_HOST'));
         $this->assertNull($this->envVars->get('MAUTIC_REQUEST_CONTEXT_SCHEME'));
         $this->assertNull($this->envVars->get('MAUTIC_REQUEST_CONTEXT_BASE_URL'));
-        $this->assertNull($this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
-        $this->assertNull($this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
+        $this->assertEquals(80, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
+        $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
     public function testContextIsCorrectForRootDomain()
@@ -61,8 +61,8 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals('foobar.com', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HOST'));
         $this->assertEquals('https', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_SCHEME'));
         $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_BASE_URL'));
-        $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
-        $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
+        $this->assertEquals(80, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
+        $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
     public function testContextIsCorrectForCustomHttpPort()
@@ -75,7 +75,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals('http', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_SCHEME'));
         $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_BASE_URL'));
         $this->assertEquals(8080, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
-        $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
+        $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
     public function testContextIsCorrectForCustomHttpsPort()
@@ -87,7 +87,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals('foobar.com', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HOST'));
         $this->assertEquals('https', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_SCHEME'));
         $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_BASE_URL'));
-        $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
+        $this->assertEquals(80, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
         $this->assertEquals(8080, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 
@@ -100,7 +100,7 @@ class SiteUrlEnvVarsTest extends TestCase
         $this->assertEquals('foobar.com', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HOST'));
         $this->assertEquals('https', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_SCHEME'));
         $this->assertEquals('/hello/there', $this->envVars->get('MAUTIC_REQUEST_CONTEXT_BASE_URL'));
-        $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
-        $this->assertEquals(null, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
+        $this->assertEquals(80, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTP_PORT'));
+        $this->assertEquals(443, $this->envVars->get('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT'));
     }
 }
