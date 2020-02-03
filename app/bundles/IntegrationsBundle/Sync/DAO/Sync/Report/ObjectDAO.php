@@ -35,7 +35,7 @@ class ObjectDAO
     /**
      * @var \DateTimeInterface
      */
-    private $changeDateTime = null;
+    private $changeDateTime;
 
     /**
      * @param string $object

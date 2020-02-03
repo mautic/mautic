@@ -23,7 +23,7 @@ class ApiMetadataDriver implements DriverInterface
     /**
      * @var ClassMetadata
      */
-    private $metadata = null;
+    private $metadata;
 
     /**
      * @var PropertyMetadata[]

@@ -16,9 +16,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class Event.
- */
 class Event
 {
     /**
@@ -132,5 +129,25 @@ class Event
         $this->eventType = $eventType;
 
         return $this;
+    }
+
+    /**
+     * @param ArrayCollection $queues
+     *
+     * @return self
+     */
+    public function setQueues($queues)
+    {
+        $this->queues = $queues;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getQueues()
+    {
+        return $this->queues;
     }
 }

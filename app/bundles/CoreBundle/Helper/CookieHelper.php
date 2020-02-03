@@ -18,11 +18,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CookieHelper
 {
-    private $path     = null;
-    private $domain   = null;
+    private $path;
+    private $domain;
     private $secure   = false;
     private $httponly = false;
-    private $request  = null;
+    private $request;
 
     /**
      * CookieHelper constructor.

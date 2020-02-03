@@ -29,7 +29,7 @@ final class AddressDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $headerTo = null;
+    private $headerTo;
 
     /**
      * AddressDTO constructor.

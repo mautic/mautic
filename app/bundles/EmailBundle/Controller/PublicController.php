@@ -758,7 +758,8 @@ class PublicController extends CommonFormController
                 ]
             );
         }
-        $message = str_replace(
+
+        return str_replace(
             [
                 '|URL|',
                 '|EMAIL|',
@@ -769,7 +770,5 @@ class PublicController extends CommonFormController
             ],
             $message
         );
-
-        return $message;
     }
 }

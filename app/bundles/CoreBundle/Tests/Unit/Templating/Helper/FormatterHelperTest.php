@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -20,19 +19,9 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStrictHtmlFormatIsRemovingScriptTags()
     {
-        $appVersion = $this->getMockBuilder(AppVersion::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dateHelper = $this->getMockBuilder(DateHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $helper = new FormatterHelper($appVersion, $dateHelper, $translator);
+        $dateHelper = $this->createMock(DateHelper::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $helper     = new FormatterHelper($dateHelper, $translator);
 
         $sample = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
 
@@ -45,17 +34,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testBooleanFormat()
     {
-        $appVersion = $this->getMockBuilder(AppVersion::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dateHelper = $this->getMockBuilder(DateHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dateHelper = $this->createMock(DateHelper::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $translator->expects($this->at(0))
             ->method('trans')
@@ -66,7 +46,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
             ->with('mautic.core.no')
             ->willReturn('no');
 
-        $helper = new FormatterHelper($appVersion, $dateHelper, $translator);
+        $helper = new FormatterHelper($dateHelper, $translator);
 
         $result = $helper->_(1, 'bool');
         $this->assertEquals('yes', $result);

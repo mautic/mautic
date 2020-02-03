@@ -183,7 +183,6 @@ return [
                 'class'     => FormSubscriber::class,
                 'arguments' => [
                     'mautic.email.model.email',
-                    'mautic.lead.model.lead',
                     'mautic.tracker.contact',
                 ],
             ],
@@ -426,9 +425,6 @@ return [
             ],
             'mautic.transport.momentum.service.swift_message' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Service\SwiftMessageService::class,
-                'arguments' => [
-                    'translator',
-                ],
             ],
             'mautic.transport.momentum.validator.swift_message' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator\SwiftMessageValidator::class,

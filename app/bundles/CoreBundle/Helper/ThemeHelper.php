@@ -132,9 +132,7 @@ class ThemeHelper
             $themeName = $this->defaultTheme;
         }
 
-        $themeHelper = new TemplatingThemeHelper($this->pathsHelper, $themeName);
-
-        return $themeHelper;
+        return new TemplatingThemeHelper($this->pathsHelper, $themeName);
     }
 
     /**

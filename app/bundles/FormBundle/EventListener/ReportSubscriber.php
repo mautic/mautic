@@ -199,7 +199,6 @@ class ReportSubscriber implements EventSubscriberInterface
 
                     $event->setGraph($g, $data);
                     break;
-                    break;
 
                 case 'mautic.form.table.top.referrers':
                     $limit                  = 10;

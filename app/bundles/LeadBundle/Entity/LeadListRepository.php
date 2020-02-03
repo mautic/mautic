@@ -267,9 +267,7 @@ class LeadListRepository extends CommonRepository
             ->andWhere($q->expr()->eq('l.isGlobal', ':true'))
             ->orderBy('l.name');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -288,9 +286,7 @@ class LeadListRepository extends CommonRepository
             ->andWhere($q->expr()->eq('l.isPreferenceCenter', ':true'))
             ->orderBy('l.name');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -335,13 +331,6 @@ class LeadListRepository extends CommonRepository
         }
 
         return ($returnArray) ? $return : $return[$listIds[0]];
-    }
-
-    private function format_period($inputSeconds)
-    {
-        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
-
-        return $now->format('H:i:s.u');
     }
 
     /**
@@ -442,7 +431,7 @@ class LeadListRepository extends CommonRepository
         $groupExpr = $q->expr()->andX();
 
         $defaultObject = $object;
-        foreach ($filters as $k => $details) {
+        foreach ($filters as $details) {
             $object = $defaultObject;
             if (!empty($details['object'])) {
                 $object = $details['object'];

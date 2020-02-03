@@ -57,7 +57,6 @@ return [
             'mautic.dynamicContent.campaignbundle.subscriber' => [
                 'class'     => \Mautic\DynamicContentBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.dynamicContent.model.dynamicContent',
                     'session',
                     'event_dispatcher',

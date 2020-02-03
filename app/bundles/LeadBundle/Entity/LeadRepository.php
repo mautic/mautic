@@ -272,9 +272,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->andWhere('l.id != '.$leadId);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -532,11 +530,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getEntitiesDbalQueryBuilder()
     {
         $alias = $this->getTableAlias();
-        $dq    = $this->getEntityManager()->getConnection()->createQueryBuilder()
+
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'leads', $alias)
             ->leftJoin($alias, MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = '.$alias.'.owner_id');
-
-        return $dq;
     }
 
     /**
@@ -792,7 +789,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $prateek  = explode('+', $string);
                 $imploder = [];
 
-                foreach ($prateek as $key => $value) {
+                foreach ($prateek as $value) {
                     $list       = $this->getEntityManager()->getRepository(LeadList::class)->findOneByAlias($value);
                     $imploder[] = ((!empty($list)) ? (int) $list->getId() : 0);
                 }

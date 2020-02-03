@@ -187,9 +187,7 @@ class WebhookModel extends FormModel
      */
     public function getEventWebooksByType($type)
     {
-        $results = $this->getEventRepository()->getEntitiesByEventType($type);
-
-        return $results;
+        return $this->getEventRepository()->getEntitiesByEventType($type);
     }
 
     /**
@@ -300,7 +298,7 @@ class WebhookModel extends FormModel
             $response = $http->post($webhook->getWebhookUrl(), $payload, $headers, $this->webhookTimeout);
 
             // remove successfully processed queues from the Webhook object so they won't get stored again
-            foreach ($this->webhookQueueIdList as $id => $queue) {
+            foreach ($this->webhookQueueIdList as $queue) {
                 $webhook->removeQueue($queue);
             }
 

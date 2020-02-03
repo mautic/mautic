@@ -104,7 +104,7 @@ class ConfigController extends FormController
                         $unsetIfEmpty = array_merge($unsetIfEmpty, $fileFields);
 
                         // Merge each bundle's updated configuration into the local configuration
-                        foreach ($formValues as $key => $object) {
+                        foreach ($formValues as $object) {
                             $checkThese = array_intersect(array_keys($object), $unsetIfEmpty);
                             foreach ($checkThese as $checkMe) {
                                 if (empty($object[$checkMe])) {

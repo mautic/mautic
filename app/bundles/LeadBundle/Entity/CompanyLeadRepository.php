@@ -66,9 +66,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('companyId', $companyId);
         }
 
-        $result = $q->execute()->fetchAll();
-
-        return $result;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -85,9 +83,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':company'))
             ->setParameter(':company', $companyId);
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -125,9 +121,7 @@ class CompanyLeadRepository extends CommonRepository
             )->setParameter('leadId', $leadId)
             ->setParameter('companyId', $companyId);
 
-        $companies = $qb->execute()->fetchAll();
-
-        return $companies;
+        return $qb->execute()->fetchAll();
     }
 
     /**
@@ -142,9 +136,7 @@ class CompanyLeadRepository extends CommonRepository
                 $qb->expr()->eq('cl.lead', ':lead')
             )->setParameter('lead', $lead);
 
-        $companies = $qb->getQuery()->execute();
-
-        return $companies;
+        return $qb->getQuery()->execute();
     }
 
     /**

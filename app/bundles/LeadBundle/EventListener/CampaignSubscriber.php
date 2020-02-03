@@ -510,12 +510,10 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
     {
-        $result = $this->leadFieldModel->getRepository()->compareDateValue(
+        return $this->leadFieldModel->getRepository()->compareDateValue(
                 $lead->getId(),
                 $event->getConfig()['field'],
                 $triggerDate->format('Y-m-d')
         );
-
-        return $result;
     }
 }

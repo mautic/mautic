@@ -26,7 +26,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class PointType extends AbstractType
 {
@@ -35,15 +34,9 @@ class PointType extends AbstractType
      */
     private $security;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(TranslatorInterface $translator, CorePermissions $security)
+    public function __construct(CorePermissions $security)
     {
-        $this->translator = $translator;
-        $this->security   = $security;
+        $this->security = $security;
     }
 
     /**

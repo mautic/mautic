@@ -203,9 +203,7 @@ class NoteController extends FormController
                 $passthroughVars['noteId'] = $note->getId();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView(
                 [
@@ -291,9 +289,7 @@ class NoteController extends FormController
 
             $passthroughVars['mauticContent'] = 'leadNote';
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView(
                 [
@@ -338,15 +334,13 @@ class NoteController extends FormController
 
         $model->deleteEntity($note);
 
-        $response = new JsonResponse(
+        return new JsonResponse(
             [
                 'deleteId'      => $objectId,
                 'mauticContent' => 'leadNote',
                 'downNoteCount' => 1,
             ]
         );
-
-        return $response;
     }
 
     /**

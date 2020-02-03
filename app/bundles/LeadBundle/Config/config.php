@@ -643,7 +643,7 @@ return [
             ],
             'mautic.company.type.form' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\CompanyType::class,
-                'arguments' => ['doctrine.orm.entity_manager', 'mautic.security', 'router', 'translator'],
+                'arguments' => ['doctrine.orm.entity_manager', 'router', 'translator'],
             ],
             'mautic.company.campaign.action.type.form' => [
                 'class'     => \Mautic\LeadBundle\Form\Type\AddToCompanyActionType::class,

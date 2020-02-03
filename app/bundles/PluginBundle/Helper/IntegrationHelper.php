@@ -631,7 +631,7 @@ class IntegrationHelper
         $keys   = array_keys($fields);
         if (0 !== count(array_intersect($groups, $keys)) && count($keys) <= 4) {
             //fields are group
-            foreach ($fields as $group => $groupFields) {
+            foreach ($fields as $groupFields) {
                 $availableFields = array_keys($groupFields);
                 foreach ($availableFields as $f) {
                     $findMatch($f, $groupFields);

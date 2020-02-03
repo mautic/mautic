@@ -29,7 +29,6 @@ class PushTransifexCommand extends ContainerAwareCommand
 {
     private $transifexFactory;
     private $translator;
-    private $coreParametersHelper;
 
     public function __construct(
         TransifexFactory $transifexFactory,
@@ -38,7 +37,6 @@ class PushTransifexCommand extends ContainerAwareCommand
     ) {
         $this->transifexFactory     = $transifexFactory;
         $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct();
     }

@@ -229,9 +229,7 @@ class LegacyEventDispatcher
                 ->setChannelId($campaignEvent->getChannelId());
         }
 
-        $result = $campaignEvent->getResult();
-
-        return $result;
+        return $campaignEvent->getResult();
     }
 
     /**

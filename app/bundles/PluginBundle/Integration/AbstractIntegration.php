@@ -930,9 +930,7 @@ abstract class AbstractIntegration
         if (!empty($settings['return_raw'])) {
             return $result;
         } else {
-            $response = $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
-
-            return $response;
+            return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
         }
     }
 
@@ -2011,7 +2009,6 @@ abstract class AbstractIntegration
                     $info[$field] = $values;
                     break;
                 case 'object':
-                    $values = $values;
                     foreach ($fieldDetails['fields'] as $f) {
                         if (isset($values->$f)) {
                             $fn = $this->matchFieldName($field, $f);
@@ -2023,8 +2020,7 @@ abstract class AbstractIntegration
                 case 'array_object':
                     $objects = [];
                     if (!empty($values)) {
-                        foreach ($values as $k => $v) {
-                            $v = $v;
+                        foreach ($values as $v) {
                             if (isset($v->value)) {
                                 $objects[] = $v->value;
                             }

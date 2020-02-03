@@ -108,7 +108,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
                 //set max for scales
                 $maxes = [];
-                foreach ($support['data'] as $label => $data) {
+                foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);
@@ -209,7 +209,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
 
                 //set max for scales
                 $maxes = [];
-                foreach ($support['data'] as $label => $data) {
+                foreach ($support['data'] as $data) {
                     $maxes[] = max($data);
                 }
                 $top                   = max($maxes);

@@ -34,7 +34,7 @@ class WidgetTypeListEvent extends CommonEvent
     /**
      * @var CorePermissions
      */
-    protected $security = null;
+    protected $security;
 
     /**
      * Adds a new widget type to the widget types list.

@@ -117,7 +117,7 @@ abstract class AbstractPermissions
             $permissionLevels[$bundle] = [];
             if (isset($permissions[$bundle])) {
                 if ($this->isEnabled()) {
-                    foreach ($permissions[$bundle] as $permId => $details) {
+                    foreach ($permissions[$bundle] as $details) {
                         $permName    = $details['name'];
                         $permBitwise = $details['bitwise'];
                         //ensure the permission still exists

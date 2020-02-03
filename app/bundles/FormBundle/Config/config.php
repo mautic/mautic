@@ -266,7 +266,6 @@ return [
             'mautic.form.type.form' => [
                 'class'     => FormType::class,
                 'arguments' => [
-                    'translator',
                     'mautic.security',
                 ],
             ],

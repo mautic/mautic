@@ -130,14 +130,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      *
      * @var int
      */
-    private $firstResult = null;
+    private $firstResult;
 
     /**
      * The maximum number of results to retrieve.
      *
      * @var int
      */
-    private $maxResults = null;
+    private $maxResults;
 
     /**
      * The counter of bound parameters used with {@see bindValue).
@@ -507,7 +507,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
         $selects = is_array($select) ? $select : func_get_args();
 
-        return $this->add('select', $selects, false);
+        return $this->add('select', $selects);
     }
 
     /**
@@ -906,7 +906,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
 
         $groupBy = is_array($groupBy) ? $groupBy : func_get_args();
 
-        return $this->add('groupBy', $groupBy, false);
+        return $this->add('groupBy', $groupBy);
     }
 
     /**
@@ -1059,7 +1059,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      */
     public function orderBy($sort, $order = null)
     {
-        return $this->add('orderBy', $sort.' '.(!$order ? 'ASC' : $order), false);
+        return $this->add('orderBy', $sort.' '.(!$order ? 'ASC' : $order));
     }
 
     /**
@@ -1158,9 +1158,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $query = 'SELECT '.implode(', ', $this->sqlParts['select']);
 
         $query .= ($this->sqlParts['from'] ? ' FROM '.implode(', ', $this->getFromClauses()) : '')
-            .(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '')
+            .(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '')
             .($this->sqlParts['groupBy'] ? ' GROUP BY '.implode(', ', $this->sqlParts['groupBy']) : '')
-            .(null !== $this->sqlParts['having'] ? ' HAVING '.((string) $this->sqlParts['having']) : '')
+            .(null !== $this->sqlParts['having'] ? ' HAVING '.($this->sqlParts['having']) : '')
             .($this->sqlParts['orderBy'] ? ' ORDER BY '.implode(', ', $this->sqlParts['orderBy']) : '');
 
         if ($this->isLimitQuery()) {
@@ -1244,11 +1244,10 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private function getSQLForUpdate()
     {
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
-        $query = 'UPDATE '.$table
-            .' SET '.implode(', ', $this->sqlParts['set'])
-            .(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '');
 
-        return $query;
+        return 'UPDATE '.$table
+            .' SET '.implode(', ', $this->sqlParts['set'])
+            .(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
     }
 
     /**
@@ -1259,9 +1258,8 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private function getSQLForDelete()
     {
         $table = $this->sqlParts['from']['table'].($this->sqlParts['from']['alias'] ? ' '.$this->sqlParts['from']['alias'] : '');
-        $query = 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.((string) $this->sqlParts['where']) : '');
 
-        return $query;
+        return 'DELETE FROM '.$table.(null !== $this->sqlParts['where'] ? ' WHERE '.($this->sqlParts['where']) : '');
     }
 
     /**
@@ -1363,7 +1361,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
                 }
                 $sql .= ' '.strtoupper($join['joinType'])
                     .' JOIN '.$join['joinTable'].' '.$join['joinAlias']
-                    .' ON '.((string) $join['joinCondition']);
+                    .' ON '.($join['joinCondition']);
                 $knownAliases[$join['joinAlias']] = true;
             }
 

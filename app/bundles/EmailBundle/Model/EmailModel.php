@@ -1161,7 +1161,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $variantWeight = 0;
                     $totalSent     = $emailSettings[$email->getId()]['variantCount'];
 
-                    foreach ($childrenVariant as $id => $child) {
+                    foreach ($childrenVariant as $child) {
                         if ($child->isPublished()) {
                             $useSlots = [];
                             if ($template = $child->getTemplate()) {
@@ -1226,12 +1226,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             //now find what percentage of current leads should receive the variants
             if (!isset($totalSent)) {
                 $totalSent = 0;
-                foreach ($this->emailSettings[$email->getId()] as $eid => $details) {
+                foreach ($this->emailSettings[$email->getId()] as $details) {
                     $totalSent += $details['variantCount'];
                 }
             }
 
-            foreach ($this->emailSettings[$email->getId()] as $eid => &$details) {
+            foreach ($this->emailSettings[$email->getId()] as &$details) {
                 // Determine the deficit for email ordering
                 if ($totalSent) {
                     $details['weight_deficit'] = $details['weight'] - ($details['variantCount'] / $totalSent);
@@ -2077,9 +2077,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chartQuery->applyDateFilters($q, 'date_read');
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -2110,9 +2108,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -2128,15 +2124,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
         $leadEventLogRepository->setCurrentUser($this->userHelper->getUser());
-        $upcomingEmails = $leadEventLogRepository->getUpcomingEvents(
+
+        return $leadEventLogRepository->getUpcomingEvents(
             [
                 'type'          => 'email.send',
                 'limit'         => $limit,
                 'canViewOthers' => $canViewOthers,
             ]
         );
-
-        return $upcomingEmails;
     }
 
     /**

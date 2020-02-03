@@ -11,21 +11,11 @@
 namespace Mautic\SmsBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\Compiler\RepeatablePassInterface;
-use Symfony\Component\DependencyInjection\Compiler\RepeatedPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Class SmsTransportPass.
- */
-class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
+class SmsTransportPass implements CompilerPassInterface
 {
-    /**
-     * @var RepeatedPass
-     */
-    private $repeatedPass;
-
     public function process(ContainerBuilder $container)
     {
         if (!$container->has('mautic.sms.transport_chain')) {
@@ -42,10 +32,5 @@ class SmsTransportPass implements CompilerPassInterface, RepeatablePassInterface
                 !empty($tags[0]['integrationAlias']) ? $tags[0]['integrationAlias'] : $id,
             ]);
         }
-    }
-
-    public function setRepeatedPass(RepeatedPass $repeatedPass)
-    {
-        $this->repeatedPass = $repeatedPass;
     }
 }

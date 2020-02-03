@@ -101,10 +101,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.user' => [
-                'class'     => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
-                'arguments' => [
-                    'session',
-                ],
+                'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
                     'priority' => 2,

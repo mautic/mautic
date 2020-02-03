@@ -139,9 +139,7 @@ class DashboardController extends AbstractFormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [
@@ -203,9 +201,7 @@ class DashboardController extends AbstractFormController
                 $passthroughVars['widgetHeight'] = $widget->getHeight();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView([
                 'viewParameters' => [

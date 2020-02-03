@@ -13,7 +13,6 @@ namespace Mautic\SmsBundle\Sms;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Api\AbstractSmsApi;
-use Monolog\Logger;
 
 class TransportChain
 {
@@ -33,23 +32,13 @@ class TransportChain
     private $integrationHelper;
 
     /**
-     * @var Logger
+     * @param string $primaryTransport
      */
-    private $logger;
-
-    /**
-     * TransportChain constructor.
-     *
-     * @param $primaryTransport
-     * @param $integrationHelper
-     * @param $logger
-     */
-    public function __construct($primaryTransport, IntegrationHelper $integrationHelper, Logger $logger)
+    public function __construct($primaryTransport, IntegrationHelper $integrationHelper)
     {
         $this->primaryTransport  = $primaryTransport;
         $this->transports        = [];
         $this->integrationHelper = $integrationHelper;
-        $this->logger            = $logger;
     }
 
     /**
@@ -100,9 +89,7 @@ class TransportChain
      */
     public function sendSms(Lead $lead, $content)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content);
-
-        return $response;
+        return $this->getPrimaryTransport()->sendSms($lead, $content);
     }
 
     /**

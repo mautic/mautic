@@ -135,9 +135,7 @@ class CategoryModel extends FormModel
             return new Category();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**

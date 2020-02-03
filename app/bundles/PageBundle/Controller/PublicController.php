@@ -165,7 +165,7 @@ class PublicController extends CommonFormController
                             $totalHits += $variants[$id]['hits'];
 
                             //determine variant to show
-                            foreach ($variants as $id => &$variant) {
+                            foreach ($variants as &$variant) {
                                 $variant['weight_deficit'] = ($totalHits) ? $variant['weight'] - ($variant['hits'] / $totalHits) : $variant['weight'];
                             }
 
@@ -428,7 +428,7 @@ class PublicController extends CommonFormController
         $redirectModel = $this->getModel('page.redirect');
         $redirect      = $redirectModel->getRedirectById($redirectId);
 
-        $logger->debug('Executing Redirect: '.(string) $redirect);
+        $logger->debug('Executing Redirect: '.$redirect);
 
         if (null === $redirect || !$redirect->isPublished(false)) {
             $logger->debug('Redirect with tracking_id of '.$redirectId.' not found');
@@ -481,48 +481,6 @@ class PublicController extends CommonFormController
         }
 
         return $this->redirect($url);
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private function replaceAssetTokenUrl($url)
-    {
-        if ($this->urlIsToken($url)) {
-            $tokens = $this->get('mautic.asset.helper.token')->findAssetTokens($url);
-
-            return isset($tokens[$url]) ? $tokens[$url] : $url;
-        }
-
-        return $url;
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
-    private function replacePageTokenUrl($url)
-    {
-        if ($this->urlIsToken($url)) {
-            $tokens = $this->get('mautic.page.helper.token')->findPageTokens($url);
-
-            return isset($tokens[$url]) ? $tokens[$url] : $url;
-        }
-
-        return $url;
-    }
-
-    /**
-     * @param string $url
-     *
-     * @return bool
-     */
-    private function urlIsToken($url)
-    {
-        return '{' === substr($url, 0, 1);
     }
 
     /**

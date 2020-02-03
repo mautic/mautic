@@ -12,7 +12,6 @@
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -26,11 +25,6 @@ class InactiveContactFinder
      * @var LeadRepository
      */
     private $leadRepository;
-
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
 
     /**
      * @var CampaignLeadRepository
@@ -47,17 +41,12 @@ class InactiveContactFinder
      */
     private $campaignMemberDatesAdded;
 
-    /**
-     * InactiveContactFinder constructor.
-     */
     public function __construct(
         LeadRepository $leadRepository,
-        CampaignRepository $campaignRepository,
         CampaignLeadRepository $campaignLeadRepository,
         LoggerInterface $logger
     ) {
         $this->leadRepository         = $leadRepository;
-        $this->campaignRepository     = $campaignRepository;
         $this->campaignLeadRepository = $campaignLeadRepository;
         $this->logger                 = $logger;
     }

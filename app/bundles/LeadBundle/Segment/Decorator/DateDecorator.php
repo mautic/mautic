@@ -18,18 +18,12 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 
 class DateDecorator extends CustomMappedDecorator
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
         ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
         CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**

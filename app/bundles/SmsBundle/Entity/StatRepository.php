@@ -167,9 +167,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $stats = $query->getQuery()->getArrayResult();
-
-        return $stats;
+        return $query->getQuery()->getArrayResult();
     }
 
     /**

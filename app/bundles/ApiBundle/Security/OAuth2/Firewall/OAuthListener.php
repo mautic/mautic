@@ -18,11 +18,4 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
  */
 class OAuthListener extends \FOS\OAuthServerBundle\Security\Firewall\OAuthListener
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(GetResponseEvent $event)
-    {
-        parent::handle($event);
-    }
 }

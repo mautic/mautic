@@ -49,22 +49,7 @@ class SendEmailToContact
     /**
      * @var string|null
      */
-    private $singleEmailMode = null;
-
-    /**
-     * @var Stat[]
-     */
-    private $statEntities = [];
-
-    /**
-     * @var Stat[]
-     */
-    private $saveEntities = [];
-
-    /**
-     * @var Stat[]
-     */
-    private $deleteEntities = [];
+    private $singleEmailMode;
 
     /**
      * @var array
@@ -259,9 +244,9 @@ class SendEmailToContact
      */
     public function reset()
     {
-        $this->saveEntities      = [];
-        $this->deleteEntities    = [];
-        $this->statEntities      = [];
+        [];
+        [];
+        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];

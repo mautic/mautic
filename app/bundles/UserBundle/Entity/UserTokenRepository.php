@@ -73,12 +73,10 @@ final class UserTokenRepository extends CommonRepository implements UserTokenRep
             $qb->delete(UserToken::class, 'ut');
         }
 
-        $resultCount = (int) $qb
+        return (int) $qb
             ->where('ut.expiration <= :current_datetime')
             ->setParameter(':current_datetime', new \DateTime())
             ->getQuery()
             ->execute();
-
-        return $resultCount;
     }
 }

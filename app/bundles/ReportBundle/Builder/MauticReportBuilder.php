@@ -379,13 +379,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $case = 'CASE';
 
-        foreach ($channelData as $channel => $data) {
+        foreach ($channelData as $data) {
             $case .= ' WHEN '.$data['column'].' IS NOT NULL THEN '.$data['column'];
         }
 
-        $case .= ' ELSE NULL END ';
-
-        return $case;
+        return $case.' ELSE NULL END ';
     }
 
     /**

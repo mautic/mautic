@@ -261,7 +261,7 @@ class LeadModel extends FormModel
             $repo->setAvailableSocialFields($socialFields);
 
             $searchFields = [];
-            foreach ($fields as $group => $groupFields) {
+            foreach ($fields as $groupFields) {
                 $searchFields = array_merge($searchFields, array_keys($groupFields));
             }
             $repo->setAvailableSearchFields($searchFields);
@@ -646,12 +646,12 @@ class LeadModel extends FormModel
             $form->submit($data);
 
             if ($form->getErrors()->count()) {
-                $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
+                $this->logger->addDebug('LEAD: form validation failed with an error of '.$form->getErrors());
             }
             foreach ($form as $field => $formField) {
                 if (isset($data[$field])) {
                     if ($formField->getErrors()->count()) {
-                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
+                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.$formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
                     } else {
@@ -662,7 +662,7 @@ class LeadModel extends FormModel
         }
 
         //update existing values
-        foreach ($fieldValues as $group => &$groupFields) {
+        foreach ($fieldValues as &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
                 if (!isset($field['value'])) {
                     $field['value'] = null;
@@ -755,9 +755,7 @@ class LeadModel extends FormModel
      */
     public function getOwnerList()
     {
-        $results = $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
-
-        return $results;
+        return $this->em->getRepository('MauticUserBundle:User')->getUserList('', 0);
     }
 
     /**
@@ -879,7 +877,7 @@ class LeadModel extends FormModel
     public function flattenFields($fields)
     {
         $flat = [];
-        foreach ($fields as $group => $fields) {
+        foreach ($fields as $fields) {
             foreach ($fields as $field) {
                 $flat[$field['alias']] = $field['value'];
             }
@@ -1448,7 +1446,7 @@ class LeadModel extends FormModel
                 if ($doNotEmail) {
                     $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
                 } else {
-                    $this->removeDncForLead($lead, 'email', true);
+                    $this->removeDncForLead($lead, 'email');
                 }
             }
         }
@@ -1583,7 +1581,7 @@ class LeadModel extends FormModel
         $currentTags  = $lead->getTags();
         $leadModified = $tagsDeleted = false;
 
-        foreach ($currentTags as $tagName => $tag) {
+        foreach ($currentTags as $tag) {
             if (!in_array($tag->getId(), $tags)) {
                 // Tag has been removed
                 $lead->removeTag($tag);
@@ -1824,7 +1822,7 @@ class LeadModel extends FormModel
         // See which companies belong to the lead already
         $leadCompanies = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
 
-        foreach ($leadCompanies as $key => $leadCompany) {
+        foreach ($leadCompanies as $leadCompany) {
             if (false === array_search($leadCompany['company_id'], $companies)) {
                 $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
             }
@@ -2032,9 +2030,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -2062,9 +2058,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**

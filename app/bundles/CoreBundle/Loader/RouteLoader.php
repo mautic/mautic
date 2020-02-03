@@ -24,15 +24,9 @@ use Symfony\Component\Routing\RouteCollection;
 class RouteLoader extends Loader
 {
     /**
-     * @var bool
-     */
-    private $loaded = false;
-
-    /**
      * @var EventDispatcherInterface
      */
     private $dispatcher;
-
     /**
      * @var CoreParametersHelper
      */
@@ -117,8 +111,6 @@ class RouteLoader extends Loader
         }
 
         $collection->addCollection($lastCollection);
-
-        $this->loaded = true;
 
         return $collection;
     }
