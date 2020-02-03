@@ -38,10 +38,7 @@ class SiteUrlEnvVars implements EnvVarsInterface
 
         // Path
         if (!empty($parts['path'])) {
-            $path = $parts['path'];
-
-            // remove index.php and index_dev.php from the path in case it was saved to config in 2.x
-            $path = str_replace(['index_dev.php', 'index.php'], '', $path);
+            $path = str_replace(['index_dev.php', 'index.php'], '', $parts['path']);
 
             // Check and remove trailing slash to prevent double // in Symfony cli generated URLs
             if ('/' == substr($path, -1)) {
@@ -63,7 +60,7 @@ class SiteUrlEnvVars implements EnvVarsInterface
         $envVars->set('MAUTIC_REQUEST_CONTEXT_HOST', null);
         $envVars->set('MAUTIC_REQUEST_CONTEXT_SCHEME', null);
         $envVars->set('MAUTIC_REQUEST_CONTEXT_BASE_URL', null);
-        $envVars->set('MAUTIC_REQUEST_CONTEXT_HTTP_PORT', null);
-        $envVars->set('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT', null);
+        $envVars->set('MAUTIC_REQUEST_CONTEXT_HTTP_PORT', 80);
+        $envVars->set('MAUTIC_REQUEST_CONTEXT_HTTPS_PORT', 443);
     }
 }

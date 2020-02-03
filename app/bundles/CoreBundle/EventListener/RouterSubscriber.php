@@ -60,8 +60,8 @@ class RouterSubscriber implements EventSubscriberInterface
         $this->router    = $router;
         $this->scheme    = $scheme;
         $this->host      = $host;
-        $this->httpsPort = $httpsPort;
-        $this->httpPort  = $httpPort;
+        $this->httpsPort = $httpsPort ?? 443;
+        $this->httpPort  = $httpPort ?? 80;
         $this->baseUrl   = $baseUrl;
     }
 
@@ -91,7 +91,14 @@ class RouterSubscriber implements EventSubscriberInterface
         }
 
         $originalContext = $this->router->getContext();
-        if ($originalContext->getBaseUrl() && !$this->baseUrl) {
+
+        // Remove index_dev.php, index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
+        $originalBaseUrl = str_replace(['index_dev.php', 'index.php'], '', $originalContext->getBaseUrl());
+        if ('/' == substr($originalBaseUrl, -1)) {
+            $originalBaseUrl = substr($originalBaseUrl, 0, -1);
+        }
+
+        if ($originalBaseUrl && !$this->baseUrl) {
             // Likely in installation where the request parameters passed into this listener are not set yet so just use the original context
             return;
         }
