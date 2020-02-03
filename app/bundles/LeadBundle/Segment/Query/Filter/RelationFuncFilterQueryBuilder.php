@@ -143,7 +143,7 @@ class RelationFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 if (!isset($subQueryBuilder)) {
                     $subQueryBuilder = $queryBuilder->getConnection()->createQueryBuilder();
                     $subQueryBuilder
-                        ->select(null)->from($filter->getTable(), $tableAlias)
+                        ->select('NULL')->from($filter->getTable(), $tableAlias)
                         ->andWhere($tableAlias.'.lead_id = l.id');
                 }
                 $subQueryBuilder
