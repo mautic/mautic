@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -660,6 +661,9 @@ class CampaignController extends AbstractStandardFormController
      */
     protected function getViewArguments(array $args, $action)
     {
+        /** @var EventCollector $eventCollector */
+        $eventCollector = $this->get('mautic.campaign.event_collector');
+
         switch ($action) {
             case 'index':
                 $args['viewParameters']['filters'] = $this->listFilters;
@@ -733,8 +737,6 @@ class CampaignController extends AbstractStandardFormController
                     ['campaign_id' => $objectId]
                 );
 
-                $session = $this->get('session');
-
                 $campaignSources = $this->getCampaignModel()->getSourceLists();
 
                 $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
@@ -746,7 +748,7 @@ class CampaignController extends AbstractStandardFormController
                         'campaign'        => $entity,
                         'stats'           => $stats,
                         'events'          => $sortedEvents,
-                        'eventSettings'   => $this->getCampaignModel()->getEvents(),
+                        'eventSettings'   => $eventCollector->getEvents(),
                         'sources'         => $this->getCampaignModel()->getLeadSources($entity),
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
@@ -768,7 +770,7 @@ class CampaignController extends AbstractStandardFormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'eventSettings'   => $this->getCampaignModel()->getEvents(),
+                        'eventSettings'   => $eventCollector->getEvents(),
                         'campaignEvents'  => $this->campaignEvents,
                         'campaignSources' => $this->campaignSources,
                         'deletedEvents'   => $this->deletedEvents,

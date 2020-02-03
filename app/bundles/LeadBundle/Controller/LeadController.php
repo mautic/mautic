@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
@@ -1511,15 +1512,18 @@ class LeadController extends FormController
                     ]
                 );
 
+                /** @var \Mautic\CampaignBundle\Membership\MembershipManager $membershipManager */
+                $membershipManager = $this->get('mautic.campaign.membership.manager');
+
                 if (!empty($add)) {
                     foreach ($add as $cid) {
-                        $campaignModel->addLeads($campaigns[$cid], $entities, true);
+                        $membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid], true);
                     }
                 }
 
                 if (!empty($remove)) {
                     foreach ($remove as $cid) {
-                        $campaignModel->removeLeads($campaigns[$cid], $entities, true);
+                        $membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid], true);
                     }
                 }
             }

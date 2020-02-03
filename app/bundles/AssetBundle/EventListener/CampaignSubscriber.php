@@ -17,19 +17,19 @@ use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    private $campaignEventModel;
+    private $realTimeExecutioner;
 
-    public function __construct(EventModel $campaignEventModel)
+    public function __construct(RealTimeExecutioner $realTimeExecutioner)
     {
-        $this->campaignEventModel = $campaignEventModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**
@@ -66,7 +66,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $asset = $event->getRecord()->getAsset();
 
         if (null !== $asset) {
-            $this->campaignEventModel->triggerEvent('asset.download', $asset, 'asset', $asset->getId());
+            $this->realTimeExecutioner->execute('asset.download', $asset, 'asset', $asset->getId());
         }
     }
 

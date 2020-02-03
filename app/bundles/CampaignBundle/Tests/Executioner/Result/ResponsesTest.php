@@ -90,14 +90,6 @@ class ResponsesTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals(
-            [
-                'action'    => $actions,
-                'condition' => $conditions,
-            ],
-            $responses->getResponseArray()
-        );
-
         $this->assertEquals($actions, $responses->getActionResponses());
         $this->assertEquals($conditions, $responses->getConditionResponses());
     }

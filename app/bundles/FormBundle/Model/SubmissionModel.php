@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\ORMException;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -54,9 +55,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * Class SubmissionModel.
- */
 class SubmissionModel extends CommonFormModel
 {
     /**
@@ -88,6 +86,11 @@ class SubmissionModel extends CommonFormModel
      * @var CampaignModel
      */
     protected $campaignModel;
+
+    /**
+     * @var MembershipManager
+     */
+    protected $membershipManager;
 
     /**
      * @var LeadFieldModel
@@ -136,6 +139,7 @@ class SubmissionModel extends CommonFormModel
         PageModel $pageModel,
         LeadModel $leadModel,
         CampaignModel $campaignModel,
+        MembershipManager $membershipManager,
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
@@ -151,6 +155,7 @@ class SubmissionModel extends CommonFormModel
         $this->pageModel              = $pageModel;
         $this->leadModel              = $leadModel;
         $this->campaignModel          = $campaignModel;
+        $this->membershipManager      = $membershipManager;
         $this->leadFieldModel         = $leadFieldModel;
         $this->companyModel           = $companyModel;
         $this->fieldHelper            = $fieldHelper;
@@ -424,7 +429,7 @@ class SubmissionModel extends CommonFormModel
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {
                 foreach ($campaigns as $campaign) {
-                    $this->campaignModel->addLead($campaign, $lead);
+                    $this->membershipManager->addContact($lead, $campaign);
                 }
             }
         }

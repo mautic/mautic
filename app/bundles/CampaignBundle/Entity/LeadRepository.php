@@ -17,9 +17,6 @@ use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-/**
- * LeadRepository.
- */
 class LeadRepository extends CommonRepository
 {
     use ContactLimiterTrait;
@@ -58,26 +55,6 @@ class LeadRepository extends CommonRepository
         }
 
         return $return;
-    }
-
-    /**
-     * Get leads for a specific campaign.
-     *
-     * @deprecated  2.1.0; Use MauticLeadBundle\Entity\LeadRepository\getEntityContacts() instead
-     *
-     * @param $args
-     *
-     * @return array
-     */
-    public function getLeadsWithFields($args)
-    {
-        return $this->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityContacts(
-            $args,
-            'campaign_leads',
-            isset($args['campaign_id']) ? $args['campaign_id'] : 0,
-            ['manually_removed' => 0],
-            'campaign_id'
-        );
     }
 
     /**

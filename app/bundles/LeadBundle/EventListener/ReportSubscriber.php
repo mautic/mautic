@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -67,6 +68,11 @@ class ReportSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
+     * @var EventCollector
+     */
+    private $eventCollector;
+
+    /**
      * @var CompanyModel
      */
     private $companyModel;
@@ -100,6 +106,7 @@ class ReportSubscriber implements EventSubscriberInterface
         LeadModel $leadModel,
         StageModel $stageModel,
         CampaignModel $campaignModel,
+        EventCollector $eventCollector,
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
         FieldsBuilder $fieldsBuilder,
@@ -108,6 +115,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
         $this->campaignModel     = $campaignModel;
+        $this->eventCollector    = $eventCollector;
         $this->companyModel      = $companyModel;
         $this->companyReportData = $companyReportData;
         $this->fieldsBuilder     = $fieldsBuilder;
@@ -782,7 +790,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $filters = array_merge($filters, $event->getCategoryColumns('cat.'), $attributionColumns);
 
         // Setup available channels
-        $availableChannels = $this->campaignModel->getEvents();
+        $availableChannels = $this->eventCollector->getEvents();
         $channels          = [];
         $channelActions    = [];
         foreach ($availableChannels['decision'] as $channel => $decision) {

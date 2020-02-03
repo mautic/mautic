@@ -11,12 +11,15 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
+use Mautic\CampaignBundle\EventCollector\EventCollector;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -32,6 +35,16 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var MembershipManager
+     */
+    private $membershipManager;
+
+    /**
+     * @var EventCollector
+     */
+    private $eventCollector;
+
     /**
      * @var CampaignModel
      */
@@ -78,6 +91,8 @@ class LeadSubscriber implements EventSubscriberInterface
     private $contactRepository;
 
     public function __construct(
+        MembershipManager $membershipManager,
+        EventCollector $eventCollector,
         CampaignModel $campaignModel,
         LeadModel $leadModel,
         TranslatorInterface $translator,
@@ -85,6 +100,8 @@ class LeadSubscriber implements EventSubscriberInterface
         RouterInterface $router,
         CorePermissions $security
     ) {
+        $this->membershipManager         = $membershipManager;
+        $this->eventCollector            = $eventCollector;
         $this->campaignModel             = $campaignModel;
         $this->leadModel                 = $leadModel;
         $this->translator                = $translator;
@@ -137,7 +154,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
 
                 if ('added' == $action) {
-                    $this->campaignModel->addLeads($campaignReferences[$c['id']], $leads, false, true);
+                    $this->membershipManager->addContacts(new ArrayCollection($leads), $campaignReferences[$c['id']], false);
                 } else {
                     if (!isset($campaignLists[$c['id']])) {
                         $campaignLists[$c['id']] = [];
@@ -156,7 +173,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         }
                     }
 
-                    $this->campaignModel->removeLeads($campaignReferences[$c['id']], $removeLeads, false, true);
+                    $this->membershipManager->removeContacts(new ArrayCollection($removeLeads), $campaignReferences[$c['id']], false);
                 }
             }
         }
@@ -200,13 +217,13 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
 
                 if ('added' == $action) {
-                    $this->campaignModel->addLead($campaign, $lead);
+                    $this->membershipManager->addContact($lead, $campaign);
                 } else {
                     if (array_intersect($leadListIds, $campaignLists[$c['id']])) {
                         continue;
                     }
 
-                    $this->campaignModel->removeLead($campaign, $lead);
+                    $this->membershipManager->removeContact($lead, $campaign);
                 }
 
                 unset($campaign);
@@ -249,7 +266,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
         $logs                      = $this->contactEventLogRepository->getLeadLogs($event->getLeadId(), $options);
-        $eventSettings             = $this->campaignModel->getEvents();
+        $eventSettings             = $this->eventCollector->getEvents();
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $logs);

@@ -367,6 +367,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
                     'mautic.campaign.model.campaign',
+                    'mautic.campaign.event_collector',
                     'mautic.lead.model.company',
                     'mautic.lead.model.company_report_data',
                     'mautic.lead.reportbundle.fields_builder',
