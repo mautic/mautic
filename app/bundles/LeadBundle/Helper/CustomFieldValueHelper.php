@@ -91,7 +91,7 @@ class CustomFieldValueHelper
      */
     private static function setValueFromPropertiesList(array $properties, $value)
     {
-        if (isset($properties['list'])) {
+        if (isset($properties['list']) && is_array($properties['list'])) {
             foreach ($properties['list'] as $property) {
                 if ($property['value'] == $value) {
                     $value = $property['label'];
