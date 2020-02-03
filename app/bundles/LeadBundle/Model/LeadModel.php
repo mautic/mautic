@@ -856,7 +856,7 @@ class LeadModel extends FormModel
                     $array[$group][$alias]['label']       = $field['label'];
                     $array[$group][$alias]['alias']       = $alias;
                     $array[$group][$alias]['type']        = $field['type'];
-                    $array[$group][$alias]['properties']  = $field['properties'];
+                    $array[$group][$alias]['properties']  = $field['properties'] ?? [];
                 }
             }
         }
