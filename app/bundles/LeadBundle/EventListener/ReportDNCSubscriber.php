@@ -158,7 +158,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         $data = $event->getData();
 
         if (isset($data[0]['reason']) || isset($data[0]['channel']) || isset($data[0]['channel_id'])) {
-            foreach ($data as $key => &$row) {
+            foreach ($data as &$row) {
                 if (isset($row['reason'])) {
                     $row['reason'] = $this->getDncReasonLabel($row['reason']);
                 }

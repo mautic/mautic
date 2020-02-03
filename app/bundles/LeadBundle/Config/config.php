@@ -779,7 +779,6 @@ return [
             'mautic.lead.segment.stat.dependencies' => [
                 'class'     => \Mautic\LeadBundle\Segment\Stat\SegmentDependencies::class,
                 'arguments' => [
-                    '@doctrine.orm.entity_manager',
                     'mautic.email.model.email',
                     'mautic.campaign.model.campaign',
                     'mautic.form.model.action',

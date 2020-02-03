@@ -119,7 +119,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
