@@ -271,7 +271,7 @@ $container->loadFromExtension('doctrine_migrations', [
 ]);
 
 // Swiftmailer Configuration
-$mailerSettings = [
+$container->loadFromExtension('swiftmailer', [
     'transport'  => '%mautic.mailer_transport%',
     'host'       => '%mautic.mailer_host%',
     'port'       => '%mautic.mailer_port%',
@@ -283,9 +283,7 @@ $mailerSettings = [
         'type' => 'service',
         'id'   => 'mautic.transport.spool',
     ],
-];
-
-$container->loadFromExtension('swiftmailer', $mailerSettings);
+]);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
