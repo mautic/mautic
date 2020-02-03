@@ -74,6 +74,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         $event->addToken($this->buildToken('first_name'), $this->buildLabel('firstname'));
         $event->addToken($this->buildToken('last_name'), $this->buildLabel('lastname'));
         $event->addToken($this->buildToken('position'), $this->buildLabel('position'));
+        $event->addToken($this->buildToken('signature'), $this->buildLabel('signature'));
     }
 
     /**
@@ -122,10 +123,11 @@ class OwnerSubscriber implements EventSubscriberInterface
         }
 
         return [
-            $this->buildToken('email')      => ArrayHelper::getValue('email', $owner),
-            $this->buildToken('first_name') => ArrayHelper::getValue('first_name', $owner),
-            $this->buildToken('last_name')  => ArrayHelper::getValue('last_name', $owner),
-            $this->buildToken('position')   => ArrayHelper::getValue('position', $owner),
+            $this->buildToken('email')       => ArrayHelper::getValue('email', $owner),
+            $this->buildToken('first_name')  => ArrayHelper::getValue('first_name', $owner),
+            $this->buildToken('last_name')   => ArrayHelper::getValue('last_name', $owner),
+            $this->buildToken('position')    => ArrayHelper::getValue('position', $owner),
+            $this->buildToken('signature')   => nl2br(ArrayHelper::getValue('signature', $owner)),
         ];
     }
 
@@ -137,10 +139,11 @@ class OwnerSubscriber implements EventSubscriberInterface
     private function getEmptyTokens()
     {
         return [
-            $this->buildToken('email')      => '',
-            $this->buildToken('first_name') => '',
-            $this->buildToken('last_name')  => '',
-            $this->buildToken('position')   => '',
+            $this->buildToken('email')       => '',
+            $this->buildToken('first_name')  => '',
+            $this->buildToken('last_name')   => '',
+            $this->buildToken('position')    => '',
+            $this->buildToken('signature')   => '',
         ];
     }
 
@@ -152,10 +155,11 @@ class OwnerSubscriber implements EventSubscriberInterface
     private function getFakeTokens()
     {
         return [
-            $this->buildToken('email')      => '['.$this->buildLabel('email').']',
-            $this->buildToken('first_name') => '['.$this->buildLabel('firstname').']',
-            $this->buildToken('last_name')  => '['.$this->buildLabel('lastname').']',
-            $this->buildToken('position')   => '['.$this->buildLabel('position').']',
+            $this->buildToken('email')       => '['.$this->buildLabel('email').']',
+            $this->buildToken('first_name')  => '['.$this->buildLabel('firstname').']',
+            $this->buildToken('last_name')   => '['.$this->buildLabel('lastname').']',
+            $this->buildToken('position')    => '['.$this->buildLabel('position').']',
+            $this->buildToken('signature')   => '['.$this->buildLabel('signature').']',
         ];
     }
 
