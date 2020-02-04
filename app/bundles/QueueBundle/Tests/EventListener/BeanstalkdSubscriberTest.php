@@ -81,6 +81,6 @@ class BeanstalkdSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testConsumeMessage()
     {
-        // @todo
+        $this->markTestIncomplete();
     }
 }
