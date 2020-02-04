@@ -11,15 +11,14 @@
 
 namespace Mautic\QueueBundle\EventListener;
 
+use Leezy\PheanstalkBundle\Proxy\PheanstalkProxy;
 use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Mautic\QueueBundle\Queue\QueueService;
-use Pheanstalk;
-use Pheanstalk\PheanstalkInterface;
+use Pheanstalk\Contract\PheanstalkInterface;
+use Pheanstalk\Exception\ServerException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
 {
@@ -54,26 +53,28 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
     public function publishMessage(Events\QueueEvent $event)
     {
-        $this->container->get('leezy.pheanstalk')
+        /** @var PheanstalkProxy $pheanstalk */
+        $proxy = $this->container->get('leezy.pheanstalk')
             ->useTube($event->getQueueName())
-            ->put($event->getPayload());
+            ->put($event->getPayload()); // @todo must be string
     }
 
     /**
-     * @throws Pheanstalk\Exception\ServerException
+     * @throws ServerException
      */
     public function consumeMessage(Events\QueueEvent $event)
     {
         $messagesConsumed = 0;
 
         while (null === $event->getMessages() || $event->getMessages() > $messagesConsumed) {
+            /** @var PheanstalkProxy $pheanstalk */
             $pheanstalk = $this->container->get('leezy.pheanstalk');
             $job        = $pheanstalk
                 ->watch($event->getQueueName())
                 ->ignore('default')
-                ->reserve(3600);
+                ->reserve();
 
-            if (empty($job)) {
+            if (null === $job) {
                 continue;
             }
 
@@ -86,7 +87,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
             } else {
                 try {
                     $pheanstalk->delete($job);
-                } catch (Pheanstalk\Exception\ServerException $e) {
+                } catch (ServerException $e) {
                     if (false === strpos($e->getMessage(), 'Cannot delete job')
                         && false === strpos($e->getMessage(), 'NOT_FOUND')
                     ) {
