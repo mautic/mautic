@@ -99,7 +99,6 @@
         "lightsaml/sp-bundle": "~1.2.1",
         "egeloen/ordered-form-bundle": "^3.0",
         "php-amqplib/rabbitmq-bundle": "^1.10",
-        "leezy/pheanstalk-bundle": "^3.2",
         "simshaun/recurr": "^3.0",
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
@@ -108,7 +107,7 @@
         "guzzlehttp/oauth-subscriber": "^0.3.0",
         "helios-ag/fm-elfinder-bundle": "~9",
         "ricardofiorani/guzzle-psr18-adapter": "^1.0",
-        "tightenco/collect": "^6.13"
+        "leezy/pheanstalk-bundle": "^4.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
