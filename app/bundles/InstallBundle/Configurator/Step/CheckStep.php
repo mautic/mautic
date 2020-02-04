@@ -228,7 +228,7 @@ class CheckStep implements StepInterface
         }
 
         $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
-        $suggestedLimit = FileHelper::convertPHPSizeToBytes('128M');
+        $suggestedLimit = FileHelper::convertPHPSizeToBytes('512M');
         if ($memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }
