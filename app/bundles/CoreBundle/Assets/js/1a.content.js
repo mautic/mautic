@@ -660,36 +660,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         });
     }
 
-    //activate shuffles
-    if (mQuery(container + ' .shuffle-grid').length) {
-        var grid = mQuery(container + " .shuffle-grid");
-
-        //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
-        setTimeout(function () {
-            grid.shuffle({
-                itemSelector: ".shuffle",
-                sizer: false
-            });
-
-            // Update shuffle on sidebar minimize/maximize
-            mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
-                })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
-                });
-
-            // Update shuffle if in a tab
-            if (grid.parents('.tab-pane').length) {
-                var tabId = grid.parents('.tab-pane').first().attr('id');
-                var tab   = mQuery('a[href="#' + tabId + '"]').on('shown.bs.tab', function() {
-                    grid.shuffle("update");
-                });
-            }
-        }, 1000);
-    }
-
     //prevent auto closing dropdowns for dropdown forms
     if (mQuery(container + ' .dropdown-menu-form').length) {
         mQuery(container + ' .dropdown-menu-form').on('click', function (e) {

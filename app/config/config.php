@@ -27,6 +27,24 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
 
+        // Remove optional services (has argument optional = true) if the service class does not exist
+        if (isset($config['services'])) {
+            $config['services'] = (new \Tightenco\Collect\Support\Collection($config['services']))
+                ->mapWithKeys(function (array $serviceGroup, string $groupName) {
+                    $serviceGroup = (new \Tightenco\Collect\Support\Collection($serviceGroup))
+                        ->reject(function ($serviceDefinition) {
+                            // Rejects services defined as optional where the service class does not exist.
+                            return is_array($serviceDefinition)
+                                && isset($serviceDefinition['optional'])
+                                && true === $serviceDefinition['optional']
+                                && isset($serviceDefinition['class'])
+                                && false === class_exists($serviceDefinition['class']);
+                        })->toArray();
+
+                    return [$groupName => $serviceGroup];
+                })->toArray();
+        }
+
         // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
         if (isset($config['services'])) {
             array_walk_recursive(

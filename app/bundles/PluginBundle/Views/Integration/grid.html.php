@@ -14,7 +14,7 @@ if ('index' == $tmpl) {
 ?>
 <?php if (count($items)): ?>
 <div class="pa-md bg-auto">
-    <div class="row shuffle-integrations">
+    <div class="row shuffle-integrations native-integrations">
             <?php foreach ($items as $item):
                 if (array_key_exists($item['plugin'], $plugins)) {
                     $pluginTitle = $plugins[$item['plugin']]['name'].' - '.$item['display'];
