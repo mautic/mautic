@@ -790,7 +790,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $filters = array_merge($filters, $event->getCategoryColumns('cat.'), $attributionColumns);
 
         // Setup available channels
-        $availableChannels = $this->eventCollector->getEvents();
+        $availableChannels = $this->eventCollector->getEventsArray();
         $channels          = [];
         $channelActions    = [];
         foreach ($availableChannels['decision'] as $channel => $decision) {

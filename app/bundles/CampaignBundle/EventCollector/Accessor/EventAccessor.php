@@ -36,9 +36,6 @@ class EventAccessor
      */
     private $decisions = [];
 
-    /**
-     * EventAccessor constructor.
-     */
     public function __construct(array $events)
     {
         $this->buildEvents($events);
