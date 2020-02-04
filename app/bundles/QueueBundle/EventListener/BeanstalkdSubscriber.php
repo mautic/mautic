@@ -51,10 +51,10 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
         $this->queueService = $queueService;
     }
 
-    public function publishMessage(Events\QueueEvent $event)
+    public function publishMessage(Events\QueueEvent $event): void
     {
-        /** @var PheanstalkProxy $pheanstalk */
-        $proxy = $this->container->get('leezy.pheanstalk')
+        /* @var PheanstalkProxy $pheanstalk */
+        $this->container->get('leezy.pheanstalk')
             ->useTube($event->getQueueName())
             ->put($event->getPayload()); // @todo must be string
     }
@@ -62,7 +62,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
     /**
      * @throws ServerException
      */
-    public function consumeMessage(Events\QueueEvent $event)
+    public function consumeMessage(Events\QueueEvent $event): void
     {
         $messagesConsumed = 0;
 
