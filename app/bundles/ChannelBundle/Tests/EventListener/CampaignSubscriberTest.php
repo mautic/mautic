@@ -25,6 +25,7 @@ use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
+use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
@@ -34,6 +35,7 @@ use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -188,7 +190,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                                     'label'            => 'mautic.campaign.sms.send_text_sms',
                                     'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
                                     'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                                    'formType'         => 'smssend_list',
+                                    'formType'         => SmsSendType::class,
                                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
                                     'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
@@ -225,7 +227,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 'label'                  => 'mautic.channel.message.send.marketing.message',
                 'description'            => 'mautic.channel.message.send.marketing.message.descr',
                 'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
-                'formType'               => 'message_send',
+                'formType'               => MessageSendType::class,
                 'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend',
                 'channel'                => 'channel.message',
                 'channelIdField'         => 'marketingMessage',

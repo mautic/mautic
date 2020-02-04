@@ -34,7 +34,7 @@ class FormValidationSubscriber implements EventSubscriberInterface
      */
     private $coreParametersHelper;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
         $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;

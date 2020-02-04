@@ -118,13 +118,11 @@ return [
                 ],
             ],
             'mautic.form.type.message_list' => [
-                'class' => 'Mautic\ChannelBundle\Form\Type\MessageListType',
-                'alias' => 'message_list',
+                'class' => \Mautic\ChannelBundle\Form\Type\MessageListType::class,
             ],
             'mautic.form.type.message_send' => [
-                'class'     => 'Mautic\ChannelBundle\Form\Type\MessageSendType',
+                'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
                 'arguments' => ['router', 'mautic.channel.model.message'],
-                'alias'     => 'message_send',
             ],
         ],
         'helpers' => [
