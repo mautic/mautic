@@ -285,7 +285,7 @@ class EventController extends CommonFormController
 
         /** @var EventCollector $eventCollector */
         $eventCollector  = $this->get('mautic.campaign.event_collector');
-        $supportedEvents = $eventCollector->getEvents()[$event['eventType']];
+        $supportedEvents = $eventCollector->getEventsArray()[$event['eventType']];
         $form            = $this->get('form.factory')->create(
             EventType::class,
             $event,
@@ -450,7 +450,7 @@ class EventController extends CommonFormController
         if ('POST' == $this->request->getMethod() && null !== $event) {
             /** @var EventCollector $eventCollector */
             $eventCollector    = $this->get('mautic.campaign.event_collector');
-            $events            = $eventCollector->getEvents();
+            $events            = $eventCollector->getEventsArray();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             // Add the field to the delete list
@@ -515,7 +515,7 @@ class EventController extends CommonFormController
         if ('POST' == $this->request->getMethod() && null !== $event) {
             /** @var EventCollector $eventCollector */
             $eventCollector    = $this->get('mautic.campaign.event_collector');
-            $events            = $eventCollector->getEvents();
+            $events            = $eventCollector->getEventsArray();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list
