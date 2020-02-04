@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class BeanstalkdSubscriber extends AbstractQueueSubscriber
 {
-    const DELAY_DURATION = 60;
+    public const DELAY_DURATION = 60;
 
     /**
      * @var string
@@ -56,7 +56,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
         /* @var PheanstalkProxy $pheanstalk */
         $this->container->get('leezy.pheanstalk')
             ->useTube($event->getQueueName())
-            ->put($event->getPayload()); // @todo must be string
+            ->put($event->getPayload());
     }
 
     /**
