@@ -119,6 +119,7 @@ return [
                 'class'     => MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM\LoadCitrixData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['doctrine.orm.entity_manager'],
+                'optional'  => true,
             ],
         ],
         'integrations' => [
