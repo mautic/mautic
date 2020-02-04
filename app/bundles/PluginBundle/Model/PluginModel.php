@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -31,10 +32,16 @@ class PluginModel extends FormModel
      */
     protected $coreParametersHelper;
 
-    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper)
+    /**
+     * @var BundleHelper
+     */
+    private $bundleHelper;
+
+    public function __construct(FieldModel $leadFieldModel, CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper)
     {
         $this->leadFieldModel       = $leadFieldModel;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->bundleHelper         = $bundleHelper;
     }
 
     /**
@@ -89,7 +96,7 @@ class PluginModel extends FormModel
      */
     public function getAllPluginsConfig()
     {
-        return $this->coreParametersHelper->getParameter('plugin.bundles', []);
+        return $this->bundleHelper->getPluginBundles();
     }
 
     /**

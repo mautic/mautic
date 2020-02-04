@@ -25,7 +25,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->coreParametersHelper       = $coreParametersHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
