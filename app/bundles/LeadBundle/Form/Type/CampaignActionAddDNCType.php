@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -34,7 +35,7 @@ class CampaignActionAddDNCType extends AbstractType
 
         $builder->add(
             'reason',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.lead.batch.dnc_reason',
                 'required'   => false,

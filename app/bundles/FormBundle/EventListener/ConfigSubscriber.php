@@ -33,7 +33,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->addForm([
             'bundle'     => 'FormBundle',
             'formAlias'  => 'formconfig',
-            'formType '  => ConfigFormType::class,
+            'formType'   => ConfigFormType::class,
             'formTheme'  => 'MauticFormBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticFormBundle'),
         ]);
