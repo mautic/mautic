@@ -14,7 +14,6 @@ namespace Mautic\SmsBundle\Api;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
-use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -37,10 +36,7 @@ class TwilioApi extends AbstractSmsApi
      */
     protected $sendingPhoneNumber;
 
-    /**
-     * TwilioApi constructor.
-     */
-    public function __construct(TrackableModel $pageTrackableModel, PhoneNumberHelper $phoneNumberHelper, IntegrationHelper $integrationHelper, Logger $logger)
+    public function __construct(TrackableModel $pageTrackableModel, IntegrationHelper $integrationHelper, Logger $logger)
     {
         $this->logger = $logger;
 

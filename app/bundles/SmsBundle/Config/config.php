@@ -93,10 +93,9 @@ return [
         ],
         'other' => [
             'mautic.sms.api' => [
-                'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
+                'class'     => \Mautic\SmsBundle\Api\TwilioApi::class,
                 'arguments' => [
                     'mautic.page.model.trackable',
-                    'mautic.helper.phone_number',
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
@@ -113,7 +112,6 @@ return [
                 'class'        => \Mautic\SmsBundle\Api\TwilioApi::class,
                 'arguments'    => [
                     'mautic.page.model.trackable',
-                    'mautic.helper.phone_number',
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
