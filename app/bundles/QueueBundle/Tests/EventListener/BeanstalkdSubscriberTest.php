@@ -50,15 +50,7 @@ class BeanstalkdSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testPublishMessage()
     {
         $queueName = 'queueName';
-        $payload   = '{}';
-
-        $event = $this->createMock(QueueEvent::class);
-        $event->expects($this->once())
-            ->method('getQueueName')
-            ->willReturn($queueName);
-        $event->expects($this->once())
-            ->method('getPayload')
-            ->willReturn($payload);
+        $event     = new QueueEvent('', $queueName);
 
         $this->container
             ->expects($this->once())
@@ -71,16 +63,12 @@ class BeanstalkdSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('useTube')
             ->with($queueName)
             ->willReturn($this->pheanstalkProxy);
+
         $this->pheanstalkProxy
             ->expects($this->once())
             ->method('put')
-            ->with($payload);
+            ->with('[]');
 
         $this->beanstalkdSubscriber->publishMessage($event);
-    }
-
-    public function testConsumeMessage()
-    {
-        $this->markTestIncomplete();
     }
 }
