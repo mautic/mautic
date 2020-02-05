@@ -35,7 +35,6 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -53,8 +52,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $mailboxHelper;
     private $mailHelper;
     private $leadModel;
-    private $leadEntity;
-    private $leadRepository;
     private $trackableModel;
     private $userModel;
     private $translator;
@@ -83,8 +80,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->mailboxHelper          = $this->createMock(Mailbox::class);
         $this->mailHelper             = $this->createMock(MailHelper::class);
         $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->leadEntity             = $this->createMock(Lead::class);
-        $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->trackableModel         = $this->createMock(TrackableModel::class);
         $this->userModel              = $this->createMock(UserModel::class);
         $this->translator             = $this->createMock(Translator::class);
@@ -538,7 +533,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->at(0))
             ->method('persist')
-            ->with($this->callback(function ($statDevice) use ($stat, $ipAddress) {
+            ->with($this->callback(function ($statDevice) {
                 $this->assertInstanceOf(Stat::class, $statDevice);
 
                 return true;
