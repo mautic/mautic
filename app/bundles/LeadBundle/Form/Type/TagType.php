@@ -38,7 +38,6 @@ class TagType extends AbstractType
             $transformer = new TagEntityModelTransformer(
                 $this->em,
                 Tag::class,
-                'id',
                 ($options['multiple'])
             );
 
