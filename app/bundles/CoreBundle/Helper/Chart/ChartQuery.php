@@ -220,14 +220,9 @@ class ChartQuery extends AbstractChart
     public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
         // Convert time unitst to the right form for current database platform
-        $dbUnit  = $this->translateTimeUnit($this->unit);
-        $limit   = $this->countAmountFromDateRange();
-        $groupBy = '';
-
-        if (isset($filters['groupBy'])) {
-            $groupBy = ', '.$tablePrefix.'.'.$filters['groupBy'];
-            unset($filters['groupBy']);
-        }
+        $dbUnit        = $this->translateTimeUnit($this->unit);
+        $limit         = $this->countAmountFromDateRange();
+        $groupBy       = '';
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
 
         if (true === $isEnumerable) {
