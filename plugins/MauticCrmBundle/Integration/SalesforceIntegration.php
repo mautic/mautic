@@ -438,7 +438,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if (isset($dataObject) && $dataObject) {
+                if ($dataObject) {
                     $entity = false;
                     switch ($object) {
                         case 'Contact':
