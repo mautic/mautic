@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9843d25a350baff74c9d195ae2795df",
+    "content-hash": "6e8137b27ef200915fd502f1094364e3",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -4339,28 +4339,27 @@
         },
         {
             "name": "leezy/pheanstalk-bundle",
-            "version": "3.4.2",
+            "version": "4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/armetiz/LeezyPheanstalkBundle.git",
-                "reference": "e27e1507e7224faba0b439a09808839a366a8569"
+                "reference": "f0bc37c40eb6bf5fb2ecccd5119b3b8a086cb11b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/armetiz/LeezyPheanstalkBundle/zipball/e27e1507e7224faba0b439a09808839a366a8569",
-                "reference": "e27e1507e7224faba0b439a09808839a366a8569",
+                "url": "https://api.github.com/repos/armetiz/LeezyPheanstalkBundle/zipball/f0bc37c40eb6bf5fb2ecccd5119b3b8a086cb11b",
+                "reference": "f0bc37c40eb6bf5fb2ecccd5119b3b8a086cb11b",
                 "shasum": ""
             },
             "require": {
-                "pda/pheanstalk": "~3.0",
-                "php": ">=5.5.9",
+                "pda/pheanstalk": "~4.0",
+                "php": ">=7.1.0",
                 "psr/log": "~1.0",
                 "symfony/console": "~2.5|~3.0|^4.0",
                 "symfony/framework-bundle": "~2.5|~3.0|^4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0|~5.0",
-                "phpunit/phpunit-mock-objects": "2.3.0|~3.4"
+                "phpunit/phpunit": "~7.0"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -4395,7 +4394,7 @@
                 "queueing",
                 "symfony"
             ],
-            "time": "2019-03-15T08:14:42+00:00"
+            "time": "2019-08-12T08:05:11+00:00"
         },
         {
             "name": "lightsaml/lightsaml",
@@ -5440,30 +5439,28 @@
         },
         {
             "name": "pda/pheanstalk",
-            "version": "v3.2.1",
+            "version": "v4.0.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/pda/pheanstalk.git",
-                "reference": "57b6e76f1b06ca798e739a8dee92c2dac04fd170"
+                "url": "https://github.com/pheanstalk/pheanstalk.git",
+                "reference": "41212671020de91086ace9e6181e69829466f087"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pda/pheanstalk/zipball/57b6e76f1b06ca798e739a8dee92c2dac04fd170",
-                "reference": "57b6e76f1b06ca798e739a8dee92c2dac04fd170",
+                "url": "https://api.github.com/repos/pheanstalk/pheanstalk/zipball/41212671020de91086ace9e6181e69829466f087",
+                "reference": "41212671020de91086ace9e6181e69829466f087",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "ext-mbstring": "*",
+                "php": ">=7.1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
+                "phpdocumentor/phpdocumentor": "^2",
+                "phpunit/phpunit": "^7",
+                "vimeo/psalm": "^2.0"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.1-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Pheanstalk\\": "src/"
@@ -5479,6 +5476,11 @@
                     "email": "paul@annesley.cc",
                     "homepage": "http://paul.annesley.cc/",
                     "role": "Developer"
+                },
+                {
+                    "name": "Sam Mousa",
+                    "email": "sam@mousa.nl",
+                    "role": "Maintainer"
                 }
             ],
             "description": "PHP client for beanstalkd queue",
@@ -5486,7 +5488,7 @@
             "keywords": [
                 "beanstalkd"
             ],
-            "time": "2018-09-19T12:16:28+00:00"
+            "time": "2020-01-24T11:16:41+00:00"
         },
         {
             "name": "php-amqplib/php-amqplib",
@@ -10989,7 +10991,7 @@
         },
         {
             "name": "tightenco/collect",
-            "version": "v6.13.0",
+            "version": "v6.14.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tightenco/collect.git",

@@ -62,7 +62,7 @@ class QueueEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return string|array
      */
     public function getPayload($returnArray = false)
     {
