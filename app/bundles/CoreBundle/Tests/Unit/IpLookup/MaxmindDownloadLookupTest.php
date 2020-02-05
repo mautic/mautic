@@ -25,7 +25,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
         $license_key =  $_ENV['MAXMIND_LICENSE_KEY'];
 
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup($license_key, null, __DIR__.'/../../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup($license_key, null, sys_get_temp_dir());
 
         $result = $ipService->downloadRemoteDataStore();
 
@@ -39,7 +39,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
         }
 
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup(null, null, sys_get_temp_dir());
 
         $details = $ipService->setIpAddress('52.52.118.192')->getDetails();
 
