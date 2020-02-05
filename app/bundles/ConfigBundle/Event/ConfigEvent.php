@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigEvent extends CommonEvent
 {
     /**
@@ -26,9 +23,14 @@ class ConfigEvent extends CommonEvent
     private $preserve = [];
 
     /**
-     * @param array $config
+     * @param array
      */
     private $config;
+
+    /**
+     * @param ParameterBag
+     */
+    private $post;
 
     /**
      * @var array
@@ -57,6 +59,7 @@ class ConfigEvent extends CommonEvent
     public function __construct(array $config, ParameterBag $post)
     {
         $this->config = $config;
+        $this->post   = $post;
     }
 
     /**
@@ -87,6 +90,11 @@ class ConfigEvent extends CommonEvent
         } else {
             $this->config = $config;
         }
+    }
+
+    public function getPost(): ParameterBag
+    {
+        return $this->post;
     }
 
     /**
