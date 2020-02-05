@@ -67,6 +67,10 @@ class SetContactAvatarFormSubscriber extends CommonSubscriber
         $contact = $submissionEvent->getLead();
         $results = $submissionEvent->getResults();
 
+        if (!$contact) {
+            return;
+        }
+
         /** @var Field $field */
         foreach ($fields as $field) {
             switch ($field->getType()) {
