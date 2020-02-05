@@ -279,6 +279,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Class ListTriggerType removed as it was not used anywhere.
 *   Class PointTriggerType removed as it was not used anywhere.
 *   Class TagListType removed as it was not used anywhere.
+*   Class Mautic\LeadBundle\Form\DataTransformer\UtmTagEntityModelTransformer removed as it was not used anywhere.
 *   Deprecated class EmailTokenHelper removed.
 *   Deprecated routes removed:
     *   mautic_contact_import_index - /s/{object}/import/{page}
