@@ -20,8 +20,7 @@ class DateDecorator extends CustomMappedDecorator
 {
     public function __construct(
         ContactSegmentFilterOperator $contactSegmentFilterOperator,
-        ContactSegmentFilterDictionary $contactSegmentFilterDictionary,
-        CoreParametersHelper $coreParametersHelper
+        ContactSegmentFilterDictionary $contactSegmentFilterDictionary
     ) {
         parent::__construct($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
     }
