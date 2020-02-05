@@ -59,8 +59,8 @@ class ConnectionBuilder
             ];
         }
 
-        if (!isset($connectionRestrictions[$key])) {
-            $connectionRestrictions['anchor'][$key] = [];
+        if (!isset(self::$connectionRestrictions[$key])) {
+            self::$connectionRestrictions['anchor'][$key] = [];
         }
 
         if (isset($event['connectionRestrictions'])) {
