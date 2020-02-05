@@ -311,13 +311,13 @@ class IntegrationHelper
         }
 
         foreach ($returnServices as $key => $value) {
-            if (!isset($value)) {
+            if ($value) {
                 unset($returnServices[$key]);
             }
         }
 
         foreach ($returnServices as $key => $value) {
-            if (!isset($value)) {
+            if ($value) {
                 unset($returnServices[$key]);
             }
         }
