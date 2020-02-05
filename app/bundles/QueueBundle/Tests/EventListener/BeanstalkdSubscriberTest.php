@@ -8,7 +8,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace QueueBundle\Tests\EventListener;
+namespace Mautic\QueueBundle\Tests\EventListener;
 
 use Leezy\PheanstalkBundle\Proxy\PheanstalkProxy;
 use Mautic\QueueBundle\Event\QueueEvent;
