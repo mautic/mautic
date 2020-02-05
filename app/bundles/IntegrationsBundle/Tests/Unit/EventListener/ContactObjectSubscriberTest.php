@@ -308,7 +308,7 @@ class ContactObjectSubscriberTest extends TestCase
 
         $this->subscriber->buildContactRoute($event);
 
-        $this->assertSame(null, $event->getRoute());
+        $this->assertNull($event->getRoute());
     }
 
     public function testBuildContactRouteWithRightObject(): void
