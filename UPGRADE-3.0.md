@@ -126,6 +126,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   Removed the now unused FormSubmitHelper 
 *   AbTestHelper class removed, use DetermineWinnerSubscriber instead
 *   Removed service mautic.form.type.asset_dashboard_downloads_in_time_widget with not existing class
+*   Static method Asset::convertSizeToBytes() removed. Use Mautic\CoreBundle\Helper\FileHelper::convertPHPSizeToBytes() instead.
 
 ### CampaignBundle
 *   Deprecated LegacyEventDispatcher and legacy events removed:

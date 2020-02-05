@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
@@ -23,9 +24,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Asset.
- */
 class Asset extends FormEntity
 {
     /**
@@ -1298,39 +1296,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * Borrowed from Symfony\Component\HttpFoundation\File\UploadedFile::getMaxFilesize.
-     *
-     * @param $size
-     *
-     * @return int|string
-     */
-    public static function convertSizeToBytes($size)
-    {
-        if ('' === $size) {
-            return PHP_INT_MAX;
-        }
-
-        $max = ltrim($size, '+');
-        if (0 === strpos($max, '0x')) {
-            $max = intval($max, 16);
-        } elseif (0 === strpos($max, '0')) {
-            $max = intval($max, 8);
-        } else {
-            $max = intval($max);
-        }
-
-        switch (strtolower(substr($size, -1))) {
-            case 't':
-            case 'g':
-            case 'm':
-            case 'k':
-                $max *= 1024;
-        }
-
-        return $max;
-    }
-
-    /**
      * Get value from PHP configuration with special handling of -1.
      *
      * @param string    $setting
@@ -1347,7 +1312,7 @@ class Asset extends FormEntity
         }
 
         if ($convertToBytes) {
-            $value = self::convertSizeToBytes($value);
+            $value = FileHelper::convertPHPSizeToBytes($value);
         }
 
         return (int) $value;

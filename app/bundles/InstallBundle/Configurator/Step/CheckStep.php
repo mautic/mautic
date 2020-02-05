@@ -13,6 +13,7 @@ namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -226,9 +227,8 @@ class CheckStep implements StepInterface
             }
         }
 
-        $memoryLimit    = $this->toBytes(ini_get('memory_limit'));
-        $suggestedLimit = 128 * 1024 * 1024;
-
+        $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
+        $suggestedLimit = FileHelper::convertPHPSizeToBytes('512M');
         if ($memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }
@@ -277,34 +277,5 @@ class CheckStep implements StepInterface
         }
 
         return $parameters;
-    }
-
-    /**
-     * Takes the memory limit string form php.ini and returns numeric value in bytes.
-     *
-     * @param string $val
-     *
-     * @return int
-     */
-    private function toBytes($val)
-    {
-        $val = trim($val);
-
-        if (-1 == $val) {
-            return PHP_INT_MAX;
-        }
-
-        $last = strtolower($val[strlen($val) - 1]);
-        $val  = (int) $val;
-
-        switch ($last) {
-            // The 'G' modifier is available since PHP 5.1.0
-            case 'g':
-            case 'm':
-            case 'k':
-                $val *= 1024;
-        }
-
-        return $val;
     }
 }
