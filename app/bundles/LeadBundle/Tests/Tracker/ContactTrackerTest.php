@@ -210,7 +210,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $this->coreParametersHelperMock->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->willReturn(true);
 
         $this->leadRepositoryMock->expects($this->once())
@@ -242,7 +242,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $this->coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->willReturn(false);
 
         $this->leadRepositoryMock->expects($this->never())

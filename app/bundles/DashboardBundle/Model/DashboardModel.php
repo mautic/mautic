@@ -226,10 +226,10 @@ class DashboardModel extends FormModel
      */
     public function populateWidgetContent(Widget $widget, $filter = [])
     {
-        $cacheDir = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
+        $cacheDir = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
 
         if (null === $widget->getCacheTimeout() || -1 === $widget->getCacheTimeout()) {
-            $widget->setCacheTimeout($this->coreParametersHelper->getParameter('cached_data_timeout'));
+            $widget->setCacheTimeout($this->coreParametersHelper->get('cached_data_timeout'));
         }
 
         // Merge global filter with widget params
@@ -262,7 +262,7 @@ class DashboardModel extends FormModel
      */
     public function clearDashboardCache()
     {
-        $cacheDir     = $this->coreParametersHelper->getParameter('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
+        $cacheDir     = $this->coreParametersHelper->get('cached_data_dir', $this->pathsHelper->getSystemPath('cache', true));
         $cacheStorage = new CacheStorageHelper(CacheStorageHelper::ADAPTOR_FILESYSTEM, $this->userHelper->getUser()->getId(), null, $cacheDir);
 
         $cacheStorage->clear();
@@ -318,7 +318,7 @@ class DashboardModel extends FormModel
      */
     public function getDefaultFilter()
     {
-        $dateRangeDefault = $this->coreParametersHelper->getParameter('default_daterange_filter', '-1 month');
+        $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
         $dateRangeStart   = new \DateTime();
         $dateRangeStart->modify($dateRangeDefault);
 

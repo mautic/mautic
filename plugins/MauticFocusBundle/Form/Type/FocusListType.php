@@ -39,7 +39,7 @@ class FocusListType extends AbstractType
                     }
 
                     //sort by language
-                    asort($choices);
+                    ksort($choices, SORT_NATURAL);
 
                     return $choices;
                 },

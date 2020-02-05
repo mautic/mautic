@@ -590,6 +590,13 @@ return [
                 'tag' => 'console.command',
             ],
         ],
+        'fixtures' => [
+            'mautic.campaign.fixture.campaign' => [
+                'class'    => \Mautic\CampaignBundle\Tests\DataFixtures\Orm\CampaignData::class,
+                'tag'      => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'optional' => true,
+            ],
+        ],
     ],
     'parameters' => [
         'campaign_time_wait_on_event_false' => 'PT1H',

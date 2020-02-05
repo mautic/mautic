@@ -28,7 +28,7 @@ class RedirectListType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'choices'     => array_flip($this->coreParametersHelper->getParameter('redirect_list_types')),
+            'choices'     => array_flip($this->coreParametersHelper->get('redirect_list_types')),
             'expanded'    => false,
             'multiple'    => false,
             'label'       => 'mautic.page.form.redirecttype',

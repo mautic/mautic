@@ -118,10 +118,15 @@ return [
             'mautic.api.subscriber' => [
                 'class'     => \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
-                    'mautic.core.model.auditlog',
                     'translator',
+                ],
+            ],
+            'mautic.api.client.subscriber' => [
+                'class'     => \Mautic\ApiBundle\EventListener\ClientSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.api.configbundle.subscriber' => [

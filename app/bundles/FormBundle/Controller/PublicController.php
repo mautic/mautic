@@ -267,12 +267,12 @@ class PublicController extends CommonFormController
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->getParameter('theme').':message.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php');
 
         return $this->render($logicalName, [
             'message'  => $msg,
             'type'     => $msgType,
-            'template' => $this->coreParametersHelper->getParameter('theme'),
+            'template' => $this->coreParametersHelper->get('theme'),
         ]);
     }
 

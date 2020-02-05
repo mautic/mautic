@@ -403,7 +403,7 @@ class CommonApiController extends FOSRestController implements MauticController
         $args = array_merge(
             [
                 'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $this->request->query->get('search', ''),
                     'force'  => $this->listFilters,

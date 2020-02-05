@@ -86,7 +86,7 @@ class UploadSubscriber implements EventSubscriberInterface
     public function onUploadValidation(ValidationEvent $event)
     {
         $file       = $event->getFile();
-        $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
+        $extensions = $this->coreParametersHelper->get('allowed_extensions');
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
         if (null === $file) {

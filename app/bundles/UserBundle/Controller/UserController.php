@@ -13,6 +13,7 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Form\Type\ContactType;
 
 class UserController extends FormController
@@ -33,7 +34,7 @@ class UserController extends FormController
         $this->setListFilters();
 
         //set limits
-        $limit = $this->get('session')->get('mautic.user.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $this->get('session')->get('mautic.user.limit', $this->coreParametersHelper->get('default_pagelimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -152,12 +153,11 @@ class UserController extends FormController
                     $model->saveEntity($user);
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
+                    /** @var LanguageHelper $languageHelper */
+                    $languageHelper     = $this->container->get('mautic.helper.language');
+                    $installedLanguages = $languageHelper->getSupportedLanguages();
 
                     if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
-                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-                        $languageHelper = $this->factory->getHelper('language');
-
                         $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
 
                         // If there is an error, we need to reset the user's locale to the default
@@ -285,12 +285,11 @@ class UserController extends FormController
                     $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->coreParametersHelper->getParameter('supported_languages');
+                    /** @var LanguageHelper $languageHelper */
+                    $languageHelper     = $this->container->get('mautic.helper.language');
+                    $installedLanguages = $languageHelper->getSupportedLanguages();
 
                     if ($user->getLocale() && !array_key_exists($user->getLocale(), $installedLanguages)) {
-                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-                        $languageHelper = $this->factory->getHelper('language');
-
                         $fetchLanguage = $languageHelper->extractLanguagePackage($user->getLocale());
 
                         // If there is an error, we need to reset the user's locale to the default
@@ -471,7 +470,7 @@ class UserController extends FormController
                     } else {
                         $bundle = $object = $reEntity;
                         if (strpos($reEntity, ':')) {
-                            list($bundle, $object) = explode(':', $reEntity);
+                            [$bundle, $object] = explode(':', $reEntity);
                         }
                         $entityId = $form->get('id')->getData();
                     }

@@ -43,7 +43,7 @@ class EncryptionHelper
             throw new \RuntimeException('None of possible cryptography libraries is supported');
         }
 
-        $this->key = $coreParametersHelper->getParameter('mautic.secret_key');
+        $this->key = $coreParametersHelper->get('mautic.secret_key');
     }
 
     /**

@@ -762,7 +762,7 @@ class CommonController extends Controller implements MauticController
             $sourceIterator = new ArraySourceIterator($toExport);
         }
 
-        $dateFormat  = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat  = $this->coreParametersHelper->get('date_format_dateonly');
         $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
         $writer      = 'xlsx' === $type ? new XlsWriter('php://output') : new CsvWriter('php://output');
         $contentType = 'xlsx' === $type ? 'application/vnd.ms-excel' : 'text/csv';

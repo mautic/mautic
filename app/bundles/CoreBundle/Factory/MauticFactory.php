@@ -249,7 +249,7 @@ class MauticFactory
      */
     public function getParameter($id, $default = false)
     {
-        return $this->container->get('mautic.helper.core_parameters')->getParameter($id, $default);
+        return $this->container->get('mautic.helper.core_parameters')->get($id, $default);
     }
 
     /**

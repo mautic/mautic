@@ -31,8 +31,8 @@ class ContactFrequencyType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $showContactCategories = $this->coreParametersHelper->getParameter('show_contact_categories');
-        $showContactSegments   = $this->coreParametersHelper->getParameter('show_contact_segments');
+        $showContactCategories = $this->coreParametersHelper->get('show_contact_categories');
+        $showContactSegments   = $this->coreParametersHelper->get('show_contact_segments');
 
         // var_dump($options['data'], $options['channels']);die;
         if (!empty($options['channels'])) {

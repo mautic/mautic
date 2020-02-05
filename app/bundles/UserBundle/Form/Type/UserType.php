@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -51,21 +50,14 @@ class UserType extends AbstractType
      */
     private $languageHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $parametersHelper;
-
     public function __construct(
         TranslatorInterface $translator,
         UserModel $model,
-        LanguageHelper $languageHelper,
-        CoreParametersHelper $parametersHelper
+        LanguageHelper $languageHelper
     ) {
         $this->translator       = $translator;
         $this->model            = $model;
         $this->languageHelper   = $languageHelper;
-        $this->parametersHelper = $parametersHelper;
     }
 
     /**
@@ -310,8 +302,7 @@ class UserType extends AbstractType
         foreach ($languages as $code => $langData) {
             $choices[$langData['name']] = $code;
         }
-
-        $choices = array_merge($choices, array_flip($this->parametersHelper->getParameter('supported_languages')));
+        $choices = array_merge($choices, array_flip($this->languageHelper->getSupportedLanguages()));
 
         // Alpha sort the languages by name
         ksort($choices);

@@ -51,7 +51,7 @@ class DateRangeType extends AbstractType
             $defaultFrom = new \DateTime($sessionDateFrom);
             $defaultTo   = new \DateTime($sessionDateTo);
         } else {
-            $dateRangeDefault = $this->coreParametersHelper->getParameter('default_daterange_filter', '-1 month');
+            $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
             $defaultFrom      = new \DateTime($dateRangeDefault);
             $defaultTo        = new \DateTime();
         }

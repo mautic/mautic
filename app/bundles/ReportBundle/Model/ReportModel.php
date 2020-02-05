@@ -99,7 +99,7 @@ class ReportModel extends FormModel
         CsvExporter $csvExporter,
         ExcelExporter $excelExporter
     ) {
-        $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->templatingHelper  = $templatingHelper;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;

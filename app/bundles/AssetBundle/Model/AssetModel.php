@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\Email;
@@ -35,9 +36,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class AssetModel.
- */
 class AssetModel extends FormModel
 {
     /**
@@ -100,7 +98,7 @@ class AssetModel extends FormModel
         $this->deviceCreatorService   = $deviceCreatorService;
         $this->deviceDetectorFactory  = $deviceDetectorFactory;
         $this->deviceTrackingService  = $deviceTrackingService;
-        $this->maxAssetSize           = $coreParametersHelper->getParameter('mautic.max_size');
+        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
     }
 
     /**
@@ -502,7 +500,7 @@ class AssetModel extends FormModel
     public function getMaxUploadSize($unit = 'M', $humanReadable = false)
     {
         $maxAssetSize  = $this->maxAssetSize;
-        $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : Asset::convertSizeToBytes($maxAssetSize.'M');
+        $maxAssetSize  = (-1 == $maxAssetSize || 0 === $maxAssetSize) ? PHP_INT_MAX : FileHelper::convertMegabytesToBytes($maxAssetSize);
         $maxPostSize   = Asset::getIniValue('post_max_size');
         $maxUploadSize = Asset::getIniValue('upload_max_filesize');
         $memoryLimit   = Asset::getIniValue('memory_limit');

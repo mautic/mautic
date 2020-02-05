@@ -59,7 +59,11 @@ return [
                 'class' => \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class,
             ],
             \Mautic\InstallBundle\Configurator\Form\EmailStepType::class => [
-                'class' => \Mautic\InstallBundle\Configurator\Form\EmailStepType::class,
+                'class'     => \Mautic\InstallBundle\Configurator\Form\EmailStepType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.email.transport_type',
+                ],
             ],
             \Mautic\InstallBundle\Configurator\Form\UserStepType::class => [
                 'class'     => \Mautic\InstallBundle\Configurator\Form\UserStepType::class,

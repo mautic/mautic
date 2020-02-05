@@ -748,7 +748,7 @@ class CampaignController extends AbstractStandardFormController
                         'campaign'        => $entity,
                         'stats'           => $stats,
                         'events'          => $sortedEvents,
-                        'eventSettings'   => $eventCollector->getEvents(),
+                        'eventSettings'   => $eventCollector->getEventsArray(),
                         'sources'         => $this->getCampaignModel()->getLeadSources($entity),
                         'dateRangeForm'   => $dateRangeForm->createView(),
                         'campaignSources' => $this->campaignSources,
@@ -770,7 +770,7 @@ class CampaignController extends AbstractStandardFormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'eventSettings'   => $eventCollector->getEvents(),
+                        'eventSettings'   => $eventCollector->getEventsArray(),
                         'campaignEvents'  => $this->campaignEvents,
                         'campaignSources' => $this->campaignSources,
                         'deletedEvents'   => $this->deletedEvents,

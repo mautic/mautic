@@ -80,7 +80,7 @@ class EventController extends CommonFormController
         $eventCollector = $this->get('mautic.campaign.event_collector');
 
         //fire the builder event
-        $events = $eventCollector->getEvents();
+        $events = $eventCollector->getEventsArray();
         $form   = $this->get('form.factory')->create(
             EventType::class,
             $event,
@@ -280,12 +280,12 @@ class EventController extends CommonFormController
          * the supported events for this type because we already made
          * sure that we're accessing a supported event type above.
          *
-         * Method getEvents() returns translated labels & descriptions
+         * Method getEventsArray() returns translated labels & descriptions
          */
 
         /** @var EventCollector $eventCollector */
         $eventCollector  = $this->get('mautic.campaign.event_collector');
-        $supportedEvents = $eventCollector->getEvents()[$event['eventType']];
+        $supportedEvents = $eventCollector->getEventsArray()[$event['eventType']];
         $form            = $this->get('form.factory')->create(
             EventType::class,
             $event,
@@ -450,7 +450,7 @@ class EventController extends CommonFormController
         if ('POST' == $this->request->getMethod() && null !== $event) {
             /** @var EventCollector $eventCollector */
             $eventCollector    = $this->get('mautic.campaign.event_collector');
-            $events            = $eventCollector->getEvents();
+            $events            = $eventCollector->getEventsArray();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             // Add the field to the delete list
@@ -515,7 +515,7 @@ class EventController extends CommonFormController
         if ('POST' == $this->request->getMethod() && null !== $event) {
             /** @var EventCollector $eventCollector */
             $eventCollector    = $this->get('mautic.campaign.event_collector');
-            $events            = $eventCollector->getEvents();
+            $events            = $eventCollector->getEventsArray();
             $event['settings'] = $events[$event['eventType']][$event['type']];
 
             //add the field to the delete list

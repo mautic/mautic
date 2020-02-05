@@ -61,10 +61,10 @@ class ConfigSubscriber implements EventSubscriberInterface
             ]
         );
 
-        $data = $event->getConfig(ConfigType::class);
+        $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
-        $monitoredEmail = $this->coreParametersHelper->getParameter('monitored_email');
+        $monitoredEmail = $this->coreParametersHelper->get('monitored_email');
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
@@ -86,6 +86,6 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
         }
 
-        $event->setConfig($data, ConfigType::class);
+        $event->setConfig($data, 'emailconfig');
     }
 }

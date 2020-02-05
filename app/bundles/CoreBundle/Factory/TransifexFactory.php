@@ -38,8 +38,8 @@ class TransifexFactory
     public function getTransifex(): TransifexInterface
     {
         if (!$this->transifex) {
-            $username = $this->coreParametersHelper->getParameter('transifex_username');
-            $password = $this->coreParametersHelper->getParameter('transifex_password');
+            $username = $this->coreParametersHelper->get('transifex_username');
+            $password = $this->coreParametersHelper->get('transifex_password');
 
             if (empty($username) || empty($password)) {
                 throw new BadConfigurationException('Transifex credentials are required to connect to Transifex API. Insert transifex_username and transifex_password params to your local.php file.');

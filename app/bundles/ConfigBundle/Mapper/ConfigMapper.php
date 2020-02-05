@@ -63,7 +63,7 @@ class ConfigMapper
 
         // All config values are stored at root level of the config
         foreach ($formParameters as $formKey => $defaultValue) {
-            $configValue = $this->parametersHelper->getParameter($formKey);
+            $configValue = $this->parametersHelper->get($formKey);
 
             if (null === $configValue) {
                 // Nothing has been locally configured so keep default

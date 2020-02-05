@@ -153,7 +153,7 @@ class AjaxController extends CommonAjaxController
             $settings = $request->request->all();
 
             if (empty($settings['password'])) {
-                $existingMonitoredSettings = $this->coreParametersHelper->getParameter('monitored_email');
+                $existingMonitoredSettings = $this->coreParametersHelper->get('monitored_email');
                 if (is_array($existingMonitoredSettings) && (!empty($existingMonitoredSettings[$settings['mailbox']]['password']))) {
                     $settings['password'] = $existingMonitoredSettings[$settings['mailbox']]['password'];
                 }
@@ -221,7 +221,7 @@ class AjaxController extends CommonAjaxController
                 try {
                     if (method_exists($mailer, 'setApiKey')) {
                         if (empty($settings['api_key'])) {
-                            $settings['api_key'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_api_key');
+                            $settings['api_key'] = $this->get('mautic.helper.core_parameters')->get('mailer_api_key');
                         }
                         $mailer->setApiKey($settings['api_key']);
                     }
@@ -232,7 +232,7 @@ class AjaxController extends CommonAjaxController
                 try {
                     if (is_callable([$mailer, 'setUsername']) && is_callable([$mailer, 'setPassword'])) {
                         if (empty($settings['password'])) {
-                            $settings['password'] = $this->get('mautic.helper.core_parameters')->getParameter('mailer_password');
+                            $settings['password'] = $this->get('mautic.helper.core_parameters')->get('mailer_password');
                         }
                         $mailer->setUsername($settings['user']);
                         $mailer->setPassword($settings['password']);

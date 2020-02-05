@@ -32,7 +32,7 @@ class FileApiController extends CommonApiController
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
-        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions');
+        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->get('allowed_extensions');
 
         parent::initialize($event);
     }
@@ -166,7 +166,7 @@ class FileApiController extends CommonApiController
             if ('images' === $dir) {
                 $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
             } elseif ('assets' === $dir) {
-                $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+                $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->get('upload_dir'));
             }
 
             if (false === $absoluteDir) {
@@ -208,6 +208,6 @@ class FileApiController extends CommonApiController
             .$this->request->getHttpHost()
             .':'.$this->request->getPort()
             .$this->request->getBasePath().'/'
-            .$this->get('mautic.helper.core_parameters')->getParameter('image_path');
+            .$this->get('mautic.helper.core_parameters')->get('image_path');
     }
 }

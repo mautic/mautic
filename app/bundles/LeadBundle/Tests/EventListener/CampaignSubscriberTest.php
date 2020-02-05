@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -72,6 +73,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 
+        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $mockCoreParametersHelper->method('get')
+            ->with('default_timezone')
+            ->willReturn('UTC');
+
         $subscriber = new CampaignSubscriber(
             $mockIpLookupHelper,
             $mockLeadModel,
@@ -79,7 +85,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            ['default_timezone' => 'UTC']
+            $mockCoreParametersHelper
         );
 
         /** @var LeadModel $leadModel */

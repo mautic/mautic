@@ -64,7 +64,7 @@ class SocialLoginType extends AbstractType
                     'buttonImageUrl',
                     HiddenType::class,
                     [
-                        'data' => $this->coreParametersHelper->getParameter('site_url').'/'.$this->coreParametersHelper->getParameter('image_path').'/',
+                        'data' => $this->coreParametersHelper->get('site_url').'/'.$this->coreParametersHelper->get('image_path').'/',
                     ]
                 );
             }

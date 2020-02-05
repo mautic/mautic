@@ -359,7 +359,7 @@ return [
                     'mautic.lead.model.list',
                     'mautic.lead.model.company',
                     'mautic.campaign.model.campaign',
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.campaignbundle.action_delete_contacts.subscriber' => [

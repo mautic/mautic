@@ -99,7 +99,7 @@ class MessageSchedule
     public function fileCouldBeSend($filePath)
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);
-        $maxFileSize = $this->coreParametersHelper->getParameter('report_export_max_filesize_in_bytes');
+        $maxFileSize = $this->coreParametersHelper->get('report_export_max_filesize_in_bytes');
 
         return $filesize <= $maxFileSize;
     }

@@ -68,10 +68,10 @@ class IpLookupHelper
         $this->request               = $requestStack->getCurrentRequest();
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
-        $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
-        $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
-        $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
-        $this->trackPrivateIPRanges  = $coreParametersHelper->getParameter('mautic.track_private_ip_ranges');
+        $this->doNotTrackIps         = $coreParametersHelper->get('do_not_track_ips');
+        $this->doNotTrackBots        = $coreParametersHelper->get('do_not_track_bots');
+        $this->doNotTrackInternalIps = $coreParametersHelper->get('do_not_track_internal_ips');
+        $this->trackPrivateIPRanges  = $coreParametersHelper->get('track_private_ip_ranges');
         $this->coreParametersHelper  = $coreParametersHelper;
     }
 
@@ -140,7 +140,7 @@ class IpLookupHelper
 
             if (null === $ipAddress) {
                 $ipAddress = new IpAddress();
-                if ($this->coreParametersHelper->getParameter('anonymize_ip')) {
+                if ($this->coreParametersHelper->get('anonymize_ip')) {
                     $ip = preg_replace(['/\.\d*$/', '/[\da-f]*:[\da-f]*$/'], ['.***', '****:****'], $ip);
                 }
                 $ipAddress->setIpAddress($ip);

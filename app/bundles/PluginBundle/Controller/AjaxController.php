@@ -92,7 +92,7 @@ class AjaxController extends CommonAjaxController
                             'enable_data_priority' => $enableDataPriority,
                             'integration'          => $integration,
                             'page'                 => $page,
-                            'limit'                => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
+                            'limit'                => $this->get('mautic.helper.core_parameters')->get('default_pagelimit'),
                         ]
                     );
 

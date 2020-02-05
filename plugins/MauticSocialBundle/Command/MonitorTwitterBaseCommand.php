@@ -92,7 +92,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->integrationHelper    = $integrationHelper;
         $this->twitterCommandHelper = $twitterCommandHelper;
 
-        $this->translator->setLocale($coreParametersHelper->getParameter('locale', 'en_US'));
+        $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
 
         parent::__construct();
     }

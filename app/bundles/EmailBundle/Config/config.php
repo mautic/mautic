@@ -362,7 +362,23 @@ return [
             ],
         ],
         'other' => [
+            'mautic.spool.delegator' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'swiftmailer.transport.real',
+                ],
+            ],
+
             // Mailers
+            'mautic.transport.spool' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport::class,
+                'arguments' => [
+                    'swiftmailer.mailer.default.transport.eventdispatcher',
+                    'mautic.spool.delegator',
+                ],
+            ],
+
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
@@ -781,7 +797,7 @@ return [
         'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
         'mailer_custom_headers'        => [],
         'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'            => '%kernel.root_dir%/var/spool',
+        'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
         'mailer_spool_msg_limit'       => null,
         'mailer_spool_time_limit'      => null,
         'mailer_spool_recover_timeout' => 900,

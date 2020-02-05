@@ -33,7 +33,7 @@ class TrailingSlashHelper
      */
     public function getSafeRedirectUrl(Request $request)
     {
-        $siteUrl  = $this->coreParametersHelper->getParameter('site_url');
+        $siteUrl  = $this->coreParametersHelper->get('site_url');
         $pathInfo = substr($request->getPathInfo(), 0, -1);
 
         return $siteUrl.$pathInfo;

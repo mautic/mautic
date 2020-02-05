@@ -36,8 +36,8 @@ class AjaxController extends CommonAjaxController
                     $data['ignoreDefaultColors'] = true;
                 }
 
-                $snapshotUrl = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_url');
-                $snapshotKey = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_key');
+                $snapshotUrl = $this->get('mautic.helper.core_parameters')->get('website_snapshot_url');
+                $snapshotKey = $this->get('mautic.helper.core_parameters')->get('website_snapshot_key');
 
                 $http     = $this->get('mautic.http.connector');
                 $response = $http->get($snapshotUrl.'?url='.urlencode($website).'&key='.$snapshotKey, [], 30);

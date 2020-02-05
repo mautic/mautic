@@ -510,7 +510,7 @@ class LeadModel extends FormModel
                 }
             }
 
-            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->getParameter('ip_lookup_create_organization', false)) {
+            if (!$entity->getCompany() && !empty($details['organization']) && $this->coreParametersHelper->get('ip_lookup_create_organization', false)) {
                 $entity->addUpdatedField('company', $details['organization']);
             }
         }
@@ -518,7 +518,7 @@ class LeadModel extends FormModel
         $updatedFields = $entity->getUpdatedFields();
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company']            = $updatedFields['company'];
-            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            [$company, $leadAdded, $companyEntity]     = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
@@ -579,7 +579,7 @@ class LeadModel extends FormModel
         if ($fetchSocialProfiles) {
             //@todo - add a catch to NOT do social gleaning if a lead is created via a form, etc as we do not want the user to experience the wait
             //generate the social cache
-            list($socialCache, $socialFeatureSettings) = $this->integrationHelper->getUserProfiles(
+            [$socialCache, $socialFeatureSettings] = $this->integrationHelper->getUserProfiles(
                 $lead,
                 $data,
                 true,
@@ -1305,7 +1305,7 @@ class LeadModel extends FormModel
         // Extract company data and import separately
         // Modifies the data array
         $company                           = null;
-        list($companyFields, $companyData) = $this->companyModel->extractCompanyDataFromImport($fields, $data);
+        [$companyFields, $companyData]     = $this->companyModel->extractCompanyDataFromImport($fields, $data);
 
         if (!empty($companyData)) {
             $companyFields = array_flip($companyFields);
@@ -2130,7 +2130,7 @@ class LeadModel extends FormModel
     {
         $event = $this->dispatcher->dispatch(
             LeadEvents::TIMELINE_ON_GENERATE,
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->getParameter('site_url'))
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'))
         );
 
         $payload = [

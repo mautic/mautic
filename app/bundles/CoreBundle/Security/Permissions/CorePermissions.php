@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
@@ -35,9 +36,9 @@ class CorePermissions
     protected $userHelper;
 
     /**
-     * @var array
+     * @var CoreParametersHelper
      */
-    private $params;
+    private $coreParametersHelper;
 
     /**
      * @var array
@@ -69,20 +70,18 @@ class CorePermissions
      */
     private $checkedPermissions = [];
 
-    /**
-     * CorePermissions constructor.
-     *
-     * @param Translator $translator
-     * @param            $bundles
-     * @param            $pluginBundles
-     */
-    public function __construct(UserHelper $userHelper, TranslatorInterface $translator, array $parameters, $bundles, $pluginBundles)
-    {
-        $this->translator    = $translator;
-        $this->params        = $parameters;
-        $this->bundles       = $bundles;
-        $this->pluginBundles = $pluginBundles;
-        $this->userHelper    = $userHelper;
+    public function __construct(
+        UserHelper $userHelper,
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper,
+        array $bundles,
+        array $pluginBundles
+    ) {
+        $this->userHelper           = $userHelper;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->bundles              = $bundles;
+        $this->pluginBundles        = $pluginBundles;
 
         $this->registerPermissionClasses();
     }
@@ -153,7 +152,7 @@ class CorePermissions
         //bust out permissions into their respective bundles
         $bundlePermissions = [];
         foreach ($permissions as $permission => $perms) {
-            list($bundle, $level)               = explode(':', $permission);
+            [$bundle, $level]                   = explode(':', $permission);
             $bundlePermissions[$bundle][$level] = $perms;
         }
 
@@ -448,7 +447,7 @@ class CorePermissions
      */
     protected function getParams()
     {
-        return $this->params;
+        return $this->coreParametersHelper->all();
     }
 
     /**

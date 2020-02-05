@@ -27,7 +27,7 @@ class PopupController extends CommonController
         $response = $this->render(
             'MauticNotificationBundle:Popup:index.html.php',
             [
-                'siteUrl' => $this->coreParametersHelper->getParameter('site_url'),
+                'siteUrl' => $this->coreParametersHelper->get('site_url'),
             ]
         );
 

@@ -1,5 +1,7 @@
 <?php
 
+// Include path settings
+$root = $container->getParameter('kernel.root_dir');
 include __DIR__.'/paths_helper.php';
 
 $ormMappings        =
@@ -175,17 +177,15 @@ $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
+$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
 
 // Decide on secure cookie based on site_url setting
-$secureCookie = $container->hasParameter('mautic.site_url') && 'https' === substr(ltrim($container->getParameter('mautic.site_url')), 0, 5);
-
-// Generate session name
-// Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
-$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
-$sessionName = md5(md5($paths['local_config']).$key);
+// This cannot be set dynamically
+$siteUrl      = $configParameterBag->get('site_url');
+$secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
@@ -211,11 +211,9 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'trusted_hosts'   => '%mautic.trusted_hosts%',
-    'trusted_proxies' => '%mautic.trusted_proxies%',
     'session'         => [ //handler_id set to null will use default session handler from php.ini
         'handler_id'    => null,
-        'name'          => $sessionName,
+        'name'          => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure' => $secureCookie,
     ],
     'fragments'            => null,
@@ -255,12 +253,6 @@ $dbalSettings = [
     'server_version' => '%mautic.db_server_version%',
 ];
 
-// If using pdo_sqlite as the database driver, add the path to config file
-$dbDriver = $container->getParameter('mautic.db_driver');
-if ('pdo_sqlite' == $dbDriver) {
-    $dbalSettings['path'] = '%mautic.db_path%';
-}
-
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
     'orm'  => [
@@ -271,16 +263,15 @@ $container->loadFromExtension('doctrine', [
 ]);
 
 //MigrationsBundle Configuration
-$prefix = $container->getParameter('mautic.db_table_prefix');
 $container->loadFromExtension('doctrine_migrations', [
     'dir_name'   => '%kernel.root_dir%/migrations',
     'namespace'  => 'Mautic\\Migrations',
-    'table_name' => $prefix.'migrations',
+    'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
     'name'       => 'Mautic Migrations',
 ]);
 
 // Swiftmailer Configuration
-$mailerSettings = [
+$container->loadFromExtension('swiftmailer', [
     'transport'  => '%mautic.mailer_transport%',
     'host'       => '%mautic.mailer_host%',
     'port'       => '%mautic.mailer_port%',
@@ -288,17 +279,11 @@ $mailerSettings = [
     'password'   => '%mautic.mailer_password%',
     'encryption' => '%mautic.mailer_encryption%',
     'auth_mode'  => '%mautic.mailer_auth_mode%',
-];
-
-// Only spool if using file as otherwise emails are not sent on redirects
-$spoolType = $container->getParameter('mautic.mailer_spool_type');
-if ('file' == $spoolType) {
-    $mailerSettings['spool'] = [
-        'type' => '%mautic.mailer_spool_type%',
-        'path' => '%mautic.mailer_spool_path%',
-    ];
-}
-$container->loadFromExtension('swiftmailer', $mailerSettings);
+    'spool'      => [
+        'type' => 'service',
+        'id'   => 'mautic.transport.spool',
+    ],
+]);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
@@ -308,8 +293,6 @@ $container->loadFromExtension('knp_menu', [
 ]);
 
 // OneupUploader Configuration
-$uploadDir = $container->getParameter('mautic.upload_dir');
-$maxSize   = $container->getParameter('mautic.max_size');
 $container->loadFromExtension('oneup_uploader', [
     // 'orphanage' => array(
     //     'maxage' => 86400,
@@ -326,7 +309,7 @@ $container->loadFromExtension('oneup_uploader', [
             // 'max_size' => ($maxSize * 1000000),
             // 'use_orphanage' => true,
             'storage' => [
-                'directory' => $uploadDir,
+                'directory' => '%mautic.upload_dir%',
             ],
         ],
     ],
@@ -378,26 +361,26 @@ $container->loadFromExtension('jms_serializer', [
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
-            'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
+            'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
         ],
     ],
 ]);
 
-$api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
+$rateLimit = $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'        => 0 == $api_rate_limiter_limit ? false : true,
+  'enabled'        => 0 === $rateLimit ? false : true,
   'storage_engine' => 'cache',
   'cache_service'  => 'api_rate_limiter_cache',
   'path_limits'    => [
     [
       'path'   => '/api',
-      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'limit'  => $rateLimit,
       'period' => 3600,
     ],
   ],
   'fos_oauth_key_listener' => true,
   'display_headers'        => true,
-  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls per hour.", "details": [] } ]}',
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
@@ -449,9 +432,6 @@ $container->setDefinition(
 );
 
 // ElFinder File Manager
-$elFinderPath = trim($container->getParameter('mautic.image_path'), '/');
-$elFinderUrl  = rtrim($container->getParameter('mautic.site_url'), '/').'/'.$elFinderPath;
-
 $container->loadFromExtension('fm_elfinder', [
     'assets_path'            => 'media/assets',
     'instances'              => [
@@ -466,12 +446,12 @@ $container->loadFromExtension('fm_elfinder', [
                 'roots' => [
                     'uploads' => [
                         'driver'            => 'LocalFileSystem',
-                        'path'              => $elFinderPath,
+                        'path'              => '%env(MAUTIC_EL_FINDER_PATH)%',
                         'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
                         'upload_deny'       => ['all'],
                         'upload_max_size'   => '2M',
                         'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
-                        'url'               => $elFinderUrl, // We need to specify URL in case mod_rewrite is disabled
+                        'url'               => '%env(MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
                     ],
                 ],
             ],

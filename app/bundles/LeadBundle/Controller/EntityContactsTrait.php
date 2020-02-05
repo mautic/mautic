@@ -73,7 +73,7 @@ trait EntityContactsTrait
         //set limits
         $limit = $this->get('session')->get(
             'mautic.'.$sessionVar.'.contact.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
+            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
         );
 
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);

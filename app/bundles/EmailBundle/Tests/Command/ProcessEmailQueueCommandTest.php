@@ -101,7 +101,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         }
         copy($tryAgainMessage, $tmpTryAgainMessageFile);
 
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->withConsecutive(['mailer_spool_type'])
             ->willReturnOnConsecutiveCalls(true);
 
