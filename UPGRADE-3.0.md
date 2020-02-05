@@ -183,6 +183,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   Deprecated class ConfigModel removed
 *   Deprecated JS function Mautic.hideSpecificConfigFields removed
 *   Deprecated method ConfigEvent::getPost() removed
+*   1st param removed from constructor of ConfigBuilderEvent as it was never used.
 All ConfigSubscribers must keep 'formAlias' but also add 'formType' with the form type class name.
 
 Before:

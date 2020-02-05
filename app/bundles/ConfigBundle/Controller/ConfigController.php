@@ -37,7 +37,7 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
         $fileFields  = $event->getFileFields();
@@ -196,7 +196,7 @@ class ConfigController extends FormController
             return $this->accessDenied();
         }
 
-        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
 
@@ -238,7 +238,7 @@ class ConfigController extends FormController
         }
 
         $success    = 0;
-        $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
+        $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
 
