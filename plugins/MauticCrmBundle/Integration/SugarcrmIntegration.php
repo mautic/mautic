@@ -322,9 +322,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $isRequired = function (array $field, $object) {
             switch (true) {
                 case 'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']):
-                    return true;
                 case 'Contacts' === $object && 'email1' === $field['name']:
-                    return true;
                 case 'id' !== $field['name'] && !empty($field['required']):
                     return true;
                 default:
@@ -334,7 +332,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         try {
             if (!empty($sugarObjects) and is_array($sugarObjects)) {
-                foreach ($sugarObjects as $key => $sObject) {
+                foreach ($sugarObjects as $sObject) {
                     if ('Accounts' === $sObject) {
                         // Match Sugar object to Mautic's
                         $sObject = 'company';
@@ -458,9 +456,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getFetchQuery($params)
     {
-        $dateRange = $params;
-
-        return $dateRange;
+        return $params;
     }
 
     /**
@@ -818,7 +814,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $assignedUserIds            = [];
             $onwerEmailByAssignedUserId = [];
             if ('Leads' == $object || 'Contacts' == $object || 'Accounts' == $object) {
-                foreach ($data[$RECORDS_LIST_NAME] as $key => $record) {
+                foreach ($data[$RECORDS_LIST_NAME] as $record) {
                     if ('6' == $SUGAR_VERSION) {
                         foreach ($record['name_value_list'] as $item) {
                             if ('assigned_user_id' == $item['name'] && $item['value'] && '' != $item['value']) {
@@ -841,7 +837,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $checkEmailsInSugar = [];
             if ('Leads' == $object) {
                 if ('6' == $SUGAR_VERSION) {
-                    foreach ($data[$RECORDS_LIST_NAME] as $key => $record) {
+                    foreach ($data[$RECORDS_LIST_NAME] as $record) {
                         foreach ($record['name_value_list'] as $item) {
                             if ('email1' == $item['name'] && $item['value'] && '' != $item['value']) {
                                 $checkEmailsInSugar[] = $item['value'];
@@ -857,7 +853,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             if (!empty($checkEmailsInSugar)) {
                 $sugarLeads = $this->getApiHelper()->getLeads(['checkemail_contacts' => $checkEmailsInSugar, 'offset' => 0, 'max_results' => 1000], 'Contacts');
                 if (isset($sugarLeads[$RECORDS_LIST_NAME])) {
-                    foreach ($sugarLeads[$RECORDS_LIST_NAME] as $k => $record) {
+                    foreach ($sugarLeads[$RECORDS_LIST_NAME] as $record) {
                         $sugarLeadRecord = [];
                         if ('6' == $SUGAR_VERSION) {
                             foreach ($record['name_value_list'] as $item) {
@@ -874,7 +870,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
 
-            foreach ($data[$RECORDS_LIST_NAME] as $key => $record) {
+            foreach ($data[$RECORDS_LIST_NAME] as $record) {
                 $integrationEntities = [];
                 $dataObject          = [];
                 if (isset($record[$MODULE_FIELD_NAME]) && 'Accounts' == $record[$MODULE_FIELD_NAME]) {
@@ -883,7 +879,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     $newName = '__'.$object;
                 }
                 if ('6' == $SUGAR_VERSION) {
-                    foreach ($record['name_value_list'] as $k=>$item) {
+                    foreach ($record['name_value_list'] as $item) {
                         if ('Activity' !== $object) {
                             if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
                                 $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
@@ -1778,9 +1774,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $fields = array_flip($fieldsToUpdate);
         }
 
-        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
-
-        return $fieldsToUpdate;
+        return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
     /**
@@ -1896,9 +1890,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         foreach ($multiSelectArrayValues as $item) {
             $convertedSugarCrmMultiSelectString = $convertedSugarCrmMultiSelectString.'^'.$item.'^'.',';
         }
-        $convertedSugarCrmMultiSelectString = substr($convertedSugarCrmMultiSelectString, 0, -1);
 
-        return $convertedSugarCrmMultiSelectString;
+        return substr($convertedSugarCrmMultiSelectString, 0, -1);
     }
 
     /**
@@ -1933,11 +1926,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $regexString            = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
         preg_match_all($regexString, $suiteCrmMultiSelectStringToConvert, $matches, PREG_SET_ORDER, 0);
         $convertedString        = '';
-        foreach ($matches as $row => $innerArray) {
+        foreach ($matches as $innerArray) {
             $convertedString     = $convertedString.$innerArray[2].'|';
         }
-        $convertedString        = substr($convertedString, 0, -1);
 
-        return $convertedString;
+        return substr($convertedString, 0, -1);
     }
 }

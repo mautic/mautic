@@ -222,7 +222,7 @@ class TwitterCommandHelper
 
             // Key by twitter handle
             $twitterLeads = [];
-            foreach ($leads as $leadId => $lead) {
+            foreach ($leads as $lead) {
                 $fields                       = $lead->getFields();
                 $twitterHandle                = strtolower($fields[$handleFieldGroup][$this->twitterHandleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;
@@ -260,7 +260,7 @@ class TwitterCommandHelper
             // key by name
             $namedLeads = [];
             /** @var Lead $lead */
-            foreach ($leadsByName as $leadId => $lead) {
+            foreach ($leadsByName as $lead) {
                 $firstName                            = $lead->getFirstname();
                 $lastName                             = $lead->getLastname();
                 $namedLeads[$firstName.' '.$lastName] = $lead;

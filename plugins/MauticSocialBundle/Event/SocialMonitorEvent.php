@@ -14,9 +14,6 @@ namespace MauticPlugin\MauticSocialBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class SocialMonitorEvent.
- */
 class SocialMonitorEvent extends CommonEvent
 {
     /**
@@ -40,8 +37,6 @@ class SocialMonitorEvent extends CommonEvent
     protected $leadIds = [];
 
     /**
-     * SocialMonitorEvent constructor.
-     *
      * @param $integrationName
      * @param $newLeadCount
      * @param $updatedLeadCount
@@ -50,7 +45,6 @@ class SocialMonitorEvent extends CommonEvent
     {
         $this->integrationName  = $integrationName;
         $this->entity           = $monitoring;
-        $this->leadIds          = $this->leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }

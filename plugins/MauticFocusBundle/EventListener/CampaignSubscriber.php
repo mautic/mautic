@@ -14,26 +14,14 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EventModel
-     */
-    private $campaignEventModel;
-
-    /**
-     * @var FocusModel
-     */
-    private $focusModel;
-
     /**
      * @var TrackingHelper
      */
@@ -44,12 +32,10 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $router;
 
-    public function __construct(EventModel $eventModel, FocusModel $focusModel, TrackingHelper $trackingHelper, RouterInterface $router)
+    public function __construct(TrackingHelper $trackingHelper, RouterInterface $router)
     {
-        $this->campaignEventModel = $eventModel;
-        $this->focusModel         = $focusModel;
-        $this->trackingHelper     = $trackingHelper;
-        $this->router             = $router;
+        $this->trackingHelper = $trackingHelper;
+        $this->router         = $router;
     }
 
     /**

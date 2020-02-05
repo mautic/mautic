@@ -194,9 +194,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $fields = $this->getAvailableLeadFields(self::ORGANIZATION_ENTITY_TYPE);
-
-        return $fields;
+        return $this->getAvailableLeadFields(self::ORGANIZATION_ENTITY_TYPE);
     }
 
     /**
