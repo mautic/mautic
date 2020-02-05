@@ -564,7 +564,6 @@ return [
                 'arguments' => [
                     'transifex.factory',
                     'translator',
-                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
