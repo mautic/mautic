@@ -21,4 +21,5 @@ parameters:
 		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
 		- '#Constant MAUTIC_ENV not found.#'
+		- '#Constant MAUTIC_VERSION not found.#'
 		- '/Variable \$\w+ might not be defined\./'
