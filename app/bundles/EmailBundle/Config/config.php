@@ -474,7 +474,7 @@ return [
                 ],
             ],
             'mautic.transport.sendgrid' => [
-                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport',
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\SendgridTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
