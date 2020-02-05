@@ -74,7 +74,10 @@ class WebhookType extends AbstractType
             [
                 'label'      => 'mautic.webhook.form.secret',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.webhook.secret.tooltip',
+                ],
                 'empty_data' => EncryptionHelper::generateKey(),
                 'required'   => false,
             ]
