@@ -36,7 +36,7 @@ class EmailStep implements StepInterface
      *
      * @var string
      */
-    public $mailer_transport = 'mail';
+    public $mailer_transport = 'smtp';
 
     /**
      * SMTP host
@@ -70,6 +70,13 @@ class EmailStep implements StepInterface
     public $mailer_password;
 
     /**
+     * Mailer API key if applicable.
+     *
+     * @var string
+     */
+    public $mailer_api_key;
+
+    /**
      * SMTP encryption
      * Required in step.
      *
@@ -96,7 +103,7 @@ class EmailStep implements StepInterface
      *
      * @var string
      */
-    public $mailer_spool_path = '%kernel.root_dir%/var/spool';
+    public $mailer_spool_path = '%kernel.root_dir%/../var/spool';
 
     public function __construct(Session $session)
     {

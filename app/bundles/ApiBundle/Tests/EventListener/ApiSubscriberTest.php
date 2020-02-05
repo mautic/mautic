@@ -13,44 +13,33 @@ namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
-use Symfony\Component\HttpFoundation\HeaderBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ApiSubscriberTest extends CommonMocks
 {
     /**
-     * @var IpLookupHelper|PHPUnit_Framework_MockObject_MockObject
-     */
-    private $ipLookupHelper;
-
-    /**
-     * @var CoreParametersHelper|PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|MockObject
      */
     private $coreParametersHelper;
 
     /**
-     * @var AuditLogModel|PHPUnit_Framework_MockObject_MockObject
-     */
-    private $auditLogModel;
-
-    /**
-     * @var TranslatorInterface|PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 
     /**
-     * @var Request|PHPUnit_Framework_MockObject_MockObject
+     * @var Request|MockObject
      */
     private $request;
 
     /**
-     * @var GetResponseEvent|PHPUnit_Framework_MockObject_MockObject
+     * @var GetResponseEvent|MockObject
      */
     private $event;
 
@@ -63,39 +52,15 @@ class ApiSubscriberTest extends CommonMocks
     {
         parent::setUp();
 
-        $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->auditLogModel        = $this->createMock(AuditLogModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->request              = $this->createMock(Request::class);
+        $this->request->headers     = new ParameterBag();
         $this->event                = $this->createMock(GetResponseEvent::class);
         $this->subscriber           = new ApiSubscriber(
-            $this->ipLookupHelper,
             $this->coreParametersHelper,
-            $this->auditLogModel,
             $this->translator
         );
-    }
-
-    public function testIsBasicAuthWithValidBasicAuth()
-    {
-        $this->request->headers = new HeaderBag(['Authorization' => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=']);
-
-        $this->assertTrue($this->subscriber->isBasicAuth($this->request));
-    }
-
-    public function testIsBasicAuthWithInvalidBasicAuth()
-    {
-        $this->request->headers = new HeaderBag(['Authorization' => 'Invalid Basic Auth value']);
-
-        $this->assertFalse($this->subscriber->isBasicAuth($this->request));
-    }
-
-    public function testIsBasicAuthWithMissingBasicAuth()
-    {
-        $this->request->headers = new HeaderBag([]);
-
-        $this->assertFalse($this->subscriber->isBasicAuth($this->request));
     }
 
     public function testOnKernelRequestWhenNotMasterRequest()
@@ -105,7 +70,7 @@ class ApiSubscriberTest extends CommonMocks
             ->willReturn(false);
 
         $this->coreParametersHelper->expects($this->never())
-            ->method('getParameter');
+            ->method('get');
 
         $this->assertNull($this->subscriber->onKernelRequest($this->event));
     }
@@ -125,11 +90,19 @@ class ApiSubscriberTest extends CommonMocks
             ->willReturn('/api/endpoint');
 
         $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('api_enabled')
             ->willReturn(false);
 
-        $this->expectException(AccessDeniedHttpException::class);
+        $this->event->expects($this->once())
+            ->method('setResponse')
+            ->with($this->isInstanceOf(JsonResponse::class))
+            ->willReturnCallback(
+                function (JsonResponse $response) {
+                    $this->assertEquals(403, $response->getStatusCode());
+                }
+            );
+
         $this->subscriber->onKernelRequest($this->event);
     }
 
@@ -147,10 +120,10 @@ class ApiSubscriberTest extends CommonMocks
             ->method('getRequestUri')
             ->willReturn('/api/endpoint');
 
-        $this->coreParametersHelper->expects($this->once())
-            ->method('getParameter')
-            ->with('api_enabled')
-            ->willReturn(true);
+        $this->coreParametersHelper->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(['api_enabled'], ['api_enable_basic_auth'])
+            ->willReturnOnConsecutiveCalls(true, true);
 
         $this->subscriber->onKernelRequest($this->event);
     }

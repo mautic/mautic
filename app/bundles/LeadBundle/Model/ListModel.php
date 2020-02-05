@@ -1354,9 +1354,9 @@ class ListModel extends FormModel
      */
     protected function batchSleep()
     {
-        $leadSleepTime = $this->coreParametersHelper->getParameter('batch_lead_sleep_time', false);
+        $leadSleepTime = $this->coreParametersHelper->get('batch_lead_sleep_time', false);
         if (false === $leadSleepTime) {
-            $leadSleepTime = $this->coreParametersHelper->getParameter('batch_sleep_time', 1);
+            $leadSleepTime = $this->coreParametersHelper->get('batch_sleep_time', 1);
         }
 
         if (empty($leadSleepTime)) {

@@ -70,7 +70,7 @@ class CsvExporter
      */
     private function putRow($handle, array $row)
     {
-        if ($this->coreParametersHelper->getParameter('csv_always_enclose')) {
+        if ($this->coreParametersHelper->get('csv_always_enclose')) {
             fputs($handle, '"'.implode('","', $row).'"'."\n");
         } else {
             fputcsv($handle, $row);

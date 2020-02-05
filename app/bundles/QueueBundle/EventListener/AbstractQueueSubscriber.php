@@ -24,8 +24,6 @@ abstract class AbstractQueueSubscriber implements EventSubscriberInterface
 
     abstract public function consumeMessage(Events\QueueEvent $event);
 
-    abstract public function buildConfig(Events\QueueConfigEvent $event);
-
     /**
      * @return array
      */
@@ -34,7 +32,6 @@ abstract class AbstractQueueSubscriber implements EventSubscriberInterface
         return [
             QueueEvents::PUBLISH_MESSAGE => ['onPublishMessage', 0],
             QueueEvents::CONSUME_MESSAGE => ['onConsumeMessage', 0],
-            QueueEvents::BUILD_CONFIG    => ['onBuildConfig', 0],
         ];
     }
 
@@ -54,11 +51,5 @@ abstract class AbstractQueueSubscriber implements EventSubscriberInterface
         }
 
         $this->consumeMessage($event);
-    }
-
-    public function onBuildConfig(Events\QueueConfigEvent $event)
-    {
-        $event->addProtocolChoice($this->protocol, $this->protocolUiTranslation);
-        $this->buildConfig($event);
     }
 }

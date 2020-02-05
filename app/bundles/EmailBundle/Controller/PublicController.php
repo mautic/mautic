@@ -157,7 +157,7 @@ class PublicController extends CommonFormController
         }
 
         if (empty($template) && empty($formTemplate)) {
-            $template = $this->coreParametersHelper->getParameter('theme');
+            $template = $this->coreParametersHelper->get('theme');
         } elseif (!empty($formTemplate)) {
             $template = $formTemplate;
         }
@@ -184,7 +184,7 @@ class PublicController extends CommonFormController
                 $successSessionName .= ".{$lead->getId()}";
             }
 
-            if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
+            if (!$this->get('mautic.helper.core_parameters')->get('show_contact_preferences')) {
                 $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
@@ -192,11 +192,11 @@ class PublicController extends CommonFormController
                 $viewParameters = [
                     'lead'                         => $lead,
                     'idHash'                       => $idHash,
-                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_frequency'),
-                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_pause_dates'),
-                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferred_channels'),
-                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_categories'),
-                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->getParameter('show_contact_segments'),
+                    'showContactFrequency'         => $this->get('mautic.helper.core_parameters')->get('show_contact_frequency'),
+                    'showContactPauseDates'        => $this->get('mautic.helper.core_parameters')->get('show_contact_pause_dates'),
+                    'showContactPreferredChannels' => $this->get('mautic.helper.core_parameters')->get('show_contact_preferred_channels'),
+                    'showContactCategories'        => $this->get('mautic.helper.core_parameters')->get('show_contact_categories'),
+                    'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
                 ];
 
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
@@ -345,7 +345,7 @@ class PublicController extends CommonFormController
 
             $model->removeDoNotContact($stat->getEmailAddress());
 
-            $message = $this->coreParametersHelper->getParameter('resubscribe_message');
+            $message = $this->coreParametersHelper->get('resubscribe_message');
             if (!$message) {
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
@@ -371,7 +371,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->getParameter('theme');
+        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
         $theme = $this->factory->getTheme($template);
 
@@ -382,7 +382,7 @@ class PublicController extends CommonFormController
         // Ensure template still exists
         $theme = $this->factory->getTheme($template);
         if (empty($theme) || $theme->getTheme() !== $template) {
-            $template = $this->coreParametersHelper->getParameter('theme');
+            $template = $this->coreParametersHelper->get('theme');
         }
 
         $analytics = $this->factory->getHelper('template.analytics')->getCode();
@@ -416,22 +416,16 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        // Use the real transport as the one in Mailer could be SpoolTransport if the system is configured to queue
-        // Can't use swiftmailer.transport.real because it's not set for when queue is disabled
-        $transportParam   = $this->get('mautic.helper.core_parameters')->getParameter(('mailer_transport'));
-        $currentTransport = $this->get('swiftmailer.mailer.transport.'.$transportParam);
+        $realTransport = $this->container->get('swiftmailer.transport.real');
 
-        $isCallbackInterface = $currentTransport instanceof CallbackTransportInterface;
-        if ($isCallbackInterface && $currentTransport->getCallbackPath() === $transport) {
-            if ($currentTransport instanceof CallbackTransportInterface) {
-                $event = new TransportWebhookEvent($currentTransport, $this->request);
-                $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
-            }
-
-            return new Response('success');
+        if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        $event = new TransportWebhookEvent($realTransport, $this->request);
+        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+
+        return new Response('success');
     }
 
     /**
@@ -748,7 +742,7 @@ class PublicController extends CommonFormController
     {
         $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-        $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
+        $message = $this->coreParametersHelper->get('unsubscribe_message');
         if (!$message) {
             $message = $translator->trans(
                 'mautic.email.unsubscribed.success',

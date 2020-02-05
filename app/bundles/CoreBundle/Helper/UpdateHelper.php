@@ -122,7 +122,7 @@ class UpdateHelper
             $update = (array) json_decode(file_get_contents($cacheFile));
 
             // Check if the user has changed the update channel, if so the cache is invalidated
-            if ($update['stability'] == $this->coreParametersHelper->getParameter('update_stability')) {
+            if ($update['stability'] == $this->coreParametersHelper->get('update_stability')) {
                 // If we're within the cache time, return the cached data
                 if ($update['checkedTime'] > strtotime('-3 hours')) {
                     return $update;
@@ -135,7 +135,7 @@ class UpdateHelper
             // Generate a unique instance ID for the site
             $instanceId = hash(
                 'sha1',
-                $this->coreParametersHelper->getParameter('secret_key').'Mautic'.$this->coreParametersHelper->getParameter('db_driver')
+                $this->coreParametersHelper->get('secret_key').'Mautic'.$this->coreParametersHelper->get('db_driver')
             );
 
             $data = array_map(
@@ -144,10 +144,10 @@ class UpdateHelper
                     'application'   => 'Mautic',
                     'version'       => MAUTIC_VERSION,
                     'phpVersion'    => PHP_VERSION,
-                    'dbDriver'      => $this->coreParametersHelper->getParameter('db_driver'),
+                    'dbDriver'      => $this->coreParametersHelper->get('db_driver'),
                     'serverOs'      => $this->getServerOs(),
                     'instanceId'    => $instanceId,
-                    'installSource' => $this->coreParametersHelper->getParameter('install_source', 'Mautic'),
+                    'installSource' => $this->coreParametersHelper->get('install_source', 'Mautic'),
                 ]
             );
 
@@ -163,11 +163,11 @@ class UpdateHelper
                 [
                     'appVersion' => MAUTIC_VERSION,
                     'phpVersion' => PHP_VERSION,
-                    'stability'  => $this->coreParametersHelper->getParameter('update_stability'),
+                    'stability'  => $this->coreParametersHelper->get('update_stability'),
                 ]
             );
 
-            $data   = $this->connector->post($this->coreParametersHelper->getParameter('system_update_url'), $appData, [], 10);
+            $data   = $this->connector->post($this->coreParametersHelper->get('system_update_url'), $appData, [], 10);
             $update = json_decode($data->body);
         } catch (\Exception $exception) {
             // Log the error
@@ -219,7 +219,7 @@ class UpdateHelper
             'announcement' => $update->announcement,
             'package'      => $update->package,
             'checkedTime'  => time(),
-            'stability'    => $this->coreParametersHelper->getParameter('update_stability'),
+            'stability'    => $this->coreParametersHelper->get('update_stability'),
         ];
 
         file_put_contents($cacheFile, json_encode($data));

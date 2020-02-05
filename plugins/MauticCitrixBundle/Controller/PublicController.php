@@ -75,7 +75,7 @@ class PublicController extends CommonController
         $response->headers->set('Content-type', 'application/'.($is_xhr ? 'json' : 'x-javascript'));
 
         // Allow CORS requests only from dev machines
-        $allowedIps = $this->coreParametersHelper->getParameter('dev_hosts') ?: [];
+        $allowedIps = $this->coreParametersHelper->get('dev_hosts') ?: [];
         if (in_array($request->getClientIp(), $allowedIps, true)) {
             $response->headers->set('Access-Control-Allow-Origin', '*');
         }

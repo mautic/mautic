@@ -63,7 +63,7 @@ class QueueService
         unset($logPayload['request']);
         $this->logger->debug('QUEUE: Queuing job for '.$queueName, $logPayload);
 
-        $protocol                   = $this->coreParametersHelper->getParameter('queue_protocol');
+        $protocol                   = $this->coreParametersHelper->get('queue_protocol');
         $payload['mauticQueueName'] = $queueName;
         $event                      = new QueueEvent($protocol, $queueName, $payload);
         $this->eventDispatcher->dispatch(QueueEvents::PUBLISH_MESSAGE, $event);
@@ -75,7 +75,7 @@ class QueueService
      */
     public function consumeFromQueue($queueName, $messages = null)
     {
-        $protocol = $this->coreParametersHelper->getParameter('queue_protocol');
+        $protocol = $this->coreParametersHelper->get('queue_protocol');
         $event    = new QueueEvent($protocol, $queueName, [], $messages);
         $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
     }
@@ -113,6 +113,6 @@ class QueueService
      */
     public function isQueueEnabled()
     {
-        return '' != $this->coreParametersHelper->getParameter('queue_protocol');
+        return '' != $this->coreParametersHelper->get('queue_protocol');
     }
 }

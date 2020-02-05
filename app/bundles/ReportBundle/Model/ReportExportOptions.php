@@ -37,7 +37,7 @@ class ReportExportOptions
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->batchSize = $coreParametersHelper->getParameter('report_export_batch_size');
+        $this->batchSize = $coreParametersHelper->get('report_export_batch_size');
         $this->page      = 1;
     }
 

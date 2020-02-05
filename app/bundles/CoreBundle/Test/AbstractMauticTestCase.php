@@ -46,6 +46,14 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected function setUp()
     {
+        $defaultConfig = json_encode(
+            [
+                'api_enabled'           => true,
+                'api_enable_basic_auth' => true,
+            ]
+        );
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$defaultConfig);
+
         \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
 
         $this->client = static::createClient([], $this->clientServer);

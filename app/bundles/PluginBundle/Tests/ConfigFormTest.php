@@ -97,7 +97,7 @@ class ConfigFormTest extends KernelTestCase
         $pathsHelper          = $this->getMockBuilder(PathsHelper::class)->disableOriginalConstructor()->getMock();
         $bundleHelper         = $this->getMockBuilder(BundleHelper::class)->disableOriginalConstructor()->getMock();
         $pluginModel          = $this->getMockBuilder(PluginModel::class)->disableOriginalConstructor()->getMock();
-        $coreParametersHelper = new CoreParametersHelper(self::$kernel);
+        $coreParametersHelper = new CoreParametersHelper(self::$kernel->getContainer());
         $templatingHelper     = $this->getMockBuilder(TemplatingHelper::class)->disableOriginalConstructor()->getMock();
         $entityManager        = $this
             ->getMockBuilder(EntityManager::class)

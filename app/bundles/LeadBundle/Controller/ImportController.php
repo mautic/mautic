@@ -523,7 +523,7 @@ class ImportController extends FormController
 
     protected function getLineCountLimit()
     {
-        return $this->get('mautic.helper.core_parameters')->getParameter('background_import_if_more_rows_than', 0);
+        return $this->get('mautic.helper.core_parameters')->get('background_import_if_more_rows_than', 0);
     }
 
     /**

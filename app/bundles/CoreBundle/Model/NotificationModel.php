@@ -236,7 +236,7 @@ class NotificationModel extends FormModel
      */
     public function updateUpstreamNotifications()
     {
-        $url = $this->coreParametersHelper->getParameter('rss_notification_url');
+        $url = $this->coreParametersHelper->get('rss_notification_url');
 
         if (empty($url)) {
             return;

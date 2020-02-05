@@ -46,7 +46,7 @@ class NoteController extends FormController
         //set limits
         $limit = $session->get(
             'mautic.lead.'.$lead->getId().'.note.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
+            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
         );
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {

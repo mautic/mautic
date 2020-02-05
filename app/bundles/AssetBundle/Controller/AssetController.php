@@ -50,7 +50,7 @@ class AssetController extends FormController
         }
 
         //set limits
-        $limit = $this->get('session')->get('mautic.asset.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_assetlimit'));
+        $limit = $this->get('session')->get('mautic.asset.limit', $this->get('mautic.helper.core_parameters')->get('default_assetlimit'));
         $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -245,7 +245,7 @@ class AssetController extends FormController
         if ('1' === $download || '1' === $stream) {
             try {
                 //set the uploadDir
-                $activeAsset->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+                $activeAsset->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                 $contents = $activeAsset->getFileContents();
             } catch (\Exception $e) {
                 return $this->notFound();
@@ -287,7 +287,9 @@ class AssetController extends FormController
         if (null == $entity) {
             $entity = $model->getEntity();
         }
-        $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->get('mautic.helper.core_parameters')->getParameter('max_size')));
+
+        $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->get('mautic.helper.core_parameters')->get('max_size')));
+
         $method  = $this->request->getMethod();
         $session = $this->get('session');
 
@@ -296,7 +298,7 @@ class AssetController extends FormController
         }
 
         $maxSize    = $model->getMaxUploadSize();
-        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions'));
+        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->get('allowed_extensions'));
 
         $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', [
             '%fileSize%' => '{{filesize}}',
@@ -328,7 +330,7 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
 
@@ -421,12 +423,14 @@ class AssetController extends FormController
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
-        $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->get('mautic.helper.core_parameters')->getParameter('max_size')));
+
+        $entity->setMaxSize(FileHelper::convertMegabytesToBytes($this->get('mautic.helper.core_parameters')->get('max_size')));
+
         $session    = $this->get('session');
         $page       = $session->get('mautic.asset.page', 1);
         $method     = $this->request->getMethod();
         $maxSize    = $model->getMaxUploadSize();
-        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions'));
+        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->get('allowed_extensions'));
 
         $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', [
             '%fileSize%' => '{{filesize}}',
@@ -491,7 +495,7 @@ class AssetController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+                    $entity->setUploadDir($this->get('mautic.helper.core_parameters')->get('upload_dir'));
                     $entity->preUpload();
                     $entity->upload();
 

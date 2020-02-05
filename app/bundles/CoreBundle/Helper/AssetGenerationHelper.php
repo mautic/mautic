@@ -19,9 +19,9 @@ use Symfony\Component\Finder\Finder;
 class AssetGenerationHelper
 {
     /**
-     * @var CoreParametersHelper
+     * @var BundleHelper
      */
-    private $coreParametersHelper;
+    private $bundleHelper;
 
     /**
      * @var PathsHelper
@@ -36,11 +36,11 @@ class AssetGenerationHelper
     /**
      * AssetGenerationHelper constructor.
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, PathsHelper $pathsHelper, AppVersion $version)
+    public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->bundleHelper         = $bundleHelper;
         $this->pathsHelper          = $pathsHelper;
-        $this->version              = substr(hash('sha1', $coreParametersHelper->getParameter('secret_key').$version->getVersion()), 0, 8);
+        $this->version              = substr(hash('sha1', $coreParametersHelper->get('secret_key').$version->getVersion()), 0, 8);
     }
 
     /**
@@ -97,7 +97,7 @@ class AssetGenerationHelper
                 $modifiedLast = [];
 
                 //get a list of all core asset files
-                $bundles = $this->coreParametersHelper->getParameter('bundles');
+                $bundles = $this->bundleHelper->getMauticBundles();
 
                 $fileTypes = ['css', 'js'];
                 foreach ($bundles as $bundle) {

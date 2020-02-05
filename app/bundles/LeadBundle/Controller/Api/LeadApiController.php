@@ -129,7 +129,7 @@ class LeadApiController extends CommonApiController
         $results = $this->getModel('lead.note')->getEntities(
             [
                 'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $this->request->query->get('search', ''),
                     'force'  => [
@@ -145,7 +145,7 @@ class LeadApiController extends CommonApiController
             ]
         );
 
-        list($notes, $count) = $this->prepareEntitiesForView($results);
+        [$notes, $count] = $this->prepareEntitiesForView($results);
 
         $view = $this->view(
             [
@@ -183,7 +183,7 @@ class LeadApiController extends CommonApiController
         $results = $this->getModel('lead.device')->getEntities(
             [
                 'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->getParameter('default_pagelimit')),
+                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
                     'string' => $this->request->query->get('search', ''),
                     'force'  => [
@@ -199,7 +199,7 @@ class LeadApiController extends CommonApiController
             ]
         );
 
-        list($devices, $count) = $this->prepareEntitiesForView($results);
+        [$devices, $count] = $this->prepareEntitiesForView($results);
 
         $view = $this->view(
             [
@@ -375,7 +375,7 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
 
-        list($events, $serializerGroups) = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
+        [$events, $serializerGroups] = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
         $view    = $this->view($events);
         $context = $view->getContext()->setGroups($serializerGroups);

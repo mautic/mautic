@@ -10,10 +10,6 @@
  */
 
 //oAuth 2.0
-
-$accessTokenLifetime  = $container->hasParameter('mautic.api_oauth2_access_token_lifetime') ? ($container->getParameter('mautic.api_oauth2_access_token_lifetime') * 60) : 3600;
-$refreshTokenLifetime = $container->hasParameter('mautic.api_oauth2_refresh_token_lifetime') ? ($container->getParameter('mautic.api_oauth2_refresh_token_lifetime') * 60 * 60 * 24) : 1209600;
-
 $container->loadFromExtension('fos_oauth_server', [
     'db_driver'           => 'orm',
     'client_class'        => 'Mautic\ApiBundle\Entity\oAuth2\Client',
@@ -24,8 +20,8 @@ $container->loadFromExtension('fos_oauth_server', [
         'user_provider' => 'mautic.user.provider',
         'options'       => [
             //'supported_scopes' => 'user'
-            'access_token_lifetime'  => $accessTokenLifetime,
-            'refresh_token_lifetime' => $refreshTokenLifetime,
+            'access_token_lifetime'  => '%env(int:MAUTIC_API_OAUTH2_ACCESS_TOKEN_LIFETIME)%',
+            'refresh_token_lifetime' => '%env(int:MAUTIC_API_OAUTH2_REFRESH_TOKEN_LIFETIME)%',
         ],
     ],
     'template' => [

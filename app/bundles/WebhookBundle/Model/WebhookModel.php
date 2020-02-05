@@ -645,11 +645,11 @@ class WebhookModel extends FormModel
      */
     private function setConfigProps(CoreParametersHelper $coreParametersHelper)
     {
-        $this->webhookLimit     = (int) $coreParametersHelper->getParameter('webhook_limit', 10);
-        $this->disableLimit     = (int) $coreParametersHelper->getParameter('webhook_disable_limit', 100);
-        $this->webhookTimeout   = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);
-        $this->logMax           = (int) $coreParametersHelper->getParameter('webhook_log_max', 1000);
-        $this->queueMode        = $coreParametersHelper->getParameter('queue_mode');
-        $this->eventsOrderByDir = $coreParametersHelper->getParameter('events_orderby_dir', Criteria::ASC);
+        $this->webhookLimit     = (int) $coreParametersHelper->get('webhook_limit', 10);
+        $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
+        $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->queueMode        = $coreParametersHelper->get('queue_mode');
+        $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }
 }

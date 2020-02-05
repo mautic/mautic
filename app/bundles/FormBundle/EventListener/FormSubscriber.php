@@ -431,7 +431,7 @@ class FormSubscriber implements EventSubscriberInterface
         $this->mailer->reset();
 
         // ingore queue
-        if ('file' == $this->coreParametersHelper->getParameter('mailer_spool_type') && $config['immediately']) {
+        if ('file' == $this->coreParametersHelper->get('mailer_spool_type') && $config['immediately']) {
             $this->mailer = $this->mailer->getSampleMailer();
         }
 

@@ -50,7 +50,7 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreatingTransifexWithCredentials()
     {
         $this->coreParametersHelper->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->withConsecutive(
                 ['transifex_username'],
                 ['transifex_password']

@@ -94,13 +94,13 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $mockCoreParametersHelper->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
-                    return 'mautic.track_private_ip_ranges' === $param ? true : $defaultValue;
+                    return 'track_private_ip_ranges' === $param ? true : $defaultValue;
                 }
             );
-        $ip      = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
+        $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
         $this->assertEquals('192.168.0.1', $ip->getIpAddress());
     }
@@ -142,7 +142,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
             $mockCoreParametersHelper->expects($this->any())
-                ->method('getParameter')
+                ->method('get')
                 ->willReturn(null);
         }
 

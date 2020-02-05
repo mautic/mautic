@@ -64,7 +64,7 @@ class ConstantContactType extends AbstractType
         $session         = $this->session;
         $limit           = $session->get(
             'mautic.plugin.'.$integrationName.'.lead.limit',
-            $this->coreParametersHelper->getParameter('default_pagelimit')
+            $this->coreParametersHelper->get('default_pagelimit')
         );
         $page = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
 

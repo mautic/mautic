@@ -98,13 +98,6 @@ class CoreSubscriber implements EventSubscriberInterface
     private $formRepository;
 
     /**
-     * System parameters.
-     *
-     * @var array
-     */
-    private $params;
-
-    /**
      * @var MauticFactory
      */
     private $factory;
@@ -121,7 +114,6 @@ class CoreSubscriber implements EventSubscriberInterface
         TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
-        array $params,
         MauticFactory $factory
     ) {
         $this->bundleHelper         = $bundleHelper;
@@ -135,7 +127,6 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->translator           = $translator;
         $this->requestStack         = $requestStack;
         $this->formRepository       = $formRepository;
-        $this->params               = $params;
         $this->factory              = $factory;
     }
 
@@ -198,13 +189,13 @@ class CoreSubscriber implements EventSubscriberInterface
                 // firewall setting the known user
                 $tz = $user->getTimezone();
                 if (empty($tz)) {
-                    $tz = $this->params['default_timezone'];
+                    $tz = $this->coreParametersHelper->get('default_timezone');
                 }
                 $session->set('_timezone', $tz);
 
                 $locale = $user->getLocale();
                 if (empty($locale)) {
-                    $locale = $this->params['locale'];
+                    $locale = $this->coreParametersHelper->get('locale');
                 }
                 $session->set('_locale', $locale);
             }

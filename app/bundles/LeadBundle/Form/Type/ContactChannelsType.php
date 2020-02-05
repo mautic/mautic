@@ -30,9 +30,9 @@ class ContactChannelsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $showContactFrequency         = $this->coreParametersHelper->getParameter('show_contact_frequency');
-        $showContactPauseDates        = $this->coreParametersHelper->getParameter('show_contact_pause_dates');
-        $showContactPreferredChannels = $this->coreParametersHelper->getParameter('show_contact_preferred_channels');
+        $showContactFrequency         = $this->coreParametersHelper->get('show_contact_frequency');
+        $showContactPauseDates        = $this->coreParametersHelper->get('show_contact_pause_dates');
+        $showContactPreferredChannels = $this->coreParametersHelper->get('show_contact_preferred_channels');
 
         $builder->add(
             'subscribed_channels',

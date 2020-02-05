@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -18,15 +19,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class EnvironmentSubscriber implements EventSubscriberInterface
 {
     /**
-     * System params.
-     *
-     * @var array
+     * @var CoreParametersHelper
      */
-    private $params;
+    private $coreParametersHelper;
 
-    public function __construct(array $params)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->params = $params;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -56,7 +55,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone', $this->params['default_timezone']));
+        date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->get('default_timezone')));
     }
 
     /**
@@ -74,7 +73,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         if ($locale = $request->attributes->get('_locale')) {
             $request->getSession()->set('_locale', $locale);
         } else {
-            $request->setLocale($request->getSession()->get('_locale', $this->params['locale']));
+            $request->setLocale($request->getSession()->get('_locale', $this->coreParametersHelper->get('locale')));
         }
     }
 }

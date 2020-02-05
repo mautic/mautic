@@ -438,7 +438,7 @@ class ThemeHelper
         $requiredFiles      = ['config.json', 'html/message.html.twig'];
         $foundRequiredFiles = [];
         $allowedFiles       = [];
-        $allowedExtensions  = $this->coreParametersHelper->getParameter('theme_import_allowed_extensions');
+        $allowedExtensions  = $this->coreParametersHelper->get('theme_import_allowed_extensions');
 
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {

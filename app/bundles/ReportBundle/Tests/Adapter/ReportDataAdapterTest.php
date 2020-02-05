@@ -31,7 +31,7 @@ class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('report_export_batch_size')
             ->willReturn(11);
 

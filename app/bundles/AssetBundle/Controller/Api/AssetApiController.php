@@ -57,7 +57,7 @@ class AssetApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        $assetDir = $this->get('mautic.helper.core_parameters')->getParameter('upload_dir');
+        $assetDir = $this->get('mautic.helper.core_parameters')->get('upload_dir');
         $entity->setUploadDir($assetDir);
 
         if (isset($parameters['file'])) {

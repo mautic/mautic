@@ -12,6 +12,7 @@
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\LanguageHelper;
 
 /**
  * Class ProfileController.
@@ -31,7 +32,7 @@ class ProfileController extends FormController
 
         //set some permissions
         $permissions = [
-            'apiAccess' => ($this->get('mautic.helper.core_parameters')->getParameter('api_enabled')) ?
+            'apiAccess' => ($this->get('mautic.helper.core_parameters')->get('api_enabled')) ?
                 $this->get('mautic.security')->isGranted('api:access:full')
                 : 0,
             'editName'     => $this->get('mautic.security')->isGranted('user:profile:editname'),
@@ -164,12 +165,11 @@ class ProfileController extends FormController
                     $model->saveEntity($me);
 
                     //check if the user's locale has been downloaded already, fetch it if not
-                    $installedLanguages = $this->get('mautic.helper.core_parameters')->getParameter('supported_languages');
+                    /** @var LanguageHelper $languageHelper */
+                    $languageHelper     = $this->container->get('mautic.helper.language');
+                    $installedLanguages = $languageHelper->getSupportedLanguages();
 
                     if ($me->getLocale() && !array_key_exists($me->getLocale(), $installedLanguages)) {
-                        /** @var \Mautic\CoreBundle\Helper\LanguageHelper $languageHelper */
-                        $languageHelper = $this->get('mautic.helper.language');
-
                         $fetchLanguage = $languageHelper->extractLanguagePackage($me->getLocale());
 
                         // If there is an error, we need to reset the user's locale to the default
@@ -194,13 +194,13 @@ class ProfileController extends FormController
                     // Update timezone and locale
                     $tz = $me->getTimezone();
                     if (empty($tz)) {
-                        $tz = $this->get('mautic.helper.core_parameters')->getParameter('default_timezone');
+                        $tz = $this->get('mautic.helper.core_parameters')->get('default_timezone');
                     }
                     $this->get('session')->set('_timezone', $tz);
 
                     $locale = $me->getLocale();
                     if (empty($locale)) {
-                        $locale = $this->get('mautic.helper.core_parameters')->getParameter('locale');
+                        $locale = $this->get('mautic.helper.core_parameters')->get('locale');
                     }
                     $this->get('session')->set('_locale', $locale);
 

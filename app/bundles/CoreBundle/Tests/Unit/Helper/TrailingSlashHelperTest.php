@@ -25,7 +25,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParametersHelper->method('getParameter')
+        $this->coreParametersHelper->method('get')
             ->with('site_url')
             ->willReturn('https://test.com');
     }

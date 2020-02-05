@@ -13,6 +13,7 @@ namespace Mautic\ConfigBundle\Service;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Compare normalized for data and log changes.
@@ -79,6 +80,10 @@ class ConfigChangeLogger
         $diff = [];
         foreach ($postData as $key => $value) {
             if (array_key_exists($key, $originalData) && $originalData[$key] != $value) {
+                if ($value instanceof UploadedFile) {
+                    $value = $value->getFilename();
+                }
+
                 $diff[$key] = $value;
             }
         }

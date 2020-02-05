@@ -164,21 +164,19 @@ return [
                     'translator',
                     'request_stack',
                     'mautic.form.repository.form',
-                    '%mautic.parameters%',
                     'mautic.factory',
                 ],
             ],
             'mautic.core.environment.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
                 'arguments' => [
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.configbundle.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
                     'mautic.helper.language',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.configbundle.subscriber.theme' => [
@@ -260,7 +258,6 @@ return [
                     'translator',
                     'mautic.helper.language',
                     'mautic.ip_lookup.factory',
-                    '%mautic.supported_languages%',
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
                 ],
@@ -447,6 +444,9 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
+                    '%kernel.cache_dir%',
+                    '%kernel.logs_dir%',
+                    '%kernel.root_dir%',
                 ],
             ],
             'mautic.helper.ip_lookup' => [
@@ -465,17 +465,17 @@ return [
                 ],
             ],
             'mautic.helper.core_parameters' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CoreParametersHelper',
+                'class'     => \Mautic\CoreBundle\Helper\CoreParametersHelper::class,
                 'arguments' => [
-                    'kernel',
+                    'service_container',
                 ],
                 'serviceAlias' => 'mautic.config',
             ],
             'mautic.helper.bundle' => [
                 'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',
                 'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'kernel',
+                    '%mautic.bundles%',
+                    '%mautic.plugin.bundles%',
                 ],
             ],
             'mautic.helper.phone_number' => [
@@ -604,6 +604,10 @@ return [
             ],
 
             // System uses
+            'mautic.di.env_processor.nullable' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
@@ -633,7 +637,7 @@ return [
                 'arguments' => [
                     'mautic.helper.user',
                     'translator',
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
                 ],
@@ -678,6 +682,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.helper.bundle',
                     'mautic.helper.paths',
                     'mautic.helper.app_version',
                 ],
@@ -710,9 +715,11 @@ return [
                     'mautic.http.connector',
                 ],            ],
             'mautic.helper.cache' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
+                'class'     => \Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
-                    'kernel',
+                    '%kernel.cache_dir%',
+                    'session',
+                    'mautic.helper.paths',
                 ],
             ],
             'mautic.helper.templating' => [
@@ -765,7 +772,7 @@ return [
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                     'mautic.helper.integration',
                 ],
             ],
@@ -887,6 +894,14 @@ return [
                 ],
                 'tag' => 'validator.constraint_validator',
             ],
+            // Logger
+            'mautic.monolog.handler' => [
+                'class'     => \Mautic\CoreBundle\Monolog\Handler\FileLogHandler::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.monolog.fulltrace.formatter',
+                ],
+            ],
         ],
         'models' => [
             'mautic.core.model.auditlog' => [
@@ -974,10 +989,12 @@ return [
     'parameters' => [
         'site_url'                        => '',
         'webroot'                         => '',
-        'cache_path'                      => '%kernel.root_dir%/var/cache',
-        'log_path'                        => '%kernel.root_dir%/var/logs',
+        'cache_path'                      => '%kernel.root_dir%/../var/cache',
+        'log_path'                        => '%kernel.root_dir%/../var/logs',
+        'max_log_files'                   => 7,
+        'log_file_name'                   => 'mautic_%kernel.environment%.php',
         'image_path'                      => 'media/images',
-        'tmp_path'                        => '%kernel.root_dir%/var/tmp',
+        'tmp_path'                        => '%kernel.root_dir%/../var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
@@ -990,9 +1007,9 @@ return [
         'db_server_version'               => '5.5',
         'locale'                          => 'en_US',
         'secret_key'                      => '',
-        'dev_hosts'                       => null,
-        'trusted_hosts'                   => null,
-        'trusted_proxies'                 => null,
+        'dev_hosts'                       => [],
+        'trusted_hosts'                   => [],
+        'trusted_proxies'                 => [],
         'rememberme_key'                  => hash('sha1', uniqid(mt_rand())),
         'rememberme_lifetime'             => 31536000, //365 days in seconds
         'rememberme_path'                 => '/',
@@ -1070,5 +1087,6 @@ return [
         'system_update_url'         => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
+        'debug'                     => false,
     ],
 ];

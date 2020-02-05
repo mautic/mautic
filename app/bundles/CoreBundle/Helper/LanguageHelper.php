@@ -14,6 +14,7 @@ namespace Mautic\CoreBundle\Helper;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Monolog\Logger;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Helper class for managing Mautic's installed languages.
@@ -50,17 +51,44 @@ class LanguageHelper
      */
     private $coreParametersHelper;
 
+    /**
+     * @var array
+     */
+    private $supportedLanguages = [];
+
+    /**
+     * @var string
+     */
+    private $installedTranslationsDirectory;
+
+    /**
+     * @var string
+     */
+    private $defaultTranslationsDirectory;
+
     public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector)
     {
-        $this->pathsHelper          = $pathsHelper;
-        $this->logger               = $logger;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->connector            = $connector;
-
-        $this->installer = new Installer($this->pathsHelper->getSystemPath('translations_root').'/translations');
+        $this->pathsHelper                    = $pathsHelper;
+        $this->logger                         = $logger;
+        $this->coreParametersHelper           = $coreParametersHelper;
+        $this->connector                      = $connector;
+        $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
+        $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
+        $this->installer                      = new Installer($this->installedTranslationsDirectory);
 
         // Moved to outside environment folder so that it doesn't get wiped on each config update
         $this->cacheFile = $pathsHelper->getSystemPath('cache').'/../languageList.txt';
+    }
+
+    public function getSupportedLanguages(): array
+    {
+        if (!empty($this->supportedLanguages)) {
+            return $this->supportedLanguages;
+        }
+
+        $this->loadSupportedLanguages();
+
+        return $this->supportedLanguages;
     }
 
     /**
@@ -154,7 +182,7 @@ class LanguageHelper
      */
     public function fetchLanguages($overrideCache = false, $returnError = true)
     {
-        $overrideFile = $this->coreParametersHelper->getParameter('language_list_file');
+        $overrideFile = $this->coreParametersHelper->get('language_list_file');
         if (!empty($overrideFile) && is_readable($overrideFile)) {
             $overrideData = json_decode(file_get_contents($overrideFile), true);
             if (isset($overrideData['languages'])) {
@@ -178,7 +206,7 @@ class LanguageHelper
 
         // Get the language data
         try {
-            $data      = $this->connector->get($this->coreParametersHelper->getParameter('translations_list_url'), [], 10);
+            $data      = $this->connector->get($this->coreParametersHelper->get('translations_list_url'), [], 10);
             $manifest  = json_decode($data->body, true);
             $languages = [];
 
@@ -256,7 +284,7 @@ class LanguageHelper
             ];
         }
 
-        $langUrl = $this->coreParametersHelper->getParameter('translations_fetch_url').$languageCode.'.zip';
+        $langUrl = $this->coreParametersHelper->get('translations_fetch_url').$languageCode.'.zip';
 
         // GET the update data
         try {
@@ -301,5 +329,30 @@ class LanguageHelper
         return [
             'error' => false,
         ];
+    }
+
+    private function loadSupportedLanguages()
+    {
+        // Find available translations
+        $finder = new Finder();
+        $finder
+            ->directories()
+            ->in($this->defaultTranslationsDirectory)
+            ->in($this->installedTranslationsDirectory)
+            ->ignoreDotFiles(true)
+            ->depth('== 0');
+
+        foreach ($finder as $dir) {
+            $locale = $dir->getFilename();
+
+            // Check config exists
+            $configFile = $dir->getRealpath().'/config.json';
+            if (!file_exists($configFile)) {
+                return;
+            }
+
+            $config                            = json_decode(file_get_contents($configFile), true);
+            $this->supportedLanguages[$locale] = (!empty($config['name'])) ? $config['name'] : $locale;
+        }
     }
 }

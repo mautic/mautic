@@ -11,14 +11,10 @@
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event as Events;
+use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -28,19 +24,9 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ApiSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
 
     /**
      * @var TranslatorInterface
@@ -48,14 +34,10 @@ class ApiSubscriber implements EventSubscriberInterface
     private $translator;
 
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
         CoreParametersHelper $coreParametersHelper,
-        AuditLogModel $auditLogModel,
         TranslatorInterface $translator
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->auditLogModel        = $auditLogModel;
         $this->translator           = $translator;
     }
 
@@ -65,10 +47,8 @@ class ApiSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST         => ['onKernelRequest', 255],
-            KernelEvents::RESPONSE        => ['onKernelResponse', 0],
-            ApiEvents::CLIENT_POST_SAVE   => ['onClientPostSave', 0],
-            ApiEvents::CLIENT_POST_DELETE => ['onClientDelete', 0],
+            KernelEvents::REQUEST  => ['onKernelRequest', 255],
+            KernelEvents::RESPONSE => ['onKernelResponse', 0],
         ];
     }
 
@@ -83,141 +63,139 @@ class ApiSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $apiEnabled   = $this->coreParametersHelper->getParameter('api_enabled');
-        $isApiRequest = $this->isApiRequest($event);
+        $request = $event->getRequest();
 
-        if ($isApiRequest && !$apiEnabled) {
-            throw new AccessDeniedHttpException($this->translator->trans('mautic.api.error.api.disabled'));
+        // Ignore if not an API request
+        if (!RequestHelper::isApiRequest($request)) {
+            return;
+        }
+
+        // Prevent access to API if disabled
+        $apiEnabled = $this->coreParametersHelper->get('api_enabled');
+        if (!$apiEnabled) {
+            $response   = new JsonResponse(
+                [
+                    'errors' => [
+                        [
+                            'message' => $this->translator->trans('mautic.api.error.api.disabled'),
+                            'code'    => 403,
+                            'type'    => 'api_disabled',
+                        ],
+                    ],
+                ],
+                403
+            );
+
+            $event->setResponse($response);
+
+            return;
+        }
+
+        // Prevent access via basic auth if it is disabled
+        $hasBasicAuth     = RequestHelper::hasBasicAuth($request);
+        $basicAuthEnabled = $this->coreParametersHelper->get('api_enable_basic_auth');
+
+        if ($hasBasicAuth && !$basicAuthEnabled) {
+            $response   = new JsonResponse(
+                [
+                    'errors' => [
+                        [
+                            'message' => $this->translator->trans('mautic.api.error.basic.auth.disabled'),
+                            'code'    => 403,
+                            'type'    => 'access_denied',
+                        ],
+                    ],
+                ],
+                403
+            );
+
+            $event->setResponse($response);
         }
     }
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        $response   = $event->getResponse();
-        $content    = $response->getContent();
-        $statusCode = $response->getStatusCode();
+        $request      = $event->getRequest();
+        $isApiRequest = RequestHelper::isApiRequest($request);
+        $hasBasicAuth = RequestHelper::hasBasicAuth($event->getRequest());
 
-        if ($this->isApiRequest($event) && false !== strpos($content, 'error')) {
-            // Override api messages with something useful
-            if ($data = json_decode($content, true)) {
-                $type = null;
-                if (isset($data['error'])) {
-                    $error   = $data['error'];
-                    $message = false;
-                    if (is_array($error)) {
-                        if (!isset($error['message'])) {
-                            return;
-                        }
+        // Ignore if this is not an API request
+        if (!$isApiRequest) {
+            return;
+        }
 
-                        // Catch useless oauth1a errors
-                        $error = $error['message'];
-                    }
+        // Ignore if this does not contain an error response
+        $response = $event->getResponse();
+        $content  = $response->getContent();
+        if (false === strpos($content, 'error')) {
+            return;
+        }
 
-                    switch ($error) {
-                        case 'access_denied':
-                            if ($this->isBasicAuth($event->getRequest())) {
-                                if ($this->coreParametersHelper->getParameter('api_enable_basic_auth')) {
-                                    $message = $this->translator->trans('mautic.api.error.basic.auth.invalid.credentials');
-                                } else {
-                                    $message = $this->translator->trans('mautic.api.error.basic.auth.disabled');
-                                }
-                            } else {
-                                $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
-                            }
+        // Ignore if content is not json
+        if (!$data = json_decode($content, true)) {
+            return;
+        }
 
-                            $type = $error;
-                            break;
-                        default:
-                            if (isset($data['error_description'])) {
-                                $message = $data['error_description'];
-                                $type    = $error;
-                            } elseif ($this->translator->hasId('mautic.api.auth.error.'.$error)) {
-                                $message = $this->translator->trans('mautic.api.auth.error.'.$error);
-                                $type    = $error;
-                            }
-                    }
+        // Ignore if an error was not found in the JSON response
+        if (!isset($data['error'])) {
+            return;
+        }
 
-                    if ($message) {
-                        $response = new JsonResponse(
-                            [
-                                'errors' => [
-                                    [
-                                        'message' => $message,
-                                        'code'    => $response->getStatusCode(),
-                                        'type'    => $type,
-                                    ],
-                                ],
-                            ],
-                            $statusCode
-                        );
+        // Override api messages with something useful
+        $type  = null;
+        $error = $data['error'];
+        if (is_array($error)) {
+            if (!isset($error['message'])) {
+                return;
+            }
 
-                        $event->setResponse($response);
+            // Catch useless oauth1a errors
+            $error = $error['message'];
+        }
+
+        switch ($error) {
+            case 'access_denied':
+                $type    = $error;
+                $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
+
+                if ($hasBasicAuth) {
+                    if ($this->coreParametersHelper->get('api_enable_basic_auth')) {
+                        $message = $this->translator->trans('mautic.api.error.basic.auth.invalid.credentials');
+                    } else {
+                        $message = $this->translator->trans('mautic.api.error.basic.auth.disabled');
                     }
                 }
-            }
+
+                break;
+            default:
+                if (isset($data['error_description'])) {
+                    $message = $data['error_description'];
+                    $type    = $error;
+                } elseif ($this->translator->hasId('mautic.api.auth.error.'.$error)) {
+                    $message = $this->translator->trans('mautic.api.auth.error.'.$error);
+                    $type    = $error;
+                }
         }
-    }
 
-    public function isBasicAuth(Request $request)
-    {
-        try {
-            return 0 === strpos(strtolower($request->headers->get('Authorization')), 'basic');
-        } catch (\Exception $e) {
-            return false;
+        // Message was not overriden so leave as is
+        if (!isset($message)) {
+            return;
         }
-    }
 
-    /**
-     * Add a client change entry to the audit log.
-     */
-    public function onClientPostSave(Events\ClientEvent $event)
-    {
-        $client = $event->getClient();
-        if ($details = $event->getChanges()) {
-            $log = [
-                'bundle'    => 'api',
-                'object'    => 'client',
-                'objectId'  => $client->getId(),
-                'action'    => ($event->isNew()) ? 'create' : 'update',
-                'details'   => $details,
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
-        }
-    }
+        $statusCode = $response->getStatusCode();
+        $response   = new JsonResponse(
+            [
+                'errors' => [
+                    [
+                        'message' => $message,
+                        'code'    => $response->getStatusCode(),
+                        'type'    => $type,
+                    ],
+                ],
+            ],
+            $statusCode
+        );
 
-    /**
-     * Add a role delete entry to the audit log.
-     */
-    public function onClientDelete(Events\ClientEvent $event)
-    {
-        $client = $event->getClient();
-        $log    = [
-            'bundle'    => 'api',
-            'object'    => 'client',
-            'objectId'  => $client->deletedId,
-            'action'    => 'delete',
-            'details'   => ['name' => $client->getName()],
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-        ];
-        $this->auditLogModel->writeToLog($log);
-    }
-
-    /**
-     * @param $event
-     *
-     * @return bool
-     */
-    private function isApiRequest($event)
-    {
-        $request    = $event->getRequest();
-        $requestUrl = $request->getRequestUri();
-
-        // Check if /oauth or /api
-        $isApiRequest = (false !== strpos($requestUrl, '/oauth') || false !== strpos($requestUrl, '/api'));
-
-        defined('MAUTIC_API_REQUEST') or define('MAUTIC_API_REQUEST', $isApiRequest);
-
-        return $isApiRequest;
+        $event->setResponse($response);
     }
 }

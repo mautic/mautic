@@ -19,6 +19,7 @@ use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\User;
@@ -67,7 +68,7 @@ class InstallController extends CommonController
         }
 
         if (false !== strpos($index, '.')) {
-            list($index, $subIndex) = explode('.', $index);
+            [$index, $subIndex] = explode('.', $index);
         }
 
         $params = $this->configurator->getParameters();
@@ -117,7 +118,7 @@ class InstallController extends CommonController
 
                                 if ($schemaHelper->createDatabase()) {
                                     $formData->server_version = $schemaHelper->getServerVersion();
-                                    if ($this->saveConfiguration($formData, $step, true)) {
+                                    if ($this->saveConfiguration($formData, $step)) {
                                         // Refresh to install schema with new connection information in the container
                                         return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
                                     }
@@ -206,10 +207,10 @@ class InstallController extends CommonController
                 // Merge final things into the config, wipe the container, and we're done!
                 $finalConfigVars = [
                     'secret_key' => EncryptionHelper::generateKey(),
-                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBaseUrl(),
+                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBasePath(),
                 ];
 
-                if (!$this->saveConfiguration($finalConfigVars, null, true)) {
+                if (!$this->saveConfiguration($finalConfigVars, null)) {
                     $this->addFlash('mautic.installer.error.writing.configuration', [], 'error');
                 }
 
@@ -443,7 +444,7 @@ class InstallController extends CommonController
      *
      * @return bool
      */
-    protected function saveConfiguration($params, $step = null, $clearCache = false)
+    protected function saveConfiguration($params, $step = null)
     {
         if (null !== $step) {
             $params = $step->update($params);
@@ -457,9 +458,9 @@ class InstallController extends CommonController
             return false;
         }
 
-        if ($clearCache) {
-            $this->get('mautic.helper.cache')->clearContainerFile(false);
-        }
+        /** @var CacheHelper $cacheHelper */
+        $cacheHelper = $this->get('mautic.helper.cache');
+        $cacheHelper->refreshConfig();
 
         return true;
     }

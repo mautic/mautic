@@ -166,10 +166,11 @@ return [
         ],
         'models' => [
             'mautic.plugin.model.plugin' => [
-                'class'     => 'Mautic\PluginBundle\Model\PluginModel',
+                'class'     => \Mautic\PluginBundle\Model\PluginModel::class,
                 'arguments' => [
                     'mautic.lead.model.field',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.bundle',
                 ],
             ],
 

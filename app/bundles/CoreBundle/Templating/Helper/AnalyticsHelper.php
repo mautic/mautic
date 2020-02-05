@@ -26,7 +26,7 @@ class AnalyticsHelper extends Helper
      */
     public function __construct(CoreParametersHelper $parametersHelper)
     {
-        $this->code = htmlspecialchars_decode($parametersHelper->getParameter('google_analytics', ''));
+        $this->code = htmlspecialchars_decode($parametersHelper->get('google_analytics', ''));
     }
 
     /**
