@@ -13,6 +13,7 @@
 # Backwards compatibility breaking changes
 
 *   Minimal PHP version was increased from v5.6.19 to v7.2.0.
+*   Minimal MySql version was increased from v5.5.3 to v5.7.14
 *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md](https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md)
 *   Migrating the database should be done by upgrading to the latest 2.x series then to M3 as all 2.x migrations have been removed from the 3.x code
 *   jQuery v2.x has been replaced with jQuery v3.3.1. jQuery 2.x code is not supported anymore..
