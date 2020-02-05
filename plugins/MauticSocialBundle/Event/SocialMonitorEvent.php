@@ -45,6 +45,7 @@ class SocialMonitorEvent extends CommonEvent
     {
         $this->integrationName  = $integrationName;
         $this->entity           = $monitoring;
+        $this->leadIds          = $leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }
