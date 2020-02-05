@@ -61,7 +61,7 @@ final class EmailReplyRepository extends EntityRepository implements EmailReplyR
         );
     }
 
-    private function getAlias(): string
+    private function getTableAlias(): string
     {
         return 'reply';
     }
