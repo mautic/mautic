@@ -123,25 +123,4 @@ EOT
 
         return 0;
     }
-
-    /**
-     * @param string $fixturesDir
-     * @param string $classPrefix
-     * @param bool   $returnClassNames
-     */
-    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
-    {
-        if ($returnClassNames) {
-            //get files within the directory
-            $finder = new Finder();
-            $finder->files()->in($fixturesDir)->name('*.php');
-            foreach ($finder as $file) {
-                //add the file to be loaded
-                $class      = str_replace('.php', '', $file->getFilename());
-                $fixtures[] = $classPrefix.$class;
-            }
-        } else {
-            $fixtures[] = $fixturesDir;
-        }
-    }
 }
