@@ -11,6 +11,7 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -22,12 +23,20 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
 {
     /**
      * @var ContainerInterface
      */
     private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getGroups(): array
+    {
+        return ['group_install'];
+    }
 
     /**
      * {@inheritdoc}
@@ -90,8 +99,9 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
                 }
 
                 $indexesToAdd[$object][$alias] = $field;
-
-                $this->addReference('leadfield-'.$alias, $entity);
+                if (!$this->hasReference('leadfield-'.$alias)) {
+                    $this->addReference('leadfield-'.$alias, $entity);
+                }
                 ++$order;
             }
 
