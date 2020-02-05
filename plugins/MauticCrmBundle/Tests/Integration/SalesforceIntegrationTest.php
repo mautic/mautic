@@ -1079,7 +1079,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToUpdate')
             ->willReturnCallback(
-                function () use ($max, $specificObject, $maxSfContacts, $maxSfLeads) {
+                function () use ($max, $specificObject) {
                     $args = func_get_args();
                     $object = $args[6];
 
@@ -1112,7 +1112,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToCreate')
             ->willReturnCallback(
-                function () use (&$restart, $max) {
+                function () use ($max) {
                     $args = func_get_args();
 
                     if (false === $args[2]) {
