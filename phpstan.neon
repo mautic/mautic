@@ -14,7 +14,8 @@ parameters:
 		- app/bundles/CoreBundle/Views/Helper/action_button_helper.php
 		- app/bundles/FormBundle/Views/Field/field_helper.php
 		- app/bundles/CoreBundle/Loader/ParameterLoader.php
-		- app/bundles/CoreBundle/Helper/PathsHelper.php  
+		- app/bundles/CoreBundle/Helper/PathsHelper.php
+		- app/bundles/CoreBundle/Configurator/Configurator.php
 	ignoreErrors:
 		- '#Cannot unset offset#'
 		- '#Undefined variable: \$container#'
