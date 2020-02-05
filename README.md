@@ -75,7 +75,7 @@ By contributing to this project, you accept and agree to the [Contributor Agreem
 	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
-4. Recommended MySQL defaults can be set by running the queries `SET GLOBAL innodb_default_row_format=DYNAMIC; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
+4. Recommended MySQL minimal version 5.7.14 and defaults can be set by running the queries `SET GLOBAL innodb_default_row_format=DYNAMIC; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
 
 ## Installation
 
