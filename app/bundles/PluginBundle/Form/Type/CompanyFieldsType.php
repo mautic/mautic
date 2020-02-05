@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class SocialMediaServiceType.
- */
 class CompanyFieldsType extends AbstractType
 {
     use FieldsTypeTrait;
@@ -42,11 +39,8 @@ class CompanyFieldsType extends AbstractType
         return 'integration_company_fields';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $this->buildFieldView($view, $options, 'company');
+        $this->buildFieldView($view, $options);
     }
 }
