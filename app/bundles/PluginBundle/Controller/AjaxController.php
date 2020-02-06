@@ -12,7 +12,6 @@
 namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
@@ -20,9 +19,6 @@ use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     /**
@@ -31,7 +27,7 @@ class AjaxController extends CommonAjaxController
     protected function setIntegrationFilterAction(Request $request)
     {
         $session      = $this->get('session');
-        $pluginFilter = InputHelper::int($this->request->get('plugin'));
+        $pluginFilter = (int) $this->request->get('plugin');
         $session->set('mautic.integrations.filter', $pluginFilter);
 
         return $this->sendJsonResponse(['success' => 1]);

@@ -15,8 +15,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
- * Class ChartQuery.
- *
  * Methods to get the chart data as native queries to get better performance and work with date/time native SQL queries.
  */
 class ChartQuery extends AbstractChart
@@ -222,14 +220,8 @@ class ChartQuery extends AbstractChart
     public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
         // Convert time unitst to the right form for current database platform
-        $dbUnit  = $this->translateTimeUnit($this->unit);
-        $limit   = $this->countAmountFromDateRange($this->unit);
-        $groupBy = '';
-
-        if (isset($filters['groupBy'])) {
-            $groupBy = ', '.$tablePrefix.'.'.$filters['groupBy'];
-            unset($filters['groupBy']);
-        }
+        $dbUnit        = $this->translateTimeUnit($this->unit);
+        $limit         = $this->countAmountFromDateRange();
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
 
         if (true === $isEnumerable) {
@@ -240,7 +232,7 @@ class ChartQuery extends AbstractChart
             $count = $countColumn.' AS count';
         }
         $query->select($dateConstruct.' AS date, '.$count)
-            ->groupBy($dateConstruct.$groupBy);
+            ->groupBy($dateConstruct);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
     }
@@ -302,7 +294,7 @@ class ChartQuery extends AbstractChart
         $data          = [];
         $averageCounts = [];
         $oneUnit       = $this->getUnitInterval();
-        $limit         = $this->countAmountFromDateRange($this->unit);
+        $limit         = $this->countAmountFromDateRange();
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
 

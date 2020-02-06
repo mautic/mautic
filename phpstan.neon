@@ -1,5 +1,5 @@
 parameters:
-	level: 0
+	level: 1
 	excludes_analyse:
 		- *.html.php
 		- *.js.php
@@ -13,9 +13,17 @@ parameters:
 		- app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php
 		- app/bundles/CoreBundle/Views/Helper/action_button_helper.php
 		- app/bundles/FormBundle/Views/Field/field_helper.php
+		- app/bundles/CoreBundle/Loader/ParameterLoader.php
+		- app/bundles/CoreBundle/Helper/PathsHelper.php
+		- app/bundles/CoreBundle/Configurator/Configurator.php
 	ignoreErrors:
 		- '#Cannot unset offset#'
 		- '#Undefined variable: \$container#'
 		- '#Undefined variable: \$parameters#'
 		- '#Access to an undefined property Mautic\\AssetBundle\\Controller\\UploadController::\$errorHandler.#' # issue of the oneup/uploader-bundle package
 		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'
+		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
+		- '#Constant MAUTIC_ENV not found.#'
+		- '#Constant MAUTIC_VERSION not found.#'
+		- '#Constant MAUTIC_ROOT_DIR not found.#'
+		- '/Variable \$\w+ might not be defined\./'

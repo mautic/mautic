@@ -21,17 +21,13 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Kernel;
 
-/**
- * Class IntegrationHelper.
- */
 class IntegrationHelper
 {
     /**
-     * @var Container
+     * @var ContainerInterface
      */
     private $container;
 
@@ -73,11 +69,8 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    /**
-     * @throws \Exception
-     */
     public function __construct(
-        Kernel $kernel,
+        ContainerInterface $container,
         EntityManager $em,
         PathsHelper $pathsHelper,
         BundleHelper $bundleHelper,
@@ -85,7 +78,7 @@ class IntegrationHelper
         TemplatingHelper $templatingHelper,
         PluginModel $pluginModel
     ) {
-        $this->container            = $kernel->getContainer();
+        $this->container            = $container;
         $this->em                   = $em;
         $this->pathsHelper          = $pathsHelper;
         $this->bundleHelper         = $bundleHelper;
@@ -311,13 +304,7 @@ class IntegrationHelper
         }
 
         foreach ($returnServices as $key => $value) {
-            if (!isset($value)) {
-                unset($returnServices[$key]);
-            }
-        }
-
-        foreach ($returnServices as $key => $value) {
-            if (!isset($value)) {
+            if (!$value) {
                 unset($returnServices[$key]);
             }
         }

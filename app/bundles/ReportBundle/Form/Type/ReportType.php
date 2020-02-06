@@ -140,9 +140,7 @@ class ReportType extends AbstractType
                 ]
             );
 
-            $model        = $this->reportModel;
-            $tableList    = $options['table_list'];
-            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($model, $tables, $tableList) {
+            $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($tables) {
                 if (empty($source)) {
                     reset($tables);
                     $firstGroup = key($tables);
@@ -150,9 +148,9 @@ class ReportType extends AbstractType
                     $source = key($tables[$firstGroup]);
                 }
 
-                $columns           = $model->getColumnList($source);
-                $groupByColumns    = $model->getColumnList($source, true);
-                $filters           = $model->getFilterList($source);
+                $columns           = $this->reportModel->getColumnList($source);
+                $groupByColumns    = $this->reportModel->getColumnList($source, true);
+                $filters           = $this->reportModel->getFilterList($source);
                 $filterDefinitions = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
                 $operatorHtml      = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
 
@@ -280,7 +278,7 @@ class ReportType extends AbstractType
                         ]
                 );
 
-                $graphList = $model->getGraphList($source);
+                $graphList = $this->reportModel->getGraphList($source);
                 if (is_array($currentGraphs)) {
                     $orderColumns = array_values($currentGraphs);
                     $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');

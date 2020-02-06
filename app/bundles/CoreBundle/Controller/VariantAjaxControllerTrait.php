@@ -33,7 +33,7 @@ trait VariantAjaxControllerTrait
             'html'    => '',
         ];
         $type = InputHelper::clean($request->request->get('abKey'));
-        $id   = InputHelper::int($request->request->get('id'));
+        $id   = (int) $request->request->get('id');
 
         if (!empty($type)) {
             //get the HTML for the form

@@ -1019,7 +1019,6 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.model.lead_segment.decorator.date.optionFactory' => [

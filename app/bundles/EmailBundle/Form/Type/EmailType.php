@@ -384,8 +384,7 @@ class EmailType extends AbstractType
         );
 
         $request                 = $this->requestStack->getCurrentRequest();
-        $url                     = $request->getSchemeAndHttpHost().$request->getBasePath();
-        $variantSettingsModifier = function (FormEvent $event, $isVariant) use ($url) {
+        $variantSettingsModifier = function (FormEvent $event, $isVariant) {
             if ($isVariant) {
                 $event->getForm()->add(
                     'variantSettings',

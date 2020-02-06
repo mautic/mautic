@@ -14,7 +14,6 @@ namespace Mautic\ChannelBundle\PreferenceBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Psr\Log\LoggerInterface;
 
 class ChannelPreferences
 {
@@ -28,12 +27,7 @@ class ChannelPreferences
      */
     private $organizedByPriority = [];
 
-    /**
-     * ChannelPreferences constructor.
-     *
-     * @param string $channel
-     */
-    public function __construct($channel, Event $event, LoggerInterface $logger)
+    public function __construct(Event $event)
     {
         $this->event   = $event;
     }

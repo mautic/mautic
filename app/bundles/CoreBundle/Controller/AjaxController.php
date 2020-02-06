@@ -236,7 +236,7 @@ class AjaxController extends CommonController
     {
         $dataArray      = ['success' => 0];
         $name           = InputHelper::clean($request->request->get('model'));
-        $id             = InputHelper::int($request->request->get('id'));
+        $id             = (int) $request->request->get('id');
         $customToggle   = InputHelper::clean($request->request->get('customToggle'));
         $model          = $this->getModel($name);
 
@@ -310,7 +310,7 @@ class AjaxController extends CommonController
     {
         $dataArray   = ['success' => 0];
         $name        = InputHelper::clean($request->request->get('model'));
-        $id          = InputHelper::int($request->request->get('id'));
+        $id          = (int) $request->request->get('id');
         $extra       = InputHelper::clean($request->request->get('parameter'));
         $model       = $this->getModel($name);
         $entity      = $model->getEntity($id);
@@ -673,7 +673,7 @@ class AjaxController extends CommonController
      */
     protected function clearNotificationAction(Request $request)
     {
-        $id = InputHelper::int($request->get('id', 0));
+        $id = (int) $request->get('id', 0);
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');

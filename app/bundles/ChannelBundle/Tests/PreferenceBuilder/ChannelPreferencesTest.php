@@ -53,6 +53,6 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
      */
     private function getChannelPreference($channel, Event $event)
     {
-        return new ChannelPreferences($channel, $event, new NullLogger());
+        return new ChannelPreferences($event);
     }
 }
