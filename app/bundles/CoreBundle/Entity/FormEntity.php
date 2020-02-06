@@ -439,7 +439,11 @@ class FormEntity extends CommonEntity
             return true;
         }
 
-        return method_exists($this, 'getId') ? (bool) $this->getId() : false;
+        if (!method_exists($this, 'getId')) {
+            return true;
+        }
+
+        return !$this->getId();
     }
 
     /**
