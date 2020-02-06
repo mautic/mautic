@@ -19,6 +19,7 @@ parameters:
         - 'app/bundles/LeadBundle/Entity/LeadField.php' # Rector doesn't understand the lifecycle method.
         - 'app/bundles/WebhookBundle/Entity/Webhook.php' # Rector doesn't understand the JMS serialization hacks.
         - 'app/bundles/UserBundle/Entity/UserToken.php' # Rector doesn't understand the private prop $id is useful there.
+        - 'app/bundles/EmailBundle/Entity/EmailReplyRepository.php' # Method getTableAlias() is called only from the trait. Bad, bad. Excluding for now.
 
     exclude_rectors:
         - 'Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector' # Causes BC breaks and broken services. Use only manually with caution.
