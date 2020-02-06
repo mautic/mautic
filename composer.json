@@ -30,8 +30,6 @@
         "symfony/validator": "~3.4.0",
         "symfony/yaml": "~3.4.0",
         "symfony/property-access": "~3.4.0",
-        "symfony/dom-crawler": "~3.4.0",
-        "symfony/browser-kit": "~3.4.0",
         "symfony/cache": "~3.4.0",
         "symfony/asset": "~3.4.0",
         "symfony/class-loader": "~3.4.0",
@@ -113,6 +111,8 @@
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
         "symfony/var-dumper": "~3.4.0",
+        "symfony/browser-kit": "~3.4.0",
+        "symfony/dom-crawler": "~3.4.0",
 
         "symfony/phpunit-bridge": "~4.3.0",
         "phpunit/phpunit": "~7.5.0",
