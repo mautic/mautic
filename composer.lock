@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.133.7",
+            "version": "3.133.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "cd6fb07aed2cc68088251e3c572d111d67d558a3"
+                "reference": "c564fcccd5fc7b5e8514d1cbe35558be1e3a11cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/cd6fb07aed2cc68088251e3c572d111d67d558a3",
-                "reference": "cd6fb07aed2cc68088251e3c572d111d67d558a3",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/c564fcccd5fc7b5e8514d1cbe35558be1e3a11cd",
+                "reference": "c564fcccd5fc7b5e8514d1cbe35558be1e3a11cd",
                 "shasum": ""
             },
             "require": {
@@ -88,7 +88,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2020-02-04T19:11:15+00:00"
+            "time": "2020-02-05T19:12:47+00:00"
         },
         {
             "name": "clue/stream-filter",
@@ -5306,16 +5306,16 @@
         },
         {
             "name": "oneup/uploader-bundle",
-            "version": "2.1.6",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/1up-lab/OneupUploaderBundle.git",
-                "reference": "a36b9a0cd8aaf6774efffc6c00b3519fb050a8db"
+                "reference": "8bd74b2d5f07f9ee6280f0b90ed8199471f57f52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/1up-lab/OneupUploaderBundle/zipball/a36b9a0cd8aaf6774efffc6c00b3519fb050a8db",
-                "reference": "a36b9a0cd8aaf6774efffc6c00b3519fb050a8db",
+                "url": "https://api.github.com/repos/1up-lab/OneupUploaderBundle/zipball/8bd74b2d5f07f9ee6280f0b90ed8199471f57f52",
+                "reference": "8bd74b2d5f07f9ee6280f0b90ed8199471f57f52",
                 "shasum": ""
             },
             "require": {
@@ -5326,7 +5326,8 @@
                 "symfony/http-foundation": "^3.0|^4.0",
                 "symfony/templating": "^3.0|^4.0",
                 "symfony/translation": "^3.0|^4.0",
-                "symfony/yaml": "^3.0|^4.0"
+                "symfony/yaml": "^3.0|^4.0",
+                "twig/twig": "^1.41|^2.10|^3.0"
             },
             "require-dev": {
                 "amazonwebservices/aws-sdk-for-php": "1.5.*",
@@ -5388,7 +5389,7 @@
                 "plupload",
                 "upload"
             ],
-            "time": "2020-02-04T14:24:29+00:00"
+            "time": "2020-02-06T09:12:03+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -11108,16 +11109,16 @@
         },
         {
             "name": "twilio/sdk",
-            "version": "5.42.1",
+            "version": "5.42.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twilio/twilio-php.git",
-                "reference": "aa93c45dda3ac28f0fd01aa775313017af7aa8c2"
+                "reference": "0cfcb871b18a9c427dd9e8f0ed7458d43009b48a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/aa93c45dda3ac28f0fd01aa775313017af7aa8c2",
-                "reference": "aa93c45dda3ac28f0fd01aa775313017af7aa8c2",
+                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/0cfcb871b18a9c427dd9e8f0ed7458d43009b48a",
+                "reference": "0cfcb871b18a9c427dd9e8f0ed7458d43009b48a",
                 "shasum": ""
             },
             "require": {
@@ -11154,7 +11155,7 @@
                 "sms",
                 "twilio"
             ],
-            "time": "2020-01-22T21:27:31+00:00"
+            "time": "2020-02-05T19:55:13+00:00"
         },
         {
             "name": "voku/portable-ascii",
