@@ -25,9 +25,6 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
 
-/**
- * Class IntegrationHelper.
- */
 class IntegrationHelper
 {
     /**
@@ -73,9 +70,6 @@ class IntegrationHelper
 
     private $byPlugin = [];
 
-    /**
-     * @throws \Exception
-     */
     public function __construct(
         Kernel $kernel,
         EntityManager $em,
@@ -311,13 +305,7 @@ class IntegrationHelper
         }
 
         foreach ($returnServices as $key => $value) {
-            if ($value) {
-                unset($returnServices[$key]);
-            }
-        }
-
-        foreach ($returnServices as $key => $value) {
-            if ($value) {
+            if (!$value) {
                 unset($returnServices[$key]);
             }
         }
