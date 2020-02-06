@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -36,17 +35,12 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * @param Lead   $lead
      * @param string $filePath
      *
      * @throws FileNotFoundException
      */
-    public function createAvatarFromFile(Lead $lead = null, $filePath)
+    public function createAvatarFromFile(Lead $lead, $filePath)
     {
-        if (!$lead) {
-            throw new ContactNotFoundException();
-        }
-
         if (!file_exists($filePath)) {
             throw new FileNotFoundException();
         }
