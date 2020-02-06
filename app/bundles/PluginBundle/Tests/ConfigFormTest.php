@@ -138,7 +138,7 @@ class ConfigFormTest extends KernelTestCase
                 );
 
         $integrationHelper = new IntegrationHelper(
-            self::$kernel,
+            self::$kernel->getContainer(),
             $entityManager,
             $pathsHelper,
             $bundleHelper,
