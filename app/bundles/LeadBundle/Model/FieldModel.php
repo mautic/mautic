@@ -72,13 +72,13 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'mobile' => [
-            'type'     => TelType::class,
+            'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
         ],
         'phone' => [
-            'type'     => TelType::class,
+            'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
@@ -91,7 +91,7 @@ class FieldModel extends FormModel
             'default'  => 0,
         ],
         'fax' => [
-            'type'     => TelType::class,
+            'type'     => 'tel',
             'listable' => true,
             'object'   => 'lead',
         ],
@@ -220,7 +220,7 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companyphone' => [
-            'type'     => TelType::class,
+            'type'     => 'tel',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'company',
@@ -267,7 +267,7 @@ class FieldModel extends FormModel
             'object'     => 'company',
         ],
         'companyfax' => [
-            'type'     => TelType::class,
+            'type'     => 'tel',
             'listable' => true,
             'group'    => 'professional',
             'object'   => 'company',
