@@ -222,7 +222,6 @@ class ChartQuery extends AbstractChart
         // Convert time unitst to the right form for current database platform
         $dbUnit        = $this->translateTimeUnit($this->unit);
         $limit         = $this->countAmountFromDateRange();
-        $groupBy       = '';
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
 
         if (true === $isEnumerable) {
@@ -233,7 +232,7 @@ class ChartQuery extends AbstractChart
             $count = $countColumn.' AS count';
         }
         $query->select($dateConstruct.' AS date, '.$count)
-            ->groupBy($dateConstruct.$groupBy);
+            ->groupBy($dateConstruct);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
     }
