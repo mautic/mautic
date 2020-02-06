@@ -16,9 +16,6 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-/**
- * Class TagEntityModelTransformer.
- */
 class TagEntityModelTransformer implements DataTransformerInterface
 {
     /**
@@ -38,10 +35,9 @@ class TagEntityModelTransformer implements DataTransformerInterface
 
     /**
      * @param string $repo
-     * @param string $identifier
      * @param bool   $isArray
      */
-    public function __construct(EntityManager $em, $repo = '', $identifier = 'id', $isArray = false)
+    public function __construct(EntityManager $em, $repo = '', $isArray = false)
     {
         $this->em         = $em;
         $this->repository = $repo;

@@ -17,9 +17,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
-/**
- * Class MonitoringController.
- */
 class MonitoringController extends FormController
 {
     use EntityContactsTrait;
@@ -182,7 +179,7 @@ class MonitoringController extends FormController
 
                     if (!$form->get('buttons')->get('save')->isClicked()) {
                         //return edit view so that all the session stuff is loaded
-                        return $this->editAction($entity->getId(), true);
+                        return $this->editAction($entity->getId());
                     }
 
                     $viewParameters = [

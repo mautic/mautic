@@ -30,7 +30,7 @@ class AjaxController extends CommonAjaxController
 
             if ($website) {
                 // Let's try to extract colors from image
-                $id = InputHelper::int($request->request->get('id'));
+                $id = (int) $request->request->get('id');
                 if (!empty($id)) {
                     // Tell the JS to not populate with default colors
                     $data['ignoreDefaultColors'] = true;

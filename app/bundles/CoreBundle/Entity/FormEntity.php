@@ -17,9 +17,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class FormEntity.
- */
 class FormEntity extends CommonEntity
 {
     /**
@@ -442,9 +439,11 @@ class FormEntity extends CommonEntity
             return true;
         }
 
-        $id = $this->getId();
+        if (!method_exists($this, 'getId')) {
+            return true;
+        }
 
-        return (empty($id)) ? true : false;
+        return !$this->getId();
     }
 
     /**

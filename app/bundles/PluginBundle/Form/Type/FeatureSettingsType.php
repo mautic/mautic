@@ -22,9 +22,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FeatureSettingsType.
- */
 class FeatureSettingsType extends AbstractType
 {
     /**
@@ -42,9 +39,6 @@ class FeatureSettingsType extends AbstractType
      */
     protected $logger;
 
-    /**
-     * FeatureSettingsType constructor.
-     */
     public function __construct(
         Session $session,
         CoreParametersHelper $coreParametersHelper,
@@ -63,9 +57,8 @@ class FeatureSettingsType extends AbstractType
         $integrationObject->appendToForm($builder, $options['data'], 'features');
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
-        $formSettings  = $options['integration_object']->getFormDisplaySettings();
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields, $formSettings) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields) {
             $integrationName = $integrationObject->getName();
             $session         = $this->session;
             $limit           = $session->get(

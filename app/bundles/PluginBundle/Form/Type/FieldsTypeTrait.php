@@ -241,21 +241,18 @@ trait FieldsTypeTrait
         );
     }
 
-    /**
-     * @param $object
-     */
     protected function configureFieldOptions(OptionsResolver $resolver, $object)
     {
         $resolver->setRequired(['integration_fields', 'mautic_fields', 'integration', 'integration_object', 'page']);
         $resolver->setDefined([('lead' === $object) ? 'update_mautic' : 'update_mautic_company']);
         $resolver->setDefaults(
             [
-                'special_instructions' => function (Options $options) use ($object) {
+                'special_instructions' => function (Options $options) {
                     list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $specialInstructions;
                 },
-                'alert_type' => function (Options $options) use ($object) {
+                'alert_type' => function (Options $options) {
                     list($specialInstructions, $alertType) = $options['integration_object']->getFormNotes('leadfield_match');
 
                     return $alertType;

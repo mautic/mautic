@@ -49,11 +49,11 @@ class TransportChainTest extends AbstractMauticTestCase
         parent::setUp();
 
         $this->transportChain = new TransportChain(
-            'mautic.test.twilio.mock', $this->container->get('mautic.helper.integration'), $this->container->get('logger')
+            'mautic.test.twilio.mock',
+            $this->container->get('mautic.helper.integration')
         );
 
-        $this->twilioTransport = $this->getMockBuilder(TwilioTransport::class)
-                                      ->disableOriginalConstructor()->getMock();
+        $this->twilioTransport = $this->createMock(TwilioTransport::class);
 
         $this->twilioTransport
             ->method('sendSMS')

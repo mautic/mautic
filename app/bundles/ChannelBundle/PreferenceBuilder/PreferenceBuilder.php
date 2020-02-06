@@ -94,7 +94,7 @@ class PreferenceBuilder
     private function getChannelPreferenceObject($channel, $priority)
     {
         if (!isset($this->channels[$channel])) {
-            $this->channels[$channel] = new ChannelPreferences($channel, $this->event, $this->logger);
+            $this->channels[$channel] = new ChannelPreferences($this->event);
         }
 
         $this->channels[$channel]->addPriority($priority);

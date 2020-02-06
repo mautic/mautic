@@ -11,17 +11,11 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-/**
- * Class PostmarkTransport.
- */
 class PostmarkTransport extends \Swift_SmtpTransport
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($host = 'localhost', $port = 25, $security = null)
+    public function __construct($host = 'smtp.postmarkapp.com', $port = 587, $security = 'tls')
     {
-        parent::__construct('smtp.postmarkapp.com', 587, 'tls');
+        parent::__construct($host, $port, $security);
 
         $this->setAuthMode('login');
     }

@@ -21,7 +21,7 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('one', ArrayHelper::getValue(0, $origin));
         $this->assertSame('three', ArrayHelper::getValue('two', $origin));
-        $this->assertSame(null, ArrayHelper::getValue('five', $origin));
+        $this->assertNull(ArrayHelper::getValue('five', $origin));
         $this->assertSame('default', ArrayHelper::getValue('five', $origin, 'default'));
     }
 
@@ -33,9 +33,9 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['two' => 'three', 'four' => null], $origin);
         $this->assertSame('three', ArrayHelper::pickValue('two', $origin));
         $this->assertSame(['four' => null], $origin);
-        $this->assertSame(null, ArrayHelper::pickValue('five', $origin));
+        $this->assertNull(ArrayHelper::pickValue('five', $origin));
         $this->assertSame('default', ArrayHelper::pickValue('five', $origin, 'default'));
-        $this->assertSame(null, ArrayHelper::pickValue('four', $origin, 'default'));
+        $this->assertNull(ArrayHelper::pickValue('four', $origin, 'default'));
         $this->assertSame([], $origin);
     }
 

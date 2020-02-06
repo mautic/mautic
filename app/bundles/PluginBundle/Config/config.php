@@ -138,7 +138,7 @@ return [
             'mautic.helper.integration' => [
                 'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
                 'arguments' => [
-                    'kernel',
+                    'service_container',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.paths',
                     'mautic.helper.bundle',

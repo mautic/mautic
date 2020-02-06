@@ -37,14 +37,15 @@ class SocialMonitorEvent extends CommonEvent
     protected $leadIds = [];
 
     /**
-     * @param $integrationName
-     * @param $newLeadCount
-     * @param $updatedLeadCount
+     * @param string $integrationName
+     * @param int    $newLeadCount
+     * @param int    $updatedLeadCount
      */
     public function __construct($integrationName, Monitoring $monitoring, array $leadIds, $newLeadCount, $updatedLeadCount)
     {
         $this->integrationName  = $integrationName;
         $this->entity           = $monitoring;
+        $this->leadIds          = $leadIds;
         $this->newLeadCount     = (int) $newLeadCount;
         $this->updatedLeadCount = (int) $updatedLeadCount;
     }

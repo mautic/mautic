@@ -140,7 +140,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 $this->auditLogModel->writeToLog($log);
 
                 // Date identified entry
-                if (isset($changes['dateIdentified'])) {
+                if (isset($details['dateIdentified'])) {
                     //log the day lead was identified
                     $log = [
                         'bundle'    => 'lead',

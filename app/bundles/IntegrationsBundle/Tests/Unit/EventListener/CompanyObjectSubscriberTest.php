@@ -308,7 +308,7 @@ class CompanyObjectSubscriberTest extends TestCase
 
         $this->subscriber->buildCompanyRoute($event);
 
-        $this->assertSame(null, $event->getRoute());
+        $this->assertNull($event->getRoute());
     }
 
     public function testBuildCompanyRouteWithRightObject(): void
