@@ -1279,7 +1279,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         $records = $data['data'][0];
-        foreach ($fields as $key => $field) {
+        foreach ($fields as $field) {
             foreach ($records as $recordKey => $recordValue) {
                 if ($recordKey === $field['api_name']) {
                     $parsedData[$recordKey] = $recordValue;

@@ -36,8 +36,6 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class HubspotIntegration.
- *
  * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
@@ -47,9 +45,6 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     protected $userHelper;
 
-    /**
-     * HubspotIntegration constructor.
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -278,9 +273,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             $fields = array_flip($fieldsToUpdate);
         }
 
-        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
-
-        return $fieldsToUpdate;
+        return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
     /**
