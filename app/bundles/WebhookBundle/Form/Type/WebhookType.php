@@ -16,6 +16,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -29,9 +30,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WebhookType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
@@ -70,6 +68,21 @@ class WebhookType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'secret',
+            TextType::class,
+            [
+                'label'      => 'mautic.webhook.form.secret',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.webhook.secret.tooltip',
+                ],
+                'empty_data' => EncryptionHelper::generateKey(),
+                'required'   => false,
+            ]
+        );
+
         $events = $options['events'];
 
         $choices = [];
@@ -81,12 +94,12 @@ class WebhookType extends AbstractType
             'events',
             ChoiceType::class,
             [
-                'choices'           => $choices,
-                'multiple'          => true,
-                'expanded'          => true,
-                'label'             => 'mautic.webhook.form.webhook.events',
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => ''],
+                'choices'    => $choices,
+                'multiple'   => true,
+                'expanded'   => true,
+                'label'      => 'mautic.webhook.form.webhook.events',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => ''],
                 ]
         );
 
@@ -103,7 +116,6 @@ class WebhookType extends AbstractType
             ]
         );
 
-        //add category
         $builder->add(
             'category',
             CategoryListType::class,
@@ -130,9 +142,6 @@ class WebhookType extends AbstractType
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -144,9 +153,6 @@ class WebhookType extends AbstractType
         $resolver->setDefined(['events']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'webhook';

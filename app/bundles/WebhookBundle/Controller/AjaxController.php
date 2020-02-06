@@ -44,15 +44,23 @@ class AjaxController extends CommonAjaxController
         $now = new \DateTime();
 
         $payloads['timestamp'] = $now->format('c');
+        $jsonPayloads          = json_encode($payloads);
+
+        // generate a base64 encoded HMAC-SHA256 signature of the payload
+        $secret    = InputHelper::string($request->request->get('secret'));
+        $signature = base64_encode(hash_hmac('sha256', $jsonPayloads, $secret, true));
 
         // Set up custom headers
-        $headers = ['Content-Type' => 'application/json'];
+        $headers = [
+            'Content-Type'      => 'application/json',
+            'Webhook-Signature' => $signature,
+        ];
 
         // instantiate new http class
         $http = new Http();
 
         // set the response
-        $response = $http->post($url, json_encode($payloads), $headers);
+        $response = $http->post($url, $jsonPayloads, $headers);
 
         // default to an error message
         $dataArray = [
