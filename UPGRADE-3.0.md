@@ -407,3 +407,5 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Some use of choices for ChoiceType in Mautic 2 is dependent on the Symfony 2.8 bc break and need to have the key/values flipped. See [https://symfony.com/doc/2.8/reference/forms/types/choice.html#choices-as-values](https://symfony.com/doc/2.8/reference/forms/types/choice.html#choices-as-values)
 *   $view[‘router’]->generate() in PHP templates has to be changed to $view[‘router’]->url()
 *   [sensio/generator-bundle](https://packagist.org/packages/sensio/generator-bundle) package was removed from the dev dependencies as it's abandoned.
+*   [symfony/browser-kit](https://symfony.com/doc/current/components/browser_kit.html) package was moved from the prod into dev dependencies as it's supposed to be used for functional tests.
+*   [symfony/dom-crawler](https://symfony.com/doc/current/components/dom_crawler.html) package was moved from the prod into dev dependencies as it's supposed to be used for functional tests.
