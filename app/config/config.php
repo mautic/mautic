@@ -476,12 +476,12 @@ $container->loadFromExtension('fm_elfinder', [
                 'roots' => [
                     'uploads' => [
                         'driver'            => 'LocalFileSystem',
-                        'path'              => '%env(MAUTIC_EL_FINDER_PATH)%',
+                        'path'              => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                         'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
                         'upload_deny'       => ['all'],
                         'upload_max_size'   => '2M',
                         'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
-                        'url'               => '%env(MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                        'url'               => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
                     ],
                 ],
             ],
