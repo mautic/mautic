@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class TwilioIntegration.
@@ -90,7 +91,7 @@ class TwilioIntegration extends AbstractIntegration
         if ('features' == $formArea) {
             $builder->add(
                 'sending_phone_number',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.sms.config.form.sms.sending_phone_number',
                     'label_attr' => ['class' => 'control-label'],
