@@ -119,9 +119,7 @@ class DynamicsApi extends CrmApi
      */
     public function getLeads(array $params)
     {
-        $data = $this->request('', $params, 'GET', 'contacts');
-
-        return $data;
+        return $this->request('', $params, 'GET', 'contacts');
     }
 
     /**
@@ -250,7 +248,7 @@ class DynamicsApi extends CrmApi
         $a_blocks = preg_split("/-+$boundary/", $input);
         array_pop($a_blocks);
         // loop data blocks
-        foreach ($a_blocks as $id => $block) {
+        foreach ($a_blocks as $block) {
             if (empty($block)) {
                 continue;
             }

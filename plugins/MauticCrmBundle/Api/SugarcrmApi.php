@@ -6,7 +6,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class SugarcrmApi extends CrmApi
 {
-    private $module   = 'Leads';
     protected $object = 'Leads';
 
     /**
@@ -90,9 +89,7 @@ class SugarcrmApi extends CrmApi
         $tokenData = $this->integration->getKeys();
 
         if ('6' == $tokenData['version']) {
-            $resp = $this->request('get_module_fields', [], 'GET', $object);
-
-            return $resp;
+            return $this->request('get_module_fields', [], 'GET', $object);
         } else {
             $parameters = [
                 'module_filter' => $object,
@@ -329,7 +326,7 @@ class SugarcrmApi extends CrmApi
 
         if (!empty($activity)) {
             foreach ($activity as $sugarId => $records) {
-                foreach ($records['records'] as $key => $record) {
+                foreach ($records['records'] as $record) {
                     $rec   = [];
                     $rec[] = ['name' => 'name', 'value' => $record['name']];
                     $rec[] = ['name' => 'description', 'value' => $record['description']];
@@ -388,7 +385,7 @@ class SugarcrmApi extends CrmApi
                             $link_field_names[] = 'mtc_webactivities_leads';
                         }
                         ++$nbLeads;
-                        foreach ($records['records'] as $key => $record) {
+                        foreach ($records['records'] as $record) {
                             $name_value_lists[] = [];
                             $delete_array[]     = 0;
                             $idList[]           = $sugarId;
@@ -417,7 +414,7 @@ class SugarcrmApi extends CrmApi
                         } else {
                             $link_field_name = 'mtc_webactivities_leads';
                         }
-                        foreach ($records['records'] as $key => $record) {
+                        foreach ($records['records'] as $record) {
                             if (!isset($resp[$nbAct]['contents']['id'])) {
                                 continue;
                             } //current Web activity was not created
@@ -468,7 +465,7 @@ class SugarcrmApi extends CrmApi
 
             $res = [];
             if (isset($data['entry_list'])) {
-                foreach ($data['entry_list'] as $key => $record) {
+                foreach ($data['entry_list'] as $record) {
                     $fields       = [];
                     $fields['id'] = $record['id'];
                     foreach ($record['name_value_list'] as $item) {
@@ -516,7 +513,7 @@ class SugarcrmApi extends CrmApi
             }
             $res = [];
             if (isset($data['records'])) {
-                foreach ($data['records'] as $key => $record) {
+                foreach ($data['records'] as $record) {
                     if (isset($record['email'][0]['email_address']) && '' != $record['email'][0]['email_address']) {
                         $emails      = $record['email'];
                         $found_email = $record['email'][0]['email_address'];
@@ -640,9 +637,8 @@ class SugarcrmApi extends CrmApi
                     'deleted'     => 0,
                     'favorites'   => false,
                 ];
-                $resp = $this->request('get_entry_list', $parameters, 'GET', $object);
 
-                return $resp;
+                return $this->request('get_entry_list', $parameters, 'GET', $object);
             }
         } else {
             if (!empty($fields)) {
@@ -694,9 +690,8 @@ class SugarcrmApi extends CrmApi
                     //'deleted'     => 0,
                     //'favorites'   => false,
                 ];
-                $resp = $this->request("$object/filter", $parameters, 'POST', $object);
 
-                return $resp;
+                return $this->request("$object/filter", $parameters, 'POST', $object);
             }
         }
     }

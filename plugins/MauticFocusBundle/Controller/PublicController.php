@@ -43,9 +43,8 @@ class PublicController extends CommonController
             }
 
             $content  = $model->generateJavascript($focus, false, (MAUTIC_ENV == 'dev'));
-            $response = new Response($content, 200, ['Content-Type' => 'application/javascript']);
 
-            return $response;
+            return new Response($content, 200, ['Content-Type' => 'application/javascript']);
         } else {
             return new Response('', 200, ['Content-Type' => 'application/javascript']);
         }
@@ -73,8 +72,6 @@ class PublicController extends CommonController
             }
         }
 
-        $response = TrackingPixelHelper::getResponse($this->request);
-
-        return $response;
+        return TrackingPixelHelper::getResponse($this->request);
     }
 }

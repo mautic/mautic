@@ -4,6 +4,7 @@ parameters:
 
     paths:
         - app/bundles
+        - plugins
 
     exclude_paths:
         - '*/tests/*'
@@ -13,6 +14,8 @@ parameters:
         - '*/InstallFixtures/*'
         - '*/Fixtures/*'
         - '*.html.php'
+        - '*.inc.php'
+        - '*.js.php'
         - 'app/bundles/LeadBundle/Entity/LeadField.php' # Rector doesn't understand the lifecycle method.
         - 'app/bundles/WebhookBundle/Entity/Webhook.php' # Rector doesn't understand the JMS serialization hacks.
         - 'app/bundles/UserBundle/Entity/UserToken.php' # Rector doesn't understand the private prop $id is useful there.

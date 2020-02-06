@@ -224,7 +224,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
-                    foreach ($hubspotObjects as $key => $object) {
+                    foreach ($hubspotObjects as $object) {
                         // Check the cache first
                         $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
                         if ($fields = parent::getAvailableLeadFields($settings)) {

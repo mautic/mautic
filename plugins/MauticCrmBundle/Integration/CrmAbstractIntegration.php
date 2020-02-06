@@ -102,9 +102,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if ($this->isAuthorized()) {
                 $result = $this->getApiHelper()->getLeads($query);
 
-                $executed = $this->amendLeadDataBeforeMauticPopulate($result, $object);
-
-                return $executed;
+                return $this->amendLeadDataBeforeMauticPopulate($result, $object);
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);

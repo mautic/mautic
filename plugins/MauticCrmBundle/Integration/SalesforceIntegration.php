@@ -285,7 +285,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $salesFields = [];
         try {
             if (!empty($salesForceObjects) and is_array($salesForceObjects)) {
-                foreach ($salesForceObjects as $key => $sfObject) {
+                foreach ($salesForceObjects as $sfObject) {
                     if ('Account' === $sfObject) {
                         // Match SF object to Mautic's
                         $sfObject = 'company';
@@ -396,9 +396,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getFetchQuery($params)
     {
-        $dateRange = $params;
-
-        return $dateRange;
+        return $params;
     }
 
     /**
@@ -1312,9 +1310,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
         }
-        $resultLead = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', $lead->getId());
 
-        return $resultLead;
+        return $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', $lead->getId());
     }
 
     /**
@@ -2423,9 +2420,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getSalesforceSyncLimit($currentContactList, $limit)
     {
-        $limit -= count($currentContactList);
-
-        return $limit;
+        return $limit - count($currentContactList);
     }
 
     /**
@@ -2471,9 +2466,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fields = array_flip($fieldsToUpdate);
         }
 
-        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
-
-        return $fieldsToUpdate;
+        return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
     }
 
     /**
@@ -2627,9 +2620,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         //get last modified date for donot contact in Salesforce
         $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$sfFieldString.') ORDER BY CreatedDate DESC';
         $queryUrl      = $this->getQueryUrl();
-        $historySF     = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
 
-        return $historySF;
+        return $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
     }
 
     /**
@@ -2651,7 +2643,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             return;
         }
 
-        foreach ($sfRecords as $leadEmail => $record) {
+        foreach ($sfRecords as $record) {
             if (empty($record['integration_entity_id'])) {
                 continue;
             }
@@ -2929,7 +2921,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $sfEntityRecords,
         $progress = null
     ) {
-        foreach ($sfEntityRecords['records'] as $sfKey => $sfEntityRecord) {
+        foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
             $syncCompany = false;
             $update      = false;
             $sfObject    = $sfEntityRecord['attributes']['type'];
@@ -3177,9 +3169,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $this->cleanupFromSync();
-        $result = array_merge($resultsByName, $resultsById);
 
-        return $result;
+        return array_merge($resultsByName, $resultsById);
     }
 
     public function getCompanyName($accountId, $field, $searchBy = 'Id')

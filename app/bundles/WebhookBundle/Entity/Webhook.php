@@ -13,7 +13,7 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -23,9 +23,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Webhook.
- */
 class Webhook extends FormEntity
 {
     /**
@@ -47,6 +44,11 @@ class Webhook extends FormEntity
      * @var string
      */
     private $webhookUrl;
+
+    /**
+     * @var string
+     */
+    private $secret;
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category
@@ -94,9 +96,6 @@ class Webhook extends FormEntity
      */
     private $eventsOrderbyDir;
 
-    /*
-     * Constructor
-     */
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -139,12 +138,9 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        $builder->createField('webhookUrl', Type::STRING)
-            ->columnName('webhook_url')
-            ->length(191)
-            ->build();
-
-        $builder->addNullableField('eventsOrderbyDir', Type::STRING, 'events_orderby_dir');
+        $builder->addNamedField('webhookUrl', Types::STRING, 'webhook_url');
+        $builder->addField('secret', Types::STRING);
+        $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
     }
 
     /**
@@ -161,6 +157,7 @@ class Webhook extends FormEntity
                     'name',
                     'description',
                     'webhookUrl',
+                    'secret',
                     'eventsOrderbyDir',
                     'category',
                     'triggers',
@@ -211,8 +208,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -221,8 +216,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Webhook
@@ -236,8 +229,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -246,8 +237,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return Webhook
@@ -261,8 +250,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -271,8 +258,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set webhookUrl.
-     *
      * @param string $webhookUrl
      *
      * @return Webhook
@@ -286,8 +271,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get webhookUrl.
-     *
      * @return string
      */
     public function getWebhookUrl()
@@ -296,10 +279,27 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set category.
+     * @param string $secret
      *
-     * @param Category $category
-     *
+     * @return Webhook
+     */
+    public function setSecret($secret)
+    {
+        $this->isChanged('secret', $secret);
+        $this->secret = $secret;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret()
+    {
+        return $this->secret;
+    }
+
+    /**
      * @return Webhook
      */
     public function setCategory(Category $category = null)
@@ -311,8 +311,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get category.
-     *
      * @return Category
      */
     public function getCategory()
@@ -408,8 +406,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param \Mautic\WebhookBundle\Entity\Event $event
-     *
      * @return $this
      */
     public function addEvent(Event $event)
@@ -422,8 +418,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param \Mautic\WebhookBundle\Entity\Event $event
-     *
      * @return $this
      */
     public function removeEvent(Event $event)
@@ -463,8 +457,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param $queues
-     *
      * @return $this
      */
     public function addQueues($queues)
@@ -510,8 +502,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param $logs
-     *
      * @return $this
      */
     public function addLogs($logs)
@@ -555,8 +545,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param mixed $payload
-     *
      * @return Webhook
      */
     public function setPayload($payload)
@@ -585,7 +573,6 @@ class Webhook extends FormEntity
 
     /**
      * @param string $prop
-     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {

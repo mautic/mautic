@@ -7,8 +7,6 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class HubspotApi extends CrmApi
 {
-    private $module = 'contacts';
-
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];

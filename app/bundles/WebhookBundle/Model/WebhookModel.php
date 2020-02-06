@@ -290,8 +290,15 @@ class WebhookModel extends FormModel
             $payload = json_encode($payload);
         }
 
+        // generate a base64 encoded HMAC-SHA256 signature of the payload
+        $secret    = $webhook->getSecret();
+        $signature = base64_encode(hash_hmac('sha256', $payload, $secret, true));
+
         // Set up custom headers
-        $headers = ['Content-Type' => 'application/json'];
+        $headers = [
+            'Content-Type'      => 'application/json',
+            'Webhook-Signature' => $signature,
+        ];
         $start   = microtime(true);
 
         try {

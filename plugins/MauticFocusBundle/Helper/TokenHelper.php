@@ -55,7 +55,7 @@ class TokenHelper
         $tokens = [];
 
         if (count($matches[0])) {
-            foreach ($matches[1] as $k => $id) {
+            foreach ($matches[1] as $id) {
                 $token = '{focus='.$id.'}';
                 $focus = $this->model->getEntity($id);
                 if (null !== $focus

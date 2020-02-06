@@ -238,10 +238,6 @@ class PublicController extends FormController
                         $data['companycountry'] = $loc['country'];
                     }
 
-                    if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode']['value'])) {
-                        $loc['postalCode'];
-                    }
-
                     if (array_key_exists('state', $loc) && empty($currFields['companystate']['value'])) {
                         $data['companystate'] = $loc['state'];
                     }

@@ -19,18 +19,18 @@ class Clearbit_Base
     const REQUEST_LATENCY = 0.2;
     const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
-    private $_next_req_time = null;
+    private $_next_req_time;
 
     protected $_baseUri     = '';
     protected $_resourceUri = '';
     protected $_version     = 'v2';
 
-    protected $_apiKey    = null;
-    protected $_webhookId = null;
+    protected $_apiKey;
+    protected $_webhookId;
 
-    public $response_obj  = null;
-    public $response_code = null;
-    public $response_json = null;
+    public $response_obj;
+    public $response_code;
+    public $response_json;
 
     /**
      * Slow down calls to the Clearbit API if needed.
