@@ -44,7 +44,7 @@ class ModelFactory
         [$bundle, $name] = $parts;
 
         $containerKey = strtolower(
-            str_replace(['%bundle%', '%name%'], [$bundle, $name], 'mautic.%bundle%.model.%name%')
+            sprintf('mautic.%s.model.%s', $bundle, $name)
         );
 
         if ($this->container->has($containerKey)) {
