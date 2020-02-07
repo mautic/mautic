@@ -873,7 +873,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function getModel($modelNameKey)
     {
-        return $this->get('mautic.model.factory')->get($modelNameKey);
+        return $this->get('mautic.model.factory')->getModel($modelNameKey);
     }
 
     /**
