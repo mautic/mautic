@@ -40,7 +40,7 @@ class IntegrationSyncSettingsType extends AbstractType
             'objects',
             ChoiceType::class,
             [
-                'choices'     => $objects,
+                'choices'     => array_flip($objects),
                 'expanded'    => true,
                 'multiple'    => true,
                 'label'       => 'mautic.integration.sync_objects',
