@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39c95f61da5ccff0216a2963998af545",
+    "content-hash": "0e9cbc7e4e53e19b93d7eeab4cee8b2d",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -4045,6 +4045,47 @@
             "time": "2018-07-01T00:12:15+00:00"
         },
         {
+            "name": "kamermans/guzzle-oauth2-subscriber",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kamermans/guzzle-oauth2-subscriber.git",
+                "reference": "0e484edf9b8b12ec4710f86ba9b0831ccd1f6283"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kamermans/guzzle-oauth2-subscriber/zipball/0e484edf9b8b12ec4710f86ba9b0831ccd1f6283",
+                "reference": "0e484edf9b8b12ec4710f86ba9b0831ccd1f6283",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": ">=4.0",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "kamermans\\OAuth2\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steve Kamerman",
+                    "email": "stevekamerman@gmail.com"
+                }
+            ],
+            "description": "OAuth 2.0 client for Guzzle 4, 5 and 6+",
+            "keywords": [
+                "Guzzle",
+                "oauth"
+            ],
+            "time": "2019-02-26T16:58:01+00:00"
+        },
+        {
             "name": "knplabs/gaufrette",
             "version": "v0.9.0",
             "source": {
@@ -7511,63 +7552,6 @@
             "time": "2020-01-01T11:03:25+00:00"
         },
         {
-            "name": "symfony/browser-kit",
-            "version": "v3.4.37",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/browser-kit.git",
-                "reference": "ede0c5fa204586e3fa51053fbea9cea8a5a3ee8b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/ede0c5fa204586e3fa51053fbea9cea8a5a3ee8b",
-                "reference": "ede0c5fa204586e3fa51053fbea9cea8a5a3ee8b",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9|>=7.0.8",
-                "symfony/dom-crawler": "~2.8|~3.0|~4.0"
-            },
-            "require-dev": {
-                "symfony/css-selector": "~2.8|~3.0|~4.0",
-                "symfony/process": "~2.8|~3.0|~4.0"
-            },
-            "suggest": {
-                "symfony/process": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\BrowserKit\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony BrowserKit Component",
-            "homepage": "https://symfony.com",
-            "time": "2020-01-01T11:03:25+00:00"
-        },
-        {
             "name": "symfony/cache",
             "version": "v3.4.37",
             "source": {
@@ -8034,63 +8018,6 @@
                 }
             ],
             "description": "Symfony Doctrine Bridge",
-            "homepage": "https://symfony.com",
-            "time": "2020-01-01T11:03:25+00:00"
-        },
-        {
-            "name": "symfony/dom-crawler",
-            "version": "v3.4.37",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "c6fcc96c530ef18dcb4e605e3e9a97c483a160e6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/c6fcc96c530ef18dcb4e605e3e9a97c483a160e6",
-                "reference": "c6fcc96c530ef18dcb4e605e3e9a97c483a160e6",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.5.9|>=7.0.8",
-                "symfony/polyfill-ctype": "~1.8",
-                "symfony/polyfill-mbstring": "~1.0"
-            },
-            "require-dev": {
-                "symfony/css-selector": "~2.8|~3.0|~4.0"
-            },
-            "suggest": {
-                "symfony/css-selector": ""
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.4-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\DomCrawler\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony DomCrawler Component",
             "homepage": "https://symfony.com",
             "time": "2020-01-01T11:03:25+00:00"
         },
@@ -12004,47 +11931,6 @@
             "time": "2018-07-31T19:32:56+00:00"
         },
         {
-            "name": "kamermans/guzzle-oauth2-subscriber",
-            "version": "v1.0.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kamermans/guzzle-oauth2-subscriber.git",
-                "reference": "0e484edf9b8b12ec4710f86ba9b0831ccd1f6283"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kamermans/guzzle-oauth2-subscriber/zipball/0e484edf9b8b12ec4710f86ba9b0831ccd1f6283",
-                "reference": "0e484edf9b8b12ec4710f86ba9b0831ccd1f6283",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": ">=4.0",
-                "php": ">=5.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "kamermans\\OAuth2\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Steve Kamerman",
-                    "email": "stevekamerman@gmail.com"
-                }
-            ],
-            "description": "OAuth 2.0 client for Guzzle 4, 5 and 6+",
-            "keywords": [
-                "Guzzle",
-                "oauth"
-            ],
-            "time": "2019-02-26T16:58:01+00:00"
-        },
-        {
             "name": "liip/functional-test-bundle",
             "version": "3.3.0",
             "source": {
@@ -13759,6 +13645,63 @@
             "time": "2016-10-03T07:35:21+00:00"
         },
         {
+            "name": "symfony/browser-kit",
+            "version": "v3.4.37",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/browser-kit.git",
+                "reference": "ede0c5fa204586e3fa51053fbea9cea8a5a3ee8b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/ede0c5fa204586e3fa51053fbea9cea8a5a3ee8b",
+                "reference": "ede0c5fa204586e3fa51053fbea9cea8a5a3ee8b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8",
+                "symfony/dom-crawler": "~2.8|~3.0|~4.0"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.8|~3.0|~4.0",
+                "symfony/process": "~2.8|~3.0|~4.0"
+            },
+            "suggest": {
+                "symfony/process": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\BrowserKit\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony BrowserKit Component",
+            "homepage": "https://symfony.com",
+            "time": "2020-01-01T11:03:25+00:00"
+        },
+        {
             "name": "symfony/css-selector",
             "version": "v5.0.4",
             "source": {
@@ -13810,6 +13753,63 @@
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
             "time": "2020-01-04T14:08:26+00:00"
+        },
+        {
+            "name": "symfony/dom-crawler",
+            "version": "v3.4.37",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/dom-crawler.git",
+                "reference": "c6fcc96c530ef18dcb4e605e3e9a97c483a160e6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/c6fcc96c530ef18dcb4e605e3e9a97c483a160e6",
+                "reference": "c6fcc96c530ef18dcb4e605e3e9a97c483a160e6",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5.9|>=7.0.8",
+                "symfony/polyfill-ctype": "~1.8",
+                "symfony/polyfill-mbstring": "~1.0"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.8|~3.0|~4.0"
+            },
+            "suggest": {
+                "symfony/css-selector": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\DomCrawler\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony DomCrawler Component",
+            "homepage": "https://symfony.com",
+            "time": "2020-01-01T11:03:25+00:00"
         },
         {
             "name": "symfony/phpunit-bridge",

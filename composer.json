@@ -30,8 +30,6 @@
         "symfony/validator": "~3.4.0",
         "symfony/yaml": "~3.4.0",
         "symfony/property-access": "~3.4.0",
-        "symfony/dom-crawler": "~3.4.0",
-        "symfony/browser-kit": "~3.4.0",
         "symfony/cache": "~3.4.0",
         "symfony/asset": "~3.4.0",
         "symfony/class-loader": "~3.4.0",
@@ -108,11 +106,14 @@
         "helios-ag/fm-elfinder-bundle": "~9",
         "ricardofiorani/guzzle-psr18-adapter": "^1.0",
         "leezy/pheanstalk-bundle": "^4.0",
-        "tightenco/collect": "^6.13"
+        "tightenco/collect": "^6.13",
+        "kamermans/guzzle-oauth2-subscriber": "^1.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",
         "symfony/var-dumper": "~3.4.0",
+        "symfony/browser-kit": "~3.4.0",
+        "symfony/dom-crawler": "~3.4.0",
 
         "symfony/phpunit-bridge": "~4.3.0",
         "phpunit/phpunit": "~7.5.0",
@@ -125,7 +126,6 @@
         "webfactory/exceptions-bundle": "~4.3",
         "friendsofphp/php-cs-fixer": "~2.16.1",
         "liip/test-fixtures-bundle": "^1.6",
-        "kamermans/guzzle-oauth2-subscriber": "^1.0",
         "phpstan/phpstan": "^0.12.3",
         "rector/rector-prefixed": "0.6.13"
     },
