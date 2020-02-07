@@ -210,9 +210,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $success = $this->isAuthorized();
             if (!$success) {
                 return $this->authorizationError;
-            } else {
-                return false;
             }
+
+            return false;
         } else {
             $settings = [
                 'grant_type'         => 'password',
@@ -654,9 +654,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ('6' == $this->keys['version']) {
             if (!empty($response['name'])) {
                 return $response['description'];
-            } else {
-                return $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
             }
+
+            return $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
         } else {
             return parent::getErrorsFromResponse($response);
         }
@@ -700,9 +700,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             ];
 
             return [$parameters, $headers];
-        } else {
-            return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
         }
+
+        return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
     /**
@@ -751,14 +751,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $this->authorizationError = $error;
 
             return empty($error);
-        } else {
-            if ($this->isConfigured()) {
-                // SugarCRM 7 uses password grant type so login each time to ensure session is valid
-                $this->authCallback();
-            }
-
-            return parent::isAuthorized();
         }
+        if ($this->isConfigured()) {
+            // SugarCRM 7 uses password grant type so login each time to ensure session is valid
+            $this->authCallback();
+        }
+
+        return parent::isAuthorized();
     }
 
     /**
@@ -1901,9 +1900,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
         if (preg_match($regex, $stringToCheck)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

@@ -178,9 +178,9 @@ class RoleController extends FormController
                         'mauticContent' => 'role',
                     ],
                 ]);
-            } else {
-                return $this->editAction($entity->getId());
             }
+
+            return $this->editAction($entity->getId());
         }
 
         return $this->delegateView([
@@ -231,8 +231,6 @@ class RoleController extends FormController
                 'mauticContent' => 'role',
             ],
         ];
-
-        //user not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -245,7 +243,10 @@ class RoleController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($entity)) {
+        }
+
+        //user not found
+        if ($model->isLocked($entity)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'user.role');
         }
@@ -284,11 +285,10 @@ class RoleController extends FormController
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
-            } else {
-                //the form has to be rebuilt because the permissions were updated
-                $permissionsConfig = $this->getPermissionsConfig($entity);
-                $form              = $model->createForm($entity, $this->get('form.factory'), $action, ['permissionsConfig' => $permissionsConfig['config']]);
             }
+            //the form has to be rebuilt because the permissions were updated
+            $permissionsConfig = $this->getPermissionsConfig($entity);
+            $form              = $model->createForm($entity, $this->get('form.factory'), $action, ['permissionsConfig' => $permissionsConfig['config']]);
         } else {
             //lock the entity
             $model->lockEntity($entity);

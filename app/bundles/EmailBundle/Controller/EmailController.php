@@ -269,7 +269,6 @@ class EmailController extends FormController
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-
         if (null === $email) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
@@ -292,12 +291,13 @@ class EmailController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $email->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -626,8 +626,6 @@ class EmailController extends FormController
                 'mauticContent' => 'email',
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -643,12 +641,14 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'email:emails:editown',
             'email:emails:editother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -723,7 +723,6 @@ class EmailController extends FormController
                     ]
                 );
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
@@ -741,7 +740,9 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+            }
+
+            if ($valid && $form->get('buttons')->get('apply')->isClicked()) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
             }

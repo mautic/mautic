@@ -173,12 +173,10 @@ class FormModel extends AbstractCommonModel
         }
 
         if (method_exists($entity, 'getId')) {
-            $isNew = ($entity->getId()) ? false : true;
-        } else {
-            $isNew = \Doctrine\ORM\UnitOfWork::STATE_NEW === $this->em->getUnitOfWork()->getEntityState($entity);
+            return ($entity->getId()) ? false : true;
         }
 
-        return $isNew;
+        return \Doctrine\ORM\UnitOfWork::STATE_NEW === $this->em->getUnitOfWork()->getEntityState($entity);
     }
 
     /**

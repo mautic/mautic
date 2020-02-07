@@ -77,8 +77,8 @@ class Translator extends BaseTranslator
     {
         if ($this->hasId($preferred, $domain, $locale)) {
             return $this->trans($preferred, $parameters, $domain, $locale);
-        } else {
-            return $this->trans($alternative, $parameters, $domain, $locale);
         }
+
+        return $this->trans($alternative, $parameters, $domain, $locale);
     }
 }

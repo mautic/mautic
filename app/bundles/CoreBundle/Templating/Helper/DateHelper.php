@@ -70,13 +70,12 @@ class DateHelper extends Helper
     {
         if (empty($datetime)) {
             return '';
-        } else {
-            $this->helper->setDateTime($datetime, $fromFormat, $timezone);
-
-            return $this->helper->toLocalString(
-                $this->formats[$type]
-            );
         }
+        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+
+        return $this->helper->toLocalString(
+            $this->formats[$type]
+        );
     }
 
     /**
@@ -176,16 +175,14 @@ class DateHelper extends Helper
 
         if ($textDate) {
             return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format('g:i a')]);
+        }
+        $interval = $this->helper->getDiff('now', null, true);
+        if ($interval->invert && !$forceDateForNonText) {
+            // In the past
+            return $this->translator->trans('mautic.core.date.ago', ['%days%' => $interval->days]);
         } else {
-            $interval = $this->helper->getDiff('now', null, true);
-
-            if ($interval->invert && !$forceDateForNonText) {
-                // In the past
-                return $this->translator->trans('mautic.core.date.ago', ['%days%' => $interval->days]);
-            } else {
-                // In the future
-                return $this->toFullConcat($datetime, $timezone, $fromFormat);
-            }
+            // In the future
+            return $this->toFullConcat($datetime, $timezone, $fromFormat);
         }
     }
 

@@ -190,7 +190,6 @@ class PageController extends FormController
         $activePage = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->get('session')->get('mautic.page.page', 1);
-
         if (null === $activePage) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -211,7 +210,9 @@ class PageController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$security->hasEntityAccess(
+        }
+
+        if (!$security->hasEntityAccess(
                 'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
             ) ||
             ($activePage->getIsPreferenceCenter() &&
@@ -500,8 +501,6 @@ class PageController extends FormController
                 'mauticContent' => 'page',
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -514,7 +513,10 @@ class PageController extends FormController
                     ],
                 ])
             );
-        } elseif (!$security->hasEntityAccess(
+        }
+
+        //not found
+        if (!$security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
         ) ||
             ($entity->getIsPreferenceCenter() && !$security->hasEntityAccess(

@@ -45,9 +45,9 @@ class PublicController extends CommonController
             $content  = $model->generateJavascript($focus, false, (MAUTIC_ENV == 'dev'));
 
             return new Response($content, 200, ['Content-Type' => 'application/javascript']);
-        } else {
-            return new Response('', 200, ['Content-Type' => 'application/javascript']);
         }
+
+        return new Response('', 200, ['Content-Type' => 'application/javascript']);
     }
 
     /**

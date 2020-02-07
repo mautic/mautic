@@ -39,9 +39,8 @@ class DynamicContentApiController extends CommonController
         $method = $this->request->getMethod();
         if (method_exists($this, $method.'Action')) {
             return $this->{$method.'Action'}($objectAlias);
-        } else {
-            throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
         }
+        throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
     }
 
     public function getAction($objectAlias)

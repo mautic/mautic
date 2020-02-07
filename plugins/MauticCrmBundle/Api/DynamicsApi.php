@@ -133,12 +133,11 @@ class DynamicsApi extends CrmApi
     {
         if ($id) {
             $operation = sprintf('accounts(%s)', $id);
-            $data      = $this->request($operation, $params, 'GET');
-        } else {
-            $data = $this->request('', $params, 'GET', 'accounts');
+
+            return $this->request($operation, $params, 'GET');
         }
 
-        return $data;
+        return $this->request('', $params, 'GET', 'accounts');
     }
 
     /**

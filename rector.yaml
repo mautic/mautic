@@ -1,6 +1,7 @@
 parameters:
     sets:
         - dead-code
+        - early-return
 
     paths:
         - app/bundles

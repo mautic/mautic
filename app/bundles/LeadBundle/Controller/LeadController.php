@@ -582,7 +582,6 @@ class LeadController extends FormController
                 'mauticContent' => 'lead',
             ],
         ];
-        //lead not found
         if (null === $lead) {
             return $this->postActionRedirect(
                 array_merge(
@@ -598,12 +597,13 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+        //lead not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($lead)) {
             //deny access if the entity is locked
@@ -679,7 +679,6 @@ class LeadController extends FormController
                 //unlock the entity
                 $model->unlockEntity($lead);
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
@@ -696,7 +695,9 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
                 $form = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
@@ -849,7 +850,6 @@ class LeadController extends FormController
                     $data      = $form->getData();
                     $secLeadId = $data['lead_to_merge'];
                     $secLead   = $model->getEntity($secLeadId);
-
                     if (null === $secLead) {
                         return $this->postActionRedirect(
                             array_merge(
@@ -865,10 +865,10 @@ class LeadController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
-                        !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
-                        || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
-                    ) {
+                    }
+
+                    if (!$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
+                    || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())) {
                         return $this->accessDenied();
                     } elseif ($model->isLocked($mainLead)) {
                         //deny access if the entity is locked
@@ -1542,42 +1542,40 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            // Get a list of campaigns
-            $campaigns = $campaignModel->getPublishedCampaigns(true);
-            $items     = [];
-            foreach ($campaigns as $campaign) {
-                $items[$campaign['name']] = $campaign['id'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchCampaigns',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            BatchType::class,
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        // Get a list of campaigns
+        $campaigns = $campaignModel->getPublishedCampaigns(true);
+        $items     = [];
+        foreach ($campaigns as $campaign) {
+            $items[$campaign['name']] = $campaign['id'];
+        }
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchCampaigns',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        BatchType::class,
+                        [],
+                        [
+                            'items'  => $items,
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1641,34 +1639,33 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchDnc',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            DncType::class,
-                            [],
-                            [
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchDnc',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        DncType::class,
+                        [],
+                        [
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1738,44 +1735,42 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            // Get a list of lists
-            /** @var \Mautic\StageBundle\Model\StageModel $model */
-            $model  = $this->getModel('stage');
-            $stages = $model->getUserStages();
-            $items  = [];
-            foreach ($stages as $stage) {
-                $items[$stage['name']] = $stage['id'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchStages',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            StageType::class,
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        // Get a list of lists
+        /** @var \Mautic\StageBundle\Model\StageModel $model */
+        $model  = $this->getModel('stage');
+        $stages = $model->getUserStages();
+        $items  = [];
+        foreach ($stages as $stage) {
+            $items[$stage['name']] = $stage['id'];
+        }
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchStages',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        StageType::class,
+                        [],
+                        [
+                            'items'  => $items,
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1838,41 +1833,39 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
-            $items = [];
-            foreach ($users as $user) {
-                $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
-            }
-
-            $route = $this->generateUrl(
-                'mautic_contact_action',
-                [
-                    'objectAction' => 'batchOwners',
-                ]
-            );
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form' => $this->createForm(
-                            OwnerType::class,
-                            [],
-                            [
-                                'items'  => $items,
-                                'action' => $route,
-                            ]
-                        )->createView(),
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadBatch',
-                        'route'         => $route,
-                    ],
-                ]
-            );
         }
+        $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
+        $items = [];
+        foreach ($users as $user) {
+            $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
+        }
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchOwners',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->createForm(
+                        OwnerType::class,
+                        [],
+                        [
+                            'items'  => $items,
+                            'action' => $route,
+                        ]
+                    )->createView(),
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
     }
 
     /**

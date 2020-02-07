@@ -156,11 +156,10 @@ abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport im
                     $message->generateId();
 
                     return $count - count($failed);
-                } else {
-                    $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
-                    $evt->setFailedRecipients($failedRecipients);
-                    $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
                 }
+                $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
+                $evt->setFailedRecipients($failedRecipients);
+                $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
             }
         } catch (\Swift_TransportException $e) {
             $failedRecipients = array_merge(

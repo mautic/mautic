@@ -203,31 +203,29 @@ class InstallController extends CommonController
                 // On to the next step
 
                 return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => (int) $index]));
-            } else {
-                // Merge final things into the config, wipe the container, and we're done!
-                $finalConfigVars = [
-                    'secret_key' => EncryptionHelper::generateKey(),
-                    'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBasePath(),
-                ];
-
-                if (!$this->saveConfiguration($finalConfigVars, null)) {
-                    $this->addFlash('mautic.installer.error.writing.configuration', [], 'error');
-                }
-
-                return $this->postActionRedirect(
-                    [
-                        'viewParameters' => [
-                            'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
-                            'parameters'  => $this->configurator->render(),
-                            'version'     => MAUTIC_VERSION,
-                            'tmpl'        => $tmpl,
-                        ],
-                        'returnUrl'         => $this->generateUrl('mautic_installer_final'),
-                        'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
-                        'forwardController' => false,
-                    ]
-                );
             }
+            // Merge final things into the config, wipe the container, and we're done!
+            $finalConfigVars = [
+                'secret_key' => EncryptionHelper::generateKey(),
+                'site_url'   => $this->request->getSchemeAndHttpHost().$this->request->getBasePath(),
+            ];
+            if (!$this->saveConfiguration($finalConfigVars, null)) {
+                $this->addFlash('mautic.installer.error.writing.configuration', [], 'error');
+            }
+
+            return $this->postActionRedirect(
+                [
+                    'viewParameters' => [
+                        'welcome_url' => $this->generateUrl('mautic_dashboard_index'),
+                        'parameters'  => $this->configurator->render(),
+                        'version'     => MAUTIC_VERSION,
+                        'tmpl'        => $tmpl,
+                    ],
+                    'returnUrl'         => $this->generateUrl('mautic_installer_final'),
+                    'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
+                    'forwardController' => false,
+                ]
+            );
         } else {
             // Redirect back to last step if the user advanced ahead via the URL
             $last = (int) end($completedSteps) + 1;

@@ -138,10 +138,11 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $config = $this->mergeConfigToFeatureSettings($config);
 
         $mappedData = $this->populateLeadData($lead, $config);
-
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['email'])) {
+        }
+
+        if (empty($mappedData['email'])) {
             return false;
         } elseif (!isset($config['list_settings'])) {
             return false;

@@ -66,9 +66,9 @@ class ClientModel extends FormModel
     {
         if ('oauth2' == $this->apiMode) {
             return $this->em->getRepository(Client::class);
-        } else {
-            return $this->em->getRepository(Consumer::class);
         }
+
+        return $this->em->getRepository(Consumer::class);
     }
 
     /**

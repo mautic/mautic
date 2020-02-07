@@ -252,9 +252,8 @@ class DateTimeHelper
             $dt->add($interval);
 
             return $dt;
-        } else {
-            $this->datetime->add($interval);
         }
+        $this->datetime->add($interval);
     }
 
     /**
@@ -274,9 +273,8 @@ class DateTimeHelper
             $dt->sub($interval);
 
             return $dt;
-        } else {
-            $this->datetime->sub($interval);
         }
+        $this->datetime->sub($interval);
     }
 
     /**
@@ -328,9 +326,8 @@ class DateTimeHelper
             $dt->modify($string);
 
             return $dt;
-        } else {
-            $this->datetime->modify($string);
         }
+        $this->datetime->modify($string);
     }
 
     /**

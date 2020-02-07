@@ -114,7 +114,8 @@ class CacheStorageHelper
     {
         if (0 === $maxAge) {
             return false;
-        } elseif (null !== $maxAge) {
+        }
+        if (null !== $maxAge) {
         }
 
         $cacheItem = $this->cacheAdaptor->getItem($name);

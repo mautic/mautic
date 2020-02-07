@@ -246,7 +246,8 @@ class ContactLimiter
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');
-        } elseif ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
+        }
+        if ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
             throw new \Exception('Campaign Limit exceeded');
         }
         $this->campaignLimitUsed += $reduction;

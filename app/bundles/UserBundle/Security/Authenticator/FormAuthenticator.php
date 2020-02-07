@@ -112,7 +112,6 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
             // Assume the user is authenticated although the token will tell for sure
             $authenticated = true;
         }
-
         if ($authenticated) {
             return new PluginToken(
                 $providerKey,
@@ -122,7 +121,9 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
                 $user->getRoles(),
                 $response
             );
-        } elseif ($response) {
+        }
+
+        if ($response) {
             return new PluginToken(
                 $providerKey,
                 $authenticatingService,

@@ -626,9 +626,9 @@ class CampaignController extends AbstractStandardFormController
             if ($isClone) {
                 // Clone hasn't saved the sources yet so return the current list as added
                 return [$campaignSources, [], $campaignSources];
-            } else {
-                return [[], [], $campaignSources];
             }
+
+            return [[], [], $campaignSources];
         }
 
         // Deleted sources

@@ -463,9 +463,8 @@ class FieldModel extends FormModel
 
                 if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
                     throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
-                } else {
-                    throw $e;
                 }
+                throw $e;
             }
 
             // If this is a new contact field, and it was successfully added to the contacts table, save it
@@ -730,9 +729,9 @@ class FieldModel extends FormModel
             $entity->setProperties($properties);
 
             return true;
-        } else {
-            return $result[1];
         }
+
+        return $result[1];
     }
 
     /**
@@ -777,9 +776,9 @@ class FieldModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

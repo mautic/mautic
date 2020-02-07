@@ -336,8 +336,8 @@ class SchemaHelper
     {
         if (empty($prefix) || false === strpos($name, $prefix)) {
             return $backupPrefix.$name;
-        } else {
-            return str_replace($prefix, $backupPrefix, $name);
         }
+
+        return str_replace($prefix, $backupPrefix, $name);
     }
 }

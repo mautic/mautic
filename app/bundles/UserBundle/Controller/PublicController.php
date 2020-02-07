@@ -113,11 +113,10 @@ class PublicController extends FormController
                                 'route' => $action,
                             ],
                         ]);
-                    } else {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken', [], 'notice', null, false);
-
-                        return $this->redirect($this->generateUrl('mautic_user_passwordresetconfirm'));
                     }
+                    $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken', [], 'notice', null, false);
+
+                    return $this->redirect($this->generateUrl('mautic_user_passwordresetconfirm'));
                 }
             }
         }

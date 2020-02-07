@@ -243,9 +243,9 @@ class ColumnSchemaHelper
         if (!$this->sm->tablesExist($table)) {
             if ($throwException) {
                 throw new SchemaException("Table $table does not exist!");
-            } else {
-                return false;
             }
+
+            return false;
         } else {
             return true;
         }

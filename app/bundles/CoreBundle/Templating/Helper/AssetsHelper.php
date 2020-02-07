@@ -662,9 +662,9 @@ class AssetsHelper
 
         if ($urlOnly) {
             return $flagImg;
-        } else {
-            return '<img src="'.$flagImg.'" class="'.$class.'" />';
         }
+
+        return '<img src="'.$flagImg.'" class="'.$class.'" />';
     }
 
     /**

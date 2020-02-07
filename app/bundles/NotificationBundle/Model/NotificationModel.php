@@ -145,12 +145,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     public function getEntity($id = null)
     {
         if (null === $id) {
-            $entity = new Notification();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Notification();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -211,9 +209,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return;
         }
+
+        return;
     }
 
     /**

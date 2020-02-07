@@ -39,10 +39,11 @@ class OAuthListener extends \Bazinga\OAuthServerBundle\Security\Firewall\OAuthLi
 
         try {
             $returnValue = $this->authenticationManager->authenticate($token);
-
             if ($returnValue instanceof TokenInterface) {
                 return $this->tokenStorage->setToken($returnValue);
-            } elseif ($returnValue instanceof Response) {
+            }
+
+            if ($returnValue instanceof Response) {
                 return $event->setResponse($returnValue);
             }
         } catch (AuthenticationException $e) {

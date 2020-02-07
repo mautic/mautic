@@ -204,21 +204,19 @@ class PublicController extends CommonFormController
             if ($isAjax) {
                 // Post via ajax so return a json response
                 return new JsonResponse($data);
-            } else {
-                $response = json_encode($data);
-
-                return $this->render('MauticFormBundle::messenger.html.php', ['response' => $response]);
             }
+            $response = json_encode($data);
+
+            return $this->render('MauticFormBundle::messenger.html.php', ['response' => $response]);
         } else {
             if (!empty($error)) {
                 if ($return) {
                     $hash = (null !== $form) ? '#'.strtolower($form->getAlias()) : '';
 
                     return $this->redirect($return.$query.'mauticError='.rawurlencode($error).$hash);
-                } else {
-                    $msg     = $error;
-                    $msgType = 'error';
                 }
+                $msg     = $error;
+                $msgType = 'error';
             } elseif ('redirect' == $postAction) {
                 return $this->redirect($postActionProperty);
             } elseif ('return' == $postAction) {
@@ -228,9 +226,8 @@ class PublicController extends CommonFormController
                     }
 
                     return $this->redirect($return);
-                } else {
-                    $msg = $this->get('translator')->trans('mautic.form.submission.thankyou');
                 }
+                $msg = $this->get('translator')->trans('mautic.form.submission.thankyou');
             } else {
                 $msg = $postActionProperty;
             }
@@ -298,32 +295,27 @@ class PublicController extends CommonFormController
 
         if (null === $form || !$form->isPublished()) {
             return $this->notFound();
-        } else {
-            $html = $model->getContent($form);
-
-            $model->populateValuesWithGetParameters($form, $html);
-
-            $viewParams = [
-                'content'     => $html,
-                'stylesheets' => $customStylesheets,
-                'name'        => $form->getName(),
-                'metaRobots'  => '<meta name="robots" content="index">',
-            ];
-
-            if ($form->getNoIndex()) {
-                $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
-            }
-
-            $template = $form->getTemplate();
-            if (!empty($template)) {
-                $theme = $this->factory->getTheme($template);
-                if ($theme->getTheme() != $template) {
-                    $config = $theme->getConfig();
-                    if (in_array('form', $config['features'])) {
-                        $template = $theme->getTheme();
-                    } else {
-                        $template = null;
-                    }
+        }
+        $html = $model->getContent($form);
+        $model->populateValuesWithGetParameters($form, $html);
+        $viewParams = [
+            'content'     => $html,
+            'stylesheets' => $customStylesheets,
+            'name'        => $form->getName(),
+            'metaRobots'  => '<meta name="robots" content="index">',
+        ];
+        if ($form->getNoIndex()) {
+            $viewParams['metaRobots'] = '<meta name="robots" content="noindex">';
+        }
+        $template = $form->getTemplate();
+        if (!empty($template)) {
+            $theme = $this->factory->getTheme($template);
+            if ($theme->getTheme() != $template) {
+                $config = $theme->getConfig();
+                if (in_array('form', $config['features'])) {
+                    $template = $theme->getTheme();
+                } else {
+                    $template = null;
                 }
             }
         }

@@ -140,14 +140,14 @@ class DashboardController extends AbstractFormController
             }
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
-            ]);
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
+        ]);
     }
 
     /**
@@ -202,14 +202,14 @@ class DashboardController extends AbstractFormController
             }
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView([
-                'viewParameters' => [
-                    'form' => $form->createView(),
-                ],
-                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
-            ]);
         }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
+        ]);
     }
 
     /**

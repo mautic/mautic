@@ -89,10 +89,10 @@ class SegmentContactsLineChartQuery extends ChartQuery
             $total = $totalCountDateTo - $totalSum;
             if ($total > -1) {
                 return $total;
-            } else {
-                return 0;
             }
         }, $sums);
+
+        return 0;
 
         return array_reverse($totals);
     }

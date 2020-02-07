@@ -156,9 +156,8 @@ class EventLogApiController extends CommonApiController
 
         if (is_string($result)) {
             return $this->returnError($result, Response::HTTP_CONFLICT);
-        } else {
-            list($log, $created) = $result;
         }
+        list($log, $created) = $result;
 
         $event->addContactLog($log);
         $view = $this->view(

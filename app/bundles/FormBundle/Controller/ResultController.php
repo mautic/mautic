@@ -54,7 +54,6 @@ class ResultController extends CommonFormController
         $formPage       = $session->get('mautic.form.page', 1);
         $returnUrl      = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
         $viewOnlyFields = $formModel->getCustomComponents()['viewOnlyFields'];
-
         if (null === $form) {
             //redirect back to form list
             return $this->postActionRedirect(
@@ -75,12 +74,13 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -256,7 +256,6 @@ class ResultController extends CommonFormController
         $session   = $this->get('session');
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
-
         if (null === $form) {
             //redirect back to form list
             return $this->postActionRedirect(
@@ -277,12 +276,13 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 

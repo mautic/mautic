@@ -129,6 +129,9 @@ abstract class AbstractFormFieldHelper
             // Numberical array so set labels as values
             $list = array_combine($list, $list);
         }
+        if ($removeEmpty && empty($val) && empty($label)) {
+            continue;
+        }
 
         $valueFormatting = function ($list) use ($removeEmpty, $flipArray) {
             $choices = [];
@@ -137,9 +140,7 @@ abstract class AbstractFormFieldHelper
                     $val   = $label['value'];
                     $label = $label['label'];
                 }
-                if ($removeEmpty && empty($val) && empty($label)) {
-                    continue;
-                } elseif (empty($label)) {
+                if (empty($label)) {
                     $label = $val;
                 }
                 if (!is_array($label)) {

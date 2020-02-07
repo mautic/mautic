@@ -351,7 +351,6 @@ class PlainTextHelper
             }
             $url .= $link;
         }
-
         if ('table' == $linkMethod) {
             if (false === ($index = array_search($url, $this->linkList))) {
                 $index            = count($this->linkList);
@@ -359,7 +358,9 @@ class PlainTextHelper
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ('nextline' == $linkMethod) {
+        }
+
+        if ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         } else { // link_method defaults to inline
             return $display.' ['.$url.']';

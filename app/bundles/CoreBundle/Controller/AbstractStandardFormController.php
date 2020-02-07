@@ -275,9 +275,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
             if ($arguments = $this->afterEntityClone($newEntity, $entity)) {
                 return call_user_func_array([$this, 'editAction'], $arguments);
-            } else {
-                return $this->editAction($newEntity, true);
             }
+
+            return $this->editAction($newEntity, true);
         }
 
         return $this->newAction();
@@ -381,8 +381,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
             ],
             'entity' => $entity,
         ];
-
-        //form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 $this->getPostActionRedirectArguments(
@@ -401,7 +399,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'edit'
                 )
             );
-        } elseif ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
+        }
+
+        //form not found
+        if ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
             //deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
             return $this->accessDenied();
         } elseif (!$isClone && $model->isLocked($entity)) {
@@ -463,7 +464,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
                 $returnUrl = $this->generateUrl($this->getIndexRoute(), $viewParameters);
             }
-
             if ($cancelled || ($valid && !$this->isFormApplied($form))) {
                 return $this->postActionRedirect(
                     $this->getPostActionRedirectArguments(
@@ -477,7 +477,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'edit'
                     )
                 );
-            } elseif ($valid) {
+            }
+
+            if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
                 $form   = $model->createForm($entity, $this->get('form.factory'), $action);
@@ -733,7 +735,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         if ($this->get('templating')->exists($this->getControllerBase().':'.$file)) {
             return $this->getControllerBase().':'.$file;
-        } elseif ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
+        }
+        if ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
             return $this->getTemplateBase().':'.$file;
         } else {
             return 'MauticCoreBundle:Standard:'.$file;
@@ -1030,7 +1033,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     $this->getUpdateSelectParams($form['updateSelect']->getData(), $entity)
                 );
             }
-
             if ($cancelled || ($valid && !$this->isFormApplied($form))) {
                 if ($isInPopup) {
                     $passthrough['closeModal'] = true;
@@ -1048,7 +1050,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'new'
                     )
                 );
-            } elseif ($valid && $this->isFormApplied($form)) {
+            }
+
+            if ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($entity->getId(), true);
             }
         }
@@ -1109,7 +1113,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);
         $security = $this->get('mautic.security');
-
         if (null === $entity) {
             $page = $this->get('session')->get('mautic.'.$this->getSessionBase().'.page', 1);
 
@@ -1133,7 +1136,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'view'
                 )
             );
-        } elseif (!$this->checkActionPermission('view', $entity)) {
+        }
+
+        if (!$this->checkActionPermission('view', $entity)) {
             return $this->accessDenied();
         }
 

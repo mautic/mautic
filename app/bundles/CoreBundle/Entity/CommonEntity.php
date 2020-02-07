@@ -37,7 +37,8 @@ class CommonEntity
     {
         if (0 === strpos($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
-        } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
+        }
+        if ('getName' == $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 

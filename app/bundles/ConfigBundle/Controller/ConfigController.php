@@ -157,9 +157,9 @@ class ConfigController extends FormController
                     }
 
                     return $this->delegateRedirect($this->generateUrl('mautic_config_action', $redirectParameters));
-                } else {
-                    return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
                 }
+
+                return $this->delegateRedirect($this->generateUrl('mautic_dashboard_index'));
             }
         }
 

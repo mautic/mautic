@@ -464,29 +464,28 @@ class ImportController extends FormController
             // Ajax request to batch process so just return ajax response unless complete
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
-        } else {
-            $activeLink = 'lead' === $object ? '#mautic_contact_index' : '#mautic_company_index';
-
-            return $this->delegateView(
-                [
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $contentTemplate,
-                    'passthroughVars' => [
-                        'activeLink'    => $activeLink,
-                        'mauticContent' => 'leadImport',
-                        'route'         => $this->generateUrl(
-                            'mautic_import_action',
-                            [
-                                'object'       => 'lead' === $object ? 'contacts' : 'companies',
-                                'objectAction' => 'new',
-                            ]
-                        ),
-                        'step'     => $step,
-                        'progress' => $progress,
-                    ],
-                ]
-            );
         }
+        $activeLink = 'lead' === $object ? '#mautic_contact_index' : '#mautic_company_index';
+
+        return $this->delegateView(
+            [
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => $contentTemplate,
+                'passthroughVars' => [
+                    'activeLink'    => $activeLink,
+                    'mauticContent' => 'leadImport',
+                    'route'         => $this->generateUrl(
+                        'mautic_import_action',
+                        [
+                            'object'       => 'lead' === $object ? 'contacts' : 'companies',
+                            'objectAction' => 'new',
+                        ]
+                    ),
+                    'step'     => $step,
+                    'progress' => $progress,
+                ],
+            ]
+        );
     }
 
     /**
@@ -511,10 +510,11 @@ class ImportController extends FormController
     protected function importInBrowser(Form $form)
     {
         $browserImportLimit = $this->getLineCountLimit();
-
         if ($browserImportLimit && $this->getLineCount() < $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->get('save')->isClicked()) {
+        }
+
+        if (!$browserImportLimit && $form->get('buttons')->get('save')->isClicked()) {
             return true;
         }
 
@@ -534,10 +534,11 @@ class ImportController extends FormController
     protected function importInCli(Form $form)
     {
         $browserImportLimit = $this->getLineCountLimit();
-
         if ($browserImportLimit && $this->getLineCount() >= $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->get('apply')->isClicked()) {
+        }
+
+        if (!$browserImportLimit && $form->get('buttons')->get('apply')->isClicked()) {
             return true;
         }
 

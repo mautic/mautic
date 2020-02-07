@@ -95,12 +95,10 @@ class oAuthHelper
     private function getCompositeKey()
     {
         if (strlen($this->accessTokenSecret) > 0) {
-            $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
-        } else {
-            $composite_key = $this->encode($this->clientSecret).'&';
+            return $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         }
 
-        return $composite_key;
+        return $this->encode($this->clientSecret).'&';
     }
 
     /**

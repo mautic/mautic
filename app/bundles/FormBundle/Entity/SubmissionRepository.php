@@ -221,9 +221,9 @@ class SubmissionRepository extends CommonRepository
             );
 
             return [$expr, $parameters];
-        } else {
-            return parent::getFilterExpr($q, $filter);
         }
+
+        return parent::getFilterExpr($q, $filter);
     }
 
     /**

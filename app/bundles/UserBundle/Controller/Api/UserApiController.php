@@ -97,13 +97,12 @@ class UserApiController extends CommonApiController
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
-            } else {
-                $entity = $this->model->getEntity();
-                if (isset($parameters['plainPassword']['password'])) {
-                    $submittedPassword = $parameters['plainPassword']['password'];
-                    $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
-                    $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
-                }
+            }
+            $entity = $this->model->getEntity();
+            if (isset($parameters['plainPassword']['password'])) {
+                $submittedPassword = $parameters['plainPassword']['password'];
+                $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+                $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
             }
         } else {
             //Changing passwords via API is forbidden
@@ -169,10 +168,11 @@ class UserApiController extends CommonApiController
         }
 
         $permissions = $this->request->request->get('permissions');
-
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
-        } elseif (!is_array($permissions)) {
+        }
+
+        if (!is_array($permissions)) {
             $permissions = [$permissions];
         }
 

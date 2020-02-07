@@ -361,16 +361,15 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $this->em->detach($companyLead);
 
                 continue;
-            } else {
-                $companyLead = new CompanyLead();
-                $companyLead->setCompany($companyLeadAdd[$companyId]);
-                $companyLead->setLead($lead);
-                $companyLead->setDateAdded($dateManipulated);
-                $contactAdded     = true;
-                $persistCompany[] = $companyLead;
-                $dispatchEvents[] = $companyId;
-                $companyName      = $companyLeadAdd[$companyId]->getName();
             }
+            $companyLead = new CompanyLead();
+            $companyLead->setCompany($companyLeadAdd[$companyId]);
+            $companyLead->setLead($lead);
+            $companyLead->setDateAdded($dateManipulated);
+            $contactAdded     = true;
+            $persistCompany[] = $companyLead;
+            $dispatchEvents[] = $companyId;
+            $companyName      = $companyLeadAdd[$companyId]->getName();
         }
 
         if (!empty($persistCompany)) {
@@ -600,9 +599,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -806,22 +805,20 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         foreach ($this->fetchCompanyFields() as $entityField) {
             if (isset($fieldData[$entityField['alias']])) {
                 $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
-
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;
 
                     continue;
                 }
-
                 try {
                     $this->cleanFields($fieldData, $entityField);
                 } catch (\Exception $exception) {
                     $fieldErrors[] = $entityField['alias'].': '.$exception->getMessage();
                 }
-
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($company->isNew() && $entityField['defaultValue']) {
+            }
+            if ($company->isNew() && $entityField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }

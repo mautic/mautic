@@ -100,13 +100,13 @@ class SidebarCanvasEvent extends Event
     {
         if ($canvas) {
             return $this->$canvas;
-        } else {
-            return [
-                'left'  => $this->left,
-                'right' => $this->right,
-                'main'  => $this->main,
-            ];
         }
+
+        return [
+            'left'  => $this->left,
+            'right' => $this->right,
+            'main'  => $this->main,
+        ];
     }
 
     /**

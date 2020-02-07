@@ -68,8 +68,6 @@ class DefaultController extends FormController
                 'mauticContent' => $source,
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -82,7 +80,10 @@ class DefaultController extends FormController
                     ],
                 ])
             );
-        } elseif (!$event->hasAccess()) {
+        }
+
+        //not found
+        if (!$event->hasAccess()) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

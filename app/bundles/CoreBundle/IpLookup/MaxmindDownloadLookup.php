@@ -44,9 +44,8 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $queryString         = http_build_query($data);
 
             return 'https://download.maxmind.com/app/geoip_download?'.$queryString;
-        } else {
-            $this->logger->warn('MaxMind license key is required.');
         }
+        $this->logger->warn('MaxMind license key is required.');
     }
 
     /**

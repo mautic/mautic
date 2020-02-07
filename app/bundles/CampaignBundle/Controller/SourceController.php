@@ -106,20 +106,19 @@ class SourceController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            $viewParams = [
-                'sourceType' => $sourceType,
-                'form'       => $form->createView(),
-            ];
-
-            return $this->ajaxAction(
-                [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+        $viewParams = [
+            'sourceType' => $sourceType,
+            'form'       => $form->createView(),
+        ];
+
+        return $this->ajaxAction(
+            [
+                'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
@@ -212,20 +211,19 @@ class SourceController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            $viewParams = [
-                'sourceType' => $sourceType,
-                'form'       => $form->createView(),
-            ];
-
-            return $this->ajaxAction(
-                [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+        $viewParams = [
+            'sourceType' => $sourceType,
+            'form'       => $form->createView(),
+        ];
+
+        return $this->ajaxAction(
+            [
+                'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**

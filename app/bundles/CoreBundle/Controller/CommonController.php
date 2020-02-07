@@ -224,9 +224,9 @@ class CommonController extends Controller implements MauticController
     {
         if ($this->request->isXmlHttpRequest()) {
             return new JsonResponse(['redirect' => $url]);
-        } else {
-            return $this->redirect($url);
         }
+
+        return $this->redirect($url);
     }
 
     /**
@@ -411,12 +411,10 @@ class CommonController extends Controller implements MauticController
         }
 
         if ($newContent instanceof Response) {
-            $response = $newContent;
-        } else {
-            $response = new JsonResponse($dataArray, $code);
+            return $newContent;
         }
 
-        return $response;
+        return new JsonResponse($dataArray, $code);
     }
 
     /**

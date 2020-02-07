@@ -45,10 +45,11 @@ class MailchimpApi extends EmailMarketingApi
         $url = sprintf('%s/%s/%s', $apiUrl, $this->version, $endpoint);
 
         $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json']);
-
         if (is_array($response) && !empty($response['status']) && 'error' == $response['status']) {
             throw new ApiErrorException($response['error']);
-        } elseif (is_array($response) && !empty($response['errors'])) {
+        }
+
+        if (is_array($response) && !empty($response['errors'])) {
             $errors = [];
             foreach ($response['errors'] as $error) {
                 $errors[] = $error['message'];

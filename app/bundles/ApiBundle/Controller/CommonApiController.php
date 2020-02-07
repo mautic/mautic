@@ -1182,9 +1182,8 @@ class CommonApiController extends FOSRestController implements MauticController
 
             if ($this->inBatchMode) {
                 return $entity;
-            } else {
-                $view = $this->view([$this->entityNameOne => $entity], $statusCode, $headers);
             }
+            $view = $this->view([$this->entityNameOne => $entity], $statusCode, $headers);
 
             $this->setSerializationContext($view);
         } else {

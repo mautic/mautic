@@ -468,9 +468,9 @@ class LeadModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -1510,13 +1510,11 @@ class LeadModel extends FormModel
 
                     continue;
                 }
-
                 try {
                     $this->cleanFields($fieldData, $leadField);
                 } catch (\Exception $exception) {
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
-
                 if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
                     try {
                         $this->emailValidator->validate($fieldData[$leadField['alias']], false);
@@ -1524,10 +1522,10 @@ class LeadModel extends FormModel
                         $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                     }
                 }
-
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($lead->isNew() && $leadField['defaultValue']) {
+            }
+            if ($lead->isNew() && $leadField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
@@ -2509,26 +2507,20 @@ class LeadModel extends FormModel
     {
         // if !$checkCurrentStatus, assume is contactable due to already being valided
         $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DNC::IS_CONTACTABLE;
-
-        // If they don't have a DNC entry yet
         if (DNC::IS_CONTACTABLE === $isContactable) {
             $dnc = new DNC();
-
             if (is_array($channel)) {
                 $channelId = reset($channel);
                 $channel   = key($channel);
 
                 $dnc->setChannelId((int) $channelId);
             }
-
             $dnc->setChannel($channel);
             $dnc->setReason($reason);
             $dnc->setLead($lead);
             $dnc->setDateAdded(new \DateTime());
             $dnc->setComments($comments);
-
             $lead->addDoNotContactEntry($dnc);
-
             if ($persist) {
                 // Use model saveEntity to trigger events for DNC change
                 $this->saveEntity($lead);
@@ -2536,8 +2528,9 @@ class LeadModel extends FormModel
 
             return $dnc;
         }
-        // Or if the given reason is different than the stated reason
-        elseif ($isContactable !== $reason) {
+
+        // If they don't have a DNC entry yet
+        if ($isContactable !== $reason) {
             /** @var DNC $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves

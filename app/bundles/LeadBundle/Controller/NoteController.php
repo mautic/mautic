@@ -204,18 +204,18 @@ class NoteController extends FormController
             }
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form'        => $form->createView(),
-                        'lead'        => $lead,
-                        'permissions' => $permissions,
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
-                ]
-            );
         }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form'        => $form->createView(),
+                    'lead'        => $lead,
+                    'permissions' => $permissions,
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
+            ]
+        );
     }
 
     /**
@@ -290,18 +290,18 @@ class NoteController extends FormController
             $passthroughVars['mauticContent'] = 'leadNote';
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form'        => $form->createView(),
-                        'lead'        => $lead,
-                        'permissions' => $permissions,
-                    ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
-                ]
-            );
         }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form'        => $form->createView(),
+                    'lead'        => $lead,
+                    'permissions' => $permissions,
+                ],
+                'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
+            ]
+        );
     }
 
     /**
@@ -356,8 +356,8 @@ class NoteController extends FormController
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($leadId, $objectId);
-        } else {
-            return $this->accessDenied();
         }
+
+        return $this->accessDenied();
     }
 }

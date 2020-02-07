@@ -135,8 +135,8 @@ class ThemeHelper
         $errorPage = $this->getThemePath()."/error_{$code}.html.php";
         if (file_exists($errorPage)) {
             return ":{$this->theme}:error_{$code}.html.php";
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

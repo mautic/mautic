@@ -31,9 +31,9 @@ class CategoryController extends AbstractFormController
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($bundle, $objectId, $objectModel);
-        } else {
-            return $this->accessDenied();
         }
+
+        return $this->accessDenied();
     }
 
     /**
@@ -225,7 +225,6 @@ class CategoryController extends AbstractFormController
         }
 
         $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
-
         if ($closeModal) {
             if ($inForm) {
                 return new JsonResponse([
@@ -236,7 +235,6 @@ class CategoryController extends AbstractFormController
                     'categoryId'    => $entity->getId(),
                 ]);
             }
-
             $viewParameters = [
                 'page'   => $session->get('mautic.category.page'),
                 'bundle' => $bundle,
@@ -252,7 +250,9 @@ class CategoryController extends AbstractFormController
                     'closeModal'    => 1,
                 ],
             ]);
-        } elseif (!empty($valid)) {
+        }
+
+        if (!empty($valid)) {
             //return edit view to prevent duplicates
             return $this->editAction($bundle, $entity->getId(), true);
         } else {
@@ -381,23 +381,23 @@ class CategoryController extends AbstractFormController
                     ],
                 ]
             );
-        } else {
-            return $this->ajaxAction(
-                [
-                    'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
-                    'viewParameters'  => [
-                        'form'           => $form->createView(),
-                        'activeCategory' => $entity,
-                        'bundle'         => $bundle,
-                    ],
-                    'passthroughVars' => [
-                        'mauticContent' => 'category',
-                        'success'       => $success,
-                        'route'         => false,
-                    ],
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            [
+                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
+                'viewParameters'  => [
+                    'form'           => $form->createView(),
+                    'activeCategory' => $entity,
+                    'bundle'         => $bundle,
+                ],
+                'passthroughVars' => [
+                    'mauticContent' => 'category',
+                    'success'       => $success,
+                    'route'         => false,
+                ],
+            ]
+        );
     }
 
     /**

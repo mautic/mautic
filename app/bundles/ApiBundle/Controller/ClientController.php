@@ -239,7 +239,6 @@ class ClientController extends FormController
                     );
                 }
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     [
@@ -251,7 +250,9 @@ class ClientController extends FormController
                         ],
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            }
+
+            if ($valid && !$cancelled) {
                 return $this->editAction($client->getId(), true);
             }
         }
@@ -299,8 +300,6 @@ class ClientController extends FormController
                 'mauticContent' => 'client',
             ],
         ];
-
-        //client not found
         if (null === $client) {
             return $this->postActionRedirect(
                 array_merge(
@@ -316,7 +315,10 @@ class ClientController extends FormController
                     ]
                 )
             );
-        } elseif ($model->isLocked($client)) {
+        }
+
+        //client not found
+        if ($model->isLocked($client)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $client, 'api.client');
         }

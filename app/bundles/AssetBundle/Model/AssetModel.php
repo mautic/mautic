@@ -305,9 +305,8 @@ class AssetModel extends FormModel
         } catch (\Exception $e) {
             if (MAUTIC_ENV === 'dev') {
                 throw $e;
-            } else {
-                error_log($e);
             }
+            error_log($e);
         }
 
         $this->em->detach($download);
@@ -387,12 +386,10 @@ class AssetModel extends FormModel
     public function getEntity($id = null)
     {
         if (null === $id) {
-            $entity = new Asset();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Asset();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -437,9 +434,9 @@ class AssetModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

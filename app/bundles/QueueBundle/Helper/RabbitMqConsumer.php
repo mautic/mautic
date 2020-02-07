@@ -28,10 +28,11 @@ class RabbitMqConsumer implements ConsumerInterface
     public function execute(AMQPMessage $msg)
     {
         $event = $this->queueService->dispatchConsumerEventFromPayload($msg->body);
-
         if (QueueConsumerResults::TEMPORARY_REJECT === $event->getResult()) {
             return static::MSG_REJECT_REQUEUE;
-        } elseif (QueueConsumerResults::ACKNOWLEDGE === $event->getResult()) {
+        }
+
+        if (QueueConsumerResults::ACKNOWLEDGE === $event->getResult()) {
             return static::MSG_ACK;
         } elseif (QueueConsumerResults::REJECT === $event->getResult()) {
             return static::MSG_REJECT;

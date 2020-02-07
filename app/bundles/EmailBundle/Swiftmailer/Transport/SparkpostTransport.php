@@ -442,7 +442,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     {
         if (isset($response['errors'][0]['description'])) {
             return $response['errors'][0]['description'];
-        } elseif (isset($response['errors'][0]['message'])) {
+        }
+        if (isset($response['errors'][0]['message'])) {
             return $response['errors'][0]['message'];
         }
 

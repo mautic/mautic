@@ -61,7 +61,8 @@ class SecurityController extends CommonController
                         'request' => $this->request,
                     ]
                 );
-            } elseif ('schemaMigration' == $step) {
+            }
+            if ('schemaMigration' == $step) {
                 // Done so finalize
                 return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
                     [

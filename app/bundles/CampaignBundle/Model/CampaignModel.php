@@ -218,9 +218,9 @@ class CampaignModel extends CommonFormModel
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -771,14 +771,13 @@ class CampaignModel extends CommonFormModel
             // no parents so leave order as is
 
             return;
-        } else {
-            foreach ($hierarchy as $eventId => $parent) {
-                if ($parent == $root || 1 === $count) {
-                    $events[$eventId]->setOrder($order);
-                    unset($hierarchy[$eventId]);
-                    if (count($hierarchy)) {
-                        $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
-                    }
+        }
+        foreach ($hierarchy as $eventId => $parent) {
+            if ($parent == $root || 1 === $count) {
+                $events[$eventId]->setOrder($order);
+                unset($hierarchy[$eventId]);
+                if (count($hierarchy)) {
+                    $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
                 }
             }
         }

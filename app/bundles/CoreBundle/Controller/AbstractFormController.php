@@ -187,18 +187,16 @@ abstract class AbstractFormController extends CommonController
             $permissionBase = $this->getPermissionBase();
         }
 
-        if ($permissionBase) {
-            if ($entity && $security->checkPermissionExists($permissionBase.':editown')) {
-                return $security->hasEntityAccess(
-                    $permissionBase.':editown',
-                    $permissionBase.':editother',
-                    $entity->getCreatedBy()
-                );
-            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
-                return $security->isGranted(
-                    $permissionBase.':edit'
-                );
-            }
+        if ($entity && $security->checkPermissionExists($permissionBase.':editown')) {
+            return $security->hasEntityAccess(
+                $permissionBase.':editown',
+                $permissionBase.':editother',
+                $entity->getCreatedBy()
+            );
+        } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
+            return $security->isGranted(
+                $permissionBase.':edit'
+            );
         }
 
         return $this->get('mautic.helper.user')->getUser()->isAdmin();

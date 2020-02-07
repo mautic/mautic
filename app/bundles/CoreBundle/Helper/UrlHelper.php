@@ -59,9 +59,8 @@ class UrlHelper
 
             if (200 === $response->code) {
                 return rtrim($response->body);
-            } else {
-                $this->logger->addWarning("Url shortner failed with code {$response->code}: {$response->body}");
             }
+            $this->logger->addWarning("Url shortner failed with code {$response->code}: {$response->body}");
         } catch (\Exception $exception) {
             $this->logger->addError(
                 $exception->getMessage(),

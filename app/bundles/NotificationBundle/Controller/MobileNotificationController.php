@@ -160,7 +160,6 @@ class MobileNotificationController extends FormController
         $notification = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->get('session')->get('mautic.mobile_notification.page', 1);
-
         if (null === $notification) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_mobile_notification_index', ['page' => $page]);
@@ -183,12 +182,13 @@ class MobileNotificationController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'notification:mobile_notifications:viewown',
             'notification:mobile_notifications:viewother',
             $notification->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -413,8 +413,6 @@ class MobileNotificationController extends FormController
                 'mauticContent' => 'mobile_notification',
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -430,12 +428,14 @@ class MobileNotificationController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'notification:mobile_notifications:viewown',
             'notification:mobile_notifications:viewother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

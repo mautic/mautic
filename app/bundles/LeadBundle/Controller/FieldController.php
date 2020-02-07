@@ -183,7 +183,6 @@ class FieldController extends FormController
                     }
                 }
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     [
@@ -195,7 +194,9 @@ class FieldController extends FormController
                         ],
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            }
+
+            if ($valid && !$cancelled) {
                 return $this->editAction($field->getId(), true);
             } elseif (!$valid) {
                 // some bug in Symfony prevents repopulating list options on errors
@@ -250,7 +251,6 @@ class FieldController extends FormController
                 'mauticContent' => 'leadfield',
             ],
         ];
-        //list not found
         if (null === $field) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -263,7 +263,9 @@ class FieldController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($field)) {
+        }
+        //list not found
+        if ($model->isLocked($field)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $field, 'lead.field');
         }
@@ -306,7 +308,6 @@ class FieldController extends FormController
                 //unlock the entity
                 $model->unlockEntity($field);
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
@@ -315,7 +316,9 @@ class FieldController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+
+            if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $field->getId()]);
                 $form   = $model->createForm($field, $this->get('form.factory'), $action);

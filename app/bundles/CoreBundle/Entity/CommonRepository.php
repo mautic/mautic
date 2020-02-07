@@ -346,11 +346,12 @@ class CommonRepository extends EntityRepository
         } else {
             $hydrationMode = Query::HYDRATE_OBJECT;
         }
-
         if (!empty($args['iterator_mode'])) {
             // Hydrate one by one
             return $query->iterate(null, $hydrationMode);
-        } elseif (empty($args['ignore_paginator'])) {
+        }
+
+        if (empty($args['ignore_paginator'])) {
             // Paginator
             return new Paginator($query, false);
         } else {

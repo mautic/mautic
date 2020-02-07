@@ -126,9 +126,9 @@ class TokenHelper
         }
         if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {
             return $value;
-        } else {
-            return $value ?: $defaultValue;
         }
+
+        return $value ?: $defaultValue;
     }
 
     /**

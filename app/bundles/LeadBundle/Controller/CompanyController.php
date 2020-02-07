@@ -294,8 +294,6 @@ class CompanyController extends FormController
                 'mauticContent' => 'company',
             ],
         ];
-
-        //form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -311,7 +309,10 @@ class CompanyController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //form not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $entity->getOwner())) {
@@ -398,7 +399,6 @@ class CompanyController extends FormController
                     ]
                 );
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     [
@@ -408,7 +408,9 @@ class CompanyController extends FormController
                         'passthroughVars' => $passthrough,
                     ]
                 );
-            } elseif ($valid) {
+            }
+
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $model->getEntity($objectId);
                 $form    = $model->createForm($company, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
@@ -674,7 +676,6 @@ class CompanyController extends FormController
                     $data           = $form->getData();
                     $primaryMergeId = $data['company_to_merge'];
                     $primaryCompany = $model->getEntity($primaryMergeId);
-
                     if (null === $primaryCompany) {
                         return $this->postActionRedirect(
                             array_merge(
@@ -690,7 +691,9 @@ class CompanyController extends FormController
                                 ]
                             )
                         );
-                    } elseif (!$permissions['lead:leads:editother']) {
+                    }
+
+                    if (!$permissions['lead:leads:editother']) {
                         return $this->accessDenied();
                     } elseif ($model->isLocked($secondaryCompany)) {
                         //deny access if the entity is locked

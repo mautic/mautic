@@ -241,8 +241,6 @@ class PointController extends AbstractFormController
                 'mauticContent' => 'point',
             ],
         ];
-
-        //form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -255,7 +253,10 @@ class PointController extends AbstractFormController
                     ],
                 ])
             );
-        } elseif (!$this->get('mautic.security')->isGranted('point:points:edit')) {
+        }
+
+        //form not found
+        if (!$this->get('mautic.security')->isGranted('point:points:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

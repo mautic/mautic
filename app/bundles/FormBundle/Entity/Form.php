@@ -381,10 +381,8 @@ class Form extends FormEntity
      */
     public function getDescription($truncate = false, $length = 45)
     {
-        if ($truncate) {
-            if (strlen($this->description) > $length) {
-                return substr($this->description, 0, $length).'...';
-            }
+        if (strlen($this->description) > $length) {
+            return substr($this->description, 0, $length).'...';
         }
 
         return $this->description;

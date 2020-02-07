@@ -114,12 +114,10 @@ class ZohoApi extends CrmApi
                 $params['id'] = $id;
             }
 
-            $data = $this->request($object, $params, 'GET', false, $settings);
-        } else {
-            $data = $this->request($object, $params, 'GET', false, $settings);
+            return $this->request($object, $params, 'GET', false, $settings);
         }
 
-        return $data;
+        return $this->request($object, $params, 'GET', false, $settings);
     }
 
     /**
@@ -145,12 +143,10 @@ class ZohoApi extends CrmApi
         if ($id) {
             $params['id'] = $id;
 
-            $data = $this->request('Accounts', $params, 'GET', false, $settings);
-        } else {
-            $data = $this->request('Accounts', $params, 'GET', false, $settings);
+            return $this->request('Accounts', $params, 'GET', false, $settings);
         }
 
-        return $data;
+        return $this->request('Accounts', $params, 'GET', false, $settings);
     }
 
     /**

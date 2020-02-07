@@ -183,10 +183,11 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('value', $value);
 
             $result = $q->execute()->fetch();
-
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
-            } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
+            }
+
+            if (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
                 return empty($result['id']);
             } else {
                 return false;

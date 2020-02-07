@@ -88,32 +88,31 @@ class ClearbitController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $this->request->getMethod()) {
-                try {
-                    $this->get('mautic.plugin.clearbit.lookup_helper')->lookupContact($lead, array_key_exists('notify', $data));
-                    $this->addFlash(
-                        'mautic.lead.batch_leads_affected',
-                        [
-                            'pluralCount' => 1,
-                            '%count%'     => 1,
-                        ]
-                    );
-                } catch (\Exception $ex) {
-                    $this->addFlash(
-                        $ex->getMessage(),
-                        [],
-                        'error'
-                    );
-                }
-
-                return new JsonResponse(
+        }
+        if ('POST' === $this->request->getMethod()) {
+            try {
+                $this->get('mautic.plugin.clearbit.lookup_helper')->lookupContact($lead, array_key_exists('notify', $data));
+                $this->addFlash(
+                    'mautic.lead.batch_leads_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'pluralCount' => 1,
+                        '%count%'     => 1,
                     ]
                 );
+            } catch (\Exception $ex) {
+                $this->addFlash(
+                    $ex->getMessage(),
+                    [],
+                    'error'
+                );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);
@@ -191,21 +190,20 @@ class ClearbitController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            if ($count > 20) {
-                $this->addFlash(
-                    $this->translator->trans('mautic.plugin.clearbit.toomany'),
-                    [],
-                    'error'
-                );
+        }
+        if ($count > 20) {
+            $this->addFlash(
+                $this->translator->trans('mautic.plugin.clearbit.toomany'),
+                [],
+                'error'
+            );
 
-                return new JsonResponse(
-                    [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
-                    ]
-                );
-            }
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
         if ('GET' === $this->request->getMethod()) {
             $route = $this->generateUrl(
@@ -235,41 +233,40 @@ class ClearbitController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $this->request->getMethod()) {
-                $notify = array_key_exists('notify', $data);
-                foreach ($lookupEmails as $id => $lookupEmail) {
-                    if ($lead = $model->getEntity($id)) {
-                        try {
-                            $this->get('mautic.plugin.clearbit.lookup_helper')->lookupContact($lead, $notify);
-                        } catch (\Exception $ex) {
-                            $this->addFlash(
-                                    $ex->getMessage(),
-                                    [],
-                                    'error'
-                                );
-                            --$count;
-                        }
+        }
+        if ('POST' === $this->request->getMethod()) {
+            $notify = array_key_exists('notify', $data);
+            foreach ($lookupEmails as $id => $lookupEmail) {
+                if ($lead = $model->getEntity($id)) {
+                    try {
+                        $this->get('mautic.plugin.clearbit.lookup_helper')->lookupContact($lead, $notify);
+                    } catch (\Exception $ex) {
+                        $this->addFlash(
+                                $ex->getMessage(),
+                                [],
+                                'error'
+                            );
+                        --$count;
                     }
                 }
-
-                if ($count) {
-                    $this->addFlash(
-                            'mautic.lead.batch_leads_affected',
-                            [
-                                'pluralCount' => $count,
-                                '%count%'     => $count,
-                            ]
-                        );
-                }
-
-                return new JsonResponse(
-                    [
-                        'closeModal' => true,
-                         'flashes'   => $this->getFlashContent(),
-                    ]
-                );
             }
+
+            if ($count) {
+                $this->addFlash(
+                        'mautic.lead.batch_leads_affected',
+                        [
+                            'pluralCount' => $count,
+                            '%count%'     => $count,
+                        ]
+                    );
+            }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                     'flashes'   => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);
@@ -343,32 +340,31 @@ class ClearbitController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $this->request->getMethod()) {
-                try {
-                    $this->get('mautic.plugin.clearbit.lookup_helper')->lookupCompany($company, array_key_exists('notify', $data));
-                    $this->addFlash(
-                        'mautic.company.batch_companies_affected',
-                        [
-                            'pluralCount' => 1,
-                            '%count%'     => 1,
-                        ]
-                    );
-                } catch (\Exception $ex) {
-                    $this->addFlash(
-                        $ex->getMessage(),
-                        [],
-                        'error'
-                    );
-                }
-
-                return new JsonResponse(
+        }
+        if ('POST' === $this->request->getMethod()) {
+            try {
+                $this->get('mautic.plugin.clearbit.lookup_helper')->lookupCompany($company, array_key_exists('notify', $data));
+                $this->addFlash(
+                    'mautic.company.batch_companies_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'pluralCount' => 1,
+                        '%count%'     => 1,
                     ]
                 );
+            } catch (\Exception $ex) {
+                $this->addFlash(
+                    $ex->getMessage(),
+                    [],
+                    'error'
+                );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);
@@ -445,21 +441,20 @@ class ClearbitController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-        } else {
-            if ($count > 20) {
-                $this->addFlash(
-                    $this->translator->trans('mautic.plugin.clearbit.comptoomany'),
-                    [],
-                    'error'
-                );
+        }
+        if ($count > 20) {
+            $this->addFlash(
+                $this->translator->trans('mautic.plugin.clearbit.comptoomany'),
+                [],
+                'error'
+            );
 
-                return new JsonResponse(
-                    [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
-                    ]
-                );
-            }
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
         if ('GET' === $this->request->getMethod()) {
             $route = $this->generateUrl(
@@ -489,41 +484,40 @@ class ClearbitController extends FormController
                     ],
                 ]
             );
-        } else {
-            if ('POST' === $this->request->getMethod()) {
-                $notify = array_key_exists('notify', $data);
-                foreach ($lookupWebsites as $id => $lookupWebsite) {
-                    if ($company = $model->getEntity($id)) {
-                        try {
-                            $this->get('mautic.plugin.clearbit.lookup_helper')->lookupCompany($company, $notify);
-                        } catch (\Exception $ex) {
-                            $this->addFlash(
-                                $ex->getMessage(),
-                                [],
-                                'error'
-                            );
-                            --$count;
-                        }
+        }
+        if ('POST' === $this->request->getMethod()) {
+            $notify = array_key_exists('notify', $data);
+            foreach ($lookupWebsites as $id => $lookupWebsite) {
+                if ($company = $model->getEntity($id)) {
+                    try {
+                        $this->get('mautic.plugin.clearbit.lookup_helper')->lookupCompany($company, $notify);
+                    } catch (\Exception $ex) {
+                        $this->addFlash(
+                            $ex->getMessage(),
+                            [],
+                            'error'
+                        );
+                        --$count;
                     }
                 }
+            }
 
-                if ($count) {
-                    $this->addFlash(
-                        'mautic.company.batch_companies_affected',
-                        [
-                            'pluralCount' => $count,
-                            '%count%'     => $count,
-                        ]
-                    );
-                }
-
-                return new JsonResponse(
+            if ($count) {
+                $this->addFlash(
+                    'mautic.company.batch_companies_affected',
                     [
-                        'closeModal' => true,
-                        'flashes'    => $this->getFlashContent(),
+                        'pluralCount' => $count,
+                        '%count%'     => $count,
                     ]
                 );
             }
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
         }
 
         return new Response('Bad Request', 400);

@@ -89,9 +89,9 @@ class ArrayHelper
         return  array_map(function ($x, $y) use ($subtracted) {
             if ($subtracted) {
                 return $x - $y;
-            } else {
-                return $x + $y;
             }
+
+            return $x + $y;
         }, $a1, $b2);
     }
 }

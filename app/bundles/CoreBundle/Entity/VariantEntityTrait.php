@@ -197,9 +197,9 @@ trait VariantEntityTrait
 
         if ($isChild) {
             return (null === $parent) ? false : true;
-        } else {
-            return (!empty($parent) || count($children)) ? true : false;
         }
+
+        return (!empty($parent) || count($children)) ? true : false;
     }
 
     /**

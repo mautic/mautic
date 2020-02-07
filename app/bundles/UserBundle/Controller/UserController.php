@@ -189,7 +189,6 @@ class UserController extends FormController
                     ]);
                 }
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
@@ -200,7 +199,9 @@ class UserController extends FormController
                         'mauticContent' => 'user',
                     ],
                 ]);
-            } elseif ($valid && !$cancelled) {
+            }
+
+            if ($valid && !$cancelled) {
                 return $this->editAction($user->getId(), true);
             }
         }
@@ -247,7 +248,6 @@ class UserController extends FormController
                 'mauticContent' => 'user',
             ],
         ];
-
         if (null === $user) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -260,7 +260,9 @@ class UserController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($user)) {
+        }
+
+        if ($model->isLocked($user)) {
             //deny access if the entity is locked
             return $this->isLocked($postActionVars, $user, 'user.user');
         }

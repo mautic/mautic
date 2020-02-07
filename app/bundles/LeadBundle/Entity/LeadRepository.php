@@ -293,9 +293,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if (count($result)) {
             return $all ? $result : $result[0];
-        } else {
-            return;
         }
+
+        return;
     }
 
     /**

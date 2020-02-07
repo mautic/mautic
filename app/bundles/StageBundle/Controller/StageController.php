@@ -270,8 +270,6 @@ class StageController extends AbstractFormController
                 'mauticContent' => 'stage',
             ],
         ];
-
-        //form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -287,7 +285,10 @@ class StageController extends AbstractFormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->isGranted('stage:stages:edit')) {
+        }
+
+        //form not found
+        if (!$this->get('mautic.security')->isGranted('stage:stages:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

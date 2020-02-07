@@ -92,7 +92,8 @@ class CampaignDecisionEvent extends Event
     {
         if ($type) {
             return (!empty($this->eventSettings[$eventType][$type])) ? $this->eventSettings[$eventType][$type] : false;
-        } elseif ($eventType) {
+        }
+        if ($eventType) {
             return (!empty($this->eventSettings[$eventType])) ? $this->eventSettings[$eventType] : false;
         }
 

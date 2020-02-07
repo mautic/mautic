@@ -128,7 +128,6 @@ class TriggerController extends FormController
             'point:triggers:delete',
             'point:triggers:publish',
         ], 'RETURN_ARRAY');
-
         if (null === $entity) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_pointtrigger_index', ['page' => $page]);
@@ -149,7 +148,9 @@ class TriggerController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$permissions['point:triggers:view']) {
+        }
+
+        if (!$permissions['point:triggers:view']) {
             return $this->accessDenied();
         }
 
@@ -321,8 +322,6 @@ class TriggerController extends FormController
                 'mauticContent' => 'pointTrigger',
             ],
         ];
-
-        //form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -335,7 +334,10 @@ class TriggerController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->get('mautic.security')->isGranted('point:triggers:edit')) {
+        }
+
+        //form not found
+        if (!$this->get('mautic.security')->isGranted('point:triggers:edit')) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -388,12 +390,10 @@ class TriggerController extends FormController
                 //unlock the entity
                 $model->unlockEntity($entity);
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
                 $template       = 'MauticPointBundle:Trigger:index';
-
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
 
@@ -404,7 +404,9 @@ class TriggerController extends FormController
                         'contentTemplate' => $template,
                     ])
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
+            }
+
+            if ($form->get('buttons')->get('apply')->isClicked()) {
                 //rebuild everything to include new ids
                 $cleanSlate = true;
             }

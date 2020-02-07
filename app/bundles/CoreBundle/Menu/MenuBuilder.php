@@ -84,7 +84,8 @@ class MenuBuilder
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
                     //current match
                     return $item;
-                } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
+                }
+                if ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
                     //route uri match
                     return $item;
                 } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {

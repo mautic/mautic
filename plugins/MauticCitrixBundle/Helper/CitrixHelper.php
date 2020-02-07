@@ -185,40 +185,39 @@ class CitrixHelper
                 $results = self::getG2wApi()->request($url, $params);
 
                 return iterator_to_array(self::getKeyPairs($results, 'webinarID', 'subject'));
+            }
+            if ('meeting' === $listType) {
+                $url    = 'upcomingMeetings';
+                $params = [];
+                if (!$onlyFutures) {
+                    $url                 = 'historicalMeetings';
+                    $params['startDate'] = $fromTime;
+                    $params['endDate']   = $toTime;
+                }
+                $results = self::getG2mApi()->request($url, $params);
+
+                return iterator_to_array(self::getKeyPairs($results, 'meetingId', 'subject'));
             } else {
-                if ('meeting' === $listType) {
-                    $url    = 'upcomingMeetings';
-                    $params = [];
-                    if (!$onlyFutures) {
-                        $url                 = 'historicalMeetings';
-                        $params['startDate'] = $fromTime;
-                        $params['endDate']   = $toTime;
-                    }
-                    $results = self::getG2mApi()->request($url, $params);
+                if ('training' === $listType) {
+                    $results = self::getG2tApi()->request('trainings');
 
-                    return iterator_to_array(self::getKeyPairs($results, 'meetingId', 'subject'));
+                    return iterator_to_array(self::getKeyPairs($results, 'trainingKey', 'name'));
                 } else {
-                    if ('training' === $listType) {
-                        $results = self::getG2tApi()->request('trainings');
-
-                        return iterator_to_array(self::getKeyPairs($results, 'trainingKey', 'name'));
-                    } else {
-                        if ('assist' === $listType) {
-                            // show sessions in the last month
-                            // times must be in ISO format: YYYY-MM-ddTHH:mm:ssZ
-                            $params = [
-                                'fromTime' => preg_filter(
-                                    '/^(.+)[\+\-].+$/',
-                                    '$1Z',
-                                    date('c', strtotime('-1 month', time()))
-                                ),
-                                'toTime'      => preg_filter('/^(.+)[\+\-].+$/', '$1Z', date('c')),
-                                'sessionType' => 'screen_sharing',
-                            ];
-                            $results = self::getG2aApi()->request('sessions', $params);
-                            if ((array) $results && array_key_exists('sessions', $results)) {
-                                return iterator_to_array(self::getAssistPairs($results['sessions']));
-                            }
+                    if ('assist' === $listType) {
+                        // show sessions in the last month
+                        // times must be in ISO format: YYYY-MM-ddTHH:mm:ssZ
+                        $params = [
+                            'fromTime' => preg_filter(
+                                '/^(.+)[\+\-].+$/',
+                                '$1Z',
+                                date('c', strtotime('-1 month', time()))
+                            ),
+                            'toTime'      => preg_filter('/^(.+)[\+\-].+$/', '$1Z', date('c')),
+                            'sessionType' => 'screen_sharing',
+                        ];
+                        $results = self::getG2aApi()->request('sessions', $params);
+                        if ((array) $results && array_key_exists('sessions', $results)) {
+                            return iterator_to_array(self::getAssistPairs($results['sessions']));
                         }
                     }
                 }
@@ -376,48 +375,47 @@ class CitrixHelper
                 );
 
                 return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
+            }
+            if (CitrixProducts::GOTOTRAINING === $product) {
+                $response = self::getG2tApi()->request(
+                    'trainings/'.$productId.'/start'
+                );
+
+                return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
             } else {
-                if (CitrixProducts::GOTOTRAINING === $product) {
-                    $response = self::getG2tApi()->request(
-                        'trainings/'.$productId.'/start'
+                if (CitrixProducts::GOTOASSIST === $product) {
+                    // TODO: use the sessioncallback to update attendance status
+                    $router = self::$router;
+                    $params = [
+                        'sessionStatusCallbackUrl' => $router
+                            ->generate(
+                                'mautic_citrix_sessionchanged',
+                                [],
+                                UrlGeneratorInterface::ABSOLUTE_URL
+                            ),
+                        'sessionType'      => 'screen_sharing',
+                        'partnerObject'    => '',
+                        'partnerObjectUrl' => '',
+                        'customerName'     => $firstname.' '.$lastname,
+                        'customerEmail'    => $email,
+                        'machineUuid'      => '',
+                    ];
+
+                    $response = self::getG2aApi()->request(
+                        'sessions',
+                        $params,
+                        'POST'
                     );
 
-                    return (is_array($response) && array_key_exists('hostURL', $response)) ? $response['hostURL'] : '';
-                } else {
-                    if (CitrixProducts::GOTOASSIST === $product) {
-                        // TODO: use the sessioncallback to update attendance status
-                        $router = self::$router;
-                        $params = [
-                            'sessionStatusCallbackUrl' => $router
-                                ->generate(
-                                    'mautic_citrix_sessionchanged',
-                                    [],
-                                    UrlGeneratorInterface::ABSOLUTE_URL
-                                ),
-                            'sessionType'      => 'screen_sharing',
-                            'partnerObject'    => '',
-                            'partnerObjectUrl' => '',
-                            'customerName'     => $firstname.' '.$lastname,
-                            'customerEmail'    => $email,
-                            'machineUuid'      => '',
-                        ];
-
-                        $response = self::getG2aApi()->request(
-                            'sessions',
-                            $params,
-                            'POST'
-                        );
-
-                        return (is_array($response)
-                            && array_key_exists(
-                                'startScreenSharing',
-                                $response
-                            )
-                            && array_key_exists(
-                                'launchUrl',
-                                $response['startScreenSharing']
-                            )) ? $response['startScreenSharing']['launchUrl'] : '';
-                    }
+                    return (is_array($response)
+                        && array_key_exists(
+                            'startScreenSharing',
+                            $response
+                        )
+                        && array_key_exists(
+                            'launchUrl',
+                            $response['startScreenSharing']
+                        )) ? $response['startScreenSharing']['launchUrl'] : '';
                 }
             }
         } catch (\Exception $ex) {
@@ -442,17 +440,16 @@ class CitrixHelper
             $result = self::getG2wApi()->request($product.'s/'.$productId);
 
             return $result['subject'];
+        }
+        if (CitrixProducts::GOTOMEETING === $product) {
+            $result = self::getG2mApi()->request($product.'s/'.$productId);
+
+            return $result[0]['subject'];
         } else {
-            if (CitrixProducts::GOTOMEETING === $product) {
-                $result = self::getG2mApi()->request($product.'s/'.$productId);
+            if (CitrixProducts::GOTOTRAINING === $product) {
+                $result = self::getG2tApi()->request($product.'s/'.$productId);
 
-                return $result[0]['subject'];
-            } else {
-                if (CitrixProducts::GOTOTRAINING === $product) {
-                    $result = self::getG2tApi()->request($product.'s/'.$productId);
-
-                    return $result['name'];
-                }
+                return $result['name'];
             }
         }
 

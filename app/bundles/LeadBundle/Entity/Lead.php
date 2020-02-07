@@ -748,7 +748,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif ($this->getCompany()) {
+        }
+        if ($this->getCompany()) {
             return $this->getCompany();
         } elseif ($this->getEmail()) {
             return $this->getEmail();
@@ -889,7 +890,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         if (null !== $this->actualPoints) {
             return $this->actualPoints;
-        } elseif (null !== $this->updatedPoints) {
+        }
+        if (null !== $this->updatedPoints) {
             return $this->updatedPoints;
         }
 
@@ -1077,10 +1079,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             if ($id->getPushID() === $identifier) {
                 if ($id->isEnabled() === $enabled) {
                     return $this;
-                } else {
-                    $entity = $id;
-                    $this->removePushID($id);
                 }
+                $entity = $id;
+                $this->removePushID($id);
             }
         }
 
@@ -1988,37 +1989,34 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                         }
 
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
-                    } else {
-                        $convertToMonth = function ($number, $unit) {
-                            switch ($unit) {
-                                case FrequencyRule::TIME_MONTH:
-                                    $number = (int) $number;
-                                    break;
-                                case FrequencyRule::TIME_WEEK:
-                                    $number = $number * 4;
-                                    break;
-                                case FrequencyRule::TIME_DAY:
-                                    $number = $number * 30;
-                                    break;
-                            }
-
-                            return $number;
-                        };
-
-                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
-                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
-
-                        if ($aFrequency === $bFrequency) {
-                            return 0;
-                        }
-
-                        return ($aFrequency > $bFrequency) ? -1 : 1;
                     }
                 }
 
                 return ($a['preferred_channel'] > $b['preferred_channel']) ? -1 : 1;
             }
         );
+        $convertToMonth = function ($number, $unit) {
+            switch ($unit) {
+                case FrequencyRule::TIME_MONTH:
+                    $number = (int) $number;
+                    break;
+                case FrequencyRule::TIME_WEEK:
+                    $number = $number * 4;
+                    break;
+                case FrequencyRule::TIME_DAY:
+                    $number = $number * 30;
+                    break;
+            }
+
+            return $number;
+        };
+        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
+        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
+        if ($aFrequency === $bFrequency) {
+            return 0;
+        }
+
+        return ($aFrequency > $bFrequency) ? -1 : 1;
 
         $rules = [];
         foreach ($frequencyRules as $rule) {

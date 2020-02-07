@@ -410,21 +410,20 @@ class IntegrationHelper
                 'skype'  => "/skype:(.*?)($|\?)/",
                 'google' => "/plus.google.com\/(.*?)($|\/)/",
             ];
-        } else {
-            //populate placeholder
-            return [
-                'twitter'    => 'https://twitter.com/%handle%',
-                'facebook'   => 'https://facebook.com/%handle%',
-                'linkedin'   => 'https://linkedin.com/in/%handle%',
-                'instagram'  => 'https://instagram.com/%handle%',
-                'pinterest'  => 'https://pinterest.com/%handle%',
-                'klout'      => 'https://klout.com/%handle%',
-                'youtube'    => 'https://youtube.com/user/%handle%',
-                'flickr'     => 'https://flickr.com/photos/%handle%',
-                'skype'      => 'skype:%handle%?call',
-                'googleplus' => 'https://plus.google.com/%handle%',
-            ];
         }
+        //populate placeholder
+        return [
+            'twitter'    => 'https://twitter.com/%handle%',
+            'facebook'   => 'https://facebook.com/%handle%',
+            'linkedin'   => 'https://linkedin.com/in/%handle%',
+            'instagram'  => 'https://instagram.com/%handle%',
+            'pinterest'  => 'https://pinterest.com/%handle%',
+            'klout'      => 'https://klout.com/%handle%',
+            'youtube'    => 'https://youtube.com/user/%handle%',
+            'flickr'     => 'https://flickr.com/photos/%handle%',
+            'skype'      => 'skype:%handle%?call',
+            'googleplus' => 'https://plus.google.com/%handle%',
+        ];
     }
 
     /**

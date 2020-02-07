@@ -216,7 +216,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         //check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
         if (!empty($eventParent) && 'email.send' === $eventParent['type']) {
-            // click decision
             if ($event->checkContext('email.click')) {
                 /** @var Hit $hit */
                 $hit = $eventDetails;
@@ -232,7 +231,9 @@ class CampaignSubscriber implements EventSubscriberInterface
                 }
 
                 return $event->setResult(false);
-            } elseif ($event->checkContext('email.open')) {
+            }
+            // click decision
+            if ($event->checkContext('email.open')) {
                 // open decision
                 return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
             } elseif ($event->checkContext('email.reply')) {

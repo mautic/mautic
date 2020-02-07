@@ -260,11 +260,9 @@ trait CustomFieldEntityTrait
             }
 
             return array_merge($fieldValues, $this->updatedFields);
-        } else {
-            // The fields are already flattened
-
-            return $this->fields;
         }
+        // The fields are already flattened
+        return $this->fields;
     }
 
     /**

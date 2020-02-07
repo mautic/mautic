@@ -168,9 +168,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         $lists = (isset($leadLists[$l['id']])) ? $leadLists[$l['id']] : [];
                         if (array_intersect(array_keys($lists), $campaignLists[$c['id']])) {
                             continue;
-                        } else {
-                            $removeLeads[] = $l;
                         }
+                        $removeLeads[] = $l;
                     }
 
                     $this->membershipManager->removeContacts(new ArrayCollection($removeLeads), $campaignReferences[$c['id']], false);

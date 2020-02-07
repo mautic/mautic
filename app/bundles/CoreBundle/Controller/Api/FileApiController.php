@@ -121,10 +121,11 @@ class FileApiController extends CommonApiController
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
-
         if (!file_exists($filePath)) {
             return $this->returnError('File does not exist', Response::HTTP_NOT_FOUND);
-        } elseif (!is_writable($filePath)) {
+        }
+
+        if (!is_writable($filePath)) {
             return $this->returnError('File is not writable');
         } else {
             unlink($filePath);

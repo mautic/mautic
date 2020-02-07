@@ -165,12 +165,10 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getEntity($id = null)
     {
         if (null === $id) {
-            $entity = new Tweet();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Tweet();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -214,9 +212,9 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

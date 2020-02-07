@@ -298,26 +298,22 @@ class BuilderEvent extends Event
         }
 
         if ('label' == $this->tokenFilterTarget) {
-            // Do a search against the label
-            $tokens = array_filter(
+            return array_filter(
                 $tokens,
                 function ($v) use ($filter) {
                     return 0 === stripos($v, $filter);
                 }
             );
-        } else {
-            // Do a search against the token
-            $found = array_filter(
-                array_keys($tokens),
-                function ($k) use ($filter) {
-                    return 0 === stripos($k, $filter);
-                }
-            );
-
-            $tokens = array_intersect_key($tokens, array_flip($found));
         }
+        // Do a search against the token
+        $found = array_filter(
+            array_keys($tokens),
+            function ($k) use ($filter) {
+                return 0 === stripos($k, $filter);
+            }
+        );
 
-        return $tokens;
+        return array_intersect_key($tokens, array_flip($found));
     }
 
     /**

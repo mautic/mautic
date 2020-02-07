@@ -276,11 +276,12 @@ class CorePermissions
 
             $this->grantedPermissions[$permission] = $permissions[$permission];
         }
-
         if ('MATCH_ALL' == $mode) {
             //deny if any of the permissions are denied
             return in_array(0, $permissions) ? false : true;
-        } elseif ('MATCH_ONE' == $mode) {
+        }
+
+        if ('MATCH_ONE' == $mode) {
             //grant if any of the permissions were granted
             return in_array(1, $permissions) ? true : false;
         } elseif ('RETURN_ARRAY' == $mode) {
@@ -369,9 +370,9 @@ class CorePermissions
         if (0 === $ownerId) {
             if ($other) {
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
         } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {

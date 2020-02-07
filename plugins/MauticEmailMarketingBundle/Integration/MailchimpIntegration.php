@@ -95,9 +95,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
             $data = $this->makeRequest('https://login.mailchimp.com/oauth2/metadata');
 
             return $this->extractAuthKeys($data, 'dc');
-        } else {
-            return $error;
         }
+
+        return $error;
     }
 
     /**
@@ -160,10 +160,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
     {
         $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);
-
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['EMAIL'])) {
+        }
+
+        if (empty($mappedData['EMAIL'])) {
             return false;
         } elseif (!isset($config['list_settings'])) {
             return false;

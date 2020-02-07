@@ -398,7 +398,6 @@ class ReportController extends FormController
                 $viewParams = ['report' => $page];
                 $template   = 'MauticReportBundle:Report:index';
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 // Clear session items in case columns changed
                 $session->remove('mautic.report.'.$entity->getId().'.orderby');
@@ -414,7 +413,9 @@ class ReportController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+
+            if ($valid) {
                 // Rebuild the form for updated columns
                 $form = $model->createForm($entity, $this->get('form.factory'), $action);
             }
@@ -562,7 +563,6 @@ class ReportController extends FormController
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
-
         if (null === $entity) {
             $page = $this->container->get('session')->get('mautic.report.page', 1);
 
@@ -584,7 +584,9 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        }
+
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         }
 
@@ -739,7 +741,8 @@ class ReportController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->container->get('mautic.security')->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
+        }
+        if (!$this->container->get('mautic.security')->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -763,7 +766,6 @@ class ReportController extends FormController
         $model    = $this->getModel('report');
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
-
         if (null === $entity) {
             $page = $this->container->get('session')->get('mautic.report.page', 1);
 
@@ -785,7 +787,9 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        }
+
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         }
 

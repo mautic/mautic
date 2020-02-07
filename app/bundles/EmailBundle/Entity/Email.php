@@ -1112,9 +1112,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         if ($this->getSentCount($includevariants) > 0) {
             return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**

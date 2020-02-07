@@ -107,11 +107,11 @@ class DetailsType extends AbstractType
                             'data-toggle' => 'tooltip',
                             'title'       => $tooltips[$val],
                         ];
-                    } else {
-                        return [];
                     }
                 },
             ]);
+
+            return [];
         }
 
         $builder->add('featureSettings', FeatureSettingsType::class, [

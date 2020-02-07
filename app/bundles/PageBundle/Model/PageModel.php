@@ -505,12 +505,11 @@ class PageModel extends FormModel
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
-            } else {
-                $this->logger->addError(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
             }
+            $this->logger->addError(
+                $exception->getMessage(),
+                ['exception' => $exception]
+            );
         }
 
         //save hit to the cookie to use to update the exit time
@@ -658,12 +657,11 @@ class PageModel extends FormModel
                 } catch (\Exception $exception) {
                     if (MAUTIC_ENV === 'dev') {
                         throw $exception;
-                    } else {
-                        $this->logger->addError(
-                            $exception->getMessage(),
-                            ['exception' => $exception]
-                        );
                     }
+                    $this->logger->addError(
+                        $exception->getMessage(),
+                        ['exception' => $exception]
+                    );
                 }
             }
         }
@@ -751,12 +749,11 @@ class PageModel extends FormModel
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
-            } else {
-                $this->logger->addError(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
             }
+            $this->logger->addError(
+                $exception->getMessage(),
+                ['exception' => $exception]
+            );
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {

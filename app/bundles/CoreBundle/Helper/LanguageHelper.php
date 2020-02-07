@@ -187,7 +187,8 @@ class LanguageHelper
             $overrideData = json_decode(file_get_contents($overrideFile), true);
             if (isset($overrideData['languages'])) {
                 return $overrideData['languages'];
-            } elseif (isset($overrideData['name'])) {
+            }
+            if (isset($overrideData['name'])) {
                 return $overrideData;
             }
 
@@ -300,7 +301,6 @@ class LanguageHelper
                 ],
             ];
         }
-
         if ($data->code >= 300 && $data->code < 400) {
             return [
                 'error'   => true,
@@ -309,7 +309,9 @@ class LanguageHelper
                     '%url%' => $langUrl,
                 ],
             ];
-        } elseif (200 != $data->code) {
+        }
+
+        if (200 != $data->code) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.language.helper.error.on.language.server.side',

@@ -49,9 +49,9 @@ class SugarcrmApi extends CrmApi
 
             if (is_array($response) && !empty($response['name']) && !empty($response['number'])) {
                 throw new ApiErrorException($response['name'].' '.$object.' '.$sMethod.' '.$method);
-            } else {
-                return $response;
             }
+
+            return $response;
         } else {
             $request_url = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], $sMethod);
             $settings    = [
@@ -90,16 +90,14 @@ class SugarcrmApi extends CrmApi
 
         if ('6' == $tokenData['version']) {
             return $this->request('get_module_fields', [], 'GET', $object);
-        } else {
-            $parameters = [
-                'module_filter' => $object,
-                'type_filter'   => 'modules',
-            ];
-
-            $response = $this->request('metadata', $parameters, 'GET', $object);
-
-            return $response['modules'][$object];
         }
+        $parameters = [
+            'module_filter' => $object,
+            'type_filter'   => 'modules',
+        ];
+        $response = $this->request('metadata', $parameters, 'GET', $object);
+
+        return $response['modules'][$object];
     }
 
     /**
@@ -236,67 +234,66 @@ class SugarcrmApi extends CrmApi
             }
 
             return $response;
-        } else {
-            $leadFieldsList = [];
-            $response       = [];
-            //body is prepared for Sugar6. Translate it to sugar 7
-            $reference_ids = [];
-            foreach ($data as $object => $leadFieldsList) {
-                $requests = [];
-                $all_ids  = [];
-                foreach ($leadFieldsList as $body) {
-                    $fields = [];
-                    $ids    = [];
-                    foreach ($body as $field) {
-                        $fields[$field['name']] = $field['value'];
-                    }
-                    $request = [];
-                    if (isset($fields['id'])) {
-                        $ids['id'] = $fields['id'];
-                        //Update record
-                        $sugarLeadId = $fields['id'];
-                        unset($fields['id']);
-                        $request['method'] = 'PUT';
-                        $request['url']    = "/v10/$object/$sugarLeadId";
-                        $request['data']   = $fields;
-                    } else {
-                        //Create record
-                        $request['data']   = $fields;
-                        $request['url']    = '/v10/'.$object;
-                        $request['method'] = 'POST';
-                    }
-                    $requests[]          = $request;
-                    $ids['reference_id'] = $fields['reference_id'];
-                    $all_ids[]           = $ids;
+        }
+        $leadFieldsList = [];
+        $response       = [];
+        //body is prepared for Sugar6. Translate it to sugar 7
+        $reference_ids = [];
+        foreach ($data as $object => $leadFieldsList) {
+            $requests = [];
+            $all_ids  = [];
+            foreach ($leadFieldsList as $body) {
+                $fields = [];
+                $ids    = [];
+                foreach ($body as $field) {
+                    $fields[$field['name']] = $field['value'];
                 }
-                $parameters = [
-                    'requests' => $requests,
-                ];
+                $request = [];
+                if (isset($fields['id'])) {
+                    $ids['id'] = $fields['id'];
+                    //Update record
+                    $sugarLeadId = $fields['id'];
+                    unset($fields['id']);
+                    $request['method'] = 'PUT';
+                    $request['url']    = "/v10/$object/$sugarLeadId";
+                    $request['data']   = $fields;
+                } else {
+                    //Create record
+                    $request['data']   = $fields;
+                    $request['url']    = '/v10/'.$object;
+                    $request['method'] = 'POST';
+                }
+                $requests[]          = $request;
+                $ids['reference_id'] = $fields['reference_id'];
+                $all_ids[]           = $ids;
+            }
+            $parameters = [
+                'requests' => $requests,
+            ];
 
-                $resp = $this->request('bulk', $parameters, 'POST', $object);
-                if (!empty($resp)) {
-                    foreach ($resp as $k => $leadFields) {
-                        $fields = $leadFields['contents'];
-                        if (200 != $leadFields['status']) {
-                            $result = ['ko' => true,
-                                'error'     => $leadFields['error'].' '.$leadFields['error_message'], ];
-                        } else {
-                            $result = ['reference_id' => $all_ids[$k]['reference_id'],
-                                    'id'              => $fields['id'],
-                                    'new'             => !isset($all_ids[$k]['id']),
-                                    'ko'              => false, ];
-                            if (isset($all_ids[$k]['id']) && $fields['id'] != $all_ids[$k]['id']) {
-                                $result['ko']    = true;
-                                $result['error'] = 'Returned ID does not correspond to input id';
-                            }
+            $resp = $this->request('bulk', $parameters, 'POST', $object);
+            if (!empty($resp)) {
+                foreach ($resp as $k => $leadFields) {
+                    $fields = $leadFields['contents'];
+                    if (200 != $leadFields['status']) {
+                        $result = ['ko' => true,
+                            'error'     => $leadFields['error'].' '.$leadFields['error_message'], ];
+                    } else {
+                        $result = ['reference_id' => $all_ids[$k]['reference_id'],
+                                'id'              => $fields['id'],
+                                'new'             => !isset($all_ids[$k]['id']),
+                                'ko'              => false, ];
+                        if (isset($all_ids[$k]['id']) && $fields['id'] != $all_ids[$k]['id']) {
+                            $result['ko']    = true;
+                            $result['error'] = 'Returned ID does not correspond to input id';
                         }
-                        $response[] = $result;
                     }
+                    $response[] = $result;
                 }
             }
-
-            return $response;
         }
+
+        return $response;
     }
 
     /**
@@ -482,58 +479,53 @@ class SugarcrmApi extends CrmApi
             }
 
             return $res;
-        } else {
-            //TODO
-
-            if (isset($query['emails'])) {
-                $filter[] = ['email_addresses.email_address' => ['$in' => $query['emails']]];
-                $filter[] = ['deleted' => '0'];
-            }
-            if (isset($query['ids'])) {
-                $filter[] = ['id' => ['$in' => $query['ids']]];
-            }
-
-            $data   = ['filter' => 'all'];
-            $fields = ['id', 'email1'];
-
-            $parameters = [
-                    'filter' => [['$and' => $filter]],
-                    'offset' => 0,
-                'fields'     => implode(',', $fields),
-                'max_num'    => 1000,
-                //'deleted'     => 0,
+        }
+        //TODO
+        if (isset($query['emails'])) {
+            $filter[] = ['email_addresses.email_address' => ['$in' => $query['emails']]];
+            $filter[] = ['deleted' => '0'];
+        }
+        if (isset($query['ids'])) {
+            $filter[] = ['id' => ['$in' => $query['ids']]];
+        }
+        $data       = ['filter' => 'all'];
+        $fields     = ['id', 'email1'];
+        $parameters = [
+                'filter' => [['$and' => $filter]],
+                'offset' => 0,
+            'fields'     => implode(',', $fields),
+            'max_num'    => 1000,
+            //'deleted'     => 0,
                 //'favorites'   => false,
             ];
-            $data = $this->request('Users/filter', $parameters, 'POST', 'Users');
-
-            if (isset($query['type']) && 'BYEMAIL' == $query['type']) {
-                $type = 'BYEMAIL';
-            } else {
-                $type = 'BYID';
-            }
-            $res = [];
-            if (isset($data['records'])) {
-                foreach ($data['records'] as $record) {
-                    if (isset($record['email'][0]['email_address']) && '' != $record['email'][0]['email_address']) {
-                        $emails      = $record['email'];
-                        $found_email = $record['email'][0]['email_address'];
-                        foreach ($record['name_value_list'] as $email) {
-                            if ('' != $email['email_address'] && 1 == $email['primary_address']) {
-                                $found_email = $email;
-                                break;
-                            }
+        $data = $this->request('Users/filter', $parameters, 'POST', 'Users');
+        if (isset($query['type']) && 'BYEMAIL' == $query['type']) {
+            $type = 'BYEMAIL';
+        } else {
+            $type = 'BYID';
+        }
+        $res = [];
+        if (isset($data['records'])) {
+            foreach ($data['records'] as $record) {
+                if (isset($record['email'][0]['email_address']) && '' != $record['email'][0]['email_address']) {
+                    $emails      = $record['email'];
+                    $found_email = $record['email'][0]['email_address'];
+                    foreach ($record['name_value_list'] as $email) {
+                        if ('' != $email['email_address'] && 1 == $email['primary_address']) {
+                            $found_email = $email;
+                            break;
                         }
-                        if ('BYID' == $type) {
-                            $res[$record['id']] = $found_email;
-                        } else {
-                            $res[$found_email] = $record['id'];
-                        }
+                    }
+                    if ('BYID' == $type) {
+                        $res[$record['id']] = $found_email;
+                    } else {
+                        $res[$found_email] = $record['id'];
                     }
                 }
             }
-
-            return $res;
         }
+
+        return $res;
     }
 
     public function getIdBySugarEmail($query = null)

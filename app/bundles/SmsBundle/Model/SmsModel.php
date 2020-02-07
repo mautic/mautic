@@ -167,12 +167,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     public function getEntity($id = null)
     {
         if (null === $id) {
-            $entity = new Sms();
-        } else {
-            $entity = parent::getEntity($id);
+            return new Sms();
         }
 
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -405,9 +403,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return;
         }
+
+        return;
     }
 
     /**

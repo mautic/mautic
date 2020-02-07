@@ -760,9 +760,9 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     {
         if (null !== $this->role) {
             return $this->role->isAdmin();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

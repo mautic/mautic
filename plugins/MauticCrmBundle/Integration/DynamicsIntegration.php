@@ -304,7 +304,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                  'UniqueidentifierType',
                             ], true)) {
                                 continue;
-                            } elseif (in_array($fieldType, [
+                            }
+                            if (in_array($fieldType, [
                                 'DoubleType',
                                  'IntegerType',
                                  'MoneyType',

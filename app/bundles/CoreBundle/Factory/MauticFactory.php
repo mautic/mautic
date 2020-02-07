@@ -411,9 +411,9 @@ class MauticFactory
     {
         if ($system) {
             return $this->container->get('logger');
-        } else {
-            return $this->container->get('monolog.logger.mautic');
         }
+
+        return $this->container->get('monolog.logger.mautic');
     }
 
     /**

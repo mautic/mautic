@@ -252,7 +252,8 @@ class SubmissionEvent extends CommonEvent
     {
         if (null === $key) {
             return $this->feedback;
-        } elseif (isset($this->feedback[$key])) {
+        }
+        if (isset($this->feedback[$key])) {
             return $this->feedback[$key];
         }
 

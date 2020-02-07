@@ -101,9 +101,8 @@ EOT
             $output->writeln("\n\n<error>Error writing json config file for the specified theme ($theme).</error>");
 
             return 1;
-        } else {
-            $output->writeln("\n\n<info>Successfully wrote json config file for the specified theme ($theme).</info>");
         }
+        $output->writeln("\n\n<info>Successfully wrote json config file for the specified theme ($theme).</info>");
 
         if (!$savePhpConfig) {
             if (!unlink($configPath)) {

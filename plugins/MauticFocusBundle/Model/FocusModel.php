@@ -402,9 +402,9 @@ class FocusModel extends FormModel
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

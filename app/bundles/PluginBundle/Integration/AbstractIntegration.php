@@ -474,12 +474,10 @@ abstract class AbstractIntegration
             );
 
             return $this->keys;
-        } else {
-            $this->encryptAndSetApiKeys($withKeys, $settings);
-
-            //reset for events that depend on rebuilding auth objects
-            $this->setIntegrationSettings($settings);
         }
+        $this->encryptAndSetApiKeys($withKeys, $settings);
+        //reset for events that depend on rebuilding auth objects
+        $this->setIntegrationSettings($settings);
     }
 
     /**
@@ -724,7 +722,8 @@ abstract class AbstractIntegration
                 }
 
                 return implode('; ', $errors);
-            } elseif (!empty($response->error->message)) {
+            }
+            if (!empty($response->error->message)) {
                 return $response->error->message;
             } else {
                 return (string) $response;
@@ -732,13 +731,14 @@ abstract class AbstractIntegration
         } elseif (is_array($response)) {
             if (isset($response['error_description'])) {
                 return $response['error_description'];
-            } elseif (isset($response['error'])) {
+            }
+            if (isset($response['error'])) {
                 if (is_array($response['error'])) {
                     if (isset($response['error']['message'])) {
                         return $response['error']['message'];
-                    } else {
-                        return implode(', ', $response['error']);
                     }
+
+                    return implode(', ', $response['error']);
                 } else {
                     return $response['error'];
                 }
@@ -930,9 +930,9 @@ abstract class AbstractIntegration
         }
         if (!empty($settings['return_raw'])) {
             return $result;
-        } else {
-            return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
         }
+
+        return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
     }
 
     /**
@@ -1127,12 +1127,12 @@ abstract class AbstractIntegration
             }
 
             return $url;
-        } else {
-            return $this->router->generate(
-                'mautic_integration_auth_callback',
-                ['integration' => $this->getName()]
-            );
         }
+
+        return $this->router->generate(
+            'mautic_integration_auth_callback',
+            ['integration' => $this->getName()]
+        );
     }
 
     /**
@@ -1992,16 +1992,14 @@ abstract class AbstractIntegration
                 if (!isset($data[$field]) and !is_object($data)) {
                     $info[$field] = '';
                     continue;
-                } else {
-                    $values = $data[$field];
                 }
+                $values = $data[$field];
             } else {
                 if (!isset($data->$field)) {
                     $info[$field] = '';
                     continue;
-                } else {
-                    $values = $data->$field;
                 }
+                $values = $data->$field;
             }
 
             switch ($fieldDetails['type']) {
@@ -2181,9 +2179,9 @@ abstract class AbstractIntegration
     {
         if ('leadfield_match' == $section) {
             return ['mautic.integration.form.field_match_notes', 'info'];
-        } else {
-            return ['', 'info'];
         }
+
+        return ['', 'info'];
     }
 
     /**

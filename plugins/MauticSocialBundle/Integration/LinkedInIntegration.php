@@ -105,10 +105,11 @@ class LinkedInIntegration extends SocialIntegration
     {
         $persistLead = false;
         $accessToken = $this->getContactAccessToken($socialCache);
-
         if (!isset($accessToken['access_token'])) {
             return;
-        } elseif (isset($accessToken['access_token'])) {
+        }
+
+        if (isset($accessToken['access_token'])) {
             $persistLead = $this->persistNewLead;
         }
 

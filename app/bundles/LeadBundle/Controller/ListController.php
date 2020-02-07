@@ -191,7 +191,6 @@ class ListController extends FormController
                     ]);
                 }
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
@@ -202,7 +201,9 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist',
                     ],
                 ]);
-            } elseif ($valid && !$cancelled) {
+            }
+
+            if ($valid && !$cancelled) {
                 return $this->editAction($list->getId(), true);
             }
         }
@@ -353,9 +354,9 @@ class ListController extends FormController
                         ];
 
                         return $this->postActionRedirect($postActionVars);
-                    } else {
-                        return $this->viewAction($segment->getId());
                     }
+
+                    return $this->viewAction($segment->getId());
                 }
             } else {
                 //unlock the entity
@@ -735,7 +736,6 @@ class ListController extends FormController
         } else {
             $filters = [];
         }
-
         if (null === $list) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -756,12 +756,13 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'lead:leads:viewown',
             'lead:lists:viewother',
             $list->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
         /** @var TranslatorInterface $translator */

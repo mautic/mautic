@@ -143,12 +143,11 @@ class InputOptionsDAO
 
         if ($input[$optionName] instanceof DateTimeInterface) {
             return $input[$optionName];
-        } else {
-            try {
-                return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
-            } catch (\Throwable $e) {
-                throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
-            }
+        }
+        try {
+            return is_string($input[$optionName]) ? new DateTimeImmutable($input[$optionName], new DateTimeZone('UTC')) : null;
+        } catch (\Throwable $e) {
+            throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
         }
     }
 
@@ -160,10 +159,11 @@ class InputOptionsDAO
         if (empty($input[$optionName])) {
             return null;
         }
-
         if ($input[$optionName] instanceof ObjectIdsDAO) {
             return $input[$optionName];
-        } elseif (is_array($input[$optionName])) {
+        }
+
+        if (is_array($input[$optionName])) {
             return ObjectIdsDAO::createFromCliOptions($input[$optionName]);
         } else {
             throw new InvalidValueException("{$optionName} option has an unexpected type. Use an array or ObjectIdsDAO object.");

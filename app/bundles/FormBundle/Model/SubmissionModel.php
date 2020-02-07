@@ -243,7 +243,6 @@ class SubmissionModel extends CommonFormModel
                 'type'  => $type,
                 'alias' => $alias,
             ];
-
             if ($f->isCaptchaType()) {
                 $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
                 if (!empty($captcha)) {
@@ -252,7 +251,9 @@ class SubmissionModel extends CommonFormModel
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
-            } elseif ($f->isFileType()) {
+            }
+
+            if ($f->isFileType()) {
                 try {
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();

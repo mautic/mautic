@@ -342,15 +342,13 @@ class TriggerModel extends CommonFormModel
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
             return $this->invokeCallback($event, $lead, $settings);
-        } else {
-            /** @var TriggerEvent $triggerEvent */
-            $triggerEvent = $this->getEventRepository()->find($event['id']);
-
-            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-            $event                = $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
-
-            return $event->getResult();
         }
+        /** @var TriggerEvent $triggerEvent */
+        $triggerEvent         = $this->getEventRepository()->find($event['id']);
+        $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+        $event                = $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
+
+        return $event->getResult();
     }
 
     /**

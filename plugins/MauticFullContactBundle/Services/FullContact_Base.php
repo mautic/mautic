@@ -183,10 +183,9 @@ class FullContact_Base
 
         if ('403' === $this->response_code) {
             throw new NoCreditException($this->response_obj->message);
-        } else {
-            if ('200' === $this->response_code) {
-                $this->_update_rate_limit($headers);
-            }
+        }
+        if ('200' === $this->response_code) {
+            $this->_update_rate_limit($headers);
         }
 
         return $this->response_obj;

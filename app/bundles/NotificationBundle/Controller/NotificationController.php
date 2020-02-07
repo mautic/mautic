@@ -164,7 +164,6 @@ class NotificationController extends AbstractFormController
         $notification = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->get('session')->get('mautic.notification.page', 1);
-
         if (null === $notification) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_notification_index', ['page' => $page]);
@@ -187,12 +186,13 @@ class NotificationController extends AbstractFormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'notification:notifications:viewown',
             'notification:notifications:viewother',
             $notification->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -414,8 +414,6 @@ class NotificationController extends AbstractFormController
                 'mauticContent' => 'notification',
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -431,12 +429,14 @@ class NotificationController extends AbstractFormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'notification:notifications:viewown',
             'notification:notifications:viewother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

@@ -51,10 +51,11 @@ class DoctrineEventsSubscriber implements EventSubscriber
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
-        //in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
-        } elseif (empty($this->tablePrefix)) {
+        }
+        //in the installer
+        if (empty($this->tablePrefix)) {
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
         }
 

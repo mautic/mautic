@@ -228,9 +228,9 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     {
         if (self::SELECT == $this->type) {
             return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
-        } else {
-            return $this->connection->executeUpdate($this->getSQL(), $this->params, $this->paramTypes);
         }
+
+        return $this->connection->executeUpdate($this->getSQL(), $this->params, $this->paramTypes);
     }
 
     /**

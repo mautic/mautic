@@ -152,7 +152,6 @@ class SmsController extends FormController
         $sms = $model->getEntity($objectId);
         //set the page we came from
         $page = $this->get('session')->get('mautic.sms.page', 1);
-
         if (null === $sms) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_sms_index', ['page' => $page]);
@@ -173,12 +172,13 @@ class SmsController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'sms:smses:viewown',
             'sms:smses:viewother',
             $sms->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -401,8 +401,6 @@ class SmsController extends FormController
                 'mauticContent' => 'sms',
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -418,12 +416,14 @@ class SmsController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'sms:smses:viewown',
             'sms:smses:viewother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

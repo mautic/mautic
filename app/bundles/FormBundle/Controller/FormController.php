@@ -150,7 +150,6 @@ class FormController extends CommonFormController
 
         //set the page we came from
         $page = $this->get('session')->get('mautic.form.page', 1);
-
         if (null === $activeForm) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $page]);
@@ -173,12 +172,13 @@ class FormController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $activeForm->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -518,8 +518,6 @@ class FormController extends CommonFormController
                 'mauticContent' => 'form',
             ],
         ];
-
-        //form not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -535,12 +533,14 @@ class FormController extends CommonFormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //form not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'form:forms:editown',
             'form:forms:editother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -660,11 +660,9 @@ class FormController extends CommonFormController
                 $returnUrl      = $this->generateUrl('mautic_form_index', $viewParameters);
                 $template       = 'MauticFormBundle:Form:index';
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
-
                 // Clear session items in case columns changed
                 $session->remove('mautic.formresult.'.$entity->getId().'.orderby');
                 $session->remove('mautic.formresult.'.$entity->getId().'.orderbydir');
@@ -680,11 +678,12 @@ class FormController extends CommonFormController
                         ]
                     )
                 );
-            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+            }
+
+            if ($valid && $form->get('buttons')->get('apply')->isClicked()) {
                 // Rebuild everything to include new ids
                 $cleanSlate = true;
                 $reorder    = true;
-
                 if ($valid) {
                     // Rebuild the form with new action so that apply doesn't keep creating a clone
                     $action = $this->generateUrl('mautic_form_action', ['objectAction' => 'edit', 'objectId' => $entity->getId()]);

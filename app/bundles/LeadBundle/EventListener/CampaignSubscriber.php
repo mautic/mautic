@@ -377,9 +377,9 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
             return $event->setFailed('mautic.lead.no_company');
-        } else {
-            return $event->setResult(true);
         }
+
+        return $event->setResult(true);
     }
 
     public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event)

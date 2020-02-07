@@ -152,7 +152,6 @@ class AssetController extends FormController
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-
         if (null === $activeAsset) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
@@ -173,7 +172,9 @@ class AssetController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->get('mautic.security')->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             return $this->accessDenied();
         }
 
@@ -457,8 +458,6 @@ class AssetController extends FormController
                 'mauticContent' => 'asset',
             ],
         ];
-
-        //not found
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -471,10 +470,12 @@ class AssetController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        }
+
+        //not found
+        if (!$this->get('mautic.security')->hasEntityAccess(
             'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked

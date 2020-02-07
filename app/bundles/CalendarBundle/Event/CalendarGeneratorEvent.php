@@ -86,9 +86,8 @@ class CalendarGeneratorEvent extends Event
         if ($r + $g + $b > 382) {
             //bright color, use dark font
             return '#47535f';
-        } else {
-            //dark color, use bright font
-            return '#ffffff';
         }
+        //dark color, use bright font
+        return '#ffffff';
     }
 }

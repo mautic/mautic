@@ -129,16 +129,14 @@ class VtigerIntegration extends CrmAbstractIntegration
             }
 
             return false;
+        }
+        $error = $this->extractAuthKeys($response['result']);
+        if (empty($error)) {
+            return true;
         } else {
-            $error = $this->extractAuthKeys($response['result']);
+            $this->authorzationError = $error;
 
-            if (empty($error)) {
-                return true;
-            } else {
-                $this->authorzationError = $error;
-
-                return false;
-            }
+            return false;
         }
     }
 
@@ -165,9 +163,9 @@ class VtigerIntegration extends CrmAbstractIntegration
         $success = $this->isAuthorized();
         if (!$success) {
             return $this->authorzationError;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

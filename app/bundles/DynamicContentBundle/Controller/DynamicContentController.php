@@ -200,7 +200,6 @@ class DynamicContentController extends FormController
                     ]
                 );
             }
-
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 return $this->postActionRedirect(
                     [
@@ -210,7 +209,9 @@ class DynamicContentController extends FormController
                         'passthroughVars' => $passthrough,
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            }
+
+            if ($valid && !$cancelled) {
                 return $this->editAction($entity->getId(), true);
             }
         }
@@ -253,7 +254,6 @@ class DynamicContentController extends FormController
                 'mauticContent' => 'dynamicContent',
             ],
         ];
-
         if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
@@ -269,7 +269,9 @@ class DynamicContentController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -354,7 +356,6 @@ class DynamicContentController extends FormController
 
         //set the page we came from
         $page = $this->get('session')->get('mautic.dynamicContent.page', 1);
-
         if (null === $entity) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
@@ -377,12 +378,13 @@ class DynamicContentController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess(
+        }
+
+        if (!$security->hasEntityAccess(
             'dynamiccontent:dynamiccontents:viewown',
             'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 

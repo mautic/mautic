@@ -26,9 +26,9 @@ class IcontactApi extends EmailMarketingApi
 
         if (is_array($response) && !empty($response['errors'])) {
             throw new ApiErrorException(implode(' ', $response['errors']));
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     /**

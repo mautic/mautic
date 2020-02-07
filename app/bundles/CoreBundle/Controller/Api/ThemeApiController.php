@@ -50,13 +50,14 @@ class ThemeApiController extends CommonApiController
         $response  = ['success' => false];
         $themeZip  = $request->files->get('file');
         $extension = $themeZip->getClientOriginalExtension();
-
         if (!$themeZip) {
             return $this->returnError(
                 $this->translator->trans('mautic.core.theme.upload.empty', [], 'validators'),
                 Response::HTTP_BAD_REQUEST
             );
-        } elseif ('zip' !== $extension) {
+        }
+
+        if ('zip' !== $extension) {
             return $this->returnError(
                 $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators'),
                 Response::HTTP_BAD_REQUEST

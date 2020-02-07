@@ -41,9 +41,9 @@ class AuthController extends FormController
             $session->set('mautic.integration.postauth.message', ['mautic.integration.notfound', ['%name%' => $integration], 'error']);
             if ($isAjax) {
                 return new JsonResponse(['url' => $this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration])]);
-            } else {
-                return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
             }
+
+            return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
         }
 
         try {
@@ -53,9 +53,9 @@ class AuthController extends FormController
             $redirectUrl = $this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]);
             if ($isAjax) {
                 return new JsonResponse(['url' => $redirectUrl]);
-            } else {
-                return new RedirectResponse($redirectUrl);
             }
+
+            return new RedirectResponse($redirectUrl);
         }
 
         //check for error

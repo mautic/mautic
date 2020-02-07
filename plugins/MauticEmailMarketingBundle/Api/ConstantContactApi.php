@@ -34,9 +34,9 @@ class ConstantContactApi extends EmailMarketingApi
             }
 
             throw new ApiErrorException(implode(' ', $errors));
-        } else {
-            return $response;
         }
+
+        return $response;
     }
 
     /**

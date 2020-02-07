@@ -34,33 +34,30 @@ class PublicController extends CommonController
         $url = $request->query->get('url', null);
         if (!$url) {
             return $this->accessDenied(false, 'ERROR: url not specified');
-        } else {
-            /** @var IntegrationHelper $integrationHelper */
-            $integrationHelper = $this->get('mautic.helper.integration');
-            $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
-
-            if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
-                return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
-            }
-
-            $ch = curl_init($url);
-            if ('post' === strtolower($request->server->get('REQUEST_METHOD', ''))) {
-                $headers = [
-                    'Content-type: application/json',
-                    'Accept: application/json',
-                ];
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->request->all()));
-            }
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, true);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_USERAGENT, $request->server->get('HTTP_USER_AGENT', ''));
-            list($header, $contents) = preg_split('/([\r\n][\r\n])\\1/', curl_exec($ch), 2);
-            $status                  = curl_getinfo($ch);
-            curl_close($ch);
         }
+        /** @var IntegrationHelper $integrationHelper */
+        $integrationHelper = $this->get('mautic.helper.integration');
+        $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
+        if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
+            return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
+        }
+        $ch = curl_init($url);
+        if ('post' === strtolower($request->server->get('REQUEST_METHOD', ''))) {
+            $headers = [
+                'Content-type: application/json',
+                'Accept: application/json',
+            ];
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->request->all()));
+        }
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, $request->server->get('HTTP_USER_AGENT', ''));
+        list($header, $contents) = preg_split('/([\r\n][\r\n])\\1/', curl_exec($ch), 2);
+        $status                  = curl_getinfo($ch);
+        curl_close($ch);
 
         // Set the JSON data object contents, decoding it from JSON if possible.
         $decoded_json = json_decode($contents);

@@ -259,11 +259,9 @@ abstract class AbstractChart
         $colorHelper = new ColorHelper();
 
         if (isset($this->colors[$datasetId])) {
-            $color = $colorHelper->setHex($this->colors[$datasetId]);
-        } else {
-            $color = $colorHelper->buildRandomColor();
+            return $colorHelper->setHex($this->colors[$datasetId]);
         }
 
-        return $color;
+        return $colorHelper->buildRandomColor();
     }
 }

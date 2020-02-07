@@ -219,9 +219,9 @@ class FormModel extends CommonFormModel
             $this->dispatcher->dispatch($name, $event);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -421,12 +421,10 @@ class FormModel extends CommonFormModel
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
-            $html = $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
-        } else {
-            $html = $this->removeScriptTag($html);
+            return $this->getFormScript($form)."\n\n".$this->removeScriptTag($html);
         }
 
-        return $html;
+        return $this->removeScriptTag($html);
     }
 
     /**
@@ -968,10 +966,9 @@ class FormModel extends CommonFormModel
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
-        } else {
-            // remove DOCTYPE, <html>, and <body> tags for old libxml
-            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
         }
+        // remove DOCTYPE, <html>, and <body> tags for old libxml
+        return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
     }
 
     /**
