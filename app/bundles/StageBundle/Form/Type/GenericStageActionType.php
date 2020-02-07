@@ -33,8 +33,8 @@ class GenericStageActionType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.stage.action.weight.help',
                 ],
-            'precision' => 0,
-            'data'      => $default,
+            'scale' => 0,
+            'data'  => $default,
         ]);
     }
 

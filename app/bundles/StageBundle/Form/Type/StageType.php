@@ -66,8 +66,8 @@ class StageType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.stage.action.weight.help',
                 ],
-            'precision' => 0,
-            'required'  => false,
+            'scale'    => 0,
+            'required' => false,
         ]);
 
         if (!empty($options['data']) && $options['data'] instanceof Stage) {
