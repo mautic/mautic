@@ -25,11 +25,12 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/segments/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $id             = $response['segment']['id'];
 
         if (!empty($response['errors'][0])) {
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
         }
+
+        $this->assertTrue(!empty($response['list']['id']));
 
         // $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         // $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);

@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Form;
 
+use Ivory\OrderedForm\OrderedResolvedFormType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,87 +22,95 @@ use Symfony\Component\Form\Form;
 
 trait RequestTrait
 {
-    /**
-     * @param null  $entity
-     * @param array $masks
-     */
     protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [])
     {
         // Special handling of some fields
         foreach ($form as $name => $child) {
-            if (isset($params[$name])) {
-                $type = get_class($child->getConfig()->getType());
-                switch ($type) {
-                    case YesNoButtonGroupType::class:
-                        if (is_object($entity)) {
-                            $setter = 'set'.ucfirst($name);
-                            // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
-                            // If value is array and count 1, return value of array as string
-                            if (is_array($params[$name]) && 1 == count($params[$name])) {
-                                $params[$name] = end($params[$name]);
-                            }
+            if (!isset($params[$name])) {
+                continue;
+            }
 
-                            if ('' === $params[$name]) {
-                                break;
-                            }
+            $type = $child->getConfig()->getType();
+            if ($type instanceof OrderedResolvedFormType) {
+                $type = $type->getInnerType();
+            }
 
-                            $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
-                            $data = (bool) $data;
-                            try {
-                                $entity->$setter($data);
-                                // Manually handled so remove from form processing
-                                unset($form[$name], $params[$name]);
-                                break;
-                            } catch (\InvalidArgumentException $exception) {
-                            }
-
-                            // If not manually handled cast to int because Symfony form processing take false as empty
-                            $params[$name] = (int) $data;
-                        }
+            switch (get_class($type)) {
+                case YesNoButtonGroupType::class:
+                    if (!is_object($entity)) {
                         break;
-                    case ChoiceType::class:
-                        if ($child->getConfig()->getOption('multiple')) {
-                            // Ensure the value is an array
-                            if (!is_array($params[$name])) {
-                                if (false !== strpos($params[$name], '|')) {
-                                    $params[$name] = explode('|', $params[$name]);
-                                } else {
-                                    $params[$name] = [$params[$name]];
-                                }
-                            }
-                        }
-                        break;
-                    case DateTimeType::class:
-                    case DateType::class:
-                    case TimeType::class:
-                        // Prevent zero based date placeholders
-                        $dateTest = (int) str_replace(['/', '-', ' '], '', $params[$name]);
+                    }
 
-                        if (!$dateTest) {
-                            // Date placeholder was used so just ignore it to allow import of the field
-                            unset($params[$name]);
-                        } else {
-                            if (false === ($timestamp = strtotime($params[$name]))) {
-                                $timestamp = null;
-                            }
-                            if ($timestamp) {
-                                switch ($type) {
-                                    case DateTimeType::class:
-                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
-                                        break;
-                                    case DateType::class:
-                                        $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
-                                        break;
-                                    case TimeType::class:
-                                        $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
-                                        break;
-                                }
-                            } else {
-                                unset($params[$name]);
-                            }
-                        }
+                    $setter = 'set'.ucfirst($name);
+                    // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                    // If value is array and count 1, return value of array as string
+                    if (is_array($params[$name]) && 1 == count($params[$name])) {
+                        $params[$name] = end($params[$name]);
+                    }
+
+                    if ('' === $params[$name]) {
                         break;
-                }
+                    }
+
+                    $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
+                    $data = (bool) $data;
+                    try {
+                        $entity->$setter($data);
+                        // Manually handled so remove from form processing
+                        unset($form[$name], $params[$name]);
+                        break;
+                    } catch (\InvalidArgumentException $exception) {
+                    }
+
+                    // If not manually handled cast to int because Symfony form processing take false as empty
+                    $params[$name] = (int) $data;
+
+                    break;
+                case ChoiceType::class:
+                    if (!$child->getConfig()->getOption('multiple')) {
+                        break;
+                    }
+
+                    // Ensure the value is an array
+                    if (!is_array($params[$name])) {
+                        $params[$name] = (false !== strpos($params[$name], '|')) ? explode('|', $params[$name]) : [$params[$name]];
+                    }
+
+                    break;
+                case DateTimeType::class:
+                case DateType::class:
+                case TimeType::class:
+                    // Prevent zero based date placeholders
+                    $dateTest = (int) str_replace(['/', '-', ' '], '', $params[$name]);
+
+                    if (!$dateTest) {
+                        // Date placeholder was used so just ignore it to allow import of the field
+                        unset($params[$name]);
+                        break;
+                    }
+
+                    if (false === ($timestamp = strtotime($params[$name]))) {
+                        $timestamp = null;
+                    }
+
+                    if (!$timestamp) {
+                        unset($params[$name]);
+                        break;
+                    }
+
+                    switch ($type) {
+                        case DateTimeType::class:
+                            $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i');
+                            break;
+                        case DateType::class:
+                            $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                            break;
+                        case TimeType::class:
+                            $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                            break;
+                    }
+
+                    break;
             }
         }
 
