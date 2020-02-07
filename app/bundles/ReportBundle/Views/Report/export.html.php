@@ -19,6 +19,11 @@ $columnOrder          = $report->getColumns();
 $graphOrder           = $report->getGraphs();
 $startCount           = 1;
 ?>
+<style>
+    #app-content.content-only.container {
+        overflow-x: scroll;
+    }
+</style>
 
 <div class="pa-md">
     <h3><?php echo $report->getName(); ?></h3>

@@ -34,7 +34,7 @@ class SyncCommandTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncServiceInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncService;
 

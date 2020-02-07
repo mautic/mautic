@@ -22,6 +22,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
@@ -117,7 +118,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'                  => 'mautic.channel.message.send.marketing.message',
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
-            'formType'               => 'message_send',
+            'formType'               => MessageSendType::class,
             'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend',
             'channel'                => 'channel.message',
             'channelIdField'         => 'marketingMessage',

@@ -25,27 +25,27 @@ use Symfony\Component\Translation\TranslatorInterface;
 class UserNotificationHelperTest extends TestCase
 {
     /**
-     * @var Writer|\PHPUnit_Framework_MockObject_MockObject
+     * @var Writer|\PHPUnit\Framework\MockObject\MockObject
      */
     private $writer;
 
     /**
-     * @var UserHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var UserHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $userHelper;
 
     /**
-     * @var OwnerProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var OwnerProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $ownerProvider;
 
     /**
-     * @var RouteHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var RouteHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $routeHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 

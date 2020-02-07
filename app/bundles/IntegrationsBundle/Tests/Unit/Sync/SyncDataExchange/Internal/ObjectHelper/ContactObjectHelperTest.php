@@ -33,27 +33,27 @@ use PHPUnit\Framework\TestCase;
 class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $model;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $repository;
 
     /**
-     * @var Connection|\PHPUnit_Framework_MockObject_MockObject
+     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
      */
     private $connection;
 
     /**
-     * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldModel;
 
     /**
-     * @var DoNotContact|\PHPUnit_Framework_MockObject_MockObject
+     * @var DoNotContact|\PHPUnit\Framework\MockObject\MockObject
      */
     private $doNotContactModel;
 

@@ -13,11 +13,9 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class CookieHelper.
- */
 class CookieHelper
 {
+    const SAME_SITE_NONE = '; samesite=none';
     private $path;
     private $domain;
     private $secure   = false;
@@ -25,8 +23,6 @@ class CookieHelper
     private $request;
 
     /**
-     * CookieHelper constructor.
-     *
      * @param $cookiePath
      * @param $cookieDomain
      * @param $cookieSecure
@@ -75,11 +71,17 @@ class CookieHelper
             return true;
         }
 
+        // If https, SameSite equals None
+        $sameSiteNoneText = '';
+        if (true === $secure or (null === $secure and true === $this->secure)) {
+            $sameSiteNoneText = self::SAME_SITE_NONE;
+        }
+
         setcookie(
             $name,
             $value,
             ($expire) ? (int) (time() + $expire) : null,
-            (null == $path) ? $this->path : $path,
+            ((null == $path) ? $this->path : $path).$sameSiteNoneText,
             (null == $domain) ? $this->domain : $domain,
             (null == $secure) ? $this->secure : $secure,
             (null == $httponly) ? $this->httponly : $httponly

@@ -34,17 +34,17 @@ class FullObjectReportBuilderTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectProvider;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dispatcher;
 
     /**
-     * @var FieldBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldBuilder;
 

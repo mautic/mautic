@@ -23,14 +23,11 @@ class FocusListType extends AbstractType
         $this->repo       = $this->focusModel->getRepository();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'choices'           => function (Options $options) {
+                'choices' => function (Options $options) {
                     $choices = [];
 
                     $list = $this->repo->getFocusList($options['data']);
@@ -43,10 +40,10 @@ class FocusListType extends AbstractType
 
                     return $choices;
                 },
-                'expanded'          => false,
-                'multiple'          => true,
-                'required'          => false,
-                'empty_value'       => function (Options $options) {
+                'expanded'    => false,
+                'multiple'    => true,
+                'required'    => false,
+                'placeholder' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone';
                 },
                 'disabled' => function (Options $options) {

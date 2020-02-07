@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var ValueHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $valueHelper;
 

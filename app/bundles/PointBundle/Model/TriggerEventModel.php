@@ -68,4 +68,36 @@ class TriggerEventModel extends CommonFormModel
 
         return $formFactory->create(TriggerEventType::class, $entity, $options);
     }
+
+    /**
+     * Get segments which are dependent on given segment.
+     *
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getReportIdsWithDependenciesOnSegment($segmentId)
+    {
+        $filter = [
+            'force'  => [
+                ['column' => 'e.type', 'expr' => 'eq', 'value'=>'lead.changelists'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getProperties();
+            foreach ($retrFilters as $eachFilter) {
+                if (in_array($segmentId, $eachFilter)) {
+                    $dependents[] = $entity->getTrigger()->getId();
+                }
+            }
+        }
+
+        return $dependents;
+    }
 }

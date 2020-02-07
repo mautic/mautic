@@ -103,7 +103,7 @@ class CampaignRepository extends CommonRepository
             ->where($this->getPublishedByDateExpression($q));
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('c.created_by', ':id'))
+            $q->andWhere($q->expr()->eq('c.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
         }
 

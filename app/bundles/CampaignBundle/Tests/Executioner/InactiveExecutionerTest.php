@@ -28,27 +28,27 @@ use Symfony\Component\Console\Output\BufferedOutput;
 class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|InactiveContactFinder
+     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveContactFinder
      */
     private $inactiveContactFinder;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Translator
+     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventScheduler
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
      */
     private $eventScheduler;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|InactiveHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject|InactiveHelper
      */
     private $inactiveHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventExecutioner
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
      */
     private $eventExecutioner;
 

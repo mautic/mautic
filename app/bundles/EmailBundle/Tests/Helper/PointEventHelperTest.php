@@ -46,7 +46,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
      * @param bool $published
      * @param bool $success
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getMockMauticFactory($published = true, $success = true)
     {
@@ -71,7 +71,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getMockLead()
     {
@@ -92,7 +92,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
      * @param bool $published
      * @param bool $success
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function getMockEmail($published = true, $success = true)
     {

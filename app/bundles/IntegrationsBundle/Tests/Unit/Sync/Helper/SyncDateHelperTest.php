@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class SyncDateHelperTest extends TestCase
 {
     /**
-     * @var SyncDateHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncDateHelper;
 

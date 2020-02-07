@@ -27,27 +27,27 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
      */
     private $leadModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private $leadRepo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
      */
     private $dispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
      */
     private $logger;
 
