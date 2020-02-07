@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-echo $view['assets']->includeScript('plugins/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
+echo $view['assets']->includeScript('app/bundles/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad');
 
 /** @var \Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface $integrationObject Set through buildView */
 $activeTab = $activeTab ?: 'details-container';
