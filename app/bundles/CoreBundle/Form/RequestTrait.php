@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Form;
 
-use Ivory\OrderedForm\OrderedResolvedFormType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
@@ -31,7 +31,7 @@ trait RequestTrait
             }
 
             $type = $child->getConfig()->getType();
-            if ($type instanceof OrderedResolvedFormType) {
+            if ($type instanceof ResolvedFormTypeInterface) {
                 $type = $type->getInnerType();
             }
 
