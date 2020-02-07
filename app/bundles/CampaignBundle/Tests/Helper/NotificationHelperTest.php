@@ -24,22 +24,22 @@ use Symfony\Component\Routing\Router;
 class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|UserModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|UserModel
      */
     private $userModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|NotificationModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|NotificationModel
      */
     private $notificationModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Router
+     * @var \PHPUnit\Framework\MockObject\MockObject|Router
      */
     private $router;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Translator
+     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private $translator;
 

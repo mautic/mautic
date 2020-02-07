@@ -13,22 +13,22 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ListModel
+     * @var \PHPUnit\Framework\MockObject\MockObject|ListModel
      */
     private $mockListModel;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ExecutionContext
+     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContext
      */
     private $context;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|RequestStack
+     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
     private $requestStack;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Request
+     * @var \PHPUnit\Framework\MockObject\MockObject|Request
      */
     private $request;
 

@@ -25,22 +25,22 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ThemeHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var TemplatingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $templatingHelper;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParameterHelper;
 

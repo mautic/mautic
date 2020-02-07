@@ -31,7 +31,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
     private $connection;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
      */
     private $entityManager;
 

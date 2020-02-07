@@ -51,4 +51,22 @@ final class ApiEvents
      * @var string
      */
     const BUILD_ROUTE = 'mautic.build_api_route';
+
+    /**
+     * The mautic.api_on_entity_pre_save event is thrown after an entity about to be saved via API.
+     *
+     * The event listener receives a Mautic\ApiBundle\Event\ApiEntityEvent instance.
+     *
+     * @var string
+     */
+    const API_ON_ENTITY_PRE_SAVE = 'mautic.api_on_entity_pre_save';
+
+    /**
+     * The mautic.api_on_entity_post_save event is thrown after an entity is saved via API.
+     *
+     * The event listener receives a Mautic\ApiBundle\Event\ApiEntityEvent instance.
+     *
+     * @var string
+     */
+    const API_ON_ENTITY_POST_SAVE = 'mautic.api_on_entity_post_save';
 }

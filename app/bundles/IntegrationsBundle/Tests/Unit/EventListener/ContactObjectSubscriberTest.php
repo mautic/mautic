@@ -31,12 +31,12 @@ use Symfony\Component\Routing\Router;
 class ContactObjectSubscriberTest extends TestCase
 {
     /**
-     * @var ContactObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $contactObjectHelper;
 
     /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     private $router;
 
@@ -308,7 +308,7 @@ class ContactObjectSubscriberTest extends TestCase
 
         $this->subscriber->buildContactRoute($event);
 
-        $this->assertSame(null, $event->getRoute());
+        $this->assertNull($event->getRoute());
     }
 
     public function testBuildContactRouteWithRightObject(): void

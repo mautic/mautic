@@ -41,47 +41,47 @@ use Psr\Log\LoggerInterface;
 class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventCollector|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventCollector|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventCollector;
 
     /**
-     * @var EventLogger|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventLogger|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventLogger;
 
     /**
-     * @var ActionExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     * @var ActionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
     private $actionExecutioner;
 
     /**
-     * @var ConditionExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConditionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
     private $conditionExecutioner;
 
     /**
-     * @var DecisionExecutioner|\PHPUnit_Framework_MockObject_MockObject
+     * @var DecisionExecutioner|\PHPUnit\Framework\MockObject\MockObject
      */
     private $decisionExecutioner;
 
     /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $logger;
 
     /**
-     * @var EventScheduler|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventScheduler|\PHPUnit\Framework\MockObject\MockObject
      */
     private $eventScheduler;
 
     /**
-     * @var RemovedContactTracker|\PHPUnit_Framework_MockObject_MockObject
+     * @var RemovedContactTracker|\PHPUnit\Framework\MockObject\MockObject
      */
     private $removedContactTracker;
 
     /**
-     * @var LeadRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $leadRepository;
 

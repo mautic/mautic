@@ -16,9 +16,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
- * Configurator.
- *
- * @author Marc Weistroff <marc.weistroff@gmail.com>
  * @note   This class is based on Sensio\Bundle\DistributionBundle\Configurator\Configurator
  */
 class Configurator
@@ -51,9 +48,6 @@ class Configurator
      */
     protected $parameters;
 
-    /**
-     * Configurator constructor.
-     */
     public function __construct(PathsHelper $pathsHelper)
     {
         $this->filename   = $pathsHelper->getSystemPath('local_config');

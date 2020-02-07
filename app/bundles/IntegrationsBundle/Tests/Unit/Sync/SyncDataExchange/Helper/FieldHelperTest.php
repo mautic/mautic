@@ -27,32 +27,32 @@ use Symfony\Component\Translation\TranslatorInterface;
 class FieldHelperTest extends TestCase
 {
     /**
-     * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldModel;
 
     /**
-     * @var VariableExpresserHelperInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var VariableExpresserHelperInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $variableExpresserHelper;
 
     /**
-     * @var ChannelListHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $channelListHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $eventDispatcher;
 
     /**
-     * @var MauticSyncFieldsLoadEvent|\PHPUnit_Framework_MockObject_MockObject
+     * @var MauticSyncFieldsLoadEvent|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mauticSyncFieldsLoadEvent;
 
     /**
-     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectProvider;
 

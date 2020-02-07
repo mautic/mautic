@@ -2286,4 +2286,33 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         return $errors;
     }
+
+    /**
+     * @param $segmentId
+     *
+     * @return array
+     */
+    public function getEmailsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $entities =  $this->getEntities(
+            [
+                'filter'         => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'eq',
+                            'value'  => $segmentId,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $ids = [];
+        foreach ($entities as $entity) {
+            $ids[] = $entity->getId();
+        }
+
+        return $ids;
+    }
 }

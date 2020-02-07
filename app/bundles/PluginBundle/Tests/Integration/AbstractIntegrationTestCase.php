@@ -30,77 +30,77 @@ use Symfony\Component\Translation\TranslatorInterface;
 class AbstractIntegrationTestCase extends MauticMysqlTestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $dispatcher;
 
     /**
-     * @var CacheStorageHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CacheStorageHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $cache;
 
     /**
-     * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $em;
 
     /**
-     * @var Session|\PHPUnit_Framework_MockObject_MockObject
+     * @var Session|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $session;
 
     /**
-     * @var RequestStack|\PHPUnit_Framework_MockObject_MockObject
+     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $request;
 
     /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $router;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $translator;
 
     /**
-     * @var Logger|\PHPUnit_Framework_MockObject_MockObject
+     * @var Logger|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $logger;
 
     /**
-     * @var EncryptionHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EncryptionHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $encryptionHelper;
 
     /**
-     * @var LeadModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $leadModel;
 
     /**
-     * @var CompanyModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $companyModel;
 
     /**
-     * @var PathsHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var PathsHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $pathsHelper;
 
     /**
-     * @var NotificationModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var NotificationModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $notificationModel;
 
     /**
-     * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $fieldModel;
 
     /**
-     * @var IntegrationEntityModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var IntegrationEntityModel|\PHPUnit\Framework\MockObject\MockObject
      */
     protected $integrationEntityModel;
 

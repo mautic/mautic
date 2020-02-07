@@ -36,8 +36,6 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class HubspotIntegration.
- *
  * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
@@ -47,9 +45,6 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     protected $userHelper;
 
-    /**
-     * HubspotIntegration constructor.
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
@@ -260,6 +255,28 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param       $fieldsToUpdate
+     * @param array $objects
+     *
+     * @return array
+     */
+    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    {
+        if (null === $objects) {
+            $objects = ['Leads', 'Contacts'];
+        }
+
+        if (isset($fieldsToUpdate['leadFields'])) {
+            // Pass in the whole config
+            $fields = $fieldsToUpdate['leadFields'];
+        } else {
+            $fields = array_flip($fieldsToUpdate);
+        }
+
+        return $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
+    }
+
+    /**
      * Format the lead data to the structure that HubSpot requires for the createOrUpdate request.
      *
      * @param array $leadData All the lead fields mapped
@@ -346,7 +363,8 @@ class HubspotIntegration extends CrmAbstractIntegration
             return [];
         }
         foreach ($data['properties'] as $key => $field) {
-            $fieldsValues[$key] = $field['value'];
+            $value              = str_replace(';', '|', $field['value']);
+            $fieldsValues[$key] = $value;
         }
         if ('Lead' == $object && !isset($fieldsValues['email'])) {
             foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
@@ -583,7 +601,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                 'feature_settings' => ['objects' => $config['objects']],
             ]
         );
-
         $this->amendLeadDataBeforePush($mappedData);
 
         if (empty($mappedData)) {
@@ -616,5 +633,17 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         return false;
+    }
+
+    /**
+     * Amend mapped lead data before pushing to CRM.
+     *
+     * @param $mappedData
+     */
+    public function amendLeadDataBeforePush(&$mappedData)
+    {
+        foreach ($mappedData as &$data) {
+            $data = str_replace('|', ';', $data);
+        }
     }
 }

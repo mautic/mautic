@@ -891,7 +891,8 @@ abstract class AbstractIntegration
         $headers = [];
         if (is_array($parseHeaders)) {
             foreach ($parseHeaders as $key => $value) {
-                if (false !== strpos($value, ':')) {
+                // Ignore string keys which assume it is already parsed and avoids splitting up a value that includes colons (such as a date/time)
+                if (!is_string($key) && false !== strpos($value, ':')) {
                     list($key, $value) = explode(':', $value);
                     $key               = trim($key);
                     $value             = trim($value);

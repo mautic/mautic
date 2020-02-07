@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
+use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 
@@ -47,7 +48,7 @@ class EventAccessorTest extends \PHPUnit\Framework\TestCase
                 'label'                  => 'Clicks email',
                 'description'            => 'Trigger actions when an email is clicked. Connect a &quot;Send Email&quot; action to the top of this decision.',
                 'eventName'              => 'mautic.email.on_campaign_trigger_decision',
-                'formType'               => 'email_click_decision',
+                'formType'               => EmailClickDecisionType::class,
                 'connectionRestrictions' => [
                     'source' => [
                         'action' => [

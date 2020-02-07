@@ -38,22 +38,22 @@ class IntegrationSyncProcessTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncDateHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncDateHelper;
 
     /**
-     * @var MappingHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $mappingHelper;
 
     /**
-     * @var ObjectChangeGenerator|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectChangeGenerator;
 
     /**
-     * @var SyncDataExchangeInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var SyncDataExchangeInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncDataExchange;
 

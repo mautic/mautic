@@ -912,16 +912,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     && '' != $dataObject['email1__Leads'] && in_array($dataObject['email1__Leads'], $sugarRejectedLeads)) {
                     continue; //Lead email is already in Sugar Contacts. Do not carry on
                 }
-                //$itemLastDate = $itemDateModified;
-                //if ($itemDateEntered > $itemLastDate) {
-                //    $itemLastDate = $itemDateEntered;
-                //}
 
-                if (isset($dataObject) && $dataObject && !empty($dataObject)) {
+                if (!empty($dataObject)) {
                     if ('Leads' == $object or 'Contacts' == $object) {
-                        $email_present = false;
-                        $email         = null;
-
                         if (isset($dataObject['assigned_user_id'.'__'.$object])) {
                             $auid = $dataObject['assigned_user_id'.'__'.$object];
                             if (isset($onwerEmailByAssignedUserId[$auid])) {

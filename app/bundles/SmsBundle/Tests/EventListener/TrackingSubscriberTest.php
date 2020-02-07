@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|StatRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject|StatRepository
      */
     private $statRepository;
 

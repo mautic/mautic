@@ -17,9 +17,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FieldsType.
- */
 class FieldsType extends AbstractType
 {
     use FieldsTypeTrait;
@@ -42,11 +39,8 @@ class FieldsType extends AbstractType
         return 'integration_fields';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $this->buildFieldView($view, $options, 'lead');
+        $this->buildFieldView($view, $options);
     }
 }

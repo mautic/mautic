@@ -912,7 +912,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      * @param int  $maxSfContacts
      * @param null $updateObject
      *
-     * @return SalesforceIntegration|\PHPUnit_Framework_MockObject_MockObject
+     * @return SalesforceIntegration|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getSalesforceIntegration($maxUpdate = 100, $maxCreate = 200, $maxSfLeads = 25, $maxSfContacts = 25, $updateObject = null)
     {
@@ -1045,7 +1045,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 )
             );
 
-        /* @var \PHPUnit_Framework_MockObject_MockObject $this->>dispatcher */
+        /* @var \PHPUnit\Framework\MockObject\MockObject $this->>dispatcher */
         $this->dispatcher->method('dispatch')
             ->will(
                 $this->returnCallback(
@@ -1079,7 +1079,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToUpdate')
             ->willReturnCallback(
-                function () use ($max, $specificObject, $maxSfContacts, $maxSfLeads) {
+                function () use ($max, $specificObject) {
                     $args = func_get_args();
                     $object = $args[6];
 
@@ -1112,7 +1112,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToCreate')
             ->willReturnCallback(
-                function () use (&$restart, $max) {
+                function () use ($max) {
                     $args = func_get_args();
 
                     if (false === $args[2]) {

@@ -31,12 +31,12 @@ use Symfony\Component\Routing\Router;
 class CompanyObjectSubscriberTest extends TestCase
 {
     /**
-     * @var CompanyObjectHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyObjectHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $companyObjectHelper;
 
     /**
-     * @var Router|\PHPUnit_Framework_MockObject_MockObject
+     * @var Router|\PHPUnit\Framework\MockObject\MockObject
      */
     private $router;
 
@@ -308,7 +308,7 @@ class CompanyObjectSubscriberTest extends TestCase
 
         $this->subscriber->buildCompanyRoute($event);
 
-        $this->assertSame(null, $event->getRoute());
+        $this->assertNull($event->getRoute());
     }
 
     public function testBuildCompanyRouteWithRightObject(): void

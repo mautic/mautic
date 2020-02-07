@@ -500,7 +500,7 @@ class UserController extends FormController
                 return $this->redirect($returnUrl);
             }
         } else {
-            $reEntityId = InputHelper::int($this->request->get('id'));
+            $reEntityId = (int) $this->request->get('id');
             $reSubject  = InputHelper::clean($this->request->get('subject'));
             $returnUrl  = InputHelper::clean($this->request->get('returnUrl', $this->generateUrl('mautic_dashboard_index')));
             $reEntity   = InputHelper::clean($this->request->get('entity'));

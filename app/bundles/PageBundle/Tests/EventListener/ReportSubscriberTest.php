@@ -28,17 +28,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ReportSubscriberTest extends WebTestCase
 {
     /**
-     * @var CompanyReportData|\PHPUnit_Framework_MockObject_MockObject
+     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
      */
     private $companyReportData;
 
     /**
-     * @var HitRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var HitRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $hitRepository;
 
     /**
-     * @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $translator;
 

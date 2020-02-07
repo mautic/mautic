@@ -12,12 +12,8 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\EventDispatcher\Event;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigBuilderEvent extends Event
 {
     /**
@@ -42,10 +38,7 @@ class ConfigBuilderEvent extends Event
      */
     protected $encodedFields = [];
 
-    /**
-     * ConfigBuilderEvent constructor.
-     */
-    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
+    public function __construct(BundleHelper $bundleHelper)
     {
         $this->bundleHelper = $bundleHelper;
     }

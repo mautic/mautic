@@ -20,7 +20,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+class CampaignSendSubscriber implements EventSubscriberInterface
 {
     /**
      * @var SmsModel

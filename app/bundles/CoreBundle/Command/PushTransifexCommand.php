@@ -13,7 +13,6 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Factory\TransifexFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\Transifex\Connector\Resources;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,18 +31,14 @@ class PushTransifexCommand extends ContainerAwareCommand
 
     public function __construct(
         TransifexFactory $transifexFactory,
-        TranslatorInterface $translator,
-        CoreParametersHelper $coreParametersHelper
+        TranslatorInterface $translator
     ) {
-        $this->transifexFactory     = $transifexFactory;
-        $this->translator           = $translator;
+        $this->transifexFactory = $transifexFactory;
+        $this->translator       = $translator;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:transifex:push')
@@ -66,9 +61,6 @@ EOT
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));

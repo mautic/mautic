@@ -535,7 +535,7 @@ class CommonController extends Controller implements MauticController
         }
 
         if ($this->request->query->has('limit')) {
-            $limit = InputHelper::int($this->request->query->get('limit'));
+            $limit = (int) $this->request->query->get('limit');
             $session->set("$name.limit", $limit);
         }
 

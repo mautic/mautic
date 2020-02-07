@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Form\Type\PermissionListType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class LeadPermissions.
- */
 class LeadPermissions extends AbstractPermissions
 {
     public function __construct($params)
@@ -40,18 +37,13 @@ class LeadPermissions extends AbstractPermissions
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return string|void
+     * @return string
      */
     public function getName()
     {
         return 'lead';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addExtendedFormFields('lead', 'leads', $builder, $data, false);
@@ -90,9 +82,6 @@ class LeadPermissions extends AbstractPermissions
         $this->addStandardFormFields($this->getName(), 'imports', $builder, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function analyzePermissions(array &$permissions, $allPermissions, $isSecondRound = false)
     {
         parent::analyzePermissions($permissions, $allPermissions, $isSecondRound);
@@ -101,7 +90,7 @@ class LeadPermissions extends AbstractPermissions
         $viewPerms = ['viewown', 'viewother', 'full'];
         if (
             (!isset($permissions['leads']) || (array_intersect($viewPerms, $permissions['leads']) == $viewPerms)) &&
-            (isset($permissions['lists']) || isset($permission['fields']))
+            (isset($permissions['lists']) || isset($permissions['fields']))
         ) {
             $permissions['leads'][] = 'viewown';
         }
@@ -110,11 +99,6 @@ class LeadPermissions extends AbstractPermissions
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param $name
-     * @param $level
-     *
      * @return array
      */
     protected function getSynonym($name, $level)

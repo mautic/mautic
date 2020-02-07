@@ -36,17 +36,17 @@ class MauticSyncProcessTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncDateHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncDateHelper;
 
     /**
-     * @var ObjectChangeGenerator|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectChangeGenerator|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectChangeGenerator;
 
     /**
-     * @var MauticSyncDataExchange|\PHPUnit_Framework_MockObject_MockObject
+     * @var MauticSyncDataExchange|\PHPUnit\Framework\MockObject\MockObject
      */
     private $syncDataExchange;
 

@@ -87,7 +87,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $statRepository->expects($this->once())
             ->method('findOneBy')
             ->willReturnCallback(
-                function ($hash) use ($lead, $stat) {
+                function ($hash) use ($stat) {
                     $stat->setTrackingHash($hash);
 
                     $email = new Email();

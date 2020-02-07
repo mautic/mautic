@@ -1541,7 +1541,7 @@ class CommonRepository extends EntityRepository
                                 $whereClause = $query->expr()->{$clause['expr']}($column, ':'.$param);
                                 $query->setParameter($param, $clause['val']);
                             }
-                            // no break
+                            break;
                         default:
                             if (method_exists($query->expr(), $clause['expr'])) {
                                 if (in_array($clause['expr'], $columnValue)) {

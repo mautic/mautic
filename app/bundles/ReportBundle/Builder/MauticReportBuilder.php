@@ -21,9 +21,6 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Mautic Report Builder class.
- */
 final class MauticReportBuilder implements ReportBuilderInterface
 {
     /**
@@ -224,7 +221,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build ORDER BY clause
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
-                if (isset($o['column'])) {
+                if (isset($options['order']['column'])) {
                     $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
                 } elseif (!empty($options['order'][0][1])) {
                     list($column, $dir) = $options['order'];
@@ -417,11 +414,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         );
                         break;
                     case 'empty':
-                        $groupExpr->add(
-                            $expr->isNull($filter['column'])
+                        $expression = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column']),
+                            $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
                         );
+
                         $groupExpr->add(
-                            $expr->eq($filter['column'], $expr->literal(''))
+                            $expression
                         );
                         break;
                     default:

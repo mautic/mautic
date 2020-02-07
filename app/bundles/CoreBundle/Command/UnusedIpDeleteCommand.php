@@ -58,7 +58,7 @@ EOT
         try {
             $limit       = $input->getOption('limit');
             $deletedRows = $ipAddressRepo->deleteUnusedIpAddresses($limit);
-            $output->writeln(sprintf('<info>%s unused IP addresses has been deleted</info>', $deletedRows));
+            $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
         } catch (DBALException $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
 

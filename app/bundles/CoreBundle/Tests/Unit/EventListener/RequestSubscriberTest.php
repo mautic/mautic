@@ -34,7 +34,7 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
     private $request;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $getResponseEventMock;
 

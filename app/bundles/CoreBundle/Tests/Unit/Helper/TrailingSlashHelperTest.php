@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CoreParametersHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
      */
     private $coreParametersHelper;
 

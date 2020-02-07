@@ -183,6 +183,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   Deprecated class ConfigModel removed
 *   Deprecated JS function Mautic.hideSpecificConfigFields removed
 *   Deprecated method ConfigEvent::getPost() removed
+*   1st param removed from constructor of ConfigBuilderEvent as it was never used.
 All ConfigSubscribers must keep 'formAlias' but also add 'formType' with the form type class name.
 
 Before:
@@ -279,6 +280,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Class ListTriggerType removed as it was not used anywhere.
 *   Class PointTriggerType removed as it was not used anywhere.
 *   Class TagListType removed as it was not used anywhere.
+*   Class Mautic\LeadBundle\Form\DataTransformer\UtmTagEntityModelTransformer removed as it was not used anywhere.
 *   Deprecated class EmailTokenHelper removed.
 *   Deprecated routes removed:
     *   mautic_contact_import_index - /s/{object}/import/{page}
@@ -319,6 +321,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Deprecated cookie mautic_session_id will no longer be created.
 *   Payloads for the following webhook events will no longer have the lead array element: Contact Deleted Event, Contact Points Changed Event, Contact Updated Event. “lead” array element has been removed. We have the same information in the contact array element.
 *   LeadEvents::FORM_SUBMIT_REMOVE_DO_NOT_CONTACT event is removed. Listen for the LeadEvents::ON_EXECUTE_SUBMIT_ACTION instead, and check the context of `lead.remove_do_not_contact`
+*   3rd param $identifier of Constructor of Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer removed as it was not used.
 
 ### NotificationsBundle
 

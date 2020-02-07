@@ -36,9 +36,12 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
+use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
+use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ListModel extends FormModel
 {
@@ -54,10 +57,16 @@ class ListModel extends FormModel
      */
     private $leadSegmentService;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegmentService)
+    /**
+     * @var SegmentChartQueryFactory
+     */
+    private $segmentChartQueryFactory;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, ContactSegmentService $leadSegment, SegmentChartQueryFactory $segmentChartQueryFactory)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadSegmentService   = $leadSegmentService;
+        $this->coreParametersHelper     = $coreParametersHelper;
+        $this->leadSegmentService       = $leadSegment;
+        $this->segmentChartQueryFactory = $segmentChartQueryFactory;
     }
 
     /**
@@ -1652,9 +1661,17 @@ class ListModel extends FormModel
     public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
-        $query    = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $contacts = $query->fetchTimeData('lead_lists_leads', 'date_added', $filter);
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts'), $contacts);
+        $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
+
+        // added line everytime
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
+
+        // Just if we have event log data
+        // Added in 2.15 , then we can' display just from data from date range with event logs
+        if ($query->isStatsFromEventLog()) {
+            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
+            $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
+        }
 
         return $chart->render();
     }
@@ -1684,37 +1701,35 @@ class ListModel extends FormModel
     }
 
     /**
-     * Get segments which are dependent on given segment.
-     *
-     * @param int $segmentId
+     * @param      $segmentId      *
+     * @param null $returnProperty property of entity in returned array, null return all entity
      *
      * @return array
      */
-    public function getSegmentsWithDependenciesOnSegment($segmentId)
+    public function getSegmentsWithDependenciesOnSegment($segmentId, $returnProperty = 'name')
     {
-        $limit  = 1000;
-        $start  = 0;
         $filter = [
             'force'  => [
                 ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
                 ['column' => 'l.id', 'expr' => 'neq', 'value'=>$segmentId],
             ],
         ];
-
         $entities = $this->getEntities(
             [
-                'start'      => $start,
-                'limit'      => $limit,
                 'filter'     => $filter,
             ]
         );
         $dependents = [];
-
+        $accessor   = new PropertyAccessor();
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 if ('leadlist' === $eachFilter['type'] && in_array($segmentId, $eachFilter['filter'])) {
-                    $dependents[] = $entity->getName();
+                    if ($returnProperty && $value = $accessor->getValue($entity, $returnProperty)) {
+                        $dependents[] = $value;
+                    } else {
+                        $dependents[] = $entity;
+                    }
                 }
             }
         }

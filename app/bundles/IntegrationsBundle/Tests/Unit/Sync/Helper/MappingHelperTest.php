@@ -32,22 +32,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MappingHelperTest extends TestCase
 {
     /**
-     * @var FieldModel|\PHPUnit_Framework_MockObject_MockObject
+     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private $fieldModel;
 
     /**
-     * @var ObjectProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectProvider;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private $dispatcher;
 
     /**
-     * @var ObjectMappingRepository|\PHPUnit_Framework_MockObject_MockObject
+     * @var ObjectMappingRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $objectMappingRepository;
 
