@@ -430,7 +430,7 @@ class CommonApiController extends FOSRestController implements MauticController
 
         $results = $this->model->getEntities($args);
 
-        list($entities, $totalCount) = $this->prepareEntitiesForView($results);
+        [$entities, $totalCount] = $this->prepareEntitiesForView($results);
 
         $view = $this->view(
             [
@@ -802,7 +802,7 @@ class CommonApiController extends FOSRestController implements MauticController
                 ]
             );
 
-            list($entities, $total) = $prepareForSerialization
+            [$entities, $total] = $prepareForSerialization
                 ?
                 $this->prepareEntitiesForView($entities)
                 :
@@ -873,26 +873,7 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     protected function getModel($modelNameKey)
     {
-        // Shortcut for models with the same name as the bundle
-        if (false === strpos($modelNameKey, '.')) {
-            $modelNameKey = "$modelNameKey.$modelNameKey";
-        }
-
-        $parts = explode('.', $modelNameKey);
-
-        if (2 !== count($parts)) {
-            throw new \InvalidArgumentException($modelNameKey.' is not a valid model key.');
-        }
-
-        list($bundle, $name) = $parts;
-
-        $containerKey = str_replace(['%bundle%', '%name%'], [$bundle, $name], 'mautic.%bundle%.model.%name%');
-
-        if ($this->container->has($containerKey)) {
-            return $this->container->get($containerKey);
-        }
-
-        throw new \InvalidArgumentException($containerKey.' is not a registered container key.');
+        return $this->get('mautic.model.factory')->get($modelNameKey);
     }
 
     /**
