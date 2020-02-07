@@ -28,39 +28,69 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
-
-        // Remove optional services (has argument optional = true) if the service class does not exist
-        if (isset($config['services'])) {
-            $config['services'] = (new \Tightenco\Collect\Support\Collection($config['services']))
-                ->mapWithKeys(function (array $serviceGroup, string $groupName) {
-                    $serviceGroup = (new \Tightenco\Collect\Support\Collection($serviceGroup))
-                        ->reject(function ($serviceDefinition) {
-                            // Rejects services defined as optional where the service class does not exist.
-                            return is_array($serviceDefinition)
-                                && isset($serviceDefinition['optional'])
-                                && true === $serviceDefinition['optional']
-                                && isset($serviceDefinition['class'])
-                                && false === class_exists($serviceDefinition['class']);
-                        })->toArray();
-
-                    return [$groupName => $serviceGroup];
-                })->toArray();
-        }
-
-        // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
-        if (isset($config['services'])) {
-            array_walk_recursive(
-                $config['services'],
-                function (&$v, $k) {
-                    $v = str_replace('%', '%%', $v);
+        $config = (new \Tightenco\Collect\Support\Collection($config))
+            ->transform(function ($configGroup, string $configGroupName) use (&$ipLookupServices) {
+                if (!is_array($configGroup)) {
+                    return $configGroup;
                 }
-            );
-        }
 
-        // Register IP lookup services
-        if (isset($config['ip_lookup_services'])) {
-            $ipLookupServices = array_merge($ipLookupServices, $config['ip_lookup_services']);
-        }
+                $configGroup = new \Tightenco\Collect\Support\Collection($configGroup);
+
+                switch ($configGroupName) {
+                    case 'ip_lookup_services':
+                        $ipLookupServices = array_merge($ipLookupServices, $configGroup->toArray());
+                        break;
+                    case 'services':
+                        return $configGroup
+                            ->reject(function ($serviceDefinition) {
+                                // Remove optional services (has argument optional = true) if the service class does not exist
+                                return is_array($serviceDefinition)
+                                    && isset($serviceDefinition['optional'])
+                                    && true === $serviceDefinition['optional']
+                                    && isset($serviceDefinition['class'])
+                                    && false === class_exists($serviceDefinition['class']);
+                            })
+                            ->transform(function ($serviceDefinition) {
+                                // Encodes percent signs so they are not compiled in the container
+                                if (is_array($serviceDefinition)) {
+                                    array_walk_recursive(
+                                        $serviceDefinition,
+                                        function (&$value) {
+                                            $value = str_replace('%', '%%', $value);
+                                        }
+                                    );
+
+                                    return $serviceDefinition;
+                                }
+
+                                return str_replace('%', '%%', $serviceDefinition);
+                            })
+                            ->toArray();
+                        break;
+                    case 'parameters':
+                        return $configGroup
+                            // Encodes percent signs so they are not compiled in the container
+                            ->transform(function ($parameterValue) {
+                                if (is_array($parameterValue)) {
+                                    array_walk_recursive(
+                                        $parameterValue,
+                                        function (&$value) {
+                                            $value = str_replace('%', '%%', $value);
+                                        }
+                                    );
+
+                                    return $parameterValue;
+                                }
+
+                                return str_replace('%', '%%', $parameterValue);
+                            })
+                            ->toArray();
+                        break;
+                    default:
+                        return $configGroup;
+                }
+            })
+            ->toArray();
 
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
@@ -446,12 +476,12 @@ $container->loadFromExtension('fm_elfinder', [
                 'roots' => [
                     'uploads' => [
                         'driver'            => 'LocalFileSystem',
-                        'path'              => '%env(MAUTIC_EL_FINDER_PATH)%',
+                        'path'              => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                         'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
                         'upload_deny'       => ['all'],
                         'upload_max_size'   => '2M',
                         'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
-                        'url'               => '%env(MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                        'url'               => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
                     ],
                 ],
             ],
