@@ -34,6 +34,9 @@ class WebhookType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
 
+        /** @var Webhook $webhook */
+        $webhook = $builder->getData();
+
         $builder->add(
             'name',
             TextType::class,
@@ -78,8 +81,8 @@ class WebhookType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.webhook.secret.tooltip',
                 ],
-                'empty_data' => EncryptionHelper::generateKey(),
-                'required'   => false,
+                'data'     => $webhook->getSecret() ?? EncryptionHelper::generateKey(),
+                'required' => false,
             ]
         );
 
@@ -126,20 +129,24 @@ class WebhookType extends AbstractType
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $builder->add('eventsOrderbyDir', ChoiceType::class, [
-            'choices' => [
-                'mautic.core.form.default'                                  => '',
-                'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
-                'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
-            ],
-            'label' => 'mautic.webhook.config.event.orderby',
-            'attr'  => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
-            ],
-            'placeholder'       => '',
-            'required'          => false,
-            ]);
+        $builder->add(
+            'eventsOrderbyDir',
+            ChoiceType::class,
+            [
+                'choices' => [
+                    'mautic.core.form.default'                                  => '',
+                    'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
+                    'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
+                ],
+                'label' => 'mautic.webhook.config.event.orderby',
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
+                ],
+                'placeholder' => '',
+                'required'    => false,
+            ]
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver)
