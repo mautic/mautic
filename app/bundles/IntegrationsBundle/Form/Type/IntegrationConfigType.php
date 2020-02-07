@@ -78,7 +78,7 @@ class IntegrationConfigType extends AbstractType
                 [
                     'label'      => 'mautic.integration.features',
                     'label_attr' => ['class' => 'control-label'],
-                    'choices'    => $integrationObject->getSupportedFeatures(),
+                    'choices'    => array_flip($integrationObject->getSupportedFeatures()),
                     'expanded'   => true,
                     'multiple'   => true,
                     'required'   => false,
