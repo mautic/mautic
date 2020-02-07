@@ -62,7 +62,7 @@ class ModelFactory
     public function hasModel($modelNameKey)
     {
         try {
-            $this->getModel(strtolower($modelNameKey));
+            $this->getModel($modelNameKey);
 
             return true;
         } catch (\InvalidArgumentException $exception) {
