@@ -16,6 +16,7 @@ use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -117,7 +118,7 @@ class TweetType extends AbstractType
         $builder->add(
             $builder->create(
                 'page',
-                'page_list',
+                PageListType::class,
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
