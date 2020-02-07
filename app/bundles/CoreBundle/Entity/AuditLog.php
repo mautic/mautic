@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -97,9 +98,7 @@ class AuditLog
             ->length(50)
             ->build();
 
-        $builder->createField('objectId', 'integer')
-            ->columnName('object_id')
-            ->build();
+        $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder->createField('action', 'string')
             ->length(50)
