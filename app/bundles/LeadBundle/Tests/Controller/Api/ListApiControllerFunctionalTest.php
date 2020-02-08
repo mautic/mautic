@@ -30,22 +30,19 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
         }
 
-        $this->assertTrue(!empty($response['list']['id']));
+        $segmentId = $response['list']['id'];
 
-        // $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
-        // $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
-        // $this->assertEquals(4, $response['contact']['points']);
-        // $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertGreaterThan(0, $segmentId);
+        $this->assertEquals($payload['name'], $response['list']['name']);
+        $this->assertEquals($payload['description'], $response['list']['description']);
 
         // Lets try to create the same contact to see that the values are not re-setted
-        // $this->client->request('POST', '/api/contacts/new', ['email' => 'apiemail1@email.com']);
-        // $clientResponse = $this->client->getResponse();
-        // $response       = json_decode($clientResponse->getContent(), true);
+        $this->client->request('PATCH', "/api/segments/{$segmentId}/edit", ['name' => 'API segment renamed']);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
 
-        // $this->assertEquals($contactId, $response['contact']['id']);
-        // $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
-        // $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
-        // $this->assertEquals(4, $response['contact']['points']);
-        // $this->assertEquals(2, count($response['contact']['tags']));
+        $this->assertSame($segmentId, $response['list']['id'], 'ID of the created segment does not match with the edited one.');
+        $this->assertEquals('API segment renamed', $response['list']['name']);
+        $this->assertEquals($payload['description'], $response['list']['description']);
     }
 }
