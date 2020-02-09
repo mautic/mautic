@@ -11,6 +11,13 @@
 
 namespace Mautic\CoreBundle\Form;
 
+use Mautic\CoreBundle\Form\Type\BooleanType;
+use Mautic\CoreBundle\Form\Type\CountryType;
+use Mautic\CoreBundle\Form\Type\LocaleType;
+use Mautic\CoreBundle\Form\Type\MultiselectType;
+use Mautic\CoreBundle\Form\Type\RegionType;
+use Mautic\CoreBundle\Form\Type\SelectType;
+use Mautic\CoreBundle\Form\Type\TimezoneType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -34,9 +41,9 @@ trait RequestTrait
             if ($type instanceof ResolvedFormTypeInterface) {
                 $type = $type->getInnerType();
             }
-
             switch (get_class($type)) {
                 case YesNoButtonGroupType::class:
+                case BooleanType::class:
                     if (!is_object($entity)) {
                         break;
                     }
@@ -67,6 +74,12 @@ trait RequestTrait
 
                     break;
                 case ChoiceType::class:
+                case CountryType::class:
+                case LocaleType::class:
+                case MultiselectType::class:
+                case RegionType::class:
+                case SelectType::class:
+                case TimezoneType::class:
                     if (!$child->getConfig()->getOption('multiple')) {
                         break;
                     }
