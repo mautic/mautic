@@ -322,6 +322,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Payloads for the following webhook events will no longer have the lead array element: Contact Deleted Event, Contact Points Changed Event, Contact Updated Event. “lead” array element has been removed. We have the same information in the contact array element.
 *   LeadEvents::FORM_SUBMIT_REMOVE_DO_NOT_CONTACT event is removed. Listen for the LeadEvents::ON_EXECUTE_SUBMIT_ACTION instead, and check the context of `lead.remove_do_not_contact`
 *   3rd param $identifier of Constructor of Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer removed as it was not used.
+*   Entity\LeadListRepository::getLists() signature changed to accept Mautic\UserBundle\Entity\User or null as first argument
 
 ### NotificationsBundle
 

@@ -834,7 +834,7 @@ class ListModel extends FormModel
      */
     public function getUserLists($alias = '')
     {
-        $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : false;
+        $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
         return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
     }
