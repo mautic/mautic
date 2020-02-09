@@ -22,11 +22,6 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * @var bool
      */
-    private $removeEmpty = true;
-
-    /**
-     * @var bool
-     */
     private $withLabels = true;
 
     /**
@@ -37,13 +32,12 @@ class SortableListTransformer implements DataTransformerInterface
     /**
      * SortableListTransformer constructor.
      *
-     * @param bool $removeEmpty
+     * @param bool $deprecatedRemoveEmpty @deprecated; to be removed in 4.0
      * @param bool $withLabels
      * @param bool $atRootLevel
      */
-    public function __construct($removeEmpty = true, $withLabels = true, $useKeyValuePairs = false)
+    public function __construct($deprecatedRemoveEmpty = true, $withLabels = true, $useKeyValuePairs = false)
     {
-        $this->removeEmpty      = $removeEmpty;
         $this->withLabels       = $withLabels;
         $this->useKeyValuePairs = $useKeyValuePairs;
     }
@@ -87,7 +81,7 @@ class SortableListTransformer implements DataTransformerInterface
             return ['list' => []];
         }
 
-        $array['list'] = AbstractFormFieldHelper::parseList($array['list'], $this->removeEmpty);
+        $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
 
         if (!$this->withLabels) {
             $array['list'] = array_keys($array['list']);

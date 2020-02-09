@@ -770,7 +770,7 @@ class ListController extends FormController
         $listModel                    = $this->getModel('lead.list');
         $dateRangeValues              = $this->request->get('daterange', []);
         $action                       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm                = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $segmentContactsLineChartData = $listModel->getSegmentContactsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),

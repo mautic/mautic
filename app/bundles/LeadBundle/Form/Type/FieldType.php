@@ -253,7 +253,7 @@ class FieldType extends AbstractType
                         ]
                     );
 
-                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list'], true, false, true) : [];
+                    $list = isset($properties['list']) ? FormFieldHelper::parseList($properties['list']) : [];
                     $form->add(
                         'defaultValue',
                         ChoiceType::class,
@@ -262,7 +262,7 @@ class FieldType extends AbstractType
                             'label_attr'        => ['class' => 'control-label is-chosen'],
                             'attr'              => ['class' => 'form-control'],
                             'required'          => false,
-                            'choices'           => $list,
+                            'choices'           => array_flip($list),
                         ]
                     );
                     break;

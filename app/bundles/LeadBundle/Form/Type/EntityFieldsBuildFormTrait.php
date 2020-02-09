@@ -200,7 +200,7 @@ trait EntityFieldsBuildFormTrait
 
                     $emptyValue = '';
                     if (in_array($type, [SelectType::class, MultiselectType::class]) && !empty($properties['list'])) {
-                        $typeProperties['choices']      = FormFieldHelper::parseList($properties['list'], true, false, true);
+                        $typeProperties['choices']      = array_flip(FormFieldHelper::parseList($properties['list']));
                         $cleaningRules[$field['alias']] = 'raw';
                     }
                     if (BooleanType::class === $type && !empty($properties['yes']) && !empty($properties['no'])) {

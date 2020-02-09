@@ -117,8 +117,8 @@ $appendAttribute($containerAttr, 'class', $defaultContainerClass);
 
 // Setup list parsing
 if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
-    $parseList           = [];
-    $ignoreNumericalKeys = false;
+    $parseList     = [];
+    $isBooleanList = false;
 
     if (!isset($contactFields)) {
         $contactFields = [];
@@ -134,11 +134,11 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
                 $parseList = $formFields[$field['leadField']]['properties']['list'];
                 break;
             case 'boolean' == $leadFieldType:
-                $parseList = [
+                $parseList     = [
                     0 => $formFields[$field['leadField']]['properties']['no'],
                     1 => $formFields[$field['leadField']]['properties']['yes'],
                 ];
-                $ignoreNumericalKeys = true;
+                $isBooleanList = true;
                 break;
             case 'country' == $leadFieldType:
                 $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
@@ -169,7 +169,11 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
-    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type']) && in_array($formFields[$field['leadField']]['type'], ['datetime', 'date'])) {
+    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type'])
+        && in_array(
+            $formFields[$field['leadField']]['type'],
+            ['datetime', 'date']
+        )) {
         $tempLeadFieldType = $formFields[$field['leadField']]['type'];
         foreach ($parseList as $key => $aTemp) {
             if ($date = ('datetime' == $tempLeadFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
@@ -177,6 +181,12 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
             }
         }
     }
-    $list           = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList, false, $ignoreNumericalKeys);
+
+    $list = $isBooleanList
+        ?
+        \Mautic\FormBundle\Helper\FormFieldHelper::parseBooleanList($parseList)
+        :
+        \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
+
     $firstListValue = reset($list);
 }
