@@ -109,8 +109,8 @@ abstract class AbstractFormFieldHelper
             return static::parseBooleanList($list);
         }
 
-        /** @var ListParserInterface[] $scalarParsers */
-        $scalarParsers = [
+        /** @var ListParserInterface[] $parsers */
+        $parsers = [
             new JsonListParser(),
             new BarListParser(),
             new ValueListParser(),
@@ -118,7 +118,7 @@ abstract class AbstractFormFieldHelper
         ];
 
         $listParser = null;
-        foreach ($scalarParsers as $parser) {
+        foreach ($parsers as $parser) {
             try {
                 $list = $parser->parse($list);
             } catch (FormatNotSupportedException $exception) {
@@ -131,15 +131,15 @@ abstract class AbstractFormFieldHelper
 
     public static function parseBooleanList($list): array
     {
-        /** @var ListParserInterface[] $scalarParsers */
-        $scalarParsers = [
+        /** @var ListParserInterface[] $parsers */
+        $parsers = [
             new JsonListParser(),
             new BarListParser(),
             new ValueListParser(),
         ];
 
         $listParser = null;
-        foreach ($scalarParsers as $parser) {
+        foreach ($parsers as $parser) {
             try {
                 $list = $parser->parse($list);
             } catch (FormatNotSupportedException $exception) {
