@@ -116,16 +116,16 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         // Lets try to create the same segment to see that the values are not re-setted
-        $this->client->request('PATCH', '/api/segments/batch/edit', $response1);
+        $this->client->request('PATCH', '/api/segments/batch/edit', $response1['lists']);
         $clientResponse  = $this->client->getResponse();
         $response2       = json_decode($clientResponse->getContent(), true);
-        dump($response2);
+
         if (!empty($response2['errors'][0])) {
             $this->fail($response2['errors'][0]['code'].': '.$response2['errors'][0]['message']);
         }
 
         foreach ($response2['statusCodes'] as $statusCode) {
-            $this->assertSame(201, $statusCode);
+            $this->assertSame(200, $statusCode);
         }
 
         foreach ($response2['lists'] as $key => $segment) {
