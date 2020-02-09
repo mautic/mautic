@@ -12,6 +12,8 @@
 namespace Mautic\FormBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -221,7 +223,7 @@ class FormApiController extends CommonApiController
 
                 $actionEntity->setForm($entity);
 
-                $actionForm = $this->createActionEntityForm($actionEntity);
+                $actionForm = $this->createActionEntityForm($actionEntity, $actionParams);
                 $actionForm->submit($actionParams, 'PATCH' !== $method);
 
                 if (!$actionForm->isValid()) {
@@ -261,8 +263,13 @@ class FormApiController extends CommonApiController
      *
      * @return FormInterface
      */
-    protected function createActionEntityForm($entity)
+    protected function createActionEntityForm(Action $entity, array $action)
     {
+        /** @var FormModel $formModel */
+        $formModel  = $this->getModel('form');
+        $components = $formModel->getCustomComponents();
+        $type       = $action['type'] ?? $entity->getType();
+
         return $this->getModel('form.action')->createForm(
             $entity,
             $this->get('form.factory'),
@@ -270,6 +277,7 @@ class FormApiController extends CommonApiController
             [
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
+                'settings'           => $components['actions'][$type],
             ]
         );
     }
