@@ -524,7 +524,7 @@ class CampaignModel extends CommonFormModel
                     }
                 }
 
-                // no break
+            // no break
             case 'forms':
             case null:
                 $choices['forms'] = [];
@@ -580,7 +580,12 @@ class CampaignModel extends CommonFormModel
             $repo   = $this->getRepository();
             $leadId = $lead->getId();
             //get the campaigns the lead is currently part of
-            $campaigns[$leadId] = $repo->getPublishedCampaigns(null, $lead->getId(), $forList, $this->security->isGranted($this->getPermissionBase().':viewother'));
+            $campaigns[$leadId] = $repo->getPublishedCampaigns(
+                null,
+                $lead->getId(),
+                $forList,
+                $this->security->isGranted($this->getPermissionBase().':viewother')
+            );
         }
 
         return $campaigns[$lead->getId()];
@@ -598,7 +603,12 @@ class CampaignModel extends CommonFormModel
         static $campaigns = [];
 
         if (empty($campaigns)) {
-            $campaigns = $this->getRepository()->getPublishedCampaigns(null, null, $forList, $this->security->isGranted($this->getPermissionBase().':viewother'));
+            $campaigns = $this->getRepository()->getPublishedCampaigns(
+                null,
+                null,
+                $forList,
+                $this->security->isGranted($this->getPermissionBase().':viewother')
+            );
         }
 
         return $campaigns;
@@ -796,5 +806,35 @@ class CampaignModel extends CommonFormModel
         $contactLimiter = new ContactLimiter($limit);
 
         return $this->membershipBuilder->build($campaign, $contactLimiter, $maxLeads, $output);
+    }
+
+    /**
+     * @param $segmentId
+     *
+     * @return array
+     */
+    public function getCampaignIdsWithDependenciesOnSegment($segmentId)
+    {
+        $entities = $this->getRepository()->getEntities(
+            [
+                'filter'    => [
+                    'force' => [
+                        [
+                            'column' => 'l.id',
+                            'expr'   => 'eq',
+                            'value'  => $segmentId,
+                        ],
+                    ],
+                ],
+                'joinLists' => true,
+            ]
+        );
+
+        $ids = [];
+        foreach ($entities as $entity) {
+            $ids[] = $entity->getId();
+        }
+
+        return $ids;
     }
 }
