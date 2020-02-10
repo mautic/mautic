@@ -45,6 +45,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -140,6 +141,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $cacheStorageHelper;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * @var DNC
      */
     private $doNotContact;
@@ -161,6 +167,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         DeviceTracker $deviceTracker,
         RedirectRepository $redirectRepository,
         CacheStorageHelper $cacheStorageHelper,
+        ContactTracker $contactTracker,
         DNC $doNotContact
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
@@ -176,6 +183,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->deviceTracker         = $deviceTracker;
         $this->redirectRepository    = $redirectRepository;
         $this->cacheStorageHelper    = $cacheStorageHelper;
+        $this->contactTracker        = $contactTracker;
         $this->doNotContact          = $doNotContact;
     }
 
@@ -488,9 +496,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if (null !== $lead) {
             // Set the lead as current lead
             if ($activeRequest) {
-                $this->leadModel->setCurrentLead($lead);
+                $this->contactTracker->setTrackedContact($lead);
             } else {
-                $this->leadModel->setSystemCurrentLead($lead);
+                $this->contactTracker->setSystemContact($lead);
             }
         }
 

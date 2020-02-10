@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadPointLog;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
@@ -54,12 +55,23 @@ class PointModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    public function __construct(Session $session, IpLookupHelper $ipLookupHelper, LeadModel $leadModel, MauticFactory $mauticFactory)
-    {
+    /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    public function __construct(
+        Session $session,
+        IpLookupHelper $ipLookupHelper,
+        LeadModel $leadModel,
+        MauticFactory $mauticFactory,
+        ContactTracker $contactTracker
+    ) {
         $this->session            = $session;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->mauticFactory      = $mauticFactory;
+        $this->contactTracker     = $contactTracker;
     }
 
     /**
@@ -212,7 +224,7 @@ class PointModel extends CommonFormModel
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
+            $lead = $this->contactTracker->getContact();
 
             if (null === $lead || !$lead->getId()) {
                 return;

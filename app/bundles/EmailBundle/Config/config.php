@@ -643,6 +643,7 @@ return [
                     'mautic.lead.model.lead',
                     'event_dispatcher',
                     'monolog.logger.mautic',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.helper.mailer' => [
@@ -700,6 +701,7 @@ return [
                     'mautic.tracker.device',
                     'mautic.page.repository.redirect',
                     'mautic.helper.cache_storage',
+                    'mautic.tracker.contact',
                     'mautic.lead.model.dnc',
                 ],
             ],

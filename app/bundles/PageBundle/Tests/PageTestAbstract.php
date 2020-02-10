@@ -94,12 +94,6 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel->expects($this
-            ->any())
-            ->method('getCurrentLead')
-            ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
-
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()

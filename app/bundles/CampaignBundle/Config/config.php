@@ -232,11 +232,11 @@ return [
             'mautic.campaign.model.campaign' => [
                 'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,
                 'arguments' => [
-                    'mautic.lead.model.lead',
                     'mautic.lead.model.list',
                     'mautic.form.model.form',
                     'mautic.campaign.event_collector',
                     'mautic.campaign.membership.builder',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.campaign.model.event'     => [

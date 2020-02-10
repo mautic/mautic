@@ -26,7 +26,7 @@ use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
@@ -70,11 +70,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     private $auditLogModel;
 
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var DynamicContentHelper
      */
     private $dynamicContentHelper;
@@ -89,6 +84,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
      */
     private $security;
 
+    /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
     public function __construct(
         TrackableModel $trackableModel,
         PageTokenHelper $pageTokenHelper,
@@ -96,10 +96,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         FormTokenHelper $formTokenHelper,
         FocusTokenHelper $focusTokenHelper,
         AuditLogModel $auditLogModel,
-        LeadModel $leadModel,
         DynamicContentHelper $dynamicContentHelper,
         DynamicContentModel $dynamicContentModel,
-        CorePermissions $security
+        CorePermissions $security,
+        ContactTracker $contactTracker
     ) {
         $this->trackableModel       = $trackableModel;
         $this->pageTokenHelper      = $pageTokenHelper;
@@ -107,10 +107,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $this->formTokenHelper      = $formTokenHelper;
         $this->focusTokenHelper     = $focusTokenHelper;
         $this->auditLogModel        = $auditLogModel;
-        $this->leadModel            = $leadModel;
         $this->dynamicContentHelper = $dynamicContentHelper;
         $this->dynamicContentModel  = $dynamicContentModel;
         $this->security             = $security;
+        $this->contactTracker       = $contactTracker;
     }
 
     /**
@@ -205,7 +205,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function decodeTokens(PageDisplayEvent $event)
     {
-        $lead = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;
+        $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         if (!$lead) {
             return;
         }

@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusViewEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
@@ -60,7 +61,10 @@ class PublicController extends CommonController
             /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
             $model = $this->getModel('focus');
             $focus = $model->getEntity($id);
-            $lead  = $this->getModel('lead')->getCurrentLead();
+
+            /** @var ContactTracker $contactTracker */
+            $contactTracker = $this->get('mautic.tracker.contact');
+            $lead           = $contactTracker->getContact();
 
             if ($focus && $focus->isPublished() && $lead) {
                 $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);

@@ -2525,50 +2525,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the current lead; if $returnTracking = true then array with lead, trackingId, and boolean of if trackingId
-     * was just generated or not.
-     *
-     * @deprecated 2.13.0 to be removed in 3.0
-     *
-     * @param bool|false $returnTracking
-     *
-     * @return Lead|array|null
-     */
-    public function getCurrentLead($returnTracking = false)
-    {
-        @trigger_error('getCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::getContact instead', E_USER_DEPRECATED);
-
-        $trackedContact = $this->contactTracker->getContact();
-        $trackingId     = $this->contactTracker->getTrackingId();
-
-        return ($returnTracking) ? [$trackedContact, $trackingId, false] : $trackedContact;
-    }
-
-    /**
-     * Sets current lead.
-     *
-     * @deprecated 2.13.0 to be removed in 3.0; use ContactTracker::getContact instead
-     */
-    public function setCurrentLead(Lead $lead)
-    {
-        @trigger_error('setCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setTrackedContact instead', E_USER_DEPRECATED);
-
-        $this->contactTracker->setTrackedContact($lead);
-    }
-
-    /**
-     * Used by system processes that hook into events that use getCurrentLead().
-     *
-     * @param Lead $lead
-     */
-    public function setSystemCurrentLead(Lead $lead = null)
-    {
-        @trigger_error('setSystemCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setSystemContac instead', E_USER_DEPRECATED);
-
-        $this->contactTracker->setSystemContact($lead);
-    }
-
-    /**
      * Merge two leads; if a conflict of data occurs, the newest lead will get precedence.
      *
      * @deprecated 2.13.0; to be removed in 3.0. Use \Mautic\LeadBundle\Deduplicate\ContactMerger instead

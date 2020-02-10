@@ -98,9 +98,6 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pendingEvent->expects($this->once())
             ->method('failAll');
 
-        $this->leadModel->expects($this->never())
-            ->method('setSystemCurrentLead');
-
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($config, $logs, false, $pendingEvent, $this->mauticFactory);
     }
 

@@ -25,7 +25,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Tests\FormTestAbstract;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -58,11 +58,6 @@ class DeleteFormTest extends FormTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel = $this
-            ->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $fieldHelper = $this
             ->getMockBuilder(FormFieldHelper::class)
             ->disableOriginalConstructor()
@@ -75,6 +70,11 @@ class DeleteFormTest extends FormTestAbstract
 
         $formUploaderMock = $this
             ->getMockBuilder(FormUploader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $contactTracker = $this
+            ->getMockBuilder(ContactTracker::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -94,10 +94,10 @@ class DeleteFormTest extends FormTestAbstract
             $themeHelper,
             $formActionModel,
             $formFieldModel,
-            $leadModel,
             $fieldHelper,
             $leadFieldModel,
             $formUploaderMock,
+            $contactTracker,
             $columnSchemaHelper,
             $tableSchemaHelper
         );

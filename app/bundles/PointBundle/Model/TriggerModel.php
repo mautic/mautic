@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
@@ -52,12 +53,23 @@ class TriggerModel extends CommonFormModel
      */
     protected $mauticFactory;
 
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, TriggerEventModel $pointTriggerEventModel, MauticFactory $mauticFactory)
-    {
+    /**
+     * @var ContactTracker
+     */
+    protected $contactTracker;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        LeadModel $leadModel,
+        TriggerEventModel $pointTriggerEventModel,
+        MauticFactory $mauticFactory,
+        ContactTracker $contactTracker
+    ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
         $this->mauticFactory          = $mauticFactory;
+        $this->contactTracker         = $contactTracker;
     }
 
     /**
@@ -316,7 +328,7 @@ class TriggerModel extends CommonFormModel
         }
 
         if (null === $lead) {
-            $lead = $this->leadModel->getCurrentLead();
+            $lead = $this->contactTracker->getContact();
         }
 
         if (!$force) {
