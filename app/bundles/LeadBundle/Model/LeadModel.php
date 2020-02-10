@@ -2210,19 +2210,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @deprecatd 2.4; to be removed in 3.0
-     * use mautic.channel.helper.channel_list service (Mautic\ChannelBundle\Helper\ChannelListHelper) to obtain the desired channels
-     *
-     * Get contact channels.
-     *
-     * @return array
-     */
-    public function getAllChannels()
-    {
-        return $this->channelListHelper->getChannelList();
-    }
-
-    /**
      * @return array
      */
     public function getPreferenceChannels()

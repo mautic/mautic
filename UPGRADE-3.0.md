@@ -275,6 +275,10 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 
 ### LeadBundle
 
+*   LeadModel Deprecated methods removed:
+    * remove LeadModel::flattenFields use Lead::getProfileFields
+    * remove LeadModel::getFrequencyRule and use LeadModel::getFrequencyRules
+    * remove LeadModel::getAllChannels() use mautic.channel.helper.channel_list serviceremove LeadModel::getAllChannels() use mautic.channel.helper.channel_list service
 *   FieldToOrderTransformer depends on LeadFieldRepostitory instead of EntityManager.
 *   Remove the now unused Event\EventHelper class
 *   Remove the now unused Event\FormEventHelper class
