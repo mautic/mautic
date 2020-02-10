@@ -54,13 +54,13 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
 
         $choices = [];
         if ($field->isBidirectionalSyncEnabled()) {
-            $choices[ObjectMappingDAO::SYNC_BIDIRECTIONALLY] = 'mautic.integration.sync_direction_bidirectional';
+            $choices['mautic.integration.sync_direction_bidirectional'] = ObjectMappingDAO::SYNC_BIDIRECTIONALLY;
         }
         if ($field->isToIntegrationSyncEnabled()) {
-            $choices[ObjectMappingDAO::SYNC_TO_INTEGRATION] = 'mautic.integration.sync_direction_integration';
+            $choices['mautic.integration.sync_direction_integration'] = ObjectMappingDAO::SYNC_TO_INTEGRATION;
         }
         if ($field->isToMauticSyncEnabled()) {
-            $choices[ObjectMappingDAO::SYNC_TO_MAUTIC] = 'mautic.integration.sync_direction_mautic';
+            $choices['mautic.integration.sync_direction_mautic'] = ObjectMappingDAO::SYNC_TO_MAUTIC;
         }
 
         if (empty($choices)) {
