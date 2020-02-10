@@ -1070,18 +1070,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @depreacated 2.6.0 to be removed in 3.0; use getFrequencyRules() instead
-     *
-     * @param null $channel
-     *
-     * @return mixed
-     */
-    public function getFrequencyRule(Lead $lead, $channel = null)
-    {
-        return $this->getFrequencyRules($lead, $channel);
-    }
-
-    /**
      * @param string $channel
      *
      * @return mixed
