@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;
@@ -133,6 +134,11 @@ class PageTestAbstract extends WebTestCase
 
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
+        $contactTracker = $this
+            ->getMockBuilder(ContactTracker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $pageModel = new PageModel(
             $cookieHelper,
             $ipLookupHelper,
@@ -142,7 +148,8 @@ class PageTestAbstract extends WebTestCase
             $trackableModel,
             $queueService,
             $companyModel,
-            $deviceTrackerMock
+            $deviceTrackerMock,
+            $contactTracker
         );
 
         $pageModel->setDispatcher($dispatcher);

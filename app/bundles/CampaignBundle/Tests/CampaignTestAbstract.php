@@ -21,6 +21,7 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 
 class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
 {
@@ -80,7 +81,11 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
         $eventCollector    = $this->createMock(EventCollector::class);
         $membershipBuilder = $this->createMock(MembershipBuilder::class);
 
-        $campaignModel = new CampaignModel($leadModel, $leadListModel, $formModel, $eventCollector, $membershipBuilder);
+        $contactTracker = $this->getMockBuilder(ContactTracker::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $campaignModel = new CampaignModel($leadModel, $leadListModel, $formModel, $eventCollector, $membershipBuilder, $contactTracker);
 
         $leadModel->setEntityManager($entityManager);
         $leadListModel->setEntityManager($entityManager);

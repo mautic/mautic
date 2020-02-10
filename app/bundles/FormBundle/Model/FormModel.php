@@ -111,17 +111,17 @@ class FormModel extends CommonFormModel
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper
     ) {
-        $this->request             = $requestStack->getCurrentRequest();
-        $this->templatingHelper    = $templatingHelper;
-        $this->themeHelper         = $themeHelper;
-        $this->formActionModel     = $formActionModel;
-        $this->formFieldModel      = $formFieldModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->leadFieldModel      = $leadFieldModel;
-        $this->formUploader        = $formUploader;
-        $this->contactTracker      = $contactTracker;
-        $this->columnSchemaHelper  = $columnSchemaHelper;
-        $this->tableSchemaHelper   = $tableSchemaHelper;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->templatingHelper       = $templatingHelper;
+        $this->themeHelper            = $themeHelper;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->contactTracker         = $contactTracker;
+        $this->columnSchemaHelper     = $columnSchemaHelper;
+        $this->tableSchemaHelper      = $tableSchemaHelper;
     }
 
     /**
