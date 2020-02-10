@@ -51,11 +51,10 @@ class UniqueUserAliasValidator extends ConstraintValidator
             );
 
             if (count($lists)) {
-                $this->context->addViolationAt(
-                    $field,
-                    $constraint->message,
-                    ['%alias%' => $list->getAlias()]
-                );
+                $this->context->buildViolation($constraint->message)
+                    ->atPath($field)
+                    ->setParameter('%alias%', $list->getAlias())
+                    ->addViolation();
             }
         }
     }
