@@ -1557,6 +1557,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $errors = [];
 
+        $firstMail = true;
         foreach ($to as $toAddress) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash, $saveStat);
@@ -1572,6 +1573,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 if ($saveStat) {
                     $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
+                }
+
+                // If this is the first message, flush the queue before we clear the cc and bcc
+                if ($firstMail) {
+                    $errors[]  = $this->flushQueue($mailer);
+                    $firstMail = false;
                 }
 
                 // Clear CC and BCC to do not duplicate the send several times
@@ -1623,11 +1630,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         //flush the message
-        if (!$mailer->flushQueue()) {
-            $errorArray = $mailer->getErrors();
-            unset($errorArray['failures']);
-            $errors[] = implode('; ', $errorArray);
-        }
+        $errors[] = $this->flushQueue($mailer);
 
         if (isset($saveEntities)) {
             $this->getStatRepository()->saveEntities($saveEntities);
@@ -1637,6 +1640,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         unset($mailer);
 
         return $errors;
+    }
+
+    private function flushQueue(MailHelper $mailer): array
+    {
+        if (!$mailer->flushQueue()) {
+            $errorArray = $mailer->getErrors();
+            unset($errorArray['failures']);
+
+            return implode('; ', $errorArray);
+        }
+
+        return [];
     }
 
     /**
