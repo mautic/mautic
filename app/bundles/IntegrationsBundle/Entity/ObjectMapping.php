@@ -101,10 +101,7 @@ class ObjectMapping
             ->columnName('internal_object_name')
             ->build();
 
-        $builder
-            ->createField('internalObjectId', Type::INTEGER)
-            ->columnName('internal_object_id')
-            ->build();
+        $builder->addBigIntIdField('internalObjectId', 'internal_object_id', false);
 
         $builder
             ->createField('integrationObjectName', Type::STRING)

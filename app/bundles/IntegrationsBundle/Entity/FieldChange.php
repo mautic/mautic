@@ -76,10 +76,7 @@ class FieldChange
             ->createField('integration', Type::STRING)
             ->build();
 
-        $builder
-            ->createField('objectId', Type::INTEGER)
-            ->columnName('object_id')
-            ->build();
+        $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder
             ->createField('objectType', Type::STRING)

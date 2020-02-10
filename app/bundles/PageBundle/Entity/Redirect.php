@@ -67,7 +67,7 @@ class Redirect extends FormEntity
         $builder->setTable('page_redirects')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\RedirectRepository');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('redirectId', 'string')
             ->columnName('redirect_id')

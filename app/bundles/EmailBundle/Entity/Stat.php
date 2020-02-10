@@ -148,7 +148,7 @@ class Stat
             ->addIndex(['date_sent'], 'email_date_sent')
             ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('email', 'Email')
             ->inversedBy('stats')

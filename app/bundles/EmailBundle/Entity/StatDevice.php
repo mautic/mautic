@@ -55,7 +55,7 @@ class StatDevice
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
             ->addIndex(['date_opened'], 'date_opened_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
             ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')

@@ -118,7 +118,7 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_notification_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_notification_source_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('notification', 'Notification')
             ->inversedBy('stats')
