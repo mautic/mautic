@@ -23,14 +23,8 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class SortableListType.
- */
 class SortableListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $constraints = ($options['option_required']) ? [
@@ -80,21 +74,15 @@ class SortableListType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels'], $options['key_value_pairs']));
+        )->addModelTransformer(new SortableListTransformer($options['with_labels'], $options['key_value_pairs']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['isSortable']     = (!empty($options['sortable']));
         $view->vars['addValueButton'] = $options['add_value_button'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -125,9 +113,6 @@ class SortableListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
         return 'sortablelist';

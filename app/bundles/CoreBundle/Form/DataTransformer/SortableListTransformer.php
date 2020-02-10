@@ -14,9 +14,6 @@ namespace Mautic\CoreBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 
-/**
- * Class SortableListTransformer.
- */
 class SortableListTransformer implements DataTransformerInterface
 {
     /**
@@ -30,21 +27,16 @@ class SortableListTransformer implements DataTransformerInterface
     private $useKeyValuePairs = false;
 
     /**
-     * SortableListTransformer constructor.
-     *
-     * @param bool $deprecatedRemoveEmpty @deprecated; to be removed in 4.0
      * @param bool $withLabels
      * @param bool $atRootLevel
      */
-    public function __construct($deprecatedRemoveEmpty = true, $withLabels = true, $useKeyValuePairs = false)
+    public function __construct($withLabels = true, $useKeyValuePairs = false)
     {
         $this->withLabels       = $withLabels;
         $this->useKeyValuePairs = $useKeyValuePairs;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function transform($array)
@@ -57,8 +49,6 @@ class SortableListTransformer implements DataTransformerInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return array
      */
     public function reverseTransform($array)
@@ -72,8 +62,6 @@ class SortableListTransformer implements DataTransformerInterface
 
     /**
      * @param $array
-     *
-     * @return mixed
      */
     private function formatList($array)
     {
