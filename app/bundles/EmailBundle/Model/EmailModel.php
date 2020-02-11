@@ -1788,9 +1788,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param bool   $canViewOthers
+     * @param          $reason
+     * @param          $canViewOthers
+     * @param int|null $companyId
+     * @param int|null $campaignId
+     * @param int|null $segmentId
      *
      * @return array
      */
