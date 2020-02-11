@@ -1564,26 +1564,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             if (!$mailer->addTo($toAddress)) {
                 $errors[] = "{$toAddress}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
-            } else {
-                if (!$mailer->queue(true)) {
-                    $errorArray = $mailer->getErrors();
-                    unset($errorArray['failures']);
-                    $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
-                }
+                continue;
+            }
 
-                if ($saveStat) {
-                    $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
-                }
+            if (!$mailer->queue(true)) {
+                $errorArray = $mailer->getErrors();
+                unset($errorArray['failures']);
+                $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
+            }
 
-                // If this is the first message, flush the queue before we clear the cc and bcc
-                if ($firstMail) {
-                    $errors[]  = $this->flushQueue($mailer);
-                    $firstMail = false;
-                }
+            if ($saveStat) {
+                $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
+            }
 
-                // Clear CC and BCC to do not duplicate the send several times
-                $mailer->setCc([]);
-                $mailer->setBcc([]);
+            // If this is the first message, flush the queue. This process clears the cc and bcc.
+            if (true === $firstMail) {
+                $errors[]  = $this->flushQueue($mailer);
+                $firstMail = false;
             }
         }
 
@@ -1612,20 +1609,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             if (!$mailer->setTo($user['email'], $user['firstname'].' '.$user['lastname'])) {
                 $errors[] = "{$user['email']}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
-            } else {
-                if (!$mailer->queue(true)) {
-                    $errorArray = $mailer->getErrors();
-                    unset($errorArray['failures']);
-                    $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
-                }
+                continue;
+            }
 
-                if ($saveStat) {
-                    $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
-                }
+            if (!$mailer->queue(true)) {
+                $errorArray = $mailer->getErrors();
+                unset($errorArray['failures']);
+                $errors[] = "{$user['email']}: ".implode('; ', $errorArray);
+            }
 
-                // Clear CC and BCC to do not duplicate the send several times
-                $mailer->setCc([]);
-                $mailer->setBcc([]);
+            if ($saveStat) {
+                $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
+            }
+
+            // If this is the first message, flush the queue. This process clears the cc and bcc.
+            if (true === $firstMail) {
+                $this->flushQueue($mailer);
+                $firstMail = false;
             }
         }
 
