@@ -212,10 +212,16 @@ $configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getPara
 // Set template engines
 $engines = ['php', 'twig'];
 
-// Decide on secure cookie based on site_url setting
+// Decide on secure cookie based on site_url setting or the request if in installer
 // This cannot be set dynamically
-$siteUrl      = $configParameterBag->get('site_url');
-$secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+
+if (defined('MAUTIC_INSTALLER')) {
+    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $secureCookie = $request->isSecure();
+} else {
+    $siteUrl      = $configParameterBag->get('site_url');
+    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+}
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
