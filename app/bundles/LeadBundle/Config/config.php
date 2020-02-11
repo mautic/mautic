@@ -421,7 +421,10 @@ return [
                 ],
             ],
             'mautic.lead.pointbundle.subscriber' => [
-                'class' => \Mautic\LeadBundle\EventListener\PointSubscriber::class,
+                'class'     => \Mautic\LeadBundle\EventListener\PointSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
             ],
             'mautic.lead.search.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SearchSubscriber::class,
