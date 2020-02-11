@@ -58,10 +58,6 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             ->method('getFormList')
             ->will($this->returnValue([['id' => self::$mockId, 'name' => self::$mockName]]));
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $leadListModel = $this->getMockBuilder(ListModel::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,9 +81,8 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $campaignModel = new CampaignModel($leadModel, $leadListModel, $formModel, $eventCollector, $membershipBuilder, $contactTracker);
+        $campaignModel = new CampaignModel($leadListModel, $formModel, $eventCollector, $membershipBuilder, $contactTracker);
 
-        $leadModel->setEntityManager($entityManager);
         $leadListModel->setEntityManager($entityManager);
         $formModel->setEntityManager($entityManager);
         $campaignModel->setEntityManager($entityManager);
