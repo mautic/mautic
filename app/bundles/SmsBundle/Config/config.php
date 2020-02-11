@@ -306,8 +306,8 @@ return [
         'sms_username'             => null,
         'sms_password'             => null,
         'sms_sending_phone_number' => null,
-        'sms_frequency_number'     => null,
-        'sms_frequency_time'       => null,
+        'sms_frequency_number'     => 0,
+        'sms_frequency_time'       => 0,
         'sms_transport'            => 'mautic.sms.twilio.transport',
     ],
 ];

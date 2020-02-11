@@ -247,10 +247,6 @@ class CheckStep implements StepInterface
             }
         }
 
-        if (!extension_loaded('apcu') || !ini_get('apc.enabled')) {
-            $messages[] = 'mautic.install.extension.apcu';
-        }
-
         return $messages;
     }
 
