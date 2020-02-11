@@ -568,6 +568,10 @@ return [
             ],
         ],
         'other' => [
+            'mautic.cache.warmer.middleware' => [
+                'class' => \Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class,
+                'tag'   => 'kernel.cache_warmer',
+            ],
             'mautic.http.client' => [
                 'class' => GuzzleHttp\Client::class,
             ],
