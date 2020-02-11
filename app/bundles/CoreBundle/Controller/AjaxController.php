@@ -672,30 +672,6 @@ class AjaxController extends CommonController
      *
      * @return JsonResponse
      */
-    protected function updateUserStatusAction(Request $request)
-    {
-        $status = InputHelper::clean($request->request->get('status'));
-
-        /** @var \Mautic\UserBundle\Model\UserModel $model */
-        $model = $this->getModel('user');
-
-        $currentStatus = $this->user->getOnlineStatus();
-        if (!in_array($currentStatus, ['manualaway', 'dnd'])) {
-            if ($status == 'back') {
-                $status = 'online';
-            }
-
-            $model->setOnlineStatus($status);
-        }
-
-        return $this->sendJsonResponse(['success' => 1]);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return JsonResponse
-     */
     protected function clearNotificationAction(Request $request)
     {
         $id = InputHelper::int($request->get('id', 0));
