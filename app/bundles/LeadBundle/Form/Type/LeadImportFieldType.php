@@ -56,11 +56,16 @@ class LeadImportFieldType extends AbstractType
             'mautic.lead.import.label.ownerusername'  => 'ownerusername',
         ];
 
-        $importChoiceFields = [
-            'mautic.lead.contact'        => array_flip($options['lead_fields']),
-            'mautic.lead.company'        => array_flip($options['company_fields']),
-            'mautic.lead.special_fields' => $specialFields,
+        $fieldGroups = [
+            'mautic.lead.contact',
+            'mautic.lead.company',
+            'mautic.lead.special_fields',
         ];
+
+        $importChoiceFields = [];
+        foreach ($fieldGroups as $fieldGroup) {
+            $importChoiceFields[$fieldGroup] = array_flip($options['all_fields'][$fieldGroup]);
+        }
 
         if ('lead' !== $options['object']) {
             unset($importChoiceFields['mautic.lead.contact']);
