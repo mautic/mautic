@@ -103,6 +103,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   Removed deprecated \Mautic\CoreBundle\Templating\Helper\ButtonHelper::renderPreCustomButtons use renderButtons() instead
 *   Removed deprecated \Mautic\CoreBundle\Templating\Helper\ButtonHelper::renderPostCustomButtons
 *   Removed deprecated \Mautic\CoreBundle\Templating\Helper\ButtonHelper::setCustomButtons; listen to  CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS event instead
+*   Removed command class GenerateMigrationsCommand as it was broken with new Doctrine. Instead of `mautic:migrations:migrate` use command `doctrine:migrations:migrate` to generate a migration class.
 *   Abstract class CommonStatsSubscriber was refactored out of CommonSubscriber and so it needs its own dependencies: CorePermissions and EntityManager. All classes extending CommonStatsSubscriber must provide those dependencies.
 *   Protected methods CommonStatsSubscriber::addContactRestrictedRepositories() and CommonStatsSubscriber::addContactRestrictedRepositories() do not have the first parameter of EntityManager. See the point above. The second parameter must be an array now.
 *   CommonSubscriber removed. Implement Symfony\Component\EventDispatcher\EventSubscriberInterface directly and use DI instead.
