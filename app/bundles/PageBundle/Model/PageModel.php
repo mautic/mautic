@@ -46,9 +46,6 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class PageModel.
- */
 class PageModel extends FormModel
 {
     use TranslationModelTrait;
@@ -59,11 +56,6 @@ class PageModel extends FormModel
      * @var bool
      */
     protected $catInUrl;
-
-    /**
-     * @var bool
-     */
-    protected $trackByFingerprint;
 
     /**
      * @var CookieHelper
@@ -492,9 +484,7 @@ class PageModel extends FormModel
         $hit->setCode($code);
 
         $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
-        if (!empty($query['fingerprint']) && $trackedDevice->getDeviceFingerprint() !== $query['fingerprint']) {
-            $trackedDevice->setDeviceFingerprint($query['fingerprint']);
-        }
+
         $hit->setTrackingId($trackedDevice->getTrackingId());
         $hit->setDeviceStat($trackedDevice);
 

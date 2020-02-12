@@ -109,6 +109,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   EventPass removed as it was not needed after the CommonSubscriber was removed.
 *   BabDev/Transifex/* classes were replaced with Mautic/Transifex/*
 *   Mautic\CoreBundle\IpLookup\MaxmindLookup was renamed to Mautic\CoreBundle\IpLookup\AbstractMaxmindLookup and set as abstract class
+*   Fingerprint2 JS library was removed.
 *   \Mautic\CoreBundle\CoreParametersHelper can no longer be used to fetch other Symfony parameters, `mautic.paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. 
     * For Symfony parameters: Pass them as needed to the constructor of the service
     * For `mautic.bundles` or `mautic.plugin.bundles` use \Mautic\CoreBundle\Helper\BundleHelper::getMauticBundles() or getPluginBundles() instead
@@ -281,6 +282,8 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Class PointTriggerType removed as it was not used anywhere.
 *   Class TagListType removed as it was not used anywhere.
 *   Class Mautic\LeadBundle\Form\DataTransformer\UtmTagEntityModelTransformer removed as it was not used anywhere.
+*   Property (column) LeadDevice::deviceFingerprint was removed together with its setter and getter.
+*   Method LeadDeviceRepository::getDeviceByFingerprint() removed.
 *   Deprecated class EmailTokenHelper removed.
 *   Deprecated routes removed:
     *   mautic_contact_import_index - /s/{object}/import/{page}

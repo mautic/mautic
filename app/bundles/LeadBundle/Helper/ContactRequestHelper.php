@@ -171,7 +171,7 @@ class ContactRequestHelper
             }
         }
 
-        return $this->getContactByFingerprint();
+        throw new ContactNotFoundException();
     }
 
     /**
@@ -214,35 +214,6 @@ class ContactRequestHelper
 
             return;
         }
-    }
-
-    /**
-     * @return Lead
-     *
-     * @throws ContactNotFoundException
-     */
-    private function getContactByFingerprint()
-    {
-        if (!$this->coreParametersHelper->get('track_by_fingerprint')) {
-            // Track by fingerprint is disabled so just use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if (!$this->trackedContact->isAnonymous() || empty($this->queryFields['fingerprint'])) {
-            // We already know who this is or fingerprint is not available so just use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if ($device = $this->leadDeviceRepository->getDeviceByFingerprint($this->queryFields['fingerprint'])) {
-            $deviceLead = $this->leadModel->getEntity($device['lead_id']);
-
-            $this->logger->addDebug("LEAD: Contact ID# {$deviceLead->getId()} tracked through fingerprint.");
-
-            // Merge tracked visitor into the contact found by fingerprint
-            return $this->mergeWithTrackedContact($deviceLead);
-        }
-
-        throw new ContactNotFoundException();
     }
 
     private function prepareContactFromRequest()
