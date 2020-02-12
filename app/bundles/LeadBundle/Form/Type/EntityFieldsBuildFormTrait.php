@@ -148,7 +148,7 @@ trait EntityFieldsBuildFormTrait
                         $opts['with_seconds']   = true;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
-                    } elseif ('date' == $type) {
+                    } elseif (DateType::class == $type) {
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                     } else {
                         $opts['model_timezone'] = 'UTC';
