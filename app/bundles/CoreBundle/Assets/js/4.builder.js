@@ -1537,7 +1537,7 @@ Mautic.initSlotListeners = function() {
             params.slot.find('label.label3').text(params.field.val());
         } else if ('label-text4' === fieldParam) {
             params.slot.find('label.label4').text(params.field.val());
-        } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
+        } else if ('flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
             params.slot.find('a').eq(0).attr('href', params.field.val());

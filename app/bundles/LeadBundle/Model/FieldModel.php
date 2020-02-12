@@ -172,11 +172,6 @@ class FieldModel extends FormModel
             'group'    => 'social',
             'object'   => 'lead',
         ],
-        'googleplus' => [
-            'listable' => true,
-            'group'    => 'social',
-            'object'   => 'lead',
-        ],
         'instagram' => [
             'listable' => true,
             'group'    => 'social',
