@@ -363,6 +363,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Deprecated method MauticPlugin\MauticSocialBundle\Command\MonitorTwitterBaseCommand::createLeadsFromStatuses removed
 *   Deprecated method MauticPlugin\MauticSocialBundle\Command\MonitorTwitterBaseCommand::getTwitterIntegration removed
 *   Deprecated method MauticPlugin\MauticSocialBundle\Command\MonitorTwitterBaseCommand::buildTwitterSearchQueryy removed
+*   Classes GooglePlusType and GooglePlusIntegration removed as Google+ social network does not exist anymore.
 
 ### UserBundle
 
