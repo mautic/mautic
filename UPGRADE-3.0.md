@@ -320,6 +320,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Deprecated method ListModel::getLeadsByList() was removed.
 *   Signature of ListModel::getLifeCycleSegments() method changed. 4th param is not array of $filters but bool of $canViewOthers. That method was actually called with bool anyway.
 *   Signature of ListModel::getTopLists() method changed. 3th param is not array of $filters but bool of $canViewOthers. That method was actually called with bool anyway.
+*   Signature of ContactRequestHelper::__construct() method changed. 5th param removed.
 *   Deprecated method DateDecorator::getDefaultDate() was removed.
 *   Deprecated cookie mautic_session_id will no longer be created.
 *   Payloads for the following webhook events will no longer have the lead array element: Contact Deleted Event, Contact Points Changed Event, Contact Updated Event. “lead” array element has been removed. We have the same information in the contact array element.

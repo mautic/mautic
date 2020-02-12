@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
@@ -42,11 +41,6 @@ class ContactRequestHelper
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
-
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
 
     /**
      * @var IpLookupHelper
@@ -83,15 +77,11 @@ class ContactRequestHelper
      */
     private $publiclyUpdatableFieldValues = [];
 
-    /**
-     * ContactRequestHelper constructor.
-     */
     public function __construct(
         LeadModel $leadModel,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         IpLookupHelper $ipLookupHelper,
-        LeadDeviceRepository $leadDeviceRepository,
         RequestStack $requestStack,
         Logger $logger,
         EventDispatcherInterface $eventDispatcher
@@ -100,7 +90,6 @@ class ContactRequestHelper
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadDeviceRepository = $leadDeviceRepository;
         $this->request              = $requestStack->getCurrentRequest();
         $this->logger               = $logger;
         $this->eventDispatcher      = $eventDispatcher;
