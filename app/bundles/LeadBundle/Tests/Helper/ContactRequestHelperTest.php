@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -55,11 +54,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     private $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
     private $requestStack;
@@ -80,7 +74,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $this->leadDeviceRepository = $this->createMock(LeadDeviceRepository::class);
         $this->requestStack         = $this->createMock(RequestStack::class);
         $this->logger               = $this->createMock(Logger::class);
         $this->dispatcher           = $this->createMock(EventDispatcher::class);
@@ -241,7 +234,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->coreParametersHelper,
             $this->ipLookupHelper,
-            $this->leadDeviceRepository,
             $this->requestStack,
             $this->logger,
             $this->dispatcher
