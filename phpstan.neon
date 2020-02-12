@@ -25,5 +25,4 @@ parameters:
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
 		- '#Constant MAUTIC_ENV not found.#'
 		- '#Constant MAUTIC_VERSION not found.#'
-		- '#Constant MAUTIC_ROOT_DIR not found.#'
 		- '/Variable \$\w+ might not be defined\./'

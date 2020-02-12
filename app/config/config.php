@@ -300,10 +300,11 @@ $container->loadFromExtension('doctrine', [
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'   => '%kernel.root_dir%/migrations',
-    'namespace'  => 'Mautic\\Migrations',
-    'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
-    'name'       => 'Mautic Migrations',
+    'dir_name'        => '%kernel.root_dir%/migrations',
+    'namespace'       => 'Mautic\\Migrations',
+    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+    'name'            => 'Mautic Migrations',
+    'custom_template' => '%kernel.root_dir%/migrations/Migration.template',
 ]);
 
 // Swiftmailer Configuration
