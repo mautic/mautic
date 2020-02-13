@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,7 +35,7 @@ class oAuthHelper
 
     private $request;
 
-    public function __construct(AbstractIntegration $integration, Request $request = null, $settings = [])
+    public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();

@@ -44,7 +44,7 @@ class PublicController extends CommonController
             }
 
             $ch = curl_init($url);
-            if ('post' === strtolower($request->server->get('REQUEST_METHOD', ''))) {
+            if (Request::METHOD_POST === $request->getMethod()) {
                 $headers = [
                     'Content-type: application/json',
                     'Accept: application/json',
@@ -71,8 +71,7 @@ class PublicController extends CommonController
         $response = new Response($json, $status['http_code']);
 
         // Generate appropriate content-type header.
-        $is_xhr = 'xmlhttprequest' === strtolower($request->server->get('HTTP_X_REQUESTED_WITH', null));
-        $response->headers->set('Content-type', 'application/'.($is_xhr ? 'json' : 'x-javascript'));
+        $response->headers->set('Content-type', 'application/'.($request->isXmlHttpRequest() ? 'json' : 'x-javascript'));
 
         // Allow CORS requests only from dev machines
         $allowedIps = $this->coreParametersHelper->get('dev_hosts') ?: [];
