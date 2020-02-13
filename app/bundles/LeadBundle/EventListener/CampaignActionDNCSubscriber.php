@@ -90,7 +90,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
                 $dnc = $this->doNotContact->addDncForContact(
                     $contactId,
                     $channel,
-                    \Mautic\LeadBundle\Entity\DoNotContact::MANUAL,
+                    \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED,
                     $reason,
                     false
                 );
@@ -110,12 +110,15 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
         $contacts        = $event->getContactsKeyedById();
+        $reasons         = [\Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED, \Mautic\LeadBundle\Entity\DoNotContact::MANUAL];
+
         foreach ($contacts as $contactId=>$contact) {
             foreach ($channels as $channel) {
                 $this->doNotContact->removeDncForContact(
                     $contactId,
                     $channel,
-                    false
+                    false,
+                    $reasons
                 );
             }
         }

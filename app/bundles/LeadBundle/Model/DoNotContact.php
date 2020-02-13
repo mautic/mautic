@@ -39,10 +39,10 @@ class DoNotContact
     /**
      * Remove a Lead's DNC entry based on channel.
      *
-     * @param int       $contactId
-     * @param string    $channel
-     * @param bool|true $persist
-     * @param int|null  $reason
+     * @param int            $contactId
+     * @param string         $channel
+     * @param bool|true      $persist
+     * @param array|int|null $reason
      *
      * @return bool
      */
@@ -55,7 +55,10 @@ class DoNotContact
             if ($dnc->getChannel() === $channel) {
                 // Skip if reason doesn't match
                 // Some integrations (Sugar CRM) can use both reasons (unsubscribed, bounced)
-                if ($reason && $dnc->getReason() != $reason) {
+                if (!is_array($reason)) {
+                    $reason = [$reason];
+                }
+                if ($reason && !in_array($dnc->getReason(), $reason)) {
                     continue;
                 }
                 $contact->removeDoNotContactEntry($dnc);
@@ -76,8 +79,8 @@ class DoNotContact
      *
      * @param int          $contactId
      * @param string|array $channel                  If an array with an ID, use the structure ['email' => 123]
-     * @param string       $comments
      * @param int          $reason                   Must be a class constant from the DoNotContact class
+     * @param string       $comments
      * @param bool         $persist
      * @param bool         $checkCurrentStatus
      * @param bool         $allowUnsubscribeOverride
@@ -114,7 +117,8 @@ class DoNotContact
             /** @var DNC $dnc */
             foreach ($contact->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves or if the code forces it
-                $allowOverride = ($allowUnsubscribeOverride || DNC::UNSUBSCRIBED !== $dnc->getReason());
+
+                $allowOverride = ($allowUnsubscribeOverride || !in_array($dnc->getReason(), [DNC::UNSUBSCRIBED, DNC::BOUNCED]));
 
                 // Only update if the contact did not unsubscribe themselves
                 if ($allowOverride && $dnc->getChannel() === $channel) {
