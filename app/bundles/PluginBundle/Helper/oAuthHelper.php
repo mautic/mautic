@@ -35,13 +35,6 @@ class oAuthHelper
 
     private $request;
 
-    /**
-     * oAuthHelper constructor.
-     *
-     * @param UnifiedIntegrationInterface $integration
-     * @param Request|null                $request
-     * @param array                       $settings
-     */
     public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
