@@ -18,7 +18,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class CookieHelper
 {
-    const SAME_SITE_NONE = '; samesite=none';
+    const SAME_SITE = '; samesite=';
+    const SAME_SITE_VALUE = 'none';
     private $path        = null;
     private $domain      = null;
     private $secure      = false;
@@ -79,19 +80,34 @@ class CookieHelper
 
         // If https, SameSite equals None
         $sameSiteNoneText = '';
+        $sameSiteNoneTextGreaterPhp73 = null;
         if ($secure === true or ($secure === null and $this->secure === true)) {
-            $sameSiteNoneText = self::SAME_SITE_NONE;
+            $sameSiteNoneText = self::SAME_SITE . self::SAME_SITE_VALUE;
+            $sameSiteNoneTextGreaterPhp73 = self::SAME_SITE_VALUE;
         }
 
-        setcookie(
-            $name,
-            $value,
-            ($expire) ? (int) (time() + $expire) : null,
-            (($path == null) ? $this->path : $path).$sameSiteNoneText,
-            ($domain == null) ? $this->domain : $domain,
-            ($secure == null) ? $this->secure : $secure,
-            ($httponly == null) ? $this->httponly : $httponly
-        );
+        if (version_compare(phpversion(), '7.3', '>=')) {
+            setcookie(
+                $name,
+                $value,
+                ($expire) ? (int) (time() + $expire) : null,
+                (($path == null) ? $this->path : $path).$sameSiteNoneText,
+                ($domain == null) ? $this->domain : $domain,
+                ($secure == null) ? $this->secure : $secure,
+                ($httponly == null) ? $this->httponly : $httponly,
+                $sameSiteNoneTextGreaterPhp73
+            );
+        } else {
+            setcookie(
+                $name,
+                $value,
+                ($expire) ? (int) (time() + $expire) : null,
+                (($path == null) ? $this->path : $path),
+                ($domain == null) ? $this->domain : $domain,
+                ($secure == null) ? $this->secure : $secure,
+                ($httponly == null) ? $this->httponly : $httponly
+            );
+        }
     }
 
     /**
