@@ -17,11 +17,11 @@ class CookieHelper
 {
     const SAME_SITE       = '; SameSite=';
     const SAME_SITE_VALUE = 'None';
-    private $path         = null;
-    private $domain       = null;
+    private $path;
+    private $domain;
     private $secure       = false;
     private $httponly     = false;
-    private $request      = null;
+    private $request;
 
     /**
      * @param $cookiePath
