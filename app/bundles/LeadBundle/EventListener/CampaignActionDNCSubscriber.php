@@ -90,7 +90,7 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
                 $dnc = $this->doNotContact->addDncForContact(
                     $contactId,
                     $channel,
-                    \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED,
+                    \Mautic\LeadBundle\Entity\DoNotContact::MANUAL,
                     $reason,
                     false
                 );
