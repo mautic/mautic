@@ -402,7 +402,7 @@ $container->loadFromExtension('framework', [
     ],
 ]);
 
-$rateLimit = $configParameterBag->get('api_rate_limiter_limit');
+$rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
   'enabled'        => 0 === $rateLimit ? false : true,
   'storage_engine' => 'cache',
