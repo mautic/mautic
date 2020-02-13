@@ -15,9 +15,9 @@ use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\PluginEvents;
 use MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 
-class IntegrationRequestSubscriberTest extends PHPUnit_Framework_TestCase
+class IntegrationRequestSubscriberTest extends TestCase
 {
     /** @var PluginIntegrationRequestEvent */
     protected $event;
