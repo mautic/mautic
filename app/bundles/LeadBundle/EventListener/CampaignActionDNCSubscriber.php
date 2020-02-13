@@ -83,22 +83,24 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
         $reason          = ArrayHelper::getValue('reason', $config, '');
-        $persistEntities = [];
+        $dncPersists     = [];
         $contacts        = $event->getContactsKeyedById();
         foreach ($contacts as $contactId=>$contact) {
             foreach ($channels as $channel) {
-                $this->doNotContact->addDncForContact(
+                $dnc = $this->doNotContact->addDncForContact(
                     $contactId,
                     $channel,
                     \Mautic\LeadBundle\Entity\DoNotContact::MANUAL,
                     $reason,
-                    false
+                   false
                 );
+                if ($dnc) {
+                    $dncPersists[] = $dnc;
+                }
             }
-            $persistEntities[] = $contact;
         }
-
-        $this->leadModel->saveEntities($persistEntities);
+        $this->doNotContact->getDncRepo()->saveEntities($dncPersists);
+        $this->leadModel->saveEntities($contacts);
 
         $event->passAll();
     }
@@ -107,20 +109,23 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
-        $persistEntities = [];
+        $dncPersists     = [];
         $contacts        = $event->getContactsKeyedById();
         foreach ($contacts as $contactId=>$contact) {
             foreach ($channels as $channel) {
-                $this->doNotContact->removeDncForContact(
+                $dnc = $this->doNotContact->removeDncForContact(
                     $contactId,
                     $channel,
-                    true
+                    false
                 );
+                if ($dnc) {
+                    $dncPersists[] = $dnc;
+                }
             }
-            $persistEntities[] = $contact;
         }
 
-        $this->leadModel->saveEntities($persistEntities);
+        $this->doNotContact->getDncRepo()->saveEntities($dncPersists);
+        $this->leadModel->saveEntities($contacts);
 
         $event->passAll();
     }
