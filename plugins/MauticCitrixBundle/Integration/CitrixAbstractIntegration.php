@@ -29,9 +29,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         return [];
     }
 
-    /**
-     * @param Integration $settings
-     */
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /
@@ -42,17 +39,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         }
 
         parent::setIntegrationSettings($settings);
-    }
-
-    /**
-     * Refresh tokens.
-     */
-    public function getRefreshTokenKeys()
-    {
-        return [
-            'refresh_token',
-            'expires_in',
-        ];
     }
 
     /**
