@@ -95,7 +95,9 @@ class CookieHelper
                 ($domain == null) ? $this->domain : $domain,
                 ($secure == null) ? $this->secure : $secure,
                 ($httponly == null) ? $this->httponly : $httponly,
-                $sameSiteNoneTextGreaterPhp73
+                [
+                    'samesite' => $sameSiteNoneTextGreaterPhp73
+                ]
             );
         } else {
             setcookie(
