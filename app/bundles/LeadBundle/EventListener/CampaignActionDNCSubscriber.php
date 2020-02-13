@@ -109,22 +109,16 @@ class CampaignActionDNCSubscriber implements EventSubscriberInterface
     {
         $config          = $event->getEvent()->getProperties();
         $channels        = ArrayHelper::getValue('channels', $config, []);
-        $dncPersists     = [];
         $contacts        = $event->getContactsKeyedById();
         foreach ($contacts as $contactId=>$contact) {
             foreach ($channels as $channel) {
-                $dnc = $this->doNotContact->removeDncForContact(
+                $this->doNotContact->removeDncForContact(
                     $contactId,
                     $channel,
                     false
                 );
-                if ($dnc) {
-                    $dncPersists[] = $dnc;
-                }
             }
         }
-
-        $this->doNotContact->getDncRepo()->saveEntities($dncPersists);
         $this->leadModel->saveEntities($contacts);
 
         $event->passAll();
