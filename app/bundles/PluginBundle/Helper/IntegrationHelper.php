@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
@@ -662,7 +663,7 @@ class IntegrationHelper
         } elseif ($integration instanceof Plugin) {
             // A bundle so check for an icon
             $icon = $pluginPath.'/'.$integration->getBundle().'/Assets/img/icon.png';
-        } elseif ($integration instanceof AbstractIntegration) {
+        } elseif ($integration instanceof UnifiedIntegrationInterface) {
             return $integration->getIcon();
         }
 
