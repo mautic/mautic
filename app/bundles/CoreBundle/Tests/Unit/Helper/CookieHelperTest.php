@@ -50,7 +50,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $cookie = $this->getCookie($cookieName);
-        $this->assertContains('samesite=none', $cookie);
+        $this->assertContains('SameSite=None', $cookie);
         $this->assertContains('secure', $cookie);
     }
 
@@ -75,7 +75,7 @@ class CookieHelperTest extends \PHPUnit\Framework\TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $cookie = $this->getCookie($cookieName);
-        $this->assertNotContains('samesite=none', $cookie);
+        $this->assertNotContains('SameSite=None', $cookie);
         $this->assertNotContains('secure', $cookie);
     }
 

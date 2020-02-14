@@ -15,11 +15,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CookieHelper
 {
-    const SAME_SITE_NONE = '; samesite=none';
+    const SAME_SITE       = '; SameSite=';
+    const SAME_SITE_VALUE = 'None';
     private $path;
     private $domain;
-    private $secure   = false;
-    private $httponly = false;
+    private $secure       = false;
+    private $httponly     = false;
     private $request;
 
     /**
@@ -72,20 +73,37 @@ class CookieHelper
         }
 
         // If https, SameSite equals None
-        $sameSiteNoneText = '';
+        $sameSiteNoneText             = '';
+        $sameSiteNoneTextGreaterPhp73 = null;
         if (true === $secure or (null === $secure and true === $this->secure)) {
-            $sameSiteNoneText = self::SAME_SITE_NONE;
+            $sameSiteNoneText             = self::SAME_SITE.self::SAME_SITE_VALUE;
+            $sameSiteNoneTextGreaterPhp73 = self::SAME_SITE_VALUE;
         }
 
-        setcookie(
-            $name,
-            $value,
-            ($expire) ? (int) (time() + $expire) : null,
-            ((null == $path) ? $this->path : $path).$sameSiteNoneText,
-            (null == $domain) ? $this->domain : $domain,
-            (null == $secure) ? $this->secure : $secure,
-            (null == $httponly) ? $this->httponly : $httponly
-        );
+        if (version_compare(phpversion(), '7.3', '>=')) {
+            setcookie(
+                $name,
+                $value,
+                [
+                    'expires'  => ($expire) ? (int) (time() + $expire) : null,
+                    'path'     => ((null == $path) ? $this->path : $path),
+                    'domain'   => (null == $domain) ? $this->domain : $domain,
+                    'secure'   => (null == $secure) ? $this->secure : $secure,
+                    'httponly' => (null == $httponly) ? $this->httponly : $httponly,
+                    'samesite' => $sameSiteNoneTextGreaterPhp73,
+                ]
+            );
+        } else {
+            setcookie(
+                $name,
+                $value,
+                ($expire) ? (int) (time() + $expire) : null,
+                ((null == $path) ? $this->path : $path).$sameSiteNoneText,
+                (null == $domain) ? $this->domain : $domain,
+                (null == $secure) ? $this->secure : $secure,
+                (null == $httponly) ? $this->httponly : $httponly
+            );
+        }
     }
 
     /**

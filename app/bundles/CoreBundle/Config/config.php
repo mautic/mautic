@@ -1080,7 +1080,7 @@ return [
         'batch_campaign_sleep_time' => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
-        'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'rss_notification_url'      => '',
         'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
         'translations_fetch_url'    => 'https://language-packs.mautic.com/',
         'system_update_url'         => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
