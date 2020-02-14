@@ -56,15 +56,8 @@ class LeadDeviceRepository extends CommonRepository
     public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.device as device, es.device_fingerprint')
+        $sq->select('es.id as id, es.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
-        if (!empty($statIds)) {
-            $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
-
-            $sq->andWhere(
-                $sq->expr()->in('es.id', $inIds)
-            );
-        }
 
         if (null !== $deviceNames) {
             if (!is_array($deviceNames)) {
@@ -128,32 +121,6 @@ class LeadDeviceRepository extends CommonRepository
         $device = $sq->execute()->fetchAll();
 
         return (!empty($device)) ? $device[0] : [];
-    }
-
-    /**
-     * @param string $fingerprint
-     *
-     * @return LeadDevice
-     */
-    public function getDeviceByFingerprint($fingerprint)
-    {
-        if (!$fingerprint) {
-            return null;
-        }
-
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.lead_id as lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
-
-        $sq->where(
-            $sq->expr()->eq('es.device_fingerprint', ':fingerprint')
-        )
-            ->setParameter('fingerprint', $fingerprint);
-
-        //get the first match
-        $device = $sq->execute()->fetch();
-
-        return $device ? $device : null;
     }
 
     /**

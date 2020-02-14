@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -55,11 +54,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
     private $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
      */
     private $requestStack;
@@ -80,7 +74,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker       = $this->createMock(ContactTracker::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $this->leadDeviceRepository = $this->createMock(LeadDeviceRepository::class);
         $this->requestStack         = $this->createMock(RequestStack::class);
         $this->logger               = $this->createMock(Logger::class);
         $this->dispatcher           = $this->createMock(EventDispatcher::class);
@@ -209,11 +202,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->with('track_by_tracking_url')
             ->willReturn(false);
 
-        $this->coreParametersHelper->expects($this->at(1))
-            ->method('get')
-            ->with('track_by_fingerprint')
-            ->willReturn(false);
-
         $query = [
             'ct' => [
                 'lead'    => 2,
@@ -236,132 +224,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
-    public function testIdentifyContactByFingerprintIfEnabled()
-    {
-        $this->coreParametersHelper->expects($this->at(0))
-            ->method('get')
-            ->with('track_by_tracking_url')
-            ->willReturn(false);
-
-        $this->coreParametersHelper->expects($this->at(1))
-            ->method('get')
-            ->with('track_by_fingerprint')
-            ->willReturn(true);
-
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
-        $lead->method('getIpAddresses')
-            ->willReturn(new ArrayCollection());
-
-        $this->leadModel->expects($this->once())
-            ->method('getEntity')
-            ->with(2)
-            ->willReturn($lead);
-
-        $this->trackedContact->method('isAnonymous')
-            ->willReturn(true);
-
-        $query = [
-            'ct'          => [],
-            'fingerprint' => 'abc123',
-        ];
-
-        $this->leadDeviceRepository->expects($this->once())
-            ->method('getDeviceByFingerprint')
-            ->with('abc123')
-            ->willReturn(['lead_id' => 2]);
-
-        $this->leadModel->expects($this->once())
-            ->method('mergeLeads')
-            ->with($this->trackedContact, $lead, false)
-            ->willReturn($lead);
-
-        $this->leadModel->expects($this->once())
-            ->method('checkForDuplicateContact')
-            ->with($query, $lead, true, true)
-            ->willReturn([$this->trackedContact, []]);
-
-        $helper = $this->getContactRequestHelper();
-        $this->assertEquals($lead->getId(), $helper->getContactFromQuery($query)->getId());
-    }
-
-    public function testTrackedIdentifiedVisitorIsNotTrackedByFingerprint()
-    {
-        $this->coreParametersHelper->expects($this->at(0))
-            ->method('get')
-            ->with('track_by_tracking_url')
-            ->willReturn(false);
-
-        $this->coreParametersHelper->expects($this->at(1))
-            ->method('get')
-            ->with('track_by_fingerprint')
-            ->willReturn(true);
-
-        $this->leadModel->expects($this->never())
-            ->method('getEntity');
-
-        $this->trackedContact->method('isAnonymous')
-            ->willReturn(false);
-
-        $query = [
-            'ct'          => [],
-            'fingerprint' => 'abc123',
-        ];
-
-        $this->leadDeviceRepository->expects($this->never())
-            ->method('getDeviceByFingerprint');
-
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
-
-        $this->leadModel->expects($this->once())
-            ->method('checkForDuplicateContact')
-            ->with($query, $this->trackedContact, true, true)
-            ->willReturn([$this->trackedContact, []]);
-
-        $helper = $this->getContactRequestHelper();
-        $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
-    }
-
-    public function testFingerprintIsNotUsedToIdentifyLeadIfDisabled()
-    {
-        $this->coreParametersHelper->expects($this->at(0))
-            ->method('get')
-            ->with('track_by_tracking_url')
-            ->willReturn(false);
-
-        $this->coreParametersHelper->expects($this->at(1))
-            ->method('get')
-            ->with('track_by_fingerprint')
-            ->willReturn(false);
-
-        $this->leadModel->expects($this->never())
-            ->method('getEntity');
-
-        $this->trackedContact->method('isAnonymous')
-            ->willReturn(true);
-
-        $query = [
-            'ct'          => [],
-            'fingerprint' => 'abc123',
-        ];
-
-        $this->leadDeviceRepository->expects($this->never())
-            ->method('getDeviceByFingerprint');
-
-        $this->leadModel->expects($this->never())
-            ->method('mergeLeads');
-
-        $this->leadModel->expects($this->once())
-            ->method('checkForDuplicateContact')
-            ->with($query, $this->trackedContact, true, true)
-            ->willReturn([$this->trackedContact, []]);
-
-        $helper = $this->getContactRequestHelper();
-        $this->assertEquals($this->trackedContact, $helper->getContactFromQuery($query));
-    }
-
     /**
      * @return ContactRequestHelper
      */
@@ -372,7 +234,6 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->coreParametersHelper,
             $this->ipLookupHelper,
-            $this->leadDeviceRepository,
             $this->requestStack,
             $this->logger,
             $this->dispatcher
