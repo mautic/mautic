@@ -27,7 +27,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -56,11 +56,6 @@ class LegacyEventDispatcher
     private $logger;
 
     /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
-    /**
      * @var NotificationHelper
      */
     private $notificationHelper;
@@ -71,22 +66,27 @@ class LegacyEventDispatcher
     private $factory;
 
     /**
+     * @var ContactTracker
+     */
+    private $contactTracker;
+
+    /**
      * LegacyEventDispatcher constructor.
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         EventScheduler $scheduler,
         LoggerInterface $logger,
-        LeadModel $leadModel,
         NotificationHelper $notificationHelper,
-        MauticFactory $factory
+        MauticFactory $factory,
+        ContactTracker $contactTracker
     ) {
         $this->dispatcher         = $dispatcher;
         $this->scheduler          = $scheduler;
         $this->logger             = $logger;
-        $this->leadModel          = $leadModel;
         $this->notificationHelper = $notificationHelper;
         $this->factory            = $factory;
+        $this->contactTracker     = $contactTracker;
     }
 
     /**
@@ -113,7 +113,7 @@ class LegacyEventDispatcher
 
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
-            $this->leadModel->setSystemCurrentLead($log->getLead());
+            $this->contactTracker->setSystemContact($log->getLead());
 
             if (isset($settings['eventName'])) {
                 $result = $this->dispatchEventName($settings['eventName'], $settings, $log);
@@ -159,7 +159,7 @@ class LegacyEventDispatcher
             $this->scheduler->rescheduleFailures($rescheduleFailures);
         }
 
-        $this->leadModel->setSystemCurrentLead(null);
+        $this->contactTracker->setSystemContact(null);
     }
 
     /**
