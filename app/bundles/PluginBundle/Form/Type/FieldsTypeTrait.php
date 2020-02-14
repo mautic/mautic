@@ -51,7 +51,7 @@ trait FieldsTypeTrait
 
                 foreach ($mauticFields as $key => $value) {
                     if (is_array($mauticFields)) {
-                        $mauticFields[$key] = array_flip($value);
+                        $mauticFields[$key] = $value;
                     }
                 }
 
