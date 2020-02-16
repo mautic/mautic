@@ -36,7 +36,12 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testCountPage(int $count, int $limit, int $page)
     {
-        $this->assertSame($page, $this->pageHelper->countPage($count, $limit));
+        $this->session->expects($this->once())
+            ->method('get')
+            ->with('mautic.test.limit')
+            ->willReturn($limit);
+
+        $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
     public function pageProvider()
@@ -59,7 +64,12 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testCountStart(int $page, int $limit, int $start)
     {
-        $this->assertSame($start, $this->pageHelper->countPage($page, $limit));
+        $this->session->expects($this->once())
+            ->method('get')
+            ->with('mautic.test.limit')
+            ->willReturn($limit);
+
+        $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
     public function startProvider()
