@@ -19,6 +19,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
@@ -76,7 +77,11 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new FeedbackLoop($contactFinder, $leadModel, $translator, $logger);
+        $doNotContact = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $processor = new FeedbackLoop($contactFinder, $leadModel, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->fblReport = <<<'BODY'

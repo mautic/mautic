@@ -347,14 +347,16 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
             $leadModel = $this->getModel('lead');
+            /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+            $doNotContact = $this->getModel('mautic.lead.model.dnc');
 
             $lead = $leadModel->getEntity($leadId);
 
             if (null !== $lead && null !== $channel) {
                 if ('remove' === $action) {
-                    $leadModel->addDncForLead($lead, $channel, 'user', DoNotContact::MANUAL);
+                    $doNotContact->addDncForContact($lead, $channel, 'user', DoNotContact::MANUAL);
                 } elseif ('add' === $action) {
-                    $leadModel->removeDncForLead($lead, $channel);
+                    $doNotContact->removeDncForContact($lead, $channel);
                 }
                 $dataArray['success'] = 1;
             }
@@ -460,6 +462,10 @@ class AjaxController extends CommonAjaxController
         if (!empty($dncId)) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
+
+            /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+            $doNotContact = $this->getModel('mautic.lead.model.dnc');
+
             /** @var \Mautic\LeadBundle\Entity\DoNotContact $dnc */
             $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 [
@@ -470,7 +476,7 @@ class AjaxController extends CommonAjaxController
             $lead = $dnc->getLead();
             if ($lead) {
                 // Use lead model to trigger listeners
-                $model->removeDncForLead($lead, 'email');
+                $doNotContact->removeDncForContact($lead, 'email');
             } else {
                 $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
             }

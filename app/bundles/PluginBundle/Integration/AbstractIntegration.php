@@ -193,6 +193,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected $integrationEntityModel;
 
     /**
+     * @var \Mautic\LeadBundle\Model\DoNotContact
+     */
+    protected $doNotContact;
+
+    /**
      * @var array
      */
     protected $commandParameters = [];
@@ -212,7 +217,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         PathsHelper $pathsHelper,
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
-        IntegrationEntityModel $integrationEntityModel
+        IntegrationEntityModel $integrationEntityModel,
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->dispatcher             = $eventDispatcher;
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
@@ -229,6 +235,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->notificationModel      = $notificationModel;
         $this->fieldModel             = $fieldModel;
         $this->integrationEntityModel = $integrationEntityModel;
+        $this->doNotContact           = $doNotContact;
     }
 
     public function setCommandParameters(array $params)
@@ -2556,7 +2563,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         $isDoNotContact = 0;
         if ($lead = $this->leadModel->getEntity($leadId)) {
-            $isContactableReason = $this->leadModel->isContactable($lead, $channel);
+            $isContactableReason = $this->doNotContact->isContactable($lead, $channel);
             if (DoNotContact::IS_CONTACTABLE !== $isContactableReason) {
                 $isDoNotContact = 1;
             }

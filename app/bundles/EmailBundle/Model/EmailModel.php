@@ -1704,7 +1704,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         foreach ($leads as $lead) {
-            $this->leadModel->removeDncForLead($lead, 'email');
+            $this->doNotContact->removeDncForContact($lead, 'email');
         }
     }
 
@@ -1730,7 +1730,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $dnc = [];
         foreach ($leadId as $lead) {
-            $dnc[] = $this->leadModel->addDncForLead(
+            $dnc[] = $this->doNotContact->addDncForContact(
                 $this->em->getReference('MauticLeadBundle:Lead', $lead),
                 'email',
                 $comments,

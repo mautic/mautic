@@ -54,18 +54,25 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $dispatcher;
 
+    /**
+     * @var \Mautic\LeadBundle\Model\DoNotContact
+     */
+    private $doNotContact;
+
     public function __construct(
         IntegrationHelper $integrationHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->integrationHelper = $integrationHelper;
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi   = $notificationApi;
         $this->dispatcher        = $dispatcher;
+        $this->doNotContact      = $doNotContact;
     }
 
     /**
@@ -129,7 +136,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $lead = $event->getLead();
 
-        if (DoNotContact::IS_CONTACTABLE !== $this->leadModel->isContactable($lead, 'notification')) {
+        if (DoNotContact::IS_CONTACTABLE !== $this->doNotContact->isContactable($lead, 'notification')) {
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
         }
 

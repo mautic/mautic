@@ -48,18 +48,25 @@ class FeedbackLoop implements ProcessorInterface
     private $message;
 
     /**
+     * @var \Mautic\LeadBundle\Model\DoNotContact
+     */
+    private $doNotContact;
+
+    /**
      * FeedbackLoop constructor.
      */
     public function __construct(
         ContactFinder $contactFinder,
         LeadModel $leadModel,
         TranslatorInterface $translator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->contactFinder = $contactFinder;
         $this->leadModel     = $leadModel;
         $this->translator    = $translator;
         $this->logger        = $logger;
+        $this->doNotContact  = $doNotContact;
     }
 
     /**
@@ -93,7 +100,7 @@ class FeedbackLoop implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.spam');
         foreach ($contacts as $contact) {
-            $this->leadModel->addDncForLead($contact, 'email', $comments, DoNotContact::UNSUBSCRIBED);
+            $this->doNotContact->addDncForContact($contact, 'email', $comments, DoNotContact::UNSUBSCRIBED);
         }
 
         return true;

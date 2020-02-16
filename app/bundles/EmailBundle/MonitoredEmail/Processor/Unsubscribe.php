@@ -55,6 +55,11 @@ class Unsubscribe implements ProcessorInterface
     private $message;
 
     /**
+     * @var \Mautic\LeadBundle\Model\DoNotContact
+     */
+    private $doNotContact;
+
+    /**
      * Bounce constructor.
      */
     public function __construct(
@@ -62,13 +67,15 @@ class Unsubscribe implements ProcessorInterface
         ContactFinder $contactFinder,
         LeadModel $leadModel,
         TranslatorInterface $translator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->transport     = $transport;
         $this->contactFinder = $contactFinder;
         $this->leadModel     = $leadModel;
         $this->translator    = $translator;
         $this->logger        = $logger;
+        $this->doNotContact  = $doNotContact;
     }
 
     /**
@@ -117,7 +124,7 @@ class Unsubscribe implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.unsubscribed');
         foreach ($contacts as $contact) {
-            $this->leadModel->addDncForLead($contact, $channel, $comments, DoNotContact::UNSUBSCRIBED);
+            $this->doNotContact->addDncForContact($contact, $channel, $comments, DoNotContact::UNSUBSCRIBED);
         }
 
         return true;

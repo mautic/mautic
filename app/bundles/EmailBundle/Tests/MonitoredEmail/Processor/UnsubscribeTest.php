@@ -20,6 +20,7 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
@@ -68,8 +69,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
 
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -79,7 +78,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new Unsubscribe($transport, $contactFinder, $leadModel, $translator, $logger);
+        $doNotContact = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $processor = new Unsubscribe($transport, $contactFinder, $leadModel, $translator, $logger, $doNotContact);
 
         $message = new Message();
         $this->assertTrue($processor->process($message));
@@ -127,8 +130,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
 
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
@@ -138,7 +139,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new Unsubscribe($transport, $contactFinder, $leadModel, $translator, $logger);
+        $doNotContact = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $processor = new Unsubscribe($transport, $contactFinder, $leadModel, $translator, $logger, $doNotContact);
 
         $message     = new Message();
         $message->to = ['contact+unsubscribe_123abc@test.com' => null];

@@ -37,7 +37,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -102,7 +101,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->redirectRepositoryMock = $this->createMock(RedirectRepository::class);
         $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
-        $this->doNotContact           = $this->createMock(DNC::class);
+        $this->doNotContact           = $this->createMock(DoNotContact::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,

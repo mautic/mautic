@@ -614,6 +614,7 @@ return [
                     'mautic.lead.model.lead',
                     'translator',
                     'monolog.logger.mautic',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.message.processor.unsubscribe' => [
@@ -624,6 +625,7 @@ return [
                     'mautic.lead.model.lead',
                     'translator',
                     'monolog.logger.mautic',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.message.processor.feedbackloop' => [
@@ -633,6 +635,7 @@ return [
                     'mautic.lead.model.lead',
                     'translator',
                     'monolog.logger.mautic',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.message.processor.replier' => [

@@ -20,6 +20,7 @@ return [
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
                     'event_dispatcher',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.notification.campaignbundle.condition_subscriber' => [
