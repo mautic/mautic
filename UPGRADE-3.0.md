@@ -103,6 +103,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   Removed deprecated \Mautic\CoreBundle\Templating\Helper\ButtonHelper::renderPreCustomButtons use renderButtons() instead
 *   Removed deprecated \Mautic\CoreBundle\Templating\Helper\ButtonHelper::renderPostCustomButtons
 *   Removed deprecated \Mautic\CoreBundle\Templating\Helper\ButtonHelper::setCustomButtons; listen to  CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS event instead
+*   Removed command class GenerateMigrationsCommand as it was broken with new Doctrine. Instead of `mautic:migrations:generate` use command `doctrine:migrations:generate` to generate a migration class.
 *   Abstract class CommonStatsSubscriber was refactored out of CommonSubscriber and so it needs its own dependencies: CorePermissions and EntityManager. All classes extending CommonStatsSubscriber must provide those dependencies.
 *   Protected methods CommonStatsSubscriber::addContactRestrictedRepositories() and CommonStatsSubscriber::addContactRestrictedRepositories() do not have the first parameter of EntityManager. See the point above. The second parameter must be an array now.
 *   CommonSubscriber removed. Implement Symfony\Component\EventDispatcher\EventSubscriberInterface directly and use DI instead.
@@ -110,6 +111,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   BabDev/Transifex/* classes were replaced with Mautic/Transifex/*
 *   Mautic\CoreBundle\IpLookup\MaxmindLookup was renamed to Mautic\CoreBundle\IpLookup\AbstractMaxmindLookup and set as abstract class
 *   Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer::__construct() has only 2 parameters now. The first one was removed as not used.
+*   Fingerprint2 JS library was removed.
 *   \Mautic\CoreBundle\CoreParametersHelper can no longer be used to fetch other Symfony parameters, `mautic.paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. 
     * For Symfony parameters: Pass them as needed to the constructor of the service
     * For `mautic.bundles` or `mautic.plugin.bundles` use \Mautic\CoreBundle\Helper\BundleHelper::getMauticBundles() or getPluginBundles() instead
@@ -282,6 +284,8 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Class PointTriggerType removed as it was not used anywhere.
 *   Class TagListType removed as it was not used anywhere.
 *   Class Mautic\LeadBundle\Form\DataTransformer\UtmTagEntityModelTransformer removed as it was not used anywhere.
+*   Property (column) LeadDevice::deviceFingerprint was removed together with its setter and getter.
+*   Method LeadDeviceRepository::getDeviceByFingerprint() removed.
 *   Deprecated class EmailTokenHelper removed.
 *   Deprecated routes removed:
     *   mautic_contact_import_index - /s/{object}/import/{page}
@@ -318,6 +322,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Deprecated method ListModel::getLeadsByList() was removed.
 *   Signature of ListModel::getLifeCycleSegments() method changed. 4th param is not array of $filters but bool of $canViewOthers. That method was actually called with bool anyway.
 *   Signature of ListModel::getTopLists() method changed. 3th param is not array of $filters but bool of $canViewOthers. That method was actually called with bool anyway.
+*   Signature of ContactRequestHelper::__construct() method changed. 5th param removed.
 *   Deprecated method DateDecorator::getDefaultDate() was removed.
 *   Deprecated cookie mautic_session_id will no longer be created.
 *   Payloads for the following webhook events will no longer have the lead array element: Contact Deleted Event, Contact Points Changed Event, Contact Updated Event. “lead” array element has been removed. We have the same information in the contact array element.
@@ -365,6 +370,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Deprecated method MauticPlugin\MauticSocialBundle\Command\MonitorTwitterBaseCommand::createLeadsFromStatuses removed
 *   Deprecated method MauticPlugin\MauticSocialBundle\Command\MonitorTwitterBaseCommand::getTwitterIntegration removed
 *   Deprecated method MauticPlugin\MauticSocialBundle\Command\MonitorTwitterBaseCommand::buildTwitterSearchQueryy removed
+*   Classes GooglePlusType and GooglePlusIntegration removed as Google+ social network does not exist anymore.
 
 ### UserBundle
 

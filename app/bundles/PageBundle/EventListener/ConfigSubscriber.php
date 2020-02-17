@@ -63,7 +63,6 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
                 'track_by_tracking_url'                 => false,
-                'track_by_fingerprint'                  => false,
                 'facebook_pixel_id'                     => null,
                 'facebook_pixel_trackingpage_enabled'   => false,
                 'facebook_pixel_landingpage_enabled'    => false,

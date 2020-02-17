@@ -65,8 +65,8 @@ class CitrixCampaignActionType extends AbstractType
 
         $newChoices = [];
         foreach ($choices as $k => $c) {
-            if (0 === strpos($k, $product)) {
-                $newChoices[$c] = $k;
+            if (0 === mb_strpos($k, $product)) {
+                $newChoices[$k] = $c;
             }
         }
 
@@ -74,9 +74,9 @@ class CitrixCampaignActionType extends AbstractType
             'event-criteria-'.$product,
             ChoiceType::class,
             [
-                'label'             => $this->translator->trans('plugin.citrix.action.criteria'),
-                'choices'           => $newChoices,
-                ]
+                'label'   => $this->translator->trans('plugin.citrix.action.criteria'),
+                'choices' => $newChoices,
+            ]
         );
 
         if (CitrixProducts::GOTOASSIST !== $product) {
@@ -84,9 +84,9 @@ class CitrixCampaignActionType extends AbstractType
                 $product.'-list',
                 ChoiceType::class,
                 [
-                    'label'             => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
-                    'choices'           => array_flip(CitrixHelper::getCitrixChoices($product)),
-                    'multiple'          => true,
+                    'label'    => $this->translator->trans('plugin.citrix.decision.'.$product.'.list'),
+                    'choices'  => array_flip(CitrixHelper::getCitrixChoices($product)),
+                    'multiple' => true,
                 ]
             );
         }
@@ -102,8 +102,8 @@ class CitrixCampaignActionType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'plugin.citrix.emailtemplate_descr',
                 ],
-                'required' => true,
-                'multiple' => false,
+                'required'   => true,
+                'multiple'   => false,
             ];
 
             if (array_key_exists('list_options', $options)) {

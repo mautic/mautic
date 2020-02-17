@@ -32,6 +32,7 @@ if (!isset($inBuilder)) {
             'inForm'        => true,
             'id'            => $field['id'],
             'formId'        => $formId,
+            'formName'      => $formName,
             'contactFields' => (isset($contactFields)) ? $contactFields : [],
             'companyFields' => (isset($companyFields)) ? $companyFields : [],
             'inBuilder'     => $inBuilder,

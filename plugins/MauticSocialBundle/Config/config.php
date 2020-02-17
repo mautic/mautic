@@ -99,9 +99,6 @@ return [
             'mautic.form.type.social.twitter' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
             ],
-            'mautic.form.type.social.googleplus' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\GooglePlusType',
-            ],
             'mautic.form.type.social.linkedin' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
             ],
@@ -200,27 +197,6 @@ return [
             ],
             'mautic.integration.foursquare' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.integration.googleplus' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Integration\GooglePlusIntegration::class,
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.helper.cache_storage',

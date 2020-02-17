@@ -914,14 +914,13 @@ class LeadModel extends FormModel
     public function getContactFromRequest($queryFields = [])
     {
         // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
-        $requestStack        = new RequestStack();
+        $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $contactRequestHelper = new ContactRequestHelper(
             $this,
             $this->contactTracker,
             $this->coreParametersHelper,
             $this->ipLookupHelper,
-            $this->getDeviceRepository(),
             $requestStack,
             $this->logger,
             $this->dispatcher

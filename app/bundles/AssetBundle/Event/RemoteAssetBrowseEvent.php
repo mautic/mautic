@@ -14,6 +14,7 @@ namespace Mautic\AssetBundle\Event;
 use Gaufrette\Adapter;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
 /**
  * Class RemoteAssetBrowseEvent.
@@ -30,7 +31,7 @@ class RemoteAssetBrowseEvent extends CommonEvent
      */
     private $integration;
 
-    public function __construct(AbstractIntegration $integration)
+    public function __construct(UnifiedIntegrationInterface $integration)
     {
         $this->integration = $integration;
     }
