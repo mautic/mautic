@@ -52,7 +52,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '-alpha';
+    const EXTRA_VERSION = '-beta';
 
     /**
      * @var bool|null
