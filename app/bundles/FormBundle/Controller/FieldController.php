@@ -160,7 +160,7 @@ class FieldController extends CommonFormController
                     'field'         => $formField,
                     'id'            => $keyId,
                     'formId'        => $formId,
-                    'formName'      => $formEntity->generateFormName(),
+                    'formName'      => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
                     'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'     => true,
