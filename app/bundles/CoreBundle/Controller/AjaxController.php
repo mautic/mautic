@@ -343,7 +343,7 @@ class AjaxController extends CommonController
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-        $cookieHelper = $this->factory->getHelper('cookie');
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->setCookie('mautic_update', 'setupUpdate', 300);
 
         return $this->sendJsonResponse($dataArray);
@@ -360,11 +360,14 @@ class AjaxController extends CommonController
         $translator = $this->translator;
 
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper = $this->factory->getHelper('update');
+        $updateHelper = $this->container->get('mautic.helper.update');
 
         // Fetch the update package
         $update  = $updateHelper->fetchData();
         $package = $updateHelper->fetchPackage($update['package']);
+
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->factory->getHelper('cookie');
 
         if ($package['error']) {
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
@@ -372,8 +375,6 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             $dataArray['success']        = 1;
@@ -383,8 +384,6 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->setCookie('mautic_update', 'downloadPackage', 300);
         }
 
@@ -402,7 +401,10 @@ class AjaxController extends CommonController
         $translator = $this->translator;
 
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper = $this->factory->getHelper('update');
+        $updateHelper = $this->container->get('mautic.helper.update');
+
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
 
         // Fetch the package data
         $update  = $updateHelper->fetchData();
@@ -441,8 +443,6 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
@@ -462,8 +462,6 @@ class AjaxController extends CommonController
 
                 // A way to keep the upgrade from failing if the session is lost after
                 // the cache is cleared by upgrade.php
-                /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-                $cookieHelper = $this->factory->getHelper('cookie');
                 $cookieHelper->setCookie('mautic_update', 'extractPackage', 300);
             }
         }
@@ -500,15 +498,15 @@ class AjaxController extends CommonController
             @rmdir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade');
         }
 
-        $cacheDir = $this->factory->getSystemPath('cache');
+        $cacheDir = $this->container->get('mautic.helper.paths')->getSystemPath('cache');
 
         // Cleanup the update cache data now too
         if (file_exists($cacheDir.'/lastUpdateCheck.txt')) {
             @unlink($cacheDir.'/lastUpdateCheck.txt');
         }
 
-        if (file_exists($cacheDir.'/'.$this->factory->getVersion().'.zip')) {
-            @unlink($cacheDir.'/'.$this->factory->getVersion().'.zip');
+        if (file_exists($cacheDir.'/'.MAUTIC_VERSION.'.zip')) {
+            @unlink($cacheDir.'/'.MAUTIC_VERSION.'.zip');
         }
 
         // Update languages
@@ -542,15 +540,14 @@ class AjaxController extends CommonController
         $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
-            $env  = $this->factory->getEnvironment();
-            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env];
+            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
 
-            if ('prod' == $env) {
+            if ('prod' === MAUTIC_ENV) {
                 $args[] = '--no-debug';
             }
 
             $input       = new ArgvInput($args);
-            $application = new Application($this->get('kernel'));
+            $application = new Application($this->container->get('kernel'));
             $application->setAutoExit(false);
             $output = new BufferedOutput();
 
@@ -563,11 +560,14 @@ class AjaxController extends CommonController
             $result = $application->run($input, $output);
         }
 
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
+
         if (0 !== $result) {
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $output->fetch()));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
-            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
+            $this->container->get('monolog.logger.mautic')->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
 
             $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
             $dataArray['message']    = $translator->trans(
@@ -578,14 +578,11 @@ class AjaxController extends CommonController
 
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
-            /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-            $cookieHelper = $this->factory->getHelper('cookie');
+            /* @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
             $cookieHelper->setCookie('mautic_update', 'schemaMigration', 300);
 
             if ($request->get('finalize', false)) {
@@ -621,14 +618,8 @@ class AjaxController extends CommonController
         // Check for a post install message
         if ($postMessage = $this->container->get('session')->get('post_upgrade_message', false)) {
             $this->container->get('session')->remove('post_upgrade_message');
-            $postMessage = sprintf('<h4 class="mt-lg">%s</h4><p>%s</p>', $this->container->get('translator')->trans('mautic.core.update.post_message'), $postMessage);
-            if ('1.2.3' == $this->container->get('kernel')->getVersion()) {
-                // @TODO - remove in 2.0
-                $dataArray['message'] .= $postMessage;
-                $dataArray['postmessage'] = false;
-            } else {
-                $dataArray['postmessage'] = $postMessage;
-            }
+            $postMessage              = sprintf('<h4 class="mt-lg">%s</h4><p>%s</p>', $this->container->get('translator')->trans('mautic.core.update.post_message'), $postMessage);
+            $dataArray['postmessage'] = $postMessage;
         }
 
         // Execute the mautic.post_upgrade event
@@ -637,11 +628,11 @@ class AjaxController extends CommonController
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
-        $cookieHelper = $this->factory->getHelper('cookie');
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->deleteCookie('mautic_update');
 
         // Set a redirect to force a page reload to get new menu items, assets, etc
-        $dataArray['redirect'] = $this->get('router')->generate('mautic_core_update');
+        $dataArray['redirect'] = $this->container->get('router')->generate('mautic_core_update');
 
         return $this->sendJsonResponse($dataArray);
     }
