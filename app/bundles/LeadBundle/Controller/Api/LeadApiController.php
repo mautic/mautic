@@ -617,10 +617,10 @@ class LeadApiController extends CommonApiController
 
                 if (DoNotContact::IS_CONTACTABLE === $reason) {
                     // Remove DNC record
-                    $doNotContact->removeDncForContact($entity, $channel, false);
+                    $doNotContact->removeDncForContact($entity->getId(), $channel, false);
                 } else {
                     // Add DNC record
-                    $doNotContact->addDncForContact($entity, $channel, $comments, $reason, false);
+                    $doNotContact->addDncForContact($entity->getId(), $channel, $comments, $reason, false);
                 }
             }
             unset($parameters['doNotContact']);

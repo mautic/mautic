@@ -2182,7 +2182,7 @@ class LeadModel extends FormModel
      */
     public function getContactChannels(Lead $lead)
     {
-        $allChannels = $this->getPreferenceChannels();
+        $allChannels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
 
         $channels = [];
         foreach ($allChannels as $channel) {
@@ -2201,7 +2201,7 @@ class LeadModel extends FormModel
      */
     public function getDoNotContactChannels(Lead $lead)
     {
-        $allChannels = $this->getPreferenceChannels();
+        $allChannels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE, true);
 
         $channels = [];
         foreach ($allChannels as $channel) {

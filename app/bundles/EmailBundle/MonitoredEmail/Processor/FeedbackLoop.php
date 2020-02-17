@@ -92,7 +92,7 @@ class FeedbackLoop implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.spam');
         foreach ($contacts as $contact) {
-            $this->doNotContact->addDncForContact($contact, 'email', $comments, DoNotContact::UNSUBSCRIBED);
+            $this->doNotContact->addDncForContact($contact->getId(), 'email', $comments, DoNotContact::UNSUBSCRIBED);
         }
 
         return true;

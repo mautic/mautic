@@ -141,7 +141,7 @@ class Bounce implements ProcessorInterface
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.'.$bounce->getRuleCategory());
         foreach ($contacts as $contact) {
-            $this->doNotContact->addDncForContact($contact, $channel, $comments);
+            $this->doNotContact->addDncForContact($contact->getId(), $channel, $comments);
         }
 
         return true;
