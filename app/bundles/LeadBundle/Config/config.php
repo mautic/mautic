@@ -514,7 +514,7 @@ return [
                 ],
             ],
             'mautic.lead.subscriber.donotcontact' => [
-                'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber::class,
+                'class'     => \Mautic\LeadBundle\EventListener\DoNotContactSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.dnc',
                 ],

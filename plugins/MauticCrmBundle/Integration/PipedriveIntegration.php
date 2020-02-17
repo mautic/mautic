@@ -86,9 +86,9 @@ class PipedriveIntegration extends CrmAbstractIntegration
             $companyModel,
             $pathsHelper,
             $notificationModel,
-            $doNotContact,
             $fieldModel,
-            $integrationEntityModel
+            $integrationEntityModel,
+            $doNotContact
         );
 
         $this->transport  = $transport;
