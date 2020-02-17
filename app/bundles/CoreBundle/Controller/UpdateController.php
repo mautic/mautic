@@ -32,13 +32,13 @@ class UpdateController extends CommonController
         }
 
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper = $this->factory->getHelper('update');
+        $updateHelper = $this->container->get('mautic.helper.update');
         $updateData   = $updateHelper->fetchData();
 
         return $this->delegateView([
             'viewParameters' => [
                 'updateData'     => $updateData,
-                'currentVersion' => $this->factory->getVersion(),
+                'currentVersion' => MAUTIC_VERSION,
             ],
             'contentTemplate' => 'MauticCoreBundle:Update:index.html.php',
             'passthroughVars' => [
@@ -63,10 +63,9 @@ class UpdateController extends CommonController
         $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
-            $env  = $this->factory->getEnvironment();
-            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.$env];
+            $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
 
-            if ('prod' == $env) {
+            if ('prod' === MAUTIC_ENV) {
                 $args[] = '--no-debug';
             }
 
@@ -93,7 +92,7 @@ class UpdateController extends CommonController
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $outputBuffer));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
-            $this->factory->getLogger()->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
+            $this->get('monolog.logger.mautic')->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
 
             $failed = true;
         } elseif ($this->request->get('update', 0)) {

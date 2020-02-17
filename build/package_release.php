@@ -14,9 +14,7 @@
  */
 
 // List of critical migrations
-$criticalMigrations = [
-    '20160225000000',
-];
+$criticalMigrations = [];
 
 $baseDir = __DIR__;
 
@@ -158,10 +156,10 @@ chdir(__DIR__.'/packaging');
 system("rm -f ../packages/{$appVersion}.zip ../packages/{$appVersion}-update.zip");
 
 echo "Packaging Mautic Full Installation\n";
-system('zip -r ../packages/'.$appVersion.'.zip . -x@../excludefiles.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'.zip . -x@../exclude_files.txt -x@../exclude_files_full.txt > /dev/null');
 
 echo "Packaging Mautic Update Package\n";
-system('zip -r ../packages/'.$appVersion.'-update.zip -x@../excludefiles.txt -@ < modified_files.txt > /dev/null');
+system('zip -r ../packages/'.$appVersion.'-update.zip -x@../exclude_files.txt -@ < modified_files.txt > /dev/null');
 
 system('openssl sha1 ../packages/'.$appVersion.'.zip');
 system('openssl sha1 ../packages/'.$appVersion.'-update.zip');

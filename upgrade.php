@@ -11,7 +11,7 @@
 ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
-define('MAUTIC_MINIMUM_PHP', '5.6.19');
+define('MAUTIC_MINIMUM_PHP', '7.2.21');
 define('MAUTIC_MAXIMUM_PHP', '7.3.999');
 
 // Are we running the minimum version?
@@ -31,7 +31,6 @@ $task       = getVar('task');
 
 define('IN_CLI', 'cli' === php_sapi_name());
 define('MAUTIC_ROOT', (IN_CLI || $standalone || empty($task)) ? __DIR__ : dirname(__DIR__));
-define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT.'/upgrade_errors.txt');
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT.'/app');
 
 if ($standalone || IN_CLI) {
@@ -45,12 +44,11 @@ if ($standalone || IN_CLI) {
 
 // Get local parameters
 $localParameters = get_local_config();
-if (isset($localParameters['cache_path'])) {
-    $cacheDir = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod');
-} else {
-    $cacheDir = MAUTIC_APP_ROOT.'/cache/prod';
-}
+$cacheDir        = (isset($localParameters['cache_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/cache/prod';
+$logDir          = (isset($localParameters['log_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['log_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/logs';
+
 define('MAUTIC_CACHE_DIR', $cacheDir);
+define('MAUTIC_UPGRADE_ERROR_LOG', $logDir.'/upgrade_errors.php');
 
 /*
  * Updating to 2.8.1: Check to see if we have a mautic_session_name
@@ -1165,7 +1163,7 @@ function process_error_log(array $errorLog)
         if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
             $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
         } else {
-            $errors = '';
+            $errors = "<?php die('no access'); \n\n";
         }
 
         $errors .= implode(PHP_EOL, $errorLog)."\n";
