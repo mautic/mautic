@@ -51,6 +51,10 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('focus.show', $action);
     }
 
+    /**
+     * @return CampaignExecutionEvent
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $focusId = (int) $event->getConfig()['focus'];
@@ -59,7 +63,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
         $values                 = [];
         $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], UrlGeneratorInterface::ABSOLUTE_URL)];
-        $this->trackingHelper->updateSession($values);
+        $this->trackingHelper->updateCacheItem($values);
 
         return $event->setResult(true);
     }

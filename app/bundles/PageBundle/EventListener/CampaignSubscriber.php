@@ -218,6 +218,11 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
+    /**
+     * @return CampaignExecutionEvent
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $config = $event->getConfig();
@@ -229,7 +234,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         foreach ($config['services'] as $service) {
             $values[$service][] = ['category' => $config['category'], 'action' => $config['action'], 'label' => $config['label']];
         }
-        $this->trackingHelper->updateSession($values);
+        $this->trackingHelper->updateCacheItem($values);
 
         return $event->setResult(true);
     }
