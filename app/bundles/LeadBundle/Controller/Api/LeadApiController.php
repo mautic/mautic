@@ -413,7 +413,7 @@ class LeadApiController extends CommonApiController
 
         /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
         $doNotContact = $this->get('mautic.lead.model.dnc');
-        $doNotContact->addDncForContact($entity->getId(), $channel, $comments, $reason);
+        $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
 
         return $this->handleView($view);
@@ -620,7 +620,7 @@ class LeadApiController extends CommonApiController
                     $doNotContact->removeDncForContact($entity->getId(), $channel, false);
                 } else {
                     // Add DNC record
-                    $doNotContact->addDncForContact($entity->getId(), $channel, $comments, $reason, false);
+                    $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments, false);
                 }
             }
             unset($parameters['doNotContact']);

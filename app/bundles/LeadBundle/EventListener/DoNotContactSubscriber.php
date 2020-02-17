@@ -46,8 +46,8 @@ class DoNotContactSubscriber implements EventSubscriberInterface
         $this->doNotContact->addDncForContact(
             $doNotContactAddEvent->getLead()->getId(),
             $doNotContactAddEvent->getChannel(),
-            $doNotContactAddEvent->getComments(),
             $doNotContactAddEvent->getReason(),
+            $doNotContactAddEvent->getComments(),
             $doNotContactAddEvent->isPersist(),
             $doNotContactAddEvent->isCheckCurrentStatus(),
             $doNotContactAddEvent->isOverride()
