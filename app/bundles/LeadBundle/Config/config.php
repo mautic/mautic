@@ -513,6 +513,12 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.lead.subscriber.donotcontact' => [
+                'class'     => \Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.dnc',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [

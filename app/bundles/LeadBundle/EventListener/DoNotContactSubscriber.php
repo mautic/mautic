@@ -35,7 +35,7 @@ class DoNotContactSubscriber implements EventSubscriberInterface
     public function removeDncForLead(DoNotContactRemoveEvent $doNotContactRemoveEvent)
     {
         $this->doNotContact->removeDncForContact(
-            $doNotContactRemoveEvent->getLead(),
+            $doNotContactRemoveEvent->getLead()->getId(),
             $doNotContactRemoveEvent->getChannel(),
             $doNotContactRemoveEvent->getPersist()
         );
@@ -44,7 +44,7 @@ class DoNotContactSubscriber implements EventSubscriberInterface
     public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent)
     {
         $this->doNotContact->addDncForContact(
-            $doNotContactAddEvent->getLead(),
+            $doNotContactAddEvent->getLead()->getId(),
             $doNotContactAddEvent->getChannel(),
             $doNotContactAddEvent->getComments(),
             $doNotContactAddEvent->getReason(),
