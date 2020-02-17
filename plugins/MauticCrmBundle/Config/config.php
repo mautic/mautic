@@ -81,6 +81,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                     'mautic.helper.user',
                 ],
             ],
@@ -145,6 +146,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.integration.zoho' => [
@@ -165,6 +167,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.integration.dynamics' => [
@@ -185,6 +188,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.integration.connectwise' => [
@@ -205,6 +209,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.integration.pipedrive' => [
@@ -225,6 +230,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.lead.model.field',
                     'mautic.plugin.model.integration_entity',
+                    'mautic.lead.model.dnc',
                     'mautic_integration.service.transport',
                     'mautic_integration.pipedrive.export.lead',
                 ],
