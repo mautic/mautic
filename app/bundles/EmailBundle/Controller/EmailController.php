@@ -32,6 +32,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
 {
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
@@ -1329,6 +1331,7 @@ class EmailController extends FormController
     public function sendExampleAction($objectId)
     {
         $model  = $this->getModel('email');
+        /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 
         //not found or not allowed
@@ -1352,6 +1355,10 @@ class EmailController extends FormController
         // Get the quick add form
         $action = $this->generateUrl('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $objectId]);
         $user   = $this->get('mautic.helper.user')->getUser();
+
+        // We have to add prefix to example emails
+        $subject = sprintf('%s %s', static::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject());
+        $entity->setSubject($subject);
 
         $form = $this->createForm(ExampleSendType::class, ['emails' => ['list' => [$user->getEmail()]]], ['action' => $action]);
         /* @var \Mautic\EmailBundle\Model\EmailModel $model */
