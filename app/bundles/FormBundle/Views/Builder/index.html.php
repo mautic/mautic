@@ -109,6 +109,7 @@ if (!isset($inBuilder)) {
                                             'inForm'        => true,
                                             'id'            => $field['id'],
                                             'formId'        => $formId,
+                                            'formName'      => $activeForm->generateFormName(),
                                             'contactFields' => $contactFields,
                                             'companyFields' => $companyFields,
                                             'inBuilder'     => $inBuilder,

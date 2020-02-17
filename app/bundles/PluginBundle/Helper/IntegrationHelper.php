@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
@@ -408,7 +409,6 @@ class IntegrationHelper
                 ],
                 'flickr' => "/flickr.com\/photos\/(.*?)($|\/)/",
                 'skype'  => "/skype:(.*?)($|\?)/",
-                'google' => "/plus.google.com\/(.*?)($|\/)/",
             ];
         } else {
             //populate placeholder
@@ -422,7 +422,6 @@ class IntegrationHelper
                 'youtube'    => 'https://youtube.com/user/%handle%',
                 'flickr'     => 'https://flickr.com/photos/%handle%',
                 'skype'      => 'skype:%handle%?call',
-                'googleplus' => 'https://plus.google.com/%handle%',
             ];
         }
     }
@@ -662,7 +661,7 @@ class IntegrationHelper
         } elseif ($integration instanceof Plugin) {
             // A bundle so check for an icon
             $icon = $pluginPath.'/'.$integration->getBundle().'/Assets/img/icon.png';
-        } elseif ($integration instanceof AbstractIntegration) {
+        } elseif ($integration instanceof UnifiedIntegrationInterface) {
             return $integration->getIcon();
         }
 

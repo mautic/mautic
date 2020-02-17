@@ -95,7 +95,7 @@ $activeTab = $activeTab ?: 'details-container';
     <?php if ($showFeaturesTab): ?>
     <div class="tab-pane fade <?php if ('features-container' == $activeTab): echo 'in active'; endif; ?> bdr-w-0" id="features-container">
         <?php
-        echo $view['form']->row($form['supportedFeatures']);
+        echo $view['form']->rowIfExists($form, 'supportedFeatures');
 
         if ($useFeatureSettings || $useSyncFeatures):
             echo '<hr />';

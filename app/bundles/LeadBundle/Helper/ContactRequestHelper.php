@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
@@ -42,11 +41,6 @@ class ContactRequestHelper
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
-
-    /**
-     * @var LeadDeviceRepository
-     */
-    private $leadDeviceRepository;
 
     /**
      * @var IpLookupHelper
@@ -83,15 +77,11 @@ class ContactRequestHelper
      */
     private $publiclyUpdatableFieldValues = [];
 
-    /**
-     * ContactRequestHelper constructor.
-     */
     public function __construct(
         LeadModel $leadModel,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         IpLookupHelper $ipLookupHelper,
-        LeadDeviceRepository $leadDeviceRepository,
         RequestStack $requestStack,
         Logger $logger,
         EventDispatcherInterface $eventDispatcher
@@ -100,7 +90,6 @@ class ContactRequestHelper
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadDeviceRepository = $leadDeviceRepository;
         $this->request              = $requestStack->getCurrentRequest();
         $this->logger               = $logger;
         $this->eventDispatcher      = $eventDispatcher;
@@ -171,7 +160,7 @@ class ContactRequestHelper
             }
         }
 
-        return $this->getContactByFingerprint();
+        throw new ContactNotFoundException();
     }
 
     /**
@@ -214,35 +203,6 @@ class ContactRequestHelper
 
             return;
         }
-    }
-
-    /**
-     * @return Lead
-     *
-     * @throws ContactNotFoundException
-     */
-    private function getContactByFingerprint()
-    {
-        if (!$this->coreParametersHelper->get('track_by_fingerprint')) {
-            // Track by fingerprint is disabled so just use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if (!$this->trackedContact->isAnonymous() || empty($this->queryFields['fingerprint'])) {
-            // We already know who this is or fingerprint is not available so just use tracked lead
-            throw new ContactNotFoundException();
-        }
-
-        if ($device = $this->leadDeviceRepository->getDeviceByFingerprint($this->queryFields['fingerprint'])) {
-            $deviceLead = $this->leadModel->getEntity($device['lead_id']);
-
-            $this->logger->addDebug("LEAD: Contact ID# {$deviceLead->getId()} tracked through fingerprint.");
-
-            // Merge tracked visitor into the contact found by fingerprint
-            return $this->mergeWithTrackedContact($deviceLead);
-        }
-
-        throw new ContactNotFoundException();
     }
 
     private function prepareContactFromRequest()
