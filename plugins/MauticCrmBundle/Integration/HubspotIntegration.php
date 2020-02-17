@@ -83,7 +83,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             $notificationModel,
             $fieldModel,
             $integrationEntityModel,
-            $doNotContact,
+            $doNotContact
         );
     }
 
