@@ -45,7 +45,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->expects($this->never())
             ->method('modifyTags');
 
-        $this->subscriber->onPointTriggerExecuted(new TriggerExecutedEvent($triggerEvent, $contact));
+        $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 
     public function testOnPointTriggerExecutedForChangeTagsTyoe()
@@ -62,6 +62,6 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('modifyTags')
             ->with($contact, ['tagA'], []);
 
-        $this->subscriber->onPointTriggerExecuted(new TriggerExecutedEvent($triggerEvent, $contact));
+        $this->subscriber->onTriggerExecute(new TriggerExecutedEvent($triggerEvent, $contact));
     }
 }
