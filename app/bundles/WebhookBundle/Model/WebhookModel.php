@@ -17,14 +17,17 @@ use JMS\Serializer\SerializerInterface;
 use Joomla\Http\Http;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
+use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
@@ -111,11 +114,21 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param      $entity
-     * @param      $formFactory
-     * @param null $action
+     * @param Webhook $entity
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        if (null === $entity->getSecret()) {
+            $entity->setSecret(EncryptionHelper::generateKey());
+        }
+
+        parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * @param Webhook $entity
+     * @param         $formFactory
+     * @param null    $action
      *
      * @return mixed
      *
@@ -137,7 +150,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @return Webhook|null
      */
     public function getEntity($id = null)
     {
@@ -149,13 +162,11 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\WebhookBundle\Entity\WebhookRepository
+     * @return WebhookRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:Webhook');
+        return $this->em->getRepository(Webhook::class);
     }
 
     /**
@@ -440,13 +451,11 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Get Qeueue Repository.
-     *
      * @return WebhookQueueRepository
      */
     public function getQueueRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:WebhookQueue');
+        return $this->em->getRepository(WebhookQueue::class);
     }
 
     /**
@@ -454,7 +463,7 @@ class WebhookModel extends FormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:Event');
+        return $this->em->getRepository(Event::class);
     }
 
     /**
@@ -462,7 +471,7 @@ class WebhookModel extends FormModel
      */
     public function getLogRepository()
     {
-        return $this->em->getRepository('MauticWebhookBundle:Log');
+        return $this->em->getRepository(Log::class);
     }
 
     /**
@@ -525,7 +534,7 @@ class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $queueRepo */
+        /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
         return $queueRepo->getEntities(

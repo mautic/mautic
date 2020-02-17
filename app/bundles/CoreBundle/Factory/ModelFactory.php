@@ -41,9 +41,11 @@ class ModelFactory
             throw new \InvalidArgumentException($modelNameKey.' is not a valid model key.');
         }
 
-        list($bundle, $name) = $parts;
+        [$bundle, $name] = $parts;
 
-        $containerKey = str_replace(['%bundle%', '%name%'], [$bundle, $name], 'mautic.%bundle%.model.%name%');
+        $containerKey = strtolower(
+            sprintf('mautic.%s.model.%s', $bundle, $name)
+        );
 
         if ($this->container->has($containerKey)) {
             return $this->container->get($containerKey);

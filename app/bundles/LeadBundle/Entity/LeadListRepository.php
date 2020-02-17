@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
@@ -92,19 +93,8 @@ class LeadListRepository extends CommonRepository
      *
      * @return array
      */
-    public function getLists($user = false, $alias = '', $id = '')
+    public function getLists(?User $user = null, $alias = '', $id = '')
     {
-        static $lists = [];
-
-        if (is_object($user)) {
-            $user = $user->getId();
-        }
-
-        $key = (int) $user.$alias.$id;
-        if (isset($lists[$key])) {
-            return $lists[$key];
-        }
-
         $q = $this->getEntityManager()->createQueryBuilder()
             ->from(LeadList::class, 'l', 'l.id');
 
@@ -112,10 +102,10 @@ class LeadListRepository extends CommonRepository
             ->andWhere($q->expr()->eq('l.isPublished', ':true'))
             ->setParameter('true', true, 'boolean');
 
-        if (!empty($user)) {
+        if ($user) {
             $q->andWhere($q->expr()->eq('l.isGlobal', ':true'));
             $q->orWhere('l.createdBy = :user');
-            $q->setParameter('user', $user);
+            $q->setParameter('user', $user->getId());
         }
 
         if (!empty($alias)) {
@@ -131,11 +121,7 @@ class LeadListRepository extends CommonRepository
 
         $q->orderBy('l.name');
 
-        $results = $q->getQuery()->getArrayResult();
-
-        $lists[$key] = $results;
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**

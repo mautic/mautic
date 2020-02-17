@@ -136,13 +136,13 @@ class ListModel extends FormModel
         //make sure alias is not already taken
         $repo      = $this->getRepository();
         $testAlias = $alias;
-        $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
+        $existing  = $repo->getLists(null, $testAlias, $entity->getId());
         $count     = count($existing);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $existing  = $repo->getLists($this->userHelper->getUser(), $testAlias, $entity->getId());
+            $existing  = $repo->getLists(null, $testAlias, $entity->getId());
             $count     = count($existing);
             ++$aliasTag;
         }
@@ -834,7 +834,7 @@ class ListModel extends FormModel
      */
     public function getUserLists($alias = '')
     {
-        $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : false;
+        $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
         return $this->em->getRepository(LeadList::class)->getLists($user, $alias);
     }

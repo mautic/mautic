@@ -79,6 +79,7 @@ return [
             'mautic.social.stats.subscriber' => [
                 'class'     => \MauticPlugin\MauticSocialBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
+                    'mautic.security',
                     'doctrine.orm.entity_manager',
                 ],
             ],

@@ -110,6 +110,7 @@ All fixtures must be defined as services in a bundle's config.php
 *   EventPass removed as it was not needed after the CommonSubscriber was removed.
 *   BabDev/Transifex/* classes were replaced with Mautic/Transifex/*
 *   Mautic\CoreBundle\IpLookup\MaxmindLookup was renamed to Mautic\CoreBundle\IpLookup\AbstractMaxmindLookup and set as abstract class
+*   Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer::__construct() has only 2 parameters now. The first one was removed as not used.
 *   Fingerprint2 JS library was removed.
 *   \Mautic\CoreBundle\CoreParametersHelper can no longer be used to fetch other Symfony parameters, `mautic.paths`, `mautic.supported_languages`, `mautic.bundles`, or `mautic.plugin.bundles`. 
     * For Symfony parameters: Pass them as needed to the constructor of the service
@@ -327,6 +328,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 *   Payloads for the following webhook events will no longer have the lead array element: Contact Deleted Event, Contact Points Changed Event, Contact Updated Event. “lead” array element has been removed. We have the same information in the contact array element.
 *   LeadEvents::FORM_SUBMIT_REMOVE_DO_NOT_CONTACT event is removed. Listen for the LeadEvents::ON_EXECUTE_SUBMIT_ACTION instead, and check the context of `lead.remove_do_not_contact`
 *   3rd param $identifier of Constructor of Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer removed as it was not used.
+*   Entity\LeadListRepository::getLists() signature changed to accept Mautic\UserBundle\Entity\User or null as first argument
 
 ### NotificationsBundle
 

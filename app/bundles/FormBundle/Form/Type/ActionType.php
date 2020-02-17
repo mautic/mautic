@@ -32,19 +32,27 @@ class ActionType extends AbstractType
     {
         $masks = ['description' => 'html'];
 
-        $builder->add('name', TextType::class, [
-            'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'name',
+            TextType::class,
+            [
+                'label'      => 'mautic.core.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => false,
+            ]
+        );
 
-        $builder->add('description', TextareaType::class, [
-            'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control editor'],
-            'required'   => false,
-        ]);
+        $builder->add(
+            'description',
+            TextareaType::class,
+            [
+                'label'      => 'mautic.core.description',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control editor'],
+                'required'   => false,
+            ]
+        );
 
         $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
         $formType        = $options['settings']['formType'];
@@ -53,7 +61,8 @@ class ActionType extends AbstractType
             'data'  => $properties,
             'attr'  => [
                 'data-formid' => $options['formId'], //sneaky way of feeding the formId without requiring the option
-            ], ];
+            ],
+        ];
         if (isset($options['settings']['formTypeCleanMasks'])) {
             $masks['properties'] = $options['settings']['formTypeCleanMasks'];
         }
@@ -77,16 +86,24 @@ class ActionType extends AbstractType
             $btnIcon  = 'fa fa-plus';
         }
 
-        $builder->add('buttons', FormButtonsType::class, [
-            'save_text'       => $btnValue,
-            'save_icon'       => $btnIcon,
-            'apply_text'      => false,
-            'container_class' => 'bottom-form-buttons',
-        ]);
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'save_text'       => $btnValue,
+                'save_icon'       => $btnIcon,
+                'apply_text'      => false,
+                'container_class' => 'bottom-form-buttons',
+            ]
+        );
 
-        $builder->add('formId', HiddenType::class, [
-            'mapped' => false,
-        ]);
+        $builder->add(
+            'formId',
+            HiddenType::class,
+            [
+                'mapped' => false,
+            ]
+        );
 
         $builder->addEventSubscriber(new CleanFormSubscriber($masks));
 
@@ -100,10 +117,6 @@ class ActionType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'settings' => false,
-        ]);
-
         $resolver->setRequired(['settings', 'formId']);
     }
 

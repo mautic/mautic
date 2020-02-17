@@ -281,7 +281,7 @@ class DynamicContentType extends AbstractType
                 'filters',
                 CollectionType::class,
                 [
-                    'type'          => DwcEntryFiltersType::class,
+                    'entry_type'    => DwcEntryFiltersType::class,
                     'entry_options' => [
                         'countries'    => $this->countryChoices,
                         'regions'      => $this->regionChoices,

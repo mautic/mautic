@@ -108,12 +108,12 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                     ?>
                                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                                         <?php foreach ($field as $value => $params):
-                                                            $list    = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                                            $choices = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList(
-                                                                $list,
-                                                                true,
-                                                                ('boolean' === $params['properties']['type'])
-                                                            );
+                                                            $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
+                                                            $choices   = ('boolean' === $params['properties']['type'])
+                                                                ?
+                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
+                                                                :
+                                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
                                                             $list     = json_encode($choices);
                                                             $callback = (!empty($params['properties']['callback']))
                                                                 ? $params['properties']['callback'] : '';

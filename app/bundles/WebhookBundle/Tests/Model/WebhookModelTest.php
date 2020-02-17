@@ -14,19 +14,57 @@ namespace Mautic\WebhookBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
+use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WebhookModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
     private $parametersHelperMock;
+
+    /**
+     * @var MockObject|SerializerInterface
+     */
     private $serializerMock;
+
+    /**
+     * @var MockObject|NotificationModel
+     */
     private $notificationModelMock;
+
+    /**
+     * @var MockObject|EntityManager
+     */
     private $entityManagerMock;
+
+    /**
+     * @var MockObject|WebhookRepository
+     */
+    private $webhookRepository;
+
+    /**
+     * @var MockObject|UserHelper
+     */
+    private $userHelper;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var WebhookModel
+     */
     private $model;
 
     protected function setUp()
@@ -35,7 +73,34 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         $this->serializerMock        = $this->createMock(SerializerInterface::class);
         $this->notificationModelMock = $this->createMock(NotificationModel::class);
         $this->entityManagerMock     = $this->createMock(EntityManager::class);
+        $this->userHelper            = $this->createMock(UserHelper::class);
+        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
+        $this->webhookRepository     = $this->createMock(WebhookRepository::class);
         $this->model                 = $this->initModel();
+    }
+
+    public function testSaveEntity(): void
+    {
+        $entity = new Webhook();
+
+        // The secret hash is null at first.
+        $this->assertNull($entity->getSecret());
+
+        $this->entityManagerMock->expects($this->once())
+            ->method('getRepository')
+            ->with(Webhook::class)
+            ->willReturn($this->webhookRepository);
+
+        $this->webhookRepository->expects($this->once())
+            ->method('saveEntity')
+            ->with($this->callback(function (Webhook $entity) {
+                // The secret hash is not empty on save.
+                $this->assertNotEmpty($entity->getSecret());
+
+                return true;
+            }));
+
+        $this->model->saveEntity($entity);
     }
 
     public function testGetEventsOrderbyDirWhenSetInWebhook()
@@ -85,7 +150,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManagerMock->expects($this->at(0))
             ->method('getRepository')
-            ->with('MauticWebhookBundle:WebhookQueue')
+            ->with(WebhookQueue::class)
             ->willReturn($queueRepositoryMock);
 
         $this->entityManagerMock->expects($this->once())
@@ -144,6 +209,8 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
         );
 
         $model->setEntityManager($this->entityManagerMock);
+        $model->setUserHelper($this->userHelper);
+        $model->setDispatcher($this->dispatcher);
 
         return $model;
     }

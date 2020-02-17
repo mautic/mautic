@@ -11,6 +11,12 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
+use Mautic\CoreBundle\Helper\ListParser\BarListParser;
+use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
+use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
+use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
+use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
 use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractFormFieldHelper
@@ -90,88 +96,58 @@ abstract class AbstractFormFieldHelper
     /**
      * Format a string into an array.
      *
-     * @param      $list
-     * @param bool $removeEmpty
-     * @param bool $ignoreNumerical
-     * @param bool $flipArray
+     * @param mixed $list                      List to parse
+     * @param bool  $removeEmpty               @deprecated Kept for BC with method signature
+     * @param bool  $deprecatedIgnoreNumerical @deprecated Flag was introduced to support boolean choice lists; use parseBooleanList instead
      *
      * @return array
      */
-    public static function parseList($list, $removeEmpty = true, $ignoreNumerical = false, $flipArray = false)
+    public static function parseList($list, $removeEmpty = true, $deprecatedIgnoreNumerical = false)
     {
-        // Note if this was an array to start and if we need to determine if the keys are sequentially numerical
-        // for BC purposes
-        $checkNumericalKeys = true;
-        if (!is_array($list)) {
-            // Try to json decode first
-            if (0 === strpos($list, '{') && $json = json_decode($list, true)) {
-                $list = $json;
-            } else {
-                if (false !== strpos($list, '|')) {
-                    $checkNumericalKeys = false;
-                    $parts              = explode('||', $list);
-                    if (count($parts) > 1) {
-                        $labels = explode('|', $parts[0]);
-                        $values = explode('|', $parts[1]);
-                        $list   = array_combine($values, $labels);
-                    } else {
-                        $labels = explode('|', $list);
-                        $values = $labels;
-                        $list   = array_combine($values, $labels);
-                    }
-                } elseif (!empty($list) && !is_array($list)) {
-                    $list = [$list => $list];
-                }
+        if ($deprecatedIgnoreNumerical) {
+            // BC support for support
+            return static::parseBooleanList($list);
+        }
+
+        /** @var ListParserInterface[] $parsers */
+        $parsers = [
+            new JsonListParser(),
+            new BarListParser(),
+            new ValueListParser(),
+            new ArrayListParser(),
+        ];
+
+        $listParser = null;
+        foreach ($parsers as $parser) {
+            try {
+                $list = $parser->parse($list);
+            } catch (FormatNotSupportedException $exception) {
+                continue;
             }
         }
 
-        if (!$ignoreNumerical && $checkNumericalKeys && isset($list[0]) && !is_array($list[0]) && array_keys($list) === range(0, count($list) - 1)) {
-            // Numberical array so set labels as values
-            $list = array_combine($list, $list);
-        }
+        return static::parseChoiceList($list);
+    }
 
-        $valueFormatting = function ($list) use ($removeEmpty, $flipArray) {
-            $choices = [];
-            foreach ($list as $val => $label) {
-                if (is_array($label) && isset($label['value'])) {
-                    $val   = $label['value'];
-                    $label = $label['label'];
-                }
-                if ($removeEmpty && empty($val) && empty($label)) {
-                    continue;
-                } elseif (empty($label)) {
-                    $label = $val;
-                }
-                if (!is_array($label)) {
-                    $value = trim(html_entity_decode($val, ENT_QUOTES));
-                    $label = trim(html_entity_decode($label, ENT_QUOTES));
-                    if ($flipArray) {
-                        $choices[$label] = $value;
-                    } else {
-                        $choices[$value] = $label;
-                    }
-                }
-            }
+    public static function parseBooleanList($list): array
+    {
+        /** @var ListParserInterface[] $parsers */
+        $parsers = [
+            new JsonListParser(),
+            new BarListParser(),
+            new ValueListParser(),
+        ];
 
-            return $choices;
-        };
-
-        $formatList = $list;
-        $choices    = [];
-
-        if (is_array($list)) {
-            foreach ($list as $val => $label) {
-                if (is_array($label) && !isset($label['label'])) {
-                    $choices[$val] = $valueFormatting($label);
-                    unset($formatList[$val]);
-                }
-            }
-            if (!empty($formatList)) {
-                $choices = $valueFormatting($formatList);
+        $listParser = null;
+        foreach ($parsers as $parser) {
+            try {
+                $list = $parser->parse($list);
+            } catch (FormatNotSupportedException $exception) {
+                continue;
             }
         }
 
-        return $choices;
+        return static::parseChoiceList($list);
     }
 
     /**
@@ -188,6 +164,16 @@ abstract class AbstractFormFieldHelper
             case self::FORMAT_BAR:
                 return implode('|', $choices);
             case self::FORMAT_SIMPLE_ARRAY:
+                if (isset($choices[0]) && isset($choices[0]['label'])) {
+                    $array = [];
+
+                    foreach ($choices as $choice) {
+                        $array[$choice['value']] = $choice['label'];
+                    }
+
+                    return $array;
+                }
+
                 return $choices;
             case self::FORMAT_ARRAY:
                 $array = [];
@@ -200,5 +186,41 @@ abstract class AbstractFormFieldHelper
 
                 return $array;
         }
+    }
+
+    protected static function parseChoiceList(array $list)
+    {
+        $choices = [];
+        foreach ($list as $value => $label) {
+            if (is_array($label) && isset($label['value'])) {
+                $value = $label['value'];
+                $label = $label['label'];
+
+                if ('' === $value || null === $value) {
+                    // Value is empty which can't work as a key
+                    continue;
+                }
+
+                $choices[trim(html_entity_decode($value, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                continue;
+            }
+
+            if (('' === $label || null === $label) && ('' === $value || null === $value)) {
+                // Both label and value are empty which can't work as choices
+                continue;
+            }
+
+            if (is_array($label)) {
+                // Process the label as an array as this is likely an option group
+                $key = trim(html_entity_decode($value, ENT_QUOTES));
+
+                $choices[$key] = static::parseChoiceList($label);
+                continue;
+            }
+
+            $choices[trim(html_entity_decode($value, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+        }
+
+        return $choices;
     }
 }

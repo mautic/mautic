@@ -67,7 +67,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:Trigger');
+        return $this->em->getRepository(Trigger::class);
     }
 
     /**
@@ -77,7 +77,7 @@ class TriggerModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticPointBundle:TriggerEvent');
+        return $this->em->getRepository(TriggerEvent::class);
     }
 
     /**
@@ -267,7 +267,7 @@ class TriggerModel extends CommonFormModel
     /**
      * Gets array of custom events from bundles subscribed PointEvents::TRIGGER_ON_BUILD.
      *
-     * @return mixed
+     * @return mixed[]
      */
     public function getEvents()
     {
@@ -303,8 +303,7 @@ class TriggerModel extends CommonFormModel
     /**
      * Triggers a specific event.
      *
-     * @param array $event
-     * @param Lead  $lead
+     * @param array $event triggerEvent converted to array
      * @param bool  $force
      *
      * @return bool Was event triggered
@@ -316,7 +315,7 @@ class TriggerModel extends CommonFormModel
             return false;
         }
 
-        if (null == $lead) {
+        if (null === $lead) {
             $lead = $this->leadModel->getCurrentLead();
         }
 
@@ -347,9 +346,10 @@ class TriggerModel extends CommonFormModel
             $triggerEvent = $this->getEventRepository()->find($event['id']);
 
             $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-            $event                = $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
 
-            return $event->getResult();
+            $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
+
+            return $triggerExecutedEvent->getResult();
         }
     }
 
