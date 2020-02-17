@@ -101,7 +101,7 @@ class PublicController extends FormController
             if (array_key_exists('socialProfiles', $result)) {
                 $socialProfiles = $result['socialProfiles'];
             }
-            foreach (['facebook', 'foursquare', 'googleplus', 'instagram', 'linkedin', 'twitter'] as $p) {
+            foreach (['facebook', 'foursquare', 'instagram', 'linkedin', 'twitter'] as $p) {
                 foreach ($socialProfiles as $socialProfile) {
                     if (array_key_exists('type', $socialProfile) && $socialProfile['type'] === $p && empty($currFields[$p]['value'])) {
                         $data[$p] = array_key_exists('url', $socialProfile) ? $socialProfile['url'] : '';

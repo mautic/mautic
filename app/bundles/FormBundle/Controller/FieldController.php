@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -145,6 +146,10 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
+            /** @var FormModel $formModel */
+            $formModel  = $this->getModel('form');
+            $formEntity = $formModel->getEntity($formId);
+
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
             $passthroughVars['fieldHtml'] = $this->renderView(
@@ -155,6 +160,7 @@ class FieldController extends CommonFormController
                     'field'         => $formField,
                     'id'            => $keyId,
                     'formId'        => $formId,
+                    'formName'      => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
                     'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'     => true,

@@ -14,29 +14,11 @@ namespace Mautic\CoreBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class SlotImageType.
- */
 class SlotSocialFollowType extends SlotType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
-
-        $builder->add(
-            'glink',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.googleplus.url',
-                'label_attr' => ['class' => 'control-label'],
-                'required'   => false,
-                'attr'       => [
-                    'value'           => 'http://plus.google.com',
-                    'class'           => 'form-control',
-                    'data-slot-param' => 'glink',
-                ],
-            ]
-        );
 
         $builder->add(
             'flink',

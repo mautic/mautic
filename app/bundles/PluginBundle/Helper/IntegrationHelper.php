@@ -409,7 +409,6 @@ class IntegrationHelper
                 ],
                 'flickr' => "/flickr.com\/photos\/(.*?)($|\/)/",
                 'skype'  => "/skype:(.*?)($|\?)/",
-                'google' => "/plus.google.com\/(.*?)($|\/)/",
             ];
         } else {
             //populate placeholder
@@ -423,7 +422,6 @@ class IntegrationHelper
                 'youtube'    => 'https://youtube.com/user/%handle%',
                 'flickr'     => 'https://flickr.com/photos/%handle%',
                 'skype'      => 'skype:%handle%?call',
-                'googleplus' => 'https://plus.google.com/%handle%',
             ];
         }
     }

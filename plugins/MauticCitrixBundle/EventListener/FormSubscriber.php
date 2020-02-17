@@ -13,7 +13,6 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -92,9 +91,6 @@ class FormSubscriber implements EventSubscriberInterface
         $this->templating      = $templating;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -106,10 +102,7 @@ class FormSubscriber implements EventSubscriberInterface
             CitrixEvents::ON_ASSIST_REMOTE_ACTION        => ['onAssistRemote', 0],
             CitrixEvents::ON_FORM_VALIDATE_ACTION        => ['onFormValidate', 0],
             FormEvents::FORM_PRE_SAVE                    => ['onFormPreSave', 0],
-            PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST  => [
-                ['onRequest', 0],
-                ['onResponse', 0],
-            ],
+            PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST  => ['onRequest', 0],
         ];
     }
 
