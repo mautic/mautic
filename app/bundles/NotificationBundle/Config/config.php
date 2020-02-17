@@ -16,7 +16,6 @@ return [
                 'class'     => \Mautic\NotificationBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.helper.integration',
-                    'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
                     'event_dispatcher',
