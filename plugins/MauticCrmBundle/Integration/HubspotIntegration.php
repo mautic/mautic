@@ -77,11 +77,11 @@ class HubspotIntegration extends CrmAbstractIntegration
             $translator,
             $logger,
             $encryptionHelper,
-            $leadModel,
             $companyModel,
             $pathsHelper,
             $notificationModel,
             $fieldModel,
+            $integrationEntityModel,
             $doNotContact,
             $integrationEntityModel
         );

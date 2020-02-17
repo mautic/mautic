@@ -178,7 +178,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-
+        var_dump($response);
         $this->assertSame(3, $response['contacts'][0]['doNotContact'][0]['reason']);
 
         // Batch update contact and remove DNC record

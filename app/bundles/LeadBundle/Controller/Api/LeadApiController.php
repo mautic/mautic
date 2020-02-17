@@ -430,7 +430,7 @@ class LeadApiController extends CommonApiController
     public function removeDncAction($id, $channel)
     {
         /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
-        $doNotContact = $this->getModel('mautic.lead.model.dnc');
+        $doNotContact = $this->get('mautic.lead.model.dnc');
 
         $entity = $this->model->getEntity((int) $id);
 
@@ -613,7 +613,7 @@ class LeadApiController extends CommonApiController
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
                 /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
-                $doNotContact = $this->getModel('mautic.lead.model.dnc');
+                $doNotContact = $this->get('mautic.lead.model.dnc');
 
                 if (DoNotContact::IS_CONTACTABLE === $reason) {
                     // Remove DNC record
