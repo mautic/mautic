@@ -130,7 +130,7 @@ $indexCount = 1;
                     foreach ($mauticChoices as $keyLabel => $options): ?>
                     <?php if (is_array($options)) : ?>
                     <optgroup label="<?php echo $keyLabel; ?>">
-                        <?php foreach ($options as $keyValue => $o): ?>
+                        <?php foreach ($options as $o => $keyValue): ?>
                         <option value="<?php echo $view->escape($keyValue); ?>" <?php if ($keyValue === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $keyValue): echo 'selected'; endif; ?>>
                             <?php echo $o; ?>
                         </option>
