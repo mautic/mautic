@@ -63,7 +63,6 @@ class IteratorExportDataModel implements \Iterator
             $this->totalResult = $this->data ? count($this->data) : 0;
             $this->total       = $this->total + $this->totalResult;
             $this->position    = 0;
-            ++$this->page;
         }
     }
 
