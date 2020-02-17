@@ -66,10 +66,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -82,7 +78,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new Unsubscribe($transport, $contactFinder, $leadModel, $translator, $logger, $doNotContact);
+        $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 
         $message = new Message();
         $this->assertTrue($processor->process($message));
@@ -127,10 +123,6 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -143,7 +135,7 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new Unsubscribe($transport, $contactFinder, $leadModel, $translator, $logger, $doNotContact);
+        $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 
         $message     = new Message();
         $message->to = ['contact+unsubscribe_123abc@test.com' => null];

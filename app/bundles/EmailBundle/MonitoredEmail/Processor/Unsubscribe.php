@@ -11,14 +11,12 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -33,11 +31,6 @@ class Unsubscribe implements ProcessorInterface
      * @var ContactFinder
      */
     private $contactFinder;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
 
     /**
      * @var TranslatorInterface
@@ -65,14 +58,12 @@ class Unsubscribe implements ProcessorInterface
     public function __construct(
         \Swift_Transport $transport,
         ContactFinder $contactFinder,
-        LeadModel $leadModel,
         TranslatorInterface $translator,
         LoggerInterface $logger,
         \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->transport     = $transport;
         $this->contactFinder = $contactFinder;
-        $this->leadModel     = $leadModel;
         $this->translator    = $translator;
         $this->logger        = $logger;
         $this->doNotContact  = $doNotContact;

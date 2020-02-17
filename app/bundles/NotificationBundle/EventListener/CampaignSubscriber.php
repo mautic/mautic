@@ -16,7 +16,6 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
 use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
@@ -29,11 +28,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
-
     /**
      * @var NotificationModel
      */
@@ -61,14 +55,12 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi,
         EventDispatcherInterface $dispatcher,
         \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->integrationHelper = $integrationHelper;
-        $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->notificationApi   = $notificationApi;
         $this->dispatcher        = $dispatcher;

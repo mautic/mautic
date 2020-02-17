@@ -622,7 +622,6 @@ return [
                 'arguments' => [
                     'swiftmailer.transport.real',
                     'mautic.message.search.contact',
-                    'mautic.lead.model.lead',
                     'translator',
                     'monolog.logger.mautic',
                     'mautic.lead.model.dnc',
@@ -632,7 +631,6 @@ return [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
                 'arguments' => [
                     'mautic.message.search.contact',
-                    'mautic.lead.model.lead',
                     'translator',
                     'monolog.logger.mautic',
                     'mautic.lead.model.dnc',

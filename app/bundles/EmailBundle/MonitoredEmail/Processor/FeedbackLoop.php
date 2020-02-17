@@ -16,7 +16,6 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -26,11 +25,6 @@ class FeedbackLoop implements ProcessorInterface
      * @var ContactFinder
      */
     private $contactFinder;
-
-    /**
-     * @var LeadModel
-     */
-    private $leadModel;
 
     /**
      * @var TranslatorInterface
@@ -57,13 +51,11 @@ class FeedbackLoop implements ProcessorInterface
      */
     public function __construct(
         ContactFinder $contactFinder,
-        LeadModel $leadModel,
         TranslatorInterface $translator,
         LoggerInterface $logger,
         \Mautic\LeadBundle\Model\DoNotContact $doNotContact
     ) {
         $this->contactFinder = $contactFinder;
-        $this->leadModel     = $leadModel;
         $this->translator    = $translator;
         $this->logger        = $logger;
         $this->doNotContact  = $doNotContact;

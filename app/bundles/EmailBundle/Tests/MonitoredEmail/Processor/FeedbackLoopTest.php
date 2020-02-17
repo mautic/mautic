@@ -20,7 +20,6 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
 class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
@@ -63,12 +62,6 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $leadModel->expects($this->once())
-            ->method('addDncForLead');
-
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -81,7 +74,7 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $processor = new FeedbackLoop($contactFinder, $leadModel, $translator, $logger, $doNotContact);
+        $processor = new FeedbackLoop($contactFinder, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->fblReport = <<<'BODY'
