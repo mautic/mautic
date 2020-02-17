@@ -150,7 +150,7 @@ class WebhookModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManagerMock->expects($this->at(0))
             ->method('getRepository')
-            ->with('MauticWebhookBundle:WebhookQueue')
+            ->with(WebhookQueue::class)
             ->willReturn($queueRepositoryMock);
 
         $this->entityManagerMock->expects($this->once())
