@@ -86,9 +86,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $doNotContact = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doNotContact = $this->createMock(DoNotContact::class);
 
         $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
 
@@ -154,9 +152,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $doNotContact = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doNotContact = $this->createMock(DoNotContact::class);
 
         $bouncer = new Bounce($transport, $contactFinder, $statRepo, $leadModel, $translator, $logger, $doNotContact);
 

@@ -2,9 +2,19 @@
 
 declare(strict_types=1);
 
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 class DoNotContactAddEvent extends Event
@@ -25,7 +35,7 @@ class DoNotContactAddEvent extends Event
 
     private $override;
 
-    public function __construct($lead, $channel, $comments = '', $reason = DNC::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = true)
+    public function __construct(Lead $lead, $channel, $comments = '', $reason = DNC::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = true)
     {
         $this->lead               = $lead;
         $this->channel            = $channel;

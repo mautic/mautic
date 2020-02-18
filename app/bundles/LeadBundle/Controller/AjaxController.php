@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -347,7 +347,7 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
             $leadModel = $this->getModel('lead');
-            /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+            /** @var DoNotContactModel $doNotContact */
             $doNotContact = $this->getModel('mautic.lead.model.dnc');
 
             $lead = $leadModel->getEntity($leadId);
@@ -463,10 +463,10 @@ class AjaxController extends CommonAjaxController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
 
-            /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+            /** @var DoNotContactModel $doNotContact */
             $doNotContact = $this->getModel('mautic.lead.model.dnc');
 
-            /** @var \Mautic\LeadBundle\Entity\DoNotContact $dnc */
+            /** @var DoNotContactModel $dnc */
             $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 [
                     'id' => $dncId,

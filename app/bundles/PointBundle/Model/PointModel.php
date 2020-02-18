@@ -58,7 +58,7 @@ class PointModel extends CommonFormModel
     /**
      * @var ContactTracker
      */
-    protected $contactTracker;
+    private $contactTracker;
 
     public function __construct(
         Session $session,

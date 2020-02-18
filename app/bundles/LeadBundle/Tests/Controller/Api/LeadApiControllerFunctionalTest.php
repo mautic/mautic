@@ -169,7 +169,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'email'        => $emailAddress,
             'doNotContact' => [[
                 'reason'    => DoNotContact::MANUAL,
-                'comments'  => 'manually--',
+                'comments'  => 'manually',
                 'channel'   => 'email',
                 'channelId' => null,
             ]],

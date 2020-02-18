@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
@@ -612,7 +613,7 @@ class LeadApiController extends CommonApiController
 
                 $reason = (int) ArrayHelper::getValue('reason', $dnc, DoNotContact::MANUAL);
 
-                /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+                /** @var DoNotContactModel $doNotContact */
                 $doNotContact = $this->get('mautic.lead.model.dnc');
 
                 if (DoNotContact::IS_CONTACTABLE === $reason) {

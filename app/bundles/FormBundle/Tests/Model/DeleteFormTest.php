@@ -73,10 +73,7 @@ class DeleteFormTest extends FormTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
-        $contactTracker = $this
-            ->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactTracker = $this->createMock(ContactTracker::class);
 
         $columnSchemaHelper = $this
             ->getMockBuilder(ColumnSchemaHelper::class)

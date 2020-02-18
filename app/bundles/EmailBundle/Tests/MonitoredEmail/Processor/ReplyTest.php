@@ -83,9 +83,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $contactTracker = $this->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactTracker = $this->createMock(ContactTracker::class);
 
         $processor = new Reply($statRepo, $contactFinder, $leadModel, $dispatcher, $logger, $contactTracker);
 

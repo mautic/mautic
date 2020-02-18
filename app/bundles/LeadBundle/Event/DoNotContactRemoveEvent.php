@@ -2,8 +2,18 @@
 
 declare(strict_types=1);
 
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
 class DoNotContactRemoveEvent extends Event
@@ -16,7 +26,7 @@ class DoNotContactRemoveEvent extends Event
 
     private $persist;
 
-    public function __construct($lead, $channel, $persist = true)
+    public function __construct(Lead $lead, $channel, $persist = true)
     {
         $this->lead    = $lead;
         $this->channel = $channel;

@@ -56,7 +56,7 @@ class TriggerModel extends CommonFormModel
     /**
      * @var ContactTracker
      */
-    protected $contactTracker;
+    private $contactTracker;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,

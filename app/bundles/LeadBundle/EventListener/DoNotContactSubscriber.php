@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
@@ -18,7 +27,7 @@ class DoNotContactSubscriber implements EventSubscriberInterface
         $this->doNotContact = $doNotContact;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DoNotContactAddEvent::class    => ['addDncForLead', 0],
@@ -32,7 +41,7 @@ class DoNotContactSubscriber implements EventSubscriberInterface
      * @param bool $persist
      * @param null $reason
      */
-    public function removeDncForLead(DoNotContactRemoveEvent $doNotContactRemoveEvent)
+    public function removeDncForLead(DoNotContactRemoveEvent $doNotContactRemoveEvent): void
     {
         $this->doNotContact->removeDncForContact(
             $doNotContactRemoveEvent->getLead()->getId(),
@@ -41,7 +50,7 @@ class DoNotContactSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent)
+    public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent): void
     {
         $this->doNotContact->addDncForContact(
             $doNotContactAddEvent->getLead()->getId(),
