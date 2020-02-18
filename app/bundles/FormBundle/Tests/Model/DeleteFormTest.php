@@ -12,7 +12,8 @@
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\FormBundle\Entity\Form;
@@ -47,11 +48,6 @@ class DeleteFormTest extends FormTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
-        $schemaHelperFactory = $this
-            ->getMockBuilder(SchemaHelperFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $formActionModel = $this
             ->getMockBuilder(ActionModel::class)
             ->disableOriginalConstructor()
@@ -82,17 +78,28 @@ class DeleteFormTest extends FormTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
+        $columnSchemaHelper = $this
+            ->getMockBuilder(ColumnSchemaHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $tableSchemaHelper = $this
+            ->getMockBuilder(TableSchemaHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $formModel = new FormModel(
             $requestStack,
             $templatingHelperMock,
             $themeHelper,
-            $schemaHelperFactory,
             $formActionModel,
             $formFieldModel,
             $leadModel,
             $fieldHelper,
             $leadFieldModel,
-            $formUploaderMock
+            $formUploaderMock,
+            $columnSchemaHelper,
+            $tableSchemaHelper
         );
 
         $dispatcher = $this

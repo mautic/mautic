@@ -138,19 +138,6 @@ class MauticFactory
     }
 
     /**
-     * Gets a schema helper for manipulating database schemas.
-     *
-     * @param string $type
-     * @param string $name Object name; i.e. table name
-     *
-     * @return mixed
-     */
-    public function getSchemaHelper($type, $name = null)
-    {
-        return $this->container->get('mautic.schema.helper.factory')->getSchemaHelper($type, $name);
-    }
-
-    /**
      * Retrieves Translator.
      *
      * @return \Mautic\CoreBundle\Translation\Translator

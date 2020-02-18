@@ -361,7 +361,6 @@ return [
                     'request_stack',
                     'mautic.helper.templating',
                     'mautic.helper.theme',
-                    'mautic.schema.helper.factory',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
                     'mautic.lead.model.lead',
@@ -369,6 +368,8 @@ return [
                     'mautic.lead.model.field',
                     'mautic.form.helper.form_uploader',
                     'mautic.form.model.submission_result_loader',
+                    'mautic.schema.helper.column',
+                    'mautic.schema.helper.table',
                 ],
             ],
             'mautic.form.model.submission' => [

@@ -12,7 +12,8 @@
 namespace Mautic\FormBundle\Model;
 
 use DOMDocument;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -55,11 +56,6 @@ class FormModel extends CommonFormModel
     protected $themeHelper;
 
     /**
-     * @var SchemaHelperFactory
-     */
-    protected $schemaHelperFactory;
-
-    /**
      * @var ActionModel
      */
     protected $formActionModel;
@@ -90,30 +86,42 @@ class FormModel extends CommonFormModel
     private $formUploader;
 
     /**
+     * @var ColumnSchemaHelper
+     */
+    private $columnSchemaHelper;
+
+    /**
+     * @var TableSchemaHelper
+     */
+    private $tableSchemaHelper;
+
+    /**
      * FormModel constructor.
      */
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
         ThemeHelper $themeHelper,
-        SchemaHelperFactory $schemaHelperFactory,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        ColumnSchemaHelper $columnSchemaHelper,
+        TableSchemaHelper $tableSchemaHelper
     ) {
         $this->request             = $requestStack->getCurrentRequest();
         $this->templatingHelper    = $templatingHelper;
         $this->themeHelper         = $themeHelper;
-        $this->schemaHelperFactory = $schemaHelperFactory;
         $this->formActionModel     = $formActionModel;
         $this->formFieldModel      = $formFieldModel;
         $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
         $this->leadFieldModel      = $leadFieldModel;
         $this->formUploader        = $formUploader;
+        $this->columnSchemaHelper  = $columnSchemaHelper;
+        $this->tableSchemaHelper   = $tableSchemaHelper;
     }
 
     /**
@@ -591,11 +599,10 @@ class FormModel extends CommonFormModel
     public function createTableSchema(Form $entity, $isNew = false, $dropExisting = false)
     {
         //create the field as its own column in the leads table
-        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$schemaHelper->checkTableExists($name))) {
-            $schemaHelper->addTable([
+        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+            $this->columnSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
                 'options' => [
@@ -603,16 +610,16 @@ class FormModel extends CommonFormModel
                     'uniqueIndex' => ['submission_id', 'form_id'],
                 ],
             ], true, $dropExisting);
-            $schemaHelper->executeChanges();
+            $this->tableSchemaHelper->executeChanges();
         } else {
             //check to make sure columns exist
-            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('column', $name);
+            $columnSchemaHelper = $this->columnSchemaHelper->setName($name);
             foreach ($columns as $c) {
-                if (!$schemaHelper->checkColumnExists($c['name'])) {
-                    $schemaHelper->addColumn($c, false);
+                if (!$columnSchemaHelper->checkColumnExists($c['name'])) {
+                    $columnSchemaHelper->addColumn($c, false);
                 }
             }
-            $schemaHelper->executeChanges();
+            $columnSchemaHelper->executeChanges();
         }
     }
 
@@ -626,9 +633,8 @@ class FormModel extends CommonFormModel
 
         if (!$entity->getId()) {
             //delete the associated results table
-            $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
-            $schemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
-            $schemaHelper->executeChanges();
+            $this->tableSchemaHelper->deleteTable('form_results_'.$entity->deletedId.'_'.$entity->getAlias());
+            $this->tableSchemaHelper->executeChanges();
         }
         parent::deleteEntity($entity);
     }
@@ -639,14 +645,13 @@ class FormModel extends CommonFormModel
     public function deleteEntities($ids)
     {
         $entities     = parent::deleteEntities($ids);
-        $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
             /* @var Form $entity */
             //delete the associated results table
-            $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
         }
-        $schemaHelper->executeChanges();
+        $this->tableSchemaHelper->executeChanges();
 
         return $entities;
     }

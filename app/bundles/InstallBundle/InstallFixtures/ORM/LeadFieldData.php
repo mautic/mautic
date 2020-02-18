@@ -59,10 +59,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         foreach ($fieldGroups as $object => $fields) {
             if ('company' === $object) {
                 /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'companies');
+                $schema = $this->container->get('mautic.schema.helper.column')->setName('companies');
             } else {
                 /** @var ColumnSchemaHelper $schema */
-                $schema = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('column', 'leads');
+                $schema = $this->container->get('mautic.schema.helper.column')->setName('leads');
             }
 
             $order = 1;
@@ -111,10 +111,10 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         foreach ($indexesToAdd as $object => $indexes) {
             if ('company' === $object) {
                 /** @var IndexSchemaHelper $indexHelper */
-                $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'companies');
+                $indexHelper = $this->container->get('mautic.schema.helper.index')->setName('companies');
             } else {
                 /** @var IndexSchemaHelper $indexHelper */
-                $indexHelper = $this->container->get('mautic.schema.helper.factory')->getSchemaHelper('index', 'leads');
+                $indexHelper = $this->container->get('mautic.schema.helper.index')->setName('leads');
             }
 
             foreach ($indexes as $name => $field) {

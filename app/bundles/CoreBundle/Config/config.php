@@ -855,14 +855,6 @@ return [
                 'tag' => 'twig.extension',
             ],
             // Schema
-            'mautic.schema.helper.factory' => [
-                'class'     => 'Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory',
-                'arguments' => [
-                    'mautic.schema.helper.table',
-                    'mautic.schema.helper.index',
-                    'mautic.schema.helper.column',
-                ],
-            ],
             'mautic.schema.helper.column' => [
                 'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',
                 'arguments' => [
