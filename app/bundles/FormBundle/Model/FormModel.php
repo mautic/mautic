@@ -602,7 +602,7 @@ class FormModel extends CommonFormModel
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
         if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
-            $this->columnSchemaHelper->addTable([
+            $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
                 'options' => [
