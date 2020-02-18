@@ -18,6 +18,7 @@
 *   Symfony deprecations were removed or refactored [https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md](https://github.com/symfony/symfony/blob/3.0/UPGRADE-3.0.md)
 *   Migrating the database should be done by upgrading to the latest 2.x series then to M3 as all 2.x migrations have been removed from the 3.x code
 *   jQuery v2.x has been replaced with jQuery v3.3.1. jQuery 2.x code is not supported anymore..
+*   app/version.txt has beeen removed in favor of app/release_metadata.json which includes the version
 
 ### Subscribers
 
