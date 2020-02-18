@@ -367,7 +367,6 @@ return [
                     'mautic.helper.form.field_helper',
                     'mautic.lead.model.field',
                     'mautic.form.helper.form_uploader',
-                    'mautic.form.model.submission_result_loader',
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
                 ],
