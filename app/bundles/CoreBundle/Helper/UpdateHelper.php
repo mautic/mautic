@@ -11,7 +11,12 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
+use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
+use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataIsFreshException;
+use Mautic\CoreBundle\Helper\Update\Github\Release;
+use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
 use Monolog\Logger;
 
 /**
@@ -19,11 +24,6 @@ use Monolog\Logger;
  */
 class UpdateHelper
 {
-    /**
-     * @var Http
-     */
-    private $connector;
-
     /**
      * @var PathsHelper
      */
@@ -40,14 +40,16 @@ class UpdateHelper
     private $coreParametersHelper;
 
     /**
-     * UpdateHelper constructor.
+     * @var Client
      */
-    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Http $connector)
+    private $client;
+
+    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Client $client)
     {
         $this->pathsHelper          = $pathsHelper;
         $this->logger               = $logger;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->connector            = $connector;
+        $this->client               = $client;
     }
 
     /**
@@ -61,7 +63,12 @@ class UpdateHelper
     {
         // GET the update data
         try {
-            $data = $this->connector->get($package);
+            $response = $this->client->request('GET', $package);
+            if (200 !== $response->getStatusCode()) {
+                throw new \Exception('error code '.$response->getStatusCode());
+            }
+
+            $data = json_decode($response->getBody()->getContents(), true);
         } catch (\Exception $exception) {
             $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
@@ -115,19 +122,56 @@ class UpdateHelper
      */
     public function fetchData($overrideCache = false)
     {
-        $cacheFile = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
+        $cacheFile       = $this->pathsHelper->getSystemPath('cache').'/lastUpdateCheck.txt';
+        $updateStability = $this->coreParametersHelper->get('update_stability');
 
-        // Check if we have a cache file and try to return cached data if so
-        if (!$overrideCache && is_readable($cacheFile)) {
-            $update = (array) json_decode(file_get_contents($cacheFile));
-
-            // Check if the user has changed the update channel, if so the cache is invalidated
-            if ($update['stability'] == $this->coreParametersHelper->get('update_stability')) {
-                // If we're within the cache time, return the cached data
-                if ($update['checkedTime'] > strtotime('-3 hours')) {
-                    return $update;
-                }
+        try {
+            if (!$overrideCache && is_readable($cacheFile)) {
+                return $this->checkCachedUpdateData($updateStability, $overrideCache);
             }
+        } catch (UpdateCacheDataIsFreshException $exception) {
+            // Fetch a fresh list
+        }
+
+        // Send statistics if enabled
+        $this->sendStats();
+
+        // Fetch the latest version
+        try {
+            $release = $this->fetchLatestCompatibleVersion($updateStability);
+        } catch (LatestVersionSupportedException $exception) {
+            return [
+                'error'   => false,
+                'message' => 'mautic.core.updater.running.latest.version',
+            ];
+        } catch (CouldNotFetchLatestVersionException $exception) {
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.updates',
+            ];
+        }
+
+        // The user is able to update to the latest version, cache the data first
+        $data = [
+            'error'        => false,
+            'message'      => 'mautic.core.updater.update.available',
+            'version'      => $release->getVersion(),
+            'announcement' => $release->getAnnouncementUrl(),
+            'package'      => $release->getDownloadUrl(),
+            'stability'    => $release->getStability(),
+            'checkedTime'  => time(),
+        ];
+
+        file_put_contents($cacheFile, json_encode($data));
+
+        return $data;
+    }
+
+    private function sendStats()
+    {
+        if (!$statUrl = $this->coreParametersHelper->get('stats_update_url')) {
+            // Stat collection disabled
+            return;
         }
 
         // Before processing the update data, send up our metrics
@@ -151,79 +195,68 @@ class UpdateHelper
                 ]
             );
 
-            $this->connector->post('https://updates.mautic.org/stats/send', $data, [], 10);
+            $options = [
+                'form_params'     => $data,
+                'connect_timeout' => 10,
+            ];
+
+            $this->client->request('POST', $statUrl, $options);
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
+            $this->logger->error(sprintf('STAT UPDATE: %s', $exception->getMessage()));
+        }
+    }
+
+    /**
+     * @throws UpdateCacheDataIsFreshException
+     */
+    private function checkCachedUpdateData(string $cacheFile, string $updateStability): array
+    {
+        // Check if we have a cache file and try to return cached data if so
+        $update = (array) json_decode(file_get_contents($cacheFile));
+
+        // Check if the user has changed the update channel, if so the cache is invalidated
+        if ($update['stability'] === $updateStability && $update['checkedTime'] > strtotime('-3 hours')) {
+            throw new UpdateCacheDataIsFreshException();
         }
 
-        // Get the update data
-        try {
-            $appData = array_map(
-                'trim',
-                [
-                    'appVersion' => MAUTIC_VERSION,
-                    'phpVersion' => PHP_VERSION,
-                    'stability'  => $this->coreParametersHelper->get('update_stability'),
-                ]
-            );
+        return $update;
+    }
 
-            $data   = $this->connector->post($this->coreParametersHelper->get('system_update_url'), $appData, [], 10);
-            $update = json_decode($data->body);
-        } catch (\Exception $exception) {
-            // Log the error
-            $this->logger->addError('An error occurred while attempting to fetch updates: '.$exception->getMessage());
-
-            return [
-                'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.updates',
-            ];
+    /**
+     * @throws CouldNotFetchLatestVersionException
+     * @throws LatestVersionSupportedException
+     */
+    private function fetchLatestCompatibleVersion(string $updateStability): Release
+    {
+        // Check if the in-app updater is enabled
+        if (!$updateUrl = $this->coreParametersHelper->get('system_update_url')) {
+            // In app updating is disabled
+            throw new LatestVersionSupportedException();
         }
 
-        if (200 != $data->code) {
+        // Fetch a new list of data
+        $response = $this->client->request('GET', $updateUrl);
+        if (200 !== $response->getStatusCode()) {
             // Log the error
-            $this->logger->addError(
+            $this->logger->error(
                 sprintf(
-                    'An unexpected %1$s code was returned while attempting to fetch updates.  The message received was: %2$s',
-                    $data->code,
-                    is_string($data->body) ? $data->body : implode('; ', $data->body)
+                    'UPDATE CHECK FAILED: %s (%s)',
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase()
                 )
             );
 
-            return [
-                'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.updates',
-            ];
+            throw new CouldNotFetchLatestVersionException();
         }
 
-        // If the user's up-to-date, go no further
-        if ($update->latest_version) {
-            return [
-                'error'   => false,
-                'message' => 'mautic.core.updater.running.latest.version',
-            ];
+        $releases = json_decode($response->getBody()->getContents(), true);
+        if (empty($releases)) {
+            $this->logger->error(sprintf('UPDATE CHECK FAILED: response body for %s is not json', $updateUrl));
+
+            throw new CouldNotFetchLatestVersionException();
         }
 
-        // Last sanity check, if the $update->version is older than our current version
-        if (version_compare(MAUTIC_VERSION, $update->version, 'ge')) {
-            return [
-                'error'   => false,
-                'message' => 'mautic.core.updater.running.latest.version',
-            ];
-        }
-
-        // The user is able to update to the latest version, cache the data first
-        $data = [
-            'error'        => false,
-            'message'      => 'mautic.core.updater.update.available',
-            'version'      => $update->version,
-            'announcement' => $update->announcement,
-            'package'      => $update->package,
-            'checkedTime'  => time(),
-            'stability'    => $this->coreParametersHelper->get('update_stability'),
-        ];
-
-        file_put_contents($cacheFile, json_encode($data));
-
-        return $data;
+        return (new ReleaseParser($this->client))->getLatestSupportedRelease($releases, PHP_VERSION, MAUTIC_VERSION, $updateStability);
     }
 }

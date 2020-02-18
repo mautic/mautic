@@ -1083,12 +1083,14 @@ return [
         'batch_campaign_sleep_time' => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
-        'rss_notification_url'      => '',
-        'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
-        'translations_fetch_url'    => 'https://language-packs.mautic.com/',
-        'system_update_url'         => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
         'debug'                     => false,
+        'rss_notification_url'      => '',
+        'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
+        'translations_fetch_url'    => 'https://language-packs.mautic.com/',
+        'stats_update_url'          => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable
+        'install_source'            => 'Mautic',
+        'system_update_url'         => 'https://api.github.com/repos/mautic/mautic/releases',
     ],
 ];
