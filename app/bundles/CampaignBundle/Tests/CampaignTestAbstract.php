@@ -76,9 +76,7 @@ class CampaignTestAbstract extends \PHPUnit\Framework\TestCase
         $eventCollector    = $this->createMock(EventCollector::class);
         $membershipBuilder = $this->createMock(MembershipBuilder::class);
 
-        $contactTracker = $this->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactTracker = $this->createMock(ContactTracker::class);
 
         $campaignModel = new CampaignModel($leadListModel, $formModel, $eventCollector, $membershipBuilder, $contactTracker);
 

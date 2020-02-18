@@ -17,6 +17,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -48,7 +49,7 @@ class Unsubscribe implements ProcessorInterface
     private $message;
 
     /**
-     * @var \Mautic\LeadBundle\Model\DoNotContact
+     * @var DoNotContactModel
      */
     private $doNotContact;
 
@@ -60,7 +61,7 @@ class Unsubscribe implements ProcessorInterface
         ContactFinder $contactFinder,
         TranslatorInterface $translator,
         LoggerInterface $logger,
-        \Mautic\LeadBundle\Model\DoNotContact $doNotContact
+        DoNotContactModel $doNotContact
     ) {
         $this->transport     = $transport;
         $this->contactFinder = $contactFinder;

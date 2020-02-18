@@ -22,6 +22,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
@@ -193,7 +194,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected $integrationEntityModel;
 
     /**
-     * @var \Mautic\LeadBundle\Model\DoNotContact
+     * @var DoNotContactModel
      */
     protected $doNotContact;
 
@@ -218,7 +219,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         NotificationModel $notificationModel,
         FieldModel $fieldModel,
         IntegrationEntityModel $integrationEntityModel,
-        \Mautic\LeadBundle\Model\DoNotContact $doNotContact
+        DoNotContactModel $doNotContact
     ) {
         $this->dispatcher             = $eventDispatcher;
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());

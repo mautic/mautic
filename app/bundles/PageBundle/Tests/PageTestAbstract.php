@@ -134,10 +134,7 @@ class PageTestAbstract extends WebTestCase
 
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
-        $contactTracker = $this
-            ->getMockBuilder(ContactTracker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $contactTracker = $this->createMock(ContactTracker::class);
 
         $pageModel = new PageModel(
             $cookieHelper,
