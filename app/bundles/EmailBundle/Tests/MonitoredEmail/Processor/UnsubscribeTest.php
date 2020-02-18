@@ -21,7 +21,6 @@ use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
 class UnsubscribeTest extends \PHPUnit\Framework\TestCase

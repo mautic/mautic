@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -18,8 +18,11 @@ use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DoNotContactSubscriber implements EventSubscriberInterface
+final class DoNotContactSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var DoNotContact
+     */
     private $doNotContact;
 
     public function __construct(DoNotContact $doNotContact)
@@ -35,12 +38,6 @@ class DoNotContactSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param $lead
-     * @param $channel
-     * @param bool $persist
-     * @param null $reason
-     */
     public function removeDncForLead(DoNotContactRemoveEvent $doNotContactRemoveEvent): void
     {
         $this->doNotContact->removeDncForContact(

@@ -461,7 +461,6 @@ class AjaxController extends CommonAjaxController
 
         if (!empty($dncId)) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model = $this->getModel('lead');
 
             /** @var DoNotContactModel $doNotContact */
             $doNotContact = $this->getModel('mautic.lead.model.dnc');

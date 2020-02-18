@@ -78,7 +78,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ContactTracker
      */
-    private $ccontactTracker;
+    private $contactTracker;
 
     public function setUp()
     {
@@ -87,7 +87,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel              = $this->createMock(LeadModel::class);
         $this->triggerEventModel      = $this->createMock(TriggerEventModel::class);
         $this->mauticFactory          = $this->createMock(MauticFactory::class);
-        $this->ccontactTracker        = $this->createMock(ContactTracker::class);
+        $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
         $this->translator             = $this->createMock(TranslatorInterface::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
@@ -97,7 +97,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->triggerEventModel,
             $this->mauticFactory,
-            $this->ccontactTracker
+            $this->contactTracker
         );
 
         $this->triggerModel->setDispatcher($this->dispatcher);
