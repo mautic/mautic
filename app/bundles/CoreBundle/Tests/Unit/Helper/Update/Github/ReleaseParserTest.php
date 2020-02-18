@@ -52,6 +52,11 @@ class ReleaseParserTest extends TestCase
 
                             return new Response(200, [], $metadata);
                         },
+                        function (Request $request, array $options) {
+                            $metadata = file_get_contents(__DIR__.'/json/metadata-2.15.0.json');
+
+                            return new Response(200, [], $metadata);
+                        },
                     ]
                 ),
             ]
@@ -84,11 +89,11 @@ class ReleaseParserTest extends TestCase
         $this->assertSame($expects, $release->getVersion());
     }
 
-    public function testMatchingReleaseReturnedForStableStabilityAndMauticMinimumVersion()
+    public function testMatchingReleaseReturnedForStableStability()
     {
         $expects       = '3.0.0';
         $phpVersion    = '7.3.0';
-        $mauticVersion = '2.16.0';
+        $mauticVersion = '2.20.0';
         $stability     = 'stable';
 
         $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
@@ -101,6 +106,18 @@ class ReleaseParserTest extends TestCase
         $expects       = '2.16.0';
         $phpVersion    = '7.1.0';
         $mauticVersion = '2.15.0';
+        $stability     = 'stable';
+
+        $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
+
+        $this->assertSame($expects, $release->getVersion());
+    }
+
+    public function testMatchingReleaseReturnedForMinimumMauticVersion()
+    {
+        $expects       = '2.15.0';
+        $phpVersion    = '7.1.0';
+        $mauticVersion = '2.1.0';
         $stability     = 'stable';
 
         $release = $this->releaseParser->getLatestSupportedRelease($this->getReleases(), $phpVersion, $mauticVersion, $stability);
