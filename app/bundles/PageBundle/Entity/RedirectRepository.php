@@ -141,7 +141,7 @@ class RedirectRepository extends CommonRepository
                 ->setParameter('campaignId', $campaignId);
         }
 
-        if ($companyId !== null) {
+        if (!empty($companyId)) {
             $sb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
             $sb->select('null')
