@@ -135,6 +135,6 @@ trait CustomFieldsApiControllerTrait
             );
         }
 
-        $this->model->setFieldValues($entity, $parameters, !$isPostOrPatch);
+        $this->model->setFieldValues($entity, $parameters, true);
     }
 }
