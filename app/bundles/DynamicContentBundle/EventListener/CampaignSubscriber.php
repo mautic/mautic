@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -14,6 +15,9 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Mautic\LeadBundle\Model\LeadModel;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\InvalidArgumentException;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -26,14 +30,24 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $session;
     /**
+     * @var CacheProvider
+     */
+    protected $cache;
+
+    /**
      * @var EventDispatcherInterface
      */
     private $dispatcher;
 
-    public function __construct(DynamicContentModel $dynamicContentModel, SessionInterface $session, EventDispatcherInterface $dispatcher)
+    /**
+     * @param DynamicContentModel $dynamicContentModel
+     * @param CacheProvider $cache
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(DynamicContentModel $dynamicContentModel, CacheProvider $cache, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
-        $this->session             = $session;
+        $this->cache               = $cache;
         $this->dispatcher          = $dispatcher;
     }
 
@@ -115,18 +129,31 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
         }
 
-        $this->session->set('dwc.slot_name.lead.'.$lead->getId(), $eventDetails);
+        /** @var CacheItemInterface $item */
+        $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
+        $item->set($eventDetails);
+        $item->expiresAfter(86400); //one day in seconds
+        $this->cache->save($item);
 
         $event->stopPropagation();
 
         return $event->setResult(true);
     }
 
+    /**
+     * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
+     *
+     * @throws InvalidArgumentException
+     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
-        $slot        = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
+        /* @var CacheItemInterface $item */
+        $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
+        $slot = $item->get();
 
         $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
 
