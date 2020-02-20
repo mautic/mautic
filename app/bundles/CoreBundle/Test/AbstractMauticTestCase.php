@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -62,6 +63,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $this->container = $this->client->getContainer();
         $this->em        = $this->container->get('doctrine')->getManager();
+
+        /** @var RouterInterface $router */
+        $router = $this->container->get('router');
+        $scheme = $router->getContext()->getScheme();
+        $secure = strcasecmp($scheme, 'https');
+
+        $this->client->setServerParameter('HTTPS', $secure);
 
         $this->mockServices();
     }
