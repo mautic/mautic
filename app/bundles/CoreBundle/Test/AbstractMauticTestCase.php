@@ -67,7 +67,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         /** @var RouterInterface $router */
         $router = $this->container->get('router');
         $scheme = $router->getContext()->getScheme();
-        $secure = strcasecmp($scheme, 'https');
+        $secure = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', $secure);
 
