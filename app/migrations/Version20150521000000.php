@@ -15,6 +15,7 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\PageBundle\Entity\Redirect;
 
@@ -57,7 +58,7 @@ class Version20150521000000 extends AbstractMauticMigration
         $results = $q->execute()->fetchAll();
 
         foreach ($results as $r) {
-            $properties = unserialize($r['properties']);
+            $properties = Serializer::decode($r['properties']);
             if (is_array($properties) && !empty($properties['message'])) {
                 $this->connection->update(MAUTIC_TABLE_PREFIX.'forms',
                     [
@@ -115,7 +116,7 @@ class Version20150521000000 extends AbstractMauticMigration
         $deleteActions    = [];
         foreach ($actions as $action) {
             try {
-                $properties = unserialize($action['properties']);
+                $properties = Serializer::decode($action['properties']);
 
                 foreach ($properties['mappedFields'] as $leadFieldId => $formFieldId) {
                     if (!empty($formFieldId)) {

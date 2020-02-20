@@ -174,6 +174,10 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.extension.openssl';
         }
 
+        if (!function_exists('curl_init')) {
+            $messages[] = 'mautic.install.extension.curl';
+        }
+
         if (!function_exists('finfo_open')) {
             $messages[] = 'mautic.install.extension.fileinfo';
         }

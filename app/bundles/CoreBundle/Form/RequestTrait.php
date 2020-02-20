@@ -39,7 +39,7 @@ trait RequestTrait
                             }
 
                             if ('' === $params[$name]) {
-                                continue;
+                                break;
                             }
 
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
@@ -51,7 +51,9 @@ trait RequestTrait
                                 break;
                             } catch (\InvalidArgumentException $exception) {
                             }
-                            $params[$name] = $data;
+
+                            // If not manually handled cast to int because Symfony form processing take false as empty
+                            $params[$name] = (int) $data;
                         }
                         break;
                     case 'choice':

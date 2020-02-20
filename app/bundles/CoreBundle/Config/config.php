@@ -575,6 +575,12 @@ return [
             'mautic.helper.file_properties' => [
                 'class' => \Mautic\CoreBundle\Helper\FileProperties::class,
             ],
+            'mautic.helper.trailing_slash' => [
+                'class'     => \Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -1094,7 +1100,7 @@ return [
         'batch_campaign_sleep_time' => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
-        'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'rss_notification_url'      => '',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
     ],

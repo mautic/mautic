@@ -211,7 +211,12 @@ class LeadRepository extends CommonRepository
         $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
         $q->select('l.lead_id, l.date_added')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
-            ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.campaign_id', ':campaignId'),
+                    $q->expr()->eq('l.manually_removed', 0)
+                )
+            )
             // Order by ID so we can query by greater than X contact ID when batching
             ->orderBy('l.lead_id')
             ->setMaxResults($limiter->getBatchLimit())
@@ -291,7 +296,12 @@ class LeadRepository extends CommonRepository
             $q = $this->getSlaveConnection()->createQueryBuilder();
             $q->select('count(*)')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l')
-                ->where($q->expr()->eq('l.campaign_id', ':campaignId'))
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.campaign_id', ':campaignId'),
+                        $q->expr()->eq('l.manually_removed', 0)
+                    )
+                )
                 // Order by ID so we can query by greater than X contact ID when batching
                 ->orderBy('l.lead_id')
                 ->setParameter('campaignId', (int) $campaignId);
@@ -405,7 +415,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
+        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -440,7 +450,7 @@ class LeadRepository extends CommonRepository
             );
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
-        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb);
+        $this->updateQueryWithExistingMembershipExclusion($campaignId, $qb, $campaignCanBeRestarted);
 
         if (!$campaignCanBeRestarted) {
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
@@ -578,16 +588,22 @@ class LeadRepository extends CommonRepository
      * @param              $campaignId
      * @param QueryBuilder $qb
      */
-    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb)
+    private function updateQueryWithExistingMembershipExclusion($campaignId, QueryBuilder $qb, $campaignCanBeRestarted = false)
     {
+        $membershipConditions = [
+            $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
+            $qb->expr()->eq('cl.campaign_id', (int) $campaignId),
+        ];
+
+        if ($campaignCanBeRestarted) {
+            $membershipConditions[] = $qb->expr()->eq('cl.manually_removed', 0);
+        }
+
         $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-                    $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
-                )
+                $qb->expr()->andX(...$membershipConditions)
             );
 
         $qb->andWhere(

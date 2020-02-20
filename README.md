@@ -2,6 +2,17 @@ Mautic Introduction
 ===========
 ![Mautic](https://www.mautic.org/media/images/github_readme.png "Mautic Open Source Marketing Automation")
 
+## Supported Versions
+Please note that the release dates indicated with * below are *estimations*, no rights can be derived from them.
+
+| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until
+|--|--|--|--|--|
+|2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
+|2.16  | 30 Jan 2020* | 13 Feb 2020* | 13 Feb 2020 | June 2020? (TBD)**
+|3.0   | 27 Jan 2020* | 3 Feb 2020* | TBD | TBD
+
+** = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
+
 ## Getting Started
 
 The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
@@ -44,9 +55,9 @@ Installing from source is only recommended if you are comfortable using the comm
 
 ## Requirements
 
-#### Contributors Agreement 
+#### Contributor Agreement 
 
-By contributing to this project, you accept and agree to the [Contributors Agreement](https://www.mautic.org/contributors-agreement) in its entirety.
+By contributing to this project, you accept and agree to the [Contributor Agreement](https://www.mautic.org/contributor-agreement) in its entirety.
 
 #### Development / Build process requirements
 
@@ -64,7 +75,7 @@ By contributing to this project, you accept and agree to the [Contributors Agree
 	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
-4. Disabling `ONLY_FULL_GROUP_BY` on the mySQL server.
+4. Recommended MySQL defaults can be set by running the queries `SET GLOBAL innodb_default_row_format=DYNAMIC; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
 
 ## Installation
 
