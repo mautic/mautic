@@ -72,6 +72,22 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 'lead_lists',
             ]
         );
+
+        $segmentClickedAnyLinkFromEmail = $this->fixtures->getReference('clicked-any-link-from-any-email-test');
+        $segmentContacts                = $contactSegmentService->getTotalLeadListLeadsCount($segmentClickedAnyLinkFromEmail);
+        $this->assertEquals(
+            1,
+            $segmentContacts[$segmentClickedAnyLinkFromEmail->getId()]['count'],
+            'There should be 1 in this segment. Check that page hit with source equals to email, redirect_id and email_id exists just for one contact'
+        );
+
+        $segmentNotClickedAnyLinkFromEmail = $this->fixtures->getReference('not-clicked-any-link-from-any-email-test');
+        $segmentContacts                   = $contactSegmentService->getTotalLeadListLeadsCount($segmentNotClickedAnyLinkFromEmail);
+        $this->assertGreaterThan(
+            1,
+            $segmentContacts[$segmentNotClickedAnyLinkFromEmail->getId()]['count'],
+            'There should be more than 1 in this segment. Check that page hit with source equals to email, redirect_id and email_id exists just for one contact'
+        );
     }
 
     public function testSegmentCountIsCorrect(): void

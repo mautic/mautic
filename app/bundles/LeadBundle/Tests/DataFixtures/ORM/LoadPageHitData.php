@@ -22,6 +22,9 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
                 'dateHit'    => new \DateTime('-1 day'),
                 'code'       => 200,
                 'trackingId' => 'asdf',
+                'email'      => $this->getReference('email-n-1'),
+                'redirect'   => $this->getReference('redirect-n-1'),
+                'source'     => 'email',
             ],
             [
                 'ipAddress'  => $this->getReference('ipAddress-2'),
@@ -97,6 +100,9 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
         $hit->setDateHit($hitConfig['dateHit']);
         $hit->setCode($hitConfig['code']);
         $hit->setTrackingId($hitConfig['trackingId']);
+        $hit->setEmail($hitConfig['email']);
+        $hit->setRedirect($hitConfig['redirect']);
+        $hit->setSource($hitConfig['source']);
 
         $this->setReference($hitConfig['alias'], $hit);
 
