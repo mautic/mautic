@@ -122,6 +122,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $payload = [
             'email'     => 'apiemail1@email.com',
             'firstname' => 'API Update',
+            'lastname'  => 'customlastname',
             'points'    => 4,
             'tags'      => ['apitest', 'testapi'],
         ];
@@ -133,17 +134,58 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($payload['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
 
+        $payload2             = ['email' => 'apiemail1@email.com'];
+        $payload2['lastname'] = '';
         // Lets try to create the same contact to see that the values are not re-setted
-        $this->client->request('POST', '/api/contacts/new', ['email' => 'apiemail1@email.com']);
+        $this->client->request('POST', '/api/contacts/new', $payload2);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($contactId, $response['contact']['id']);
         $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
         $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertNotEquals($payload2['lastname'], $response['contact']['fields']['all']['lastname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+    }
+
+    public function testSingleNewEndpointCreateAndUpdateOverwriteWithBlankTrue()
+    {
+        $payload = [
+            'email'              => 'apiemail1@email.com',
+            'firstname'          => 'API Update',
+            'lastname'           => 'customlastname',
+            'points'             => 4,
+            'tags'               => ['apitest', 'testapi'],
+            'overwriteWithBlank' => true,
+        ];
+
+        $this->client->request('POST', '/api/contacts/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $contactId      = $response['contact']['id'];
+
+        $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($payload['lastname'], $response['contact']['fields']['all']['lastname']);
+        $this->assertEquals(4, $response['contact']['points']);
+        $this->assertEquals(2, count($response['contact']['tags']));
+
+        $payload2             = ['email' => 'apiemail1@email.com'];
+        $payload2['lastname'] = '';
+        // Lets try to create the same contact to see that the values are not re-setted
+        $this->client->request('POST', '/api/contacts/new', $payload2);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($payload['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($payload['lastname'], $response['contact']['fields']['all']['lastname']);
         $this->assertEquals(4, $response['contact']['points']);
         $this->assertEquals(2, count($response['contact']['tags']));
     }
