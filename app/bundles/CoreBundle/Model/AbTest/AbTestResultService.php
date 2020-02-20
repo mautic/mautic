@@ -58,7 +58,7 @@ class AbTestResultService
             ];
 
             //execute the callback
-            if (is_callable($testSettings['callback'])) {
+            if (isset($testSettings['callback']) && is_callable($testSettings['callback'])) {
                 if (is_array($testSettings['callback'])) {
                     $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
                 } elseif (strpos($testSettings['callback'], '::') !== false) {

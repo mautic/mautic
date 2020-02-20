@@ -93,30 +93,22 @@ class VariantType extends AbstractType
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 
-            $attr = [
-                'class'        => 'form-control',
-                'onchange'     => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
-                'disabled'     => !$options['is_parent'],
-            ];
-
-            if ($options['is_parent'] === true && $options['is_existing'] === false) {
-                $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
-            }
-
-            $builder->add('winnerCriteria', ChoiceType::class, [
-                'label'      => 'mautic.core.ab_test.form.winner',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => $attr,
-                'expanded'    => false,
-                'multiple'    => false,
-                'choices'     => $choices,
-                'empty_value' => 'mautic.core.form.chooseone',
-                'constraints' => !$options['is_parent'] ? null : [
-                    new NotBlank(
-                        ['message' => 'mautic.core.ab_test.winner_criteria.not_blank', 'groups' => 'variant']
-                    ),
-                ],
-            ]);
+            $builder->add(
+                'winnerCriteria',
+                ChoiceType::class, [
+                    'label'             => 'mautic.core.ab_test.form.winner',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => [
+                        'class'        => 'form-control',
+                        'onchange'     => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
+                        'disabled'     => !$options['is_parent'],
+                    ],
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'choices'     => $choices,
+                    'placeholder' => 'mautic.core.form.chooseone',
+                ]
+            );
 
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($criteria) {
                 $form = $event->getForm();
