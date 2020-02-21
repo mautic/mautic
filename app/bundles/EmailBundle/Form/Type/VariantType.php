@@ -90,23 +90,31 @@ class VariantType extends AbstractType
         $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {
-            $criteria = $abTestWinnerCriteria['criteria'];
-            $choices  = $abTestWinnerCriteria['choices'];
+            $criteria    = $abTestWinnerCriteria['criteria'];
+            $choices     = $abTestWinnerCriteria['choices'];
+            $constraints = [];
+
+            if ($options['is_parent']) {
+                $constraints[] = new NotBlank(
+                    ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                );
+            }
 
             $builder->add(
                 'winnerCriteria',
-                ChoiceType::class, [
-                    'label'             => 'mautic.core.ab_test.form.winner',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => [
-                        'class'        => 'form-control',
-                        'onchange'     => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
-                        'disabled'     => !$options['is_parent'],
+                ChoiceType::class,
+                [
+                    'label'      => 'mautic.core.ab_test.form.winner',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
                     ],
                     'expanded'    => false,
                     'multiple'    => false,
                     'choices'     => $choices,
                     'placeholder' => 'mautic.core.form.chooseone',
+                    'constraints' => $constraints,
                 ]
             );
 
