@@ -1832,7 +1832,7 @@ class LeadModel extends FormModel
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
         array_walk($tags, function (&$val) {
-            $val = trim($val);
+            $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::clean($val);
         });
 
@@ -1870,7 +1870,7 @@ class LeadModel extends FormModel
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, function (&$val) {
-                $val = trim($val);
+                $val = html_entity_decode(trim($val), ENT_QUOTES);
                 $val = InputHelper::clean($val);
             });
 
