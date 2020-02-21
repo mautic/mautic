@@ -57,9 +57,7 @@ class HubspotApi extends CrmApi
          */
         $email  = $data['email'];
         $result = [];
-        //Check if the is a valid email
-        MailHelper::validateEmail($email);
-        //Format data for request
+
         $formattedLeadData = $this->integration->formatLeadDataForCreateOrUpdate($data, $lead, $updateLink);
         if ($formattedLeadData) {
             $result = $this->request('v1/contact/createOrUpdate/email/'.$email, $formattedLeadData, 'POST');

@@ -234,6 +234,7 @@ public function onConfigGenerate(ConfigBuilderEvent $event)
 
 ### EmailBundle
 
+*   remove deprecated MailHelper::validateEmail and use EmailValidator service instead
 *   Deprecated route bc_mautic_api_sendcontactemail removed
 *   Removed the now unused FormSubmitHelper 
 *   Deprecated interface InterfaceCallbackTransport removed
