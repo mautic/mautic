@@ -67,6 +67,7 @@ All fixtures must be defined as services in a bundle's config.php
 
 ### CoreBundle
 
+*   Remove SchemaHelperFactory as deprecated use specific helper services
 *   `spacer` form type was removed without a replacement (\Mautic\CoreBundle\Form\Type\SpacerType)
 *   `hidden_entity` form type was removed (\Mautic\CoreBundle\Form\Type\HiddenEntityType)
 *   MauticFactory no longer injected into CommonRepository classes thus CommonRepository::setFactory() and $this->factory removed

@@ -14,7 +14,8 @@ namespace Mautic\FormBundle\Tests;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
@@ -69,7 +70,6 @@ class FormTestAbstract extends WebTestCase
         $requestStack         = $this->createMock(RequestStack::class);
         $templatingHelperMock = $this->createMock(TemplatingHelper::class);
         $themeHelper          = $this->createMock(ThemeHelper::class);
-        $schemaHelperFactory  = $this->createMock(SchemaHelperFactory::class);
         $formActionModel      = $this->createMock(ActionModel::class);
         $formFieldModel       = $this->createMock(FieldModel::class);
         $leadModel            = $this->createMock(LeadModel::class);
@@ -80,6 +80,8 @@ class FormTestAbstract extends WebTestCase
         $formUploaderMock     = $this->createMock(FormUploader::class);
         $this->leadFieldModel = $this->createMock(LeadFieldModel::class);
         $this->formRepository = $this->createMock(FormRepository::class);
+        $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
 
         $leadModel->expects($this
             ->any())
@@ -107,13 +109,14 @@ class FormTestAbstract extends WebTestCase
             $requestStack,
             $templatingHelperMock,
             $themeHelper,
-            $schemaHelperFactory,
             $formActionModel,
             $formFieldModel,
             $leadModel,
             $fieldHelper,
             $this->leadFieldModel,
-            $formUploaderMock
+            $formUploaderMock,
+            $columnSchemaHelper,
+            $tableSchemaHelper
         );
 
         $formModel->setDispatcher($dispatcher);
