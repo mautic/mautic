@@ -11,7 +11,6 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -47,13 +46,6 @@ class TriggerModel extends CommonFormModel
     protected $pointTriggerEventModel;
 
     /**
-     * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
-     */
-    protected $mauticFactory;
-
-    /**
      * @var ContactTracker
      */
     private $contactTracker;
@@ -68,7 +60,6 @@ class TriggerModel extends CommonFormModel
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->leadModel              = $leadModel;
         $this->pointTriggerEventModel = $pointTriggerEventModel;
-        $this->mauticFactory          = $mauticFactory;
         $this->contactTracker         = $contactTracker;
     }
 
@@ -375,7 +366,6 @@ class TriggerModel extends CommonFormModel
         $args = [
           'event'   => $event,
           'lead'    => $lead,
-          'factory' => $this->mauticFactory,
           'config'  => $event['properties'],
         ];
 

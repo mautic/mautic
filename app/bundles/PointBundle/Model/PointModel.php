@@ -11,7 +11,6 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -49,13 +48,6 @@ class PointModel extends CommonFormModel
     protected $leadModel;
 
     /**
-     * @deprecated https://github.com/mautic/mautic/issues/8229
-     *
-     * @var MauticFactory
-     */
-    protected $mauticFactory;
-
-    /**
      * @var ContactTracker
      */
     private $contactTracker;
@@ -64,13 +56,11 @@ class PointModel extends CommonFormModel
         Session $session,
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
-        MauticFactory $mauticFactory,
         ContactTracker $contactTracker
     ) {
         $this->session            = $session;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
-        $this->mauticFactory      = $mauticFactory;
         $this->contactTracker     = $contactTracker;
     }
 
@@ -259,7 +249,6 @@ class PointModel extends CommonFormModel
                     'points'     => $action->getDelta(),
                 ],
                 'lead'         => $lead,
-                'factory'      => $this->mauticFactory, // WHAT?
                 'eventDetails' => $eventDetails,
             ];
 
