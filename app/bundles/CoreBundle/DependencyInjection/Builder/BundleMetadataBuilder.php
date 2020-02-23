@@ -23,11 +23,6 @@ class BundleMetadataBuilder
     private $paths;
 
     /**
-     * @var string
-     */
-    private $root;
-
-    /**
      * @var array
      */
     private $symfonyBundles;
@@ -50,17 +45,16 @@ class BundleMetadataBuilder
     /**
      * @var array
      */
-    private $pluginMetadata;
+    private $pluginMetadata = [];
 
     /**
      * @var array
      */
-    private $coreMetadata;
+    private $coreMetadata = [];
 
-    public function __construct(array $symfonyBundles, array $paths, string $root)
+    public function __construct(array $symfonyBundles, array $paths)
     {
         $this->paths          = $paths;
-        $this->root           = $root;
         $this->symfonyBundles = $symfonyBundles;
 
         $this->buildMetadata();
@@ -112,6 +106,11 @@ class BundleMetadataBuilder
         }
 
         // Make CoreBundle the first in the core bundle list
+        if (!isset($this->coreMetadata['MauticCoreBundle'])) {
+            // Not always set for tests
+            return;
+        }
+
         $coreBundle = $this->coreMetadata['MauticCoreBundle'];
         unset($this->coreMetadata['MauticCoreBundle']);
         $this->coreMetadata = array_merge(['MauticCoreBundle' => $coreBundle], $this->coreMetadata);
@@ -144,10 +143,10 @@ class BundleMetadataBuilder
     {
         return [
             'isPlugin'          => $isPlugin,
-            'base'              => str_replace('Bundle', '', $symfonyBundle),
+            'base'              => str_replace('Bundle', '', $bundleName),
             'bundle'            => $bundleName,
             'relative'          => $relativePath,
-            'directory'         => $this->paths['root'].'/'.$relativePath,
+            'directory'         => realpath($this->paths['root'].'/'.$relativePath),
             'namespace'         => preg_replace('#\\\[^\\\]*$#', '', $namespace),
             'symfonyBundleName' => $symfonyBundle,
             'bundleClass'       => $namespace,
