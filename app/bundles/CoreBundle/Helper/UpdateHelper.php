@@ -12,9 +12,11 @@
 namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
-use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataIsFreshException;
+use Mautic\CoreBundle\Helper\Update\Exception\UpdateCacheDataNeedsToBeRefreshedException;
 use Mautic\CoreBundle\Helper\Update\Github\Release;
 use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
 use Monolog\Logger;
@@ -44,12 +46,37 @@ class UpdateHelper
      */
     private $client;
 
-    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Client $client)
+    /**
+     * @var ReleaseParser
+     */
+    private $releaseParser;
+
+    /**
+     * @var string
+     */
+    private $phpVersion;
+
+    /**
+     * @var string
+     */
+    private $mauticVersion;
+
+    public function __construct(
+        PathsHelper $pathsHelper,
+        Logger $logger,
+        CoreParametersHelper $coreParametersHelper,
+        Client $client,
+        ReleaseParser $releaseParser
+    )
     {
         $this->pathsHelper          = $pathsHelper;
         $this->logger               = $logger;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->client               = $client;
+        $this->releaseParser        = $releaseParser;
+
+        $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
+        $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';
     }
 
     /**
@@ -68,17 +95,10 @@ class UpdateHelper
                 throw new \Exception('error code '.$response->getStatusCode());
             }
 
-            $data = json_decode($response->getBody()->getContents(), true);
+            $data = $response->getBody()->getContents();
         } catch (\Exception $exception) {
             $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
-            return [
-                'error'   => true,
-                'message' => 'mautic.core.updater.error.fetching.package',
-            ];
-        }
-
-        if (200 != $data->code) {
             return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.package',
@@ -89,28 +109,12 @@ class UpdateHelper
         $target = $this->pathsHelper->getSystemPath('cache').'/'.basename($package);
 
         // Write the response to the filesystem
-        file_put_contents($target, $data->body);
+        file_put_contents($target, $data);
 
         // Return an array for the sake of consistency
         return [
             'error' => false,
         ];
-    }
-
-    /**
-     * Tries to get server OS.
-     *
-     * @return string
-     */
-    public function getServerOs()
-    {
-        if (function_exists('php_uname')) {
-            return php_uname('s').' '.php_uname('r');
-        } elseif (defined('PHP_OS')) {
-            return PHP_OS;
-        }
-
-        return 'N/A';
     }
 
     /**
@@ -127,9 +131,9 @@ class UpdateHelper
 
         try {
             if (!$overrideCache && is_readable($cacheFile)) {
-                return $this->checkCachedUpdateData($updateStability, $overrideCache);
+                return $this->checkCachedUpdateData($cacheFile, $updateStability);
             }
-        } catch (UpdateCacheDataIsFreshException $exception) {
+        } catch (UpdateCacheDataNeedsToBeRefreshedException $exception) {
             // Fetch a fresh list
         }
 
@@ -145,6 +149,26 @@ class UpdateHelper
                 'message' => 'mautic.core.updater.running.latest.version',
             ];
         } catch (CouldNotFetchLatestVersionException $exception) {
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.updates',
+            ];
+        } catch (RequestException $exception) {
+            $this->logger->error(
+                sprintf(
+                    'UPDATE CHECK: Could not fetch a release list: %s (%s)',
+                    $exception->getResponse()->getStatusCode(),
+                    $exception->getResponse()->getReasonPhrase()
+                )
+            );
+
+            return [
+                'error'   => true,
+                'message' => 'mautic.core.updater.error.fetching.updates',
+            ];
+        } catch (\Exception $exception) {
+            $this->logger->error(sprintf('UPDATE CHECK: %s', $exception->getMessage()));
+
             return [
                 'error'   => true,
                 'message' => 'mautic.core.updater.error.fetching.updates',
@@ -176,22 +200,23 @@ class UpdateHelper
 
         // Before processing the update data, send up our metrics
         try {
+            $key           = $this->coreParametersHelper->get('secret_key');
+            $dbDriver      = $this->coreParametersHelper->get('db_driver');
+            $installSource = $this->coreParametersHelper->get('install_source', 'Mautic');
+
             // Generate a unique instance ID for the site
-            $instanceId = hash(
-                'sha1',
-                $this->coreParametersHelper->get('secret_key').'Mautic'.$this->coreParametersHelper->get('db_driver')
-            );
+            $instanceId = hash('sha1', $key.$installSource.$dbDriver);
 
             $data = array_map(
                 'trim',
                 [
                     'application'   => 'Mautic',
-                    'version'       => MAUTIC_VERSION,
-                    'phpVersion'    => PHP_VERSION,
-                    'dbDriver'      => $this->coreParametersHelper->get('db_driver'),
+                    'version'       => $this->mauticVersion,
+                    'phpVersion'    => $this->phpVersion,
+                    'dbDriver'      => $dbDriver,
                     'serverOs'      => $this->getServerOs(),
                     'instanceId'    => $instanceId,
-                    'installSource' => $this->coreParametersHelper->get('install_source', 'Mautic'),
+                    'installSource' => $installSource,
                 ]
             );
 
@@ -201,6 +226,14 @@ class UpdateHelper
             ];
 
             $this->client->request('POST', $statUrl, $options);
+        } catch (RequestException $exception) {
+            $this->logger->error(
+                sprintf(
+                    'STAT UPDATE: Error communicating with the stat server: %s (%s)',
+                    $exception->getResponse()->getStatusCode(),
+                    $exception->getResponse()->getReasonPhrase()
+                )
+            );
         } catch (\Exception $exception) {
             // Not so concerned about failures here, move along
             $this->logger->error(sprintf('STAT UPDATE: %s', $exception->getMessage()));
@@ -208,7 +241,7 @@ class UpdateHelper
     }
 
     /**
-     * @throws UpdateCacheDataIsFreshException
+     * @throws UpdateCacheDataNeedsToBeRefreshedException
      */
     private function checkCachedUpdateData(string $cacheFile, string $updateStability): array
     {
@@ -216,8 +249,9 @@ class UpdateHelper
         $update = (array) json_decode(file_get_contents($cacheFile));
 
         // Check if the user has changed the update channel, if so the cache is invalidated
-        if ($update['stability'] === $updateStability && $update['checkedTime'] > strtotime('-3 hours')) {
-            throw new UpdateCacheDataIsFreshException();
+        $expiredAt = strtotime('-3 hours');
+        if ($update['stability'] !== $updateStability || $update['checkedTime'] <= $expiredAt) {
+            throw new UpdateCacheDataNeedsToBeRefreshedException();
         }
 
         return $update;
@@ -241,7 +275,7 @@ class UpdateHelper
             // Log the error
             $this->logger->error(
                 sprintf(
-                    'UPDATE CHECK FAILED: %s (%s)',
+                    'UPDATE CHECK: Failed fetching releases: %s (%s)',
                     $response->getStatusCode(),
                     $response->getReasonPhrase()
                 )
@@ -257,6 +291,22 @@ class UpdateHelper
             throw new CouldNotFetchLatestVersionException();
         }
 
-        return (new ReleaseParser($this->client))->getLatestSupportedRelease($releases, PHP_VERSION, MAUTIC_VERSION, $updateStability);
+        return $this->releaseParser->getLatestSupportedRelease($releases, $this->phpVersion, $this->mauticVersion, $updateStability);
+    }
+
+    /**
+     * Tries to get server OS.
+     *
+     * @return string
+     */
+    private function getServerOs()
+    {
+        if (function_exists('php_uname')) {
+            return php_uname('s').' '.php_uname('r');
+        } elseif (defined('PHP_OS')) {
+            return PHP_OS;
+        }
+
+        return 'unknown';
     }
 }

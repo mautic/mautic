@@ -717,13 +717,21 @@ return [
                 ],
             ],
             'mautic.helper.update' => [
-                'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
+                'class'     => \Mautic\CoreBundle\Helper\UpdateHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'monolog.logger.mautic',
                     'mautic.helper.core_parameters',
-                    'mautic.http.connector',
-                ],            ],
+                    'mautic.http.client',
+                    'mautic.helper.update.release_parser',
+                ],
+            ],
+            'mautic.helper.update.release_parser' => [
+                'class'     => \Mautic\CoreBundle\Helper\Update\Github\ReleaseParser::class,
+                'arguments' => [
+                    'mautic.http.client',
+                ],
+            ],
             'mautic.helper.cache' => [
                 'class'     => \Mautic\CoreBundle\Helper\CacheHelper::class,
                 'arguments' => [
