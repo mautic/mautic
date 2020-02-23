@@ -1,1 +1,2 @@
+critical_migrations.txt
 upgrade.php
