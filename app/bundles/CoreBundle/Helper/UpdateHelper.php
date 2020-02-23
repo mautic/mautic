@@ -67,8 +67,7 @@ class UpdateHelper
         CoreParametersHelper $coreParametersHelper,
         Client $client,
         ReleaseParser $releaseParser
-    )
-    {
+    ) {
         $this->pathsHelper          = $pathsHelper;
         $this->logger               = $logger;
         $this->coreParametersHelper = $coreParametersHelper;

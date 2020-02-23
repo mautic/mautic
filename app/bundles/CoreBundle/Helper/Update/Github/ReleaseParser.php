@@ -16,6 +16,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Exception\MetadataNotFoundException;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdatePackageNotFoundException;
+use Mautic\CoreBundle\Release\Metadata;
 
 class ReleaseParser
 {
@@ -31,7 +32,6 @@ class ReleaseParser
 
     /**
      * @throws LatestVersionSupportedException
-     * @throws MetadataNotFoundException
      * @throws UpdatePackageNotFoundException
      */
     public function getLatestSupportedRelease(array $releases, string $phpVersion, string $mauticVersion, string $allowedStability): Release

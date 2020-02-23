@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Helper\Update\Github;
+namespace Mautic\CoreBundle\Release;
 
 class Metadata
 {
@@ -17,6 +17,26 @@ class Metadata
      * @var string
      */
     private $version;
+
+    /**
+     * @var int
+     */
+    private $majorVersion;
+
+    /**
+     * @var int
+     */
+    private $minorVersion;
+
+    /**
+     * @var int
+     */
+    private $patchVersion;
+
+    /**
+     * @var string
+     */
+    private $extraVersion;
 
     /**
      * @var string
@@ -51,11 +71,37 @@ class Metadata
         $this->maxSupportedPHPVersion    = $metadata['maximum_php_version'];
         $this->minSupportedMauticVersion = $metadata['minimum_mautic_version'];
         $this->announcementUrl           = $metadata['announcement_url'];
+
+        preg_match('#^(\d+)\.(\d+)\.(\d+)[\. \-]?([a-z0-9\-\.]+)?$#', $this->version, $match);
+        $this->majorVersion = $match[1];
+        $this->minorVersion = $match[2];
+        $this->patchVersion = $match[3];
+        $this->extraVersion = $match[4] ?? '';
     }
 
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    public function getMajorVersion(): int
+    {
+        return $this->majorVersion;
+    }
+
+    public function getMinorVersion(): int
+    {
+        return $this->minorVersion;
+    }
+
+    public function getPatchVersion(): int
+    {
+        return $this->patchVersion;
+    }
+
+    public function getExtraVersion(): string
+    {
+        return $this->extraVersion;
     }
 
     public function getStability(): string

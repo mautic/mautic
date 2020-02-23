@@ -19,6 +19,7 @@
 *   Migrating the database should be done by upgrading to the latest 2.x series then to M3 as all 2.x migrations have been removed from the 3.x code
 *   jQuery v2.x has been replaced with jQuery v3.3.1. jQuery 2.x code is not supported anymore..
 *   app/version.txt has beeen removed in favor of app/release_metadata.json which includes the version
+*   `\AppKernel::MAJOR_VERSION`, `\AppKernel::MINOR_VERSION`, `\AppKernel::PATCH_VERSION`, and `\AppKernel::EXTRA_VERSION` are no longer defined. Use `\Mautic\CoreBundle\Release\ThisRelease::getMetadata()->getMajorVersion()`, etc instead. 
 
 ### Subscribers
 

@@ -9,9 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
-
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -86,7 +84,6 @@ class UpdateHelperTest extends TestCase
             ->method('getBody')
             ->willReturn($this->streamBody);
         $this->client = $this->createMock(Client::class);
-
 
         $this->helper = new UpdateHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->releaseParser);
     }
@@ -332,8 +329,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options)
-                {
+                function (string $method, string $url, array $options) {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
