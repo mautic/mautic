@@ -48,7 +48,7 @@ class ConfigMetadata
 
         $config = (new \Tightenco\Collect\Support\Collection($config));
         $config->transform(
-            function ($configGroup, string $configGroupName) use (&$ipLookupServices) {
+            function ($configGroup, string $configGroupName) {
                 if (!is_array($configGroup)) {
                     return $configGroup;
                 }
