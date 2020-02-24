@@ -71,8 +71,8 @@ class FilterType extends AbstractType
             'glue',
             ChoiceType::class,
             [
-                'label'             => false,
-                'choices'           => [
+                'label'   => false,
+                'choices' => [
                     'mautic.lead.list.form.glue.and' => 'and',
                     'mautic.lead.list.form.glue.or'  => 'or',
                 ],
@@ -94,7 +94,7 @@ class FilterType extends AbstractType
             $operator    = isset($data['operator']) ? $data['operator'] : null;
 
             if ($operators && !$operator) {
-                $operator = $this->getFirstOperatorKey($operators);
+                $operator = array_key_first($operators);
             }
 
             $form->add(
@@ -115,7 +115,7 @@ class FilterType extends AbstractType
                 TextType::class,
                 [
                     'label' => false,
-                    'data'  => isset($data['filter']) ? $data['filter'] : '',
+                    'data'  => $data['filter'] ?? '',
                     'attr'  => ['class' => 'form-control'],
                 ]
             );
@@ -134,13 +134,16 @@ class FilterType extends AbstractType
                 [
                     'label' => false,
                     'attr'  => [],
-                    'data'  => (isset($data['display'])) ? $data['display'] : '',
+                    'data'  => $data['display'] ?? '',
                 ]
             );
 
+            $filterPropertiesType = $form->get('properties');
+            $filterPropertiesType->setData($data['properties'] ?? []);
+
             if ($fieldAlias && $operator) {
                 $this->typeOperatorProvider->adjustFilterPropertiesType(
-                    $form->get('properties'),
+                    $filterPropertiesType,
                     $fieldAlias,
                     $fieldObject,
                     $operator,
@@ -192,15 +195,5 @@ class FilterType extends AbstractType
     public function getBlockPrefix()
     {
         return 'leadlist_filter';
-    }
-
-    /**
-     * @deprecated replace with native array_key_first() once supported
-     */
-    private function getFirstOperatorKey(array $operators): string
-    {
-        foreach ($operators as $key => $value) {
-            return $key;
-        }
     }
 }
