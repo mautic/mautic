@@ -40,7 +40,9 @@ class ConfigMetadata
             return;
         }
 
-        if (!$config = include $directory.'/Config/config.php') {
+        $config = include $directory.'/Config/config.php';
+
+        if (!is_array($config)) {
             return;
         }
 
