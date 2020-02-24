@@ -272,7 +272,9 @@ class SubmissionEvent extends CommonEvent
     public function setAction(?Action $action = null)
     {
         $this->action = $action;
-        $this->setContext($action->getType());
+        if (null !== $action) {
+            $this->setContext($action->getType());
+        }
     }
 
     public function getAction(): ?Action
