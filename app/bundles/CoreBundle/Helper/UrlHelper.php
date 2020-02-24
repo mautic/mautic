@@ -73,6 +73,38 @@ class UrlHelper
     }
 
     /**
+     * Append query string to URL.
+     *
+     * @param string $url
+     * @param string $appendQueryString
+     *
+     * @return string
+     */
+    public static function appendQueryToUrl($url, $appendQueryString)
+    {
+        $query     = parse_url($url, PHP_URL_QUERY);
+
+        if ($query) {
+            $appendQueryString = '&'.$appendQueryString;
+        } else {
+            $appendQueryString = '?'.$appendQueryString;
+        }
+
+        $anchorParts = explode('#', $url);
+        // join url without anchor + $appendQueryString
+        $url = $anchorParts[0].$appendQueryString;
+        // prevent & or ? twice
+        $url = str_replace(['&&', '??'], ['&', '?'], $url);
+
+        // anchor
+        if (isset($anchorParts[1])) {
+            $url = sprintf('%s#%s', $url, $anchorParts[1]);
+        }
+
+        return $url;
+    }
+
+    /**
      * @param $rel
      *
      * @return string
