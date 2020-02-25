@@ -205,59 +205,35 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
 
     private function getCampaignChoices(): array
     {
-        $campaigns = $this->campaignModel->getPublishedCampaigns(true);
-        $choices   = [];
-
-        foreach ($campaigns as $campaign) {
-            $choices[$campaign['id']] = $campaign['name'];
-        }
-
-        return $choices;
+        return $this->makeChoices($this->campaignModel->getPublishedCampaigns(true), 'name', 'id');
     }
 
     private function getSegmentChoices(): array
     {
-        $segments = $this->listModel->getUserLists();
-        $choices  = [];
-
-        foreach ($segments as $segegment) {
-            $choices[$segegment['id']] = $segegment['name'];
-        }
-
-        return $choices;
+        return $this->makeChoices($this->listModel->getUserLists(), 'name', 'id');
     }
 
     private function getTagChoices(): array
     {
-        $tags    = $this->leadModel->getTagList();
-        $choices = [];
-
-        foreach ($tags as $tag) {
-            $choices[$tag['value']] = $tag['label'];
-        }
-
-        return $choices;
+        return $this->makeChoices($this->leadModel->getTagList(), 'label', 'value');
     }
 
     private function getStageChoices(): array
     {
-        $stages  = $this->stageModel->getRepository()->getSimpleList();
-        $choices = [];
-
-        foreach ($stages as $stage) {
-            $choices[$stage['value']] = $stage['label'];
-        }
-
-        return $choices;
+        return $this->makeChoices($this->stageModel->getRepository()->getSimpleList(), 'label', 'value');
     }
 
     private function getCategoryChoices(): array
     {
-        $categories = $this->categoryModel->getLookupResults('global');
-        $choices    = [];
+        return $this->makeChoices($this->categoryModel->getLookupResults('global'), 'title', 'id');
+    }
 
-        foreach ($categories as $category) {
-            $choices[$category['id']] = $category['title'];
+    private function makeChoices(array $items, string $labelName, string $keyName): array
+    {
+        $choices = [];
+
+        foreach ($items as $item) {
+            $choices[$item[$labelName]] = $item[$keyName];
         }
 
         return $choices;
