@@ -573,7 +573,7 @@ class FieldType extends AbstractType
 
         $builder->add(
             'isIndex',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.field.indexable',
                 'label_attr' => ['class' => 'control-label'],
