@@ -64,12 +64,16 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
 
+        $types = array_map(function ($category) {
+            return array_flip($category);
+        }, $event->getTypes());
+
         $builder->add(
             'type',
             ChoiceType::class,
             [
                 'label'             => 'mautic.dashboard.widget.form.type',
-                'choices'           => array_flip($event->getTypes()),
+                'choices'           => $types,
                 'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => 'mautic.core.select',
                 'attr'              => [
