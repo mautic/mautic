@@ -22,23 +22,23 @@ if (!empty($id)) {
 }
 $view['slots']->set('headerTitle', $header);
 
-$templates = [
-    'countries'      => 'country-template',
-    'regions'        => 'region-template',
-    'timezones'      => 'timezone-template',
-    'select'         => 'select-template',
-    'lists'          => 'leadlist-template',
-    'campaign'       => 'campaign-template',
-    'deviceTypes'    => 'device_type-template',
-    'deviceBrands'   => 'device_brand-template',
-    'deviceOs'       => 'device_os-template',
-    'emails'         => 'lead_email_received-template',
-    'assets'         => 'assets-template',
-    'tags'           => 'tags-template',
-    'stage'          => 'stage-template',
-    'locales'        => 'locale-template',
-    'globalcategory' => 'globalcategory-template',
-];
+// $templates = [
+//     'countries'      => 'country-template',
+//     'regions'        => 'region-template',
+//     'timezones'      => 'timezone-template',
+//     'select'         => 'select-template',
+//     'lists'          => 'leadlist-template',
+//     'campaign'       => 'campaign-template',
+//     'deviceTypes'    => 'device_type-template',
+//     'deviceBrands'   => 'device_brand-template',
+//     'deviceOs'       => 'device_os-template',
+//     'emails'         => 'lead_email_received-template',
+//     'assets'         => 'assets-template',
+//     'tags'           => 'tags-template',
+//     'stage'          => 'stage-template',
+//     'locales'        => 'locale-template',
+//     'globalcategory' => 'globalcategory-template',
+// ];
 
 $mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
 $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text-danger"' : '';
@@ -101,22 +101,12 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     ?>
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
-                                            $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                            $choices   = ('boolean' === $params['properties']['type'])
-                                                ?
-                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)
-                                                :
-                                                \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
-                                            $list      = json_encode($choices);
-                                            $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                             ?>
                                             <option value="<?php echo $view->escape($value); ?>"
                                                     id="available_<?php echo $object.'_'.$value; ?>"
                                                     data-field-object="<?php echo $object; ?>"
                                                     data-field-type="<?php echo $params['properties']['type']; ?>"
-                                                    data-field-list="<?php echo $view->escape($list); ?>"
-                                                    data-field-callback="<?php echo $callback; ?>"
                                                     data-field-operators="<?php echo $operators; ?>"
                                                     class="segment-filter <?php echo $icon; ?>">
                                                     <?php echo $view['translator']->trans($params['label']); ?>
@@ -152,28 +142,3 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
 </div>
 <?php echo $view['form']->end($form); ?>
 
-<div class="hide" id="templates">
-    <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create').'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create').'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
-        <select class="form-control not-chosen <?php echo $template; ?>" name="leadlist[filters][__name__][filter]" id="leadlist_filters___name___filter"<?php echo $attr; ?>>
-            <?php
-            if (isset($form->vars[$dataKey])):
-                foreach ($form->vars[$dataKey] as $label => $value):
-                    if (is_array($value)):
-                        echo "<optgroup label=\"$label\">\n";
-                        foreach ($value as $optionLabel => $optionValue):
-                            echo "<option value=\"$optionValue\">$optionLabel</option>\n";
-                        endforeach;
-                        echo "</optgroup>\n";
-                    else:
-                        if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
-                            continue;
-                        }
-                        echo "<option value=\"$value\">$label</option>\n";
-                    endif;
-                endforeach;
-            endif;
-            ?>
-        </select>
-    <?php endforeach; ?>
-</div>

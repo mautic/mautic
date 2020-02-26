@@ -110,15 +110,15 @@ class FilterType extends AbstractType
                 ]
             );
 
-            $form->add(
-                'filter',
-                TextType::class,
-                [
-                    'label' => false,
-                    'data'  => $data['filter'] ?? '',
-                    'attr'  => ['class' => 'form-control'],
-                ]
-            );
+            // $form->add(
+            //     'filter',
+            //     TextType::class,
+            //     [
+            //         'label' => false,
+            //         'data'  => $data['filter'] ?? '',
+            //         'attr'  => ['class' => 'form-control'],
+            //     ]
+            // );
 
             $form->add(
                 'properties',

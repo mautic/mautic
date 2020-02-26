@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -144,35 +145,64 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterForm(FilterPropertiesTypeEvent $event): void
     {
-        $form     = $event->getFilterPropertiesForm();
-        $choices  = $event->getFieldChoices();
-        $disabled = $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
-        $multiple = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
-        $data     = $form->getData();
+        $form       = $event->getFilterPropertiesForm();
+        $choices    = $event->getFieldChoices();
+        $disabled   = $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
+        $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
+        $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
+        $data       = $form->getData();
+        $attr       = ['class' => 'form-control'];
 
-        if ($event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP)) {
+        if ('tags' === $event->getFieldAlias()) {
             $form->add(
                 'filter',
-                TextType::class,
+                ChoiceType::class,
                 [
-                    'label' => false,
-                    'attr'  => [
-                        'class' => 'form-control',
-                    ],
+                    'label'                     => false,
+                    'data'                      => $data['filter'] ?? [],
+                    'choices'                   => FormFieldHelper::parseList($choices, true, ('boolean' === $event->getFieldType())),
+                    'multiple'                  => $multiple,
+                    'choice_translation_domain' => false,
+                    'disabled'                  => $disabled,
+                    'attr'                      => array_merge(
+                        $attr,
+                        [
+                            'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                            'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                            'data-allow-add'       => true,
+                            'onchange'             => 'Mautic.createLeadTag(this)',
+                            'data-field-callback'  => '',
+                        ]
+                    ),
                 ]
             );
 
             return;
         }
 
-        if ($event->fieldTypeIsOneOf('select', 'multiselect', 'boolean') || $choices) {
+        if (!$mustBeText && $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean') || $choices) {
+            $filter = $data['filter'] ?? '';
+
             // Conversion between select and multiselect values.
             if ($multiple) {
                 if (!isset($data['filter'])) {
-                    $data['filter'] = [];
+                    $filter = [];
                 } elseif (!is_array($data['filter'])) {
-                    $data['filter'] = [$data['filter']];
+                    $filter = [$data['filter']];
                 }
+            }
+
+            if ($event->fieldTypeIsOneOf('lookup')) {
+                // $attr['data-field-callback'] = 'activateLeadFieldTypeahead';
+                $attr = array_merge(
+                    $attr,
+                    [
+                        'data-toggle' => 'field-lookup',
+                        'data-target' => $event->getFieldAlias(),
+                        'data-action' => 'lead:fieldList',
+                        'placeholder' => $this->translator->trans('mautic.lead.list.form.filtervalue'),
+                    ]
+                );
             }
 
             $form->add(
@@ -180,8 +210,8 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
                 ChoiceType::class,
                 [
                     'label'                     => false,
-                    'attr'                      => ['class' => 'form-control'],
-                    'data'                      => $data['filter'],
+                    'attr'                      => $attr,
+                    'data'                      => $filter,
                     'choices'                   => FormFieldHelper::parseList($choices, true, ('boolean' === $event->getFieldType())),
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
@@ -197,7 +227,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             TextType::class,
             [
                 'label'    => false,
-                'attr'     => ['class' => 'form-control'],
+                'attr'     => $attr,
                 'disabled' => $disabled,
             ]
         );

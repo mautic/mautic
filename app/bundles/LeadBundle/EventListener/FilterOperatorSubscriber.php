@@ -57,9 +57,6 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         $this->translator           = $translator;
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -81,30 +78,28 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
-        $this->leadFieldRepository->getListablePublishedFields()->map(function(LeadField $field) use ($event) {
+        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event) {
             $type               = $field->getType();
             $properties         = $field->getProperties();
             $properties['type'] = $type;
 
-            if ('boolean' == $type) {
+            if ('boolean' === $type) {
                 $properties['list'] = [
                     0 => $properties['no'],
                     1 => $properties['yes'],
                 ];
-            }
-
-            if (in_array($type, ['select', 'multiselect'])) {
-                $properties['callback'] = 'activateLeadFieldTypeahead';
+            } elseif (in_array($type, ['select', 'multiselect'], true)) {
+                // $properties['callback'] = 'activateLeadFieldTypeahead';
                 $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
                     FormFieldHelper::FORMAT_ARRAY,
                     FormFieldHelper::parseList($properties['list'])
                 ) : '';
-            }
-
-            try {
-                $properties['list'] = $this->typeOperatorProvider->getChoicesForField($type, $field->getAlias());
-            } catch (ChoicesNotFoundException $e) {
-                // That's fine. Not all fields should have choices.
+            } else {
+                try {
+                    $properties['list'] = $this->typeOperatorProvider->getChoicesForField($type, $field->getAlias());
+                } catch (ChoicesNotFoundException $e) {
+                    // That's fine. Not all fields should have choices.
+                }
             }
 
             $event->addChoice($field->getObject(), $field->getAlias(), [

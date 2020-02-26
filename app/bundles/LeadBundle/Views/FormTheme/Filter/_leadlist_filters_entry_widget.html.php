@@ -18,10 +18,8 @@ if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
 }
 ?>
 
-<div class="panel<?php echo ($inGroup && false === $first) ? ' in-group' : ''; ?>">
-    <div class="panel-heading <?php if (!$isPrototype && '0' === $form->vars['name']) {
-    echo ' hide';
-} ?>">
+<div class="panel<?php echo ($inGroup && false === $first) ? ' in-group' : ''; ?>" id="<?php echo $id; ?>">
+    <div class="panel-heading <?php echo (!$isPrototype && '0' === $form->vars['name']) ? ' hide' : ''; ?>">
         <div class="panel-glue col-sm-2 pl-0 ">
             <?php echo $view['form']->widget($form['glue']); ?>
         </div>
@@ -35,13 +33,13 @@ if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
             <?php echo $view['form']->widget($form['operator']); ?>
         </div>
 
-        <?php $hasErrors = count($form['filter']->vars['errors']) || count($form['display']->vars['errors']); ?>
+        <?php $hasErrors = /*count($form['filter']->vars['errors']) ||*/ count($form['display']->vars['errors']); ?>
         <div class="col-xs-10 col-sm-5 padding-none<?php if ($hasErrors): echo ' has-error'; endif; ?>">
             <div class="properties-form">
                 <?php echo $view['form']->widget($form['properties']); ?>
             </div>
             <?php echo $view['form']->widget($form['display']); ?>
-            <?php echo $view['form']->errors($form['filter']); ?>
+            <?php //echo $view['form']->errors($form['filter']);?>
             <?php echo $view['form']->errors($form['display']); ?>
         </div>
 
