@@ -16,6 +16,7 @@ use ReflectionClass;
 use ReflectionException;
 use SplPriorityQueue;
 use Stack\StackedHttpKernel;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class MiddlewareBuilder
 {
@@ -28,11 +29,6 @@ class MiddlewareBuilder
      * @var string
      */
     private $cacheFile;
-
-    /**
-     * @var SplPriorityQueue|ReflectionClass[]
-     */
-    private $specs;
 
     /**
      * MiddlewareBuilder constructor.
@@ -62,22 +58,11 @@ class MiddlewareBuilder
 
     private function loadMiddlewares(): void
     {
-        if ($this->hasCacheFile()) {
-            $this->loadCacheFile();
-
-            return;
+        if (!$this->hasCacheFile()) {
+            throw new FileNotFoundException('No middleware cache file found. Please warm the middleware cache first.');
         }
 
-        $this->loadFromDirectory(__DIR__);
-
-        $env    = $this->app->getEnvironment();
-        $envDir = __DIR__.'/'.ucfirst($env);
-
-        if (file_exists($envDir)) {
-            $this->loadFromDirectory($envDir, $env);
-        }
-
-        $this->createCacheFile();
+        $this->loadCacheFile();
     }
 
     private function hasCacheFile(): bool
@@ -92,52 +77,6 @@ class MiddlewareBuilder
 
         foreach ($middlewares as $middleware) {
             $this->push($middleware);
-        }
-    }
-
-    private function createCacheFile(): void
-    {
-        if (file_exists($this->cacheFile)) {
-            unlink($this->cacheFile);
-        }
-
-        if (false === file_exists($this->app->getCacheDir())) {
-            mkdir($this->app->getCacheDir(), 0755, true);
-        }
-
-        $data  = [];
-        $clone = clone $this->specs;
-        $clone->setExtractFlags(SplPriorityQueue::EXTR_DATA);
-
-        /** @var ReflectionClass $middleware */
-        foreach ($clone as $middleware) {
-            $data[] = $middleware->getName();
-        }
-
-        $content = sprintf('<?php return %s;', var_export($data, true));
-
-        file_put_contents($this->cacheFile, $content);
-    }
-
-    private function loadFromDirectory(string $directory, ?string $env = null): void
-    {
-        $glob = glob($directory.'/*Middleware.php');
-
-        if (!empty($glob)) {
-            $this->addMiddlewares($glob, $env);
-        }
-    }
-
-    private function addMiddlewares(array $middlewares, ?string $env = null)
-    {
-        $prefix = 'Mautic\\Middleware\\';
-
-        if ($env) {
-            $prefix .= ucfirst($env).'\\';
-        }
-
-        foreach ($middlewares as $middleware) {
-            $this->push($prefix.basename(substr($middleware, 0, -4)));
         }
     }
 
