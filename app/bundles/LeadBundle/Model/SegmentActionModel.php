@@ -18,18 +18,11 @@ class SegmentActionModel
      */
     private $contactModel;
 
-    /**
-     * @param LeadModel $contactModel
-     */
     public function __construct(LeadModel $contactModel)
     {
         $this->contactModel = $contactModel;
     }
 
-    /**
-     * @param array $contactIds
-     * @param array $segmentIds
-     */
     public function addContacts(array $contactIds, array $segmentIds)
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);
@@ -45,10 +38,6 @@ class SegmentActionModel
         $this->contactModel->saveEntities($contacts);
     }
 
-    /**
-     * @param array $contactIds
-     * @param array $segmentIds
-     */
     public function removeContacts(array $contactIds, array $segmentIds)
     {
         $contacts = $this->contactModel->getLeadsByIds($contactIds);

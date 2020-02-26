@@ -32,8 +32,6 @@ class Reference
 
     /**
      * Reference constructor.
-     *
-     * @param Stat $stat
      */
     public function __construct(Stat $stat)
     {

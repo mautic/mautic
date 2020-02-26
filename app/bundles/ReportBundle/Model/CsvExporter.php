@@ -37,13 +37,12 @@ class CsvExporter
     }
 
     /**
-     * @param ReportDataResult $reportDataResult
-     * @param resource         $handle
-     * @param int              $page
+     * @param resource $handle
+     * @param int      $page
      */
     public function export(ReportDataResult $reportDataResult, $handle, $page = 1)
     {
-        if ($page === 1) {
+        if (1 === $page) {
             $this->putHeader($reportDataResult, $handle);
         }
 
@@ -51,7 +50,7 @@ class CsvExporter
             $row = [];
             foreach ($data as $k => $v) {
                 $type       = $reportDataResult->getType($k);
-                $typeString = $type !== 'string';
+                $typeString = 'string' !== $type;
                 $row[]      = $typeString ? $this->formatterHelper->_($v, $type, true) : $v;
             }
             $this->putRow($handle, $row);
@@ -59,8 +58,7 @@ class CsvExporter
     }
 
     /**
-     * @param ReportDataResult $reportDataResult
-     * @param resource         $handle
+     * @param resource $handle
      */
     private function putHeader(ReportDataResult $reportDataResult, $handle)
     {
@@ -69,11 +67,10 @@ class CsvExporter
 
     /**
      * @param resource $handle
-     * @param array    $row
      */
     private function putRow($handle, array $row)
     {
-        if ($this->coreParametersHelper->getParameter('csv_always_enclose')) {
+        if ($this->coreParametersHelper->get('csv_always_enclose')) {
             fputs($handle, '"'.implode('","', $row).'"'."\n");
         } else {
             fputcsv($handle, $row);

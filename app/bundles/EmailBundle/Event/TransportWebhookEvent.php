@@ -30,10 +30,6 @@ class TransportWebhookEvent extends Event
      */
     private $request;
 
-    /**
-     * @param CallbackTransportInterface $transport
-     * @param Request                    $request
-     */
     public function __construct(CallbackTransportInterface $transport, Request $request)
     {
         $this->transport = $transport;

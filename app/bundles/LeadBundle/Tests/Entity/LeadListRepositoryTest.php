@@ -22,7 +22,7 @@ use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 
-class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
+class LeadListRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testIncludeSegmentFilterWithFiltersAppendInOrGroups()
     {
@@ -190,7 +190,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && '%blah.com%' == $parameters[$match[1]], $string);
     }
 
     public function testLikeFilterDoesNotAppendsAmperstandIfAlreadyIncluded()
@@ -219,7 +219,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && 'blah.com%' == $parameters[$match[1]], $string);
     }
 
     public function testContainsFilterAppendsAmperstandOnBothEnds()
@@ -248,7 +248,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && '%blah.com%' == $parameters[$match[1]], $string);
     }
 
     public function testStartsWithFilterAppendsAmperstandAtEnd()
@@ -277,7 +277,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && 'blah.com%' == $parameters[$match[1]], $string);
     }
 
     public function testEndsWithFilterAppendsAmperstandAtBeginning()
@@ -306,7 +306,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && '%blah.com' == $parameters[$match[1]], $string);
     }
 
     private function getReflectedGenerateSegmentExpressionMethod($noFilters = false)
@@ -343,7 +343,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                         ->disableOriginalConstructor()
                         ->getMock();
                     switch (true) {
-                        case strpos($table, 'companies') !== false:
+                        case false !== strpos($table, 'companies'):
                             $name = 'company_email';
                             break;
                         default:

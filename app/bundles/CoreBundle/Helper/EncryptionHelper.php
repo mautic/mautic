@@ -16,9 +16,6 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-/**
- * Class EncryptionHelper.
- */
 class EncryptionHelper
 {
     /** @var SymmetricCipherInterface[] */
@@ -27,17 +24,8 @@ class EncryptionHelper
     /** @var string */
     private $key;
 
-    /**
-     * EncryptionHelper constructor.
-     *
-     * @param CoreParametersHelper          $coreParametersHelper
-     * @param SymmetricCipherInterface      $possibleCipher1
-     * @param SymmetricCipherInterface|null $possibleCipher2
-     */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        SymmetricCipherInterface $possibleCipher1,
-        SymmetricCipherInterface $possibleCipher2 = null
+        CoreParametersHelper $coreParametersHelper
     ) {
         $nonCipherArgs = 1;
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
@@ -51,11 +39,11 @@ class EncryptionHelper
             $this->availableCiphers[] = $possibleCipher;
         }
 
-        if (!$this->availableCiphers || count($this->availableCiphers) === 0) {
+        if (!$this->availableCiphers || 0 === count($this->availableCiphers)) {
             throw new \RuntimeException('None of possible cryptography libraries is supported');
         }
 
-        $this->key = $coreParametersHelper->getParameter('mautic.secret_key');
+        $this->key = $coreParametersHelper->get('mautic.secret_key');
     }
 
     /**

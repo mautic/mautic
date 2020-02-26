@@ -52,7 +52,7 @@ class CategoryApiController extends CommonApiController
             $permissionBase = $bundle.':categories';
         }
 
-        if ($action != 'create') {
+        if ('create' != $action) {
             $ownPerm   = "$permissionBase:{$action}own";
             $otherPerm = "$permissionBase:{$action}other";
 

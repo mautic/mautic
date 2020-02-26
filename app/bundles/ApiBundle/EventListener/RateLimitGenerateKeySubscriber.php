@@ -11,26 +11,18 @@
 
 namespace Mautic\ApiBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Noxlogic\RateLimitBundle\Events\GenerateKeyEvent;
 use Noxlogic\RateLimitBundle\Events\RateLimitEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class RateLimitGenerateKeySubscriber.
- */
-class RateLimitGenerateKeySubscriber extends CommonSubscriber
+class RateLimitGenerateKeySubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
-    /**
-     * RateLimitGenerateKeySubscriber constructor.
-     *
-     * @param \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -46,12 +38,9 @@ class RateLimitGenerateKeySubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param \Noxlogic\RateLimitBundle\Events\GenerateKeyEvent $event
-     */
     public function onGenerateKey(GenerateKeyEvent $event)
     {
-        $suffix = $this->coreParametersHelper->getParameter('site_url');
+        $suffix = $this->coreParametersHelper->get('site_url');
         $event->addToKey($suffix);
     }
 }

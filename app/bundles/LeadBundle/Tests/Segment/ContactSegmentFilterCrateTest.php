@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
-class ContactSegmentFilterCrateTest extends \PHPUnit_Framework_TestCase
+class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @covers \Mautic\LeadBundle\Segment\ContactSegmentFilterCrate

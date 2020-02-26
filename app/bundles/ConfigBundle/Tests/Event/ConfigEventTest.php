@@ -15,7 +15,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ConfigEventTest extends \PHPUnit_Framework_TestCase
+class ConfigEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSetConfig()
     {
@@ -39,18 +39,6 @@ class ConfigEventTest extends \PHPUnit_Framework_TestCase
         // Get complete config
         $config = [$key => $config];
         $this->assertEquals($config, $event->getConfig());
-    }
-
-    /**
-     * @deprecated 2.14.1; to be removed in 3.0 as unused
-     */
-    public function testGetPost()
-    {
-        $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
-        $event    = new ConfigEvent($config, $paramBag);
-
-        $this->assertEquals($paramBag, $event->getPost());
     }
 
     public function testGetSetPreserved()

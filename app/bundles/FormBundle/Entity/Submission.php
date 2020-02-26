@@ -68,9 +68,6 @@ class Submission
      */
     private $results = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -80,7 +77,7 @@ class Submission
             ->addIndex(['tracking_id'], 'form_submission_tracking_search')
             ->addIndex(['date_submitted'], 'form_date_submitted');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('submissions')
@@ -206,8 +203,6 @@ class Submission
     /**
      * Set form.
      *
-     * @param Form $form
-     *
      * @return Submission
      */
     public function setForm(Form $form)
@@ -308,8 +303,6 @@ class Submission
     }
 
     /**
-     * @param Lead|null $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead = null)

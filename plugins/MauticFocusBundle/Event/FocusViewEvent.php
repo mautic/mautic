@@ -24,9 +24,6 @@ class FocusViewEvent extends Event
      */
     private $stat;
 
-    /**
-     * @param Stat $stat
-     */
     public function __construct(Stat $stat)
     {
         $this->stat  = $stat;

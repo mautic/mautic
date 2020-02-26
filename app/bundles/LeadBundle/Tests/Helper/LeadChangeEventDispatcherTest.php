@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class LeadChangeEventDispatcherTest extends \PHPUnit_Framework_TestCase
+class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that date identified change dispatches correct event

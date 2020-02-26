@@ -59,7 +59,7 @@ return [
     'services' => [
         'events' => [
             'mautic.category.subscriber' => [
-                'class'     => 'Mautic\CategoryBundle\EventListener\CategorySubscriber',
+                'class'     => \Mautic\CategoryBundle\EventListener\CategorySubscriber::class,
                 'arguments' => [
                     'mautic.helper.bundle',
                     'mautic.helper.ip_lookup',
@@ -83,13 +83,10 @@ return [
                     'mautic.category.model.category',
                     'router',
                 ],
-                'alias' => 'category',
             ],
             'mautic.form.type.category_form' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryType',
-                'alias'     => 'category_form',
+                'class'     => \Mautic\CategoryBundle\Form\Type\CategoryType::class,
                 'arguments' => [
-                    'translator',
                     'session',
                 ],
             ],
@@ -98,7 +95,6 @@ return [
                 'arguments' => [
                     'event_dispatcher',
                 ],
-                'alias' => 'category_bundles_form',
             ],
         ],
         'models' => [

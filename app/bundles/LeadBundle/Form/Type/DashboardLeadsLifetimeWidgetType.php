@@ -11,47 +11,45 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
+use Recurr\Transformer\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class DashboardLeadsInTimeWidgetType.
- */
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var ListModel
      */
-    private $factory;
-
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
+    private $segmentModel;
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @var TranslatorInterface
      */
+    private $translator;
+
+    public function __construct(ListModel $segmentModel, TranslatorInterface $translator)
+    {
+        $this->segmentModel = $segmentModel;
+        $this->translator   = $translator;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $model = $this->factory->getModel('lead.list');
-
-        $lists       = $model->getUserLists();
-        $segments    = [];
-        $segments[0] = $this->factory->getTranslator()->trans('mautic.lead.all.leads');
+        $lists                                                       = $this->segmentModel->getUserLists();
+        $segments                                                    = [];
+        $segments[$this->translator->trans('mautic.lead.all.leads')] = 0;
         foreach ($lists as $list) {
-            $segments[$list['id']] = $list['name'];
+            $segments[$list['name']] = $list['id'];
         }
 
         $builder->add('flag', 'choice', [
-                'label'      => 'mautic.lead.list.filter',
-                'multiple'   => true,
-                'choices'    => $segments,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'             => 'mautic.lead.list.filter',
+                'multiple'          => true,
+                'choices'           => $segments,
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => ['class' => 'form-control'],
+                'required'          => false,
             ]
         );
     }
@@ -59,7 +57,7 @@ class DashboardLeadsLifetimeWidgetType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead_dashboard_leads_lifetime_widget';
     }

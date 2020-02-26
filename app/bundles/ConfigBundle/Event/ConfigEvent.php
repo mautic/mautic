@@ -15,9 +15,6 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigEvent extends CommonEvent
 {
     /**
@@ -26,12 +23,12 @@ class ConfigEvent extends CommonEvent
     private $preserve = [];
 
     /**
-     * @param array $config
+     * @param array
      */
     private $config;
 
     /**
-     * @param \Symfony\Component\HttpFoundation\ParameterBag $post
+     * @param ParameterBag
      */
     private $post;
 
@@ -59,10 +56,6 @@ class ConfigEvent extends CommonEvent
      */
     private $normData;
 
-    /**
-     * @param array        $config
-     * @param ParameterBag $post
-     */
     public function __construct(array $config, ParameterBag $post)
     {
         $this->config = $config;
@@ -88,8 +81,7 @@ class ConfigEvent extends CommonEvent
     /**
      * Sets the config array.
      *
-     * @param array $config
-     * @param null  $key
+     * @param null $key
      */
     public function setConfig(array $config, $key = null)
     {
@@ -100,14 +92,7 @@ class ConfigEvent extends CommonEvent
         }
     }
 
-    /**
-     * Returns the POST.
-     *
-     * @return \Symfony\Component\HttpFoundation\ParameterBag
-     *
-     * @deprecated 2.14.1; to be removed in 3.0 as unused
-     */
-    public function getPost()
+    public function getPost(): ParameterBag
     {
         return $this->post;
     }
@@ -187,8 +172,6 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * @param UploadedFile $file
-     *
      * @return string
      */
     public function getFileContent(UploadedFile $file)
@@ -219,8 +202,6 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * @param array $normData
-     *
      * @return ConfigEvent
      */
     public function setOriginalNormData(array $normData)

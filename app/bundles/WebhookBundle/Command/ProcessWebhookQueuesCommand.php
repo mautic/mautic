@@ -57,7 +57,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 
         if ($id) {
             $webhook  = $model->getEntity($id);
-            $webhooks = ($webhook !== null && $webhook->isPublished()) ? [$id => $webhook] : [];
+            $webhooks = (null !== $webhook && $webhook->isPublished()) ? [$id => $webhook] : [];
         } else {
             // make sure we only get published webhook entities
             $webhooks = $model->getEntities(

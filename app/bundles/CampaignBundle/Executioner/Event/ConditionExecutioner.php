@@ -32,8 +32,6 @@ class ConditionExecutioner implements EventInterface
 
     /**
      * ConditionExecutioner constructor.
-     *
-     * @param ConditionDispatcher $dispatcher
      */
     public function __construct(ConditionDispatcher $dispatcher)
     {
@@ -41,9 +39,6 @@ class ConditionExecutioner implements EventInterface
     }
 
     /**
-     * @param AbstractEventAccessor $config
-     * @param ArrayCollection       $logs
-     *
      * @return EvaluatedContacts
      *
      * @throws CannotProcessEventException
@@ -71,9 +66,6 @@ class ConditionExecutioner implements EventInterface
     }
 
     /**
-     * @param ConditionAccessor $config
-     * @param LeadEventLog      $log
-     *
      * @throws CannotProcessEventException
      * @throws ConditionFailedException
      */

@@ -9,15 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\IpLookup;
+namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 
-/**
- * Class GeobytesLookupTest.
- */
-class GeobytesLookupTest extends \PHPUnit_Framework_TestCase
+class GeobytesLookupTest extends \PHPUnit\Framework\TestCase
 {
+    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+
     public function testIpLookupSuccessful()
     {
         // Mock http connector
@@ -35,7 +34,7 @@ class GeobytesLookupTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($mockResponse);
 
-        $ipService = new GeobytesLookup(null, null, __DIR__.'/../../../../cache/test', null, $mockHttp);
+        $ipService = new GeobytesLookup(null, null, $this->cacheDir, null, $mockHttp);
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 

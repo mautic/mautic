@@ -13,6 +13,8 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\SortableListTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -21,14 +23,8 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class SortableListType.
- */
 class SortableListType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $constraints = ($options['option_required']) ? [
@@ -53,20 +49,20 @@ class SortableListType extends AbstractType
         $builder->add(
             $builder->create(
                 'list',
-                'collection',
+                CollectionType::class,
                 [
-                    'label'      => false,
-                    'entry_type' => ($options['with_labels']) ? SortableValueLabelListType::class : $options['entry_type'],
-                    'options'    => [
-                        'label'    => false,
-                        'required' => false,
-                        'attr'     => [
+                    'label'          => false,
+                    'entry_type'     => ($options['with_labels']) ? SortableValueLabelListType::class : $options['entry_type'],
+                    'entry_options'  => [
+                        'label'          => false,
+                        'required'       => false,
+                        'attr'           => [
                             'class'         => 'form-control',
                             'preaddon'      => $options['remove_icon'],
                             'preaddon_attr' => [
                                 'onclick' => $options['remove_onclick'],
                             ],
-                            'postaddon' => $options['sortable'],
+                            'postaddon'     => $options['sortable'],
                         ],
                         'constraints'    => $options['option_constraint'],
                         'error_bubbling' => true,
@@ -78,21 +74,15 @@ class SortableListType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-        )->addModelTransformer(new SortableListTransformer($options['option_notblank'], $options['with_labels'], $options['key_value_pairs']));
+        )->addModelTransformer(new SortableListTransformer($options['with_labels'], $options['key_value_pairs']));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['isSortable']     = (!empty($options['sortable']));
         $view->vars['addValueButton'] = $options['add_value_button'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -104,11 +94,11 @@ class SortableListType extends AbstractType
                 'remove_icon'         => 'fa fa-times',
                 'sortable'            => 'fa fa-ellipsis-v handle',
                 'with_labels'         => false,
-                'entry_type'          => 'text',
+                'entry_type'          => TextType::class,
                 'add_value_button'    => 'mautic.core.form.list.additem',
                 // Stores as [label => value] array instead of [list => [[label => the label, value => the value], ...]]
-                'key_value_pairs'          => false,
-                'option_constraint'        => [],
+                'key_value_pairs'     => false,
+                'option_constraint'   => [],
             ]
         );
 
@@ -123,10 +113,7 @@ class SortableListType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'sortablelist';
     }

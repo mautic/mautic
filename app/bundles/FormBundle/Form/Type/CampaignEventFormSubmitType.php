@@ -24,7 +24,7 @@ class CampaignEventFormSubmitType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('forms', 'form_list', [
+        $builder->add('forms', FormListType::class, [
             'label'      => 'mautic.form.campaign.event.forms',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
@@ -38,7 +38,7 @@ class CampaignEventFormSubmitType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'campaignevent_formsubmit';
     }

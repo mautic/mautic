@@ -13,22 +13,19 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ReportSubscriber.
- */
-class ReportSubscriber extends CommonSubscriber
+class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_EMAILS      = 'emails';
     const CONTEXT_EMAIL_STATS = 'email.stats';
@@ -36,7 +33,7 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var CompanyReportData
@@ -44,15 +41,15 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * ReportSubscriber constructor.
-     *
-     * @param Connection        $db
-     * @param CompanyReportData $companyReportData
+     * @var StatRepository
      */
-    public function __construct(Connection $db, CompanyReportData $companyReportData)
+    private $statRepository;
+
+    public function __construct(Connection $db, CompanyReportData $companyReportData, StatRepository $statRepository)
     {
         $this->db                = $db;
         $this->companyReportData = $companyReportData;
+        $this->statRepository    = $statRepository;
     }
 
     /**
@@ -69,8 +66,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add available tables and columns to the report builder lookup.
-     *
-     * @param ReportBuilderEvent $event
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -300,8 +295,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGeneratorEvent $event
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -406,8 +399,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Initialize the QueryBuilder object to generate reports from.
-     *
-     * @param ReportGraphEvent $event
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -421,8 +412,7 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $qb       = $event->getQueryBuilder();
-        $statRepo = $this->em->getRepository(Stat::class);
+        $qb = $event->getQueryBuilder();
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
             $queryBuilder = clone $qb;
@@ -460,7 +450,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $counts = $statRepo->getIgnoredReadFailed($queryBuilder);
+                    $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
                     $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
@@ -512,7 +502,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('sent', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -527,7 +517,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('opens', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -545,7 +535,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('failed', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -567,7 +557,7 @@ class ReportSubscriber extends CommonSubscriber
 
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -588,7 +578,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('bounced', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -603,7 +593,7 @@ class ReportSubscriber extends CommonSubscriber
                         ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
+                    $items                  = $this->statRepository->getMostEmails($queryBuilder, $limit, $offset);
                     $graphData              = [];
                     $graphData['data']      = $items;
                     $graphData['name']      = $g;
@@ -618,8 +608,6 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * Add the Do Not Contact table to the query builder.
-     *
-     * @param QueryBuilder $qb
      */
     private function addDNCTable(QueryBuilder $qb)
     {

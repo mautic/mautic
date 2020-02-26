@@ -59,13 +59,6 @@ class LookupHelper
 
     /**
      * LookupHelper constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     * @param UserHelper        $userHelper
-     * @param Logger            $logger
-     * @param Router            $router
-     * @param LeadModel         $leadModel
-     * @param CompanyModel      $companyModel
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -84,7 +77,6 @@ class LookupHelper
     }
 
     /**
-     * @param Lead $lead
      * @param bool $notify
      * @param bool $checkAuto
      */
@@ -131,9 +123,8 @@ class LookupHelper
     }
 
     /**
-     * @param Company $company
-     * @param bool    $notify
-     * @param bool    $checkAuto
+     * @param bool $notify
+     * @param bool $checkAuto
      */
     public function lookupCompany(Company $company, $notify = false, $checkAuto = false)
     {
@@ -179,7 +170,6 @@ class LookupHelper
 
     /**
      * @param $oid
-     * @param $type
      */
     public function validateRequest($oid)
     {

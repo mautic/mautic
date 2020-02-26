@@ -24,7 +24,7 @@ final class FromDTO implements \JsonSerializable
     /**
      * @var string|null
      */
-    private $name = null;
+    private $name;
 
     /**
      * FromDTO constructor.
@@ -56,7 +56,7 @@ final class FromDTO implements \JsonSerializable
         $json = [
             'email' => $this->email,
         ];
-        if ($this->name !== null) {
+        if (null !== $this->name) {
             $json['name'] = $this->name;
         }
 

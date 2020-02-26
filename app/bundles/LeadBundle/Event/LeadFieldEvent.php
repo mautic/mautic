@@ -20,8 +20,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 class LeadFieldEvent extends CommonEvent
 {
     /**
-     * @param LeadField $field
-     * @param bool      $isNew
+     * @param bool $isNew
      */
     public function __construct(LeadField &$field, $isNew = false)
     {
@@ -41,8 +40,6 @@ class LeadFieldEvent extends CommonEvent
 
     /**
      * Sets the LeadField entity.
-     *
-     * @param LeadField $field
      */
     public function setField(LeadField $field)
     {

@@ -9,11 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Entity;
+namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 
-class IpAddressTest extends \PHPUnit_Framework_TestCase
+class IpAddressTest extends \PHPUnit\Framework\TestCase
 {
     public function testExactIp()
     {

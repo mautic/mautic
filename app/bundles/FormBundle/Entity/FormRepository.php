@@ -163,9 +163,6 @@ class FormRepository extends CommonRepository
     /**
      * Fetch the form results.
      *
-     * @param Form  $form
-     * @param array $options
-     *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException

@@ -11,6 +11,7 @@
 
 namespace Mautic\DynamicContentBundle\Form\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -23,7 +24,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
     {
         $builder->add(
             'dwc_slot_name',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
@@ -42,7 +43,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
 
         $builder->add(
             'dynamicContent',
-            'dwc_list',
+            DynamicContentListType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.selectDynamicContents.default',
                 'label_attr' => ['class' => 'control-label'],
@@ -64,7 +65,7 @@ class DynamicContentDecisionType extends DynamicContentSendType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'dwcdecision_list';
     }

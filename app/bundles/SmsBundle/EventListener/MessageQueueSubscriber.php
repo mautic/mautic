@@ -14,24 +14,16 @@ namespace Mautic\SmsBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\SmsBundle\Model\SmsModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class MessageQueueSubscriber.
- */
-class MessageQueueSubscriber extends CommonSubscriber
+class MessageQueueSubscriber implements EventSubscriberInterface
 {
     /**
      * @var SmsModel
      */
-    protected $model;
+    private $model;
 
-    /**
-     * MessageQueueSubscriber constructor.
-     *
-     * @param SmsModel $model
-     */
     public function __construct(SmsModel $model)
     {
         $this->model = $model;
@@ -49,8 +41,6 @@ class MessageQueueSubscriber extends CommonSubscriber
 
     /**
      * Sends campaign emails.
-     *
-     * @param MessageQueueBatchProcessEvent $event
      */
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event)
     {
@@ -65,7 +55,7 @@ class MessageQueueSubscriber extends CommonSubscriber
         $messagesByContact = [];
 
         /** @var MessageQueue $message */
-        foreach ($messages as $id => $message) {
+        foreach ($messages as $message) {
             if ($sms && $message->getLead() && $sms->isPublished()) {
                 $contact = $message->getLead();
                 $mobile  = $contact->getMobile();

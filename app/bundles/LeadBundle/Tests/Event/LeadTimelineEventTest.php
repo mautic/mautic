@@ -13,7 +13,7 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
-class LeadTimelineEventTest extends \PHPUnit_Framework_TestCase
+class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets

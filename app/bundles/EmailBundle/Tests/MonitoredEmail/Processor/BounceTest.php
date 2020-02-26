@@ -24,7 +24,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 
-class BounceTest extends \PHPUnit_Framework_TestCase
+class BounceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Test that the transport interface processes the message appropriately

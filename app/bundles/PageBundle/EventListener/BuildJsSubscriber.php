@@ -13,36 +13,34 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Helper\TrackingHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class BuildJsSubscriber.
- */
-class BuildJsSubscriber extends CommonSubscriber
+class BuildJsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetsHelper
      */
-    protected $assetsHelper;
+    private $assetsHelper;
 
     /**
      * @var TrackingHelper
      */
-    protected $trackingHelper;
+    private $trackingHelper;
 
     /**
-     * BuildJsSubscriber constructor.
-     *
-     * @param AssetsHelper   $assetsHelper
-     * @param TrackingHelper $trackingHelper
+     * @var RouterInterface
      */
-    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper)
+    private $router;
+
+    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper, RouterInterface $router)
     {
         $this->assetsHelper   = $assetsHelper;
         $this->trackingHelper = $trackingHelper;
+        $this->router         = $router;
     }
 
     /**
@@ -59,9 +57,6 @@ class BuildJsSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJs(BuildJsEvent $event)
     {
         $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -86,30 +81,16 @@ class BuildJsSubscriber extends CommonSubscriber
     m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingUrl}';
     m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingCORSUrl}';
     m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
-    m.fingerprint = null;
-    m.fingerprintComponents = null;
-    m.fingerprintIsLoading = false;
-    
-    m.addFingerprint = function(params) {
-        for (var componentId in m.fingerprintComponents) {
-            var component = m.fingerprintComponents[componentId];
-            if (typeof component.key !== 'undefined') {
-                if (component.key === 'resolution') {
-                    params.resolution = component.value[0] + 'x' + component.value[1];
-                } else if (component.key === 'timezone_offset') {
-                    params.timezone_offset = component.value;
-                } else if (component.key === 'navigator_platform') {
-                    params.platform = component.value;
-                } else if (component.key === 'adblock') {
-                    params.adblock = component.value;
-                } else if (component.key === 'do_not_track') {
-                    params.do_not_track = component.value;
-                }
-            }
-        }
-        params.fingerprint = m.fingerprint;
-        
-        return params;
+
+    m.getOs = function() {
+        var OSName="Unknown OS";
+
+        if (navigator.appVersion.indexOf("Win")!=-1) OSName="Windows";
+        if (navigator.appVersion.indexOf("Mac")!=-1) OSName="MacOS";
+        if (navigator.appVersion.indexOf("X11")!=-1) OSName="UNIX";
+        if (navigator.appVersion.indexOf("Linux")!=-1) OSName="Linux";
+
+        return OSName;
     }
 
     m.deliverPageEvent = function(event, params) {
@@ -120,10 +101,6 @@ class BuildJsSubscriber extends CommonSubscriber
             }, 5);
             
             return;
-        }
-
-        if (m.fingerprintComponents) {
-            params = m.addFingerprint(params);
         }
 
         // Pre delivery events always take all known params and should use them in the request
@@ -193,7 +170,11 @@ class BuildJsSubscriber extends CommonSubscriber
                     page_language: n.language,
                     page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
                     page_url: l.href,
-                    counter: m.pageViewCounter
+                    counter: m.pageViewCounter,
+                    timezone_offset: new Date().getTimezoneOffset(),
+                    resolution: window.screen.width + 'x' + window.screen.height,
+                    platform: m.getOs(),
+                    do_not_track: navigator.doNotTrack == 1
                 };
                 
                 params = MauticJS.appendTrackedContact(params);
@@ -205,34 +186,10 @@ class BuildJsSubscriber extends CommonSubscriber
                     }
                 }
 
-                m.handleFingerprintInit(event, params);
+                m.deliverPageEvent(event, params);
                 
                 m.pageViewCounter++;
             }
-        }
-    }
-
-    m.handleFingerprintInit = function(event, params) {
-        if (m.fingerprintComponents) {
-            // Already loaded
-            m.deliverPageEvent(event, params);
-        } else if (!m.fingerprint && m.fingerprintIsLoading === false) {
-            m.fingerprintIsLoading = true;
-            new Fingerprint2().get(function(result, components) {
-                m.fingerprintIsLoading = false;
-                m.fingerprint = result;
-                m.fingerprintComponents = components;
-                m.deliverPageEvent(event, params);
-            });
-        } else if (m.fingerprintIsLoading === true) {
-            var fingerprintLoop = window.setInterval(function() {
-                if (m.fingerprintIsLoading === false) {
-                    m.deliverPageEvent(event, params);
-                    clearInterval(fingerprintLoop);
-                }
-            }, 5);
-        } else {
-            m.deliverPageEvent(event, params);
         }
     }
 
@@ -249,9 +206,6 @@ JS;
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
         $formSubmitUrl = $this->router->generate(
@@ -529,9 +483,6 @@ JS;
         $event->appendJs($js, 'Mautic Gated Videos');
     }
 
-    /**
-     * @param BuildJsEvent $event
-     */
     public function onBuildJsForTrackingEvent(BuildJsEvent $event)
     {
         $js = '';

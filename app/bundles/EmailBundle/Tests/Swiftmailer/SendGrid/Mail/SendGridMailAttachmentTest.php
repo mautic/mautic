@@ -15,13 +15,14 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment;
 use SendGrid\Mail;
 
-class SendGridMailAttachmentTest extends \PHPUnit_Framework_TestCase
+class SendGridMailAttachmentTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotMauticMessage()
     {
         $sendGridMailAttachment = new SendGridMailAttachment();
 
-        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+        $message = $this->getMockBuilder(\Swift_Mime_SimpleMessage::class)
+            ->disableOriginalConstructor()
             ->getMock();
 
         $mail = $this->getMockBuilder(Mail::class)

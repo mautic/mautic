@@ -38,10 +38,6 @@ class ContactSegmentFilterOperator
 
     /**
      * ContactSegmentFilterOperator constructor.
-     *
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
-     * @param OperatorOptions          $operatorOptions
      */
     public function __construct(
         TranslatorInterface $translator,

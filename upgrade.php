@@ -11,8 +11,8 @@
 ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
-define('MAUTIC_MINIMUM_PHP', '5.6.19');
-define('MAUTIC_MAXIMUM_PHP', '7.2.999');
+define('MAUTIC_MINIMUM_PHP', '7.2.21');
+define('MAUTIC_MAXIMUM_PHP', '7.3.999');
 
 // Are we running the minimum version?
 if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {
@@ -29,9 +29,8 @@ if (version_compare(PHP_VERSION, MAUTIC_MAXIMUM_PHP, 'gt')) {
 $standalone = (int) getVar('standalone', 0);
 $task       = getVar('task');
 
-define('IN_CLI', php_sapi_name() === 'cli');
+define('IN_CLI', 'cli' === php_sapi_name());
 define('MAUTIC_ROOT', (IN_CLI || $standalone || empty($task)) ? __DIR__ : dirname(__DIR__));
-define('MAUTIC_UPGRADE_ERROR_LOG', MAUTIC_ROOT.'/upgrade_errors.txt');
 define('MAUTIC_APP_ROOT', MAUTIC_ROOT.'/app');
 
 if ($standalone || IN_CLI) {
@@ -45,12 +44,11 @@ if ($standalone || IN_CLI) {
 
 // Get local parameters
 $localParameters = get_local_config();
-if (isset($localParameters['cache_path'])) {
-    $cacheDir = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod');
-} else {
-    $cacheDir = MAUTIC_APP_ROOT.'/cache/prod';
-}
+$cacheDir        = (isset($localParameters['cache_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['cache_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/cache/prod';
+$logDir          = (isset($localParameters['log_path'])) ? str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $localParameters['log_path'].'/prod') : MAUTIC_APP_ROOT.'/../var/logs';
+
 define('MAUTIC_CACHE_DIR', $cacheDir);
+define('MAUTIC_UPGRADE_ERROR_LOG', $logDir.'/upgrade_errors.php');
 
 /*
  * Updating to 2.8.1: Check to see if we have a mautic_session_name
@@ -88,7 +86,7 @@ $status = ['complete' => false, 'error' => false, 'updateState' => $state, 'step
 if (!IN_CLI) {
     $request         = explode('?', $_SERVER['REQUEST_URI'])[0];
     $url             = "//{$_SERVER['HTTP_HOST']}{$request}";
-    $isSSL           = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off');
+    $isSSL           = (!empty($_SERVER['HTTPS']) && 'off' != $_SERVER['HTTPS']);
     $cookie_path     = (isset($localParameters['cookie_path'])) ? $localParameters['cookie_path'] : '/';
     $cookie_domain   = (isset($localParameters['cookie_domain'])) ? $localParameters['cookie_domain'] : '';
     $cookie_secure   = (isset($localParameters['cookie_secure'])) ? $localParameters['cookie_secure'] : $isSSL;
@@ -102,6 +100,7 @@ if (!IN_CLI) {
         case '':
             html_body("<div class='well text-center'><h3><a href='$url?task=startUpgrade&standalone=1'>Click here to start upgrade.</a></h3><br /><strong>Do not refresh or stop the process. This may take serveral minutes.</strong></div>");
 
+            // no break
         case 'startUpgrade':
             $nextTask = 'fetchUpdates';
             break;
@@ -135,7 +134,7 @@ if (!IN_CLI) {
                 }
                 $nextTask = 'moveBundles';
                 $query    = 'count='.$state['refresh_count'].'&';
-                $state['refresh_count'] += 1;
+                ++$state['refresh_count'];
             } else {
                 $nextTask = 'moveCore';
                 unset($state['refresh_count']);
@@ -157,7 +156,7 @@ if (!IN_CLI) {
                 }
                 $nextTask = 'moveVendors';
                 $query    = 'count='.$state['refresh_count'].'&';
-                $state['refresh_count'] += 1;
+                ++$state['refresh_count'];
             } else {
                 $nextTask = 'clearCache';
                 unset($state['refresh_count']);
@@ -426,8 +425,6 @@ function download_package($update)
 }
 
 /**
- * @param $zipFile
- *
  * @return int
  */
 function extract_package($version)
@@ -441,7 +438,7 @@ function extract_package($version)
     $zipper  = new \ZipArchive();
     $archive = $zipper->open($zipFile);
 
-    if ($archive !== true) {
+    if (true !== $archive) {
         return [false, 'Could not open or read update package.'];
     }
 
@@ -461,8 +458,6 @@ function extract_package($version)
  * CLI suite.  So we'll go with Option B in this instance and just nuke the entire production cache and let Symfony rebuild it on the next
  * application cycle.
  *
- * @param array $status
- *
  * @return array
  */
 function clear_mautic_cache()
@@ -478,16 +473,15 @@ function clear_mautic_cache()
         opcache_reset();
     }
 
-    if (function_exists('apc_clear_cache')) {
-        apc_clear_cache();
+    if (function_exists('apcu_clear_cache')) {
+        apcu_clear_cache();
     }
 
     return true;
 }
 
 /**
- * @param       $command
- * @param array $args
+ * @param $command
  *
  * @return array
  *
@@ -517,7 +511,7 @@ function run_symfony_command($command, array $args)
 
     unset($input, $output);
 
-    return $exitCode === 0;
+    return 0 === $exitCode;
 }
 
 /**
@@ -607,16 +601,16 @@ function copy_directory($src, $dest)
     }
 
     // Walk through the directory copying files and recursing into folders.
-    while (($file = readdir($dh)) !== false) {
+    while (false !== ($file = readdir($dh))) {
         $sfid = $src.'/'.$file;
         $dfid = $dest.'/'.$file;
 
         switch (filetype($sfid)) {
             case 'dir':
-                if ($file != '.' && $file != '..') {
+                if ('.' != $file && '..' != $file) {
                     $ret = copy_directory($sfid, $dfid);
 
-                    if ($ret !== true) {
+                    if (true !== $ret) {
                         if (is_array($ret)) {
                             $errorLog += $ret;
                         } else {
@@ -665,8 +659,7 @@ function getVar($name, $default = '', $filter = FILTER_SANITIZE_STRING)
  * A typical update package will only include changed files in the bundles.  However, in this script we will assume that all of
  * the bundle resources are included here and recursively iterate over the bundles in batches to update the filesystem.
  *
- * @param array $status
- * @param int   $maxCount
+ * @param int $maxCount
  *
  * @return array
  */
@@ -691,7 +684,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
 
                     $result = copy_directory($src, $dest);
 
-                    if ($result !== true) {
+                    if (true !== $result) {
                         if (is_array($result)) {
                             $errorLog += $result;
                         } else {
@@ -719,7 +712,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
 
         $status['updateState']['pluginComplete'] = true;
 
-        if ($maxCount != -1) {
+        if (-1 != $maxCount) {
             // Finished with plugins, get a response back to the app so we can iterate to the next part
             return $status;
         }
@@ -744,7 +737,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
                 // Exit the loop if the count has reached 5
-                if ($maxCount != -1 && $count === $maxCount) {
+                if (-1 != $maxCount && $count === $maxCount) {
                     $completed = false;
                     break;
                 }
@@ -761,7 +754,7 @@ function move_mautic_bundles(array $status, $maxCount = 5)
 
                     $result = copy_directory($src, $dest);
 
-                    if ($result !== true) {
+                    if (true !== $result) {
                         if (is_array($result)) {
                             $errorLog += $result;
                         } else {
@@ -811,8 +804,6 @@ function move_mautic_bundles(array $status, $maxCount = 5)
  *
  * The "core" files are broken into groups for purposes of the update script: bundles, vendor, and everything else.  This step
  * will take care of the everything else.
- *
- * @param array $status
  *
  * @return array
  */
@@ -889,8 +880,7 @@ function move_mautic_core(array $status)
  * between releases.  Therefore, this step will recursively iterate over the vendors in batches to remove each package completely
  * and replace it with the new version.
  *
- * @param array $status
- * @param int   $maxCount
+ * @param int $maxCount
  *
  * @return array
  */
@@ -933,7 +923,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
             /** @var DirectoryIterator $directory */
             foreach ($iterator as $directory) {
                 // Exit the loop if the count has reached 5
-                if ($maxCount != -1 && $count === $maxCount) {
+                if (-1 != $maxCount && $count === $maxCount) {
                     $completed = false;
                     break;
                 }
@@ -953,7 +943,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
 
                     $result = copy_directory($src, $dest);
 
-                    if ($result !== true) {
+                    if (true !== $result) {
                         if (is_array($result)) {
                             $errorLog += $result;
                         } else {
@@ -1005,7 +995,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
         /** @var DirectoryIterator $directory */
         foreach ($iterator as $directory) {
             // Exit the loop if the count has reached 5
-            if ($maxCount != -1 && $count === $maxCount) {
+            if (-1 != $maxCount && $count === $maxCount) {
                 $completed = false;
                 break;
             }
@@ -1025,7 +1015,7 @@ function move_mautic_vendors(array $status, $maxCount = 5)
 
                 $result = copy_directory($src, $dest);
 
-                if ($result !== true) {
+                if (true !== $result) {
                     if (is_array($result)) {
                         $errorLog += $result;
                     } else {
@@ -1145,7 +1135,7 @@ function copy_directories($dir, &$errorLog, $createDest = true)
 
             $result = copy_directory($src, $dest);
 
-            if ($result !== true) {
+            if (true !== $result) {
                 if (is_array($result)) {
                     $errorLog += $result;
                 } else {
@@ -1164,8 +1154,6 @@ function copy_directories($dir, &$errorLog, $createDest = true)
 
 /**
  * Processes the error log for each step.
- *
- * @param array $errorLog
  */
 function process_error_log(array $errorLog)
 {
@@ -1175,7 +1163,7 @@ function process_error_log(array $errorLog)
         if (file_exists(MAUTIC_UPGRADE_ERROR_LOG)) {
             $errors = file_get_contents(MAUTIC_UPGRADE_ERROR_LOG);
         } else {
-            $errors = '';
+            $errors = "<?php die('no access'); \n\n";
         }
 
         $errors .= implode(PHP_EOL, $errorLog)."\n";
@@ -1196,7 +1184,7 @@ function process_error_log(array $errorLog)
 function recursive_remove_directory($directory)
 {
     // if the path has a slash at the end we remove it here
-    if (substr($directory, -1) == '/') {
+    if ('/' == substr($directory, -1)) {
         $directory = substr($directory, 0, -1);
     }
 
@@ -1218,7 +1206,7 @@ function recursive_remove_directory($directory)
         while (false !== ($item = readdir($handle))) {
             // if the filepointer is not the current directory
             // or the parent directory
-            if ($item != '.' && $item != '..') {
+            if ('.' != $item && '..' != $item) {
                 // we build the new path to delete
                 $path = $directory.'/'.$item;
                 // if the new path is a directory
@@ -1252,8 +1240,6 @@ function recursive_remove_directory($directory)
  *
  * While packaging updates, the script will generate a list of deleted files in comparison to the previous version.  In this step,
  * we will process that list to remove files which are no longer included in the application.
- *
- * @param array $status
  *
  * @return array
  */
@@ -1307,8 +1293,6 @@ function remove_mautic_deleted_files(array $status)
 }
 
 /**
- * @param array $state
- *
  * @return string
  */
 function get_state_param(array $state)
@@ -1318,8 +1302,6 @@ function get_state_param(array $state)
 
 /**
  * Send the response back to the main application.
- *
- * @param array $status
  */
 function send_response(array $status)
 {

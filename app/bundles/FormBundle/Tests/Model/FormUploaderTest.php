@@ -21,7 +21,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormUploaderTest extends \PHPUnit_Framework_TestCase
+class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Uploader uploads files correctly
@@ -40,7 +40,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
@@ -158,7 +158,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->exactly(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
@@ -312,7 +312,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
@@ -367,7 +367,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('form_upload_dir')
             ->willReturn($uploadDir);
 

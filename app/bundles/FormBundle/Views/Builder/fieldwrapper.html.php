@@ -32,6 +32,7 @@ if (!isset($inBuilder)) {
             'inForm'        => true,
             'id'            => $field['id'],
             'formId'        => $formId,
+            'formName'      => $formName,
             'contactFields' => (isset($contactFields)) ? $contactFields : [],
             'companyFields' => (isset($companyFields)) ? $companyFields : [],
             'inBuilder'     => $inBuilder,
@@ -39,14 +40,14 @@ if (!isset($inBuilder)) {
     );
     ?>
     </div>
-    <?php if ((isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false) || !empty($field['showAfterXSubmissions'])
+    <?php if ((isset($field['showWhenValueExists']) && false === $field['showWhenValueExists']) || !empty($field['showAfterXSubmissions'])
         || !empty($field['leadField'])
     ): ?>
         <div class="panel-footer">
             <?php if (!empty($field['leadField'])):
                 $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
                 ?>
-                <i class="fa fa-<?php echo $icon?>" aria-hidden="true"></i>
+                <i class="fa fa-<?php echo $icon; ?>" aria-hidden="true"></i>
                 <span class="inline-spacer">
             <?php
                 if (isset($contactFields[$field['leadField']]['label'])) {
@@ -59,7 +60,7 @@ if (!isset($inBuilder)) {
             ?>
         </span>
             <?php endif; ?>
-            <?php if (isset($field['showWhenValueExists']) && $field['showWhenValueExists'] === false): ?>
+            <?php if (isset($field['showWhenValueExists']) && false === $field['showWhenValueExists']): ?>
                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                 <span class="inline-spacer">
             <?php echo $view['translator']->trans('mautic.form.field.hide.if.value'); ?>

@@ -24,17 +24,11 @@ class ConsoleExceptionListener
      */
     private $logger;
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * @param ConsoleExceptionEvent $event
-     */
     public function onConsoleException(ConsoleExceptionEvent $event)
     {
         $command   = $event->getCommand();

@@ -41,9 +41,6 @@ class Progress
      */
     protected $bar;
 
-    /**
-     * @param OutputInterface|null $output
-     */
     public function __construct(OutputInterface $output = null)
     {
         $this->output = $output;
@@ -91,8 +88,6 @@ class Progress
     /**
      * Set total value.
      *
-     * @param int $total
-     *
      * @return Progress
      */
     public function setDone($done)
@@ -135,8 +130,6 @@ class Progress
 
     /**
      * Bind Progress from simple array.
-     *
-     * @param array $progress
      *
      * @return Progress
      */

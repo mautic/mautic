@@ -110,7 +110,7 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                             <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $view->escape($item['name']); ?></h4>
                                         </div>
                                         <div class="modal-body">
-                                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                            <div style="background-image: url(<?php echo $thumbnailUrl; ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
                                         </div>
                                     </div>
                                 </div>

@@ -35,17 +35,11 @@ class TemplateReference extends BaseTemplateReference
      */
     protected $pathsHelper;
 
-    /**
-     * @param ThemeHelper $themeHelper
-     */
     public function setThemeHelper(ThemeHelper $themeHelper)
     {
         $this->themeHelper = $themeHelper;
     }
 
-    /**
-     * @param PathsHelper $pathsHelper
-     */
     public function setPathsHelper(PathsHelper $pathsHelper)
     {
         $this->pathsHelper = $pathsHelper;

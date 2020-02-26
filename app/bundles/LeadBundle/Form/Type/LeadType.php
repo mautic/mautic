@@ -11,41 +11,51 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Form\Type\StageListType;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 
-/**
- * Class LeadType.
- */
 class LeadType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
-    private $factory;
+
+    /**
+     * @var CompanyModel
+     */
     private $companyModel;
 
     /**
-     * @param MauticFactory $factory
+     * @var EntityManager
      */
-    public function __construct(MauticFactory $factory, CompanyModel $companyModel)
+    private $entityManager;
+
+    public function __construct(TranslatorInterface $translator, CompanyModel $companyModel, EntityManager $entityManager)
     {
-        $this->translator   = $factory->getTranslator();
-        $this->factory      = $factory;
-        $this->companyModel = $companyModel;
+        $this->translator    = $translator;
+        $this->companyModel  = $companyModel;
+        $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
@@ -65,22 +75,20 @@ class LeadType extends AbstractType
 
             $builder->add(
                 'preferred_profile_image',
-                'choice',
+                ChoiceType::class,
                 [
-                    'choices'    => $imageChoices,
-                    'label'      => 'mautic.lead.lead.field.preferred_profile',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => true,
-                    'multiple'   => false,
-                    'attr'       => [
-                        'class' => 'form-control',
-                    ],
+                    'choices'           => $imageChoices,
+                    'label'             => 'mautic.lead.lead.field.preferred_profile',
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => ['class' => 'form-control'],
+                    'required'          => true,
+                    'multiple'          => false,
                 ]
             );
 
             $builder->add(
                 'custom_avatar',
-                'file',
+                FileType::class,
                 [
                     'label'      => false,
                     'label_attr' => ['class' => 'control-label'],
@@ -110,12 +118,12 @@ class LeadType extends AbstractType
 
         $builder->add(
             'tags',
-            'lead_tag',
+            TagType::class,
             [
                 'by_reference' => false,
                 'attr'         => [
-                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
@@ -130,8 +138,8 @@ class LeadType extends AbstractType
         }
 
         $builder->add(
-        'companies',
-            'company_list',
+            'companies',
+            CompanyListType::class,
             [
                 'label'      => 'mautic.company.selectcompany',
                 'label_attr' => ['class' => 'control-label'],
@@ -142,15 +150,12 @@ class LeadType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticUserBundle:User'
-        );
+        $transformer = new IdToEntityModelTransformer($this->entityManager, User::class);
 
         $builder->add(
             $builder->create(
                 'owner',
-                'user_list',
+                UserListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => ['class' => 'control-label'],
@@ -164,15 +169,12 @@ class LeadType extends AbstractType
             ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
-            'MauticStageBundle:Stage'
-        );
+        $transformer = new IdToEntityModelTransformer($this->entityManager, Stage::class);
 
         $builder->add(
             $builder->create(
                 'stage',
-                'stage_list',
+                StageListType::class,
                 [
                     'label'      => 'mautic.lead.lead.field.stage',
                     'label_attr' => ['class' => 'control-label'],
@@ -187,11 +189,11 @@ class LeadType extends AbstractType
         );
 
         if (!$options['isShortForm']) {
-            $builder->add('buttons', 'form_buttons');
+            $builder->add('buttons', FormButtonsType::class);
         } else {
             $builder->add(
                 'buttons',
-                'form_buttons',
+                FormButtonsType::class,
                 [
                     'apply_text' => false,
                     'save_text'  => 'mautic.core.form.save',
@@ -206,14 +208,11 @@ class LeadType extends AbstractType
         }
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
-                'data_class'  => 'Mautic\LeadBundle\Entity\Lead',
+                'data_class'  => Lead::class,
                 'isShortForm' => false,
             ]
         );
@@ -224,7 +223,7 @@ class LeadType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'lead';
     }

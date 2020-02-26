@@ -32,7 +32,7 @@
                 <?php echo $view['translator']->trans('mautic.message.queue.status.'.$item['status'], [], 'javascript'); ?>
             </td>
             <td>
-                <?php if ($item['status'] == 'pending') : ?>
+                <?php if ('pending' == $item['status']) : ?>
                 <button type="button" id="queued-message-<?php echo $item['id']; ?>" class="btn btn-default btn-nospin"  onclick="Mautic.cancelQueuedMessageEvent(<?php echo $item['id']; ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.queued.message.event.cancel'); ?>">
                     <i class="fa fa-times text-danger"></i>
                 </button>

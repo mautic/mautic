@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -58,18 +59,11 @@ EOT
         $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         if (!$force) {
-            $dialog  = $this->getHelperSet()->get('dialog');
-            $confirm = $dialog->select(
-                $output,
-                $translator->trans('mautic.core.command.install_data_confirm'),
-                [
-                    $translator->trans('mautic.core.form.no'),
-                    $translator->trans('mautic.core.form.yes'),
-                ],
-                0
-            );
+            $helper         = $this->getHelper('question');
+            $questionString = $translator->trans('mautic.core.command.install_data_confirm').' (y = '.$translator->trans('mautic.core.form.yes').', n = '.$translator->trans('mautic.core.form.no').'): ';
+            $question       = new ConfirmationQuestion($questionString, false);
 
-            if (!$confirm) {
+            if (!$helper->ask($input, $output, $question)) {
                 return 0;
             }
         }
@@ -90,7 +84,7 @@ EOT
         ]);
         $returnCode = $command->run($input, $output);
 
-        if ($returnCode !== 0) {
+        if (0 !== $returnCode) {
             return $returnCode;
         }
 
@@ -102,7 +96,7 @@ EOT
             '--quiet' => true,
         ]);
         $returnCode = $command->run($input, $output);
-        if ($returnCode !== 0) {
+        if (0 !== $returnCode) {
             return $returnCode;
         }
 
@@ -115,14 +109,10 @@ EOT
             '--quiet'  => true,
         ];
 
-        $fixtures = $this->getMauticFixtures();
-        foreach ($fixtures as $fixture) {
-            $args['--fixtures'][] = $fixture;
-        }
         $input      = new ArrayInput($args);
         $returnCode = $command->run($input, $output);
 
-        if ($returnCode !== 0) {
+        if (0 !== $returnCode) {
             return $returnCode;
         }
 
@@ -132,57 +122,5 @@ EOT
         );
 
         return 0;
-    }
-
-    /**
-     * Returns Mautic fixtures.
-     *
-     * @param bool $returnClassNames
-     *
-     * @return array
-     */
-    public function getMauticFixtures($returnClassNames = false)
-    {
-        $fixtures      = [];
-        $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
-        foreach ($mauticBundles as $bundle) {
-            $fixturesDir = $bundle['directory'].'/DataFixtures/ORM';
-
-            if (file_exists($fixturesDir)) {
-                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\';
-                $this->populateFixturesFromDirectory($fixturesDir, $fixtures, $classPrefix, $returnClassNames);
-            }
-
-            $testFixturesDir = $bundle['directory'].'/Tests/DataFixtures/ORM';
-
-            if (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
-                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\Tests\\DataFixtures\\ORM\\';
-                $this->populateFixturesFromDirectory($testFixturesDir, $fixtures, $classPrefix, $returnClassNames);
-            }
-        }
-
-        return $fixtures;
-    }
-
-    /**
-     * @param string $fixturesDir
-     * @param array  $fixtures
-     * @param string $classPrefix
-     * @param bool   $returnClassNames
-     */
-    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
-    {
-        if ($returnClassNames) {
-            //get files within the directory
-            $finder = new Finder();
-            $finder->files()->in($fixturesDir)->name('*.php');
-            foreach ($finder as $file) {
-                //add the file to be loaded
-                $class      = str_replace('.php', '', $file->getFilename());
-                $fixtures[] = $classPrefix.$class;
-            }
-        } else {
-            $fixtures[] = $fixturesDir;
-        }
     }
 }

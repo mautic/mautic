@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Helper\FileUploader;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileUploaderTest extends \PHPUnit_Framework_TestCase
+class FileUploaderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox Uploader uploads files correctly

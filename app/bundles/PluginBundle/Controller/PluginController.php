@@ -13,10 +13,9 @@ namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\PluginBundle\Entity\Integration;
-use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
+use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
@@ -165,8 +164,8 @@ class PluginController extends FormController
         }
 
         $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
-        $limit  = $this->coreParametersHelper->getParameter('default_pagelimit');
-        $start  = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit  = $this->coreParametersHelper->get('default_pagelimit');
+        $start  = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -181,7 +180,7 @@ class PluginController extends FormController
         $entity = $integrationObject->getIntegrationSettings();
 
         $form = $this->createForm(
-            'integration_details',
+            DetailsType::class,
             $entity,
             [
                 'integration'        => $entity->getName(),
@@ -192,7 +191,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ($this->request->getMethod() == 'POST') {
+        if ('POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
@@ -218,11 +217,11 @@ class PluginController extends FormController
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
                             // Ungroup the fields
                             $mauticLeadFields = [];
-                            foreach ($leadFields as $group => $groupFields) {
+                            foreach ($leadFields as $groupFields) {
                                 $mauticLeadFields = array_merge($mauticLeadFields, $groupFields);
                             }
                             $mauticCompanyFields = [];
-                            foreach ($companyFields as $group => $groupFields) {
+                            foreach ($companyFields as $groupFields) {
                                 $mauticCompanyFields = array_merge($mauticCompanyFields, $groupFields);
                             }
 

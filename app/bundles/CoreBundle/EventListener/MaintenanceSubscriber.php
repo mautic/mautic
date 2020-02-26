@@ -15,16 +15,15 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class MaintenanceSubscriber.
- */
-class MaintenanceSubscriber extends CommonSubscriber
+class MaintenanceSubscriber implements EventSubscriberInterface
 {
     /**
      * @var Connection
      */
-    protected $db;
+    private $db;
 
     /**
      * @var UserTokenRepositoryInterface
@@ -32,15 +31,18 @@ class MaintenanceSubscriber extends CommonSubscriber
     private $userTokenRepository;
 
     /**
-     * MaintenanceSubscriber constructor.
-     *
-     * @param Connection                   $db
-     * @param UserTokenRepositoryInterface $userTokenRepository
+     * @var TranslatorInterface
      */
-    public function __construct(Connection $db, UserTokenRepositoryInterface $userTokenRepository)
-    {
+    private $translator;
+
+    public function __construct(
+        Connection $db,
+        UserTokenRepositoryInterface $userTokenRepository,
+        TranslatorInterface $translator
+    ) {
         $this->db                  = $db;
         $this->userTokenRepository = $userTokenRepository;
+        $this->translator          = $translator;
     }
 
     /**
@@ -53,9 +55,6 @@ class MaintenanceSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MaintenanceEvent $event
-     */
     public function onDataCleanup(MaintenanceEvent $event)
     {
         $this->cleanupData($event, 'audit_log');
@@ -66,8 +65,7 @@ class MaintenanceSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param MaintenanceEvent $event
-     * @param string           $table
+     * @param string $table
      */
     private function cleanupData(MaintenanceEvent $event, $table)
     {
@@ -96,7 +94,7 @@ class MaintenanceSubscriber extends CommonSubscriber
             while (true) {
                 $ids = array_column($qb->execute()->fetchAll(), 'id');
 
-                if (sizeof($ids) === 0) {
+                if (0 === sizeof($ids)) {
                     break;
                 }
 

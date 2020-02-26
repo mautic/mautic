@@ -76,11 +76,6 @@ class KickoffExecutioner implements ExecutionerInterface
     private $progressBar;
 
     /**
-     * @var int
-     */
-    private $batchCounter = 0;
-
-    /**
      * @var ArrayCollection
      */
     private $rootEvents;
@@ -92,12 +87,6 @@ class KickoffExecutioner implements ExecutionerInterface
 
     /**
      * KickoffExecutioner constructor.
-     *
-     * @param LoggerInterface      $logger
-     * @param KickoffContactFinder $kickoffContactFinder
-     * @param TranslatorInterface  $translator
-     * @param EventExecutioner     $executioner
-     * @param EventScheduler       $scheduler
      */
     public function __construct(
         LoggerInterface $logger,
@@ -114,10 +103,6 @@ class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @param Campaign             $campaign
-     * @param ContactLimiter       $limiter
-     * @param OutputInterface|null $output
-     *
      * @return Counter
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
@@ -156,7 +141,6 @@ class KickoffExecutioner implements ExecutionerInterface
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
         $this->progressBar  = null;
-        $this->batchCounter = 0;
 
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();

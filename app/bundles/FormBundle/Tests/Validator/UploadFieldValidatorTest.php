@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
+class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @testdox No Files given

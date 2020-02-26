@@ -13,30 +13,23 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
+use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EventModel
+     * @var RealTimeExecutioner
      */
-    protected $campaignEventModel;
+    private $realTimeExecutioner;
 
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param EventModel $campaignEventModel
-     */
-    public function __construct(EventModel $campaignEventModel)
+    public function __construct(RealTimeExecutioner $realTimeExecutioner)
     {
-        $this->campaignEventModel = $campaignEventModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
     }
 
     /**
@@ -51,16 +44,13 @@ class CampaignSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CampaignBuilderEvent $event
-     */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $trigger = [
             'label'          => 'mautic.asset.campaign.event.download',
             'description'    => 'mautic.asset.campaign.event.download_descr',
             'eventName'      => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'formType'       => 'campaignevent_assetdownload',
+            'formType'       => CampaignEventAssetDownloadType::class,
             'channel'        => 'asset',
             'channelIdField' => 'assets',
         ];
@@ -70,26 +60,21 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for asset download.
-     *
-     * @param AssetLoadEvent $event
      */
     public function onAssetDownload(AssetLoadEvent $event)
     {
         $asset = $event->getRecord()->getAsset();
 
-        if ($asset !== null) {
-            $this->campaignEventModel->triggerEvent('asset.download', $asset, 'asset', $asset->getId());
+        if (null !== $asset) {
+            $this->realTimeExecutioner->execute('asset.download', $asset, 'asset', $asset->getId());
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
 
-        if ($eventDetails == null) {
+        if (null == $eventDetails) {
             return $event->setResult(true);
         }
 

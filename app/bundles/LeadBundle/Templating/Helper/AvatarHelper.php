@@ -11,42 +11,74 @@
 
 namespace Mautic\LeadBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\Helper\Helper;
 
 class AvatarHelper extends Helper
 {
+    private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
     /**
-     * @var MauticFactory
+     * @var AssetsHelper
      */
-    private $factory;
+    private $assetsHelper;
 
     /**
-     * @param MauticFactory $factory
+     * @var PathsHelper
      */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->factory = $factory;
+    private $pathsHelper;
+
+    public function __construct(
+        AssetsHelper $assetsHelper,
+        PathsHelper $pathsHelper
+    ) {
+        $this->assetsHelper = $assetsHelper;
+        $this->pathsHelper  = $pathsHelper;
     }
 
     /**
-     * @param Lead $lead
+     * @param string $filePath
      *
+     * @throws FileNotFoundException
+     */
+    public function createAvatarFromFile(Lead $lead, $filePath)
+    {
+        if (!file_exists($filePath)) {
+            throw new FileNotFoundException();
+        }
+
+        $avatarDir = $this->getAvatarPath(true);
+
+        if (!file_exists($avatarDir)) {
+            mkdir($avatarDir);
+        }
+
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        if (!in_array($ext, $this->imageTypes)) {
+            throw new \Exception('File is not image');
+        }
+
+        $fs = new Filesystem();
+        $fs->copy($filePath, $avatarDir.DIRECTORY_SEPARATOR.'avatar'.$lead->getId(), true);
+    }
+
+    /**
      * @return mixed
      */
     public function getAvatar(Lead $lead)
     {
         $preferred  = $lead->getPreferredProfileImage();
         $socialData = $lead->getSocialCache();
-        $leadEmail  = $lead->getEmail();
 
-        if ($preferred == 'custom') {
+        if ('custom' == $preferred) {
             $avatarPath = $this->getAvatarPath(true).'/avatar'.$lead->getId();
             if (file_exists($avatarPath) && $fmtime = filemtime($avatarPath)) {
                 // Append file modified time to ensure the latest is used by browser
-                $img = $this->factory->getHelper('template.assets')->getUrl(
+                $img = $this->assetsHelper->getUrl(
                     $this->getAvatarPath().'/avatar'.$lead->getId().'?'.$fmtime,
                     null,
                     null,
@@ -59,12 +91,7 @@ class AvatarHelper extends Helper
         }
 
         if (empty($img)) {
-            // Default to gravatar if others failed
-            if (!empty($leadEmail)) {
-                $img = $this->factory->getHelper('template.gravatar')->getImage($leadEmail);
-            } else {
-                $img = $this->getDefaultAvatar();
-            }
+            $img = $this->getDefaultAvatar();
         }
 
         return $img;
@@ -73,13 +100,13 @@ class AvatarHelper extends Helper
     /**
      * Get avatar path.
      *
-     * @param $absolute
+     * @param bool $absolute
      *
      * @return string
      */
     public function getAvatarPath($absolute = false)
     {
-        $imageDir = $this->factory->getSystemPath('images', $absolute);
+        $imageDir = $this->pathsHelper->getSystemPath('images', $absolute);
 
         return $imageDir.'/lead_avatars';
     }
@@ -91,9 +118,9 @@ class AvatarHelper extends Helper
      */
     public function getDefaultAvatar($absolute = false)
     {
-        $img = $this->factory->getSystemPath('assets').'/images/avatar.png';
+        $img = $this->pathsHelper->getSystemPath('assets').'/images/avatar.png';
 
-        return UrlHelper::rel2abs($this->factory->getHelper('template.assets')->getUrl($img));
+        return UrlHelper::rel2abs($this->assetsHelper->getUrl($img));
     }
 
     /**

@@ -45,11 +45,6 @@ class TrackingHelper
 
     /**
      * BuildJsSubscriber constructor.
-     *
-     * @param LeadModel            $leadModel
-     * @param Session              $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param RequestStack         $request
      */
     public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper, RequestStack $request)
     {
@@ -67,8 +62,8 @@ class TrackingHelper
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if (($id = $this->coreParametersHelper->getParameter($key.'_id'))) {
-                $result[$key] = $service;
+            if (($id = $this->coreParametersHelper->get($key.'_id'))) {
+                $result[$service] = $key;
             }
         }
 
@@ -117,12 +112,12 @@ class TrackingHelper
      */
     public function displayInitCode($service)
     {
-        $pixelId = $this->coreParametersHelper->getParameter($service.'_id');
+        $pixelId = $this->coreParametersHelper->get($service.'_id');
 
-        if ($pixelId && $this->coreParametersHelper->getParameter($service.'_landingpage_enabled') && $this->isLandingPage()) {
+        if ($pixelId && $this->coreParametersHelper->get($service.'_landingpage_enabled') && $this->isLandingPage()) {
             return $pixelId;
         }
-        if ($pixelId && $this->coreParametersHelper->getParameter($service.'_trackingpage_enabled') && !$this->isLandingPage()) {
+        if ($pixelId && $this->coreParametersHelper->get($service.'_trackingpage_enabled') && !$this->isLandingPage()) {
             return $pixelId;
         }
 
@@ -139,7 +134,7 @@ class TrackingHelper
 
     public function getAnonymizeIp()
     {
-        return $this->coreParametersHelper->getParameter('google_analytics_anonymize_ip');
+        return $this->coreParametersHelper->get('google_analytics_anonymize_ip');
     }
 
     /**
@@ -148,7 +143,7 @@ class TrackingHelper
     protected function isLandingPage()
     {
         $server = $this->request->getCurrentRequest()->server;
-        if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
+        if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }
 

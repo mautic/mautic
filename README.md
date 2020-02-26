@@ -1,8 +1,17 @@
-# This is the developer branch for 3.x in preparation for the Mautic Community Sprint in Amsterdam. It is completely and utterly broken so don't try to install it :-)
-
 Mautic Introduction
 ===========
 ![Mautic](https://www.mautic.org/media/images/github_readme.png "Mautic Open Source Marketing Automation")
+
+## Supported Versions
+Please note that the release dates indicated with * below are *estimations*, no rights can be derived from them.
+
+| Branch | Beta Release | Initial Release | Active Support Until | Security Support Until
+|--|--|--|--|--|
+|2.15  | 27 Sep 2019 | 8 Oct 2019 | 8 Oct 2019 | 8 Oct 2019
+|2.16  | 30 Jan 2020* | 13 Feb 2020* | 13 Feb 2020 | June 2020? (TBD)**
+|3.0   | 27 Jan 2020* | 3 Feb 2020* | TBD | TBD
+
+** = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 
 ## Getting Started
 
@@ -66,7 +75,7 @@ By contributing to this project, you accept and agree to the [Contributor Agreem
 	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
-4. Recommended MySQL defaults can be set by running the queries `SET GLOBAL innodb_default_row_format=DYNAMIC; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
+4. Recommended MySQL minimal version 5.7.14 and defaults can be set by running the queries `SET GLOBAL innodb_default_row_format=DYNAMIC; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));`
 
 ## Installation
 
@@ -84,7 +93,7 @@ By contributing to this project, you accept and agree to the [Contributor Agreem
 Each time you update Mautic's source after the initial setup/installation via a new checkout, download, git pull, etc; you will need to clear the cache. To do so, run the following command:
 
     $ cd /your/mautic/directory
-    $ php app/console cache:clear
+    $ php bin/console cache:clear
 
 (Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to add the <code>--env=dev</code> from the command).
 
@@ -98,17 +107,17 @@ Before running these commands, please make a backup of your database.
 
 If updating from <a href="https://github.com/mautic/mautic/releases">a tagged release</a> to <a href="https://github.com/mautic/mautic/releases">a tagged release</a>, schema changes will be included in a migrations file. To apply the changes, run
 
-    $ php app/console doctrine:migrations:migrate
+    $ php bin/console doctrine:migrations:migrate
 
 If you are updating to the latest source (remember this is alpha), first run
 
-    $ php app/console doctrine:schema:update --dump-sql
+    $ php bin/console doctrine:schema:update --dump-sql
 
 This will list out the queries Doctrine wants to execute in order to get the schema up-to-date (no queries are actually executed). Review the queries to ensure there is nothing detrimental to your data. If you have doubts about a query, submit an issue here and we'll verify it.
 
 If you're satisfied with the queries, execute them with
 
-    $ php app/console doctrine:schema:update --force
+    $ php bin/console doctrine:schema:update --force
 
 Your schema should now be up-to-date with the source.
 
@@ -118,7 +127,7 @@ Mautic downloaded from GitHub has the development environment. You can access it
 
 This development environment will display the PHP errors, warnings and notices directly as the output so you don't have to open the log to see them. It will also load for example translations without cache, so every change you make will be visible without clearing it. The only changes which require clearing the cache are in the `config.php` files.
 
-In case of assets like JS, CSS, the source files are loaded instead of concatenated, minified files. This way the changes in those files will be directly visible on refresh. If you'd wanted to see the change in the production environment, you'd have to have run the `app/console mautic:assets:generate` command.
+In case of assets like JS, CSS, the source files are loaded instead of concatenated, minified files. This way the changes in those files will be directly visible on refresh. If you'd wanted to see the change in the production environment, you'd have to have run the `bin/console mautic:assets:generate` command.
 
 In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
 
@@ -134,7 +143,7 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 2. Read the description and steps to test. If it's a bug fix, follow the steps to ensure you can recreate the issue.
 3. Use the development environment (above) for testing.
 3. [Apply the PR](https://help.github.com/articles/checking-out-pull-requests-locally/#modifying-an-inactive-pull-request-locally)
-4. Clear cache for development environment (`rm -rf app/cache/*` or `app/console cache:clear -e dev`).
+4. Clear cache for development environment (`rm -rf app/cache/*` or `bin/console cache:clear -e dev`).
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment about how the test went. If there is a problem, provide as much information as possible including error log messages.
 
@@ -203,7 +212,7 @@ running just the `acceptance`, `functional`, or `unit` test suites by adding one
 
 ### Static Analysis
 
-Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for some of its parts during continuous integration tests. If you want to test your specific contribution locally, install PHPSTAN globally with `composer global require phpstan/phpstan-shim`. Mautic cannot have PHPSTAN as its dev dependency, because it requires PHP7+. To run analysis on a specific bundle, run `~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/*Bundle`
+Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for static analysis. Run `composer phpstan` to run the analysis.
 
 ## FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.

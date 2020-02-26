@@ -23,9 +23,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class User.
- */
 class User extends FormEntity implements AdvancedUserInterface, \Serializable, EquatableInterface
 {
     /**
@@ -130,8 +127,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $guest = false;
 
     /**
-     * User constructor.
-     *
      * @param bool $isGuest
      */
     public function __construct($isGuest = false)
@@ -139,34 +134,17 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $this->guest = $isGuest;
     }
 
-    /**
-     * @deprecated 2.9.0 to be removed in 3.0; support for $isGuest public property
-     *
-     * @param $name
-     */
-    public function __get($name)
-    {
-        if ('isGuest' === $name) {
-            @trigger_error('$isGuest is deprecated as of 2.9.0; use construct and isGuest() instead', E_USER_DEPRECATED);
-
-            return $this->guest;
-        }
-    }
-
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('users')
-            ->setCustomRepositoryClass('Mautic\UserBundle\Entity\UserRepository');
+            ->setCustomRepositoryClass(UserRepository::class);
 
         $builder->addId();
 
         $builder->createField('username', 'string')
-            ->length(255)
+            ->length(191)
             ->unique()
             ->build();
 
@@ -176,21 +154,21 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
         $builder->createField('firstName', 'string')
             ->columnName('first_name')
-            ->length(255)
+            ->length(191)
             ->build();
 
         $builder->createField('lastName', 'string')
             ->columnName('last_name')
-            ->length(255)
+            ->length(191)
             ->build();
 
         $builder->createField('email', 'string')
-            ->length(255)
+            ->length(191)
             ->unique()
             ->build();
 
         $builder->createField('position', 'string')
-            ->length(255)
+            ->length(191)
             ->nullable()
             ->build();
 
@@ -232,9 +210,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('username', new Assert\NotBlank(
@@ -299,8 +274,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     }
 
     /**
-     * @param Form $form
-     *
      * @return array
      */
     public static function determineValidationGroups(Form $form)
@@ -355,7 +328,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'role') {
+        if ('role' == $prop) {
             if ($current && !$val) {
                 $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$this->role && $val) {
@@ -684,8 +657,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     /**
      * Set active permissions.
      *
-     * @param array $permissions
-     *
      * @return User
      */
     public function setActivePermissions(array $permissions)
@@ -787,7 +758,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
      */
     public function isAdmin()
     {
-        if ($this->role !== null) {
+        if (null !== $this->role) {
             return $this->role->isAdmin();
         } else {
             return false;

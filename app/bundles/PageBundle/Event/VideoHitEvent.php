@@ -32,9 +32,8 @@ class VideoHitEvent extends CommonEvent
     /**
      * PageHitEvent constructor.
      *
-     * @param VideoHit $hit
-     * @param          $request
-     * @param          $code
+     * @param $request
+     * @param $code
      */
     public function __construct(VideoHit $hit, $request, $code)
     {

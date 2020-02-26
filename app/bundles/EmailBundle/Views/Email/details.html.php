@@ -45,7 +45,7 @@ if (empty($emailType)) {
 
 $customButtons = [];
 if (!$isEmbedded) {
-    if ($emailType == 'list') {
+    if ('list' == $emailType) {
         $customButtons[] = [
             'attr' => [
                 'data-toggle' => 'ajax',

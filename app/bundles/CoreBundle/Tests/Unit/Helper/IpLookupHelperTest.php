@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
@@ -18,17 +18,14 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class IpLookupHelperTest.
- */
-class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
+class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
     }
 
-    public function setUp()
+    protected function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
     }
@@ -97,13 +94,13 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $mockCoreParametersHelper->expects($this->any())
-            ->method('getParameter')
+            ->method('get')
             ->willReturnCallback(
                 function ($param, $defaultValue) {
-                    return $param === 'mautic.track_private_ip_ranges' ? true : $defaultValue;
+                    return 'track_private_ip_ranges' === $param ? true : $defaultValue;
                 }
             );
-        $ip      = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
+        $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
         $this->assertEquals('192.168.0.1', $ip->getIpAddress());
     }
@@ -145,7 +142,7 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
             $mockCoreParametersHelper->expects($this->any())
-                ->method('getParameter')
+                ->method('get')
                 ->willReturn(null);
         }
 

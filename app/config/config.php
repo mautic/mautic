@@ -1,5 +1,7 @@
 <?php
 
+// Include path settings
+$root = $container->getParameter('kernel.root_dir');
 include __DIR__.'/paths_helper.php';
 
 $ormMappings        =
@@ -10,11 +12,11 @@ $ipLookupServices   = [];
 $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings, &$ipLookupServices) {
     $isPlugin = $isMautic = false;
 
-    if (strpos($namespace, 'MauticPlugin\\') !== false) {
+    if (false !== strpos($namespace, 'MauticPlugin\\')) {
         $isPlugin   = true;
         $bundleBase = $bundle;
         $relative   = $paths['plugins'].'/'.$bundleBase;
-    } elseif (strpos($namespace, 'Mautic\\') !== false) {
+    } elseif (false !== strpos($namespace, 'Mautic\\')) {
         $isMautic   = true;
         $bundleBase = str_replace('Mautic', '', $bundle);
         $relative   = $paths['bundles'].'/'.$bundleBase;
@@ -26,21 +28,69 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
 
         // Check for a single config file
         $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
-
-        // Services need to have percent signs escaped to prevent ParameterCircularReferenceException
-        if (isset($config['services'])) {
-            array_walk_recursive(
-                $config['services'],
-                function (&$v, $k) {
-                    $v = str_replace('%', '%%', $v);
+        $config = (new \Tightenco\Collect\Support\Collection($config))
+            ->transform(function ($configGroup, string $configGroupName) use (&$ipLookupServices) {
+                if (!is_array($configGroup)) {
+                    return $configGroup;
                 }
-            );
-        }
 
-        // Register IP lookup services
-        if (isset($config['ip_lookup_services'])) {
-            $ipLookupServices = array_merge($ipLookupServices, $config['ip_lookup_services']);
-        }
+                $configGroup = new \Tightenco\Collect\Support\Collection($configGroup);
+
+                switch ($configGroupName) {
+                    case 'ip_lookup_services':
+                        $ipLookupServices = array_merge($ipLookupServices, $configGroup->toArray());
+                        break;
+                    case 'services':
+                        return $configGroup
+                            ->reject(function ($serviceDefinition) {
+                                // Remove optional services (has argument optional = true) if the service class does not exist
+                                return is_array($serviceDefinition)
+                                    && isset($serviceDefinition['optional'])
+                                    && true === $serviceDefinition['optional']
+                                    && isset($serviceDefinition['class'])
+                                    && false === class_exists($serviceDefinition['class']);
+                            })
+                            ->transform(function ($serviceDefinition) {
+                                // Encodes percent signs so they are not compiled in the container
+                                if (is_array($serviceDefinition)) {
+                                    array_walk_recursive(
+                                        $serviceDefinition,
+                                        function (&$value) {
+                                            $value = str_replace('%', '%%', $value);
+                                        }
+                                    );
+
+                                    return $serviceDefinition;
+                                }
+
+                                return str_replace('%', '%%', $serviceDefinition);
+                            })
+                            ->toArray();
+                        break;
+                    case 'parameters':
+                        return $configGroup
+                            // Encodes percent signs so they are not compiled in the container
+                            ->transform(function ($parameterValue) {
+                                if (is_array($parameterValue)) {
+                                    array_walk_recursive(
+                                        $parameterValue,
+                                        function (&$value) {
+                                            $value = str_replace('%', '%%', $value);
+                                        }
+                                    );
+
+                                    return $parameterValue;
+                                }
+
+                                return str_replace('%', '%%', $parameterValue);
+                            })
+                            ->toArray();
+                        break;
+                    default:
+                        return $configGroup;
+                }
+            })
+            ->toArray();
 
         // Check for staticphp mapping
         if (file_exists($directory.'/Entity')) {
@@ -157,17 +207,21 @@ $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
+$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
 
-// Decide on secure cookie based on site_url setting
-$secureCookie = $container->hasParameter('mautic.site_url') && substr(ltrim($container->getParameter('mautic.site_url')), 0, 5) === 'https';
+// Decide on secure cookie based on site_url setting or the request if in installer
+// This cannot be set dynamically
 
-// Generate session name
-// Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
-$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
-$sessionName = md5(md5($paths['local_config']).$key);
+if (defined('MAUTIC_INSTALLER')) {
+    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $secureCookie = $request->isSecure();
+} else {
+    $siteUrl      = $configParameterBag->get('site_url');
+    $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
+}
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
@@ -193,11 +247,9 @@ $container->loadFromExtension('framework', [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
-    'trusted_hosts'   => '%mautic.trusted_hosts%',
-    'trusted_proxies' => '%mautic.trusted_proxies%',
     'session'         => [ //handler_id set to null will use default session handler from php.ini
         'handler_id'    => null,
-        'name'          => $sessionName,
+        'name'          => '%env(MAUTIC_SESSION_NAME)%',
         'cookie_secure' => $secureCookie,
     ],
     'fragments'            => null,
@@ -218,10 +270,10 @@ $dbalSettings = [
     'dbname'                => '%mautic.db_name%',
     'user'                  => '%mautic.db_user%',
     'password'              => '%mautic.db_password%',
-    'charset'               => 'UTF8',
+    'charset'               => 'utf8mb4',
     'default_table_options' => [
-        'charset'    => 'utf8',
-        'collate'    => 'utf8_unicode_ci',
+        'charset'    => 'utf8mb4',
+        'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
     ],
     'types'    => [
@@ -237,12 +289,6 @@ $dbalSettings = [
     'server_version' => '%mautic.db_server_version%',
 ];
 
-// If using pdo_sqlite as the database driver, add the path to config file
-$dbDriver = $container->getParameter('mautic.db_driver');
-if ($dbDriver == 'pdo_sqlite') {
-    $dbalSettings['path'] = '%mautic.db_path%';
-}
-
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
     'orm'  => [
@@ -253,16 +299,16 @@ $container->loadFromExtension('doctrine', [
 ]);
 
 //MigrationsBundle Configuration
-$prefix = $container->getParameter('mautic.db_table_prefix');
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'   => '%kernel.root_dir%/migrations',
-    'namespace'  => 'Mautic\\Migrations',
-    'table_name' => $prefix.'migrations',
-    'name'       => 'Mautic Migrations',
+    'dir_name'        => '%kernel.root_dir%/migrations',
+    'namespace'       => 'Mautic\\Migrations',
+    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+    'name'            => 'Mautic Migrations',
+    'custom_template' => '%kernel.root_dir%/migrations/Migration.template',
 ]);
 
 // Swiftmailer Configuration
-$mailerSettings = [
+$container->loadFromExtension('swiftmailer', [
     'transport'  => '%mautic.mailer_transport%',
     'host'       => '%mautic.mailer_host%',
     'port'       => '%mautic.mailer_port%',
@@ -270,17 +316,11 @@ $mailerSettings = [
     'password'   => '%mautic.mailer_password%',
     'encryption' => '%mautic.mailer_encryption%',
     'auth_mode'  => '%mautic.mailer_auth_mode%',
-];
-
-// Only spool if using file as otherwise emails are not sent on redirects
-$spoolType = $container->getParameter('mautic.mailer_spool_type');
-if ($spoolType == 'file') {
-    $mailerSettings['spool'] = [
-        'type' => '%mautic.mailer_spool_type%',
-        'path' => '%mautic.mailer_spool_path%',
-    ];
-}
-$container->loadFromExtension('swiftmailer', $mailerSettings);
+    'spool'      => [
+        'type' => 'service',
+        'id'   => 'mautic.transport.spool',
+    ],
+]);
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
@@ -290,8 +330,6 @@ $container->loadFromExtension('knp_menu', [
 ]);
 
 // OneupUploader Configuration
-$uploadDir = $container->getParameter('mautic.upload_dir');
-$maxSize   = $container->getParameter('mautic.max_size');
 $container->loadFromExtension('oneup_uploader', [
     // 'orphanage' => array(
     //     'maxage' => 86400,
@@ -308,7 +346,7 @@ $container->loadFromExtension('oneup_uploader', [
             // 'max_size' => ($maxSize * 1000000),
             // 'use_orphanage' => true,
             'storage' => [
-                'directory' => $uploadDir,
+                'directory' => '%mautic.upload_dir%',
             ],
         ],
     ],
@@ -351,33 +389,35 @@ $container->loadFromExtension('jms_serializer', [
         'directories'    => $serializerMappings,
     ],
     'visitors' => [
-        'json' => [
+        'json_deserialization' => [
             'options' => JSON_PRETTY_PRINT,
         ],
     ],
 ]);
 
-$container->loadFromExtension('doctrine_cache', [
-  'providers' => [
-    'api_rate_limiter_cache' => '%mautic.api_rate_limiter_cache%',
-  ],
+$container->loadFromExtension('framework', [
+    'cache' => [
+        'pools' => [
+            'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
+        ],
+    ],
 ]);
 
-$api_rate_limiter_limit = $container->getParameter('mautic.api_rate_limiter_limit');
+$rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
-  'enabled'           => $api_rate_limiter_limit == 0 ? false : true,
-  'storage_engine'    => 'doctrine',
-  'doctrine_provider' => 'api_rate_limiter_cache',
-  'path_limits'       => [
+  'enabled'        => 0 === $rateLimit ? false : true,
+  'storage_engine' => 'cache',
+  'cache_service'  => 'api_rate_limiter_cache',
+  'path_limits'    => [
     [
       'path'   => '/api',
-      'limit'  => '%mautic.api_rate_limiter_limit%',
+      'limit'  => $rateLimit,
       'period' => 3600,
     ],
   ],
   'fos_oauth_key_listener' => true,
   'display_headers'        => true,
-  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of %mautic.api_rate_limiter_limit% API calls per hour.", "details": [] } ]}',
+  'rate_response_message'  => '{ "errors": [ { "code": 429, "message": "You exceeded the rate limit of '.$rateLimit.' API calls per hour.", "details": [] } ]}',
 ]);
 
 $container->setParameter(
@@ -427,3 +467,31 @@ $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
     $definitionConsoleExceptionListener
 );
+
+// ElFinder File Manager
+$container->loadFromExtension('fm_elfinder', [
+    'assets_path'            => 'media/assets',
+    'instances'              => [
+        'default' => [
+            'locale'          => 'LANG',
+            'editor'          => 'custom',
+            'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
+            'fullscreen'      => true,
+            'include_assets'  => true,
+            'relative_path'   => false,
+            'connector'       => [
+                'roots' => [
+                    'uploads' => [
+                        'driver'            => 'LocalFileSystem',
+                        'path'              => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
+                        'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
+                        'upload_deny'       => ['all'],
+                        'upload_max_size'   => '2M',
+                        'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
+                        'url'               => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                    ],
+                ],
+            ],
+        ],
+    ],
+]);

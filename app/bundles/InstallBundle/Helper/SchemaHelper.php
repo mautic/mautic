@@ -11,18 +11,21 @@
 
 namespace Mautic\InstallBundle\Helper;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\SchemaTool;
 
 class SchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     protected $db;
 
@@ -42,9 +45,7 @@ class SchemaHelper
     protected $dbParams = [];
 
     /**
-     * SchemaHelper constructor.
-     *
-     * @param array $dbParams
+     * @throws DBALException
      */
     public function __construct(array $dbParams)
     {
@@ -52,13 +53,13 @@ class SchemaHelper
         ini_set('display_errors', 0);
 
         // Support for env variables
-        foreach ($dbParams as $k => &$v) {
+        foreach ($dbParams as &$v) {
             if (!empty($v) && is_string($v) && preg_match('/getenv\((.*?)\)/', $v, $match)) {
                 $v = (string) getenv($match[1]);
             }
         }
 
-        $dbParams['charset'] = 'UTF8';
+        $dbParams['charset'] = 'utf8mb4';
         if (isset($dbParams['name'])) {
             $dbParams['dbname'] = $dbParams['name'];
             unset($dbParams['name']);
@@ -69,9 +70,6 @@ class SchemaHelper
         $this->dbParams = $dbParams;
     }
 
-    /**
-     * @param EntityManager $em
-     */
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;
@@ -105,9 +103,9 @@ class SchemaHelper
     }
 
     /**
-     * @param $dbName
+     * @return bool
      *
-     * @return array
+     * @throws DBALException
      */
     public function createDatabase()
     {
@@ -140,9 +138,10 @@ class SchemaHelper
     /**
      * Generates SQL for installation.
      *
-     * @param object $originalData
-     *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
+     *
+     * @throws DBALException
+     * @throws ORMException
      */
     public function installSchema()
     {
@@ -176,7 +175,7 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $sql = $this->em->getConnection()->getDatabasePlatform()->getName() === 'sqlite' ? [] : ['SET foreign_key_checks = 0;'];
+        $sql = 'sqlite' === $this->em->getConnection()->getDatabasePlatform()->getName() ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {
@@ -209,7 +208,7 @@ class SchemaHelper
      *
      * @return array
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
     {
@@ -253,7 +252,7 @@ class SchemaHelper
             //drop old indexes
             /** @var \Doctrine\DBAL\Schema\Index $oldIndex */
             foreach ($backupIndexes[$t] as $indexName => $oldIndex) {
-                if ($indexName == 'primary') {
+                if ('primary' == $indexName) {
                     continue;
                 }
 
@@ -307,10 +306,10 @@ class SchemaHelper
     }
 
     /**
-     * @param $applicableSequences
      * @param $tables
+     * @param $mauticTables
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @return array
      */
     protected function dropExistingSchema($tables, $mauticTables)
     {
@@ -335,7 +334,7 @@ class SchemaHelper
      */
     protected function generateBackupName($prefix, $backupPrefix, $name)
     {
-        if (empty($prefix) || strpos($name, $prefix) === false) {
+        if (empty($prefix) || false === strpos($name, $prefix)) {
             return $backupPrefix.$name;
         } else {
             return str_replace($prefix, $backupPrefix, $name);

@@ -30,9 +30,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class TriggerCampaignCommand.
- */
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
@@ -107,18 +104,6 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private $campaign;
 
-    /**
-     * TriggerCampaignCommand constructor.
-     *
-     * @param CampaignRepository       $campaignRepository
-     * @param EventDispatcherInterface $dispatcher
-     * @param TranslatorInterface      $translator
-     * @param KickoffExecutioner       $kickoffExecutioner
-     * @param ScheduledExecutioner     $scheduledExecutioner
-     * @param InactiveExecutioner      $inactiveExecutioner
-     * @param LoggerInterface          $logger
-     * @param FormatterHelper          $formatterHelper
-     */
     public function __construct(
         CampaignRepository $campaignRepository,
         EventDispatcherInterface $dispatcher,
@@ -226,22 +211,12 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set batch size of contacts to process per round. Defaults to 100.',
                 100
-            )
-            // @deprecated 2.13.0 to be removed in 3.0; use inactive-only instead
-            ->addOption(
-                '--negative-only',
-                null,
-                InputOption::VALUE_NONE,
-                'Just execute the inactive events'
             );
 
         parent::configure();
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
      * @return int|null
      *
      * @throws \Exception
@@ -252,7 +227,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->output       = $quiet ? new NullOutput() : $output;
         $this->kickoffOnly  = $input->getOption('kickoff-only');
         $this->scheduleOnly = $input->getOption('scheduled-only');
-        $this->inactiveOnly = $input->getOption('inactive-only') || $input->getOption('negative-only');
+        $this->inactiveOnly = $input->getOption('inactive-only');
 
         $batchLimit    = $input->getOption('batch-limit');
         $campaignLimit = $input->getOption('campaign-limit');
@@ -296,7 +271,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         /** @var \Doctrine\ORM\Internal\Hydration\IterableResult $campaigns */
         $campaigns = $this->campaignRepository->getEntities(['iterator_mode' => true]);
 
-        while (($next = $campaigns->next()) !== false) {
+        while (false !== ($next = $campaigns->next())) {
             // Key is ID and not 0
             $campaign = reset($next);
             $this->triggerCampaign($campaign);
@@ -311,8 +286,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @return bool
      */
     protected function dispatchTriggerEvent(Campaign $campaign)
@@ -331,8 +304,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @param Campaign $campaign
-     *
      * @throws \Exception
      */
     private function triggerCampaign(Campaign $campaign)

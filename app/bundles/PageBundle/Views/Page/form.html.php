@@ -35,7 +35,7 @@ $template = $form['template']->vars['data'];
 $attr                               = $form->vars['attr'];
 $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
 
-$isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
+$isCodeMode = ('mautic_code_mode' === $activePage->getTemplate());
 
 if (!isset($previewUrl)) {
     $previewUrl = '';

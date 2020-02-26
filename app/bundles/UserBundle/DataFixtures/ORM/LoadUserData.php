@@ -15,30 +15,23 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-/**
- * Class LoadUserData.
- */
-class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
-     * @var ContainerInterface
+     * @var EncoderFactoryInterface
      */
-    private $container;
+    private $encoder;
 
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(EncoderFactoryInterface $encoder)
     {
-        $this->container = $container;
+        $this->encoder = $encoder;
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $user = new User();
@@ -46,10 +39,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
         $user->setLastName('User');
         $user->setUsername('admin');
         $user->setEmail('admin@yoursite.com');
-        $encoder = $this->container
-            ->get('security.encoder_factory')
-            ->getEncoder($user)
-        ;
+        $encoder = $this->encoder->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
         $user->setRole($this->getReference('admin-role'));
         $manager->persist($user);
@@ -62,10 +52,7 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, C
         $user->setLastName('User');
         $user->setUsername('sales');
         $user->setEmail('sales@yoursite.com');
-        $encoder = $this->container
-            ->get('security.encoder_factory')
-            ->getEncoder($user)
-        ;
+        $encoder = $this->encoder->getEncoder($user);
         $user->setPassword($encoder->encodePassword('mautic', $user->getSalt()));
         $user->setRole($this->getReference('sales-role'));
         $manager->persist($user);

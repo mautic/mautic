@@ -20,8 +20,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class LeadDeviceEvent extends CommonEvent
 {
     /**
-     * @param LeadDevice $device
-     * @param bool       $isNew
+     * @param bool $isNew
      */
     public function __construct(LeadDevice &$device, $isNew = false)
     {
@@ -41,8 +40,6 @@ class LeadDeviceEvent extends CommonEvent
 
     /**
      * Sets the LeadDevice entity.
-     *
-     * @param LeadDevice $device
      */
     public function setDevice(LeadDevice $device)
     {

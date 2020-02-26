@@ -36,7 +36,6 @@ class SmsSendEvent extends CommonEvent
 
     /**
      * @param string $content
-     * @param Lead   $lead
      */
     public function __construct($content, Lead $lead)
     {

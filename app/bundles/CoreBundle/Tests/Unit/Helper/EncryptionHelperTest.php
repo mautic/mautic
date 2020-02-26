@@ -9,26 +9,23 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Tests\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
-/**
- * Class EncryptionHelperTest.
- */
-class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
+class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $coreParametersHelperMock;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $mainCipherMock;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $secondaryCipherMock;
 
     /** @var string */
@@ -38,7 +35,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->mainCipherMock           = $this->createMock(OpenSSLCipher::class);
-        $this->secondaryCipherMock      = $this->createMock(McryptCipher::class);
+        $this->secondaryCipherMock      = $this->createMock(SymmetricCipherInterface::class);
     }
 
     public function testEncryptMainSupported()
@@ -55,7 +52,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(true);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
@@ -85,7 +82,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(true);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
@@ -113,7 +110,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(true);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
@@ -138,7 +135,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(true);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
@@ -166,7 +163,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(true);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
@@ -192,7 +189,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(false);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 
@@ -208,7 +205,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
             ->method('isSupported')
             ->willReturn(true);
         $this->coreParametersHelperMock->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
 

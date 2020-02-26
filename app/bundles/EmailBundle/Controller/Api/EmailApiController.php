@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -79,7 +78,7 @@ class EmailApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
@@ -94,7 +93,7 @@ class EmailApiController extends CommonApiController
                 'sentCount'        => $count,
                 'failedRecipients' => $failed,
             ],
-            Codes::HTTP_OK
+            Response::HTTP_OK
         );
 
         return $this->handleView($view);
@@ -114,7 +113,7 @@ class EmailApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            if (!$this->checkEntityAccess($entity, 'view')) {
+            if (!$this->checkEntityAccess($entity)) {
                 return $this->accessDenied();
             }
 
@@ -159,7 +158,7 @@ class EmailApiController extends CommonApiController
                 $response['failed'] = $result;
             }
 
-            $view = $this->view($response, Codes::HTTP_OK);
+            $view = $this->view($response, Response::HTTP_OK);
 
             return $this->handleView($view);
         }

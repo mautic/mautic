@@ -17,7 +17,7 @@
      <?php foreach ($activity as $item): ?>
      	<?php
          $border = 'bdr-b bdr-l-wdh-0 bdr-r-wdh-0';
-         if ($i == 0 || $i == ($total - 1)):
+         if (0 == $i || $i == ($total - 1)):
              $border = 'bdr-w-0';
          endif;
          ?>

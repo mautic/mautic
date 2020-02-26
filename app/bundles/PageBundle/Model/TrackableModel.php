@@ -15,14 +15,10 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 
-/**
- * Class TrackableModel.
- */
 class TrackableModel extends AbstractCommonModel
 {
     /**
@@ -70,8 +66,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * TrackableModel constructor.
-     *
-     * @param RedirectModel $redirectModel
      */
     public function __construct(RedirectModel $redirectModel, LeadFieldRepository $leadFieldRepository)
     {
@@ -98,7 +92,6 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param Trackable  $trackable
      * @param array      $clickthrough
      * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
      * @param array      $utmTags
@@ -119,9 +112,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Return a channel Trackable entity by URL.
      *
-     * @param   $url
-     * @param   $channel
-     * @param   $channelId
+     * @param $url
+     * @param $channel
+     * @param $channelId
      *
      * @return Trackable|null
      */
@@ -132,12 +125,12 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (strpos($url, '&amp;') !== false) {
+        while (false !== strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
         $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
-        if ($trackable == null) {
+        if (null == $trackable) {
             $trackable = $this->createTrackableEntity($url, $channel, $channelId);
             $this->getRepository()->saveEntity($trackable->getRedirect());
             $this->getRepository()->saveEntity($trackable);
@@ -243,7 +236,6 @@ class TrackableModel extends AbstractCommonModel
      * Extract URLs from content and return as trackables.
      *
      * @param mixed      $content
-     * @param array      $contentTokens
      * @param null       $channel
      * @param null       $channelId
      * @param bool|false $usingClickthrough Set to false if not using a clickthrough parameter. This is to ensure that URLs are built correctly with ?
@@ -280,8 +272,6 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Converts array of Trackable or Redirect entities into {trackable} tokens.
-     *
-     * @param array $entities
      *
      * @return array
      */
@@ -338,8 +328,6 @@ class TrackableModel extends AbstractCommonModel
             $content           = str_ireplace($secondPassSearch, $secondPassReplace, $content);
         }
 
-        unset($firstSearch, $firstReplace, $secondSearch, $secondSearch);
-
         return $content;
     }
 
@@ -350,7 +338,7 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function extractTrackablesFromContent($content)
     {
-        if (preg_match('/<[^<]+>/', $content) !== 0) {
+        if (0 !== preg_match('/<[^<]+>/', $content)) {
             // Parse as HTML
             $trackableUrls = $this->extractTrackablesFromHtml($content);
         } else {
@@ -461,7 +449,7 @@ class TrackableModel extends AbstractCommonModel
         $url = trim($url);
 
         // Ensure these are & for the sake of parsing
-        while (strpos($url, '&amp;') !== false) {
+        while (false !== strpos($url, '&amp;')) {
             $url = str_replace('&amp;', '&', $url);
         }
 
@@ -757,9 +745,9 @@ class TrackableModel extends AbstractCommonModel
             } else {
                 // Join the original URL path with the new path
                 if (isset($parts['path']) && (HTTP_URL_JOIN_PATH & $flags)) {
-                    if (isset($url['path']) && $url['path'] != '') {
+                    if (isset($url['path']) && '' != $url['path']) {
                         // If the URL doesn't start with a slash, we need to merge
-                        if ($url['path'][0] != '/') {
+                        if ('/' != $url['path'][0]) {
                             // If the path ends with a slash, store as is
                             if ('/' == $parts['path'][strlen($parts['path']) - 1]) {
                                 $sBasePath = $parts['path'];
@@ -840,8 +828,6 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Build query string while accounting for tokens that include an equal sign.
      *
-     * @param array $queryParts
-     *
      * @return mixed|string
      */
     protected function httpBuildQuery(array $queryParts)
@@ -867,14 +853,13 @@ class TrackableModel extends AbstractCommonModel
      */
     private function isContactFieldToken($token)
     {
-        return strpos($token, '{contactfield') !== false || strpos($token, '{leadfield') !== false;
+        return false !== strpos($token, '{contactfield') || false !== strpos($token, '{leadfield');
     }
 
     /**
-     * @param       $content
-     * @param       $channel
-     * @param       $channelId
-     * @param array $trackableTokens
+     * @param $content
+     * @param $channel
+     * @param $channelId
      *
      * @return string
      */
@@ -882,13 +867,16 @@ class TrackableModel extends AbstractCommonModel
     {
         // Reset content replacement arrays
         $this->contentReplacements = [
-            'first_pass'  => [
-                // Remove internal attributes
-                // Editor may convert to HTML4
-                'mautic:disable-tracking=""' => '',
-                // HTML5
-                'mautic:disable-tracking'    => '',
-            ],
+            // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
+            // I'm leaving the second one to keep current behaviour but leaving the first one commented
+            // out as it may be the one we want.
+            // 'first_pass'  => [
+            //     // Remove internal attributes
+            //     // Editor may convert to HTML4
+            //     'mautic:disable-tracking=""' => '',
+            //     // HTML5
+            //     'mautic:disable-tracking'    => '',
+            // ],
             'first_pass'  => [],
             'second_pass' => [],
         ];

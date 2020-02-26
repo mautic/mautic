@@ -48,7 +48,7 @@ $showValues = [
                         <?php foreach ($row as $key => $item) : ?>
                             <?php if (in_array($key, $showValues)) : ?>
                             <td>
-                                <?php if ($key === 'email_name') : ?>
+                                <?php if ('email_name' === $key) : ?>
                                     <a href="<?php echo $view['router']->path('mautic_email_action', ['objectAction' => 'view', 'objectId' => $row['email_id']]); ?>"
                                         title="<?php echo $item; ?>"
                                         data-toggle="ajax">

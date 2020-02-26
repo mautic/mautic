@@ -11,20 +11,28 @@
 
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class UniqueUserAliasValidator extends ConstraintValidator
 {
-    public $em;
-    public $currentUser;
+    /**
+     * @var LeadListRepository
+     */
+    public $segmentRepository;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @var UserHelper
+     */
+    public $userHelper;
+
+    public function __construct(LeadListRepository $segmentRepository, UserHelper $userHelper)
     {
-        $this->em          = $factory->getEntityManager();
-        $this->currentUser = $factory->getUser();
+        $this->segmentRepository = $segmentRepository;
+        $this->userHelper        = $userHelper;
     }
 
     public function validate($list, Constraint $constraint)
@@ -36,18 +44,17 @@ class UniqueUserAliasValidator extends ConstraintValidator
         }
 
         if ($list->getAlias()) {
-            $lists = $this->em->getRepository('MauticLeadBundle:LeadList')->getLists(
-                $this->currentUser,
+            $lists = $this->segmentRepository->getLists(
+                $this->userHelper->getUser(),
                 $list->getAlias(),
                 $list->getId()
             );
 
             if (count($lists)) {
-                $this->context->addViolationAt(
-                    $field,
-                    $constraint->message,
-                    ['%alias%' => $list->getAlias()]
-                );
+                $this->context->buildViolation($constraint->message)
+                    ->atPath($field)
+                    ->setParameter('%alias%', $list->getAlias())
+                    ->addViolation();
             }
         }
     }

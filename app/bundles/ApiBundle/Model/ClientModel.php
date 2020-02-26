@@ -15,6 +15,7 @@ use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth1\Consumer;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Event\ClientEvent;
+use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
@@ -22,9 +23,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
-/**
- * Class ClientModel.
- */
 class ClientModel extends FormModel
 {
     /**
@@ -37,11 +35,6 @@ class ClientModel extends FormModel
      */
     protected $session;
 
-    /**
-     * ClientModel constructor.
-     *
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $request = $requestStack->getCurrentRequest();
@@ -59,9 +52,6 @@ class ClientModel extends FormModel
         $this->apiMode = $apiMode;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -74,10 +64,10 @@ class ClientModel extends FormModel
      */
     public function getRepository()
     {
-        if ($this->apiMode == 'oauth2') {
-            return $this->em->getRepository('MauticApiBundle:oAuth2\Client');
+        if ('oauth2' == $this->apiMode) {
+            return $this->em->getRepository(Client::class);
         } else {
-            return $this->em->getRepository('MauticApiBundle:oAuth1\Consumer');
+            return $this->em->getRepository(Consumer::class);
         }
     }
 
@@ -102,18 +92,18 @@ class ClientModel extends FormModel
 
         $params = (!empty($action)) ? ['action' => $action] : [];
 
-        return $formFactory->create('client', $entity, $params);
+        return $formFactory->create(ClientType::class, $entity, $params);
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return null|Client|Consumer
+     * @return Client|Consumer|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
-            return $this->apiMode == 'oauth2' ? new Client() : new Consumer();
+        if (null === $id) {
+            return 'oauth2' == $this->apiMode ? new Client() : new Consumer();
         }
 
         return parent::getEntity($id);
@@ -155,8 +145,6 @@ class ClientModel extends FormModel
     }
 
     /**
-     * @param User $user
-     *
      * @return array
      */
     public function getUserClients(User $user)
@@ -176,7 +164,7 @@ class ClientModel extends FormModel
         }
 
         //remove the user from the client
-        if ($this->apiMode == 'oauth2') {
+        if ('oauth2' == $this->apiMode) {
             $entity->removeUser($this->userHelper->getUser());
             $this->saveEntity($entity);
         } else {

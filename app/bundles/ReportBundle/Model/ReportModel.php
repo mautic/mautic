@@ -32,6 +32,7 @@ use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -88,14 +89,6 @@ class ReportModel extends FormModel
 
     /**
      * ReportModel constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param ChannelListHelper    $channelListHelper
-     * @param FieldModel           $fieldModel
-     * @param ReportHelper         $reportHelper
-     * @param CsvExporter          $csvExporter
-     * @param ExcelExporter        $excelExporter
      */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
@@ -106,7 +99,7 @@ class ReportModel extends FormModel
         CsvExporter $csvExporter,
         ExcelExporter $excelExporter
     ) {
-        $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
         $this->templatingHelper  = $templatingHelper;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
@@ -115,9 +108,6 @@ class ReportModel extends FormModel
         $this->excelExporter     = $excelExporter;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
@@ -157,8 +147,10 @@ class ReportModel extends FormModel
         }
 
         $options = array_merge($options, [
-            'read_only'  => false,
             'table_list' => $this->getTableData(),
+            'attr'       => [
+                'readonly' => false,
+            ],
         ]);
 
         // Fire the REPORT_ON_BUILD event off to get the table/column data
@@ -295,8 +287,6 @@ class ReportModel extends FormModel
     /**
      * Prevent same aliases using numeric suffixes for each alias.
      *
-     * @param array $columns
-     *
      * @return array
      */
     private function preventSameAliases(array $columns)
@@ -308,13 +298,15 @@ class ReportModel extends FormModel
 
             // Count suffixes
             if (!array_key_exists($alias, $existingAliases)) {
-                $existingAliases[$alias] = 1;
+                $existingAliases[$alias] = 0;
             } else {
                 ++$existingAliases[$alias];
             }
 
             // Add numeric suffix
-            $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            if ($existingAliases[$alias] > 0) {
+                $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            }
         }
 
         return $columns;
@@ -428,8 +420,6 @@ class ReportModel extends FormModel
      * Export report.
      *
      * @param string $format
-     * @param Report $report
-     * @param array  $reportData
      * @param null   $handle
      * @param int    $page
      *
@@ -483,8 +473,8 @@ class ReportModel extends FormModel
                 return new Response($content);
 
             case 'xlsx':
-                if (!class_exists('PHPExcel')) {
-                    throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+                if (!class_exists(Spreadsheet::class)) {
+                    throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
                 }
 
                 $response = new StreamedResponse(
@@ -506,9 +496,7 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @param Report               $entity
      * @param FormFactoryInterface $formFactory
-     * @param array                $options
      *
      * @return array
      */
@@ -730,8 +718,6 @@ class ReportModel extends FormModel
     /**
      * Determine what operators should be used for the filter type.
      *
-     * @param array $data
-     *
      * @return mixed|string
      */
     private function getOperatorOptions(array $data)
@@ -749,7 +735,7 @@ class ReportModel extends FormModel
             $options = MauticReportBuilder::OPERATORS[$operator];
         }
 
-        foreach ($options as $value => &$label) {
+        foreach ($options as &$label) {
             $label = $this->translator->trans($label);
         }
 
@@ -757,9 +743,6 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param array        $debugData
-     *
      * @return int
      */
     private function getTotalCount(QueryBuilder $qb, array &$debugData)
@@ -775,6 +758,37 @@ class ReportModel extends FormModel
         }
 
         return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $search = 'lll.leadlist_id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['column'] == $search && $eachFilter['value'] == $segmentId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return $dependents;
     }
 
     /**

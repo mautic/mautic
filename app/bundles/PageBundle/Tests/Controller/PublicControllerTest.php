@@ -21,7 +21,6 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
-use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\DependencyInjection\Container;
@@ -29,7 +28,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
-class PublicControllerTest extends \PHPUnit_Framework_TestCase
+class PublicControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test that the appropriate variant is displayed based on hit counts and variant weights.
@@ -228,9 +227,7 @@ class PublicControllerTest extends \PHPUnit_Framework_TestCase
         $request = new Request();
         $request->attributes->set('ignore_mismatch', true);
 
-        $deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
-
-        $publicController = new \Mautic\PageBundle\Controller\PublicController($deviceTrackingService);
+        $publicController = new \Mautic\PageBundle\Controller\PublicController();
         $publicController->setContainer($container);
         $publicController->setRequest($request);
 

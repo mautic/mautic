@@ -29,9 +29,6 @@ class CompanyReportData
 
     /**
      * CompanyReportData constructor.
-     *
-     * @param FieldModel          $fieldModel
-     * @param TranslatorInterface $translator
      */
     public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
@@ -57,14 +54,10 @@ class CompanyReportData
             ],
         ]);
 
-        $companyColumns = array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
-
-        return $companyColumns;
+        return array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
     }
 
     /**
-     * @param ReportGeneratorEvent $event
-     *
      * @return bool
      */
     public function eventHasCompanyColumns(ReportGeneratorEvent $event)
