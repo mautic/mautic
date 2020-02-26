@@ -23,9 +23,12 @@ use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\TypeOperatorProvider;
+use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -103,7 +106,15 @@ class AjaxController extends CommonAjaxController
         $dataArray  = ['success' => 1];
         $filter     = InputHelper::clean($request->query->get('filter'));
         $fieldAlias = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
+
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getModel('lead.field');
+
+        /** @var LeadModel $contactModel */
+        $contactModel = $this->getModel('lead.lead');
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = $this->getModel('lead.company');
 
         if (empty($fieldAlias)) {
             $dataArray['error']   = 'Alias cannot be empty';
@@ -113,7 +124,7 @@ class AjaxController extends CommonAjaxController
         }
 
         if ('owner_id' === $fieldAlias) {
-            $results = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+            $results = $contactModel->getLookupResults('user', $filter);
             foreach ($results as $r) {
                 $name        = $r['firstName'].' '.$r['lastName'];
                 $dataArray[] = [
@@ -140,8 +151,14 @@ class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse($dataArray);
         }
 
+        if ($isLookup && !empty($field->getProperties()['list'])) {
+            foreach ($field->getProperties()['list'] as $predefinedValue) {
+                $dataArray[] = ['value' => $predefinedValue];
+            }
+        }
+
         if ('company' === $field->getObject()) {
-            $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$fieldAlias, $filter]);
+            $results = $companyModel->getLookupResults('companyfield', [$fieldAlias, $filter]);
             foreach ($results as $r) {
                 $dataArray[] = ['value' => $r['label']];
             }

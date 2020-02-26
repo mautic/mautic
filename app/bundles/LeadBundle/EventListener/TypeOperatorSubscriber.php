@@ -28,7 +28,6 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -150,6 +149,8 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
         $disabled   = $event->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
         $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
+        $isLookup   = $event->fieldTypeIsOneOf('lookup');
+        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone');
         $data       = $form->getData();
         $attr       = ['class' => 'form-control'];
 
@@ -180,7 +181,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$mustBeText && $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean') || $choices) {
+        if (!$isLookup && !$mustBeText && $isSelect) {
             $filter = $data['filter'] ?? '';
 
             // Conversion between select and multiselect values.
@@ -190,19 +191,6 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
                 } elseif (!is_array($data['filter'])) {
                     $filter = [$data['filter']];
                 }
-            }
-
-            if ($event->fieldTypeIsOneOf('lookup')) {
-                // $attr['data-field-callback'] = 'activateLeadFieldTypeahead';
-                $attr = array_merge(
-                    $attr,
-                    [
-                        'data-toggle' => 'field-lookup',
-                        'data-target' => $event->getFieldAlias(),
-                        'data-action' => 'lead:fieldList',
-                        'placeholder' => $this->translator->trans('mautic.lead.list.form.filtervalue'),
-                    ]
-                );
             }
 
             $form->add(
@@ -221,6 +209,16 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
 
             return;
         }
+
+        if ($isLookup) {
+            $attr['data-toggle']  = 'field-lookup';
+            $attr['data-options'] = $choices;
+            $attr['data-target']  = $event->getFieldAlias();
+            $attr['data-action']  = 'lead:fieldList';
+            $attr['placeholder']  = $this->translator->trans('mautic.lead.list.form.filtervalue');
+        }
+
+        // $attr['data-field-callback'] = 'activateLeadFieldTypeahead'; // We'll need this in some case.
 
         $form->add(
             'filter',

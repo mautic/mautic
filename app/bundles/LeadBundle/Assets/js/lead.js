@@ -352,16 +352,10 @@ Mautic.attachJsUiOnFilterForms = function() {
         Mautic.activateChosenSelect(selector + '_properties select');
         var fieldType = mQuery(selector + '_type').val();
         var fieldEl = mQuery(selector + '_properties_filter');
+        // var fieldAlias = mQuery(selector + '_field');
 
         if (fieldType === 'lookup') {
-            // var fieldCallback = fieldEl.attr('data-field-callback');
-            // if (fieldCallback && typeof Mautic[fieldCallback] === 'function') {
-            //     var fieldOptions = filterOption.data("field-list");
-            //     Mautic[fieldCallback](filterIdBase + 'filter', elId, fieldOptions);
-            // } else {
-                fieldEl.attr('data-target', alias);
                 Mautic.activateLookupTypeahead(filter.parent());
-            // }
         } else if (fieldType === 'datetime') {
             fieldEl.datetimepicker({
                 format: 'Y-m-d H:i',
