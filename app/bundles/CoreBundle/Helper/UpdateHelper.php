@@ -12,7 +12,6 @@
 namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Mautic\CoreBundle\Helper\Update\Exception\CouldNotFetchLatestVersionException;
 use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
