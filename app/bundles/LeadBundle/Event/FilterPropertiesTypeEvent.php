@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Event;
 
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
 
@@ -99,5 +100,10 @@ class FilterPropertiesTypeEvent extends Event
     public function getFieldChoices(): array
     {
         return $this->fieldDetails['properties']['list'] ?? [];
+    }
+
+    public function filterShouldBeDisabled(): bool
+    {
+        return $this->operatorIsOneOf(OperatorOptions::EMPTY, OperatorOptions::NOT_EMPTY);
     }
 }
