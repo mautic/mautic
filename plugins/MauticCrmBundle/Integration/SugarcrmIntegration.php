@@ -1410,11 +1410,15 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $data
+     * @param Lead|null $lead
+     * @param array     $data
      */
-    private function fetchDncToMautic(Lead $lead, array $data)
+    private function fetchDncToMautic(Lead $lead = null, array $data)
     {
+        if (is_null($lead)) {
+            return;
+        }
+
         $features = $this->settings->getFeatureSettings();
         if (empty($features['updateDnc'])) {
             return;
