@@ -602,11 +602,9 @@ Mautic.loadFilterForm = function(fieldObject, fieldAlias, operator, resultHtml) 
 }
 
 Mautic.addLeadListFilter = function (elId, elObj) {
-    // @todo implement the properties form into the template bellow.
     var filterId = '#available_' + elObj + '_' + elId;
     var filterOption = mQuery(filterId);
     var label = filterOption.text();
-    var alias = filterOption.val();
 
     // Create a new filter
 
@@ -616,7 +614,6 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     var prototypeStr = mQuery('.available-filters').data('prototype');
     var fieldType = filterOption.data('field-type');
     var fieldObject = filterOption.data('field-object');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist',  'campaign', 'assets', 'device_type', 'device_brand', 'device_os', 'lead_email_received', 'lead_email_sent', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
@@ -632,18 +629,6 @@ Mautic.addLeadListFilter = function (elId, elObj) {
 
     var filterBase  = prefix + "[filters][" + filterNum + "]";
     var filterIdBase = prefix + "_filters_" + filterNum + "_";
-
-    // if (isSpecial) {
-    //     var templateField = fieldType;
-    //     if (fieldType == 'boolean' || fieldType == 'multiselect') {
-    //         templateField = 'select';
-    //     }
-
-    //     // var template = mQuery('#templates .' + templateField + '-template').clone();
-    //     // template.attr('name', mQuery(template).attr('name').replace(/__name__/g, filterNum));
-    //     // template.attr('id', mQuery(template).attr('id').replace(/__name__/g, filterNum));
-    //     // prototype.find('input[name="' + filterBase + '[filter]"]').replaceWith(template);
-    // }
 
     if (mQuery('#' + prefix + '_filters div.panel').length == 0) {
         // First filter so hide the glue footer
@@ -671,102 +656,7 @@ Mautic.addLeadListFilter = function (elId, elObj) {
     prototype.find("input[name='" + filterBase + "[field]']").val(elId);
     prototype.find("input[name='" + filterBase + "[type]']").val(fieldType);
     prototype.find("input[name='" + filterBase + "[object]']").val(fieldObject);
-
-    var filterEl = (isSpecial) ? "select[name='" + filterBase + "[filter]']" : "input[name='" + filterBase + "[filter]']";
-
     prototype.appendTo('#' + prefix + '_filters');
-
-    var filter = mQuery('#' + filterIdBase + 'filter');
-
-    //activate fields
-    // if (isSpecial) {
-    //     if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean') {
-    //         // Generate the options
-    //         var fieldOptions = filterOption.data("field-list");
-    //         mQuery.each(fieldOptions, function(index, val) {
-    //             if (mQuery.isPlainObject(val)) {
-    //                 var optGroup = index;
-    //                 mQuery.each(val, function(index, value) {
-    //                     mQuery('<option class="' + optGroup + '">').val(index).text(value).appendTo(filterEl);
-    //                 });
-    //                 mQuery('.' + index).wrapAll("<optgroup label='"+index+"' />");
-    //             } else {
-    //                 mQuery('<option>').val(index).text(val).appendTo(filterEl);
-    //             }
-    //         });
-    //     }
-    // } else 
-    if (fieldType == 'lookup') {
-        var fieldCallback = filterOption.data("field-callback");
-        if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
-            var fieldOptions = filterOption.data("field-list");
-            Mautic[fieldCallback](filterIdBase + 'filter', elId, fieldOptions);
-        } else {
-            filter.attr('data-target', alias);
-            Mautic.activateLookupTypeahead(filter.parent());
-        }
-    } 
-    
-    // else 
-    
-    if (fieldType == 'datetime') {
-        filter.datetimepicker({
-            format: 'Y-m-d H:i',
-            lazyInit: true,
-            validateOnBlur: false,
-            allowBlank: true,
-            scrollMonth: false,
-            scrollInput: false
-        });
-    } else if (fieldType == 'date') {
-        filter.datetimepicker({
-            timepicker: false,
-            format: 'Y-m-d',
-            lazyInit: true,
-            validateOnBlur: false,
-            allowBlank: true,
-            scrollMonth: false,
-            scrollInput: false,
-            closeOnDateSelect: true
-        });
-    } else if (fieldType == 'time') {
-        filter.datetimepicker({
-            datepicker: false,
-            format: 'H:i',
-            lazyInit: true,
-            validateOnBlur: false,
-            allowBlank: true,
-            scrollMonth: false,
-            scrollInput: false
-        });
-    } 
-    
-    //else 
-    
-    if (fieldType == 'lookup_id') {
-        //switch the filter and display elements
-        var oldFilter = mQuery(filterEl);
-        var newDisplay = oldFilter.clone();
-        newDisplay.attr('name', filterBase + '[display]')
-            .attr('id', filterIdBase + 'display');
-
-        var oldDisplay = prototype.find("input[name='" + filterBase + "[display]']");
-        var newFilter = mQuery(oldDisplay).clone();
-        newFilter.attr('name', filterBase + '[filter]');
-        newFilter.attr('id', filterIdBase + 'filter');
-
-        oldFilter.replaceWith(newFilter);
-        oldDisplay.replaceWith(newDisplay);
-
-        var fieldCallback = filterOption.data("field-callback");
-        if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
-            var fieldOptions = filterOption.data("field-list");
-            Mautic[fieldCallback](filterIdBase + 'display', elId, fieldOptions);
-        }
-    } 
-    //else {
-    //     filter.attr('type', fieldType);
-    // }
 
     var operators = filterOption.data('field-operators');
     mQuery('#' + filterIdBase + 'operator').html('');
