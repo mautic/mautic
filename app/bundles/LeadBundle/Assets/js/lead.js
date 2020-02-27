@@ -347,17 +347,24 @@ Mautic.leadlistOnLoad = function(container, response) {
     Mautic.attachJsUiOnFilterForms();
 };
 
+/**
+ * Trigger event so plugins could attach other JS magic to the form.
+ */
+Mautic.triggerOnPropertiesFormLoadedEvent = function(selector) {
+    mQuery('#leadlist_filters').trigger('filter.properties.form.loaded', [selector]);
+};
+
 Mautic.attachJsUiOnFilterForms = function() {
     mQuery('#leadlist_filters').on('filter.properties.form.loaded', function(event, selector) {
         Mautic.activateChosenSelect(selector + '_properties select');
         var fieldType = mQuery(selector + '_type').val();
-        var fieldEl = mQuery(selector + '_properties_filter');
-        // var fieldAlias = mQuery(selector + '_field');
+        var fieldAlias = mQuery(selector + '_field').val();
+        var filterFieldEl = mQuery(selector + '_properties_filter');
 
         if (fieldType === 'lookup') {
-                Mautic.activateLookupTypeahead(filter.parent());
+            Mautic.activateLookupTypeahead(filterFieldEl.parent());
         } else if (fieldType === 'datetime') {
-            fieldEl.datetimepicker({
+            filterFieldEl.datetimepicker({
                 format: 'Y-m-d H:i',
                 lazyInit: true,
                 validateOnBlur: false,
@@ -366,7 +373,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 scrollInput: false
             });
         } else if (fieldType === 'date') {
-            fieldEl.datetimepicker({
+            filterFieldEl.datetimepicker({
                 timepicker: false,
                 format: 'Y-m-d',
                 lazyInit: true,
@@ -377,7 +384,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 closeOnDateSelect: true
             });
         } else if (fieldType === 'time') {
-            fieldEl.datetimepicker({
+            filterFieldEl.datetimepicker({
                 datepicker: false,
                 format: 'H:i',
                 lazyInit: true,
@@ -400,23 +407,21 @@ Mautic.attachJsUiOnFilterForms = function() {
     
             // oldFilter.replaceWith(newFilter);
             // oldDisplay.replaceWith(newDisplay);
-    
-            // var fieldCallback = filterOption.data("field-callback");
-            // if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
-            //     var fieldOptions = filterOption.data("field-list");
-            //     Mautic[fieldCallback](filterIdBase + 'display', elId, fieldOptions);
-            // }
+
+            var displayFieldEl = mQuery(selector + '_properties_display');
+            var fieldCallback = displayFieldEl.attr('data-field-callback');
+            if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
+                var fieldOptions = displayFieldEl.attr('data-field-list');
+                Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
+            }
         } 
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
     mQuery('#leadlist_filters .panel').each(function() {
-        var selector = '#' + mQuery(this).attr('id');
-
-        // Trigger event so plugins could attach other JS magic to the form.
-        mQuery('#leadlist_filters').trigger('filter.properties.form.loaded', [selector]);
+        Mautic.triggerOnPropertiesFormLoadedEvent('#' + mQuery(this).attr('id'));
     });
-}
+};
 
 Mautic.reorderSegmentFilters = function() {
     // Update the filter numbers sot that they are ordered correctly when processed and grouped server side
@@ -476,8 +481,7 @@ Mautic.convertLeadFilterInput = function(el) {
         var selector = '#leadlist_filters_'+filterNum+'_properties';
         mQuery(selector).html(propertiesFields);
 
-        // Trigger event so plugins could attach other JS magic to the form.
-        mQuery('#leadlist_filters').trigger('filter.properties.form.loaded', [selector]);
+        Mautic.triggerOnPropertiesFormLoadedEvent(selector);
     });
     return; // @todo make this method backward compatible for DEC and DWC.
     var prefix = 'leadlist';
@@ -557,10 +561,14 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 };
 
-Mautic.updateLookupListFilter = function(field, datum) {
-    if (datum && datum.id) {
+/**
+ * Adds values to the lookup_id form after user selects a typeahead option.
+ */
+Mautic.updateLookupListFilter = function(field, item) {
+    if (item && item.id) {
         var filterField = '#'+field.replace('_display', '_filter');
-        mQuery(filterField).val(datum.id);
+        mQuery(filterField).val(item.id);
+        mQuery(field).val(item.name);
     }
 };
 
@@ -568,7 +576,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
 
     var mQueryBackup = mQuery;
 
-    if(typeof mQueryObject == 'function'){
+    if (typeof mQueryObject === 'function') {
         mQuery = mQueryObject;
     }
 

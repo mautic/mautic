@@ -96,8 +96,9 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE => ['onTypeListCollect', 0],
             LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD          => [
                 ['onSegmentFilterFormHandleTags', 1000],
-                ['onSegmentFilterFormHandleLookup', 800],
-                ['onSegmentFilterFormHandleSelect', 600],
+                ['onSegmentFilterFormHandleLookupId', 800],
+                ['onSegmentFilterFormHandleLookup', 600],
+                ['onSegmentFilterFormHandleSelect', 400],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
         ];
@@ -172,8 +173,47 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
                     'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => true,
                     'onchange'             => 'Mautic.createLeadTag(this)',
-                    'data-field-callback'  => '',
                 ],
+            ]
+        );
+
+        $event->stopPropagation();
+    }
+
+    /**
+     * For fields where users search by label but we need the ID. Example: owner.
+     */
+    public function onSegmentFilterFormHandleLookupId(FilterPropertiesTypeEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('lookup_id')) {
+            return;
+        }
+
+        $form = $event->getFilterPropertiesForm();
+
+        // $attr['data-field-callback'] = 'activateLeadFieldTypeahead'; // We'll need this in some case.
+        // activateSegmentFilterTypeahead
+        $form->add(
+            'display',
+            TextType::class,
+            [
+                'label' => false,
+                'data'  => $form->getData()['display'] ?? '',
+                'attr'  => [
+                    'class'               => 'form-control',
+                    'data-field-callback' => 'activateSegmentFilterTypeahead',
+                    'data-target'         => $event->getFieldAlias(),
+                ],
+            ]
+        );
+
+        $form->add(
+            'filter',
+            HiddenType::class,
+            [
+                'label'    => false,
+                'attr'     => ['class' => 'form-control'],
+                'disabled' => $event->filterShouldBeDisabled(),
             ]
         );
 
