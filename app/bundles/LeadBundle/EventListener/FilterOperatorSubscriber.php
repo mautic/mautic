@@ -85,11 +85,10 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
             if ('boolean' === $type) {
                 $properties['list'] = [
-                    0 => $properties['no'],
-                    1 => $properties['yes'],
+                    $properties['no']  => 0,
+                    $properties['yes'] => 1,
                 ];
             } elseif (in_array($type, ['select', 'multiselect'], true)) {
-                // $properties['callback'] = 'activateLeadFieldTypeahead';
                 $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
                     FormFieldHelper::FORMAT_ARRAY,
                     FormFieldHelper::parseList($properties['list'])

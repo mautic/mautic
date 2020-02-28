@@ -129,8 +129,8 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldType(
             'boolean',
             [
-                0 => $this->translator->trans('mautic.core.form.no'),
-                1 => $this->translator->trans('mautic.core.form.yes'),
+                $this->translator->trans('mautic.core.form.no')  => 0,
+                $this->translator->trans('mautic.core.form.yes') => 1,
             ]
         );
 
@@ -226,14 +226,15 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // $attr['data-field-callback'] = 'activateLeadFieldTypeahead'; // We'll need this in some case.
+        $form = $event->getFilterPropertiesForm();
 
-        $event->getFilterPropertiesForm()->add(
+        $form->add(
             'filter',
             TextType::class,
             [
                 'label'    => false,
                 'disabled' => $event->filterShouldBeDisabled(),
+                'data'     => $form->getData()['filter'] ?? '',
                 'attr'     => [
                     'class'        => 'form-control',
                     'data-toggle'  => 'field-lookup',
@@ -290,19 +291,6 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         $form = $event->getFilterPropertiesForm();
 
-        // For fields where users search by label but we need the ID.
-        // if ($event->fieldTypeIsOneOf('lookup_id')) {
-        //     $form->add(
-        //         'display',
-        //         HiddenType::class,
-        //         [
-        //             'label' => false,
-        //             'attr'  => [],
-        //             'data'  => $form->getData()['display'] ?? '',
-        //         ]
-        //     );
-        // }
-
         $form->add(
             'filter',
             TextType::class,
@@ -310,6 +298,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
                 'label'    => false,
                 'attr'     => ['class' => 'form-control'],
                 'disabled' => $event->filterShouldBeDisabled(),
+                'data'     => $form->getData()['filter'] ?? '',
             ]
         );
 
