@@ -118,9 +118,9 @@ class FilterType extends AbstractType
                 ]
             );
 
-            // @todo this is a BC break. We have to ensure that the old data[filter] and data[display] will get to the properties form.
             $filterPropertiesType = $form->get('properties');
-            $filterPropertiesType->setData($data['properties'] ?? []);
+
+            $this->setPropertiesFormData($filterPropertiesType, $data ?? []);
 
             if ($fieldAlias && $operator) {
                 $this->typeOperatorProvider->adjustFilterPropertiesType(
@@ -176,5 +176,23 @@ class FilterType extends AbstractType
     public function getBlockPrefix()
     {
         return 'leadlist_filter';
+    }
+
+    /**
+     * We have to ensure that the old data[filter] and data[display] will get to the properties form
+     * to keep BC for segments created before the properties form was added and the fitler and display
+     * fields were moved there.
+     */
+    private function setPropertiesFormData(FormInterface $filterPropertiesType, array $data): void
+    {
+        if (empty($data['properties']) && !empty($data['filter'])) {
+            $propertiesData = [
+                'filter'  => $data['filter'] ?? null,
+                'display' => $data['display'] ?? null,
+            ];
+            $filterPropertiesType->setData($propertiesData);
+        } else {
+            $filterPropertiesType->setData($data['properties'] ?? []);
+        }
     }
 }
