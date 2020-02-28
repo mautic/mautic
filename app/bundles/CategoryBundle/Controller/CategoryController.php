@@ -47,7 +47,7 @@ class CategoryController extends AbstractFormController
         $session = $this->get('session');
 
         $search = $this->request->query->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $this->request->query->get('bundle', $session->get('mautic.category.type', ''));
+        $bundle = $this->request->query->get('bundle', $session->get('mautic.category.type', $bundle));
 
         if ($bundle) {
             $session->set('mautic.category.type', $bundle);
