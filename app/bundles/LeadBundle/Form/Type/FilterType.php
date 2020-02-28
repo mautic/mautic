@@ -110,16 +110,6 @@ class FilterType extends AbstractType
                 ]
             );
 
-            // $form->add(
-            //     'filter',
-            //     TextType::class,
-            //     [
-            //         'label' => false,
-            //         'data'  => $data['filter'] ?? '',
-            //         'attr'  => ['class' => 'form-control'],
-            //     ]
-            // );
-
             $form->add(
                 'properties',
                 FilterPropertiesType::class,
@@ -128,16 +118,7 @@ class FilterType extends AbstractType
                 ]
             );
 
-            $form->add(
-                'display',
-                HiddenType::class,
-                [
-                    'label' => false,
-                    'attr'  => [],
-                    'data'  => $data['display'] ?? '',
-                ]
-            );
-
+            // @todo this is a BC break. We have to ensure that the old data[filter] and data[display] will get to the properties form.
             $filterPropertiesType = $form->get('properties');
             $filterPropertiesType->setData($data['properties'] ?? []);
 
