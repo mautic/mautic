@@ -121,6 +121,9 @@ class SegmentContactsLineChartQuery extends ChartQuery
     public function getDataFromLeadEventLog($action)
     {
         $actionInverted = ('added' == $action) ? 'removed' : 'added';
+        // for added stats we check not existed removed stats greater than date_added
+        // for removed stats we check not existed added stats less than date_removed
+        $conditionForNonExistedQuery = ('added' === $action ) ? 'gt' : 'lt';
 
         $filter              = [];
         $filter['object']    = 'segment';
@@ -142,7 +145,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
                     $subQuery->expr()->eq('el.action', $subQuery->expr()->literal($actionInverted)),
                     $subQuery->expr()->eq('el.object_id', $this->segmentId),
                     $subQuery->expr()->eq('DATE_FORMAT(el.date_added, \''.$this->translateTimeUnit().'\')', 'DATE_FORMAT(t.date_added, \''.$this->translateTimeUnit().'\')'),
-                    $subQuery->expr()->gt('el.date_added', 't.date_added')
+                    $subQuery->expr()->$conditionForNonExistedQuery('el.date_added', 't.date_added')
                 ));
         $q->andWhere(sprintf('NOT EXISTS (%s)', $subQuery->getSQL()));
 
