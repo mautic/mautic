@@ -1191,7 +1191,7 @@ class ListModel extends FormModel
         ];
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => $filter,
             ]
         );
         $dependents = [];
@@ -1199,7 +1199,9 @@ class ListModel extends FormModel
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
-                if ('leadlist' === $eachFilter['type'] && in_array($segmentId, $eachFilter['filter'])) {
+                // BC support for old filters where the field existed outside of properties.
+                $filter = $eachFilter['properties']['filter'] ?? $eachFilter['filter'];
+                if ($filter && 'leadlist' === $eachFilter['type'] && in_array($segmentId, $filter)) {
                     if ($returnProperty && $value = $accessor->getValue($entity, $returnProperty)) {
                         $dependents[] = $value;
                     } else {
