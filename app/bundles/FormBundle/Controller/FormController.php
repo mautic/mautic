@@ -86,7 +86,8 @@ class FormController extends CommonFormController
             ]
         );
 
-        $count = count($forms);
+        $forms->getQuery()->setParameters([]);
+        $count = $forms->count();
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
