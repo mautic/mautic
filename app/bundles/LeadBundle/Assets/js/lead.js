@@ -394,20 +394,6 @@ Mautic.attachJsUiOnFilterForms = function() {
                 scrollInput: false
             });
         } else if (fieldType === 'lookup_id') {
-            //switch the filter and display elements
-            // var oldFilter = mQuery(filterEl);
-            // var newDisplay = oldFilter.clone();
-            // newDisplay.attr('name', filterBase + '[display]')
-            //     .attr('id', filterIdBase + 'display');
-    
-            // var oldDisplay = prototype.find("input[name='" + filterBase + "[display]']");
-            // var newFilter = mQuery(oldDisplay).clone();
-            // newFilter.attr('name', filterBase + '[filter]');
-            // newFilter.attr('id', filterIdBase + 'filter');
-    
-            // oldFilter.replaceWith(newFilter);
-            // oldDisplay.replaceWith(newDisplay);
-
             var displayFieldEl = mQuery(selector + '_properties_display');
             var fieldCallback = displayFieldEl.attr('data-field-callback');
             if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
