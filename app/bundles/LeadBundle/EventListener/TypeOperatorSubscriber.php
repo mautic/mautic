@@ -191,8 +191,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
 
         $form = $event->getFilterPropertiesForm();
 
-        // $attr['data-field-callback'] = 'activateLeadFieldTypeahead'; // We'll need this in some case.
-        // activateSegmentFilterTypeahead
+        // This field will hold the label of the lookup item.
         $form->add(
             'display',
             TextType::class,
@@ -207,6 +206,7 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             ]
         );
 
+        // This field will hold the ID of the lookup item.
         $form->add(
             'filter',
             HiddenType::class,
