@@ -237,15 +237,15 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     *
+     * Check if plain text is empty. If yes, generate it.
      */
     private function setGeneratedPlainText()
     {
         $htmlContent = $this->getContent();
-        if ($this->getPlainText() === '' && $htmlContent !== ''){
-            $parser = new PlainTextHelper();
+        if ($this->getPlainText() === '' && $htmlContent !== '') {
+            $parser             = new PlainTextHelper();
             $generatedPlainText = $parser->setHtml($htmlContent)->getText();
-            if($generatedPlainText !== ''){
+            if ($generatedPlainText !== '') {
                 $this->setPlainText($generatedPlainText);
             }
         }
