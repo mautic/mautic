@@ -135,12 +135,11 @@ class FormUploader
      */
     private function getUploadDirOfForm(Form $form)
     {
-        $formId    = $form->getId();
         $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
-        if (null === $formId) {
+        if (null === $form->deletedId) {
             throw new \LogicException('FormID can\'t be null');
         }
 
-        return $uploadDir.DIRECTORY_SEPARATOR.$formId;
+        return $uploadDir.DIRECTORY_SEPARATOR.$form->deletedId;
     }
 }
