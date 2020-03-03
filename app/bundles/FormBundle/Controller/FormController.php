@@ -1081,7 +1081,8 @@ class FormController extends CommonFormController
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
+                $objectId = (int) $objectId;
+                $entity   = $model->getEntity($objectId);
 
                 if (null === $entity) {
                     $flashes[] = [
