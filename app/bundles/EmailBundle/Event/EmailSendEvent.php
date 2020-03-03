@@ -202,9 +202,8 @@ class EmailSendEvent extends CommonEvent
         } else {
             $this->content = $content;
         }
-        if ($content !== '') {
-            $this->setGeneratedPlainText();
-        }
+        $this->setGeneratedPlainText();
+
     }
 
     /**
@@ -231,9 +230,8 @@ class EmailSendEvent extends CommonEvent
         } else {
             $this->plainText = $content;
         }
-        if ($content === '') {
-            $this->setGeneratedPlainText();
-        }
+        $this->setGeneratedPlainText();
+
     }
 
     /**
