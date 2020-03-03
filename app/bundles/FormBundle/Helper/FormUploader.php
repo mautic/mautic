@@ -133,12 +133,9 @@ class FormUploader
      *
      * @throws \LogicException If formId is null
      */
-    private function getUploadDirOfForm(?int $formId)
+    private function getUploadDirOfForm(int $formId)
     {
         $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
-        if (null === $formId) {
-            throw new \LogicException('FormID can\'t be null');
-        }
 
         return $uploadDir.DIRECTORY_SEPARATOR.$formId;
     }
