@@ -88,7 +88,7 @@ class FormUploader
 
     public function deleteFilesOfForm(Form $form)
     {
-        $formUploadDir = $this->getUploadDirOfForm($form);
+        $formUploadDir = $this->getUploadDirOfForm($form->deletedId);
         $this->fileUploader->delete($formUploadDir);
     }
 
@@ -123,7 +123,7 @@ class FormUploader
     private function getUploadDir(Field $field)
     {
         $fieldId       = $field->getId();
-        $formUploadDir = $this->getUploadDirOfForm($field->getForm());
+        $formUploadDir = $this->getUploadDirOfForm($field->getForm()->getId());
 
         return $formUploadDir.DIRECTORY_SEPARATOR.$fieldId;
     }
@@ -133,13 +133,13 @@ class FormUploader
      *
      * @throws \LogicException If formId is null
      */
-    private function getUploadDirOfForm(Form $form)
+    private function getUploadDirOfForm(?int $formId)
     {
         $uploadDir = $this->coreParametersHelper->get('form_upload_dir');
-        if (null === $form->deletedId) {
+        if (null === $formId) {
             throw new \LogicException('FormID can\'t be null');
         }
 
-        return $uploadDir.DIRECTORY_SEPARATOR.$form->deletedId;
+        return $uploadDir.DIRECTORY_SEPARATOR.$formId;
     }
 }
