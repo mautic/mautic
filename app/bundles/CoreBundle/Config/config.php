@@ -574,6 +574,13 @@ return [
                     'mautic.update.step_provider',
                 ],
             ],
+            'mautic.core.command.maxmind.purge' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
