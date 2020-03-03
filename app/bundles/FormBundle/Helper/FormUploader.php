@@ -88,7 +88,7 @@ class FormUploader
 
     public function deleteFilesOfForm(Form $form)
     {
-        $formId = $form->getId() ?: $form->deletedId;
+        $formId        = $form->getId() ?: $form->deletedId;
         $formUploadDir = $this->getUploadDirOfForm($formId);
         $this->fileUploader->delete($formUploadDir);
     }
