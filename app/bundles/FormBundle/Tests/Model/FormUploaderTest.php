@@ -399,4 +399,44 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $formUploader->deleteAllFilesOfFormField($fieldMock);
     }
+
+    public function testDeleteFilesOfForm()
+    {
+        $fileUploaderMock = $this->getMockBuilder(FileUploader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fileUploaderMock
+            ->method('delete')
+            ->with('path/to/file/1');
+
+        $coreParametersHelperMock = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $coreParametersHelperMock->expects($this->exactly(2))
+            ->method('get')
+            ->with('form_upload_dir')
+            ->willReturn($this->uploadDir);
+
+        $formMock = $this->getMockBuilder(Form::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $formMock->expects($this->at(0))
+            ->method('getId')
+            ->with()
+            ->willReturn($this->formId1);
+
+        $formMock->expects($this->at(1))
+            ->method('getId')
+            ->with()
+            ->willReturn(null);
+
+        $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
+        $formUploader->deleteFilesOfForm($formMock);
+
+        $formMock->deletedId = $this->formId1;
+
+        $formUploader->deleteFilesOfForm($formMock);
+    }
 }
