@@ -50,7 +50,8 @@ class BuildJsSubscriber implements EventSubscriberInterface
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => [
-                ['onBuildJs', 255],
+                // onBuildJs must always needs to be last to ensure setup before delivering the event
+                ['onBuildJs', -255],
                 ['onBuildJsForVideo', 256],
                 ['onBuildJsForTrackingEvent', 256],
             ],
@@ -102,7 +103,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
             
             return;
         }
-
+console.log(m.preEventDeliveryQueue.length, m.beforeFirstDeliveryMade);
         // Pre delivery events always take all known params and should use them in the request
         if (m.preEventDeliveryQueue.length && m.beforeFirstDeliveryMade === false) {
             for(var i = 0; i < m.preEventDeliveryQueue.length; i++) {
