@@ -142,7 +142,7 @@ EOT
         $matches = [];
         while ($doNotSellList->loadList($offset, $this->batchSize)) {
             $contacts = $this->findContactsFromIPs($doNotSellList->getList());
-            array_merge($matches, $contacts);
+            $matches  = array_merge($matches, $contacts);
 
             $progressBar->advance(count($doNotSellList->getList()));
 
