@@ -1458,9 +1458,6 @@ class CommonRepository extends EntityRepository
         // Parameters have to be set even if there are no expressions just in case a search command
         // passed back a parameter it used
         foreach ($queryParameters as $k => $v) {
-            // This where condition is always satisfied. It needs to be set to be sure that the
-            // parameter is used.
-            $q->andWhere(':'.$k.' = :'.$k);
             if (true === $v || false === $v) {
                 $q->setParameter($k, $v, 'boolean');
             } else {
