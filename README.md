@@ -131,6 +131,13 @@ In case of assets like JS, CSS, the source files are loaded instead of concatena
 
 In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
 
+## Contributing
+Development is open and available to any member of the Mautic community. All fixes and improvements are done through pull requests to the code. This code is open source and publicly available.
+
+If you want to contribute to Mautic's **code**, please read our [CONTRIBUTING.md](https://github.com/mautic/mautic/blob/staging/.github/CONTRIBUTING.md) or [Contributing Code](https://contribute.mautic.org/about/how-can-i-contribute/developer) docs.
+
+If you want to contribute in **other areas** of Mautic, please read our general [Contributing](https://contribute.mautic.org/about/how-can-i-contribute) guide.
+
 ## Testing
 
 ### Pull Request Testing
