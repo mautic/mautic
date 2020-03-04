@@ -138,7 +138,7 @@ class FormRepository extends CommonRepository
                 $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $q->expr()->like('f.name', ':'.$unique);
+                $expr            = $q->expr()->like('f.name', ':'.$unique);
                 $returnParameter = true;
                 break;
         }
