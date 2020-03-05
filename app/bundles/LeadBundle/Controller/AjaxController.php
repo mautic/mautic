@@ -386,7 +386,7 @@ class AjaxController extends CommonAjaxController
         $lead     = $leadModel->getEntity($leadId);
         $campaign = $campaignModel->getEntity($campaignId);
 
-        if (null === $lead && null === $campaign) {
+        if (null === $lead || null === $campaign) {
             return $this->sendJsonResponse($dataArray);
         }
 
