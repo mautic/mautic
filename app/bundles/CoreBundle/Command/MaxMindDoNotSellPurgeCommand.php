@@ -99,22 +99,6 @@ EOT
 
         $this->purgeData($output, $matches);
 
-        /*
-         * Abstract exclusion list loader
-         * maxmind exlusion list loader
-         * Exclusion loader helper
-         * Audit log lookup class?
-         * DataPurge class - takes list of contacts and fields to purge, optional value to update fields with, default null
-         */
-        // - Set ENV variable for file location
-        // - Read the file in
-        // Get a list of contacts with this IP
-        // - Only select contacts that have not null in the relevant data points
-        // Get all relevant data points
-        // Check each point against audit log to see if it cam from Max Mind
-        // remove data points that come from max mind
-        // generate report of removed data
-
         return 0;
     }
 
