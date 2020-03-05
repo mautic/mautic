@@ -230,8 +230,8 @@ trait FilterTrait
                         'class'                => 'form-control',
                         'data-toggle'          => 'field-lookup',
                         'data-target'          => $data['field'],
-                        'data-action'          => 'lead:fieldList',
-                        'data-lookup-callback' => 'updateLookupListFilter',
+                        'data-action'          => isset($field['properties']['data-action']) ? $field['properties']['data-action'] : 'lead:fieldList',
+                        'data-lookup-callback' => isset($field['properties']['data-lookup-callback']) ? $field['properties']['data-lookup-callback'] : 'updateLookupListFilter',
                         'placeholder'          => $translator->trans(
                             'mautic.lead.list.form.filtervalue'
                         ),
