@@ -103,7 +103,7 @@ class BuildJsSubscriber implements EventSubscriberInterface
             
             return;
         }
-console.log(m.preEventDeliveryQueue.length, m.beforeFirstDeliveryMade);
+
         // Pre delivery events always take all known params and should use them in the request
         if (m.preEventDeliveryQueue.length && m.beforeFirstDeliveryMade === false) {
             for(var i = 0; i < m.preEventDeliveryQueue.length; i++) {
