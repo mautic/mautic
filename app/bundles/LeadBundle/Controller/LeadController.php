@@ -1356,7 +1356,7 @@ class LeadController extends FormController
                         
                         /** @var EmailModel $emailModel */
                         $emailModel = $this->getModel('email');
-                        if(($emailEntity = $emailModel->getEntity((int)$email['templates']))){
+                        if(($emailEntity = $emailModel->getEntity((int) $email['templates']))){
                             $mailer->setEmail($emailEntity);
                         }
 
