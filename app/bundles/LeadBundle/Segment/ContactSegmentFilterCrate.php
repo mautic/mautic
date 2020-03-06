@@ -55,12 +55,13 @@ class ContactSegmentFilterCrate
 
     public function __construct(array $filter)
     {
-        $this->glue        = isset($filter['glue']) ? $filter['glue'] : null;
-        $this->field       = isset($filter['field']) ? $filter['field'] : null;
-        $this->object      = isset($filter['object']) ? $filter['object'] : self::CONTACT_OBJECT;
-        $this->type        = isset($filter['type']) ? $filter['type'] : null;
-        $this->filter      = isset($filter['filter']) ? $filter['filter'] : null;
-        $this->nullValue   = isset($filter['null_value']) ? $filter['null_value'] : null;
+        $bcFilter          = $filter['filter'] ?? null;
+        $this->glue        = $filter['glue'] ?? null;
+        $this->field       = $filter['field'] ?? null;
+        $this->object      = $filter['object'] ?? self::CONTACT_OBJECT;
+        $this->type        = $filter['type'] ?? null;
+        $this->filter      = $filter['properties']['filter'] ?? $bcFilter;
+        $this->nullValue   = $filter['null_value'] ?? null;
         $this->sourceArray = $filter;
 
         $this->setOperator($filter);
