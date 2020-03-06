@@ -582,6 +582,16 @@ final class LeadEvents
     const COLLECT_OPERATORS_FOR_FIELD_TYPE = 'mautic.collect_operators_for_field_type';
 
     /**
+     * The mautic.collect_operators_for_field event is dispatched when some filter needs operators for a specific field.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TypeOperatorsEvent
+     *
+     * @var string
+     */
+    const COLLECT_OPERATORS_FOR_FIELD = 'mautic.collect_operators_for_field';
+
+    /**
      * The mautic.adjust_filter_form_type_for_field event is dispatched when the segment filter form is built so events can add new or modify existing fields.
      *
      * The event listener receives a

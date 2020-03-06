@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Provider;
 
 use Mautic\LeadBundle\Entity\OperatorListTrait;
+use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
@@ -62,25 +63,16 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOperatorsIncluding(array $operators): array
     {
         return $this->getOperatorChoiceList(['include' => $operators]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOperatorsExcluding(array $operators): array
     {
         return $this->getOperatorChoiceList(['exclude' => $operators]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getChoicesForField(string $fieldType, string $fieldAlias): array
     {
         $aliasChoices = $this->getAllChoicesForListFieldAliases();
@@ -97,16 +89,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         throw new ChoicesNotFoundException("No choices for field type {$fieldType} nor alias {$fieldAlias} were found");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOperatorsForFieldType(string $fieldType): array
     {
-        // This condition can be removed after strict types will be implemented.
-        if (!is_string($fieldType)) {
-            throw new \InvalidArgumentException('getOperatorsForFieldType param must be string. '.print_r($fieldType, true).' provided');
-        }
-
         // If we already processed this
         if (isset($this->cachedTypeOperatorsChoices[$fieldType])) {
             return $this->cachedTypeOperatorsChoices[$fieldType];
@@ -134,6 +118,24 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         }
 
         return $this->cachedTypeOperators;
+    }
+
+    /**
+     * This method will add the default operators for the $type like the getOperatorsForFieldType() method
+     * but also allows plugins to add more operators.
+     */
+    public function getOperatorsForField(string $type, string $field): array
+    {
+        $event = new FieldOperatorsEvent(
+            $type,
+            $field,
+            $this->filterOperatorProvider->getAllOperators(),
+            $this->getOperatorsForFieldType($type)
+        );
+
+        $this->dispatcher->dispatch(LeadEvents::COLLECT_OPERATORS_FOR_FIELD, $event);
+
+        return $event->getOperators();
     }
 
     public function getAllChoicesForListFieldTypes(): array
