@@ -107,6 +107,7 @@ EOT
             '--append' => true,
             '--env'    => $env,
             '--quiet'  => true,
+            '--group'  => 'group_mautic_install_data',
         ];
 
         $input      = new ArrayInput($args);
