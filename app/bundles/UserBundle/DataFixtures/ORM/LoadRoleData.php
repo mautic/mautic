@@ -11,14 +11,23 @@
 
 namespace Mautic\UserBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 
-class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
+class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getGroups(): array
+    {
+        return ['group_mautic_install_data'];
+    }
+
     /**
      * @var RoleModel
      */

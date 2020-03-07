@@ -11,14 +11,23 @@
 
 namespace Mautic\UserBundle\DataFixtures\ORM;
 
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
-class LoadUserData extends AbstractFixture implements OrderedFixtureInterface
+class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getGroups(): array
+    {
+        return ['group_mautic_install_data'];
+    }
+
     /**
      * @var EncoderFactoryInterface
      */
