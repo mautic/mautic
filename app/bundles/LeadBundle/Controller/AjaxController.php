@@ -11,23 +11,22 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
@@ -374,19 +373,35 @@ class AjaxController extends CommonAjaxController
         $campaignId = (int) $request->request->get('campaignId');
         $action     = InputHelper::clean($request->request->get('campaignAction'));
 
-        if (!empty($leadId) && !empty($campaignId) && in_array($action, ['remove', 'add'])) {
-            $leadModel     = $this->getModel('lead');
-            $campaignModel = $this->getModel('campaign');
-
-            $lead     = $leadModel->getEntity($leadId);
-            $campaign = $campaignModel->getEntity($campaignId);
-
-            if (null !== $lead && null !== $campaign) {
-                $class = "{$action}Lead";
-                $campaignModel->$class($campaign, $lead, true);
-                $dataArray['success'] = 1;
-            }
+        if (empty($leadId) || empty($campaignId) || !in_array($action, ['remove', 'add'])) {
+            return $this->sendJsonResponse($dataArray);
         }
+
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->getModel('campaign');
+
+        $lead     = $leadModel->getEntity($leadId);
+        $campaign = $campaignModel->getEntity($campaignId);
+
+        if (null === $lead || null === $campaign) {
+            return $this->sendJsonResponse($dataArray);
+        }
+
+        /** @var MembershipManager $membershipManager */
+        $membershipManager = $this->get('mautic.campaign.membership.manager');
+
+        if ('add' === $action) {
+            $membershipManager->addContact($lead, $campaign);
+        }
+
+        if ('remove' === $action) {
+            $membershipManager->removeContact($lead, $campaign);
+        }
+
+        $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);
     }
