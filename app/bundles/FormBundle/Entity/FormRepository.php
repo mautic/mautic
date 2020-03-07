@@ -95,13 +95,14 @@ class FormRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        list($expr, $standardSearchParameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
-            return [$expr, $parameters];
+            return [$expr, $standardSearchParameters];
         }
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
+        $parameters      = [];
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
@@ -138,7 +139,7 @@ class FormRepository extends CommonRepository
                 $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $q->expr()->like('f.name', ':'.$unique);
+                $expr            = $q->expr()->like('f.name', ':'.$unique);
                 $returnParameter = true;
                 break;
         }
