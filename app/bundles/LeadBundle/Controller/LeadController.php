@@ -1365,6 +1365,12 @@ class LeadController extends FormController
 
                         $mailer->setSubject($email['subject']);
 
+                        /** @var EmailModel $emailModel */
+                        $emailModel = $this->getModel('email');
+                        if (($emailEntity = $emailModel->getEntity((int) $email['templates']))) {
+                            $mailer->setEmail($emailEntity);
+                        }
+
                         // Ensure safe emoji for notification
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true, false, false)) {
