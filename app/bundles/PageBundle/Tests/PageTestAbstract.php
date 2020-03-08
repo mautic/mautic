@@ -113,6 +113,15 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $contactTracker = $this->createMock(ContactTracker::class);
+
+        $contactTracker->expects($this
+            ->any())
+            ->method('getContact')
+            ->willReturn($this
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            );
+
         $queueService->expects($this
             ->any())
             ->method('isQueueEnabled')
@@ -134,8 +143,6 @@ class PageTestAbstract extends WebTestCase
 
         $deviceTrackerMock = $this->createMock(DeviceTracker::class);
 
-        $contactTracker = $this->createMock(ContactTracker::class);
-
         $pageModel = new PageModel(
             $cookieHelper,
             $ipLookupHelper,
@@ -156,11 +163,6 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setUserHelper($userHelper);
 
         return $pageModel;
-    }
-
-    public function getCurrentLead($tracking)
-    {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
     }
 
     /**

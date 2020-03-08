@@ -84,6 +84,13 @@ class FormTestAbstract extends WebTestCase
         $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
         $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
 
+        $contactTracker->expects($this
+            ->any())
+            ->method('getContact')
+            ->willReturn($this
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            );
+
         $templatingHelperMock->expects($this
             ->any())
             ->method('getTemplating')
@@ -149,10 +156,17 @@ class FormTestAbstract extends WebTestCase
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
+        $lead                     = new Lead();
+        $lead->setId(123);
 
         $leadFieldModel->expects($this->any())
             ->method('getUniqueIdentifierFields')
             ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
+
+        $contactTracker->expects($this
+            ->any())
+            ->method('getContact')
+            ->willReturn($lead);
 
         $userHelper->expects($this->any())
             ->method('getUser')
@@ -256,10 +270,5 @@ class FormTestAbstract extends WebTestCase
             ];
 
         return $fields;
-    }
-
-    public function getCurrentLead($tracking)
-    {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
     }
 }
