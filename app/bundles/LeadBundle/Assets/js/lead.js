@@ -361,11 +361,6 @@ Mautic.attachJsUiOnFilterForms = function() {
         var fieldAlias = mQuery(selector + '_field').val();
         var filterFieldEl = mQuery(selector + '_properties_filter');
 
-        if (filterFieldEl.length === 0) {
-            // The ID is different when the filter form is just created.
-            filterFieldEl = mQuery(selector).find('#filter_properties_filter');
-        }
-
         if (fieldType === 'lookup') {
             Mautic.activateLookupTypeahead(filterFieldEl.parent());
         } else if (fieldType === 'datetime') {
@@ -468,7 +463,7 @@ Mautic.convertLeadFilterInput = function(el) {
     var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
     var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
 
-    Mautic.loadFilterForm(fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
+    Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
@@ -578,7 +573,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
     mQuery = mQueryBackup;
 };
 
-Mautic.loadFilterForm = function(fieldObject, fieldAlias, operator, resultHtml) {
+Mautic.loadFilterForm = function(filterNum, fieldObject, fieldAlias, operator, resultHtml) {
     mQuery.ajax({
         showLoadingBar: true,
         url: mauticAjaxUrl,
@@ -588,6 +583,7 @@ Mautic.loadFilterForm = function(fieldObject, fieldAlias, operator, resultHtml) 
             fieldAlias: fieldAlias,
             fieldObject: fieldObject,
             operator: operator,
+            filterNum: filterNum,
         },
         dataType: 'json',
         success: function (response) {

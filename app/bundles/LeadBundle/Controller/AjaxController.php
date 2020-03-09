@@ -177,16 +177,21 @@ class AjaxController extends CommonAjaxController
      */
     protected function loadSegmentFilterFormAction(Request $request)
     {
-        /** @var ListModel $listModel */
-        /** @var TypeOperatorProvider $typeOperatorProvider */
+        $fieldAlias  = InputHelper::clean($request->request->get('fieldAlias'));
+        $fieldObject = InputHelper::clean($request->request->get('fieldObject'));
+        $operator    = InputHelper::clean($request->request->get('operator'));
+        $filterNum   = (int) $request->request->get('filterNum');
+
         /** @var FormFactoryInterface $formFactory */
-        $fieldAlias    = InputHelper::clean($request->request->get('fieldAlias'));
-        $fieldObject   = InputHelper::clean($request->request->get('fieldObject'));
-        $operator      = InputHelper::clean($request->request->get('operator'));
-        $formFactory   = $this->get('form.factory');
+        $formFactory = $this->get('form.factory');
+
+        /** @var TypeOperatorProvider $typeOperatorProvider */
         $typeOperators = $this->get('mautic.lead.provider.typeOperator');
-        $listModel     = $this->get('mautic.lead.model.list');
-        $form          = $formFactory->create(FilterPropertiesType::class);
+
+        /** @var ListModel $listModel */
+        $listModel = $this->get('mautic.lead.model.list');
+
+        $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
             $typeOperators->adjustFilterPropertiesType(
@@ -198,15 +203,20 @@ class AjaxController extends CommonAjaxController
             );
         }
 
+        $formHtml = $this->renderView(
+            'MauticLeadBundle:List:filterpropform.html.php',
+            [
+                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.php', []),
+            ]
+        );
+
+        $formHtml = str_replace('id="RENAME', "id=\"leadlist_filters_{$filterNum}_properties", $formHtml);
+        $formHtml = str_replace('name="RENAME', "name=\"leadlist[filters][{$filterNum}][properties]", $formHtml);
+
         return $this->sendJsonResponse(
             [
                 'viewParameters' => [
-                    'form' => $this->renderView(
-                        'MauticLeadBundle:List:filterpropform.html.php',
-                        [
-                            'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.php', []),
-                        ]
-                    ),
+                    'form' => $formHtml,
                 ],
             ]
         );
