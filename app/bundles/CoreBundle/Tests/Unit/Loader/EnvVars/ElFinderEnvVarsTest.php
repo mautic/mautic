@@ -45,7 +45,7 @@ class ElFinderEnvVarsTest extends TestCase
         $this->config->set('site_url', 'https://foo.bar/test');
 
         ElFinderEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
-        $this->assertEquals('images', $this->envVars->get('MAUTIC_EL_FINDER_PATH'));
+        $this->assertStringEndsWith('images', $this->envVars->get('MAUTIC_EL_FINDER_PATH'));
         $this->assertEquals('https://foo.bar/test/images', $this->envVars->get('MAUTIC_EL_FINDER_URL'));
     }
 
@@ -55,7 +55,7 @@ class ElFinderEnvVarsTest extends TestCase
         $this->config->set('site_url', 'https://foo.bar/test/');
 
         ElFinderEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
-        $this->assertEquals('images', $this->envVars->get('MAUTIC_EL_FINDER_PATH'));
+        $this->assertStringEndsWith('images', $this->envVars->get('MAUTIC_EL_FINDER_PATH'));
         $this->assertEquals('https://foo.bar/test/images', $this->envVars->get('MAUTIC_EL_FINDER_URL'));
     }
 }
