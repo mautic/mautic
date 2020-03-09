@@ -230,8 +230,9 @@ class ReportModel extends FormModel
         if (empty($data[$context])) {
             // Check to see if all has been obtained
             if (isset($data['all'])) {
-                $data[$context]['tables'] = &$data['all']['tables'][$context];
-                $data[$context]['graphs'] = &$data['all']['graphs'][$context];
+                $alias                    = array_pop(explode('.', $context));
+                $data[$context]['tables'] = &$data['all']['tables'][$alias];
+                $data[$context]['graphs'] = &$data['all']['graphs'][$alias];
             } else {
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
