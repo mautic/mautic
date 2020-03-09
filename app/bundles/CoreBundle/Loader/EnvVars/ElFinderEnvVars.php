@@ -17,11 +17,13 @@ class ElFinderEnvVars implements EnvVarsInterface
 {
     public static function load(ParameterBag $config, ParameterBag $defaultConfig, ParameterBag $envVars): void
     {
-        $relativeImagePath = trim($config->get('image_path'), '/');
-        $imagePath         = '%kernel.root_dir%/../'.$relativeImagePath;
-        $envVars->set('MAUTIC_EL_FINDER_PATH', $imagePath);
+        $root = rtrim($defaultConfig->get('local_root'), '/') ?: '%kernel.root_dir%';
 
-        $url = rtrim($config->get('site_url'), '/').'/'.$relativeImagePath;
+        $relativeImageFolderPath         = trim($config->get('image_path'), '/');
+        $absoluteImageFolderPath         = $root.'/'.$relativeImageFolderPath;
+        $envVars->set('MAUTIC_EL_FINDER_PATH', $absoluteImageFolderPath);
+
+        $url = rtrim($config->get('site_url'), '/').'/'.$relativeImageFolderPath;
         $envVars->set('MAUTIC_EL_FINDER_URL', $url);
     }
 }
