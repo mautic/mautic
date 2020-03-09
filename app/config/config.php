@@ -290,8 +290,8 @@ $container->setDefinition(
 
 // ElFinder File Manager
 $container->loadFromExtension('fm_elfinder', [
-    'assets_path'            => 'media/assets',
-    'instances'              => [
+    'assets_path' => 'media/assets',
+    'instances'   => [
         'default' => [
             'locale'          => 'LANG',
             'editor'          => 'custom',
@@ -300,12 +300,12 @@ $container->loadFromExtension('fm_elfinder', [
             'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
-                'debug'        => '%kernel.debug%',
-                'roots'        => [
+                'debug' => '%kernel.debug%',
+                'roots' => [
                     'uploads' => [
-                        'driver'            => 'Flysystem',
-                        'path'              => '',
-                        'flysystem'         => [
+                        'driver'    => 'Flysystem',
+                        'path'      => '',
+                        'flysystem' => [
                             'type'    => 'local',
                             'options' => [
                                 'local' => [
@@ -313,10 +313,10 @@ $container->loadFromExtension('fm_elfinder', [
                                 ],
                             ],
                         ],
-                        'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
-                        'upload_deny'       => ['all'],
-                        'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
-                        //'url'               => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                        'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
+                        'upload_deny'   => ['all'],
+                        'accepted_name' => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
+                        'url'           => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
                     ],
                 ],
             ],
