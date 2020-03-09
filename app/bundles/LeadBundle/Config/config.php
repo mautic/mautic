@@ -933,8 +933,17 @@ return [
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.paths',
+                    'mautic.helper.template.gravatar',
+                    'mautic.helper.template.default_avatar',
                 ],
                 'alias'     => 'lead_avatar',
+            ],
+            'mautic.helper.template.default_avatar' => [
+                'class'     => Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                ],
+                'alias'     => 'default_avatar',
             ],
             'mautic.helper.field.alias' => [
                 'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
