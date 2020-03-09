@@ -22,24 +22,6 @@ if (!empty($id)) {
 }
 $view['slots']->set('headerTitle', $header);
 
-// $templates = [
-//     'countries'      => 'country-template',
-//     'regions'        => 'region-template',
-//     'timezones'      => 'timezone-template',
-//     'select'         => 'select-template',
-//     'lists'          => 'leadlist-template',
-//     'campaign'       => 'campaign-template',
-//     'deviceTypes'    => 'device_type-template',
-//     'deviceBrands'   => 'device_brand-template',
-//     'deviceOs'       => 'device_os-template',
-//     'emails'         => 'lead_email_received-template',
-//     'assets'         => 'assets-template',
-//     'tags'           => 'tags-template',
-//     'stage'          => 'stage-template',
-//     'locales'        => 'locale-template',
-//     'globalcategory' => 'globalcategory-template',
-// ];
-
 $mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
 $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text-danger"' : '';
 ?>
@@ -121,7 +103,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         <div class="selected-filters" id="leadlist_filters">
                             <?php if ($filterErrors): ?>
                                 <div class="alert alert-danger has-error">
-                                    <?php echo $view['form']->errors($form['filters']); ?>
+                                    <?php echo $view['form']->getErrors($form['filters']); ?>
                                 </div>
                             <?php endif; ?>
                             <?php echo $view['form']->widget($form['filters']); ?>
