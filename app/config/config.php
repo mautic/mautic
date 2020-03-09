@@ -302,7 +302,7 @@ $container->loadFromExtension('fm_elfinder', [
             'connector'       => [
                 'debug' => '%kernel.debug%',
                 'roots' => [
-                    'uploads' => [
+                    'local' => [
                         'driver'    => 'Flysystem',
                         'path'      => '',
                         'flysystem' => [
