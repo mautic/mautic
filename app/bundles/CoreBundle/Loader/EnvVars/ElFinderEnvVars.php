@@ -19,8 +19,8 @@ class ElFinderEnvVars implements EnvVarsInterface
     {
         $root = rtrim($defaultConfig->get('local_root'), '/') ?: '%kernel.root_dir%';
 
-        $relativeImageFolderPath         = trim($config->get('image_path'), '/');
-        $absoluteImageFolderPath         = $root.'/'.$relativeImageFolderPath;
+        $relativeImageFolderPath = trim($config->get('image_path'), '/');
+        $absoluteImageFolderPath = $root.'/'.$relativeImageFolderPath;
         $envVars->set('MAUTIC_EL_FINDER_PATH', $absoluteImageFolderPath);
 
         $url = rtrim($config->get('site_url'), '/').'/'.$relativeImageFolderPath;
