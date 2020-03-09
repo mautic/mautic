@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 class DefaultAvatarHelper
 {
@@ -12,10 +13,17 @@ class DefaultAvatarHelper
      */
     private $pathsHelper;
 
+    /**
+     * @var AssetsHelper
+     */
+    private $assetsHelper;
+
     public function __construct(
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        AssetsHelper $assetsHelper
     ) {
-        $this->pathsHelper = $pathsHelper;
+        $this->pathsHelper  = $pathsHelper;
+        $this->assetsHelper = $assetsHelper;
     }
 
     /**

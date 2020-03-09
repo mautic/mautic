@@ -942,6 +942,7 @@ return [
                 'class'     => Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
+                    'templating.helper.assets',
                 ],
                 'alias'     => 'default_avatar',
             ],
