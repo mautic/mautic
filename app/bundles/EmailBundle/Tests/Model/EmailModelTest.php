@@ -37,6 +37,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
@@ -70,6 +71,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $redirectRepositoryMock;
     private $cacheStorageHelperMock;
     private $emailModel;
+    private $doNotContact;
 
     protected function setUp()
     {
@@ -97,6 +99,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->deviceTrackerMock      = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock = $this->createMock(RedirectRepository::class);
         $this->cacheStorageHelperMock = $this->createMock(CacheStorageHelper::class);
+        $this->doNotContact           = $this->createMock(DNC::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -111,7 +114,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock
+            $this->cacheStorageHelperMock,
+            $this->doNotContact
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -488,7 +492,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->sendToContactModel,
             $this->deviceTrackerMock,
             $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock
+            $this->cacheStorageHelperMock,
+            $this->doNotContact
         );
 
         $emailModel->setTranslator($this->translator);

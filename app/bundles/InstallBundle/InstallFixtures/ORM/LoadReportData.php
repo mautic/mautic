@@ -36,7 +36,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
      */
     public static function getGroups(): array
     {
-        return ['group_install'];
+        return ['group_install', 'group_mautic_install_data'];
     }
 
     /**

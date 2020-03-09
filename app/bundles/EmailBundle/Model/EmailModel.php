@@ -43,6 +43,7 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PageBundle\Entity\RedirectRepository;
@@ -139,6 +140,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     private $cacheStorageHelper;
 
     /**
+     * @var DNC
+     */
+    private $doNotContact;
+
+    /**
      * EmailModel constructor.
      */
     public function __construct(
@@ -154,7 +160,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         SendEmailToContact $sendModel,
         DeviceTracker $deviceTracker,
         RedirectRepository $redirectRepository,
-        CacheStorageHelper $cacheStorageHelper
+        CacheStorageHelper $cacheStorageHelper,
+        DNC $doNotContact
     ) {
         $this->ipLookupHelper        = $ipLookupHelper;
         $this->themeHelper           = $themeHelper;
@@ -169,6 +176,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->deviceTracker         = $deviceTracker;
         $this->redirectRepository    = $redirectRepository;
         $this->cacheStorageHelper    = $cacheStorageHelper;
+        $this->doNotContact          = $doNotContact;
     }
 
     /**
@@ -1663,7 +1671,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $email   = $stat->getEmail();
             $channel = ($email) ? ['email' => $email->getId()] : 'email';
 
-            return $this->leadModel->addDncForLead($lead, $channel, $comments, $reason, $flush);
+            return $this->doNotContact->addDncForContact($lead->getId(), $channel, $reason, $comments, $flush);
         }
 
         return false;

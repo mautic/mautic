@@ -2,177 +2,9 @@
 
 // Include path settings
 $root = $container->getParameter('kernel.root_dir');
+
+/** @var array $paths */
 include __DIR__.'/paths_helper.php';
-
-$ormMappings        =
-$serializerMappings =
-$ipLookupServices   = [];
-
-//Note Mautic specific bundles so they can be applied as needed without having to specify them individually
-$buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &$ormMappings, &$serializerMappings, &$ipLookupServices) {
-    $isPlugin = $isMautic = false;
-
-    if (false !== strpos($namespace, 'MauticPlugin\\')) {
-        $isPlugin   = true;
-        $bundleBase = $bundle;
-        $relative   = $paths['plugins'].'/'.$bundleBase;
-    } elseif (false !== strpos($namespace, 'Mautic\\')) {
-        $isMautic   = true;
-        $bundleBase = str_replace('Mautic', '', $bundle);
-        $relative   = $paths['bundles'].'/'.$bundleBase;
-    }
-
-    if ($isMautic || $isPlugin) {
-        $baseNamespace = preg_replace('#\\\[^\\\]*$#', '', $namespace);
-        $directory     = $paths['root'].'/'.$relative;
-
-        // Check for a single config file
-        $config = (file_exists($directory.'/Config/config.php')) ? include $directory.'/Config/config.php' : [];
-        $config = (new \Tightenco\Collect\Support\Collection($config))
-            ->transform(function ($configGroup, string $configGroupName) use (&$ipLookupServices) {
-                if (!is_array($configGroup)) {
-                    return $configGroup;
-                }
-
-                $configGroup = new \Tightenco\Collect\Support\Collection($configGroup);
-
-                switch ($configGroupName) {
-                    case 'ip_lookup_services':
-                        $ipLookupServices = array_merge($ipLookupServices, $configGroup->toArray());
-                        break;
-                    case 'services':
-                        return $configGroup
-                            ->reject(function ($serviceDefinition) {
-                                // Remove optional services (has argument optional = true) if the service class does not exist
-                                return is_array($serviceDefinition)
-                                    && isset($serviceDefinition['optional'])
-                                    && true === $serviceDefinition['optional']
-                                    && isset($serviceDefinition['class'])
-                                    && false === class_exists($serviceDefinition['class']);
-                            })
-                            ->transform(function ($serviceDefinition) {
-                                // Encodes percent signs so they are not compiled in the container
-                                if (is_array($serviceDefinition)) {
-                                    array_walk_recursive(
-                                        $serviceDefinition,
-                                        function (&$value) {
-                                            $value = str_replace('%', '%%', $value);
-                                        }
-                                    );
-
-                                    return $serviceDefinition;
-                                }
-
-                                return str_replace('%', '%%', $serviceDefinition);
-                            })
-                            ->toArray();
-                        break;
-                    case 'parameters':
-                        return $configGroup
-                            // Encodes percent signs so they are not compiled in the container
-                            ->transform(function ($parameterValue) {
-                                if (is_array($parameterValue)) {
-                                    array_walk_recursive(
-                                        $parameterValue,
-                                        function (&$value) {
-                                            $value = str_replace('%', '%%', $value);
-                                        }
-                                    );
-
-                                    return $parameterValue;
-                                }
-
-                                return str_replace('%', '%%', $parameterValue);
-                            })
-                            ->toArray();
-                        break;
-                    default:
-                        return $configGroup;
-                }
-            })
-            ->toArray();
-
-        // Check for staticphp mapping
-        if (file_exists($directory.'/Entity')) {
-            $finder = \Symfony\Component\Finder\Finder::create()->files('*.php')->in($directory.'/Entity')->notName('*Repository.php');
-
-            foreach ($finder as $file) {
-                // Check to see if entities are organized by subfolder
-                $subFolder = $file->getRelativePath();
-
-                // Just check first file for the loadMetadata function
-                $reflectionClass = new \ReflectionClass('\\'.$baseNamespace.'\\Entity\\'.(!empty($subFolder) ? $subFolder.'\\' : '').basename($file->getFilename(), '.php'));
-
-                if (!$reflectionClass->implementsInterface(\Mautic\CoreBundle\Entity\DeprecatedInterface::class)) {
-                    // Register API metadata
-                    if ($reflectionClass->hasMethod('loadApiMetadata')) {
-                        $serializerMappings[$bundle] = [
-                            'namespace_prefix' => $baseNamespace.'\\Entity',
-                            'path'             => "@$bundle/Entity",
-                        ];
-                    }
-
-                    // Register entities
-                    if ($reflectionClass->hasMethod('loadMetadata')) {
-                        $ormMappings[$bundle] = [
-                            'dir'       => 'Entity',
-                            'type'      => 'staticphp',
-                            'prefix'    => $baseNamespace.'\\Entity',
-                            'mapping'   => true,
-                            'is_bundle' => true,
-                        ];
-                    }
-                }
-            }
-        }
-
-        // Build permission object lists
-        // @todo - convert to tagged services
-        $permissionClasses = [];
-        if (file_exists($directory.'/Security/Permissions')) {
-            $finder = \Symfony\Component\Finder\Finder::create()->files('*Permissions.php')->in($directory.'/Security/Permissions');
-
-            foreach ($finder as $file) {
-                $className       = basename($file->getFilename(), '.php');
-                $permissionClass = '\\'.$baseNamespace.'\\Security\\Permissions\\'.$className;
-                // Skip CorePermissions and AbstractPermissions
-                if ('CoreBundle' === $bundleBase && in_array($className, ['CorePermissions', 'AbstractPermissions'])) {
-                    continue;
-                }
-
-                $permissionInstance = new $permissionClass([]);
-                $permissionName     = $permissionInstance->getName();
-
-                $permissionClasses[$permissionName] = $permissionClass;
-            }
-        }
-
-        return [
-            'isPlugin'          => $isPlugin,
-            'base'              => str_replace('Bundle', '', $bundleBase),
-            'bundle'            => $bundleBase,
-            'namespace'         => $baseNamespace,
-            'symfonyBundleName' => $bundle,
-            'bundleClass'       => $namespace,
-            'permissionClasses' => $permissionClasses,
-            'relative'          => $relative,
-            'directory'         => $directory,
-            'config'            => $config,
-        ];
-    }
-
-    return false;
-};
-
-// Separate out Mautic's bundles from other Symfony bundles
-$symfonyBundles = $container->getParameter('kernel.bundles');
-$mauticBundles  = array_filter(
-    array_map($buildBundles, $symfonyBundles, array_keys($symfonyBundles)),
-    function ($v) {
-        return !empty($v);
-    }
-);
-unset($buildBundles);
 
 // Load extra annotations
 $container->loadFromExtension('sensio_framework_extra', [
@@ -182,27 +14,15 @@ $container->loadFromExtension('sensio_framework_extra', [
     'cache'   => ['annotations' => false],
 ]);
 
-// Sort Mautic's bundles into Core and Plugins
-$setBundles = $setPluginBundles = [];
-foreach ($mauticBundles as $bundle) {
-    if ($bundle['isPlugin']) {
-        $setPluginBundles[$bundle['symfonyBundleName']] = $bundle;
-    } else {
-        $setBundles[$bundle['symfonyBundleName']] = $bundle;
-    }
-}
+// Build and store Mautic bundle metadata
+$symfonyBundles        = $container->getParameter('kernel.bundles');
+$bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
 
-// Make Core the first in the list
-$coreBundle = $setBundles['MauticCoreBundle'];
-unset($setBundles['MauticCoreBundle']);
-$setBundles = array_merge(['MauticCoreBundle' => $coreBundle], $setBundles);
-
-$container->setParameter('mautic.bundles', $setBundles);
-$container->setParameter('mautic.plugin.bundles', $setPluginBundles);
-unset($setBundles, $setPluginBundles);
+$container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
+$container->setParameter('mautic.plugin.bundles', $bundleMetadataBuilder->getPluginMetadata());
 
 // Set IP lookup services
-$container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
+$container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->getIpLookupServices());
 
 // Load parameters
 include __DIR__.'/parameters.php';
@@ -294,7 +114,7 @@ $container->loadFromExtension('doctrine', [
     'orm'  => [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
-        'mappings'                    => $ormMappings,
+        'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
     ],
 ]);
 
@@ -386,7 +206,7 @@ $container->loadFromExtension('jms_serializer', [
     'metadata' => [
         'cache'          => 'none',
         'auto_detection' => false,
-        'directories'    => $serializerMappings,
+        'directories'    => $bundleMetadataBuilder->getSerializerConfig(),
     ],
     'visitors' => [
         'json_deserialization' => [

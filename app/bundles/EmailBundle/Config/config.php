@@ -700,6 +700,7 @@ return [
                     'mautic.tracker.device',
                     'mautic.page.repository.redirect',
                     'mautic.helper.cache_storage',
+                    'mautic.lead.model.dnc',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
