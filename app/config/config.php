@@ -300,23 +300,23 @@ $container->loadFromExtension('fm_elfinder', [
             'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
-                'roots' => [
+                'debug'        => '%kernel.debug%',
+                'roots'        => [
                     'uploads' => [
                         'driver'            => 'Flysystem',
-                        'path'              => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
+                        'path'              => '',
                         'flysystem'         => [
                             'type'    => 'local',
                             'options' => [
                                 'local' => [
-                                    'path' => '%kernel.root_dir%/../media/images',
+                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                                 ],
                             ],
                         ],
                         'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'       => ['all'],
-                        'upload_max_size'   => '2M',
                         'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
-                        'url'               => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
+                        //'url'               => '%env(resolve:MAUTIC_EL_FINDER_URL)%', // We need to specify URL in case mod_rewrite is disabled
                     ],
                 ],
             ],
