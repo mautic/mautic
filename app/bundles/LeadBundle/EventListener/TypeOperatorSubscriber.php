@@ -31,6 +31,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class TypeOperatorSubscriber implements EventSubscriberInterface
 {
@@ -196,12 +197,18 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             'display',
             TextType::class,
             [
-                'label' => false,
-                'data'  => $form->getData()['display'] ?? '',
-                'attr'  => [
+                'label'    => false,
+                'required' => true,
+                'data'     => $form->getData()['display'] ?? '',
+                'attr'     => [
                     'class'               => 'form-control',
                     'data-field-callback' => 'activateSegmentFilterTypeahead',
                     'data-target'         => $event->getFieldAlias(),
+                ],
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.core.value.required']
+                    ),
                 ],
             ]
         );
@@ -211,9 +218,15 @@ class TypeOperatorSubscriber implements EventSubscriberInterface
             'filter',
             HiddenType::class,
             [
-                'label'    => false,
-                'attr'     => ['class' => 'form-control'],
-                'disabled' => $event->filterShouldBeDisabled(),
+                'label'       => false,
+                'required'    => true,
+                'attr'        => ['class' => 'form-control'],
+                'disabled'    => $event->filterShouldBeDisabled(),
+                'constraints' => [
+                    new NotBlank(
+                        ['message' => 'mautic.core.value.required']
+                    ),
+                ],
             ]
         );
 
