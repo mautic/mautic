@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e09408d23624dfd3451cee6e23c5815b",
+    "content-hash": "9fa10f1a8516228ce9a896d43954951f",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -8909,12 +8909,12 @@
             "version": "1.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/facebook/php-webdriver.git",
+                "url": "https://github.com/php-webdriver/php-webdriver-archive.git",
                 "reference": "86b5ca2f67173c9d34340845dd690149c886a605"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/86b5ca2f67173c9d34340845dd690149c886a605",
+                "url": "https://api.github.com/repos/php-webdriver/php-webdriver-archive/zipball/86b5ca2f67173c9d34340845dd690149c886a605",
                 "reference": "86b5ca2f67173c9d34340845dd690149c886a605",
                 "shasum": ""
             },
@@ -10507,7 +10507,7 @@
                 }
             ],
             "description": "This bundle generates code for you",
-            "abandoned": true,
+            "abandoned": "symfony/maker-bundle",
             "time": "2017-12-07T15:36:41+00:00"
         },
         {
