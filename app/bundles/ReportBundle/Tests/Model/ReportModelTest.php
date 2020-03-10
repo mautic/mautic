@@ -15,7 +15,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var
+     * @var ReportModel
      */
     private $reportModel;
 
