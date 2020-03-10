@@ -1519,9 +1519,9 @@ class LeadModel extends FormModel
                 // The email must be set for successful unsubscribtion
                 $lead->addUpdatedField('email', $data[$fields['email']]);
                 if ($doNotEmail) {
-                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL);
+                    $this->addDncForLead($lead, 'email', $reason, DNC::MANUAL, false);
                 } else {
-                    $this->removeDncForLead($lead, 'email', true);
+                    $this->removeDncForLead($lead, 'email', false);
                 }
             }
         }
