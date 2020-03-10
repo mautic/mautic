@@ -511,6 +511,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $results = [];
         switch ($type) {
             case 'sms':
+            case SmsType::class:
                 $entities = $this->getRepository()->getSmsList(
                     $filter,
                     $limit,
