@@ -1,3 +1,8 @@
+body, html {
+    margin: 0;
+    height: 100%;
+}
+
 /* Temporary fix #2490 */
 .gjs-clm-tag-status,
 .gjs-clm-tag-close {
@@ -6,4 +11,43 @@
 }
 .gjs-clm-tags-btn {
     width: 24px;
+}
+
+/* Custom GrapesJS CSS */
+.gjs-am-file-uploader {
+    width: 100%;
+    float: none;
+}
+
+.gjs-am-assets-cont {
+    width: 100%;
+    float: none;
+}
+
+.gjs-am-assets {
+    height: 280px;
+}
+
+.gjs-am-asset {
+    width: 25%;
+}
+
+.gjs-am-file-uploader > form #gjs-am-uploadFile {
+    padding: 20px 10px;
+}
+
+.gjs-am-file-uploader #gjs-am-title {
+    padding: 20px 10px;
+}
+
+.gjs-am-preview {
+    background-size: contain;
+}
+
+.gjs-am-preview-cont {
+    width: 40%;
+}
+
+.gjs-am-meta {
+    width: 60%;
 }

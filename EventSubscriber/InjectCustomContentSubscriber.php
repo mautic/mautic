@@ -12,7 +12,9 @@ use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 
 class InjectCustomContentSubscriber extends CommonSubscriber
 {
@@ -25,6 +27,11 @@ class InjectCustomContentSubscriber extends CommonSubscriber
      * @var GrapesJsBuilderModel
      */
     private $grapesJsBuilderModel;
+
+    /**
+     * @var FileManager
+     */
+    private $fileManager;
 
     /**
      * @var TemplatingHelper
@@ -41,13 +48,15 @@ class InjectCustomContentSubscriber extends CommonSubscriber
      *
      * @param Config               $config
      * @param GrapesJsBuilderModel $grapesJsBuilderModel
+     * @param FileManager          $fileManager
      * @param TemplatingHelper     $templatingHelper
      * @param RequestStack         $requestStack
      */
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, TemplatingHelper $templatingHelper, RequestStack $requestStack)
+    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, FileManager $fileManager, TemplatingHelper $templatingHelper, RequestStack $requestStack)
     {
         $this->config               = $config;
         $this->grapesJsBuilderModel = $grapesJsBuilderModel;
+        $this->fileManager          = $fileManager;
         $this->templatingHelper     = $templatingHelper;
         $this->requestStack         = $requestStack;
     }
@@ -89,6 +98,10 @@ class InjectCustomContentSubscriber extends CommonSubscriber
         if ($grapesJsBuilder instanceof GrapesJsBuilder && $this->requestStack->getCurrentRequest()->getMethod() !== 'POST') {
             $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
         }
+
+        $passParams['assets']     = json_encode($this->fileManager->getImages());
+        $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], true) ;
+        $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], true) ;
 
         $content = $this->templatingHelper->getTemplating()->render(
             'GrapesJsBuilderBundle:Email:settings.html.php',

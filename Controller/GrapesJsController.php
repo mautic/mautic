@@ -71,13 +71,14 @@ class GrapesJsController extends CommonController
         $content      = $entity->getContent();
 
         // Check for MJML template
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate($templateName.'.mjml.twig');
+        $themeHelper = $this->get('mautic.helper.theme');
+        $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.mjml.twig');
 
         if ($logicalName === $templateName.'.mjml.twig') {
             $type = 'mjml';
         } else {
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate($templateName.'.html.twig');
-            $slots       = $this->factory->getTheme($template)->getSlots($objectType);
+            $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
+            $slots       = $themeHelper->getTheme($template)->getSlots($objectType);
 
             //merge any existing changes
             $newContent = $this->get('session')->get('mautic.'.$objectType.'builder.'.$objectId.'.content', []);

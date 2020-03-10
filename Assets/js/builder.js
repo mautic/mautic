@@ -50,6 +50,7 @@ Mautic.initGrapesJS = function (object) {
     let panelManager;
     let textareaHtml = mQuery('textarea.builder-html');
     let textareaMjml = mQuery('textarea.builder-mjml');
+    let textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
 
     if (object === 'page') {
         editor = grapesjs.init({
@@ -69,9 +70,6 @@ Mautic.initGrapesJS = function (object) {
                 },
             }
         });
-
-        // Customize GrapesJS
-        panelManager = editor.Panels;
     } else {
         if (textareaMjml.val().length) {
             editor = grapesjs.init({
@@ -81,20 +79,19 @@ Mautic.initGrapesJS = function (object) {
                 height: '100%',
                 storageManager: false,
 
-                plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss'],
+                plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
                 pluginsOpts: {
                     'grapesjs-mjml': {
                         modalTitleImport: 'Import MJML template',
                         modalLabelImport: 'Paste all your code here below and click import',
                         modalLabelExport: 'Copy the code and use it wherever you want',
                         importPlaceholder: '',
-                    }
+                    },
+                    'grapesjs-preset-mautic': {}
                 }
             });
 
             panelManager = editor.Panels;
-
-            panelManager.removeButton("options", "mjml-import");
             panelManager.addButton('views', [
                 {
                     id: 'close',
@@ -144,11 +141,12 @@ Mautic.initGrapesJS = function (object) {
                 storageManager: false,
 
                 assetManager: {
-                    assets: '',
+                    assets: JSON.parse(textareaAssets.val()),
                     noAssets: 'No <b>assets</b> here, drag to upload',
-                    upload: 0,
+                    upload: textareaAssets.data('upload'),
                     uploadName: 'files',
                     multiUpload: true,
+                    embedAsBase64: false,
 
                     // Text on upload input
                     uploadText: 'Drop files here or click to upload',
@@ -157,12 +155,11 @@ Mautic.initGrapesJS = function (object) {
                     // Default title for the asset manager modal
                     modalTitle: 'Select Image',
 
-                    dropzone: 1,
                     openAssetsOnDrop: 1,
-                    dropzoneContent: '<div class="dropzone-inner">Drop here your assets</div>',
+                    autoAdd: true,
                 },
 
-                plugins: ['gjs-preset-newsletter', 'grapesjs-parser-postcss'],
+                plugins: ['gjs-preset-newsletter', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
                 pluginsOpts: {
                     'gjs-preset-newsletter': {
                         modalTitleImport: 'Import HTML template',
@@ -170,16 +167,13 @@ Mautic.initGrapesJS = function (object) {
                         modalLabelExport: 'Copy the code and use it wherever you want',
                         importPlaceholder: ''
                     },
+                    'grapesjs-preset-mautic': {}
                 }
             });
 
             // Customize GrapesJS
             panelManager = editor.Panels;
-
-            addGrapesJsCodeEditFunction(editor);
-
             panelManager.removeButton("options", "gjs-toggle-images");
-            panelManager.removeButton("options", "gjs-open-import-template");
             panelManager.addButton('options', [
                 {
                     id: 'undo',
@@ -216,6 +210,22 @@ Mautic.initGrapesJS = function (object) {
             ]);
         }
     }
+
+    editor.on('asset:add', (response) => {
+        // Save assets list in textarea to keep new uploaded files without reload page
+        textareaAssets.val(JSON.stringify(getAssetsList(editor)));
+    });
+
+    editor.on('asset:remove', (response) => {
+        // Save assets list in textarea to keep new deleted files without reload page
+        textareaAssets.val(JSON.stringify(getAssetsList(editor)));
+
+        // Delete file
+        mQuery.ajax({
+            url: textareaAssets.data('delete'),
+            data: {'filename': response.getFilename()}
+        });
+    });
 };
 
 /**
@@ -315,73 +325,20 @@ let setupButtonLoadingIndicator = function (activate) {
     }
 };
 
-/**
- * Add function within GrapeJS builder to edit source code
- *
- * @param editor - Initialized GrapesJS editor
- */
-let addGrapesJsCodeEditFunction = function (editor) {
-    let pfx = editor.getConfig().stylePrefix;
-    let modal = editor.Modal;
-    let cmdm = editor.Commands;
-    let codeViewer = editor.CodeManager.getViewer('CodeMirror').clone();
-    let pnm = editor.Panels;
-    let container = document.createElement('div');
-    let btnEdit = document.createElement('button');
+let getAssetsList = function(editor) {
+    let assetManager = editor.AssetManager;
+    let assets = assetManager.getAll().models;
+    let assetsList = [];
 
-    codeViewer.set({
-        codeName: 'htmlmixed',
-        readOnly: 0,
-        theme: 'hopscotch',
-        autoBeautify: true,
-        autoCloseTags: true,
-        autoCloseBrackets: true,
-        lineWrapping: true,
-        styleActiveLine: true,
-        smartIndent: true,
-        indentWithTabs: true
-    });
+    assets.forEach(function(file) {
+        let attributes = file.attributes;
 
-    btnEdit.innerHTML = 'Edit';
-    btnEdit.className = pfx + 'btn-prim ' + pfx + 'btn-import';
-    btnEdit.onclick = function() {
-        let code = codeViewer.editor.getValue();
-        editor.DomComponents.getWrapper().set('content', '');
-        editor.setComponents(code.trim());
-        modal.close();
-    };
-
-    cmdm.add('html-edit', {
-        run: function(editor, sender) {
-            sender && sender.set('active', 0);
-            var viewer = codeViewer.editor;
-            modal.setTitle('Edit code');
-
-            if (!viewer) {
-                let textarea = document.createElement('textarea');
-                container.appendChild(textarea);
-                container.appendChild(btnEdit);
-                codeViewer.init(textarea);
-                viewer = codeViewer.editor;
-            }
-
-            let content = editor.runCommand('gjs-get-inlined-html');
-            modal.setContent('');
-            modal.setContent(container);
-            codeViewer.setContent(content);
-            modal.open();
-            viewer.refresh();
+        if (attributes.type === 'image') {
+            assetsList.push({'src': attributes.src, 'width': attributes.width, 'height': attributes.height});
+        } else {
+            assetsList.push(attributes.src);
         }
     });
 
-    pnm.addButton('options', [
-        {
-            id: 'edit',
-            className: 'fa fa-edit',
-            command: 'html-edit',
-            attributes: {
-                title: 'Edit code'
-            }
-        }
-    ]);
+    return assetsList;
 };

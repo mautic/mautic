@@ -9,6 +9,14 @@ return [
     'author'      => 'Webmecanik',
     'routes'      => [
         'main'   => [
+            'grapesjsbuilder_upload' => [
+                'path'       => '/grapesjsbuilder/upload',
+                'controller' => 'GrapesJsBuilderBundle:FileManager:upload',
+            ],
+            'grapesjsbuilder_delete' => [
+                'path'       => '/grapesjsbuilder/delete',
+                'controller' => 'GrapesJsBuilderBundle:FileManager:delete',
+            ],
 	        'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
                 'controller' => 'GrapesJsBuilderBundle:GrapesJs:builder',
@@ -21,7 +29,7 @@ return [
     'services'    => [
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
-            'grapesjsbuilder.config'            => [
+            'grapesjsbuilder.config' => [
                 'class'     => \MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class,
                 'arguments' => [
                     'mautic.integrations.helper',
@@ -31,7 +39,7 @@ return [
         'sync'         => [],
         'integrations' => [
             // Basic definitions with name, display name and icon
-            'grapesjsbuilder.integration'               => [
+            'grapesjsbuilder.integration' => [
                 'class' => \MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration::class,
                 'tags'  => [
                     'mautic.integration',
@@ -54,15 +62,24 @@ return [
                 ],
             ],
         ],
-	    'helpers' => [],
+	    'helpers' => [
+            'grapesjsbuilder.helper.filemanager' => [
+                'class'=> \MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                ],
+            ],
+        ],
         'events'  => [
-            'grapesjsbuilder.event.assets.subscriber'=> [
+            'grapesjsbuilder.event.assets.subscriber' => [
                 'class'=> \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
                 'arguments' => [
                     'grapesjsbuilder.config',
                 ],
             ],
-            'grapesjsbuilder.event.email.subscriber'=> [
+            'grapesjsbuilder.event.email.subscriber' => [
                 'class'=> \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber::class,
                 'arguments' => [
                     'grapesjsbuilder.config',
@@ -74,6 +91,7 @@ return [
                 'arguments' => [
                     'grapesjsbuilder.config',
                     'grapesjsbuilder.model',
+                    'grapesjsbuilder.helper.filemanager',
                     'mautic.helper.templating',
                     'request_stack',
                 ],
