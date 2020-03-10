@@ -58,4 +58,13 @@ class ElFinderEnvVarsTest extends TestCase
         $this->assertStringEndsWith('images', $this->envVars->get('MAUTIC_EL_FINDER_PATH'));
         $this->assertEquals('https://foo.bar/test/images', $this->envVars->get('MAUTIC_EL_FINDER_URL'));
     }
+
+    public function testThatTheLocalRootHasPriorityOverTheKernelRootDir()
+    {
+        $this->defaultConfig->set('local_root', '/foo/bar');
+        $this->config->set('image_path', 'images/');
+
+        ElFinderEnvVars::load($this->config, $this->defaultConfig, $this->envVars);
+        $this->assertSame('/foo/bar/images', $this->envVars->get('MAUTIC_EL_FINDER_PATH'));
+    }
 }
