@@ -775,9 +775,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
  */
 Mautic.activateLookupTypeahead = function(containerEl) {
     containerEl.find("*[data-toggle='field-lookup']").each(function () {
-        var lookup = mQuery(this);
+        var lookup = mQuery(this),
+            callback = lookup.attr('data-callback') ? lookup.attr('data-callback') : 'activateFieldTypeahead';
 
-        Mautic.activateFieldTypeahead(
+        Mautic[callback](
             lookup.attr('id'),
             lookup.attr('data-target'),
             lookup.attr('data-options'),

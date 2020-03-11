@@ -232,6 +232,7 @@ trait FilterTrait
                         'data-target'          => $data['field'],
                         'data-action'          => isset($field['properties']['data-action']) ? $field['properties']['data-action'] : 'lead:fieldList',
                         'data-lookup-callback' => isset($field['properties']['data-lookup-callback']) ? $field['properties']['data-lookup-callback'] : 'updateLookupListFilter',
+                        'data-callback'        => isset($field['properties']['callback']) ? $field['properties']['callback'] : 'activateFieldTypeahead',
                         'placeholder'          => $translator->trans(
                             'mautic.lead.list.form.filtervalue'
                         ),
