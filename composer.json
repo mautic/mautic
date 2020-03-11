@@ -107,7 +107,8 @@
         "ricardofiorani/guzzle-psr18-adapter": "^1.0",
         "leezy/pheanstalk-bundle": "^4.0",
         "tightenco/collect": "^6.13",
-        "kamermans/guzzle-oauth2-subscriber": "^1.0"
+        "kamermans/guzzle-oauth2-subscriber": "^1.0",
+        "barryvdh/elfinder-flysystem-driver": "^0.2.1"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~3.4.0",

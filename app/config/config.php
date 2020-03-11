@@ -302,9 +302,17 @@ $container->loadFromExtension('fm_elfinder', [
             'connector'       => [
                 'roots' => [
                     'uploads' => [
-                        'driver'            => 'LocalFileSystem',
+                        'driver'            => 'Flysystem',
                         'path'              => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                        'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg'],
+                        'flysystem'         => [
+                            'type'    => 'local',
+                            'options' => [
+                                'local' => [
+                                    'path' => '%kernel.root_dir%/../media/images',
+                                ],
+                            ],
+                        ],
+                        'upload_allow'      => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'       => ['all'],
                         'upload_max_size'   => '2M',
                         'accepted_name'     => '/^[\w\x{0300}-\x{036F}][\w\x{0300}-\x{036F}\s\.\%\-]*$/u', // Supports diacritic symbols
