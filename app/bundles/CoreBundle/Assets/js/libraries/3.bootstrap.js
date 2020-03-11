@@ -946,7 +946,7 @@ if (typeof jQuery === 'undefined') {
             this.$backdrop = $('<div class="modal-backdrop ' + animate + '" />')
                 .appendTo(document.body)
 
-            this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
+            this.$element.on('mousedown.dismiss.bs.modal', $.proxy(function (e) {
                 if (e.target !== e.currentTarget) return
                 this.options.backdrop == 'static'
                     ? this.$element[0].focus.call(this.$element[0])
