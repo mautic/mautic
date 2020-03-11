@@ -48,6 +48,11 @@ class ReportModel extends FormModel
     const CHANNEL_FEATURE = 'reporting';
 
     /**
+     * @var array
+     */
+    private $reportBuilderData;
+
+    /**
      * @var mixed
      */
     protected $defaultPageLimit;
@@ -87,9 +92,6 @@ class ReportModel extends FormModel
      */
     private $excelExporter;
 
-    /**
-     * ReportModel constructor.
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         TemplatingHelper $templatingHelper,
@@ -225,13 +227,13 @@ class ReportModel extends FormModel
      */
     public function buildAvailableReports($context)
     {
-        static $data = [];
-
-        if (empty($data[$context])) {
+        if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
-            if (isset($data['all'])) {
-                $data[$context]['tables'] = &$data['all']['tables'][$context];
-                $data[$context]['graphs'] = &$data['all']['graphs'][$context];
+            if (isset($this->reportBuilderData['all'])) {
+                $contextArray                                = explode('.', $context);
+                $alias                                       = array_pop($contextArray);
+                $this->reportBuilderData[$context]['tables'] = ($this->reportBuilderData['all']['tables'][$alias]) ?: [];
+                $this->reportBuilderData[$context]['graphs'] =  $this->reportBuilderData['all']['graphs'][$alias] ?? [];
             } else {
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
@@ -243,25 +245,25 @@ class ReportModel extends FormModel
                 $graphs = $event->getGraphs();
 
                 if ('all' == $context) {
-                    $data[$context]['tables'] = $tables;
-                    $data[$context]['graphs'] = $graphs;
+                    $this->reportBuilderData[$context]['tables'] = $tables;
+                    $this->reportBuilderData[$context]['graphs'] = $graphs;
                 } else {
                     if (isset($tables[$context])) {
-                        $data[$context]['tables'] = $tables[$context];
+                        $this->reportBuilderData[$context]['tables'] = $tables[$context];
                     } else {
-                        $data[$context]['tables'] = $tables;
+                        $this->reportBuilderData[$context]['tables'] = $tables;
                     }
 
                     if (isset($graphs[$context])) {
-                        $data[$context]['graphs'] = $graphs[$context];
+                        $this->reportBuilderData[$context]['graphs'] = $graphs[$context];
                     } else {
-                        $data[$context]['graphs'] = $graphs;
+                        $this->reportBuilderData[$context]['graphs'] = $graphs;
                     }
                 }
             }
         }
 
-        return $data[$context];
+        return $this->reportBuilderData[$context];
     }
 
     /**
