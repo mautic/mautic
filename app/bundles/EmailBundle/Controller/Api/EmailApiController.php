@@ -123,10 +123,12 @@ class EmailApiController extends CommonApiController
                 return $lead;
             }
 
-            $post       = $this->request->request->all();
-            $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
-            $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
-            $response   = ['success' => false];
+            $post          = $this->request->request->all();
+            $tokens        = (!empty($post['tokens'])) ? $post['tokens'] : [];
+            $assetsIds     = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
+            $ccRecipients  = (!empty($post['ccRecipients'])) ? $post['ccRecipients'] : [];
+            $bccRecipients = (!empty($post['bccRecipients'])) ? $post['bccRecipients'] : [];
+            $response      = ['success' => false];
 
             $cleanTokens = [];
 
@@ -148,6 +150,8 @@ class EmailApiController extends CommonApiController
                     'source'            => ['api', 0],
                     'tokens'            => $cleanTokens,
                     'assetAttachments'  => $assetsIds,
+                    'ccRecipients'      => $ccRecipients,
+                    'bccRecipients'     => $bccRecipients,
                     'return_errors'     => true,
                 ]
             );

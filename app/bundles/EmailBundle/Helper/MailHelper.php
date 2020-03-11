@@ -1342,10 +1342,12 @@ class MailHelper
      * @param array $slots               Slots configured in theme
      * @param array $assetAttachments    Assets to send
      * @param bool  $ignoreTrackingPixel Do not append tracking pixel HTML
+     * @param array $ccRecipients        array of additional cc recipients
+     * @param array $bccRecipients       array of additional bcc recipients
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
+    public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false, $ccRecipients = [], $bccRecipients = [])
     {
         $this->email = $email;
 
@@ -1380,11 +1382,23 @@ class MailHelper
             $this->setReplyTo($addresses[0]);
         }
 
+        if ($ccRecipients) {
+            foreach ($ccRecipients as $ccAddress => $name) {
+                $this->addCc($ccAddress, $name);
+            }
+        }
+
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
                 $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
+                    $this->addBcc($bccAddress, $name);
+                }
+            }
+
+            if ($bccRecipients) {
+                foreach ($bccRecipients as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
             }

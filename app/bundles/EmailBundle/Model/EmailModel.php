@@ -1292,6 +1292,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
+        $ccRecipients        = ArrayHelper::getValue('ccRecipients', $options, []);
+        $bccRecipients       = ArrayHelper::getValue('bccRecipients', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
         $emailType           = ArrayHelper::getValue('email_type', $options, '');
         $isMarketing         = (in_array($emailType, ['marketing']) || !empty($listId));
@@ -1438,7 +1440,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $useSettings['slots'], $ccRecipients, $bccRecipients)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {

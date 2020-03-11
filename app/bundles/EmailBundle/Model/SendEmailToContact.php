@@ -148,11 +148,16 @@ class SendEmailToContact
     /**
      * Use an Email entity to populate content, from, etc.
      *
-     * @param array $channel ['channelName', 'channelId']
+     * @param Email $email
+     * @param array $channel          ['channelName', 'channelId']
+     * @param array $assetAttachments
+     * @param array $slots            @deprecated to be removed in 3.0; support for old email template format
+     * @param array $ccRecipients     [[address => name]]
+     * @param array $bccRecipients    [[address => name]]
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [])
+    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], array $slots = [], $ccRecipients = [], $bccRecipients = [])
     {
         // Flush anything that's pending from a previous email
         $this->flush();
@@ -160,7 +165,7 @@ class SendEmailToContact
         // Enable the queue if applicable to the transport
         $this->mailer->enableQueue();
 
-        if ($this->mailer->setEmail($email, true, [], $assetAttachments)) {
+        if ($this->mailer->setEmail($email, true, $slots, $assetAttachments, $ccRecipients, $bccRecipients)) {
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
