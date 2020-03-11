@@ -53,7 +53,7 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->parameterBagMock->method('get')
             ->with('company')
-            ->willReturn([]);
+            ->willReturn(null);
         $this->classFromAbstractFormController->setRequest($this->requestMock);
         $this->formMock->method('getName')
             ->willReturn('company');
