@@ -195,7 +195,7 @@ class Fixtures
             'all' => [
                 'tables' => [
                     'assets' => [
-                        'display_name' => 'mautic.assets.assets',
+                        'display_name' => 'mautic.asset.assets',
                         'columns'      => [
                             'a.alias' => [
                                 'label' => 'Alias',
@@ -208,7 +208,7 @@ class Fixtures
                                 'alias' => 'a_description',
                             ],
                         ],
-                        'groups' => 'assets',
+                        'group' => 'assets',
                     ],
                 ],
                 'graphs' => [

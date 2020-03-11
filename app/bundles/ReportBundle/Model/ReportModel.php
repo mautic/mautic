@@ -50,7 +50,7 @@ class ReportModel extends FormModel
     /**
      * @var array
      */
-    public $reportBuilderData;
+    private $reportBuilderData;
 
     /**
      * @var mixed
@@ -233,7 +233,7 @@ class ReportModel extends FormModel
                 $contextArray                                = explode('.', $context);
                 $alias                                       = array_pop($contextArray);
                 $this->reportBuilderData[$context]['tables'] = ($this->reportBuilderData['all']['tables'][$alias]) ?: [];
-                $this->reportBuilderData[$context]['graphs'] = (isset($this->reportBuilderData['all']['graphs'][$alias])) ? $this->reportBuilderData['all']['graphs'][$alias] : [];
+                $this->reportBuilderData[$context]['graphs'] =  $this->reportBuilderData['all']['graphs'][$alias] ?? [];
             } else {
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
