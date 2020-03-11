@@ -139,7 +139,7 @@ abstract class AbstractFormController extends CommonController
     {
         $formData = $this->request->request->get($form->getName());
 
-        return array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
+        return is_array($formData) && array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
     }
 
     /**
