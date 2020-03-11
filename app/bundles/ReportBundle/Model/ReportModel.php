@@ -308,13 +308,15 @@ class ReportModel extends FormModel
 
             // Count suffixes
             if (!array_key_exists($alias, $existingAliases)) {
-                $existingAliases[$alias] = 1;
+                $existingAliases[$alias] = 0;
             } else {
                 ++$existingAliases[$alias];
             }
 
             // Add numeric suffix
-            $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            if ($existingAliases[$alias] > 0) {
+                $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+            }
         }
 
         return $columns;
@@ -553,15 +555,17 @@ class ReportModel extends FormModel
         $totalResults    = $limit    = 0;
 
         // Prepare the query builder
-        $tableDetails = $this->getTableData($entity->getSource());
-
+        $tableDetails      = $this->getTableData($entity->getSource());
+        $dataColumns       = $dataAggregatorColumns = [];
         $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
 
         foreach ($aggregatorColumns as $aggregatorColumn) {
             $selectedColumns[] = $aggregatorColumn['column'];
+            // add aggregator columns to dataColumns also
+            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
+            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
@@ -700,17 +704,18 @@ class ReportModel extends FormModel
         }
 
         return [
-            'totalResults'    => $totalResults,
-            'data'            => $data,
-            'dataColumns'     => $dataColumns,
-            'graphs'          => $graphs,
-            'contentTemplate' => $contentTemplate,
-            'columns'         => $tableDetails['columns'],
-            'limit'           => ($paginate) ? $limit : 0,
-            'page'            => ($paginate) ? $reportPage : 1,
-            'dateFrom'        => $dataOptions['dateFrom'],
-            'dateTo'          => $dataOptions['dateTo'],
-            'debug'           => $debugData,
+            'totalResults'      => $totalResults,
+            'data'              => $data,
+            'dataColumns'       => $dataColumns,
+            'graphs'            => $graphs,
+            'contentTemplate'   => $contentTemplate,
+            'columns'           => $tableDetails['columns'],
+            'limit'             => ($paginate) ? $limit : 0,
+            'page'              => ($paginate) ? $reportPage : 1,
+            'dateFrom'          => $dataOptions['dateFrom'],
+            'dateTo'            => $dataOptions['dateTo'],
+            'debug'             => $debugData,
+            'aggregatorColumns' => $dataAggregatorColumns,
         ];
     }
 
@@ -772,6 +777,37 @@ class ReportModel extends FormModel
         }
 
         return (int) $countQb->execute()->fetchColumn();
+    }
+
+    /**
+     * @param int $segmentId
+     *
+     * @return array
+     */
+    public function getReportsIdsWithDependenciesOnSegment($segmentId)
+    {
+        $search = 'lll.leadlist_id';
+        $filter = [
+            'force'  => [
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+            ],
+        ];
+        $entities = $this->getEntities(
+            [
+                'filter'     => $filter,
+            ]
+        );
+        $dependents = [];
+        foreach ($entities as $entity) {
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if ($eachFilter['column'] == $search && $eachFilter['value'] == $segmentId) {
+                    $dependents[] = $entity->getId();
+                }
+            }
+        }
+
+        return $dependents;
     }
 
     /**

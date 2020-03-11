@@ -89,16 +89,14 @@ class UrlHelper
     {
         $path = $host = $scheme = '';
 
-        $base = 'http';
-        if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $base .= 's';
-        }
-        $base .= '://';
-        if ($_SERVER['SERVER_PORT'] != '80') {
-            $base .= $_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'].$_SERVER['REQUEST_URI'];
-        } else {
-            $base .= $_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
-        }
+        $ssl    = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
+        $scheme = strtolower($_SERVER['SERVER_PROTOCOL']);
+        $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
+        $port   = $_SERVER['SERVER_PORT'];
+        $port   = ((!$ssl && $port == '80') || ($ssl && $port == '443')) ? '' : ":$port";
+        $host   = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
+        $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
+        $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
         $base = str_replace('/index_dev.php', '', $base);
         $base = str_replace('/index.php', '', $base);
@@ -206,6 +204,7 @@ class UrlHelper
         }
 
         $url = self::sanitizeUrlScheme($url);
+        $url = self::sanitizeUrlPath($url);
         $url = self::sanitizeUrlQuery($url);
 
         return $url;
@@ -237,6 +236,23 @@ class UrlHelper
         // Set default scheme to http if missing
         if (empty($scheme)) {
             $url = sprintf('http%s', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param string $url
+     *
+     * @return string
+     */
+    private static function sanitizeUrlPath($url)
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+
+        if (!empty($path)) {
+            $sanitizedPath = str_replace(' ', '%20', $path);
+            $url           = str_replace($path, $sanitizedPath, $url);
         }
 
         return $url;

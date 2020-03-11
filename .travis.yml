@@ -1,3 +1,4 @@
+dist: trusty
 language: php
 
 services:
@@ -8,6 +9,7 @@ php:
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 cache:
   directories:

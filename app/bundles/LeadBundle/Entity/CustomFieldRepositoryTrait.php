@@ -325,12 +325,16 @@ trait CustomFieldRepositoryTrait
                             break;
                     }
                 }
+
+                $alias = $fields[$k]['alias'];
+
                 if ($byGroup) {
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                    $group                                = $fields[$k]['group'];
+                    $fieldValues[$group][$alias]          = $fields[$k];
+                    $fieldValues[$group][$alias]['value'] = $r;
                 } else {
-                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
+                    $fieldValues[$alias]          = $fields[$k];
+                    $fieldValues[$alias]['value'] = $r;
                 }
 
                 unset($fields[$k]);
@@ -360,7 +364,7 @@ trait CustomFieldRepositoryTrait
         if (empty($this->customFieldList)) {
             //Get the list of custom fields
             $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                 ->where('f.is_published = :published')
                 ->andWhere($fq->expr()->eq('object', ':object'))

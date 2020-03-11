@@ -575,6 +575,12 @@ return [
             'mautic.helper.file_properties' => [
                 'class' => \Mautic\CoreBundle\Helper\FileProperties::class,
             ],
+            'mautic.helper.trailing_slash' => [
+                'class'     => \Mautic\CoreBundle\Helper\TrailingSlashHelper::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -1036,6 +1042,7 @@ return [
         'ip_lookup_service'               => 'maxmind_download',
         'ip_lookup_auth'                  => '',
         'ip_lookup_config'                => [],
+        'ip_lookup_create_organization'   => false,
         'transifex_username'              => '',
         'transifex_password'              => '',
         'update_stability'                => 'stable',
@@ -1093,7 +1100,7 @@ return [
         'batch_campaign_sleep_time' => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
-        'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'rss_notification_url'      => '',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
     ],

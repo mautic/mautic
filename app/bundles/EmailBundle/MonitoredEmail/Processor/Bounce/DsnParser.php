@@ -460,7 +460,7 @@ class DsnParser
                      * sample 2:
                      * Diagnostic-Code: SMTP; 550 sorry, that recipient doesn't exist (#5.7.1)
                      */
-                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*(?:n't|not) exist/is", $diagnosisCode)) {
+                    elseif (preg_match("/(?:alias|account|recipient|address|email|mailbox|user).*(?:n't|not).*exist/is", $diagnosisCode)) {
                         $result['rule_cat'] = Category::UNKNOWN;
                         $result['rule_no']  = '0205';
                     }
