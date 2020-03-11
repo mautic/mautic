@@ -17,7 +17,6 @@ export default (editor, opts = {}) => {
         sourceEditBtnLabel: 'Edit',
         sourceEditModalTitle: 'Edit code',
         deleteAssetConfirmText: 'Are you sure?',
-        showLayersManager: 0,
         showImportButton: 0,
         ...opts,
     };
@@ -52,18 +51,6 @@ export default (editor, opts = {}) => {
 
         pm.removeButton("views", "open-tm");
 
-        if (!config.showLayersManager) {
-            pm.removeButton("views", "open-layers");
-        }
-
-        if (!config.showImportButton) {
-            if (mjmlTemplate) {
-                pm.removeButton("options", "mjml-import");
-            } else {
-                pm.removeButton("options", "gjs-open-import-template");
-            }
-        }
-
         // Add Settings Sector
         let traitsSector = $('<div class="gjs-sm-sector no-select">'+
             '<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>' +
@@ -87,6 +74,14 @@ export default (editor, opts = {}) => {
         let openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
         openBlocksBtn && openBlocksBtn.set('active', 1);
     });
+
+    if (!config.showImportButton) {
+        if (mjmlTemplate) {
+            pm.removeButton("options", "mjml-import");
+        } else {
+            pm.removeButton("options", "gjs-open-import-template");
+        }
+    }
 
     // Add function within builder to edit source code
     if (config.sourceEdit) {
