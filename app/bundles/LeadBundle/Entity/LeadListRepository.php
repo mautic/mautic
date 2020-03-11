@@ -549,26 +549,4 @@ class LeadListRepository extends CommonRepository
     {
         return 'l';
     }
-
-    /**
-     * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
-     * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
-     *
-     * @param string $leadTablePrefix
-     */
-    private function applyCompanyFieldFilters(QueryBuilder $q, $leadTablePrefix = 'l')
-    {
-        $joinType = ($this->listFiltersInnerJoinCompany) ? 'join' : 'leftJoin';
-        // Join company tables for query optimization
-        $q->$joinType($leadTablePrefix, MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', "$leadTablePrefix.id = cl.lead_id")
-            ->$joinType(
-                'cl',
-                MAUTIC_TABLE_PREFIX.'companies',
-                'comp',
-                'cl.company_id = comp.id'
-            );
-
-        // Return only unique contacts
-        $q->groupBy("$leadTablePrefix.id");
-    }
 }
