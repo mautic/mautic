@@ -1718,7 +1718,7 @@ ul.dropdown-menu-form {
   list-style-type: none;
 }
 .notes li > .panel > .panel-body {
-  display: table !important;
+  display: block !important;
   width: 100%;
   table-layout: fixed;
   border-spacing: 0;
