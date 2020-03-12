@@ -1168,9 +1168,17 @@ Mautic.isSlotInitiated = function(slot) {
     }) !== 'undefined';
 };
 
+Mautic.isCodeMode = function() {
+    return mQuery('a[data-theme=mautic_code_mode]').first().hasClass('hide');
+};
+
 window.document.fileManagerInsertImageCallback = function(selector, url) {
-    mQuery(selector).froalaEditor('image.insert', url);
-}
+    if (Mautic.isCodeMode()) {
+        Mautic.insertTextAtCMCursor(url);
+    } else {
+        mQuery(selector).froalaEditor('image.insert', url);
+    }
+};
 
 Mautic.initSlotListeners = function() {
     Mautic.activateGlobalFroalaOptions();
