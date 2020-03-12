@@ -1223,15 +1223,13 @@ class ListModel extends FormModel
      */
     public function canNotBeDeleted($segmentIds)
     {
-        $filter = [
-            'force'  => [
-                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
-            ],
-        ];
-
         $entities = $this->getEntities(
             [
-                'filter'     => $filter,
+                'filter' => [
+                    'force'  => [
+                        ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=>'%s:8:"leadlist"%'],
+                    ],
+                ],
             ]
         );
 
@@ -1247,7 +1245,9 @@ class ListModel extends FormModel
                 }
 
                 $idsNotToBeDeleted = array_unique(array_merge($idsNotToBeDeleted, $eachFilter['filter']));
-                foreach ($eachFilter['filter'] as $val) {
+                $bcFilterValue     = $eachFilter['filter'] ?? [];
+                $filterValue       = $eachFilter['properties']['filter'] ?? $bcFilterValue;
+                foreach ($filterValue as $val) {
                     if (!empty($dependency[$val])) {
                         $dependency[$val] = array_merge($dependency[$val], [$entity->getId()]);
                         $dependency[$val] = array_unique($dependency[$val]);
