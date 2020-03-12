@@ -74,7 +74,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         <div class="alert alert-info"><p><?php echo $view['translator']->trans('mautic.lead.lead.segment.filter.info'); ?></p></div>
                         <div class="form-group">
                             <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
-                                <select class="chosen form-control" id="available_filters">
+                                <select class="chosen form-control" id="available_segment_filters">
                                     <option value=""></option>
                                     <?php
                                     foreach ($fields as $object => $field):

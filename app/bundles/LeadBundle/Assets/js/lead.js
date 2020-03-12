@@ -268,7 +268,7 @@ Mautic.leadlistOnLoad = function(container, response) {
     }
 
     if (mQuery('#' + prefix + '_filters').length) {
-        mQuery('#available_filters').on('change', function() {
+        mQuery('#available_segment_filters').on('change', function() {
             if (mQuery(this).val()) {
                 Mautic.addLeadListFilter(mQuery(this).val(),mQuery('option:selected',this).data('field-object'));
                 mQuery(this).val('');
