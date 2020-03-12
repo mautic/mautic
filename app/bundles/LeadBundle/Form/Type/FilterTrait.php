@@ -375,7 +375,7 @@ trait FilterTrait
                     [
                         'label'          => false,
                         'attr'           => $attr,
-                        'data'           => isset($data['filter']) ? $data['filter'] : '',
+                        'data'           => $data['filter'] ?? '',
                         'error_bubbling' => false,
                     ],
                     $customOptions
@@ -389,7 +389,7 @@ trait FilterTrait
             [
                 'label'          => false,
                 'attr'           => $displayAttr,
-                'data'           => (isset($data['display'])) ? $data['display'] : '',
+                'data'           => $data['display'] ?? '',
                 'error_bubbling' => false,
             ]
         );
@@ -398,11 +398,11 @@ trait FilterTrait
             'operator',
             ChoiceType::class,
             [
-                'label'             => false,
-                'choices'           => isset($field['operators']) ? $field['operators'] : [],
-                'attr'              => [
+                'label'   => false,
+                'choices' => $field['operators'] ?? [],
+                'attr'    => [
                     'class'    => 'form-control not-chosen',
-                    'onchange' => 'Mautic.convertLeadFilterInput(this)',
+                    'onchange' => 'Mautic.convertDwcFilterInput(this)',
                 ],
             ]
         );
