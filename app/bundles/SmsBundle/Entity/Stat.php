@@ -74,6 +74,16 @@ class Stat
     private $tokens = [];
 
     /**
+     * @var bool
+     */
+    private $isDelivered = false;
+
+    /**
+     * @var bool
+     */
+    private $isRead = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -103,6 +113,14 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('isDelivered', 'boolean')
+            ->columnName('is_delivered')
+            ->build();
+
+        $builder->createField('isRead', 'boolean')
+            ->columnName('is_read')
             ->build();
 
         $builder->createField('trackingHash', 'string')
@@ -331,6 +349,46 @@ class Stat
     public function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDelivered()
+    {
+        return $this->isDelivered;
+    }
+
+    /**
+     * @param bool $isDelivered
+     *
+     * @return Stat
+     */
+    public function setIsDelivered($isDelivered)
+    {
+        $this->isDelivered = $isDelivered;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRead()
+    {
+        return $this->isRead;
+    }
+
+    /**
+     * @param bool $isRead
+     *
+     * @return Stat
+     */
+    public function setIsRead($isRead)
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }

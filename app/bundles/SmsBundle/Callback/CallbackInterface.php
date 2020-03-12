@@ -44,7 +44,7 @@ interface CallbackInterface
      *
      * @param Request $request
      *
-     * @return string
+     * @return string|array
      *
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException

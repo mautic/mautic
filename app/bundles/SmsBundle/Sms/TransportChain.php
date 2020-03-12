@@ -12,6 +12,8 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Monolog\Logger;
 
@@ -36,6 +38,11 @@ class TransportChain
      * @var Logger
      */
     private $logger;
+
+    /**
+     * @var TransportSettings
+     */
+    private $settings;
 
     /**
      * TransportChain constructor.
@@ -72,7 +79,7 @@ class TransportChain
     /**
      * Return the transport defined in parameters.
      *
-     * @return TransportInterface
+     * @return TransportAbstract
      *
      * @throws PrimaryTransportNotEnabledException
      */
@@ -97,18 +104,34 @@ class TransportChain
     }
 
     /**
-     * @param Lead   $lead
-     * @param string $content
+     * @param Lead      $lead
+     * @param string    $content
+     * @param Sms       $sms
+     * @param Stat|null $stat
      *
      * @return mixed
      *
-     * @throws \Exception
+     * @throws PrimaryTransportNotEnabledException
      */
-    public function sendSms(Lead $lead, $content)
+    public function sendSms(Lead $lead, $content, Sms $sms = null, Stat $stat= null)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content);
+        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $sms, $stat);
 
         return $response;
+    }
+
+    /**
+     * @return TransportSettings
+     *
+     * @throws PrimaryTransportNotEnabledException
+     */
+    public function getSettings()
+    {
+        if (!$this->settings) {
+            $this->settings = new TransportSettings($this->getPrimaryTransport());
+        }
+
+        return $this->settings;
     }
 
     /**

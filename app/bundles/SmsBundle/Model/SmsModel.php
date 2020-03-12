@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -29,6 +28,7 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Event\SmsEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Sms\TransportSettingsInterface;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -311,7 +311,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'content' => $tokenEvent->getContent(),
                     ];
 
-                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent());
+                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $sms, $stat);
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
@@ -463,6 +463,33 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.sms.show.total.sent'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_DELIVERED) && (!$flag || $flag === 'delivered')) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+            $q->andWhere($q->expr()->eq('t.is_delivered', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.sms.stat.delivered'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_READ) && (!$flag || $flag === 'read')) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $q->andWhere($q->expr()->eq('t.is_read', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.read'), $data);
         }
 
         return $chart->render();
