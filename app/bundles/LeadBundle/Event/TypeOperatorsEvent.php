@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -20,6 +22,13 @@ class TypeOperatorsEvent extends Event
 {
     private $operators = [];
 
+    /**
+     * $operators example:
+     * [
+     *      'include' => ['=', 'like'],
+     *      'exclude' => ['!=', '!like'],
+     * ].
+     */
     public function setOperatorsForFieldType(string $fieldType, array $operators): void
     {
         $this->operators[$fieldType] = $operators;
