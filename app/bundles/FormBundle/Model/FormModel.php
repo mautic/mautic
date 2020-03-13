@@ -1115,7 +1115,14 @@ class FormModel extends CommonFormModel
         }
 
         if (!empty($list)) {
-            $formFieldProps['list'] = ['list' => $list];
+            switch ($contactField->getType()) {
+                case 'multiselect':
+                    $formFieldProps['optionlist'] = ['list' => $list];
+                    unset($formFieldProps['list']); // Just because of previous bug MAUT-3476
+                    break;
+                default:
+                    $formFieldProps['list'] = ['list' => $list];
+            }
             $formField->setProperties($formFieldProps);
         }
     }
