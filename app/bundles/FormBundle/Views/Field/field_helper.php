@@ -156,11 +156,12 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     }
 
     if (empty($parseList)) {
+        $leadFieldType = $formFields[$field['leadField']]['type'];
         if (isset($list)) {
             $parseList = $list;
-        } elseif (!empty($properties['list'])) {
+        } elseif (!empty($properties['list']) && 'multiselect' !== $leadFieldType) {
             $parseList = $properties['list'];
-        } elseif (!empty($properties['optionlist'])) {
+        } elseif (!empty($properties['optionlist']) && 'multiselect' === $leadFieldType) {
             $parseList = $properties['optionlist'];
         }
 
