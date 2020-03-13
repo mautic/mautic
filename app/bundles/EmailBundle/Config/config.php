@@ -851,7 +851,7 @@ return [
         'mailer_is_owner'                     => false,
         'default_signature_text'              => null,
         'email_frequency_number'              => 0,
-        'email_frequency_time'                => 0,
+        'email_frequency_time'                => 'DAY',
         'show_contact_preferences'            => false,
         'show_contact_frequency'              => false,
         'show_contact_pause_dates'            => false,

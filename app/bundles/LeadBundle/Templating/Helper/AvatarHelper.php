@@ -13,8 +13,8 @@ namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Templating\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Templating\Helper\Helper;
@@ -32,12 +32,26 @@ class AvatarHelper extends Helper
      */
     private $pathsHelper;
 
+    /**
+     * @var GravatarHelper
+     */
+    private $gravatarHelper;
+
+    /**
+     * @var DefaultAvatarHelper
+     */
+    private $defaultAvatarHelper;
+
     public function __construct(
         AssetsHelper $assetsHelper,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        GravatarHelper $gravatarHelper,
+        DefaultAvatarHelper $defaultAvatarHelper
     ) {
-        $this->assetsHelper = $assetsHelper;
-        $this->pathsHelper  = $pathsHelper;
+        $this->assetsHelper        = $assetsHelper;
+        $this->pathsHelper         = $pathsHelper;
+        $this->gravatarHelper      = $gravatarHelper;
+        $this->defaultAvatarHelper = $defaultAvatarHelper;
     }
 
     /**
@@ -73,6 +87,7 @@ class AvatarHelper extends Helper
     {
         $preferred  = $lead->getPreferredProfileImage();
         $socialData = $lead->getSocialCache();
+        $leadEmail  = $lead->getEmail();
 
         if ('custom' == $preferred) {
             $avatarPath = $this->getAvatarPath(true).'/avatar'.$lead->getId();
@@ -91,7 +106,12 @@ class AvatarHelper extends Helper
         }
 
         if (empty($img)) {
-            $img = $this->getDefaultAvatar();
+            // Default to gravatar if others failed
+            if (!empty($leadEmail)) {
+                $img = $this->gravatarHelper->getImage($leadEmail);
+            } else {
+                $img = $this->defaultAvatarHelper->getDefaultAvatar();
+            }
         }
 
         return $img;
@@ -112,15 +132,13 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * @param bool|false $absolute
+     * @deprecated Use DefaultAvatarHelper::getDefaultAvatar instead of it
      *
-     * @return mixed
+     * @param bool|false $absolute
      */
-    public function getDefaultAvatar($absolute = false)
+    public function getDefaultAvatar(bool $absolute = false): string
     {
-        $img = $this->pathsHelper->getSystemPath('assets').'/images/avatar.png';
-
-        return UrlHelper::rel2abs($this->assetsHelper->getUrl($img));
+        return $this->defaultAvatarHelper->getDefaultAvatar($absolute);
     }
 
     /**

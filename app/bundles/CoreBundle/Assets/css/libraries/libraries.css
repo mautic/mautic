@@ -5307,6 +5307,9 @@ a.thumbnail.active {
   padding-left: 0;
   list-style: none;
 }
+form[name="lead"] .media-body {
+  width: 100%;
+}
 .media-list .media-body {
   width: auto;
 }
