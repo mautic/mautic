@@ -1116,6 +1116,9 @@ class FormModel extends CommonFormModel
 
         if (!empty($list)) {
             $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
             $formField->setProperties($formFieldProps);
         }
     }
