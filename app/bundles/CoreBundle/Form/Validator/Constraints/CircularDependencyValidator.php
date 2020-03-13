@@ -80,12 +80,16 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     private function reduceToSegmentIds(array $filters)
     {
-        $segmentFilters = array_filter($filters, function ($filter) {
+        $segmentFilters = array_filter($filters, function (array $filter) {
             return 'leadlist' === $filter['type']
                 && in_array($filter['operator'], [OperatorOptions::IN, OperatorOptions::NOT_IN]);
         });
 
-        $segentIdsInFilter = array_column($segmentFilters, 'filter');
+        $segentIdsInFilter = array_map(function (array $filter) {
+            $bcValue = $filter['filter'] ?? [];
+
+            return $filter['properties']['filter'] ?? $bcValue;
+        }, $segmentFilters);
 
         return $this->flatten($segentIdsInFilter);
     }
