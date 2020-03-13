@@ -456,10 +456,9 @@ Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
     
     // Extract the filter number
-    var regExp    = /_filters_(\d+)_operator/;
-    var matches   = regExp.exec(operatorSelect.attr('id'));
+    var regExp = /_filters_(\d+)_operator/;
+    var matches = regExp.exec(operatorSelect.attr('id'));
     var filterNum = matches[1];
-
     var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
     var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
 
@@ -469,82 +468,6 @@ Mautic.convertLeadFilterInput = function(el) {
 
         Mautic.triggerOnPropertiesFormLoadedEvent(selector);
     });
-    return; // @todo make this method backward compatible for DEC and DWC.
-    var prefix = 'leadlist';
-
-    var parent = mQuery(el).parents('.dynamic-content-filter, .dwc-filter');
-    if (parent.length) {
-        prefix = parent.attr('id');
-    }
-
-    var operator = mQuery(el).val();
-
-    // Extract the filter number
-    var regExp    = /_filters_(\d+)_operator/;
-    var matches   = regExp.exec(mQuery(el).attr('id'));
-    var filterNum = matches[1];
-    var filterId  = '#' + prefix + '_filters_' + filterNum + '_filter';
-
-    // Reset has-error
-    if (mQuery(filterId).parent().hasClass('has-error')) {
-        mQuery(filterId).parent().find('div.help-block').hide();
-        mQuery(filterId).parent().removeClass('has-error');
-    }
-
-    var disabled = (operator == 'empty' || operator == '!empty');
-    mQuery(filterId+', #' + prefix + '_filters_' + filterNum + '_display').prop('disabled', disabled);
-
-    if (disabled) {
-        mQuery(filterId).val('');
-    }
-
-    var newName = '';
-    var lastPos;
-
-    if (mQuery(filterId).is('select')) {
-        var isMultiple  = mQuery(filterId).attr('multiple');
-        var multiple    = (operator == 'in' || operator == '!in');
-        var placeholder = mQuery(filterId).attr('data-placeholder');
-
-        if (multiple && !isMultiple) {
-            mQuery(filterId).attr('multiple', 'multiple');
-
-            // Update the name
-            newName =  mQuery(filterId).attr('name') + '[]';
-            mQuery(filterId).attr('name', newName);
-
-            placeholder = mauticLang['chosenChooseMore'];
-        } else if (!multiple && isMultiple) {
-            mQuery(filterId).removeAttr('multiple');
-
-            // Update the name
-            newName = mQuery(filterId).attr('name');
-            lastPos = newName.lastIndexOf('[]');
-            newName = newName.substring(0, lastPos);
-
-            mQuery(filterId).attr('name', newName);
-
-            placeholder = mauticLang['chosenChooseOne'];
-        }
-
-        if (multiple) {
-            // Remove empty option
-            mQuery(filterId).find('option[value=""]').remove();
-
-            // Make sure none are selected
-            mQuery(filterId + ' option:selected').removeAttr('selected');
-        } else {
-            // Add empty option
-            mQuery(filterId).prepend("<option value='' selected></option>");
-        }
-
-        // Destroy the chosen and recreate
-        Mautic.destroyChosen(mQuery(filterId));
-
-        mQuery(filterId).attr('data-placeholder', placeholder);
-
-        Mautic.activateChosenSelect(mQuery(filterId));
-    }
 };
 
 /**
