@@ -296,6 +296,9 @@ class CampaignSubscriber implements EventSubscriberInterface
             'email_type'     => $type,
             'return_errors'  => true,
             'dnc_as_error'   => true,
+            'customHeaders'  => [
+                'X-EMAIL-ID' => $emailId,
+            ],
         ];
 
         // Determine if this email is transactional/marketing
