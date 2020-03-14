@@ -4735,3 +4735,10 @@ figcaption {
 .imagecard .imagecard-caption {
   background-color: #bbb !important;
 }
+ul.media-list.media-list-feed div.media-body {
+  width: auto;
+}
+ul.media-list.media-list-feed div.media-object {
+  padding: 0px;
+  margin: 10px;
+}
