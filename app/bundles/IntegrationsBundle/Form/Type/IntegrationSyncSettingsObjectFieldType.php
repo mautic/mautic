@@ -38,7 +38,7 @@ class IntegrationSyncSettingsObjectFieldType extends AbstractType
             ChoiceType::class,
             [
                 'label'          => false,
-                'choices'        => $options['mauticFields'],
+                'choices'        => array_flip($options['mauticFields']),
                 'required'       => $field->showAsRequired(),
                 'placeholder'    => '',
                 'error_bubbling' => false,
