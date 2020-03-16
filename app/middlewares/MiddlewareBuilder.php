@@ -17,7 +17,6 @@ use ReflectionClass;
 use ReflectionException;
 use SplPriorityQueue;
 use Stack\StackedHttpKernel;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class MiddlewareBuilder
 {
@@ -61,10 +60,6 @@ class MiddlewareBuilder
     {
         if (!$this->hasCacheFile()) {
             $this->warmUpCacheCommand();
-        }
-
-        if (!$this->hasCacheFile()) {
-            throw new FileNotFoundException('No middleware cache file found. Please warm the middleware cache first.');
         }
 
         $this->loadCacheFile();
