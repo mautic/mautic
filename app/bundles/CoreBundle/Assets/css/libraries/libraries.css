@@ -5310,6 +5310,13 @@ a.thumbnail.active {
 form[name="lead"] .media-body {
   width: 100%;
 }
+.media-list .media-body {
+  width: auto;
+}
+.media-list .media-object {
+  padding-right: 0;
+  margin-right: 10px;
+}
 .list-group {
   margin-bottom: 20px;
   padding-left: 0;
