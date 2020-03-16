@@ -1,0 +1,498 @@
+<?php
+
+/*
+ * @copyright   2020 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\LeadBundle\Tests\EventListener;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\EventListener\FilterOperatorSubscriber;
+use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Segment\OperatorOptions;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Translation\TranslatorInterface;
+
+class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
+{
+    /**
+     * @var OperatorOptions
+     */
+    private $operatorOptions;
+
+    /**
+     * @var MockObject|LeadFieldRepository
+     */
+    private $leadFieldRepository;
+
+    /**
+     * @var MockObject|TypeOperatorProviderInterface
+     */
+    private $typeOperatorProvider;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var FilterOperatorSubscriber
+     */
+    private $subscriber;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->operatorOptions      = new OperatorOptions();
+        $this->leadFieldRepository  = $this->createMock(LeadFieldRepository::class);
+        $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+
+        $this->subscriber = new FilterOperatorSubscriber(
+            $this->operatorOptions,
+            $this->leadFieldRepository,
+            $this->typeOperatorProvider,
+            $this->translator
+        );
+    }
+
+    public function testOnListOperatorsGenerate(): void
+    {
+        $event = new LeadListFiltersOperatorsEvent([], $this->translator);
+
+        $this->subscriber->onListOperatorsGenerate($event);
+
+        $operators = $event->getOperators();
+
+        // Test that random operators exist:
+        $this->assertSame(
+            [
+                'label'       => 'mautic.lead.list.form.operator.notbetween',
+                'expr'        => 'notBetween',
+                'negate_expr' => 'between',
+                'hide'        => true,
+            ],
+            $operators['!between']
+        );
+
+        $this->assertSame(
+            [
+                'label'       => 'mautic.core.operator.starts.with',
+                'expr'        => 'startsWith',
+                'negate_expr' => 'startsWith',
+            ],
+            $operators['startsWith']
+        );
+
+        $this->assertSame(
+            [
+                'label'       => 'mautic.lead.list.form.operator.in',
+                'expr'        => 'in',
+                'negate_expr' => 'notIn',
+            ],
+            $operators['in']
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddCustomFieldsForBooleanTypes(): void
+    {
+        $field = new LeadField();
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $field->setType('boolean');
+        $field->setLabel('Test Bool');
+        $field->setAlias('test_bool');
+        $field->setProperties([
+            'no'  => 'No',
+            'yes' => 'Yes',
+        ]);
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getOperatorsForFieldType')
+            ->with('boolean')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+
+        $this->assertSame(
+            [
+                'lead' => [
+                    'test_bool' => [
+                        'label'      => 'Test Bool',
+                        'properties' => [
+                            'no'   => 'No',
+                            'yes'  => 'Yes',
+                            'type' => 'boolean',
+                            'list' => [
+                                'No'  => 0,
+                                'Yes' => 1,
+                            ],
+                        ],
+                        'object'    => 'lead',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                    ],
+                ],
+            ],
+            $event->getChoices()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddCustomFieldsForSelectTypes(): void
+    {
+        $field = new LeadField();
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $field->setType('select');
+        $field->setLabel('Test Select');
+        $field->setAlias('test_select');
+        $field->setProperties([
+            'list' => [
+                'one' => 'One',
+                'two' => 'Two',
+            ],
+        ]);
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getOperatorsForFieldType')
+            ->with('select')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+
+        $this->assertSame(
+            [
+                'lead' => [
+                    'test_select' => [
+                        'label'      => 'Test Select',
+                        'properties' => [
+                            'list' => [
+                                [
+                                    'label' => 'One',
+                                    'value' => 'one',
+                                ],
+                                [
+                                    'label' => 'Two',
+                                    'value' => 'two',
+                                ],
+                            ],
+                            'type' => 'select',
+                        ],
+                        'object'    => 'lead',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                    ],
+                ],
+            ],
+            $event->getChoices()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddCustomFieldsForCountryTypes(): void
+    {
+        $field = new LeadField();
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $field->setType('country');
+        $field->setLabel('Test Country');
+        $field->setAlias('test_country');
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getOperatorsForFieldType')
+            ->with('country')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getChoicesForField')
+            ->with('country')
+            ->willReturn(
+                [
+                    'Czech Republic'  => 'Czech Republic',
+                    'Slovak Republic' => 'Slovak Republic',
+                ]
+            );
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+
+        $this->assertSame(
+            [
+                'lead' => [
+                    'test_country' => [
+                        'label'      => 'Test Country',
+                        'properties' => [
+                            'type' => 'country',
+                            'list' => [
+                                'Czech Republic'  => 'Czech Republic',
+                                'Slovak Republic' => 'Slovak Republic',
+                            ],
+                        ],
+                        'object'    => 'lead',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                    ],
+                ],
+            ],
+            $event->getChoices()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddCustomFieldsForTextTypes(): void
+    {
+        $field = new LeadField();
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $field->setType('text');
+        $field->setLabel('Test Text');
+        $field->setAlias('test_text');
+        $field->setObject('company');
+
+        $this->leadFieldRepository->expects($this->once())
+            ->method('getListablePublishedFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getOperatorsForFieldType')
+            ->with('text')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->once())
+            ->method('getChoicesForField')
+            ->with('text')
+            ->willThrowException(new ChoicesNotFoundException());
+
+        $this->subscriber->onGenerateSegmentFiltersAddCustomFields($event);
+
+        $this->assertSame(
+            [
+                'company' => [
+                    'test_text' => [
+                        'label'      => 'Test Text',
+                        'properties' => [
+                            'type' => 'text',
+                        ],
+                        'object'    => 'company',
+                        'operators' => [
+                            'equals'    => '=',
+                            'not equal' => '!=',
+                        ],
+                    ],
+                ],
+            ],
+            $event->getChoices()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddStaticFields(): void
+    {
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsForFieldType')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsIncluding')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getChoicesForField')
+            ->willReturn(
+                [
+                    'Choice A' => 'choice_a',
+                    'Choice B' => 'choice_b',
+                ]
+            );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $this->subscriber->onGenerateSegmentFiltersAddStaticFields($event);
+
+        $choices = $event->getChoices();
+
+        // Test for some random choices:
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.date_identified',
+                'properties' => [
+                    'type' => 'date',
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['lead']['date_identified']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.device_model',
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['lead']['device_model']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.dnc_unsubscribed_manually',
+                'properties' => [
+                    'type' => 'boolean',
+                    'list' => [
+                        'Choice A' => 'choice_a',
+                        'Choice B' => 'choice_b',
+                    ],
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['lead']['dnc_unsubscribed_manually']
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersAddBehaviors(): void
+    {
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsForFieldType')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getOperatorsIncluding')
+            ->willReturn(
+                [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ]
+            );
+
+        $this->typeOperatorProvider->expects($this->any())
+            ->method('getChoicesForField')
+            ->willReturn(
+                [
+                    'Choice A' => 'choice_a',
+                    'Choice B' => 'choice_b',
+                ]
+            );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $this->subscriber->onGenerateSegmentFiltersAddBehaviors($event);
+
+        $choices = $event->getChoices();
+
+        // Test for some random choices:
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.lead_email_received',
+                'object'     => 'lead',
+                'properties' => [
+                    'type' => 'select',
+                    'list' => [
+                        'Choice A' => 'choice_a',
+                        'Choice B' => 'choice_b',
+                    ],
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+            ],
+            $choices['behaviors']['lead_email_received']
+        );
+
+        $this->assertSame(
+            [
+                'label'      => 'mautic.lead.list.filter.visited_url_count',
+                'properties' => [
+                    'type' => 'number',
+                ],
+                'operators' => [
+                    'equals'    => '=',
+                    'not equal' => '!=',
+                ],
+                'object' => 'lead',
+            ],
+            $choices['behaviors']['hit_url_count']
+        );
+    }
+}
