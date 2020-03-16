@@ -33,7 +33,7 @@ class FieldController extends FormController
 
         $session = $this->get('session');
 
-        if (!$permissions['lead:fields:view']) {
+        if (!$permissions['lead:fields:view'] && !$permissions['lead:fields:full']) {
             return $this->accessDenied();
         }
 
