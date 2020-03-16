@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,8 +11,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\Events;
+use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -26,9 +24,6 @@ class SerializerSubscriber implements EventSubscriberInterface
      */
     private $requestStack;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         RequestStack $requestStack
     ) {
@@ -48,10 +43,7 @@ class SerializerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ObjectEvent $event
-     */
-    public function changeEmptyArraysToObject(ObjectEvent $event): void
+    public function changeEmptyArraysToObject(ObjectEvent $event)
     {
         $request  = $this->requestStack->getCurrentRequest();
 
