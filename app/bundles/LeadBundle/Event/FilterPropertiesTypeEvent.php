@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormInterface;
 
-class FilterPropertiesTypeEvent extends Event
+final class FilterPropertiesTypeEvent extends Event
 {
     /**
      * @var FormInterface

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 
-class FilterPropertiesTypeEventTest extends \PHPUnit\Framework\TestCase
+final class FilterPropertiesTypeEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|FormInterface

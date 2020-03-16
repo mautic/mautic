@@ -15,7 +15,7 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 
-class ListFieldChoicesEventTest extends \PHPUnit\Framework\TestCase
+final class ListFieldChoicesEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters(): void
     {

@@ -15,7 +15,7 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 
-class TypeOperatorsEventTest extends \PHPUnit\Framework\TestCase
+final class TypeOperatorsEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters(): void
     {

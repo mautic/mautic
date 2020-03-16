@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Component\EventDispatcher\Event;
 
-class SegmentOperatorQueryBuilderEvent extends Event
+final class SegmentOperatorQueryBuilderEvent extends Event
 {
     /**
      * @var QueryBuilder

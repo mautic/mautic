@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -23,7 +25,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OperatorOptions

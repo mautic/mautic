@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -18,12 +20,12 @@ use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Provider\TypeOperatorProvider;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FilterOperatorSubscriber implements EventSubscriberInterface
+final class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     /**
      * @var OperatorOptions
@@ -36,7 +38,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
     private $leadFieldRepository;
 
     /**
-     * @var TypeOperatorProvider
+     * @var TypeOperatorProviderInterface
      */
     private $typeOperatorProvider;
 
@@ -48,7 +50,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
     public function __construct(
         OperatorOptions $operatorOptions,
         LeadFieldRepository $leadFieldRepository,
-        TypeOperatorProvider $typeOperatorProvider,
+        TypeOperatorProviderInterface $typeOperatorProvider,
         TranslatorInterface $translator
     ) {
         $this->operatorOptions      = $operatorOptions;
@@ -89,7 +91,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
                     $properties['yes'] => 1,
                 ];
             } elseif (in_array($type, ['select', 'multiselect'], true)) {
-                $properties['list']     = (isset($properties['list'])) ? FormFieldHelper::formatList(
+                $properties['list'] = (isset($properties['list'])) ? FormFieldHelper::formatList(
                     FormFieldHelper::FORMAT_ARRAY,
                     FormFieldHelper::parseList($properties['list'])
                 ) : '';
@@ -101,12 +103,16 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
                 }
             }
 
-            $event->addChoice($field->getObject(), $field->getAlias(), [
-                'label'      => $field->getLabel(),
-                'properties' => $properties,
-                'object'     => $field->getObject(),
-                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
-            ]);
+            $event->addChoice(
+                $field->getObject(),
+                $field->getAlias(),
+                [
+                    'label'      => $field->getLabel(),
+                    'properties' => $properties,
+                    'object'     => $field->getObject(),
+                    'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
+                ]
+            );
         });
     }
 

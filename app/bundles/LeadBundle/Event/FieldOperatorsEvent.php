@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Event that collects operators for a specific field.
  */
-class FieldOperatorsEvent extends Event
+final class FieldOperatorsEvent extends Event
 {
     /**
      * @var string

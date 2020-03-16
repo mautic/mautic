@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Event that collects choices for different list field types.
  */
-class ListFieldChoicesEvent extends Event
+final class ListFieldChoicesEvent extends Event
 {
     private $choicesForTypes = [];
 

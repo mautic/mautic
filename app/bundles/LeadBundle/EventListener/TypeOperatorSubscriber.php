@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -33,7 +35,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class TypeOperatorSubscriber implements EventSubscriberInterface
+final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 

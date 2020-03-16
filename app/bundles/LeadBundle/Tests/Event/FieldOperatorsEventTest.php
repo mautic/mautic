@@ -15,7 +15,7 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 
-class FieldOperatorsEventTest extends \PHPUnit\Framework\TestCase
+final class FieldOperatorsEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters()
     {

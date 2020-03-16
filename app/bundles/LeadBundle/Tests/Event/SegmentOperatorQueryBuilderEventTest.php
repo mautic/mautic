@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\TestCase
+final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|QueryBuilder

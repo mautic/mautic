@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -16,7 +18,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
+final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
