@@ -59,10 +59,19 @@ class MiddlewareBuilder
     private function loadMiddlewares(): void
     {
         if (!$this->hasCacheFile()) {
+            $this->warmUpCacheCommand();
+        }
+
+        if (!$this->hasCacheFile()) {
             throw new FileNotFoundException('No middleware cache file found. Please warm the middleware cache first.');
         }
 
         $this->loadCacheFile();
+    }
+
+    private function warmUpCacheCommand(): void
+    {
+        shell_exec('bin/console cache:warmup --env='.$this->app->getEnvironment());
     }
 
     private function hasCacheFile(): bool
