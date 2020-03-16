@@ -222,6 +222,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             [
                 'label'       => false,
                 'required'    => true,
+                'data'        => $form->getData()['filter'] ?? '',
                 'attr'        => ['class' => 'form-control'],
                 'disabled'    => $event->filterShouldBeDisabled(),
                 'constraints' => [

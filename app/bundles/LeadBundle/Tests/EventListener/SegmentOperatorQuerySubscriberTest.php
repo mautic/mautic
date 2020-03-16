@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 
-final class SegmentOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SegmentOperatorQuerySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|QueryBuilder
