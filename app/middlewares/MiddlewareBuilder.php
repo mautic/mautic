@@ -12,6 +12,7 @@
 namespace Mautic\Middleware;
 
 use AppKernel;
+use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 use ReflectionClass;
 use ReflectionException;
 use SplPriorityQueue;
@@ -71,7 +72,8 @@ class MiddlewareBuilder
 
     private function warmUpCacheCommand(): void
     {
-        shell_exec('bin/console cache:warmup --env='.$this->app->getEnvironment());
+        $middlewareCacheWarmer = new MiddlewareCacheWarmer($this->app->getEnvironment());
+        $middlewareCacheWarmer->warmUp($this->app->getCacheDir());
     }
 
     private function hasCacheFile(): bool
