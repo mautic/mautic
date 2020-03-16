@@ -12,11 +12,11 @@
 namespace Mautic\Middleware;
 
 use AppKernel;
+use Mautic\CoreBundle\Cache\MiddlewareCacheWarmer;
 use ReflectionClass;
 use ReflectionException;
 use SplPriorityQueue;
 use Stack\StackedHttpKernel;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 class MiddlewareBuilder
 {
@@ -59,10 +59,16 @@ class MiddlewareBuilder
     private function loadMiddlewares(): void
     {
         if (!$this->hasCacheFile()) {
-            throw new FileNotFoundException('No middleware cache file found. Please warm the middleware cache first.');
+            $this->warmUpCacheCommand();
         }
 
         $this->loadCacheFile();
+    }
+
+    private function warmUpCacheCommand(): void
+    {
+        $middlewareCacheWarmer = new MiddlewareCacheWarmer($this->app->getEnvironment());
+        $middlewareCacheWarmer->warmUp($this->app->getCacheDir());
     }
 
     private function hasCacheFile(): bool
