@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -43,6 +44,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     private $typeOperatorProvider;
 
     /**
+     * @var FieldChoicesProviderInterface
+     */
+    private $fieldChoicesProvider;
+
+    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -51,11 +57,13 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         OperatorOptions $operatorOptions,
         LeadFieldRepository $leadFieldRepository,
         TypeOperatorProviderInterface $typeOperatorProvider,
+        FieldChoicesProviderInterface $fieldChoicesProvider,
         TranslatorInterface $translator
     ) {
         $this->operatorOptions      = $operatorOptions;
         $this->leadFieldRepository  = $leadFieldRepository;
         $this->typeOperatorProvider = $typeOperatorProvider;
+        $this->fieldChoicesProvider = $fieldChoicesProvider;
         $this->translator           = $translator;
     }
 
@@ -97,7 +105,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ) : '';
             } else {
                 try {
-                    $properties['list'] = $this->typeOperatorProvider->getChoicesForField($type, $field->getAlias());
+                    $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
                 } catch (ChoicesNotFoundException $e) {
                     // That's fine. Not all fields should have choices.
                 }
@@ -162,7 +170,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lists'),
                 'properties' => [
                     'type' => 'multiselect',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('multiselect', 'leadlist'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -171,7 +179,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.campaign'),
                 'properties' => [
                     'type' => 'select',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'campaign'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'campaign'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
                 'object'     => 'lead',
@@ -182,7 +190,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'multiselect',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('multiselect', 'tags'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'tags'),
                 ],
             ],
             'device_type' => [
@@ -191,7 +199,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'select',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'device_type'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'device_type'),
                 ],
             ],
             'device_brand' => [
@@ -200,7 +208,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'multiselect',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('multiselect', 'device_brand'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'device_brand'),
                 ],
             ],
             'device_os' => [
@@ -209,7 +217,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'multiselect',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('multiselect', 'device_os'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'device_os'),
                 ],
             ],
             'device_model' => [
@@ -226,7 +234,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_bounced'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_bounced'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -235,7 +243,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -244,7 +252,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_manually'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed_manually'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_manually'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'     => 'lead',
@@ -253,7 +261,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced_sms'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_bounced_sms'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_bounced_sms'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -262,7 +270,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -271,7 +279,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_unsubscribed_sms_manually'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms_manually'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'dnc_unsubscribed_sms_manually'),
                 ],
                 'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'     => 'lead',
@@ -281,7 +289,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'select',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'stage'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'stage'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::EQUAL_TO,
@@ -296,7 +304,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'select',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'globalcategory'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'globalcategory'),
                 ],
             ],
             'utm_campaign' => [
@@ -344,7 +352,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'object'     => 'lead',
                 'properties' => [
                     'type' => 'select',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('select', 'lead_email_received'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('select', 'lead_email_received'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsIncluding([
                     OperatorOptions::IN,
@@ -444,7 +452,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.email_id'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'email_id'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'email_id'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -468,7 +476,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'sms_clicked_link'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'sms_clicked_link'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -557,7 +565,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'notification'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'notification'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -566,7 +574,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.page_id'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'page_id'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'page_id'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',
@@ -575,7 +583,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.redirect_id'),
                 'properties' => [
                     'type' => 'boolean',
-                    'list' => $this->typeOperatorProvider->getChoicesForField('boolean', 'redirect_id'),
+                    'list' => $this->fieldChoicesProvider->getChoicesForField('boolean', 'redirect_id'),
                 ],
                 'operators' => $this->typeOperatorProvider->getOperatorsForFieldType('bool'),
                 'object'    => 'lead',

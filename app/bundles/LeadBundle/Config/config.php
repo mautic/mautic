@@ -549,6 +549,8 @@ return [
                     'mautic.lead.segment.operator_options',
                     'mautic.lead.repository.field',
                     'mautic.lead.provider.typeOperator',
+                    'mautic.lead.provider.fieldChoices',
+                    'translator',
                 ],
             ],
             'mautic.lead.subscriber.typeOperator' => [
@@ -1189,6 +1191,12 @@ return [
                 'arguments' => [
                     'event_dispatcher',
                     'mautic.lead.provider.fillterOperator',
+                ],
+            ],
+            'mautic.lead.provider.fieldChoices' => [
+                'class'     => \Mautic\LeadBundle\Provider\FieldChoicesProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
                 ],
             ],
             'mautic.lead.model.random_parameter_name' => [

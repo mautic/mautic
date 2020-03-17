@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Provider;
 
-use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Symfony\Component\Form\FormInterface;
 
@@ -24,18 +23,11 @@ interface TypeOperatorProviderInterface
     public function getOperatorsExcluding(array $operators): array;
 
     /**
-     * @throws ChoicesNotFoundException
-     */
-    public function getChoicesForField(string $fieldType, string $fieldAlias): array;
-
-    /**
      * @throws OperatorsNotFoundException
      */
     public function getOperatorsForFieldType(string $fieldType): array;
 
     public function getAllTypeOperators(): array;
-
-    public function getAllChoicesForListFieldTypes(): array;
 
     /**
      * Allows subscribers to adjust the filter form so new fields can be added.

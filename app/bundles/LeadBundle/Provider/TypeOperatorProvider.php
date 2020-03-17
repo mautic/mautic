@@ -16,9 +16,7 @@ namespace Mautic\LeadBundle\Provider;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
-use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
-use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
@@ -75,22 +73,6 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         return $this->getOperatorChoiceList(['exclude' => $operators]);
     }
 
-    public function getChoicesForField(string $fieldType, string $fieldAlias): array
-    {
-        $aliasChoices = $this->getAllChoicesForListFieldAliases();
-        $typeChoices  = $this->getAllChoicesForListFieldTypes();
-
-        if (isset($aliasChoices[$fieldAlias])) {
-            return $aliasChoices[$fieldAlias];
-        }
-
-        if (isset($typeChoices[$fieldType])) {
-            return $typeChoices[$fieldType];
-        }
-
-        throw new ChoicesNotFoundException("No choices for field type {$fieldType} nor alias {$fieldAlias} were found");
-    }
-
     public function getOperatorsForFieldType(string $fieldType): array
     {
         // If we already processed this
@@ -140,20 +122,6 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         return $event->getOperators();
     }
 
-    public function getAllChoicesForListFieldTypes(): array
-    {
-        $this->lookForFieldChoices();
-
-        return $this->cachedTypeChoices;
-    }
-
-    public function getAllChoicesForListFieldAliases()
-    {
-        $this->lookForFieldChoices();
-
-        return $this->cachedAliasChoices;
-    }
-
     public function adjustFilterPropertiesType(FormInterface $form, string $fieldAlias, string $fieldObject, string $operator, array $fieldDetails): FormInterface
     {
         $event = new FilterPropertiesTypeEvent($form, $fieldAlias, $fieldObject, $operator, $fieldDetails);
@@ -174,17 +142,5 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         $operatorOption = $this->filterOperatorProvider->getAllOperators();
 
         return (null === $operator) ? $operatorOption : $operatorOption[$operator];
-    }
-
-    private function lookForFieldChoices(): void
-    {
-        if (empty($this->cachedTypeChoices)) {
-            $event = new ListFieldChoicesEvent();
-
-            $this->dispatcher->dispatch(LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE, $event);
-
-            $this->cachedTypeChoices  = $event->getChoicesForAllListFieldTypes();
-            $this->cachedAliasChoices = $event->getChoicesForAllListFieldAliases();
-        }
     }
 }

@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\EventListener\FilterOperatorSubscriber;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
+use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -43,6 +44,11 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private $typeOperatorProvider;
 
     /**
+     * @var MockObject|FieldChoicesProviderInterface
+     */
+    private $fieldChoicesProvider;
+
+    /**
      * @var MockObject|TranslatorInterface
      */
     private $translator;
@@ -59,12 +65,14 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->operatorOptions      = new OperatorOptions();
         $this->leadFieldRepository  = $this->createMock(LeadFieldRepository::class);
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
+        $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
             $this->operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
+            $this->fieldChoicesProvider,
             $this->translator
         );
     }
@@ -246,7 +254,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->once())
+        $this->fieldChoicesProvider->expects($this->once())
             ->method('getChoicesForField')
             ->with('country')
             ->willReturn(
@@ -306,7 +314,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->once())
+        $this->fieldChoicesProvider->expects($this->once())
             ->method('getChoicesForField')
             ->with('text')
             ->willThrowException(new ChoicesNotFoundException());
@@ -355,7 +363,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->fieldChoicesProvider->expects($this->any())
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -445,7 +453,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->fieldChoicesProvider->expects($this->any())
             ->method('getChoicesForField')
             ->willReturn(
                 [
