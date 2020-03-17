@@ -5352,7 +5352,9 @@ div[data-section-focus="delete"] {
   border: 0;
   line-height: 25px;
 }
-div[data-section-focus="handle"], div[data-section-focus="clone"], div[data-section-focus="delete"] {
+div[data-section-focus="handle"],
+div[data-section-focus="clone"],
+div[data-section-focus="delete"] {
   z-index: 1000;
 }
 div[data-slot-toolbar] {
