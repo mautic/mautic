@@ -184,7 +184,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         }
                     }
 
-                    $this->membershipManager->removeContacts($removeContacts, $this->campaignReferences[$c['id']], false);
+                    $this->membershipManager->removeContacts($removeContacts, $this->campaignReferences[$c['id']], true);
                 }
             }
             $this->entityManager->clear(Lead::class);
@@ -229,13 +229,13 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
 
                 if ('added' == $action) {
-                    $this->membershipManager->addContact($lead, $campaign);
+                    $this->membershipManager->addContact($lead, $campaign, false);
                 } else {
                     if (array_intersect($leadListIds, $campaignLists[$c['id']])) {
                         continue;
                     }
 
-                    $this->membershipManager->removeContact($lead, $campaign);
+                    $this->membershipManager->removeContact($lead, $campaign, true);
                 }
 
                 unset($campaign);
