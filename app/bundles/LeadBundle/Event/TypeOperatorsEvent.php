@@ -25,8 +25,8 @@ final class TypeOperatorsEvent extends Event
     /**
      * $operators example:
      * [
-     *      'include' => ['=', 'like'],
-     *      'exclude' => ['!=', '!like'],
+     *      'include' => ['=' => 'like'],
+     *      'exclude' => ['!=' => '!like'],
      * ].
      */
     public function setOperatorsForFieldType(string $fieldType, array $operators): void

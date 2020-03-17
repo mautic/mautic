@@ -129,8 +129,8 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
      */
     public function getFilterExpressionFunctions($operator = null)
     {
-        $operatorOption = $this->filterOperatorProvider->getAllOperators();
+        $operatorOptions = $this->filterOperatorProvider->getAllOperators();
 
-        return (null === $operator) ? $operatorOption : $operatorOption[$operator];
+        return (null === $operator) ? $operatorOptions : $operatorOptions[$operator];
     }
 }
