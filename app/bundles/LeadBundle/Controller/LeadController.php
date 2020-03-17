@@ -1517,13 +1517,13 @@ class LeadController extends FormController
 
                 if (!empty($add)) {
                     foreach ($add as $cid) {
-                        $membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid], true);
+                        $membershipManager->addContacts(new ArrayCollection($entities), $campaigns[$cid]);
                     }
                 }
 
                 if (!empty($remove)) {
                     foreach ($remove as $cid) {
-                        $membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid], true);
+                        $membershipManager->removeContacts(new ArrayCollection($entities), $campaigns[$cid]);
                     }
                 }
             }
