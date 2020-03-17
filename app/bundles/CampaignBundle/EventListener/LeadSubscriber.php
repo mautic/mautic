@@ -14,7 +14,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -22,6 +22,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -35,6 +36,16 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var array
+     */
+    private $campaignLists;
+
+    /**
+     * @var array
+     */
+    private $campaignReferences;
+
     /**
      * @var MembershipManager
      */
@@ -110,7 +121,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->security                  = $security;
         $this->segmentRepository         = $entityManager->getRepository(LeadList::class);
         $this->contactEventLogRepository = $entityManager->getRepository(LeadEventLog::class);
-        $this->contactRepository         = $entityManager->getRepository(Lead::class);
+        $this->contactRepository         = $entityManager->getRepository(CampaignLead::class);
     }
 
     /**
@@ -131,51 +142,52 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadListBatchChange(ListChangeEvent $event)
     {
-        static $campaignLists = [], $listCampaigns = [], $campaignReferences = [];
-
-        $leads  = $event->getLeads();
-        $list   = $event->getList();
-        $action = $event->wasAdded() ? 'added' : 'removed';
+        $leads         = $event->getLeads();
+        $list          = $event->getList();
+        $action        = $event->wasAdded() ? 'added' : 'removed';
+        $listCampaigns = [];
 
         //get campaigns for the list
-        if (!isset($listCampaigns[$list->getId()])) {
-            $listCampaigns[$list->getId()] = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists(
-                $list->getId(),
-                $this->security->isGranted('campaign:campaigns:viewother')
-            );
-        }
+        $listCampaigns[$list->getId()] = $this->campaignModel->getRepository()->getPublishedCampaignsByLeadLists($list->getId());
 
         $leadLists = $this->segmentRepository->getLeadLists($leads, true, true);
 
         if (!empty($listCampaigns[$list->getId()])) {
+            $contactCollection = new ArrayCollection();
+            foreach ($leads as $lead) {
+                $id['id'] = $lead['id'] ?? $lead; // getReference needs this to be [identifier => value]
+                $contactCollection->set($id['id'], $this->entityManager->getReference(Lead::class, $id));
+            }
+
             foreach ($listCampaigns[$list->getId()] as $c) {
-                if (!isset($campaignReferences[$c['id']])) {
-                    $campaignReferences[$c['id']] = $this->entityManager->getReference(Campaign::class, $c['id']);
+                if (!isset($this->campaignReferences[$c['id']])) {
+                    $this->campaignReferences[$c['id']] = $this->entityManager->getReference(Campaign::class, $c['id']);
                 }
 
                 if ('added' == $action) {
-                    $this->membershipManager->addContacts(new ArrayCollection($leads), $campaignReferences[$c['id']], false);
+                    $this->membershipManager->addContacts($contactCollection, $this->campaignReferences[$c['id']], false);
                 } else {
-                    if (!isset($campaignLists[$c['id']])) {
-                        $campaignLists[$c['id']] = [];
+                    if (!isset($this->campaignLists[$c['id']])) {
+                        $this->campaignLists[$c['id']] = [];
                         foreach ($c['lists'] as $l) {
-                            $campaignLists[$c['id']][] = $l['id'];
+                            $this->campaignLists[$c['id']][] = $l['id'];
                         }
                     }
 
-                    $removeLeads = [];
-                    foreach ($leads as $l) {
-                        $lists = (isset($leadLists[$l['id']])) ? $leadLists[$l['id']] : [];
-                        if (array_intersect(array_keys($lists), $campaignLists[$c['id']])) {
+                    $removeContacts = new ArrayCollection();
+                    foreach ($contactCollection as $id => $contact) {
+                        $lists = $leadLists[$id] ?? [];
+                        if (array_intersect(array_keys($lists), $this->campaignLists[$c['id']])) {
                             continue;
                         } else {
-                            $removeLeads[] = $l;
+                            $removeContacts->set($id, $contact);
                         }
                     }
 
-                    $this->membershipManager->removeContacts(new ArrayCollection($removeLeads), $campaignReferences[$c['id']], false);
+                    $this->membershipManager->removeContacts($removeContacts, $this->campaignReferences[$c['id']], false);
                 }
             }
+            $this->entityManager->clear(Lead::class);
         }
 
         // Save memory with batch processing
