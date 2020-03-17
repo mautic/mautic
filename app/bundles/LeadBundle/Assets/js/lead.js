@@ -350,16 +350,23 @@ Mautic.leadlistOnLoad = function(container, response) {
 /**
  * Trigger event so plugins could attach other JS magic to the form.
  */
-Mautic.triggerOnPropertiesFormLoadedEvent = function(selector) {
-    mQuery('#leadlist_filters').trigger('filter.properties.form.loaded', [selector]);
+Mautic.triggerOnPropertiesFormLoadedEvent = function(selector, filterValue) {
+    mQuery('#leadlist_filters').trigger('filter.properties.form.loaded', [selector, filterValue]);
 };
 
 Mautic.attachJsUiOnFilterForms = function() {
-    mQuery('#leadlist_filters').on('filter.properties.form.loaded', function(event, selector) {
+    mQuery('#leadlist_filters').on('filter.properties.form.loaded', function(event, selector, filterValue) {
         Mautic.activateChosenSelect(selector + '_properties select');
         var fieldType = mQuery(selector + '_type').val();
         var fieldAlias = mQuery(selector + '_field').val();
         var filterFieldEl = mQuery(selector + '_properties_filter');
+
+        if (filterValue) {
+            filterFieldEl.val(filterValue);
+            if (filterFieldEl.is('select')) {
+                filterFieldEl.trigger('chosen:updated');
+            }
+        }
 
         if (fieldType === 'lookup') {
             Mautic.activateLookupTypeahead(filterFieldEl.parent());
@@ -396,7 +403,7 @@ Mautic.attachJsUiOnFilterForms = function() {
         } else if (fieldType === 'lookup_id') {
             var displayFieldEl = mQuery(selector + '_properties_display');
             var fieldCallback = displayFieldEl.attr('data-field-callback');
-            if (fieldCallback && typeof Mautic[fieldCallback] == 'function') {
+            if (fieldCallback && typeof Mautic[fieldCallback] === 'function') {
                 var fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
@@ -461,12 +468,13 @@ Mautic.convertLeadFilterInput = function(el) {
     var filterNum = matches[1];
     var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
     var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
+    var filterValue = mQuery('#leadlist_filters_'+filterNum+'_properties_filter').val();
 
     Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
         var selector = '#leadlist_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
-        Mautic.triggerOnPropertiesFormLoadedEvent(selector);
+        Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
     });
 };
 
