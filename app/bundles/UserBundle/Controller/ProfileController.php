@@ -13,6 +13,7 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class ProfileController.
@@ -61,7 +62,7 @@ class ProfileController extends FormController
                         $form->remove('firstName');
                         $form->add(
                             'firstName_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.firstname',
                                 'label_attr' => ['class' => 'control-label'],
@@ -76,7 +77,7 @@ class ProfileController extends FormController
                         $form->remove('lastName');
                         $form->add(
                             'lastName_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.lastname',
                                 'label_attr' => ['class' => 'control-label'],
@@ -94,7 +95,7 @@ class ProfileController extends FormController
                         $form->remove('username');
                         $form->add(
                             'username_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.username',
                                 'label_attr' => ['class' => 'control-label'],
@@ -111,7 +112,7 @@ class ProfileController extends FormController
                         $form->remove('position');
                         $form->add(
                             'position_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.position',
                                 'label_attr' => ['class' => 'control-label'],
@@ -128,7 +129,7 @@ class ProfileController extends FormController
                         $form->remove('email');
                         $form->add(
                             'email_unbound',
-                            'text',
+                            TextType::class,
                             [
                                 'label'      => 'mautic.core.type.email',
                                 'label_attr' => ['class' => 'control-label'],
