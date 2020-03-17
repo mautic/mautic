@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,9 +16,13 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FieldFilterTransformer implements DataTransformerInterface
 {
+    /**
+     * @var array
+     */
     private $relativeDateStrings;
 
     /**
@@ -24,11 +30,7 @@ class FieldFilterTransformer implements DataTransformerInterface
      */
     private $default;
 
-    /**
-     * @param       $translator
-     * @param array $default
-     */
-    public function __construct($translator, $default = [])
+    public function __construct(TranslatorInterface $translator, array $default = [])
     {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {
