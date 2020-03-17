@@ -233,7 +233,7 @@ $showActions = count($activeFormActions);
             <div class="tab-pane fade<?php if (!$showActions) {
                                             echo ' active in';
                                         } ?> bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs">Form Field</h5>
+                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.form.field'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var \Mautic\FormBundle\Entity\Field $field */
                     foreach ($activeFormFields as $field) : ?>
