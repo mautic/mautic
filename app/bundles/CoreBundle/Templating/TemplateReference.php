@@ -98,7 +98,7 @@ class TemplateReference extends BaseTemplateReference
                     if (
                         (!empty($match[1]) && file_exists($bundleRoot.'/'.$match[1].'Bundle/Views/'.$path)) ||
                         file_exists($pluginRoot.'/'.$this->parameters['bundle'].'/Views/'.$path) || // Check plugin dir directly
-                        file_exists('app/bundles/'.$this->parameters['bundle'].'/Views/'.$path) // Bundles dir directly
+                        file_exists($bundleRoot.'/'.$this->parameters['bundle'].'/Views/'.$path) // Bundles dir directly
                     ) {
                         // Mautic core template
                         $template = '@'.$this->get('bundle').'/Views/'.$path;
