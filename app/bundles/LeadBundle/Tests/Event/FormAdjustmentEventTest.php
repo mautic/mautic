@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
+use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 
-final class FilterPropertiesTypeEventTest extends \PHPUnit\Framework\TestCase
+final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|FormInterface
@@ -43,7 +43,7 @@ final class FilterPropertiesTypeEventTest extends \PHPUnit\Framework\TestCase
                 'list' => ['one', 'two'],
             ],
         ];
-        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $fieldDetails);
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $fieldDetails);
 
         $this->assertSame($this->form, $event->getFilterPropertiesForm());
         $this->assertSame($alias, $event->getFieldAlias());

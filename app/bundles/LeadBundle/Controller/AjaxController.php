@@ -27,7 +27,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Provider\TypeOperatorProvider;
+use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -185,8 +185,8 @@ class AjaxController extends CommonAjaxController
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->get('form.factory');
 
-        /** @var TypeOperatorProvider $typeOperatorProvider */
-        $typeOperators = $this->get('mautic.lead.provider.typeOperator');
+        /** @var FormAdjustmentsProviderInterface $formAdjustmentsProvider */
+        $formAdjustmentsProvider = $this->get('mautic.lead.provider.formAdjustments');
 
         /** @var ListModel $listModel */
         $listModel = $this->get('mautic.lead.model.list');
@@ -194,7 +194,7 @@ class AjaxController extends CommonAjaxController
         $form = $formFactory->createNamed('RENAME', FilterPropertiesType::class);
 
         if ($fieldAlias && $operator) {
-            $typeOperators->adjustFilterPropertiesType(
+            $formAdjustmentsProvider->adjustForm(
                 $form,
                 $fieldAlias,
                 $fieldObject,

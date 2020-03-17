@@ -601,7 +601,7 @@ return [
                 'arguments'   => [
                     'translator',
                     'request_stack',
-                    'mautic.lead.provider.typeOperator',
+                    'mautic.lead.provider.formAdjustments',
                     'mautic.lead.model.list',
                 ],
             ],
@@ -1195,6 +1195,12 @@ return [
             ],
             'mautic.lead.provider.fieldChoices' => [
                 'class'     => \Mautic\LeadBundle\Provider\FieldChoicesProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.provider.formAdjustments' => [
+                'class'     => \Mautic\LeadBundle\Provider\FormAdjustmentsProvider::class,
                 'arguments' => [
                     'event_dispatcher',
                 ],

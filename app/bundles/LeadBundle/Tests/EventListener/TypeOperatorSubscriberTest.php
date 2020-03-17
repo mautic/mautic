@@ -16,7 +16,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
+use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\EventListener\TypeOperatorSubscriber;
@@ -189,7 +189,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $object   = 'lead';
         $operator = OperatorOptions::EQUAL_TO;
         $details  = [];
-        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->never())
             ->method('add');
@@ -209,7 +209,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->once())
             ->method('add')
@@ -242,7 +242,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $object   = 'lead';
         $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'unicorn']];
-        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->never())
             ->method('add');
@@ -256,7 +256,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $object   = 'lead';
         $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'lookup_id']];
-        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->exactly(2))
             ->method('add')
@@ -296,7 +296,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $object   = 'lead';
         $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'unicorn']];
-        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->never())
             ->method('add');
@@ -315,7 +315,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 'list' => ['Choice A' => 'choice_a'],
             ],
         ];
-        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->once())
             ->method('add')
@@ -346,7 +346,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $object   = 'lead';
         $operator = OperatorOptions::IN;
         $details  = ['properties' => ['type' => 'unicorn']];
-        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->never())
             ->method('add');
@@ -365,7 +365,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 'list' => ['Choice A' => 'choice_a'],
             ],
         ];
-        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->never())
             ->method('add');
@@ -384,7 +384,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 'list' => ['Choice A' => 'choice_a'],
             ],
         ];
-        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->once())
             ->method('add')
@@ -411,7 +411,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $object   = 'lead';
         $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'text']];
-        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
 
         $this->form->expects($this->once())
             ->method('add')

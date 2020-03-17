@@ -19,7 +19,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
-use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
+use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -152,7 +152,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
     }
 
-    public function onSegmentFilterFormHandleTags(FilterPropertiesTypeEvent $event): void
+    public function onSegmentFilterFormHandleTags(FormAdjustmentEvent $event): void
     {
         if ('tags' !== $event->getFieldAlias()) {
             return;
@@ -186,7 +186,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     /**
      * For fields where users search by label but we need the ID. Example: owner.
      */
-    public function onSegmentFilterFormHandleLookupId(FilterPropertiesTypeEvent $event): void
+    public function onSegmentFilterFormHandleLookupId(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('lookup_id')) {
             return;
@@ -236,7 +236,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
-    public function onSegmentFilterFormHandleLookup(FilterPropertiesTypeEvent $event): void
+    public function onSegmentFilterFormHandleLookup(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('lookup')) {
             return;
@@ -265,7 +265,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
-    public function onSegmentFilterFormHandleSelect(FilterPropertiesTypeEvent $event): void
+    public function onSegmentFilterFormHandleSelect(FormAdjustmentEvent $event): void
     {
         $form       = $event->getFilterPropertiesForm();
         $data       = $form->getData();
@@ -303,7 +303,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onSegmentFilterFormHandleDefault(FilterPropertiesTypeEvent $event): void
+    public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
     {
         $form = $event->getFilterPropertiesForm();
 

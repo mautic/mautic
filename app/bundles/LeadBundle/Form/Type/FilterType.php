@@ -13,11 +13,10 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -42,9 +41,9 @@ class FilterType extends AbstractType
     private $requestStack;
 
     /**
-     * @var TypeOperatorProviderInterface
+     * @var FormAdjustmentsProviderInterface
      */
-    private $typeOperatorProvider;
+    private $formAdjustmentsProvider;
 
     /**
      * @var ListModel
@@ -54,13 +53,13 @@ class FilterType extends AbstractType
     public function __construct(
         TranslatorInterface $translator,
         RequestStack $requestStack,
-        TypeOperatorProviderInterface $typeOperatorProvider,
+        FormAdjustmentsProviderInterface $formAdjustmentsProvider,
         ListModel $listModel
     ) {
-        $this->translator           = $translator;
-        $this->requestStack         = $requestStack;
-        $this->typeOperatorProvider = $typeOperatorProvider;
-        $this->listModel            = $listModel;
+        $this->translator              = $translator;
+        $this->requestStack            = $requestStack;
+        $this->formAdjustmentsProvider = $formAdjustmentsProvider;
+        $this->listModel               = $listModel;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -123,7 +122,7 @@ class FilterType extends AbstractType
             $this->setPropertiesFormData($filterPropertiesType, $data ?? []);
 
             if ($fieldAlias && $operator) {
-                $this->typeOperatorProvider->adjustFilterPropertiesType(
+                $this->formAdjustmentsProvider->adjustForm(
                     $filterPropertiesType,
                     $fieldAlias,
                     $fieldObject,
