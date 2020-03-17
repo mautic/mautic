@@ -53,7 +53,7 @@ final class FormAdjustmentEvent extends Event
         $this->fieldDetails = $fieldDetails;
     }
 
-    public function getFilterPropertiesForm(): FormInterface
+    public function getForm(): FormInterface
     {
         return $this->form;
     }

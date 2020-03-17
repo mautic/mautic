@@ -158,7 +158,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getFilterPropertiesForm();
+        $form = $event->getForm();
 
         $form->add(
             'filter',
@@ -192,7 +192,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getFilterPropertiesForm();
+        $form = $event->getForm();
 
         // This field will hold the label of the lookup item.
         $form->add(
@@ -242,7 +242,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getFilterPropertiesForm();
+        $form = $event->getForm();
 
         $form->add(
             'filter',
@@ -267,7 +267,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterFormHandleSelect(FormAdjustmentEvent $event): void
     {
-        $form       = $event->getFilterPropertiesForm();
+        $form       = $event->getForm();
         $data       = $form->getData();
         $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
@@ -305,7 +305,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
     {
-        $form = $event->getFilterPropertiesForm();
+        $form = $event->getForm();
 
         $form->add(
             'filter',

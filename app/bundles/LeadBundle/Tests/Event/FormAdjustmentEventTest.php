@@ -45,7 +45,7 @@ final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
         ];
         $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $fieldDetails);
 
-        $this->assertSame($this->form, $event->getFilterPropertiesForm());
+        $this->assertSame($this->form, $event->getForm());
         $this->assertSame($alias, $event->getFieldAlias());
         $this->assertSame($object, $event->getFieldObject());
         $this->assertSame($operator, $event->getOperator());

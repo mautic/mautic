@@ -35,6 +35,6 @@ final class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
         $event = new FormAdjustmentEvent($form, $fieldAlias, $fieldObject, $operator, $fieldDetails);
         $this->dispatcher->dispatch(LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD, $event);
 
-        return $event->getFilterPropertiesForm();
+        return $event->getForm();
     }
 }
