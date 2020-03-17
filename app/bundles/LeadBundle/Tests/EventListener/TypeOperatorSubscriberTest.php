@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\EventListener\TypeOperatorSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -119,17 +120,17 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $operators = $event->getOperatorsForAllFieldTypes();
 
         // Test for random operators:
-        $this->assertContains('=', $operators['text']['include']);
-        $this->assertNotContains('in', $operators['text']['include']);
-        $this->assertContains('=', $operators['boolean']['include']);
-        $this->assertNotContains('in', $operators['boolean']['include']);
-        $this->assertContains('in', $operators['date']['exclude']);
-        $this->assertNotContains('=', $operators['date']['exclude']);
-        $this->assertContains('=', $operators['number']['include']);
-        $this->assertNotContains('in', $operators['number']['include']);
-        $this->assertContains('empty', $operators['country']['include']);
-        $this->assertContains('in', $operators['country']['include']);
-        $this->assertNotContains('startsWith', $operators['country']['include']);
+        $this->assertContains(OperatorOptions::EQUAL_TO, $operators['text']['include']);
+        $this->assertNotContains(OperatorOptions::IN, $operators['text']['include']);
+        $this->assertContains(OperatorOptions::EQUAL_TO, $operators['boolean']['include']);
+        $this->assertNotContains(OperatorOptions::IN, $operators['boolean']['include']);
+        $this->assertContains(OperatorOptions::IN, $operators['date']['exclude']);
+        $this->assertNotContains(OperatorOptions::EQUAL_TO, $operators['date']['exclude']);
+        $this->assertContains(OperatorOptions::EQUAL_TO, $operators['number']['include']);
+        $this->assertNotContains(OperatorOptions::IN, $operators['number']['include']);
+        $this->assertContains(OperatorOptions::EMPTY, $operators['country']['include']);
+        $this->assertContains(OperatorOptions::IN, $operators['country']['include']);
+        $this->assertNotContains(OperatorOptions::STARTS_WITH, $operators['country']['include']);
     }
 
     public function testOnTypeListCollect(): void
@@ -186,7 +187,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'unicorn';
         $object   = 'lead';
-        $operator = '=';
+        $operator = OperatorOptions::EQUAL_TO;
         $details  = [];
         $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
 
@@ -200,7 +201,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'tags';
         $object   = 'lead';
-        $operator = '=';
+        $operator = OperatorOptions::EQUAL_TO;
         $details  = [
             'properties' => [
                 'list' => [
@@ -239,7 +240,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'owner';
         $object   = 'lead';
-        $operator = '=';
+        $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'unicorn']];
         $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
 
@@ -253,7 +254,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'owner';
         $object   = 'lead';
-        $operator = '=';
+        $operator = OperatorOptions::EQUAL_TO;
         $details  = ['properties' => ['type' => 'lookup_id']];
         $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
 
@@ -287,5 +288,144 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onSegmentFilterFormHandleLookupId($event);
+    }
+
+    public function testOnSegmentFilterFormHandleLookupIfNotLookup(): void
+    {
+        $alias    = 'lookup_a';
+        $object   = 'lead';
+        $operator = OperatorOptions::EQUAL_TO;
+        $details  = ['properties' => ['type' => 'unicorn']];
+        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->never())
+            ->method('add');
+
+        $this->subscriber->onSegmentFilterFormHandleLookup($event);
+    }
+
+    public function testOnSegmentFilterFormHandleLookupIfLookup(): void
+    {
+        $alias    = 'lookup_a';
+        $object   = 'lead';
+        $operator = OperatorOptions::EMPTY;
+        $details  = [
+            'properties' => [
+                'type' => 'lookup',
+                'list' => ['Choice A' => 'choice_a'],
+            ],
+        ];
+        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                TextType::class,
+                [
+                    'label'    => false,
+                    'disabled' => true,
+                    'data'     => '',
+                    'attr'     => [
+                        'class'        => 'form-control',
+                        'data-toggle'  => 'field-lookup',
+                        'data-options' => ['Choice A' => 'choice_a'],
+                        'data-target'  => 'lookup_a',
+                        'data-action'  => 'lead:fieldList',
+                        'placeholder'  => 'mautic.lead.list.form.filtervalue',
+                    ],
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleLookup($event);
+    }
+
+    public function testOnSegmentFilterFormHandleSelectIfNotSelect(): void
+    {
+        $alias    = 'select_a';
+        $object   = 'lead';
+        $operator = OperatorOptions::IN;
+        $details  = ['properties' => ['type' => 'unicorn']];
+        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->never())
+            ->method('add');
+
+        $this->subscriber->onSegmentFilterFormHandleSelect($event);
+    }
+
+    public function testOnSegmentFilterFormHandleSelectIfSelectWithRegexpOperator(): void
+    {
+        $alias    = 'select_a';
+        $object   = 'lead';
+        $operator = OperatorOptions::REGEXP;
+        $details  = [
+            'properties' => [
+                'type' => 'select',
+                'list' => ['Choice A' => 'choice_a'],
+            ],
+        ];
+        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->never())
+            ->method('add');
+
+        $this->subscriber->onSegmentFilterFormHandleSelect($event);
+    }
+
+    public function testOnSegmentFilterFormHandleSelectIfSelect(): void
+    {
+        $alias    = 'select_a';
+        $object   = 'lead';
+        $operator = OperatorOptions::IN;
+        $details  = [
+            'properties' => [
+                'type' => 'select',
+                'list' => ['Choice A' => 'choice_a'],
+            ],
+        ];
+        $event = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                ChoiceType::class,
+                [
+                    'label'                     => false,
+                    'attr'                      => ['class' => 'form-control'],
+                    'data'                      => [],
+                    'choices'                   => ['Choice A' => 'choice_a'],
+                    'multiple'                  => true,
+                    'choice_translation_domain' => false,
+                    'disabled'                  => false,
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleSelect($event);
+    }
+
+    public function testOnSegmentFilterFormHandleDefault(): void
+    {
+        $alias    = 'text_a';
+        $object   = 'lead';
+        $operator = OperatorOptions::EQUAL_TO;
+        $details  = ['properties' => ['type' => 'text']];
+        $event    = new FilterPropertiesTypeEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                TextType::class,
+                [
+                    'label'    => false,
+                    'attr'     => ['class' => 'form-control'],
+                    'disabled' => false,
+                    'data'     => '',
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleDefault($event);
     }
 }
