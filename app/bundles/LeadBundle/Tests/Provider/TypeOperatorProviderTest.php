@@ -91,8 +91,8 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->assertSame(
-            ['not equal' => OperatorOptions::NOT_EQUAL_TO],
+        $this->assertNotContains(
+            OperatorOptions::EQUAL_TO,
             $this->provider->getOperatorsExcluding([OperatorOptions::EQUAL_TO])
         );
     }
