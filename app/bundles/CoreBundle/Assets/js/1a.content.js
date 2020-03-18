@@ -1047,7 +1047,7 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
         if (fieldEl.length && datum["value"]) {
             fieldEl.val(datum["value"]);
 
-            var lookupCallback = mQuery('#' + field).data("lookup-callback");
+            var lookupCallback = mQuery(fieldId).data('lookup-callback');
             if (lookupCallback && typeof Mautic[lookupCallback] == 'function') {
                 Mautic[lookupCallback](field, datum);
             }

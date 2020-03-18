@@ -264,26 +264,90 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 [
                     'display',
                     TextType::class,
-                    $this->callback(function (array $options) {
-                        $this->assertSame('', $options['data']);
-                        $this->assertSame([
-                            'class'               => 'form-control',
-                            'data-field-callback' => 'activateSegmentFilterTypeahead',
-                            'data-target'         => 'owner',
-                        ], $options['attr']);
+                    $this->callback(
+                        function (array $options) {
+                            $this->assertSame('', $options['data']);
+                            $this->assertSame(
+                                [
+                                    'class'               => 'form-control',
+                                    'data-field-callback' => 'activateSegmentFilterTypeahead',
+                                    'data-target'         => 'owner',
+                                    'placeholder'         => 'mautic.lead.list.form.filtervalue',
+                                ],
+                                $options['attr']
+                            );
 
-                        return true;
-                    }),
+                            return true;
+                        }
+                    ),
                 ],
                 [
                     'filter',
                     HiddenType::class,
-                    $this->callback(function (array $options) {
-                        $this->assertSame('', $options['data']);
-                        $this->assertSame(['class' => 'form-control'], $options['attr']);
+                    $this->callback(
+                        function (array $options) {
+                            $this->assertSame('', $options['data']);
+                            $this->assertSame(['class' => 'form-control'], $options['attr']);
 
-                        return true;
-                    }),
+                            return true;
+                        }
+                    ),
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleLookupId($event);
+    }
+
+    public function testOnSegmentFilterFormHandleLookupIdIfLookupIdWithCustomCallbackAndAction(): void
+    {
+        $alias    = 'custom';
+        $object   = 'lead';
+        $operator = OperatorOptions::EQUAL_TO;
+        $details  = [
+            'properties' => [
+                'type'          => 'lookup_id',
+                'data-action'   => 'foo.bar',
+                'callback'      => 'fooBarCallback',
+            ],
+        ];
+
+        $event    = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->exactly(2))
+            ->method('add')
+            ->withConsecutive(
+                [
+                    'display',
+                    TextType::class,
+                    $this->callback(
+                        function (array $options) {
+                            $this->assertSame('', $options['data']);
+                            $this->assertSame(
+                                [
+                                    'class'               => 'form-control',
+                                    'data-field-callback' => 'fooBarCallback',
+                                    'data-target'         => 'custom',
+                                    'placeholder'         => 'mautic.lead.list.form.filtervalue',
+                                    'data-action'         => 'foo.bar',
+                                ],
+                                $options['attr']
+                            );
+
+                            return true;
+                        }
+                    ),
+                ],
+                [
+                    'filter',
+                    HiddenType::class,
+                    $this->callback(
+                        function (array $options) {
+                            $this->assertSame('', $options['data']);
+                            $this->assertSame(['class' => 'form-control'], $options['attr']);
+
+                            return true;
+                        }
+                    ),
                 ]
             );
 

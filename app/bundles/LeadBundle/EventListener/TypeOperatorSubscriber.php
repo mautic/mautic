@@ -192,21 +192,30 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $form = $event->getForm();
+        $form        = $event->getForm();
+        $properties  = $event->getFieldDetails()['properties'] ?? [];
+        $displayAttr = [
+            'class'               => 'form-control',
+            'data-field-callback' => isset($properties['callback']) ? $properties['callback'] : 'activateSegmentFilterTypeahead',
+            'data-target'         => $event->getFieldAlias(),
+            'placeholder'         => $this->translator->trans(
+                'mautic.lead.list.form.filtervalue'
+            ),
+        ];
+
+        if (isset($properties['data-action'])) {
+            $displayAttr['data-action'] = $properties['data-action'];
+        }
 
         // This field will hold the label of the lookup item.
         $form->add(
             'display',
             TextType::class,
             [
-                'label'    => false,
-                'required' => true,
-                'data'     => $form->getData()['display'] ?? '',
-                'attr'     => [
-                    'class'               => 'form-control',
-                    'data-field-callback' => 'activateSegmentFilterTypeahead',
-                    'data-target'         => $event->getFieldAlias(),
-                ],
+                'label'       => false,
+                'required'    => true,
+                'data'        => $form->getData()['display'] ?? '',
+                'attr'        => $displayAttr,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.core.value.required']
