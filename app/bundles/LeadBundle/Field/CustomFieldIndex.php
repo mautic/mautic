@@ -115,7 +115,7 @@ class CustomFieldIndex
             return false;
         }
 
-        $uniqueIdentifierColumns = $this->getUniqueIdentifierIndexColumns();
+        $uniqueIdentifierColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
         if ($uniqueIdentifierColumns && !$hasIndex) {
             return false;
         }
