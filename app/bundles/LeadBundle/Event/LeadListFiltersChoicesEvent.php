@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
+class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
      * Please refer to ListModel.php, inside getChoiceFields method, for examples of choices.
