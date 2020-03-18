@@ -168,7 +168,7 @@ class CustomFieldIndex
         /** @var IndexSchemaHelper $modifySchema */
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
-        $indexColumns = $this->getUniqueIdentifierIndexColumns();
+        $indexColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
         $modifySchema->dropIndex($indexColumns, 'unique_identifier_search');
 
         $modifySchema->executeChanges();
