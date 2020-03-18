@@ -472,13 +472,14 @@ class ReportModel extends FormModel
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
                     [
-                        'data'      => $reportData['data'],
-                        'columns'   => $reportData['columns'],
-                        'pageTitle' => $name,
-                        'graphs'    => $reportData['graphs'],
-                        'report'    => $report,
-                        'dateFrom'  => $reportData['dateFrom'],
-                        'dateTo'    => $reportData['dateTo'],
+                        'reportData' => $reportData,
+                        'data'       => $reportData['data'],
+                        'columns'    => $reportData['columns'],
+                        'pageTitle'  => $name,
+                        'graphs'     => $reportData['graphs'],
+                        'report'     => $report,
+                        'dateFrom'   => $reportData['dateFrom'],
+                        'dateTo'     => $reportData['dateTo'],
                     ]
                 )->getContent();
 
