@@ -294,6 +294,15 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 }
             }
 
+            $choices = $event->getFieldChoices();
+            $choices = array_flip(
+                ('boolean' === $event->getFieldType())
+                    ?
+                    FormFieldHelper::parseBooleanList($choices)
+                    :
+                    FormFieldHelper::parseList($choices)
+            );
+
             $form->add(
                 'filter',
                 ChoiceType::class,
@@ -301,7 +310,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                     'label'                     => false,
                     'attr'                      => ['class' => 'form-control'],
                     'data'                      => $filter,
-                    'choices'                   => FormFieldHelper::parseList($event->getFieldChoices(), true, ('boolean' === $event->getFieldType())),
+                    'choices'                   => $choices,
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
                     'disabled'                  => $event->filterShouldBeDisabled(),
