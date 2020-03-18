@@ -144,7 +144,7 @@ class CustomFieldIndex
         /** @var IndexSchemaHelper $modifySchema */
         $modifySchema = $this->indexSchemaHelper->setName($leadField->getCustomFieldObject());
 
-        $indexColumns = $this->getUniqueIdentifierIndexColumns();
+        $indexColumns = $this->getUniqueIdentifierIndexColumns($leadField->getObject());
         if (!$indexColumns) {
             $this->dropIndexForUniqueIdentifiers($leadField);
 
@@ -177,10 +177,13 @@ class CustomFieldIndex
     /**
      * @return array<mixed>
      */
-    private function getUniqueIdentifierIndexColumns(): array
+    private function getUniqueIdentifierIndexColumns(string $object = 'lead'): array
     {
+        // Filters
+        $filters = ['object' => $object];
+
         // Get list of current uniques
-        $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
+        $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
 
         // Always use email
         $indexColumns = array_keys($uniqueIdentifierFields);
