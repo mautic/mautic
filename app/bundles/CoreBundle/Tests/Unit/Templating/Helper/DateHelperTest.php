@@ -51,4 +51,52 @@ class DateHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('November 20, 2017 3:45 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
     }
+
+    public function testToTextYesterdayWithPragueTimezone()
+    {
+        $dateTime    = new \DateTime('yesterday', new \DateTimeZone('UTC'));
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($key) {
+                    return $key;
+                }
+            );
+
+        $result = $this->helper->toText($dateTime, 'Europe/Prague', 'Y-m-d H:i:s', true);
+        $this->assertSame('mautic.core.date.yesterday', $result);
+    }
+
+    public function testToTextTodayWithPragueTimezone()
+    {
+        $dateTime    = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($key) {
+                    return $key;
+                }
+            );
+
+        $result = $this->helper->toText($dateTime, 'Europe/Prague', 'Y-m-d H:i:s', true);
+        $this->assertSame('mautic.core.date.today', $result);
+    }
+
+    public function testToTextTomorrowWithPragueTimezone()
+    {
+        $dateTime    = new \DateTime('tomorrow', new \DateTimeZone('UTC'));
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($key) {
+                    return $key;
+                }
+            );
+
+        $result = $this->helper->toText($dateTime, 'Europe/Prague', 'Y-m-d H:i:s', true);
+        $this->assertSame('mautic.core.date.tomorrow', $result);
+    }
 }

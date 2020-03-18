@@ -220,7 +220,7 @@ class DateTimeHelper
     public function getDiff($compare = 'now', $format = null, $resetTime = false)
     {
         if ($compare == 'now') {
-            $compare = new \DateTime();
+            $compare = new \DateTime('now', $this->datetime->getTimezone());
         }
 
         $with = clone $this->datetime;
