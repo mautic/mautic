@@ -1832,8 +1832,8 @@ class LeadModel extends FormModel
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
         array_walk($tags, function (&$val) {
-            $val = trim($val);
-            InputHelper::clean($val);
+            $val = html_entity_decode(trim($val), ENT_QUOTES);
+            $val = InputHelper::clean($val);
         });
 
         // See which tags already exist
@@ -1853,7 +1853,7 @@ class LeadModel extends FormModel
                 $tagToBeAdded = null;
 
                 if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag($tag);
+                    $tagToBeAdded = new Tag($tag, false);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $tagToBeAdded = $foundTags[$tag];
                 }
@@ -1870,8 +1870,8 @@ class LeadModel extends FormModel
             $this->logger->debug('CONTACT: Removing '.implode(', ', $removeTags).' for contact ID# '.$lead->getId());
 
             array_walk($removeTags, function (&$val) {
-                $val = trim($val);
-                InputHelper::clean($val);
+                $val = html_entity_decode(trim($val), ENT_QUOTES);
+                $val = InputHelper::clean($val);
             });
 
             // See which tags really exist
