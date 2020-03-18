@@ -445,7 +445,12 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $details  = [
             'properties' => [
                 'type' => 'select',
-                'list' => ['Choice A' => 'choice_a'],
+                'list' => [
+                    [
+                        'label' => 'Choice A',
+                        'value' => 'choice_a',
+                    ],
+                ],
             ],
         ];
         $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
