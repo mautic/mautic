@@ -72,7 +72,7 @@ class GravatarHelper extends Helper
             ?
             'https://www.mautic.org/media/images/default_avatar.png'
             :
-            $this->defaultAvatarHelper->getDefaultAvatar(true);
+            $this->defaultAvatarHelper->getDefaultAvatar(false);
 
         $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
 
