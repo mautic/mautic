@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 
 class DefaultAvatarHelper
