@@ -41,13 +41,11 @@ class GravatarHelper extends Helper
     private $requestStack;
 
     public function __construct(
-        PathsHelper $pathsHelper,
         DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
         RequestStack $requestStack
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
-        $pathsHelper->getSystemPath('images');
         $this->defaultAvatarHelper = $defaultAvatarHelper;
         $this->requestStack        = $requestStack;
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
