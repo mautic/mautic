@@ -26,7 +26,7 @@ class DefaultAvatarHelper
         $this->assetsHelper = $assetsHelper;
     }
 
-    public function getDefaultAvatar($absolute = false): string
+    public function getDefaultAvatar(bool $absolute = false): string
     {
         $img = $this->pathsHelper->getSystemPath('assets').'/images/avatar.png';
 
