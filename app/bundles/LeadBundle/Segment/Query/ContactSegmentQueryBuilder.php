@@ -92,10 +92,34 @@ class ContactSegmentQueryBuilder
                 continue;
             }
 
+            // OR - set the subqueries to query
+            if ('or' == $filter->getGlue() && !empty($queryBuilder->getSubQueries())) {
+                $queryBuilder = $this->applySubquery($queryBuilder);
+            }
+
             $queryBuilder = $filter->applyQuery($queryBuilder);
+        }
+        // If there is not OR statemennt, set the subqueries to query
+        if (!empty($queryBuilder->getSubQueries())) {
+            $queryBuilder = $this->applySubquery($queryBuilder);
         }
 
         $queryBuilder->applyStackLogic();
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return mixed
+     */
+    private function applySubquery($queryBuilder)
+    {
+        foreach ($queryBuilder->getSubQueries() as $subQuery) {
+            $queryBuilder->andWhere($queryBuilder->expr()->exists($subQuery->getSQL()));
+        }
+        $queryBuilder->resetSubQueries();
 
         return $queryBuilder;
     }

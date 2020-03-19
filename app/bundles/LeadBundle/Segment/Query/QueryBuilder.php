@@ -147,6 +147,11 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     private $boundCounter = 0;
 
     /**
+     * @var SubQuery
+     */
+    private $subQuery;
+
+    /**
      * Initializes a new <tt>QueryBuilder</tt>.
      *
      * @param \Doctrine\DBAL\Connection $connection the DBAL Connection
@@ -155,6 +160,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     {
         parent::__construct($connection);
         $this->connection = $connection;
+        $this->subQuery   = new SubQuery();
     }
 
     /**
@@ -1603,6 +1609,34 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         }
 
         return false;
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return SubQuery
+     */
+    public function getSubQueryByTable($table)
+    {
+        $this->subQuery->setTable($table);
+
+        return $this->subQuery;
+    }
+
+    /**
+     * @return SubQuery
+     */
+    public function getSubQueries()
+    {
+        return $this->subQuery->getSubQueries();
+    }
+
+    /**
+     * Reset sub queries.
+     */
+    public function resetSubQueries()
+    {
+        $this->subQuery->setSubQueries([]);
     }
 
     /**

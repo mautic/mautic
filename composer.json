@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "php": ">=5.6.19 <7.3",
+        "php": ">=5.6.19 <7.4",
 
         "symfony/console": "~2.8",
         "symfony/debug": "~2.8",
@@ -32,6 +32,7 @@
         "symfony/dom-crawler": "~2.8",
         "symfony/browser-kit": "~2.8",
         "symfony/cache": "~3.1",
+        "symfony/serializer": "~2.8",
 
         "symfony/asset": "~2.7",
         "symfony/class-loader": "~2.1",
@@ -93,7 +94,7 @@
         "misd/phone-number-bundle": "^1.1",
         "ip2location/ip2location-php": "^7.2",
         "guzzlehttp/guzzle": "^6.2",
-        "twilio/sdk": "^4.10",
+        "twilio/sdk": "^5.25",
         "debril/rss-atom-bundle": "~2.4.1",
 
         "stack/run": "^1.0",
@@ -113,6 +114,7 @@
         "ramsey/uuid": "^3.7",
         "sendgrid/sendgrid": "~6.0",
         "noxlogic/ratelimit-bundle": "^1.11",
+        "cweagans/composer-patches": "^1.6",
         "sensio/framework-extra-bundle": "~3.0"
     },
     "require-dev": {
@@ -163,6 +165,11 @@
     },
     "extra": {
         "symfony-app-dir": "app",
-        "symfony-web-dir": "../"
+        "symfony-web-dir": "../",
+        "patches": {
+            "doctrine/orm": {
+                "#6991 Support PHP 7.3 without dropping support for 5.6/7.0": "https://github.com/doctrine/doctrine2/commit/07fc401d255a4cdb4a557147d1c8a3fc7a0c718d.diff"
+            }
+        }
     }
 }

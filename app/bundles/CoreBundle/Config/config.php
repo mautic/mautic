@@ -737,8 +737,12 @@ return [
             ],
             'mautic.helper.update' => [
                 'class'     => 'Mautic\CoreBundle\Helper\UpdateHelper',
-                'arguments' => 'mautic.factory',
-            ],
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
+                    'mautic.http.connector',
+                ],            ],
             'mautic.helper.cache' => [
                 'class'     => 'Mautic\CoreBundle\Helper\CacheHelper',
                 'arguments' => [
@@ -775,7 +779,12 @@ return [
             ],
             'mautic.helper.language' => [
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
+                    'mautic.http.connector',
+                ],
             ],
             'mautic.helper.url' => [
                 'class'     => 'Mautic\CoreBundle\Helper\UrlHelper',
@@ -1100,7 +1109,10 @@ return [
         'batch_campaign_sleep_time' => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
-        'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'rss_notification_url'      => '',
+        'translations_list_url'     => 'https://language-packs.mautic.com/manifest.json',
+        'translations_fetch_url'    => 'https://language-packs.mautic.com/',
+        'system_update_url'         => 'https://updates.mautic.org/index.php?option=com_mauticdownload&task=checkUpdates',
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
     ],
