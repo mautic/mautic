@@ -791,6 +791,7 @@ return [
         'mailer_transport'             => 'smtp',
         'mailer_append_tracking_pixel' => true,
         'mailer_convert_embed_images'  => false,
+        'mailer_enable'                => true,
         'mailer_host'                  => '',
         'mailer_port'                  => null,
         'mailer_user'                  => null,
