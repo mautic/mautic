@@ -307,7 +307,7 @@ return [
         'sms_password'             => null,
         'sms_sending_phone_number' => null,
         'sms_frequency_number'     => 0,
-        'sms_frequency_time'       => 0,
+        'sms_frequency_time'       => 'DAY',
         'sms_transport'            => 'mautic.sms.twilio.transport',
     ],
 ];
