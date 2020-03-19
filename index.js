@@ -3,7 +3,6 @@ import loadBlocks from './blocks';
 
 export default (editor, opts = {}) => {
     const am = editor.AssetManager;
-    const pm = editor.Panels;
     const cfg = editor.getConfig();
 
     let config = {
@@ -89,44 +88,6 @@ export default (editor, opts = {}) => {
             },
         });
     }
-
-    editor.on('load', function() {
-        let $ = grapesjs.$;
-
-        // Load and show settings and style manager
-        let openTmBtn = pm.getButton('views', 'open-tm');
-        openTmBtn && openTmBtn.set('active', 1);
-        let openSm = pm.getButton('views', 'open-sm');
-        openSm && openSm.set('active', 1);
-
-        pm.removeButton("views", "open-tm");
-
-        // Add Settings Sector
-        let traitsSector = $('<div class="gjs-sm-sector no-select">'+
-            '<div class="gjs-sm-title"><span class="icon-settings fa fa-cog"></span> Settings</div>' +
-            '<div class="gjs-sm-properties" style="display: none;"></div></div>');
-        let traitsProps = traitsSector.find('.gjs-sm-properties');
-
-        traitsProps.append($('.gjs-trt-traits'));
-        $('.gjs-sm-sectors').before(traitsSector);
-        traitsSector.find('.gjs-sm-title').on('click', function(){
-            let traitStyle = traitsProps.get(0).style;
-            let hidden = traitStyle.display === 'none';
-
-            if (hidden) {
-                traitStyle.display = 'block';
-            } else {
-                traitStyle.display = 'none';
-            }
-        });
-
-        // Open settings
-        traitsProps.get(0).style.display = 'block';
-
-        // Open block manager
-        let openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
-        openBlocksBtn && openBlocksBtn.set('active', 1);
-    });
 
     loadButtons(editor, config);
     loadBlocks(editor, config);

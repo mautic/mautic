@@ -53,6 +53,30 @@ export default (editor, opts = {}) => {
         });
     }
 
+    if (typeof bm.get('column1') !== 'undefined') {
+        bm.get('column1').set({
+            category: 'Sections'
+        });
+    }
+
+    if (typeof bm.get('column2') !== 'undefined') {
+        bm.get('column2').set({
+            category: 'Sections'
+        });
+    }
+
+    if (typeof bm.get('column3') !== 'undefined') {
+        bm.get('column3').set({
+            category: 'Sections'
+        });
+    }
+
+    if (typeof bm.get('column3-7') !== 'undefined') {
+        bm.get('column3-7').set({
+            category: 'Sections'
+        });
+    }
+
     // Add icon to mj-hero
     if (typeof bm.get('mj-hero') !== 'undefined') {
         bm.get('mj-hero').set({
