@@ -692,6 +692,9 @@ class ReportModel extends FormModel
             $params             = $query->getParameters();
 
             foreach ($params as $name => $param) {
+                if (is_array($param)) {
+                    $param = implode("','", $param);
+                }
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
 
