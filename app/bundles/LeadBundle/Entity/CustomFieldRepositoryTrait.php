@@ -114,7 +114,15 @@ trait CustomFieldRepositoryTrait
                 //since we have to be cross-platform; it's way ugly
 
                 //We should probably totally ditch orm for leads
-                $order = $this->getTableAlias().'.id AS HIDDEN ORD';
+
+                // This "hack" is in place to allow for custom ordering in the API.
+                // See https://github.com/mautic/mautic/pull/7494#issuecomment-600970208
+                $order = '(CASE';
+                foreach ($ids as $count => $id) {
+                    $order .= ' WHEN '.$this->getTableAlias().'.id = '.$id.' THEN '.$count;
+                    ++$count;
+                }
+                $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
 
                 //ORM - generates lead entities
                 /** @var \Doctrine\ORM\QueryBuilder $q */
