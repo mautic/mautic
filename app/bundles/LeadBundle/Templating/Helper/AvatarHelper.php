@@ -138,7 +138,7 @@ class AvatarHelper extends Helper
      */
     public function getDefaultAvatar(bool $absolute = false): string
     {
-        return $this->defaultAvatarHelper->getDefaultAvatar();
+        return $this->defaultAvatarHelper->getDefaultAvatar($absolute);
     }
 
     /**
