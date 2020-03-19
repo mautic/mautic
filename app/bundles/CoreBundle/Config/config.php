@@ -614,6 +614,10 @@ return [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
                 'tag'   => 'container.env_var_processor',
             ],
+            'mautic.di.env_processor.int_nullable' => [
+                'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor::class,
+                'tag'   => 'container.env_var_processor',
+            ],
             'mautic.cipher.openssl' => [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],

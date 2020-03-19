@@ -34,7 +34,7 @@ foreach ($mauticParams as $k => $v) {
             $type = 'bool:';
             break;
         case is_int($v):
-            $type = 'int:';
+            $type = 'intNullable:';
             break;
         case is_array($v):
             $type = 'json:';
