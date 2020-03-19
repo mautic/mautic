@@ -26,12 +26,9 @@ class DefaultAvatarHelper
         $this->assetsHelper = $assetsHelper;
     }
 
-    /**
-     * @param bool|false $absolute
-     */
-    public function getDefaultAvatar(bool $absolute = false): string
+    public function getDefaultAvatar(): string
     {
-        $img = $this->pathsHelper->getSystemPath('assets', $absolute).'/images/avatar.png';
+        $img = $this->pathsHelper->getSystemPath('assets', false).'/images/avatar.png';
 
         return UrlHelper::rel2abs($this->assetsHelper->getUrl($img));
     }

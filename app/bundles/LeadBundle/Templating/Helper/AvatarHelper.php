@@ -132,13 +132,13 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * @deprecated Use DefaultAvatarHelper::getDefaultAvatar instead of it
-     *
      * @param bool|false $absolute
+     *
+     * @deprecated Use DefaultAvatarHelper::getDefaultAvatar instead of it
      */
     public function getDefaultAvatar(bool $absolute = false): string
     {
-        return $this->defaultAvatarHelper->getDefaultAvatar($absolute);
+        return $this->defaultAvatarHelper->getDefaultAvatar();
     }
 
     /**
