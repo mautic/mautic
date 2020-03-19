@@ -5,10 +5,15 @@ export default (editor, opts = {}) => {
     const cfg = editor.getConfig();
 
     if (!opts.showImportButton) {
-        if (opts.mjmlTemplate) {
-            pm.removeButton("options", "mjml-import");
-        } else {
-            pm.removeButton("options", "gjs-open-import-template");
+        let mjmlImportBtn = pm.getButton('options', 'mjml-import');
+        let htmlImportBtn = pm.getButton('options', 'gjs-open-import-template');
+
+        if (mjmlImportBtn !== null) {
+            pm.removeButton('options', 'mjml-import');
+        }
+
+        if (htmlImportBtn !== null) {
+            pm.removeButton('options', 'gjs-open-import-template');
         }
     }
 
@@ -81,4 +86,18 @@ export default (editor, opts = {}) => {
             }
         ]);
     }
+
+    // Hide open-layers when all is loaded to prevent bug
+    editor.on('load', function() {
+        if (!opts.showLayersManager) {
+            let openLayersBtn = pm.getButton('views', 'open-layers');
+
+            if (openLayersBtn !== null) {
+                openLayersBtn.set('attributes', {
+                    style: 'display:none;',
+                    title: 'toto',
+                });
+            }
+        }
+    });
 };

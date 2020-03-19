@@ -11,6 +11,7 @@ export default (editor, opts = {}) => {
         sourceEditBtnLabel: 'Edit',
         sourceEditModalTitle: 'Edit code',
         deleteAssetConfirmText: 'Are you sure?',
+        showLayersManager: 0,
         showImportButton: 0,
         mjmlTemplate: false,
         replaceRteWithFroala: true,
@@ -118,6 +119,9 @@ export default (editor, opts = {}) => {
                 traitStyle.display = 'none';
             }
         });
+
+        // Open settings
+        traitsProps.get(0).style.display = 'block';
 
         // Open block manager
         let openBlocksBtn = editor.Panels.getButton('views', 'open-blocks');
