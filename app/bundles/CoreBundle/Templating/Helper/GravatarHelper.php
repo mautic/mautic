@@ -68,7 +68,7 @@ class GravatarHelper extends Helper
                     array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1'])
                 )))
             ?
-            'https://www.mautic.org/media/images/default_avatar.png'
+            'https://www.gravatar.com/avatar?d=mp'
             :
             $this->defaultAvatarHelper->getDefaultAvatar();
 
