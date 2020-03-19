@@ -230,10 +230,8 @@ class ReportModel extends FormModel
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
             if (isset($this->reportBuilderData['all'])) {
-                $contextArray                                = explode('.', $context);
-                $alias                                       = array_pop($contextArray);
-                $this->reportBuilderData[$context]['tables'] = ($this->reportBuilderData['all']['tables'][$alias]) ?: [];
-                $this->reportBuilderData[$context]['graphs'] =  $this->reportBuilderData['all']['graphs'][$alias] ?? [];
+                $this->reportBuilderData[$context]['tables'] = $this->reportBuilderData['all']['tables'][$context] ?? [];
+                $this->reportBuilderData[$context]['graphs'] = $this->reportBuilderData['all']['graphs'][$context] ?? [];
             } else {
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;

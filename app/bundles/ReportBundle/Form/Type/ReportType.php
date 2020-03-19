@@ -142,10 +142,9 @@ class ReportType extends AbstractType
 
             $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($tables) {
                 if (empty($source)) {
-                    reset($tables);
-                    $firstGroup = key($tables);
-                    reset($tables[$firstGroup]);
-                    $source = key($tables[$firstGroup]);
+                    $firstGroup           = array_key_first($tables);
+                    $firstKeyInFirstGroup = array_key_first($tables[$firstGroup]);
+                    $source               = $tables[$firstGroup][$firstKeyInFirstGroup];
                 }
 
                 $columns           = $this->reportModel->getColumnList($source);

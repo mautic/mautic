@@ -60,7 +60,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetColumnListWithContext()
     {
-        $properContextFormat = 'mautic.asset.assets';
+        $properContextFormat = 'assets';
         $actual              = $this->reportModel->getColumnList($properContextFormat);
         $expected            = Fixtures::getGoodColumnList();
 
