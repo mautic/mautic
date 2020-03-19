@@ -68,9 +68,9 @@ class GravatarHelper extends Helper
                     array_merge($this->devHosts, ['127.0.0.1', 'fe80::1', '::1'])
                 )))
             ?
-            'https://www.gravatar.com/avatar?d=mp'
+            'mp'
             :
-            $this->defaultAvatarHelper->getDefaultAvatar();
+            $this->defaultAvatarHelper->getDefaultAvatar(true);
 
         $url = 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s='.$size;
 
