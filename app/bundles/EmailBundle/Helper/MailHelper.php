@@ -324,6 +324,10 @@ class MailHelper
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
+        if (!$this->get('mautic.helper.core_parameters')->getParameter('mailer_enable')) {
+            return false;
+        }
+
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
