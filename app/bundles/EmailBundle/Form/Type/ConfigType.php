@@ -172,24 +172,39 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'mailer_from_name',
-            TextType::class,
-            [
-                'label'       => 'mautic.email.config.mailer.from.name',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.config.mailer.from.name.tooltip',
-                    'onchange' => 'Mautic.disableSendTestEmailButton()',
-                ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
-            ]
+          'mailer_enable',
+          'yesno_button_group',
+          [
+            'label'      => 'mautic.email.config.mailer.enable',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+              'class'   => 'form-control',
+              'tooltip' => 'mautic.email.config.mailer.enable.tooltip',
+            ],
+            'data'       => empty($options['data']['mailer_enable']) ? false : true,
+            'required'   => false,
+          ]
+        );
+
+        $builder->add(
+          'mailer_from_name',
+          TextType::class,
+          [
+            'label'       => 'mautic.email.config.mailer.from.name',
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => [
+              'class'    => 'form-control',
+              'tooltip'  => 'mautic.email.config.mailer.from.name.tooltip',
+              'onchange' => 'Mautic.disableSendTestEmailButton()',
+            ],
+            'constraints' => [
+              new NotBlank(
+                [
+                  'message' => 'mautic.core.value.required',
+                ]
+              ),
+            ],
+          ]
         );
 
         $builder->add(

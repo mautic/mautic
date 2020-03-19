@@ -36,6 +36,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
                 'mailer_password'              => null,
                 'mailer_encryption'            => null,
                 'mailer_auth_mode'             => null,
+                'mailer_enable'                => 1,
                 'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
                 'mailer_spool_type'            => 'memory',
                 'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
