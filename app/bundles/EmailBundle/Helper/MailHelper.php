@@ -324,7 +324,7 @@ class MailHelper
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
-        if (!$this->get('mautic.helper.core_parameters')->getParameter('mailer_enable')) {
+        if (!$this->factory->getParameter('mailer_enable')) {
             return false;
         }
 
