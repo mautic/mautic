@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Mautic\LeadBundle\Tests\Field;
-
 
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -49,7 +47,8 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getHasMatchingUniqueIdentifierIndexProvider
      *
-     * Test getting unique identifier if object is lead.
+     * Test getting unique identifier if object is lead or company.
+     *
      * @param string $object
      * @param string $field
      * @param string $fieldKey
@@ -82,10 +81,11 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function getHasMatchingUniqueIdentifierIndexProvider() {
+    public function getHasMatchingUniqueIdentifierIndexProvider()
+    {
         return [
-            "Lead object"    => ['lead', 'email', 'email_key'],
-            "Company object" => ['company', 'company_email', 'company_email_key'],
+            'Lead object'    => ['lead', 'email', 'email_key'],
+            'Company object' => ['company', 'company_email', 'company_email_key'],
         ];
     }
 }
