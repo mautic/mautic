@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\IpLookup\MaxMindDoNotSellList;
+use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,10 +26,16 @@ class MaxMindDoNotSellPurgeCommand extends Command
      */
     private $em;
 
-    public function __construct(EntityManager $em)
+    /**
+     * @var MaxMindDoNotSellList
+     */
+    private $doNotSellList;
+
+    public function __construct(EntityManager $em, MaxMindDoNotSellList $doNotSellList)
     {
         parent::__construct();
         $this->em = $em;
+        $this->doNotSellList = $doNotSellList;
     }
 
     /**
@@ -79,17 +85,31 @@ EOT
         $dryRun          = $input->getOption('dry-run');
         $this->batchSize = $input->getOption('batch-size') ?? $this->batchSize;
 
-        $output->writeln("Step 1: Checking Do Not Sell List for matches...\n");
+        $output->writeln("Step 1: Searching for contacts with data from Do Not Sell List...\n");
 
-        $matches = $this->findIPMatches($output);
+        $progressBar = new ProgressBar($output);
+        $progressBar->start();
 
-        if (0 == count($matches)) {
+        $offset  = 0;
+        $doNotSellContacts = [];
+        while ($this->doNotSellList->loadList($offset, $this->batchSize)) {
+            $contacts = $this->findContactsFromIPs($this->doNotSellList->getList());
+            $doNotSellContacts = array_merge($doNotSellContacts, $contacts);
+
+            $progressBar->advance(count($this->doNotSellList->getList()));
+
+            $offset += $this->batchSize;
+        }
+
+        $progressBar->finish();
+
+        if (0 == count($doNotSellContacts)) {
             $output->writeln("\nNo matches found, exiting.");
 
             return 0;
         }
 
-        $output->writeln("\nFound ".count($matches).' matches.');
+        $output->writeln("\nFound ".count($doNotSellContacts).' contacts.');
 
         if ($dryRun) {
             $output->writeln('Dry run, skipping purge.');
@@ -97,45 +117,9 @@ EOT
             return 0;
         }
 
-        $this->purgeData($output, $matches);
+        $this->purgeData($output, $doNotSellContacts);
 
         return 0;
-    }
-
-    private function customIPsAreValid(array $ips): bool
-    {
-        $validator = Validation::createValidator();
-
-        $violations   = [];
-        $ipConstraint = new Ip();
-        foreach ($ips as $ip) {
-            $violations = $validator->validate($ip, [$ipConstraint]);
-        }
-
-        return boolval(count($violations));
-    }
-
-    private function findIPMatches(OutputInterface $output): array
-    {
-        $progressBar = new ProgressBar($output);
-        $progressBar->start();
-
-        $doNotSellList = new MaxMindDoNotSellList();
-
-        $offset  = 0;
-        $matches = [];
-        while ($doNotSellList->loadList($offset, $this->batchSize)) {
-            $contacts = $this->findContactsFromIPs($doNotSellList->getList());
-            $matches  = array_merge($matches, $contacts);
-
-            $progressBar->advance(count($doNotSellList->getList()));
-
-            $offset += $this->batchSize;
-        }
-
-        $progressBar->finish();
-
-        return $matches;
     }
 
     private function findContactsFromIPs(array $ips): array
