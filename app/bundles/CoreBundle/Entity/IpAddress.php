@@ -201,7 +201,11 @@ class IpAddress
                     continue;
                 }
 
-                if (preg_match('/'.str_replace(['.', '*'], ['\\.', '\\*'], $ip).'/', $this->ipAddress)) {
+                if ($ip === $this->ipAddress) {
+                    return false;
+                }
+
+                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
                     return false;
                 }
             }
