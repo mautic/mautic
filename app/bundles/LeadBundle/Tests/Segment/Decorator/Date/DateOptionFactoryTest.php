@@ -45,7 +45,7 @@ class DateOptionFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(DateAnniversary::class, $filterDecorator);
 
-        $filterName = 'birthday';
+        $filterName = 'anniversary';
 
         $filterDecorator = $this->getFilterDecorator($filterName);
 

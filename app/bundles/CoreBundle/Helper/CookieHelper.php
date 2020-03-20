@@ -123,6 +123,6 @@ class CookieHelper
      */
     public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        $this->setCookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
+        $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly);
     }
 }
