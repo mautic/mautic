@@ -149,6 +149,16 @@ return [
         ],
     ],
     'services' => [
+        'commands' => [
+            'mautic.core.command.do_not_sell' => [
+                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
+                'arguments' => [
+                    'mautic.helper.maxmind_do_not_sell_download',
+                    'translator',
+                ],
+                'tag' => 'console.command',
+            ],
+        ],
         'events' => [
             'mautic.core.subscriber' => [
                 'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
@@ -522,6 +532,14 @@ return [
                     'mautic.model.factory',
                     'database_connection',
                     'mautic.helper.user',
+                ],
+            ],
+            'mautic.helper.maxmind_do_not_sell_download' => [
+                'class'     => \Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
+                'arguments' => [
+                    '%mautic.ip_lookup_auth%',
+                    '%kernel.cache_dir%',
+                    'monolog.logger.mautic',
                 ],
             ],
         ],
