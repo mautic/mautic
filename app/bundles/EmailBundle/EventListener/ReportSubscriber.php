@@ -376,8 +376,8 @@ class ReportSubscriber extends CommonSubscriber
 
                     if ($event->hasFilter('e.id')) {
                         $filterParam = $event->createParameterName();
-                        $qbcut->andWhere("cut2.channel_id = :{$filterParam}");
-                        $qb->setParameter($filterParam, $event->getFilterValue('e.id'), \PDO::PARAM_INT);
+                        $qbcut->andWhere($qb->expr()->in('cut2.channel_id', ":{$filterParam}"));
+                        $qb->setParameter($filterParam, $event->getFilterValues('e.id'), Connection::PARAM_INT_ARRAY);
                     }
 
                     $qb->leftJoin(

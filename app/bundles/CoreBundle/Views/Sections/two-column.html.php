@@ -14,7 +14,7 @@
         <table data-section="1" style="margin: 0 auto;border-collapse: collapse !important;width: 600px;" class="w320" border="0" cellpadding="0" cellspacing="0" width="600">
             <tr>
                 <td align="center" valign="top">
-                    <table align="left" border="0" cellpadding="10" cellspacing="0" width="300" class="mobile-block">
+                    <table align="left" border="0" cellpadding="10" cellspacing="0" width="290" class="mobile-block">
                         <tr>
                             <td data-slot-container="1" valign="top" style="padding-left: 5px; padding-right: 5px;">
                                 <div data-slot="text">
@@ -23,7 +23,7 @@
                             </td>
                         </tr>
                     </table>
-                    <table align="right" border="0" cellpadding="10" cellspacing="0" width="300" class="mobile-block">
+                    <table align="left" border="0" cellpadding="10" cellspacing="0" width="290" class="mobile-block">
                         <tr>
                             <td data-slot-container="1" valign="top" style="padding-left: 5px; padding-right: 5px;">
                                 <div data-slot="text">

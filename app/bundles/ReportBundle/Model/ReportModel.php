@@ -472,13 +472,14 @@ class ReportModel extends FormModel
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
                     [
-                        'data'      => $reportData['data'],
-                        'columns'   => $reportData['columns'],
-                        'pageTitle' => $name,
-                        'graphs'    => $reportData['graphs'],
-                        'report'    => $report,
-                        'dateFrom'  => $reportData['dateFrom'],
-                        'dateTo'    => $reportData['dateTo'],
+                        'reportData' => $reportData,
+                        'data'       => $reportData['data'],
+                        'columns'    => $reportData['columns'],
+                        'pageTitle'  => $name,
+                        'graphs'     => $reportData['graphs'],
+                        'report'     => $report,
+                        'dateFrom'   => $reportData['dateFrom'],
+                        'dateTo'     => $reportData['dateTo'],
                     ]
                 )->getContent();
 
@@ -691,6 +692,9 @@ class ReportModel extends FormModel
             $params             = $query->getParameters();
 
             foreach ($params as $name => $param) {
+                if (is_array($param)) {
+                    $param = implode("','", $param);
+                }
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
 

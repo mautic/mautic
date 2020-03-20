@@ -534,11 +534,11 @@
                             // Register a callback for a redirect
                             if (response.redirect) {
                                 setTimeout(function () {
-                                    window.location = response.redirect;
+                                    window.top.location = response.redirect;
                                 }, 2000);
                             }
                         } else if (response.redirect) {
-                            window.location = response.redirect;
+                            window.top.location = response.redirect;
                         } else if (response.validationErrors) {
                             var firstPage = false;
                             for (var field in response.validationErrors) {

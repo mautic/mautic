@@ -133,7 +133,7 @@ class CampaignHelper
         $contactValues = $this->getContactValues($contact);
 
         foreach ($rawTokens as $key => $value) {
-            $values[$key] = urldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
+            $values[$key] = rawurldecode(TokenHelper::findLeadTokens($value, $contactValues, true));
         }
 
         return $values;

@@ -122,8 +122,6 @@ class ContactRequestHelper
      */
     public function getContactFromQuery(array $queryFields = [])
     {
-        $this->trackedContact = $this->contactTracker->getContact();
-
         unset($queryFields['page_url']); // This is set now automatically by PageModel
         $this->queryFields    = $queryFields;
 
@@ -132,6 +130,10 @@ class ContactRequestHelper
             $this->trackedContact = $foundContact;
             $this->contactTracker->setTrackedContact($this->trackedContact);
         } catch (ContactNotFoundException $exception) {
+        }
+
+        if (!$this->trackedContact) {
+            $this->trackedContact = $this->contactTracker->getContact();
         }
 
         if (!$this->trackedContact) {
@@ -180,7 +182,9 @@ class ContactRequestHelper
             );
             if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
-                return $foundContact;
+                if (!$foundContact->isNew()) {
+                    return $foundContact;
+                }
             }
         }
 
@@ -246,7 +250,7 @@ class ContactRequestHelper
             throw new ContactNotFoundException();
         }
 
-        if (!$this->trackedContact->isAnonymous() || empty($this->queryFields['fingerprint'])) {
+        if (($this->trackedContact && !$this->trackedContact->isAnonymous()) || (empty($this->queryFields['fingerprint']))) {
             // We already know who this is or fingerprint is not available so just use tracked lead
             throw new ContactNotFoundException();
         }
