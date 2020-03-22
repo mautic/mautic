@@ -11,19 +11,12 @@
 
 namespace Mautic\SmsBundle\Callback\DAO;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
-class ReplyDAO
+class ReplyDAO extends AbstractActionDAO
 {
     /**
      * @var string
      */
     private $message;
-
-    /**
-     * @var ArrayCollection
-     */
-    private $contacts;
 
     /**
      * @return string
@@ -39,21 +32,5 @@ class ReplyDAO
     public function setMessage($message)
     {
         $this->message = $message;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getContacts()
-    {
-        return $this->contacts;
-    }
-
-    /**
-     * @param ArrayCollection $contacts
-     */
-    public function setContacts($contacts)
-    {
-        $this->contacts = $contacts;
     }
 }

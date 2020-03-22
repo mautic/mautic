@@ -15,7 +15,6 @@ interface TransportSettingsInterface
 {
     const STAT_DELIVERED  = 'delivered';
     const STAT_READ       = 'read';
-    const FORM_ATTACHMENT = 'attachment';
 
     /**
      *  Define which settings your transport support.

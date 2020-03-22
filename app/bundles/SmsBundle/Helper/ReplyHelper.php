@@ -120,12 +120,12 @@ class ReplyHelper
     }
 
     /**
-     * Get array of ReplyDAO or DeliveryStatusDAO     *.
-     *
-     * @param                   $message
-     * @param CallbackInterface $handler
+     * @param string|ReplyDAO|array $message
+     * @param CallbackInterface     $handler
      *
      * @return array|ReplyDAO
+     *
+     * @throws NumberNotFoundException
      */
     private function getMessages($message, CallbackInterface $handler)
     {
@@ -190,7 +190,7 @@ class ReplyHelper
      *
      * @return null|\Symfony\Component\HttpFoundation\Response
      */
-    private function dispatchReplyEvent(Lead $contact, $message)
+    public function dispatchReplyEvent(Lead $contact, $message)
     {
         $replyEvent = new ReplyEvent($contact, trim($message));
 
@@ -205,7 +205,7 @@ class ReplyHelper
      *
      * @return Response|null
      */
-    private function dispatchDeliveryEvent(Lead $contact, DeliveryStatusDAO $deliveryStatus)
+    public function dispatchDeliveryEvent(Lead $contact, DeliveryStatusDAO $deliveryStatus)
     {
         $deliveryEvent = new DeliveryEvent($contact, $deliveryStatus);
 

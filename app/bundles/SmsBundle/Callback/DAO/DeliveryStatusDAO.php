@@ -11,9 +11,7 @@
 
 namespace Mautic\SmsBundle\Callback\DAO;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
-class DeliveryStatusDAO
+class DeliveryStatusDAO extends AbstractActionDAO
 {
     /**
      * @var bool
@@ -24,16 +22,6 @@ class DeliveryStatusDAO
      * @var bool
      */
     private $isRead = false;
-
-    /**
-     * @var string
-     */
-    private $trackingHash;
-
-    /**
-     * @var ArrayCollection
-     */
-    private $contacts;
 
     /**
      * @return bool
@@ -65,37 +53,5 @@ class DeliveryStatusDAO
     public function setIsRead()
     {
         $this->isRead = true;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTrackingHash()
-    {
-        return $this->trackingHash;
-    }
-
-    /**
-     * @param string $trackingHash
-     */
-    public function setTrackingHash($trackingHash)
-    {
-        $this->trackingHash = $trackingHash;
-    }
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getContacts()
-    {
-        return $this->contacts;
-    }
-
-    /**
-     * @param ArrayCollection $contacts
-     */
-    public function setContacts($contacts)
-    {
-        $this->contacts = $contacts;
     }
 }
