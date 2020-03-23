@@ -1,4 +1,5 @@
 export default (editor, opts = {}) => {
+    const $ = mQuery;
     const pm = editor.Panels;
     const modal = editor.Modal;
     const cmd = editor.Commands;
@@ -158,8 +159,6 @@ export default (editor, opts = {}) => {
         // Activate by default View Components button
         let viewComponents = pm.getButton('options', 'sw-visibility');
         viewComponents && viewComponents.set('active', 1);
-
-        let $ = grapesjs.$;
 
         // Load and show settings and style manager
         let openTmBtn = pm.getButton('views', 'open-tm');

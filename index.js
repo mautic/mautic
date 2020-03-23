@@ -2,6 +2,7 @@ import loadButtons from './buttons';
 import loadBlocks from './blocks';
 
 export default (editor, opts = {}) => {
+    const $ = mQuery;
     const am = editor.AssetManager;
     const cfg = editor.getConfig();
 
@@ -41,7 +42,7 @@ export default (editor, opts = {}) => {
         },
     });
 
-    if (config.replaceRteWithFroala && typeof mQuery.FroalaEditor !== 'undefined') {
+    if (config.replaceRteWithFroala && typeof $.FroalaEditor !== 'undefined') {
         // Hiding other toolbars already created
         let rteToolbar = editor.RichTextEditor.getToolbarEl();
         [].forEach.call(rteToolbar.children, (child) => {
@@ -50,8 +51,8 @@ export default (editor, opts = {}) => {
 
         editor.setCustomRte({
             enable: function(el, rte) {
-                rte = mQuery(el).froalaEditor({
-                    enter: mQuery.FroalaEditor.ENTER_BR,
+                rte = $(el).froalaEditor({
+                    enter: $.FroalaEditor.ENTER_BR,
                     pastePlain: true,
 
                     htmlAllowedTags: ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hgroup', 'hr', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'menu', 'menuitem', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'queue', 'rp', 'rt', 'ruby', 's', 'samp', 'script', 'style', 'section', 'select', 'small', 'source', 'span', 'strike', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr', 'center'],
@@ -63,16 +64,16 @@ export default (editor, opts = {}) => {
                     linkEditButtons: ['linkOpen', 'linkRemove'],
                 });
 
-                mQuery(el).on('froalaEditor.popups.show.link.edit', function (e, editor) {
+                $(el).on('froalaEditor.popups.show.link.edit', function (e, editor) {
                     // Get the link DOM object of the current selection.
-                    let currentLink = mQuery(el).froalaEditor('link.get');
+                    let currentLink = $(el).froalaEditor('link.get');
 
                     // Get popup link.edit
-                    let popupLink = mQuery(el).froalaEditor('popups.get', 'link.edit');
+                    let popupLink = $(el).froalaEditor('popups.get', 'link.edit');
 
                     if (typeof currentLink !== 'undefined') {
                         let top = currentLink.getBoundingClientRect().top;
-                        let height = mQuery(currentLink).outerHeight();
+                        let height = $(currentLink).outerHeight();
 
                         // Set position of popup
                         popupLink.css('top', parseInt(top) + parseInt(height) + 35);
@@ -82,9 +83,9 @@ export default (editor, opts = {}) => {
                 return rte;
             },
             disable: function(el, rte) {
-                // Remove events and destroy editor
-                mQuery(el).off('froalaEditor.popups.show.link.edit');
-                mQuery(el).froalaEditor('destroy');
+                // Remove events and destroy rte
+                $(el).off('froalaEditor.popups.show.link.edit');
+                $(el).froalaEditor('destroy');
             },
         });
     }

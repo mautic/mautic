@@ -10,7 +10,11 @@ export default (editor, opts = {}) => {
         });
     });
 
-    // Custom block inside Sections category
+    /*
+     Custom block inside Sections category
+     */
+
+    // MJML columns
     if (typeof bm.get('mj-1-column') !== 'undefined') {
         bm.get('mj-1-column').set({
             category: 'Sections'
@@ -29,6 +33,7 @@ export default (editor, opts = {}) => {
         });
     }
 
+    // Newsletter columns
     if (typeof bm.get('sect100') !== 'undefined') {
         bm.get('sect100').set({
             category: 'Sections'
@@ -53,6 +58,7 @@ export default (editor, opts = {}) => {
         });
     }
 
+    // Webpage columns
     if (typeof bm.get('column1') !== 'undefined') {
         bm.get('column1').set({
             category: 'Sections'
