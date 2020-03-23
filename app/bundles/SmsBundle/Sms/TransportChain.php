@@ -106,16 +106,15 @@ class TransportChain
     /**
      * @param Lead      $lead
      * @param string    $content
-     * @param Sms       $sms
      * @param Stat|null $stat
      *
      * @return mixed
      *
      * @throws PrimaryTransportNotEnabledException
      */
-    public function sendSms(Lead $lead, $content, Sms $sms = null, Stat $stat= null)
+    public function sendSms(Lead $lead, $content, Stat $stat= null)
     {
-        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $sms, $stat);
+        $response = $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
 
         return $response;
     }

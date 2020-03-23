@@ -170,8 +170,16 @@ return [
                     'mautic.helper.phone_number',
                 ],
             ],
+            'mautic.sms.helper.callback' => [
+                'class'     => \Mautic\SmsBundle\Helper\CallbackHelper::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'monolog.logger.mautic',
+                    'mautic.tracker.contact',
+                ],
+            ],
             'mautic.sms.helper.reply' => [
-                'class'     => \Mautic\SmsBundle\Helper\ReplyHelper::class,
+                'class'     => \Mautic\SmsBundle\Helper\CallbackHelper::class,
                 'arguments' => [
                     'event_dispatcher',
                     'monolog.logger.mautic',
@@ -244,11 +252,11 @@ return [
             ],
         ],
         'controllers' => [
-            'mautic.sms.controller.reply' => [
-                'class'     => \Mautic\SmsBundle\Controller\ReplyController::class,
+            'mautic.sms.controller.callback' => [
+                'class'     => \Mautic\SmsBundle\Controller\CallbackController::class,
                 'arguments' => [
                     'mautic.sms.callback_handler_container',
-                    'mautic.sms.helper.reply',
+                    'mautic.sms.helper.callback',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -276,7 +284,7 @@ return [
         'public' => [
             'mautic_sms_callback' => [
                 'path'       => '/sms/{transport}/callback',
-                'controller' => 'MauticSmsBundle:Reply:callback',
+                'controller' => 'MauticSmsBundle:Callback:callback',
             ],
             /* @deprecated as this was Twilio specific */
             'mautic_receive_sms' => [

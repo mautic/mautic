@@ -9,12 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\Callback\DAO;
+namespace Mautic\SmsBundle\Callback\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-abstract class AbstractActionDAO
+abstract class AbstractCallbackEvent
 {
     /**
      * @var ArrayCollection
@@ -36,10 +36,14 @@ abstract class AbstractActionDAO
 
     /**
      * @param string $trackingHash
+     *
+     * @return AbstractCallbackEvent
      */
     public function setTrackingHash($trackingHash)
     {
         $this->trackingHash = $trackingHash;
+
+        return $this;
     }
 
     /**
@@ -52,14 +56,20 @@ abstract class AbstractActionDAO
 
     /**
      * @param ArrayCollection $contacts
+     *
+     * @return AbstractCallbackEvent
      */
     public function setContacts($contacts)
     {
         $this->contacts = $contacts;
+
+        return $this;
     }
 
     /**
      * @param Lead $contact
+     *
+     * @return $this
      */
     public function setContact(Lead $contact)
     {
@@ -68,5 +78,8 @@ abstract class AbstractActionDAO
         }
 
         $this->contacts->set($contact->getId(), $contact);
+
+        return $this;
     }
+
 }

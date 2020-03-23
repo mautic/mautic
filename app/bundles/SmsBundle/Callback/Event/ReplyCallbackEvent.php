@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\SmsBundle\Callback\DAO;
+namespace Mautic\SmsBundle\Callback\Event;
 
-class ReplyDAO extends AbstractActionDAO
+class ReplyCallbackEvent extends AbstractCallbackEvent
 {
     /**
      * @var string
@@ -28,9 +28,13 @@ class ReplyDAO extends AbstractActionDAO
 
     /**
      * @param string $message
+     *
+     * @return ReplyCallbackEvent
      */
     public function setMessage($message)
     {
         $this->message = $message;
-    }
+
+        return $this;
+}
 }

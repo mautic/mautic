@@ -14,8 +14,8 @@ namespace Mautic\SmsBundle\Helper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\DAO\DeliveryStatusDAO;
-use Mautic\SmsBundle\Callback\DAO\ReplyDAO;
+use Mautic\SmsBundle\Callback\Event\DeliveryCallbackEvent;
+use Mautic\SmsBundle\Callback\Event\ReplyCallbackEvent;
 use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Event\DeliveryEvent;
 use Mautic\SmsBundle\Event\ReplyEvent;
@@ -29,9 +29,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Class ReplyHelper.
+ * Class CallbackHelper.
  */
-class ReplyHelper
+class CallbackHelper
 {
     /**
      * @var EventDispatcherInterface
@@ -49,7 +49,7 @@ class ReplyHelper
     private $contactTracker;
 
     /**
-     * ReplyHelper constructor.
+     * CallbackHelper constructor.
      *
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerInterface          $logger
@@ -91,10 +91,10 @@ class ReplyHelper
 
             $eventResponse = null;
             foreach ($messages as $message) {
-                if ($message instanceof DeliveryStatusDAO) {
-                    $eventResponse = $this->handleRequestDelivery($message);
-                } elseif ($message instanceof ReplyDAO) {
-                    $eventResponse =  $this->handleRequestReply($message);
+                if ($message instanceof DeliveryCallbackEvent) {
+                    $eventResponse = $this->handleDeliveryCallback($message);
+                } elseif ($message instanceof ReplyCallbackEvent) {
+                    $eventResponse =  $this->handleReplyCallback($message);
                 }
             }
 
@@ -120,19 +120,19 @@ class ReplyHelper
     }
 
     /**
-     * @param string|ReplyDAO|array $message
-     * @param CallbackInterface     $handler
+     * @param string|ReplyCallbackEvent|array $message
+     * @param CallbackInterface               $handler
      *
-     * @return array|ReplyDAO
+     * @return array|ReplyCallbackEvent
      *
      * @throws NumberNotFoundException
      */
     private function getMessages($message, CallbackInterface $handler)
     {
         if (is_string($message)) {
-            $object = new ReplyDAO();
-            $object->setMessage($message);
-            $object->setContacts($handler->getContacts());
+            $object = (new ReplyCallbackEvent())
+             ->setMessage($message)
+            ->setContacts($handler->getContacts());
             $message = $object;
         }
 
@@ -144,34 +144,34 @@ class ReplyHelper
     }
 
     /**
-     * @param DeliveryStatusDAO $deliveryStatusDAO
+     * @param DeliveryCallbackEvent $deliveryCallbackEvent
      *
      * @return Response|null
      */
-    private function handleRequestDelivery(DeliveryStatusDAO  $deliveryStatusDAO)
+    private function handleDeliveryCallback(DeliveryCallbackEvent  $deliveryCallbackEvent)
     {
-        $contacts = $deliveryStatusDAO->getContacts();
+        $contacts = $deliveryCallbackEvent->getContacts();
 
         $this->logger->debug(sprintf('SMS DELIVERY: Processing delivery callback'));
         $this->logger->debug(sprintf('SMS DELIVERY: Found IDs %s', implode(',', $contacts->getKeys())));
         $eventResponse  = null;
         foreach ($contacts as $contact) {
             $this->contactTracker->setSystemContact($contact);
-            $eventResponse     = $this->dispatchDeliveryEvent($contact, $deliveryStatusDAO);
+            $eventResponse     = $this->dispatchDeliveryEvent($contact, $deliveryCallbackEvent);
         }
 
         return $eventResponse;
     }
 
     /**
-     * @param ReplyDAO $replyDAO
+     * @param ReplyCallbackEvent $replyCallbackEvent
      *
      * @return Response|null
      */
-    private function handleRequestReply(ReplyDAO $replyDAO)
+    private function handleReplyCallback(ReplyCallbackEvent $replyCallbackEvent)
     {
-        $message  = $replyDAO->getMessage();
-        $contacts = $replyDAO->getContacts();
+        $message  = $replyCallbackEvent->getMessage();
+        $contacts = $replyCallbackEvent->getContacts();
 
         $this->logger->debug(sprintf('SMS REPLY: Processing message "%s"', $message));
         $this->logger->debug(sprintf('SMS REPLY: Found IDs %s', implode(',', $contacts->getKeys())));
@@ -200,12 +200,12 @@ class ReplyHelper
     }
 
     /**
-     * @param Lead              $contact
-     * @param DeliveryStatusDAO $deliveryStatus
+     * @param Lead                  $contact
+     * @param DeliveryCallbackEvent $deliveryStatus
      *
      * @return Response|null
      */
-    public function dispatchDeliveryEvent(Lead $contact, DeliveryStatusDAO $deliveryStatus)
+    public function dispatchDeliveryEvent(Lead $contact, DeliveryCallbackEvent $deliveryStatus)
     {
         $deliveryEvent = new DeliveryEvent($contact, $deliveryStatus);
 

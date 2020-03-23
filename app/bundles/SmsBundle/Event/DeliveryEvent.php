@@ -12,7 +12,7 @@
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Callback\DAO\DeliveryStatusDAO;
+use Mautic\SmsBundle\Callback\Event\DeliveryCallbackEvent;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -29,20 +29,20 @@ class DeliveryEvent extends Event
     private $contact;
 
     /**
-     * @var DeliveryStatusDAO
+     * @var DeliveryCallbackEvent
      */
-    private $deliveryStatusDAO;
+    private $deliveryCallbackEvent;
 
     /**
      * DeliveryEvent constructor.
      *
-     * @param Lead              $contact
-     * @param DeliveryStatusDAO $deliveryStatusDAO
+     * @param Lead                  $contact
+     * @param DeliveryCallbackEvent $deliveryCallbackEvent
      */
-    public function __construct(Lead $contact, DeliveryStatusDAO $deliveryStatusDAO)
+    public function __construct(Lead $contact, DeliveryCallbackEvent $deliveryCallbackEvent)
     {
-        $this->contact           = $contact;
-        $this->deliveryStatusDAO = $deliveryStatusDAO;
+        $this->contact               = $contact;
+        $this->deliveryCallbackEvent = $deliveryCallbackEvent;
     }
 
     /**
@@ -78,18 +78,18 @@ class DeliveryEvent extends Event
     }
 
     /**
-     * @return DeliveryStatusDAO
+     * @return DeliveryCallbackEvent
      */
-    public function getDeliveryStatusDAO()
+    public function getDeliveryCallbackEvent()
     {
-        return $this->deliveryStatusDAO;
+        return $this->deliveryCallbackEvent;
     }
 
     /**
-     * @param DeliveryStatusDAO $deliveryStatusDAO
+     * @param DeliveryCallbackEvent $deliveryCallbackEvent
      */
-    public function setDeliveryStatusDAO($deliveryStatusDAO)
+    public function setDeliveryCallbackEvent($deliveryCallbackEvent)
     {
-        $this->deliveryStatusDAO = $deliveryStatusDAO;
+        $this->deliveryCallbackEvent = $deliveryCallbackEvent;
     }
 }

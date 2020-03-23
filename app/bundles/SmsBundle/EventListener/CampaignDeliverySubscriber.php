@@ -26,8 +26,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CampaignDeliverySubscriber implements EventSubscriberInterface
 {
-    const TYPE_DELIVERED = 'sms.delivery';
-    const TYPE_READ      = 'sms.read';
+    const TYPE_DELIVERED   = 'sms.delivery';
+    const TYPE_READ        = 'sms.read';
+    const TYPE_FAILED      = 'sms.failed';
 
     /**
      * @var TransportChain
@@ -109,6 +110,24 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
                 ]
             );
         }
+
+        if ($this->transportChain->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED)) {
+            $event->addDecision(
+                self::TYPE_FAILED,
+                [
+                    'label'                  => 'mautic.campaign.sms.failed',
+                    'description'            => 'mautic.campaign.sms.failed.tooltip',
+                    'eventName'              => SmsEvents::ON_CAMPAIGN_DELIVERY,
+                    'connectionRestrictions' => [
+                        'source' => [
+                            'action' => [
+                                'sms.send_text_sms',
+                            ],
+                        ],
+                    ],
+                ]
+            );
+        }
     }
 
     /**
@@ -139,11 +158,13 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
      */
     public function onDelivery(DeliveryEvent $event)
     {
-        $deliveryStatusDAO = $event->getDeliveryStatusDAO();
-        if ($deliveryStatusDAO->isDelivered()) {
+        $deliveryCallbackEvent = $event->getDeliveryCallbackEvent();
+        if ($deliveryCallbackEvent->isDelivered()) {
             $type = self::TYPE_DELIVERED;
-        } elseif ($deliveryStatusDAO->isRead()) {
+        } elseif ($deliveryCallbackEvent->isRead()) {
             $type = self::TYPE_READ;
+        } elseif ($deliveryCallbackEvent->isFailed()) {
+            $type = self::TYPE_FAILED;
         } else {
             return;
         }

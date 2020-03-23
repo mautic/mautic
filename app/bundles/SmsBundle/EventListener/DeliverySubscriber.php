@@ -50,6 +50,6 @@ class DeliverySubscriber implements EventSubscriberInterface
      */
     public function onDelivery(DeliveryEvent $event)
     {
-        $this->statModel->updateStatsFromDeliveryStatusDAO($event->getDeliveryStatusDAO());
+        $this->statModel->updateStatsFromDeliveryCallbackEvent($event->getDeliveryCallbackEvent());
     }
 }

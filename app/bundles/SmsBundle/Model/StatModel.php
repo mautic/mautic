@@ -11,7 +11,7 @@
 
 namespace Mautic\SmsBundle\Model;
 
-use Mautic\SmsBundle\Callback\DAO\DeliveryStatusDAO;
+use Mautic\SmsBundle\Callback\Event\DeliveryCallbackEvent;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
 
@@ -33,9 +33,9 @@ class StatModel
     private $stat;
 
     /**
-     * @var DeliveryStatusDAO
+     * @var DeliveryCallbackEvent
      */
-    private $deliveryStatusDAO;
+    private $deliveryCallbackEvent;
 
     /**
      * StatModel constructor.
@@ -48,20 +48,22 @@ class StatModel
     }
 
     /**
-     * @param DeliveryStatusDAO $deliveryStatusDAO
+     * @param DeliveryCallbackEvent $deliveryCallbackEvent
      */
-    public function updateStatsFromDeliveryStatusDAO(DeliveryStatusDAO $deliveryStatusDAO)
+    public function updateStatsFromDeliveryCallbackEvent(DeliveryCallbackEvent $deliveryCallbackEvent)
     {
         $smsStatRepository = $this->smsModel->getStatRepository();
 
-        $this->stat              =  $smsStatRepository->findOneBy(['trackingHash' => $deliveryStatusDAO->getTrackingHash()]);
-        $this->sms               = $this->stat->getSms();
-        $this->deliveryStatusDAO = $deliveryStatusDAO;
+        $this->stat                  =  $smsStatRepository->findOneBy(['trackingHash' => $deliveryCallbackEvent->getTrackingHash()]);
+        $this->sms                   = $this->stat->getSms();
+        $this->deliveryCallbackEvent = $deliveryCallbackEvent;
 
-        if ($this->deliveryStatusDAO->isDelivered()) {
+        if ($this->deliveryCallbackEvent->isDelivered()) {
             $this->setAsDeliveredAndUpCount();
-        } elseif ($this->deliveryStatusDAO->isRead()) {
+        } elseif ($this->deliveryCallbackEvent->isRead()) {
             $this->setAsReadAndUpCount();
+        } elseif ($this->deliveryCallbackEvent->isFailed()) {
+            $this->setAsFailedAndUpCount();
         } else {
             return;
         }
@@ -97,5 +99,16 @@ class StatModel
             $this->sms->setReadCount($this->sms->getReadCount() + 1);
         }
         $this->stat->setIsRead(true);
+    }
+
+    /**
+     * Pretend up count for already failed messages.
+     */
+    public function setAsFailedAndUpCount()
+    {
+        if (!$this->stat->isFailed()) {
+            $this->sms->setFailedCount($this->sms->getFailedCount() + 1);
+        }
+        $this->stat->setIsFailed(true);
     }
 }

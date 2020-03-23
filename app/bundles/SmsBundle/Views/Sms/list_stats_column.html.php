@@ -67,3 +67,26 @@ if ($transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_READ)
     <?php
 }
 ?>
+
+
+<?php
+
+if ($transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED)) {
+    ?>
+    <span class="mt-xs label label-danger has-click-event clickable-stat"
+          data-toggle="tooltip"
+          title="<?php echo $view['translator']->trans('mautic.channel.stat.leadcount.tooltip'); ?>">
+                            <a href="<?php echo $view['router']->path(
+                                'mautic_contact_index',
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.sms_failed').':'.$item->getId()]
+                            ); ?>"><?php echo $view['translator']->trans(
+                                    'mautic.sms.stat.failedcount',
+                                    [
+                                        '%count%' => $item->getFailedCount(),
+                                        '%ratio%' => $item->getFailedRatio(),
+                                    ]
+                                ); ?></a>
+                        </span>
+    <?php
+}
+?>

@@ -310,8 +310,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                         'name'    => $sms->getName(),
                         'content' => $tokenEvent->getContent(),
                     ];
-
-                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $sms, $stat);
+                    $metadata = $this->transport->sendSms($lead, $tokenEvent->getContent(), $stat);
 
                     if (true !== $metadata) {
                         $sendResult['status'] = $metadata;
@@ -490,6 +489,20 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
             $data = $query->loadAndBuildTimeData($q);
             $chart->setDataset($this->translator->trans('mautic.email.stat.read'), $data);
+        }
+
+        if ($this->transport->getSettings()->hasSetting(TransportSettingsInterface::STAT_FAILED) && (!$flag || $flag === 'failed')) {
+            $q = $query->prepareTimeDataQuery('sms_message_stats', 'date_sent', $filter);
+
+            if (!$canViewOthers) {
+                $this->limitQueryToCreator($q);
+            }
+
+            $q->andWhere($q->expr()->eq('t.is_failed', ':true'))
+                ->setParameter('true', true, 'boolean');
+
+            $data = $query->loadAndBuildTimeData($q);
+            $chart->setDataset($this->translator->trans('mautic.email.stat.failed'), $data);
         }
 
         return $chart->render();

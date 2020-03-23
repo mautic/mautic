@@ -99,17 +99,23 @@ class Sms extends FormEntity
     private $readCount = 0;
 
     /**
+     * @var int
+     */
+    private $failedCount = 0;
+
+    /**
      * @var array
      */
     private $properties = [];
 
     public function __clone()
     {
-        $this->id             = null;
-        $this->stats          = new ArrayCollection();
-        $this->sentCount      = 0;
-        $this->deliveredCount = 0;
-        $this->readCount      = 0;
+        $this->id               = null;
+        $this->stats            = new ArrayCollection();
+        $this->sentCount        = 0;
+        $this->deliveredCount   = 0;
+        $this->readCount        = 0;
+        $this->failedCount      = 0;
         parent::__clone();
     }
 
@@ -163,6 +169,10 @@ class Sms extends FormEntity
 
         $builder->createField('readCount', 'integer')
             ->columnName('read_count')
+            ->build();
+
+        $builder->createField('failedCount', 'integer')
+            ->columnName('failed_count')
             ->build();
 
         $builder->addField('properties', 'json_array');
@@ -255,6 +265,7 @@ class Sms extends FormEntity
                     'sentCount',
                     'deliveredCount',
                     'readCount',
+                    'failedCount',
                     'properties',
                 ]
             )
@@ -569,6 +580,39 @@ class Sms extends FormEntity
     {
         $this->isChanged('readCount', $readCount);
         $this->readCount = $readCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFailedCount()
+    {
+        return $this->failedCount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFailedRatio()
+    {
+        if (!$this->failedCount) {
+            return 0;
+        }
+
+        return round($this->failedCount / $this->sentCount * 100, 2);
+    }
+
+    /**
+     * @param int $failedCount
+     *
+     * @return Sms
+     */
+    public function setFailedCount($failedCount)
+    {
+        $this->isChanged('failedCount', $failedCount);
+        $this->failedCount = $failedCount;
 
         return $this;
     }

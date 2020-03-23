@@ -12,7 +12,7 @@
 namespace Mautic\SmsBundle\Integration\Twilio;
 
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\DAO\ReplyDAO;
+use Mautic\SmsBundle\Callback\Event\ReplyCallbackEvent;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ContactHelper;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -72,7 +72,7 @@ class TwilioCallback implements CallbackInterface
     /**
      * @param Request $request
      *
-     * @return ReplyDAO
+     * @return ReplyCallbackEvent
      *
      * @throws NumberNotFoundException
      */
@@ -82,11 +82,11 @@ class TwilioCallback implements CallbackInterface
 
         $message =  trim($request->get('Body'));
 
-        $replyDAO = new ReplyDAO();
-        $replyDAO->setMessage($message);
-        $replyDAO->setContacts($this->getContacts());
+        $replyCallbackEvent = (new ReplyCallbackEvent())
+        ->setMessage($message)
+        ->setContacts($this->getContacts());
 
-        return $replyDAO;
+        return $replyCallbackEvent;
     }
 
     /**

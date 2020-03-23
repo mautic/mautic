@@ -15,15 +15,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\DAO\ReplyDAO;
+use Mautic\SmsBundle\Callback\Event\ReplyCallbackEvent;
 use Mautic\SmsBundle\Callback\ResponseInterface;
-use Mautic\SmsBundle\Helper\ReplyHelper;
+use Mautic\SmsBundle\Helper\CallbackHelper;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReplyHelperTest extends \PHPUnit_Framework_TestCase
+class CallbackHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -51,13 +51,13 @@ class ReplyHelperTest extends \PHPUnit_Framework_TestCase
     {
         $handler = $this->createMock(CallbackInterface::class);
 
-        $replyDAO = new ReplyDAO();
-        $replyDAO->setMessage('test');
-        $replyDAO->setContacts(new ArrayCollection([new Lead()]));
+        $replyCallbackEvent = new ReplyCallbackEvent();
+        $replyCallbackEvent->setMessage('test');
+        $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
 
         $handler->expects($this->once())
             ->method('getMessage')
-            ->willReturn([$replyDAO]);
+            ->willReturn([$replyCallbackEvent]);
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -77,13 +77,13 @@ class ReplyHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getResponse')
             ->willReturn($handlerResponse);
 
-        $replyDAO = new ReplyDAO();
-        $replyDAO->setMessage('test');
-        $replyDAO->setContacts(new ArrayCollection([new Lead()]));
+        $replyCallbackEvent = new ReplyCallbackEvent();
+        $replyCallbackEvent->setMessage('test');
+        $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
 
         $handler->expects($this->once())
             ->method('getMessage')
-            ->willReturn([$replyDAO]);
+            ->willReturn([$replyCallbackEvent]);
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -100,22 +100,22 @@ class ReplyHelperTest extends \PHPUnit_Framework_TestCase
     {
         $handler = $this->createMock(CallbackInterface::class);
 
-        $replyDAO = new ReplyDAO();
-        $replyDAO->setMessage('test');
-        $replyDAO->setContacts(new ArrayCollection([new Lead()]));
+        $replyCallbackEvent = new ReplyCallbackEvent();
+        $replyCallbackEvent->setMessage('test');
+        $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
 
         $handler->expects($this->once())
             ->method('getMessage')
-            ->willReturn([$replyDAO]);
+            ->willReturn([$replyCallbackEvent]);
 
         $this->getHelper()->handleRequest($handler, new Request());
     }
 
     /**
-     * @return ReplyHelper
+     * @return CallbackHelper
      */
     private function getHelper()
     {
-        return new ReplyHelper($this->eventDispatcher, $this->logger, $this->contactTracker);
+        return new CallbackHelper($this->eventDispatcher, $this->logger, $this->contactTracker);
     }
 }

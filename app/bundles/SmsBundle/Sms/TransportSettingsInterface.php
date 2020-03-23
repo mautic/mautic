@@ -15,6 +15,7 @@ interface TransportSettingsInterface
 {
     const STAT_DELIVERED  = 'delivered';
     const STAT_READ       = 'read';
+    const STAT_FAILED     = 'failed';
 
     /**
      *  Define which settings your transport support.
