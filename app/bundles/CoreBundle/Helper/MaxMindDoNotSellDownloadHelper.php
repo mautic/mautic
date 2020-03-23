@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -84,7 +83,7 @@ class MaxMindDoNotSellDownloadHelper
                 return false;
             }
             $responseContent = $response->getContent();
-        } catch (ExceptionInterface $e) {
+        } catch (\Throwable $e) {
             $this->logger->error('Failed to get content from remote Do Not Sell data: '.$e->getMessage());
 
             return false;
