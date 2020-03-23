@@ -36,9 +36,9 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
      */
     public function getRemoteDateStoreDownloadUrl()
     {
-        if (!empty($this->auth)) {
+        if (!empty($this->getLicenceKey())) {
             $data                = [];
-            $data['license_key'] = $this->auth;
+            $data['license_key'] = $this->getLicenceKey();
             $data['edition_id']  = 'GeoLite2-City';
             $data['suffix']      = 'tar.gz';
             $queryString         = http_build_query($data);
@@ -47,6 +47,19 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
         } else {
             $this->logger->warn('MaxMind license key is required.');
         }
+    }
+
+    /**
+     * @return string
+     */
+    private function getLicenceKey()
+    {
+        $auth = explode(':', $this->auth, 2);
+        if (array_key_exists(1, $auth)) {
+            return $auth[1];
+        }
+
+        return '';
     }
 
     /**
