@@ -8,7 +8,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
-final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit_Framework_TestCase
+final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @const TEMP
