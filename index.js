@@ -1,3 +1,4 @@
+import loadCommands from './commands';
 import loadButtons from './buttons';
 import loadBlocks from './blocks';
 
@@ -90,6 +91,7 @@ export default (editor, opts = {}) => {
         });
     }
 
+    loadCommands(editor, config);
     loadButtons(editor, config);
     loadBlocks(editor, config);
 };
