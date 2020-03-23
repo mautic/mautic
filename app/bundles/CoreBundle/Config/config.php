@@ -884,7 +884,7 @@ return [
             ],
 
             'mautic.native.connector' => [
-                'class'     => \Symfony\Component\HttpClient\NativeHttpClient::class,
+                'class'     => \Symfony\Contracts\HttpClient\HttpClientInterface::class,
                 'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
             ],
 
