@@ -6,9 +6,9 @@ Require:
 
 1. This PR https://github.com/mautic/mautic/pull/7754
 
-2. This plugin https://github.com/mautic-inc/plugin-integrations
+2. This plugin https://github.com/mautic-inc/plugin-integrations with this PR https://github.com/mautic-inc/plugin-integrations/pull/76
 
-3. This bundle install to plugins/GrapesJsBuilderBundle
+3. This bundle, install to plugins/GrapesJsBuilderBundle folder
 
 Don't forget remove cache
 
