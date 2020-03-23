@@ -48,18 +48,16 @@ EOT
             $localPath = $this->maxMindDoNotSellDownloadHelper->getLocalDataStoreFilepath();
 
             if ($remoteUrl && $localPath) {
-                //TODO New messages
                 $output->writeln('<error>'.$this->translator->trans(
-                        'mautic.core.ip_lookup.remote_fetch_error',
+                        'mautic.core.do_not_sell.remote_fetch_error',
                         [
                             '%remoteUrl%' => $remoteUrl,
                             '%localPath%' => $localPath,
                         ]
                     ).'</error>');
             } else {
-                //TODO New messages
                 $output->writeln('<error>'.$this->translator->trans(
-                        'mautic.core.ip_lookup.remote_fetch_error_generic'
+                        'mautic.core.do_not_sell.remote_fetch_error_generic'
                     ).'</error>');
             }
         }
