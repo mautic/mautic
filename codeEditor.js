@@ -72,7 +72,7 @@ class CodeEditor {
         if (this.opts.mjmlTemplate) {
             content = this.editor.getHtml();
         } else {
-            content = '<style>' + this.editor.getCss({avoidProtected: true}) + '</style>' + this.editor.getHtml();
+            content = this.editor.getHtml() + '<style>' + this.editor.getCss({avoidProtected: true}) + '</style>';
         }
 
         this.codeEditor.setContent(content);
