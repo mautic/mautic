@@ -37,7 +37,7 @@ Mautic.launchBuilder = function (formName, actionName) {
     mQuery('.builder').addClass('builder-active').removeClass('hide');
 
     // Init GrapesJS
-    Mautic.initGrapesJS(actionName);
+    Mautic.initGrapesJS(formName);
 };
 
 /**
@@ -49,28 +49,78 @@ Mautic.initGrapesJS = function (object) {
     let editor;
     let panelManager;
     let textareaHtml = mQuery('textarea.builder-html');
-    let textareaMjml = mQuery('textarea.builder-mjml');
     let textareaAssets = mQuery('textarea#grapesjsbuilder_assets');
+    let assetManagerConf = {
+        assets: JSON.parse(textareaAssets.val()),
+        noAssets: 'No <b>assets</b> here, drag to upload',
+        upload: textareaAssets.data('upload'),
+        uploadName: 'files',
+        multiUpload: true,
+        embedAsBase64: false,
+
+        // Text on upload input
+        uploadText: 'Drop files here or click to upload',
+        // Label for the add button
+        addBtnText: 'Add image',
+        // Default title for the asset manager modal
+        modalTitle: 'Select Image',
+
+        openAssetsOnDrop: 1,
+        autoAdd: true,
+    };
 
     if (object === 'page') {
+        // Parse HTML template
+        let parser = new DOMParser();
+        let fullHtml = parser.parseFromString(textareaHtml.val(), "text/html");
+
+        // Extract body
+        let body = fullHtml.body.innerHTML;
+
+        // Launch GrapesJS with body part
         editor = grapesjs.init({
             clearOnRender: true,
             container: '.builder-panel',
-            components: textareaHtml.val(),
+            components: body,
             height: '100%',
             storageManager: false,
+            assetManager: assetManagerConf,
+            styleManager: {
+                clearProperties: true, // Temp fix https://github.com/artf/grapesjs-preset-webpage/issues/27
+            },
 
-            plugins: ['gjs-preset-newsletter', 'grapesjs-parser-postcss'],
+            plugins: ['gjs-preset-webpage', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
             pluginsOpts: {
-                'gjs-preset-newsletter': {
-                    modalTitleImport: 'Import HTML template',
-                    modalLabelImport: 'Paste all your code here below and click import',
-                    modalLabelExport: 'Copy the code and use it wherever you want',
-                    importPlaceholder: ''
-                },
-            }
+                'gjs-preset-webpage': {},
+                'grapesjs-preset-mautic': {}
+            },
         });
-    } else {
+
+        // Customize GrapesJS
+        panelManager = editor.Panels;
+        panelManager.addButton('views', [
+            {
+                id: 'close',
+                className: 'fa fa-times-circle',
+                attributes: {title: 'Close'},
+                command: function () {
+                    // Update textarea for save
+                    fullHtml.body.innerHTML = editor.getHtml() + '<style>' + editor.getCss({avoidProtected: true}) + '</style>';
+                    textareaHtml.val(fullHtml.documentElement.outerHTML);
+
+                    // Reset HTML
+                    mQuery('.builder').removeClass('builder-active').addClass('hide');
+                    mQuery('html').css('font-size', '');
+                    mQuery('body').css('overflow-y', '');
+
+                    // Destroy GrapesJS
+                    editor.destroy();
+                }
+            }
+        ]);
+    } else if (object === 'emailform') {
+        let textareaMjml = mQuery('textarea.builder-mjml');
+
         if (textareaMjml.val().length) {
             editor = grapesjs.init({
                 clearOnRender: true,
@@ -78,15 +128,11 @@ Mautic.initGrapesJS = function (object) {
                 components: textareaMjml.val(),
                 height: '100%',
                 storageManager: false,
+                assetManager: assetManagerConf,
 
                 plugins: ['grapesjs-mjml', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
                 pluginsOpts: {
-                    'grapesjs-mjml': {
-                        modalTitleImport: 'Import MJML template',
-                        modalLabelImport: 'Paste all your code here below and click import',
-                        modalLabelExport: 'Copy the code and use it wherever you want',
-                        importPlaceholder: '',
-                    },
+                    'grapesjs-mjml': {},
                     'grapesjs-preset-mautic': {}
                 }
             });
@@ -139,55 +185,17 @@ Mautic.initGrapesJS = function (object) {
                 components: body,
                 height: '100%',
                 storageManager: false,
-
-                assetManager: {
-                    assets: JSON.parse(textareaAssets.val()),
-                    noAssets: 'No <b>assets</b> here, drag to upload',
-                    upload: textareaAssets.data('upload'),
-                    uploadName: 'files',
-                    multiUpload: true,
-                    embedAsBase64: false,
-
-                    // Text on upload input
-                    uploadText: 'Drop files here or click to upload',
-                    // Label for the add button
-                    addBtnText: 'Add image',
-                    // Default title for the asset manager modal
-                    modalTitle: 'Select Image',
-
-                    openAssetsOnDrop: 1,
-                    autoAdd: true,
-                },
+                assetManager: assetManagerConf,
 
                 plugins: ['gjs-preset-newsletter', 'grapesjs-parser-postcss', 'grapesjs-preset-mautic'],
                 pluginsOpts: {
-                    'gjs-preset-newsletter': {
-                        modalTitleImport: 'Import HTML template',
-                        modalLabelImport: 'Paste all your code here below and click import',
-                        modalLabelExport: 'Copy the code and use it wherever you want',
-                        importPlaceholder: ''
-                    },
+                    'gjs-preset-newsletter': {},
                     'grapesjs-preset-mautic': {}
                 }
             });
 
             // Customize GrapesJS
             panelManager = editor.Panels;
-            panelManager.removeButton("options", "gjs-toggle-images");
-            panelManager.addButton('options', [
-                {
-                    id: 'undo',
-                    className: 'fa fa-undo',
-                    attributes: {title: 'Undo'},
-                    command: function () { editor.runCommand('core:undo') }
-                }, {
-                    id: 'redo',
-                    className: 'fa fa-repeat',
-                    attributes: {title: 'Redo'},
-                    command: function () { editor.runCommand('core:redo') }
-                }
-            ]);
-
             panelManager.addButton('views', [
                 {
                     id: 'close',
@@ -220,7 +228,7 @@ Mautic.initGrapesJS = function (object) {
         // Save assets list in textarea to keep new deleted files without reload page
         textareaAssets.val(JSON.stringify(getAssetsList(editor)));
 
-        // Delete file
+        // Delete file on server
         mQuery.ajax({
             url: textareaAssets.data('delete'),
             data: {'filename': response.getFilename()}
@@ -245,11 +253,14 @@ Mautic.setThemeHtml = function(theme) {
             let textareaMjml = mQuery('textarea.builder-mjml');
 
             textareaHtml.val(response.templateHtml);
-            textareaMjml.val(response.templateMjml);
 
-            // If MJML template, generate HTML before save
-            if (!textareaHtml.val().length && textareaMjml.val().length) {
-                mjmlToHtml(textareaMjml, textareaHtml);
+            if (typeof textareaMjml !== 'undefined') {
+                textareaMjml.val(response.templateMjml);
+
+                // If MJML template, generate HTML before save
+                if (!textareaHtml.val().length && textareaMjml.val().length) {
+                    mjmlToHtml(textareaMjml, textareaHtml);
+                }
             }
         },
         error: function (request, textStatus, errorThrown) {
@@ -310,9 +321,9 @@ let mjmlToHtml = function (source, destination, container) {
  * @param activate - true or false
  */
 let setupButtonLoadingIndicator = function (activate) {
-    let builderButton = mQuery('#emailform_buttons_builder_toolbar');
-    let saveButton = mQuery('#emailform_buttons_save_toolbar');
-    let applyButton = mQuery('#emailform_buttons_apply_toolbar');
+    let builderButton = mQuery('.btn-builder');
+    let saveButton = mQuery('.btn-save');
+    let applyButton = mQuery('.btn-apply');
 
     if (activate) {
         Mautic.activateButtonLoadingIndicator(builderButton);
@@ -327,16 +338,14 @@ let setupButtonLoadingIndicator = function (activate) {
 
 let getAssetsList = function(editor) {
     let assetManager = editor.AssetManager;
-    let assets = assetManager.getAll().models;
+    let assets = assetManager.getAll();
     let assetsList = [];
 
-    assets.forEach(function(file) {
-        let attributes = file.attributes;
-
-        if (attributes.type === 'image') {
-            assetsList.push({'src': attributes.src, 'width': attributes.width, 'height': attributes.height});
+    assets.forEach(asset => {
+        if (asset.get('type') === 'image') {
+            assetsList.push({'src': asset.get('src'), 'width': asset.get('width'), 'height': asset.get('height')});
         } else {
-            assetsList.push(attributes.src);
+            assetsList.push(asset.get('src'));
         }
     });
 
