@@ -3,15 +3,16 @@
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Validator\Constraints\Ip;
-use Symfony\Component\Validator\Validation;
 
 /**
  * CLI Command to purge data from Mautic that appears on the
@@ -31,11 +32,17 @@ class MaxMindDoNotSellPurgeCommand extends Command
      */
     private $doNotSellList;
 
+    /**
+     * @var LeadRepository
+     */
+    private $leadRepository;
+
     public function __construct(EntityManager $em, MaxMindDoNotSellList $doNotSellList)
     {
         parent::__construct();
-        $this->em = $em;
-        $this->doNotSellList = $doNotSellList;
+        $this->em             = $em;
+        $this->doNotSellList  = $doNotSellList;
+        $this->leadRepository = $this->em->getRepository(Lead::class);
     }
 
     /**
@@ -74,26 +81,20 @@ EOT
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //TODO:
-        // Load the DoNot Sell List file and set ENV to its location
-        // Compare list values against IP table and retrieve contact id matches
-        // Check audit log to see if contact values where added by maxmind
-        // Purge data that was added this way
-        // Report on changes
         $dryRun          = $input->getOption('dry-run');
         $this->batchSize = $input->getOption('batch-size') ?? $this->batchSize;
 
-        $output->writeln("Step 1: Searching for contacts with data from Do Not Sell List...\n");
+        $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
         $progressBar = new ProgressBar($output);
         $progressBar->start();
 
-        $offset  = 0;
+        $offset            = 0;
         $doNotSellContacts = [];
         while ($this->doNotSellList->loadList($offset, $this->batchSize)) {
-            $contacts = $this->findContactsFromIPs($this->doNotSellList->getList());
+            $contacts          = $this->findContactsFromIPs($this->doNotSellList->getList());
             $doNotSellContacts = array_merge($doNotSellContacts, $contacts);
 
             $progressBar->advance(count($this->doNotSellList->getList()));
@@ -104,20 +105,29 @@ EOT
         $progressBar->finish();
 
         if (0 == count($doNotSellContacts)) {
-            $output->writeln("\nNo matches found, exiting.");
+            $output->writeln('<info>No matches found.</info>');
 
             return 0;
         }
 
-        $output->writeln("\nFound ".count($doNotSellContacts).' contacts.');
+        $output->writeln("\nFound ".count($doNotSellContacts)." contacts with IPs from Do Not Sell list.\n");
 
         if ($dryRun) {
-            $output->writeln('Dry run, skipping purge.');
+            $output->writeln('<info>Dry run; skipping purge.</info>');
 
             return 0;
         }
 
-        $this->purgeData($output, $doNotSellContacts);
+        $output->writeln('<info>Step 2: Purging data....</info>');
+        $purgeProgress = new ProgressBar($output, count($doNotSellContacts));
+
+        foreach ($doNotSellContacts as $contact) {
+            $this->purgeData($contact['id'], $contact['ip_address']);
+            $purgeProgress->advance(1);
+        }
+
+        $purgeProgress->finish();
+        $output->writeln("\n<info>Purge complete.</info>\n");
 
         return 0;
     }
@@ -126,7 +136,7 @@ EOT
     {
         $in  = "'".implode("','", $ips)."'";
         $sql =
-            'SELECT lead_id '.
+            'SELECT x.lead_id AS id, ip.ip_address AS ip_address '.
              'FROM '.MAUTIC_TABLE_PREFIX.'lead_ips_xref x '.
              'JOIN '.MAUTIC_TABLE_PREFIX.'ip_addresses ip ON x.ip_id = ip.id '.
              'WHERE ip.ip_address IN ('.$in.')';
@@ -138,16 +148,39 @@ EOT
         return $stmt->fetchAll();
     }
 
-    private function purgeData(OutputInterface $output, array $ipsToPurge)
+    private function purgeData(string $contactId, string $ip): bool
     {
-        $output->writeln('Purging data....');
-        $purgeProgress = new ProgressBar($output, count($ipsToPurge));
+        /** @var Lead $lead */
+        $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
+        $matchedIps = array_filter($lead->getIpAddresses()->getValues(), function ($item) use ($ip) {
+            return $item->getIpAddress() == $ip;
+        });
 
-        foreach ($ipsToPurge as $match) {
-            sleep(1);
-            $purgeProgress->advance();
+        // We only purge data from the contact if it matches the data in the IP details
+        if ($ipDetails = $matchedIps[0]->getIpDetails()) {
+            if (($ipDetails['city'] ?? '') == $lead->getCity()) {
+                $lead->setCity(null);
+            }
+            if (($ipDetails['region'] ?? '') == $lead->getState()) {
+                $lead->setState(null);
+            }
+            if (($ipDetails['country'] ?? '') == $lead->getCountry()) {
+                $lead->setCountry(null);
+            }
+            if (($ipDetails['zipcode'] ?? '') == $lead->getZipcode()) {
+                $lead->setZipcode(null);
+            }
+
+            $this->leadRepository->saveEntity($lead);
+
+            return true;
         }
+//        else {
+//            /** @var IpAddress $ipDetails */
+//            $ipp = $matchedIps[0]->setIpDetails(['city' => 'Boston', 'country' => 'us']);
+//            $this->em->getRepository('MauticCoreBundle:IpAddress')->saveEntity($ipp);
+//        }
 
-        $purgeProgress->finish();
+        return false;
     }
 }

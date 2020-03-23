@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class MaxMindDoNotSellList implements DoNotSellListInterface
 {
-    const DEFAULT_BATCH_SIZE = 1000;
+    const DEFAULT_BATCH_SIZE = 3000;
 
     private $batchSize = 0;
 
@@ -14,22 +14,20 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
 
     private $list = [];
 
-    private $count = null;
-
     private $listPath;
 
     // @todo DELETE THIS WHEN DEV IS DONE!!!!!!!!
-    private $mockList = ['44.242.120.158', '2.2.2.2', '3.3.3.3', '4.4.4.4', '5.5.5.5'];
+    private $mockList = ['123.123.123.123', '2.2.2.2', '3.3.3.3', '4.4.4.4', '5.5.5.5'];
 
     public function __construct(CoreParametersHelper $coreParametersHelper, int $batchSize = null)
     {
-        $this->listPath = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
+        $this->listPath  = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
         $this->batchSize = $batchSize ?? self::DEFAULT_BATCH_SIZE;
     }
 
     /**
      * This method signature supports batching but the file is actually quite small
-     * so we may not need to implement this until the file gets much bigger
+     * so we may not need to implement this until the file gets much bigger.
      */
     public function loadList(int $offset = 0, int $limit = 0): bool
     {
@@ -43,14 +41,6 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
         $this->list = array_slice($this->mockList, $offset, $limit);
 
         return boolval(count($this->list));
-    }
-
-    public function hasIP(string $ip) {
-        return $this->hasIPs([$ip]);
-    }
-
-    public function hasIPs(array $ips) {
-        // return an array of the ips that are found in the list
     }
 
     public function getList(): array
