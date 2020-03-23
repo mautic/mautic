@@ -80,13 +80,7 @@ class TwilioCallback implements CallbackInterface
     {
         $this->validateRequest($request->request);
 
-        $message =  trim($request->get('Body'));
-
-        $replyCallbackEvent = (new ReplyCallbackEvent())
-        ->setMessage($message)
-        ->setContacts($this->getContacts());
-
-        return $replyCallbackEvent;
+        return trim($request->get('Body'));
     }
 
     /**
