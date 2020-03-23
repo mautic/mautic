@@ -77,37 +77,48 @@ class InjectCustomContentSubscriber extends CommonSubscriber
             return;
         }
 
+        $passParams = [];
         $parameters = $customContentEvent->getVars();
 
-        if ($customContentEvent->getContext() != 'email.settings.advanced') {
-            return;
-        } elseif (empty($parameters['email']) || !$parameters['email'] instanceof Email) {
-            return;
-        }
-
-        $passParams = ['customMjml' => ''];
-        if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
-            $data = $this->requestStack->getCurrentRequest()->get('grapesjsbuilder', '');
-
-            if (isset($data['customMjml'])) {
-                $passParams['customMjml'] = $data['customMjml'];
+        if ($customContentEvent->getContext() === 'email.settings.advanced') {
+            if (empty($parameters['email']) || !$parameters['email'] instanceof Email) {
+                return;
             }
+
+            $passParams = ['customMjml' => ''];
+            if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
+                $data = $this->requestStack->getCurrentRequest()->get('grapesjsbuilder', '');
+
+                if (isset($data['customMjml'])) {
+                    $passParams['customMjml'] = $data['customMjml'];
+                }
+            }
+
+            $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
+            if ($grapesJsBuilder instanceof GrapesJsBuilder && $this->requestStack->getCurrentRequest()->getMethod() !== 'POST') {
+                $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
+            }
+
+            $content = $this->templatingHelper->getTemplating()->render(
+                'GrapesJsBuilderBundle:Setting:fields.html.php',
+                $passParams
+            );
+
+            $customContentEvent->addContent($content);
+
+        } elseif ($customContentEvent->getContext() === 'page.header.left') {
+            $passParams['assets']     = json_encode($this->fileManager->getImages());
+            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], true) ;
+            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], true) ;
+
+            $content = $this->templatingHelper->getTemplating()->render(
+                'GrapesJsBuilderBundle:Setting:vars.html.php',
+                $passParams
+            );
+
+            $customContentEvent->addContent($content);
         }
 
-        $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $parameters['email']]);
-        if ($grapesJsBuilder instanceof GrapesJsBuilder && $this->requestStack->getCurrentRequest()->getMethod() !== 'POST') {
-            $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
-        }
-
-        $passParams['assets']     = json_encode($this->fileManager->getImages());
-        $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], true) ;
-        $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], true) ;
-
-        $content = $this->templatingHelper->getTemplating()->render(
-            'GrapesJsBuilderBundle:Email:settings.html.php',
-            $passParams
-        );
-
-        $customContentEvent->addContent($content);
+        return;
     }
 }
