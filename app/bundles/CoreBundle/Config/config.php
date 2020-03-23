@@ -597,6 +597,7 @@ return [
                     '%mautic.ip_lookup_auth%',
                     '%kernel.cache_dir%',
                     'monolog.logger.mautic',
+                    'mautic.native.connector',
                 ],
             ],
         ],
@@ -862,6 +863,11 @@ return [
             'mautic.http.connector' => [
                 'class'   => 'Joomla\Http\Http',
                 'factory' => ['Joomla\Http\HttpFactory', 'getHttp'],
+            ],
+
+            'mautic.native.connector' => [
+                'class'     => \Symfony\Component\HttpClient\NativeHttpClient::class,
+                'factory'   => [Symfony\Component\HttpClient\HttpClient::class, 'create'],
             ],
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',

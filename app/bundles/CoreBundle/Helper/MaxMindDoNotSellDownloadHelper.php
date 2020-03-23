@@ -3,23 +3,53 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpClient\HttpClient;
-use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MaxMindDoNotSellDownloadHelper
 {
-    protected $cacheDir;
-    protected $logger;
-    protected $auth;
-    protected $httpClient;
+    /**
+     * @const REMOTE_DATA
+     */
+    const REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
 
-    public function __construct($auth, $cacheDir, LoggerInterface $logger)
+    /**
+     * @const LOCAL_FILENAME
+     */
+    const LOCAL_FILENAME = 'MaxMindDoNotSell.json';
+
+    /**
+     * @const CACHE_DIR
+     */
+    const CACHE_DIR = 'ip_data';
+
+    /**
+     * @var string
+     */
+    private $auth;
+
+    /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var string
+     */
+    private $httpClient;
+
+    public function __construct($auth, $cacheDir, LoggerInterface $logger, HttpClientInterface $httpClient)
     {
         $this->cacheDir   = $cacheDir;
         $this->logger     = $logger;
-        $this->auth       = $auth;
+        $this->auth       = explode(':', $auth, 2);
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -27,13 +57,20 @@ class MaxMindDoNotSellDownloadHelper
      */
     public function downloadRemoteDataStore()
     {
-        $httpClient = HttpClient::create([
+        if (empty($this->getUser()) || empty($this->getPassword())) {
+            $this->logger->error('Missing user ID or license key for MaxMind');
+
+            return false;
+        }
+
+        $httpClientOptions = [
             'auth_basic' => [$this->getUser(), $this->getPassword()],
-        ]);
+        ];
 
         try {
-            $response = $httpClient->request('GET',
-                $this->getRemoteDateStoreDownloadUrl());
+            $response = $this->httpClient->request('GET',
+                $this->getRemoteDataStoreDownloadUrl(),
+                $httpClientOptions);
         } catch (TransportExceptionInterface $e) {
             $this->logger->error('Failed to fetch remote Do Not Sell data: '.$e->getMessage());
 
@@ -57,40 +94,36 @@ class MaxMindDoNotSellDownloadHelper
     }
 
     /**
+     * Service URL.
+     *
      * @return string
      */
-    public function getAttribution()
+    public function getRemoteDataStoreDownloadUrl()
     {
-        return 'This API provides a simple way to retrieve privacy exclusion requests in an automated fashion, from <a href="https://api.maxmind.com/privacy/exclusions" target="_blank">maxmind.com</a>. Databases must be downloaded and periodically updated.';
+        return self::REMOTE_DATA;
     }
 
     /**
-     * @return string
-     */
-    public function getRemoteDateStoreDownloadUrl()
-    {
-        return 'https://api.maxmind.com/privacy/exclusions';
-    }
-
-    /**
+     * Filepath to the local file.
+     *
      * @return string
      */
     public function getLocalDataStoreFilepath()
     {
-        return $this->getDataDir().'/MaxMindDoNotSell.json';
+        return $this->getDataDir().'/'.self::LOCAL_FILENAME;
     }
 
     /**
      * @return string
      */
-    public function getDataDir()
+    private function getDataDir()
     {
         if (null !== $this->cacheDir) {
             if (!file_exists($this->cacheDir)) {
                 mkdir($this->cacheDir);
             }
 
-            $dataDir = $this->cacheDir.'/../ip_data';
+            $dataDir = $this->cacheDir.'/../'.self::CACHE_DIR;
 
             if (!file_exists($dataDir)) {
                 mkdir($dataDir);
@@ -105,9 +138,9 @@ class MaxMindDoNotSellDownloadHelper
     /**
      * @return string
      */
-    protected function getUser()
+    private function getUser()
     {
-        return $this->auth[0];
+        return $this->getAuthPart(0);
     }
 
     /**
@@ -115,6 +148,20 @@ class MaxMindDoNotSellDownloadHelper
      */
     protected function getPassword()
     {
-        return $this->auth[1];
+        return $this->getAuthPart(1);
+    }
+
+    /**
+     * @param int $position
+     *
+     * @return string
+     */
+    private function getAuthPart($position)
+    {
+        if (array_key_exists($position, $this->auth)) {
+            return $this->auth[$position];
+        }
+
+        return '';
     }
 }

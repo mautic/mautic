@@ -44,7 +44,7 @@ EOT
         if ($this->maxMindDoNotSellDownloadHelper->downloadRemoteDataStore()) {
             $output->writeln('<info>'.$this->translator->trans('mautic.core.success').'</info>');
         } else {
-            $remoteUrl = $this->maxMindDoNotSellDownloadHelper->getRemoteDateStoreDownloadUrl();
+            $remoteUrl = $this->maxMindDoNotSellDownloadHelper->getRemoteDataStoreDownloadUrl();
             $localPath = $this->maxMindDoNotSellDownloadHelper->getLocalDataStoreFilepath();
 
             if ($remoteUrl && $localPath) {
