@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Mautic\CoreBundle\Tests\unit\Helper;
-
 
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;
 use Psr\Log\LoggerInterface;
@@ -35,14 +33,14 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit_Framework_TestCa
 
     protected function tearDown()
     {
-        $dir = './../'.MaxMindDoNotSellDownloadHelper::CACHE_DIR;
+        $dir      = './../'.MaxMindDoNotSellDownloadHelper::CACHE_DIR;
         $filename = $dir.'/'.MaxMindDoNotSellDownloadHelper::LOCAL_FILENAME;
 
-        if (is_file($filename)){
+        if (is_file($filename)) {
             unlink($filename);
         }
 
-        if (is_dir($dir)){
+        if (is_dir($dir)) {
             rmdir($dir);
         }
     }
@@ -128,7 +126,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit_Framework_TestCa
     public function testDownloadRemoteDataStoreWhenOK()
     {
         $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', self::TEMP, $this->loggerMock, $this->httpClientMock);
-        $responseMock = $this->createMock(ResponseInterface::class);
+        $responseMock                   = $this->createMock(ResponseInterface::class);
         $this->httpClientMock->expects($this->once())
             ->method('request')
             ->with('GET', 'https://api.maxmind.com/privacy/exclusions', ['auth_basic' => ['id', 'license']])
