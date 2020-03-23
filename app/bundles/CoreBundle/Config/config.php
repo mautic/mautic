@@ -149,16 +149,6 @@ return [
         ],
     ],
     'services' => [
-        'commands' => [
-            'mautic.core.command.do_not_sell' => [
-                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
-                'arguments' => [
-                    'mautic.helper.maxmind_do_not_sell_download',
-                    'translator',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'events' => [
             'mautic.core.subscriber' => [
                 'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
@@ -602,6 +592,14 @@ return [
                     'transifex.factory',
                     'translator',
                 ],
+            ],
+            'mautic.core.command.do_not_sell' => [
+                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
+                'arguments' => [
+                    'mautic.helper.maxmind_do_not_sell_download',
+                    'translator',
+                ],
+                'tag' => 'console.command',
             ],
         ],
         'other' => [
