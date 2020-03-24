@@ -19,6 +19,7 @@ export default (editor, opts = {}) => {
         replaceRteWithFroala: true,
         categorySectionLabel: 'Sections',
         categoryBlockLabel: 'Blocks',
+        dynamicContentBlockLabel: 'Dynamic Content',
         ...opts,
     };
 
@@ -94,6 +95,7 @@ export default (editor, opts = {}) => {
         });
     }
 
+    loadComponents(editor, config);
     loadCommands(editor, config);
     loadButtons(editor, config);
     loadBlocks(editor, config);

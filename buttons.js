@@ -8,7 +8,7 @@ export default (editor, opts = {}) => {
             {
                 id: 'code-edit',
                 className: 'fa fa-edit',
-                command: 'code-edit',
+                command: 'preset-mautic:code-edit',
                 attributes: {
                     title: opts.sourceEditModalTitle
                 }
