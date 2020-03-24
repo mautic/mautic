@@ -18,6 +18,7 @@ use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Helper\CallbackHelper;
+use Mautic\SmsBundle\Model\SmsModel;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,11 +41,17 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $contactTracker;
 
+    /**
+     * @var SmsModel|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private $smsModel;
+
     protected function setUp()
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->logger          = new NullLogger();
         $this->contactTracker  = $this->createMock(ContactTracker::class);
+        $this->smsModel        = $this->createMock(SmsModel::class);
     }
 
     public function testFoundContactsDispatchEvent()
@@ -125,6 +132,6 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
      */
     private function getHelper()
     {
-        return new CallbackHelper($this->eventDispatcher, $this->logger, $this->contactTracker);
+        return new CallbackHelper($this->eventDispatcher, $this->logger, $this->contactTracker, $this->smsModel);
     }
 }
