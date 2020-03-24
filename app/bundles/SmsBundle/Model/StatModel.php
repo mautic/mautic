@@ -49,12 +49,7 @@ class StatModel
     {
         $smsStatRepository = $this->smsModel->getStatRepository();
 
-        if ($deliveryEvent->getStat() instanceof Stat) {
-            $this->stat = $deliveryEvent->getStat();
-        }
-        if (!$this->stat && $deliveryEvent->getTrackingHash()) {
-            $this->stat = $smsStatRepository->findOneBy(['trackingHash' => $deliveryEvent->getTrackingHash()]);
-        }
+        $this->stat = $deliveryEvent->getStat();
 
         if (!$this->stat) {
             return;

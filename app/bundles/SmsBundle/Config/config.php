@@ -83,13 +83,6 @@ return [
                     'mautic.sms.model.stat',
                 ],
             ],
-            'mautic.sms.campaignbundle.subscriber.delivery' => [
-                'class'     => \Mautic\SmsBundle\EventListener\CampaignDeliverySubscriber::class,
-                'arguments' => [
-                    'mautic.sms.transport_chain',
-                    'mautic.campaign.executioner.realtime',
-                ],
-            ],
         ],
         'forms' => [
             'mautic.form.type.sms' => [
@@ -176,6 +169,7 @@ return [
                     'event_dispatcher',
                     'monolog.logger.mautic',
                     'mautic.tracker.contact',
+                    'mautic.sms.model.sms',
                 ],
             ],
             'mautic.sms.helper.reply' => [
