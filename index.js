@@ -1,3 +1,4 @@
+import loadComponents from './components';
 import loadCommands from './commands';
 import loadButtons from './buttons';
 import loadBlocks from './blocks';
@@ -16,6 +17,8 @@ export default (editor, opts = {}) => {
         showImportButton: 0,
         mjmlTemplate: false,
         replaceRteWithFroala: true,
+        categorySectionLabel: 'Sections',
+        categoryBlockLabel: 'Blocks',
         ...opts,
     };
 
