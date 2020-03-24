@@ -76,11 +76,17 @@ class TwilioCallback implements CallbackInterface
      *
      * @throws NumberNotFoundException
      */
-    public function getMessage(Request $request)
+    public function getCallbackEvent(Request $request)
     {
         $this->validateRequest($request->request);
 
-        return trim($request->get('Body'));
+        $replyCallbackEvent = new ReplyCallbackEvent();
+
+        $replyCallbackEvent
+            ->setMessage(trim($request->request->get('Body')))
+            ->setContacts($this->getContacts($request));
+
+        return $replyCallbackEvent;
     }
 
     /**
@@ -94,12 +100,10 @@ class TwilioCallback implements CallbackInterface
             // Not published or not configured
             throw new NotFoundHttpException();
         }
-
         // Validate this is a request from Twilio
         if ($accountSid !== $request->get('AccountSid')) {
             throw new BadRequestHttpException();
         }
-
         // Who is the message from?
         $number = $request->get('From');
         if (empty($number)) {

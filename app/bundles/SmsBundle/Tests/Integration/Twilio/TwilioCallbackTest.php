@@ -11,6 +11,7 @@
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Helper\ContactHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
@@ -36,6 +37,8 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
         $this->configuration = $this->createMock(Configuration::class);
         $this->configuration->method('getAccountSid')
             ->willReturn('123');
+        $this->contactHelper->method('findContactsByNumber')
+            ->willReturn([new Lead()]);
     }
 
     public function testMissingFromThrowsBadRequestException()
@@ -44,13 +47,12 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
 
         $parameterBag     = $this->createMock(ParameterBag::class);
         $request          = $this->createMock(Request::class);
-        $request->request = $parameterBag;
 
         $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'], ['From'])
-            ->willReturn('123', '');
-
-        $this->getCallback()->getMessage($request);
+            ->withConsecutive(['AccountSid'], ['From'], ['Body'])
+            ->willReturn('123', '321', '');
+        $request->request = $parameterBag;
+        $this->getCallback()->getCallbackEvent($request);
     }
 
     public function testMissingBodyThrowsBadRequestException()
@@ -59,13 +61,12 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
 
         $parameterBag     = $this->createMock(ParameterBag::class);
         $request          = $this->createMock(Request::class);
-        $request->request = $parameterBag;
 
         $parameterBag->method('get')
             ->withConsecutive(['AccountSid'], ['From'], ['Body'])
             ->willReturn('123', '321', '');
-
-        $this->getCallback()->getMessage($request);
+        $request->request = $parameterBag;
+        $this->getCallback()->getCallbackEvent($request);
     }
 
     public function testMismatchedAccountSidThrowsBadRequestException()
@@ -74,28 +75,26 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
 
         $parameterBag     = $this->createMock(ParameterBag::class);
         $request          = $this->createMock(Request::class);
-        $request->request = $parameterBag;
 
         $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'])
-            ->willReturn('321');
+            ->withConsecutive(['AccountSid'], ['From'], ['Body'])
+            ->willReturn('123', '321', '');
 
-        $this->getCallback()->getMessage($request);
+        $request->request = $parameterBag;
+        $this->getCallback()->getCallbackEvent($request);
     }
 
     public function testMessageIsReturned()
     {
+        $this->expectException(BadRequestHttpException::class);
+
         $parameterBag = $this->createMock(ParameterBag::class);
         $request      = $this->createMock(Request::class);
-        $request->method('get')
-            ->willReturn('Hello');
-        $request->request = $parameterBag;
-
         $parameterBag->method('get')
             ->withConsecutive(['AccountSid'], ['From'], ['Body'])
             ->willReturn('123', '321', 'Hello');
-
-        $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
+        $request->request = $parameterBag;
+        $this->assertEquals('Hello', $this->getCallback()->getCallbackEvent($request)->getMessage());
     }
 
     /**

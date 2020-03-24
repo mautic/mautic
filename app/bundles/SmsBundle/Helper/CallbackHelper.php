@@ -55,8 +55,11 @@ class CallbackHelper
      * @param LoggerInterface          $logger
      * @param ContactTracker           $contactTracker
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, LoggerInterface $logger, ContactTracker $contactTracker)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        LoggerInterface $logger,
+        ContactTracker $contactTracker
+    ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->logger          = $logger;
         $this->contactTracker  = $contactTracker;
@@ -87,15 +90,13 @@ class CallbackHelper
         $response = $this->getDefaultResponse($handler);
 
         try {
-            $messages = $this->getMessages($handler->getMessage($request), $handler);
+            $callbackEvent = $handler->getCallbackEvent($request);
 
             $eventResponse = null;
-            foreach ($messages as $message) {
-                if ($message instanceof DeliveryCallbackEvent) {
-                    $eventResponse = $this->handleDeliveryCallback($message);
-                } elseif ($message instanceof ReplyCallbackEvent) {
-                    $eventResponse =  $this->handleReplyCallback($message);
-                }
+            if ($callbackEvent instanceof DeliveryCallbackEvent) {
+                $eventResponse = $this->handleDeliveryCallback($callbackEvent);
+            } elseif ($callbackEvent instanceof ReplyCallbackEvent) {
+                $eventResponse = $this->handleReplyCallback($callbackEvent);
             }
 
             if ($eventResponse instanceof Response) {
@@ -120,44 +121,20 @@ class CallbackHelper
     }
 
     /**
-     * @param string|ReplyCallbackEvent|array $message
-     * @param CallbackInterface               $handler
-     *
-     * @return array|ReplyCallbackEvent
-     *
-     * @throws NumberNotFoundException
-     */
-    private function getMessages($message, CallbackInterface $handler)
-    {
-        if (is_string($message)) {
-            $object = (new ReplyCallbackEvent())
-             ->setMessage($message)
-            ->setContacts($handler->getContacts());
-            $message = $object;
-        }
-
-        if (!is_array($message)) {
-            $message = [$message];
-        }
-
-        return $message;
-    }
-
-    /**
      * @param DeliveryCallbackEvent $deliveryCallbackEvent
      *
      * @return Response|null
      */
-    private function handleDeliveryCallback(DeliveryCallbackEvent  $deliveryCallbackEvent)
+    private function handleDeliveryCallback(DeliveryCallbackEvent $deliveryCallbackEvent)
     {
         $contacts = $deliveryCallbackEvent->getContacts();
 
         $this->logger->debug(sprintf('SMS DELIVERY: Processing delivery callback'));
         $this->logger->debug(sprintf('SMS DELIVERY: Found IDs %s', implode(',', $contacts->getKeys())));
-        $eventResponse  = null;
+        $eventResponse = null;
         foreach ($contacts as $contact) {
             $this->contactTracker->setSystemContact($contact);
-            $eventResponse     = $this->dispatchDeliveryEvent($contact, $deliveryCallbackEvent);
+            $eventResponse = $this->dispatchDeliveryEvent($contact, $deliveryCallbackEvent);
         }
 
         return $eventResponse;
@@ -175,7 +152,7 @@ class CallbackHelper
 
         $this->logger->debug(sprintf('SMS REPLY: Processing message "%s"', $message));
         $this->logger->debug(sprintf('SMS REPLY: Found IDs %s', implode(',', $contacts->getKeys())));
-        $eventResponse  = null;
+        $eventResponse = null;
         foreach ($contacts as $contact) {
             $this->contactTracker->setSystemContact($contact);
             $eventResponse = $this->dispatchReplyEvent($contact, $message);

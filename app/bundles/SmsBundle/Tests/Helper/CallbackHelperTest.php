@@ -56,8 +56,8 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
         $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
 
         $handler->expects($this->once())
-            ->method('getMessage')
-            ->willReturn([$replyCallbackEvent]);
+            ->method('getCallbackEvent')
+            ->willReturn($replyCallbackEvent);
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -82,8 +82,8 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
         $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
 
         $handler->expects($this->once())
-            ->method('getMessage')
-            ->willReturn([$replyCallbackEvent]);
+            ->method('getCallbackEvent')
+            ->willReturn($replyCallbackEvent);
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -105,7 +105,7 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
         $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
 
         $handler->expects($this->once())
-            ->method('getMessage')
+            ->method('getCallbackEvent')
             ->willReturn([$replyCallbackEvent]);
 
         $this->getHelper()->handleRequest($handler, new Request());

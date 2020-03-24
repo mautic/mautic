@@ -14,7 +14,7 @@ namespace Mautic\SmsBundle\Callback\Event;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 
-abstract class AbstractCallbackEvent
+abstract class AbstractCallbackEvent implements CallbackEventInterface
 {
     /**
      * @var ArrayCollection
@@ -59,7 +59,7 @@ abstract class AbstractCallbackEvent
      *
      * @return AbstractCallbackEvent
      */
-    public function setContacts($contacts)
+    public function setContacts(ArrayCollection $contacts)
     {
         $this->contacts = $contacts;
 
@@ -81,5 +81,4 @@ abstract class AbstractCallbackEvent
 
         return $this;
     }
-
 }

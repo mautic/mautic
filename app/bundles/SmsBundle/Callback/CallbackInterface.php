@@ -44,10 +44,10 @@ interface CallbackInterface
      *
      * @param Request $request
      *
-     * @return string|array
+     * @return
      *
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    public function getMessage(Request $request);
+    public function getCallbackEvent(Request $request);
 }
