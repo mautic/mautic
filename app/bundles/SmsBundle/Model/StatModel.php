@@ -11,9 +11,9 @@
 
 namespace Mautic\SmsBundle\Model;
 
-use Mautic\SmsBundle\Callback\Event\DeliveryCallbackEvent;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Entity\Stat;
+use Mautic\SmsBundle\Event\DeliveryEvent;
 
 class StatModel
 {
@@ -33,11 +33,6 @@ class StatModel
     private $stat;
 
     /**
-     * @var DeliveryCallbackEvent
-     */
-    private $deliveryCallbackEvent;
-
-    /**
      * StatModel constructor.
      *
      * @param SmsModel $smsModel
@@ -48,21 +43,30 @@ class StatModel
     }
 
     /**
-     * @param DeliveryCallbackEvent $deliveryCallbackEvent
+     * @param DeliveryEvent $deliveryEvent
      */
-    public function updateStatsFromDeliveryCallbackEvent(DeliveryCallbackEvent $deliveryCallbackEvent)
+    public function updateStatsFromDeliveryEvent(DeliveryEvent $deliveryEvent)
     {
         $smsStatRepository = $this->smsModel->getStatRepository();
 
-        $this->stat                  =  $smsStatRepository->findOneBy(['trackingHash' => $deliveryCallbackEvent->getTrackingHash()]);
-        $this->sms                   = $this->stat->getSms();
-        $this->deliveryCallbackEvent = $deliveryCallbackEvent;
+        if ($deliveryEvent->getStat() instanceof Stat) {
+            $this->stat = $deliveryEvent->getStat();
+        }
+        if (!$this->stat && $deliveryEvent->getTrackingHash()) {
+            $this->stat = $smsStatRepository->findOneBy(['trackingHash' => $deliveryEvent->getTrackingHash()]);
+        }
 
-        if ($this->deliveryCallbackEvent->isDelivered()) {
+        if (!$this->stat) {
+            return;
+        }
+
+        $this->sms = $this->stat->getSms();
+
+        if ($deliveryEvent->isDelivered()) {
             $this->setAsDeliveredAndUpCount();
-        } elseif ($this->deliveryCallbackEvent->isRead()) {
+        } elseif ($deliveryEvent->isRead()) {
             $this->setAsReadAndUpCount();
-        } elseif ($this->deliveryCallbackEvent->isFailed()) {
+        } elseif ($deliveryEvent->isFailed()) {
             $this->setAsFailedAndUpCount();
         } else {
             return;

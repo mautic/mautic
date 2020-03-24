@@ -158,12 +158,11 @@ class CampaignDeliverySubscriber implements EventSubscriberInterface
      */
     public function onDelivery(DeliveryEvent $event)
     {
-        $deliveryCallbackEvent = $event->getDeliveryCallbackEvent();
-        if ($deliveryCallbackEvent->isDelivered()) {
+        if ($event->isDelivered()) {
             $type = self::TYPE_DELIVERED;
-        } elseif ($deliveryCallbackEvent->isRead()) {
+        } elseif ($event->isRead()) {
             $type = self::TYPE_READ;
-        } elseif ($deliveryCallbackEvent->isFailed()) {
+        } elseif ($event->isFailed()) {
             $type = self::TYPE_FAILED;
         } else {
             return;

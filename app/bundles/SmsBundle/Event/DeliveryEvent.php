@@ -11,85 +11,80 @@
 
 namespace Mautic\SmsBundle\Event;
 
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\SmsBundle\Callback\Event\DeliveryCallbackEvent;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Response;
-
-class DeliveryEvent extends Event
+class DeliveryEvent extends AbstractCallbackEvent
 {
     /**
-     * @var Response
+     * @var bool
      */
-    private $response;
+    private $isDelivered = false;
 
     /**
-     * @var Lead
+     * @var bool
      */
-    private $contact;
+    private $isRead = false;
 
     /**
-     * @var DeliveryCallbackEvent
+     * @var bool
      */
-    private $deliveryCallbackEvent;
+    private $isFailed = false;
 
     /**
-     * DeliveryEvent constructor.
+     * @return bool
+     */
+    public function isDelivered()
+    {
+        return $this->isDelivered;
+    }
+
+    /**
+     * @param bool $isDelivered
      *
-     * @param Lead                  $contact
-     * @param DeliveryCallbackEvent $deliveryCallbackEvent
+     * @return $this
      */
-    public function __construct(Lead $contact, DeliveryCallbackEvent $deliveryCallbackEvent)
+    public function setIsDelivered($isDelivered)
     {
-        $this->contact               = $contact;
-        $this->deliveryCallbackEvent = $deliveryCallbackEvent;
+        $this->isDelivered = $isDelivered;
+
+        return $this;
     }
 
     /**
-     * @param Response $response
+     * @return bool
      */
-    public function setResponse(Response $response)
+    public function isRead()
     {
-        $this->response = $response;
+        return $this->isRead;
     }
 
     /**
-     * @return null|Response
+     * @param bool $isRead
+     *
+     * @return $this
      */
-    public function getResponse()
+    public function setIsRead($isRead)
     {
-        return $this->response;
+        $this->isRead = $isRead;
+
+        return $this;
     }
 
     /**
-     * @return Lead
+     * @return bool
      */
-    public function getContact()
+    public function isFailed()
     {
-        return $this->contact;
+        return $this->isFailed;
     }
 
     /**
-     * @param Lead $contact
+     * @param bool $isFailed
+     *
+     * @return $this
      */
-    public function setContact($contact)
+    public function setIsFailed($isFailed)
     {
-        $this->contact = $contact;
-    }
+        $this->isFailed = $isFailed;
 
-    /**
-     * @return DeliveryCallbackEvent
-     */
-    public function getDeliveryCallbackEvent()
-    {
-        return $this->deliveryCallbackEvent;
-    }
-
-    /**
-     * @param DeliveryCallbackEvent $deliveryCallbackEvent
-     */
-    public function setDeliveryCallbackEvent($deliveryCallbackEvent)
-    {
-        $this->deliveryCallbackEvent = $deliveryCallbackEvent;
+        return $this;
     }
 }

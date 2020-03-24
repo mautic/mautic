@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Callback\Event\ReplyCallbackEvent;
 use Mautic\SmsBundle\Callback\ResponseInterface;
+use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Helper\CallbackHelper;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -51,13 +52,16 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
     {
         $handler = $this->createMock(CallbackInterface::class);
 
-        $replyCallbackEvent = new ReplyCallbackEvent();
-        $replyCallbackEvent->setMessage('test');
-        $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
+        $replyEvent = new ReplyEvent();
+        $replyEvent->setMessage('test');
 
         $handler->expects($this->once())
-            ->method('getCallbackEvent')
-            ->willReturn($replyCallbackEvent);
+            ->method('getEvent')
+            ->willReturn($replyEvent);
+
+        $handler->expects($this->once())
+            ->method('getContacts')
+            ->willReturn(new ArrayCollection([new Lead()]));
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -77,13 +81,16 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getResponse')
             ->willReturn($handlerResponse);
 
-        $replyCallbackEvent = new ReplyCallbackEvent();
-        $replyCallbackEvent->setMessage('test');
-        $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
+        $replyEvent = new ReplyEvent();
+        $replyEvent->setMessage('test');
 
         $handler->expects($this->once())
-            ->method('getCallbackEvent')
-            ->willReturn($replyCallbackEvent);
+            ->method('getEvent')
+            ->willReturn($replyEvent);
+
+        $handler->expects($this->once())
+            ->method('getContacts')
+            ->willReturn(new ArrayCollection([new Lead()]));
 
         $this->contactTracker->expects($this->once())
             ->method('setSystemContact');
@@ -100,13 +107,16 @@ class CallbackHelperTest extends \PHPUnit_Framework_TestCase
     {
         $handler = $this->createMock(CallbackInterface::class);
 
-        $replyCallbackEvent = new ReplyCallbackEvent();
-        $replyCallbackEvent->setMessage('test');
-        $replyCallbackEvent->setContacts(new ArrayCollection([new Lead()]));
+        $replyEvent = new ReplyEvent();
+        $replyEvent->setMessage('test');
 
         $handler->expects($this->once())
-            ->method('getCallbackEvent')
-            ->willReturn([$replyCallbackEvent]);
+            ->method('getEvent')
+            ->willReturn([$replyEvent]);
+
+        $handler->expects($this->once())
+            ->method('getContacts')
+            ->willReturn(new ArrayCollection([new Lead()]));
 
         $this->getHelper()->handleRequest($handler, new Request());
     }

@@ -52,7 +52,7 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['AccountSid'], ['From'], ['Body'])
             ->willReturn('123', '321', '');
         $request->request = $parameterBag;
-        $this->getCallback()->getCallbackEvent($request);
+        $this->getCallback()->getEvent($request);
     }
 
     public function testMissingBodyThrowsBadRequestException()
@@ -66,7 +66,7 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
             ->withConsecutive(['AccountSid'], ['From'], ['Body'])
             ->willReturn('123', '321', '');
         $request->request = $parameterBag;
-        $this->getCallback()->getCallbackEvent($request);
+        $this->getCallback()->getEvent($request);
     }
 
     public function testMismatchedAccountSidThrowsBadRequestException()
@@ -79,22 +79,24 @@ class TwilioCallbackTest extends \PHPUnit_Framework_TestCase
         $parameterBag->method('get')
             ->withConsecutive(['AccountSid'], ['From'], ['Body'])
             ->willReturn('123', '321', '');
-
         $request->request = $parameterBag;
-        $this->getCallback()->getCallbackEvent($request);
+        $this->getCallback()->getEvent($request);
     }
 
     public function testMessageIsReturned()
     {
-        $this->expectException(BadRequestHttpException::class);
-
         $parameterBag = $this->createMock(ParameterBag::class);
         $request      = $this->createMock(Request::class);
+
         $parameterBag->method('get')
-            ->withConsecutive(['AccountSid'], ['From'], ['Body'])
-            ->willReturn('123', '321', 'Hello');
+            ->withConsecutive(['AccountSid'], ['From'], ['Body'], ['Body'])
+            ->willReturn('123', '321', 'Hello', 'Hello');
+
         $request->request = $parameterBag;
-        $this->assertEquals('Hello', $this->getCallback()->getCallbackEvent($request)->getMessage());
+
+        $event = $this->getCallback()->getEvent($request);
+
+        $this->assertEquals('Hello', $event->getMessage());
     }
 
     /**

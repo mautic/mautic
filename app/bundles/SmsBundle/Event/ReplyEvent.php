@@ -11,46 +11,12 @@
 
 namespace Mautic\SmsBundle\Event;
 
-use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Response;
-
-class ReplyEvent extends Event
+class ReplyEvent extends AbstractCallbackEvent
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
-
     /**
      * @var string
      */
     private $message;
-
-    /**
-     * @var Response|null
-     */
-    private $response;
-
-    /**
-     * ReplyEvent constructor.
-     *
-     * @param Lead   $contact
-     * @param string $message
-     */
-    public function __construct(Lead $contact, $message)
-    {
-        $this->contact = $contact;
-        $this->message = $message;
-    }
-
-    /**
-     * @return Lead
-     */
-    public function getContact()
-    {
-        return $this->contact;
-    }
 
     /**
      * @return string
@@ -61,18 +27,12 @@ class ReplyEvent extends Event
     }
 
     /**
-     * @param Response $response
+     * @param string $message
+     *
+     * @return $this
      */
-    public function setResponse(Response $response)
+    public function setMessage($message)
     {
-        $this->response = $response;
-    }
-
-    /**
-     * @return null|Response
-     */
-    public function getResponse()
-    {
-        return $this->response;
+        $this->message = $message;
     }
 }
