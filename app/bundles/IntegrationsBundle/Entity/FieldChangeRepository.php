@@ -147,7 +147,7 @@ class FieldChangeRepository extends CommonRepository
                 $qb->expr()->andX(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
-                    $qb->expr()->gte('f.object_id', ':objectId')
+                    $qb->expr()->eq('f.object_id', ':objectId')
                 )
             )
             ->setParameter('integration', $integration)
