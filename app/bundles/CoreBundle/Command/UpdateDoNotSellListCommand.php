@@ -3,17 +3,24 @@
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;
-use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateDoNotSellListCommand extends Command
 {
+    /**
+     * @var MaxMindDoNotSellDownloadHelper
+     */
     private $maxMindDoNotSellDownloadHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
     private $translator;
 
-    public function __construct(MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, Translator $translator)
+    public function __construct(MaxMindDoNotSellDownloadHelper $maxMindDoNotSellDownloadHelper, TranslatorInterface $translator)
     {
         parent::__construct();
         $this->maxMindDoNotSellDownloadHelper = $maxMindDoNotSellDownloadHelper;
