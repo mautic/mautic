@@ -14,24 +14,9 @@ class MaxMindDoNotSellDownloadHelper
     const REMOTE_DATA = 'https://api.maxmind.com/privacy/exclusions';
 
     /**
-     * @const LOCAL_FILENAME
-     */
-    const LOCAL_FILENAME = 'MaxMindDoNotSell.json';
-
-    /**
-     * @const CACHE_DIR
-     */
-    const CACHE_DIR = 'ip_data';
-
-    /**
      * @var string
      */
     private $auth;
-
-    /**
-     * @var string
-     */
-    private $cacheDir;
 
     /**
      * @var LoggerInterface
@@ -39,16 +24,21 @@ class MaxMindDoNotSellDownloadHelper
     private $logger;
 
     /**
-     * @var string
+     * @var HttpClientInterface
      */
     private $httpClient;
 
-    public function __construct($auth, $cacheDir, LoggerInterface $logger, HttpClientInterface $httpClient)
+    /**
+     * @var string
+     */
+    private $listPath;
+
+    public function __construct($auth, LoggerInterface $logger, HttpClientInterface $httpClient, CoreParametersHelper $coreParametersHelper)
     {
-        $this->cacheDir   = $cacheDir;
         $this->logger     = $logger;
         $this->auth       = explode(':', $auth, 2);
         $this->httpClient = $httpClient;
+        $this->listPath   = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
     }
 
     /**
@@ -58,6 +48,12 @@ class MaxMindDoNotSellDownloadHelper
     {
         if (empty($this->getUser()) || empty($this->getPassword())) {
             $this->logger->error('Missing user ID or license key for MaxMind');
+
+            return false;
+        }
+
+        if (empty($this->listPath)) {
+            $this->logger->error('Missing file path');
 
             return false;
         }
@@ -109,29 +105,7 @@ class MaxMindDoNotSellDownloadHelper
      */
     public function getLocalDataStoreFilepath()
     {
-        return $this->getDataDir().'/'.self::LOCAL_FILENAME;
-    }
-
-    /**
-     * @return string
-     */
-    private function getDataDir()
-    {
-        if (null !== $this->cacheDir) {
-            if (!file_exists($this->cacheDir)) {
-                mkdir($this->cacheDir);
-            }
-
-            $dataDir = $this->cacheDir.'/../'.self::CACHE_DIR;
-
-            if (!file_exists($dataDir)) {
-                mkdir($dataDir);
-            }
-
-            return $dataDir;
-        }
-
-        return null;
+        return $this->listPath;
     }
 
     /**
