@@ -2,45 +2,47 @@
 
 namespace Mautic\CoreBundle\IpLookup\DoNotSellList;
 
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class MaxMindDoNotSellList implements DoNotSellListInterface
 {
-    const DEFAULT_BATCH_SIZE = 3000;
-
-    private $batchSize = 0;
-
     private $position = 0;
 
     private $list = [];
 
     private $listPath;
 
-    // @todo DELETE THIS WHEN DEV IS DONE!!!!!!!!
-    private $mockList = ['123.123.123.123', '2.2.2.2', '3.3.3.3', '4.4.4.4', '5.5.5.5'];
-
-    public function __construct(CoreParametersHelper $coreParametersHelper, int $batchSize = null)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
-        $this->listPath  = $coreParametersHelper->get('maxmind_do_not_sell_list_path') ?? '';
-        $this->batchSize = $batchSize ?? self::DEFAULT_BATCH_SIZE;
+        $this->listPath  = $coreParametersHelper->get('maxmind_do_not_sell_list_path', '');
     }
 
-    /**
-     * This method signature supports batching but the file is actually quite small
-     * so we may not need to implement this until the file gets much bigger.
-     */
-    public function loadList(int $offset = 0, int $limit = 0): bool
+    public function loadList(): bool
     {
-        //Load full list without batching
-        if (0 === $offset && 0 === $limit) {
-            $this->list = $this->mockList;
-
-            return true;
+        if (false == $this->listPath) {
+            throw new FileNotFoundException('Please configure the path for the Do Not Sell List.');
         }
 
-        $this->list = array_slice($this->mockList, $offset, $limit);
+        if (false !== ($json = file_get_contents($this->listPath))) {
+            if ($data = json_decode($json, true)) {
+                $this->list = $data;
 
-        return boolval(count($this->list));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getListPath(): string
+    {
+        return $this->listPath;
+    }
+
+    public function setListPath(string $path): void
+    {
+        $this->listPath = $path;
     }
 
     public function getList(): array

@@ -20,8 +20,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MaxMindDoNotSellPurgeCommand extends Command
 {
-    private $batchSize = 3;
-
     /**
      * @var EntityManager
      */
@@ -58,12 +56,6 @@ class MaxMindDoNotSellPurgeCommand extends Command
                 InputOption::VALUE_NONE,
                 'Get a list of data that will be purged.'
             )
-            ->addOption(
-                'batch-size',
-                's',
-                InputOption::VALUE_REQUIRED,
-                'Set the batch size to use when loading the Do Not Sell List.'
-            )
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
 
@@ -83,53 +75,45 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dryRun          = $input->getOption('dry-run');
-        $this->batchSize = $input->getOption('batch-size') ?? $this->batchSize;
+        try {
+            $dryRun = $input->getOption('dry-run');
 
-        $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
+            $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
-        $progressBar = new ProgressBar($output);
-        $progressBar->start();
+            $this->doNotSellList->loadList();
+            $doNotSellContacts = $this->findContactsFromIPs($this->doNotSellList->getList());
 
-        $offset            = 0;
-        $doNotSellContacts = [];
-        while ($this->doNotSellList->loadList($offset, $this->batchSize)) {
-            $contacts          = $this->findContactsFromIPs($this->doNotSellList->getList());
-            $doNotSellContacts = array_merge($doNotSellContacts, $contacts);
+            if (0 == count($doNotSellContacts)) {
+                $output->writeln('<info>No matches found.</info>');
 
-            $progressBar->advance(count($this->doNotSellList->getList()));
+                return 0;
+            }
 
-            $offset += $this->batchSize;
-        }
+            $output->writeln('Found '.count($doNotSellContacts)." contacts with IPs from Do Not Sell list.\n");
 
-        $progressBar->finish();
+            if ($dryRun) {
+                $output->writeln('<info>Dry run; skipping purge.</info>');
 
-        if (0 == count($doNotSellContacts)) {
-            $output->writeln('<info>No matches found.</info>');
+                return 0;
+            }
+
+            $output->writeln('<info>Step 2: Purging data...</info>');
+            $purgeProgress = new ProgressBar($output, count($doNotSellContacts));
+
+            foreach ($doNotSellContacts as $contact) {
+                $this->purgeData($contact['id'], $contact['ip_address']);
+                $purgeProgress->advance(1);
+            }
+
+            $purgeProgress->finish();
+            $output->writeln("\n<info>Purge complete.</info>\n");
 
             return 0;
+        } catch (\Exception $e) {
+            $output->writeln("\n<error>".$e->getMessage().'</error>');
+
+            return 1;
         }
-
-        $output->writeln("\nFound ".count($doNotSellContacts)." contacts with IPs from Do Not Sell list.\n");
-
-        if ($dryRun) {
-            $output->writeln('<info>Dry run; skipping purge.</info>');
-
-            return 0;
-        }
-
-        $output->writeln('<info>Step 2: Purging data....</info>');
-        $purgeProgress = new ProgressBar($output, count($doNotSellContacts));
-
-        foreach ($doNotSellContacts as $contact) {
-            $this->purgeData($contact['id'], $contact['ip_address']);
-            $purgeProgress->advance(1);
-        }
-
-        $purgeProgress->finish();
-        $output->writeln("\n<info>Purge complete.</info>\n");
-
-        return 0;
     }
 
     private function findContactsFromIPs(array $ips): array
@@ -175,11 +159,6 @@ EOT
 
             return true;
         }
-//        else {
-//            /** @var IpAddress $ipDetails */
-//            $ipp = $matchedIps[0]->setIpDetails(['city' => 'Boston', 'country' => 'us']);
-//            $this->em->getRepository('MauticCoreBundle:IpAddress')->saveEntity($ipp);
-//        }
 
         return false;
     }
