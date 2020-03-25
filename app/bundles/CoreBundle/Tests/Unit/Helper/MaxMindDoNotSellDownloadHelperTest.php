@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\unit\Helper;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\TransportException;
@@ -11,9 +12,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @const TEMP
+     * @const TEMP_TEST_FILE
      */
-    const TEMP = '.';
+    const TEMP_TEST_FILE = './DoNotSellTest.json';
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
@@ -25,23 +26,28 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     private $httpClientMock;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelperMock;
+
     protected function setUp()
     {
-        $this->loggerMock     = $this->createMock(LoggerInterface::class);
-        $this->httpClientMock = $this->createMock(HttpClientInterface::class);
+        $this->loggerMock               = $this->createMock(LoggerInterface::class);
+        $this->httpClientMock           = $this->createMock(HttpClientInterface::class);
+        $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $this->coreParametersHelperMock->expects($this->once())
+            ->method('get')
+            ->with('maxmind_do_not_sell_list_path')
+            ->willReturn(self::TEMP_TEST_FILE);
     }
 
     protected function tearDown()
     {
-        $dir      = './../'.MaxMindDoNotSellDownloadHelper::CACHE_DIR;
-        $filename = $dir.'/'.MaxMindDoNotSellDownloadHelper::LOCAL_FILENAME;
+        $filename = self::TEMP_TEST_FILE;
 
         if (is_file($filename)) {
             unlink($filename);
-        }
-
-        if (is_dir($dir)) {
-            rmdir($dir);
         }
     }
 
@@ -50,7 +56,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     public function testDownloadRemoteDataStoreWhenNoLicense()
     {
-        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id', self::TEMP, $this->loggerMock, $this->httpClientMock);
+        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
             ->method('error')
             ->with('Missing user ID or license key for MaxMind');
@@ -63,7 +69,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     public function testDownloadRemoteDataStoreWhenTransportException()
     {
-        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', self::TEMP, $this->loggerMock, $this->httpClientMock);
+        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
             ->method('error')
             ->with('Failed to fetch remote Do Not Sell data: transportException');
@@ -80,7 +86,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     public function testDownloadRemoteDataStoreWhenStatusCode500()
     {
-        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', self::TEMP, $this->loggerMock, $this->httpClientMock);
+        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
             ->method('error')
             ->with('Wrong status code for Do Not Sell data: 500');
@@ -101,7 +107,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     public function testDownloadRemoteDataStoreWhenGetContentError()
     {
-        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', self::TEMP, $this->loggerMock, $this->httpClientMock);
+        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $this->loggerMock->expects($this->once())
             ->method('error')
             ->with('Failed to get content from remote Do Not Sell data: noContent');
@@ -125,7 +131,7 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
      */
     public function testDownloadRemoteDataStoreWhenOK()
     {
-        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', self::TEMP, $this->loggerMock, $this->httpClientMock);
+        $maxMindDoNotSellDownloadHelper = new MaxMindDoNotSellDownloadHelper('id:license', $this->loggerMock, $this->httpClientMock, $this->coreParametersHelperMock);
         $responseMock                   = $this->createMock(ResponseInterface::class);
         $this->httpClientMock->expects($this->once())
             ->method('request')

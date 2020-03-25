@@ -585,9 +585,9 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper::class,
                 'arguments' => [
                     '%mautic.ip_lookup_auth%',
-                    '%kernel.cache_dir%',
                     'monolog.logger.mautic',
                     'mautic.native.connector',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.token_builder' => [
