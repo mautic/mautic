@@ -433,30 +433,27 @@ Mautic.reorderSegmentFilters = function() {
             var name   = mQuery(this).attr('name');
             var suffix = id.split(/[_]+/).pop();
 
-            var is_properties = id.includes("properties");
+            var isProperties = id.includes("_properties_");
 
             if (prefix + '_filters___name___filter' === id) {
                 return true;
             }
 
-            if (name && is_properties) {
-                var newName = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
+            if (name) {
+                if (isProperties){
+                    var newName    = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
+                    var properties = 'properties_';
+                }
+                else {
+                    var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
+                    var properties = '';
+                }
                 if (name.slice(-2) === '[]') {
                     newName += '[]';
                 }
 
                 mQuery(this).attr('name', newName);
-                mQuery(this).attr('id', prefix + '_filters_' + counter + '_properties_' + suffix);
-            }
-
-            if (name && !is_properties) {
-                var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
-                if (name.slice(-2) === '[]') {
-                    newName += '[]';
-                }
-
-                mQuery(this).attr('name', newName);
-                mQuery(this).attr('id', prefix + '_filters_' + counter + '_' + suffix);
+                mQuery(this).attr('id', prefix + '_filters_' + counter + '_' + properties + suffix);
             }
 
             mQuery(this).attr('name', newName);
