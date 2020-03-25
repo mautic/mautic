@@ -72,10 +72,10 @@ class GrapesJsController extends CommonController
 
         // Check for MJML template
         $themeHelper = $this->get('mautic.helper.theme');
-        $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.mjml.twig');
 
-        if ($logicalName === $templateName.'.mjml.twig') {
-            $type = 'mjml';
+        if ($themeHelper->exists($templateName.'.mjml.twig')) {
+            $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.mjml.twig');
+            $type        = 'mjml';
         } else {
             $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
             $slots       = $themeHelper->getTheme($template)->getSlots($objectType);
