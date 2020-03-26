@@ -50,7 +50,8 @@ class BuildJsSubscriber implements EventSubscriberInterface
     {
         return [
             CoreEvents::BUILD_MAUTIC_JS => [
-                ['onBuildJs', 255],
+                // onBuildJs must always needs to be last to ensure setup before delivering the event
+                ['onBuildJs', -255],
                 ['onBuildJsForVideo', 256],
                 ['onBuildJsForTrackingEvent', 256],
             ],
