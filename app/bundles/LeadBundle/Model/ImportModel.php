@@ -26,12 +26,14 @@ use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Event\ImportBuilderEvent;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -70,6 +72,11 @@ class ImportModel extends FormModel
     protected $leadEventLogRepo;
 
     /**
+     * @var \Symfony\Component\HttpFoundation\Request|null
+     */
+    private $request;
+
+    /**
      * ImportModel constructor.
      *
      * @param PathsHelper          $pathsHelper
@@ -83,7 +90,8 @@ class ImportModel extends FormModel
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         CoreParametersHelper $config,
-        CompanyModel $companyModel
+        CompanyModel $companyModel,
+        RequestStack $requestStack
     ) {
         $this->pathsHelper       = $pathsHelper;
         $this->leadModel         = $leadModel;
@@ -91,6 +99,7 @@ class ImportModel extends FormModel
         $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
         $this->companyModel      = $companyModel;
+        $this->request           = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -385,7 +394,9 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $entityModel = $import->getObject() === 'company' ? $this->companyModel : $this->leadModel;
+                    $importBuilderEvent      = new ImportBuilderEvent($this->request);
+                    $this->dispatcher->dispatch(LeadEvents::IMPORT_BUILDER, $importBuilderEvent);
+                    $entityModel = $importBuilderEvent->getModel();
 
                     $merged = $entityModel->import(
                         $import->getMatchedFields(),

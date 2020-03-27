@@ -309,6 +309,16 @@ final class LeadEvents
     const NOTE_POST_DELETE = 'mautic.lead_note_post_delete';
 
     /**
+     * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\Import instance.
+     *
+     * @var string
+     */
+    const IMPORT_BUILDER = 'mautic.import_builder';
+
+    /**
      * The mautic.lead_import_pre_save event is dispatched right before an import is persisted.
      *
      * The event listener receives a

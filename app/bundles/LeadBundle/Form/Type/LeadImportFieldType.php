@@ -12,8 +12,12 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Event\ImportBuilderEvent;
+use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -24,11 +28,23 @@ class LeadImportFieldType extends AbstractType
     private $factory;
 
     /**
+     * @var EventDispatcher
+     */
+    private $dispatcher;
+
+    /**
+     * @var \Symfony\Component\HttpFoundation\Request|null
+     */
+    private $request;
+
+    /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, RequestStack $requestStack, EventDispatcherInterface $dispatcher)
     {
-        $this->factory = $factory;
+        $this->request    = $requestStack->getCurrentRequest();
+        $this->factory    = $factory;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -37,6 +53,9 @@ class LeadImportFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $importBuilderEvent      = new ImportBuilderEvent($this->request);
+        $this->dispatcher->dispatch(LeadEvents::IMPORT_BUILDER, $importBuilderEvent);
+
         $specialFields = [
             'dateAdded'      => 'mautic.lead.import.label.dateAdded',
             'createdByUser'  => 'mautic.lead.import.label.createdByUser',
@@ -51,15 +70,7 @@ class LeadImportFieldType extends AbstractType
             'ownerusername'  => 'mautic.lead.import.label.ownerusername',
         ];
 
-        $importChoiceFields = [
-            'mautic.lead.contact'        => $options['lead_fields'],
-            'mautic.lead.company'        => $options['company_fields'],
-            'mautic.lead.special_fields' => $specialFields,
-        ];
-
-        if ($options['object'] !== 'lead') {
-            unset($importChoiceFields['mautic.lead.contact']);
-        }
+        $importChoiceFields = array_merge($importBuilderEvent->getFields(), ['mautic.lead.special_fields' => $specialFields]);
 
         foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
@@ -167,7 +178,7 @@ class LeadImportFieldType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(['lead_fields', 'import_fields', 'company_fields', 'object']);
+        $resolver->setRequired(['import_fields', 'object']);
         $resolver->setDefaults(['line_count_limit' => 0]);
     }
 

@@ -1123,10 +1123,12 @@ Mautic.reloadLeadImportProgress = function() {
             }
         });
 
+        var batchUrl  =window.location.href;
+        batchUrl = batchUrl+''+(batchUrl.indexOf('?') >= 0 ? '&' : '?');
         // Initiate import
         mQuery.ajax({
             showLoadingBar: false,
-            url: window.location + '?importbatch=1',
+            url: batchUrl + 'importbatch=1',
             success: function(response) {
                 Mautic.moderatedIntervalCallbackIsComplete('leadImportProgress');
 

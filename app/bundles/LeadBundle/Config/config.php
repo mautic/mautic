@@ -538,6 +538,20 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.lead.subscriber.contacts.import' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ImportContactsSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.lead',
+                ],
+            ],
+            'mautic.lead.subscriber.companies.import' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ImportCompaniesSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.company',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -640,8 +654,12 @@ return [
                 'alias' => 'lead_import',
             ],
             'mautic.form.type.lead_field_import' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\LeadImportFieldType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\LeadImportFieldType::class,
+                'arguments' => [
+                    'mautic.factory',
+                    'request_stack',
+                    'event_dispatcher',
+                    ],
                 'alias'     => 'lead_field_import',
             ],
             'mautic.form.type.lead_quickemail' => [
@@ -1204,6 +1222,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.company',
+                    'request_stack',
                 ],
             ],
             'mautic.lead.model.tag' => [
