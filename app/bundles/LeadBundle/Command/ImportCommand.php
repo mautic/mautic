@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\ImportModel;
 use Symfony\Component\Console\Command\Command;
+use Mautic\UserBundle\Security\UserTokenSetter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,7 +24,8 @@ class ImportCommand extends Command
     public function __construct(
         private TranslatorInterface $translator,
         private ImportModel $importModel,
-        private ProcessSignalService $processSignalService
+        private ProcessSignalService $processSignalService,
+        private UserTokenSetter $userTokenSetter
     ) {
         parent::__construct();
     }
@@ -68,6 +70,8 @@ EOT
                 return \Symfony\Component\Console\Command\Command::SUCCESS;
             }
         }
+
+        $this->userTokenSetter->setUser($import->getCreatedBy());
 
         $output->writeln('<info>'.$this->translator->trans(
             'mautic.lead.import.is.starting',
