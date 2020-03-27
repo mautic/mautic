@@ -264,7 +264,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Lead::class);
+            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
 
         $this->subscriber->onLeadPostDelete($event);
     }
@@ -399,7 +399,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, Company::class);
+            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
 
         $this->subscriber->onCompanyPostDelete($event);
     }
