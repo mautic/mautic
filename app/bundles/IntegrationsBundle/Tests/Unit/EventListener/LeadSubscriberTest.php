@@ -56,6 +56,7 @@ class LeadSubscriberTest extends TestCase
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
                 LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
                 LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 255],
+                LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 128],
             ],
             LeadSubscriber::getSubscribedEvents()
         );
