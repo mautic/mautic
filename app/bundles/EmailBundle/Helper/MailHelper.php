@@ -254,6 +254,11 @@ class MailHelper
     private $copies = [];
 
     /**
+     * @var bool|MauticMessage
+     */
+    private $messageBackup;
+
+    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -340,6 +345,8 @@ class MailHelper
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
+        $this->messageBackup = clone $this->message;
+
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
@@ -476,6 +483,8 @@ class MailHelper
         if (!$isQueueFlush) {
             $this->createAssetDownloadEntries();
         } // else handled in flushQueue
+
+        $this->message = clone $this->messageBackup;
 
         return $error;
     }
