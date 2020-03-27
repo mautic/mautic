@@ -104,6 +104,27 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onLeadPostSave($event);
     }
 
+    public function testOnLeadCompanyChange(): void
+    {
+        $leadId      = 3;
+        $companyName = 'Dell';
+
+        $lead = $this->createMock(Lead::class);
+        $lead->expects($this->at(0))
+            ->method('getCompany')
+            ->willReturn($companyName);
+        $lead->expects($this->at(0))
+            ->method('getId')
+            ->willReturn($leadId);
+
+        $event = $this->createMock(LeadEvent::class);
+        $event->expects($this->once())
+            ->method('getLead')
+            ->willReturn($lead);
+
+        $this->subscriber->onLeadPostSave($event);
+    }
+
     public function testOnLeadPostSaveNoAction(): void
     {
         $fieldChanges = [];
