@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -461,11 +463,24 @@ class PublicController extends CommonFormController
             // Search replace lead fields in the URL
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getContactFromRequest(['ct' => $ct]);
 
-            /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+            /** @var PageModel $pageModel */
             $pageModel = $this->getModel('page');
-            $pageModel->hitPage($redirect, $this->request, 200, $lead);
+
+            try {
+                $lead = $leadModel->getContactFromRequest(['ct' => $ct]);
+                $pageModel->hitPage($redirect, $this->request, 200, $lead);
+            } catch (InvalidDecodedStringException $e) {
+                // Invalid ct value so we must unset it
+                // and process the request without it
+
+                $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+
+                $this->request->request->set('ct', '');
+                $this->request->query->set('ct', '');
+                $lead = $leadModel->getContactFromRequest();
+                $pageModel->hitPage($redirect, $this->request, 200, $lead);
+            }
 
             /** @var PrimaryCompanyHelper $primaryCompanyHelper */
             $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
