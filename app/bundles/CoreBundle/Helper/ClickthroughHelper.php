@@ -11,6 +11,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+
 class ClickthroughHelper
 {
     /**
@@ -41,7 +43,7 @@ class ClickthroughHelper
         }
 
         if (0 !== stripos($decoded, 'a')) {
-            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array', $decoded));
+            throw new InvalidDecodedStringException($decoded);
         }
 
         return Serializer::decode($decoded);
