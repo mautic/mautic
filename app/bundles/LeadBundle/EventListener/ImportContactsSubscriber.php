@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
@@ -53,7 +53,7 @@ class ImportContactsSubscriber extends CommonSubscriber
      */
     public function importBuilder(ImportBuilderEvent $event)
     {
-        $event->setObjectInRequest('lead');
+        $event->setObjectFromRequest('lead');
 
         if ($event->getObject() === 'contacts') {
             $fields = [
@@ -65,6 +65,7 @@ class ImportContactsSubscriber extends CommonSubscriber
                 ),
             ];
 
+            $event->setActiveLink('#mautic_contact_index');
             $event->setFields($fields);
             $event->setModel($this->leadModel);
         }

@@ -252,6 +252,14 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.form.subscriber.forms.import' => [
+                'class'     => \Mautic\FormBundle\EventListener\ImportFormsSubscriber::class,
+                'arguments' => [
+                    'mautic.form.model.field',
+                    'mautic.form.model.form',
+                    'mautic.form.model.import.results',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.formconfig' => [
@@ -414,6 +422,14 @@ return [
                 'class'     => SubmissionResultLoader::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.form.model.import.results' => [
+                'class'     => \Mautic\FormBundle\Model\ImportResultsModel::class,
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'mautic.form.model.submission',
+                    'mautic.lead.import.dispatcher',
                 ],
             ],
         ],

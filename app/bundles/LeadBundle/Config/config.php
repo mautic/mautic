@@ -908,6 +908,13 @@ return [
                     '@doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.lead.import.dispatcher' => [
+                'class'     => \Mautic\LeadBundle\Import\ImportDispatcher::class,
+                'arguments' => [
+                    'request_stack',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'repositories' => [
             'mautic.lead.repository.company' => [
@@ -1222,7 +1229,7 @@ return [
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.company',
-                    'request_stack',
+                    'mautic.lead.import.dispatcher',
                 ],
             ],
             'mautic.lead.model.tag' => [

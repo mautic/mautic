@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
+use Mautic\LeadBundle\Import\ImportDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -72,9 +73,9 @@ class ImportModel extends FormModel
     protected $leadEventLogRepo;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var ImportDispatcher
      */
-    private $request;
+    private $importDispatcher;
 
     /**
      * ImportModel constructor.
@@ -84,6 +85,7 @@ class ImportModel extends FormModel
      * @param NotificationModel    $notificationModel
      * @param CoreParametersHelper $config
      * @param CompanyModel         $companyModel
+     * @param ImportDispatcher     $importDispatcher
      */
     public function __construct(
         PathsHelper $pathsHelper,
@@ -91,7 +93,7 @@ class ImportModel extends FormModel
         NotificationModel $notificationModel,
         CoreParametersHelper $config,
         CompanyModel $companyModel,
-        RequestStack $requestStack
+        ImportDispatcher $importDispatcher
     ) {
         $this->pathsHelper       = $pathsHelper;
         $this->leadModel         = $leadModel;
@@ -99,7 +101,7 @@ class ImportModel extends FormModel
         $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
         $this->companyModel      = $companyModel;
-        $this->request           = $requestStack->getCurrentRequest();
+        $this->importDispatcher  = $importDispatcher;
     }
 
     /**
@@ -394,9 +396,8 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $importBuilderEvent      = new ImportBuilderEvent($this->request);
-                    $this->dispatcher->dispatch(LeadEvents::IMPORT_BUILDER, $importBuilderEvent);
-                    $entityModel = $importBuilderEvent->getModel();
+                    $importBuilderEvent = $this->importDispatcher->dispatchBuilder($import);
+                    $entityModel        = $importBuilderEvent->getModel();
 
                     $merged = $entityModel->import(
                         $import->getMatchedFields(),
@@ -406,7 +407,8 @@ class ImportModel extends FormModel
                         $import->getDefault('tags'),
                         true,
                         $eventLog,
-                        $import->getId()
+                        $import->getId(),
+                        $import
                     );
 
                     if ($merged) {

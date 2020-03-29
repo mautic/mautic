@@ -83,8 +83,8 @@ $indexRoute = $object === 'contacts' ? 'mautic_contact_index' : 'mautic_company_
                     </div>
                 <?php else: ?>
                     <div>
-                        <a class="btn btn-success" href="<?php echo $view['router']->path($indexRoute); ?>" data-toggle="ajax">
-                            <?php echo $view['translator']->trans('mautic.lead.list.view_'.$object); ?>
+                        <a class="btn btn-success" href="<?php echo $view['router']->path($importBuilderEvent->getRoute()); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans($importBuilderEvent->getLabel()); ?>
                         </a>
                         <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_import_index', ['object' => $object]); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.view.imports'); ?>

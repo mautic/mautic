@@ -11,15 +11,36 @@
 
 namespace Mautic\LeadBundle\Import;
 
-use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\DoNotContactFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\IntegrationCampaignFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\RelationFuncFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\RelationValueFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\SegmentReferenceFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\Filter\SessionsFilterQueryBuilder;
+use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Event\ImportBuilderEvent;
+use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ImportDispatcher
 {
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * ImportDispatcher constructor.
+     *
+     * @param RequestStack             $requestStack
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(RequestStack $requestStack, EventDispatcherInterface $dispatcher)
+    {
+        $this->request    = $requestStack->getCurrentRequest();
+        $this->dispatcher = $dispatcher;
+    }
+
+    public function dispatchBuilder(Import $import = null)
+    {
+        $importBuilderEvent = new ImportBuilderEvent($this->request, $import);
+        $this->dispatcher->dispatch(LeadEvents::IMPORT_BUILDER, $importBuilderEvent);
+
+        return $importBuilderEvent;
+    }
 }

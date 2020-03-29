@@ -14,18 +14,14 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\Import;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\ImportBuilderEvent;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\Progress;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Import\ImportDispatcher;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -38,17 +34,17 @@ class ImportController extends FormController
     const STEP_IMPORT_FROM_CSV = 4;
 
     /**
-     * @var ImportBuilderEvent
+     * @var ImportDispatcher
      */
-    private $importBuilderEvent;
+    private $importDispatcher;
 
     /**
      * @param FilterControllerEvent $event
      */
     public function initialize(FilterControllerEvent $event)
     {
-        $this->importBuilderEvent      = new ImportBuilderEvent($this->request);
-        $this->dispatcher->dispatch(LeadEvents::IMPORT_BUILDER, $this->importBuilderEvent);
+        /* @var ImportDispatcher $importDispatcher */
+        $this->importDispatcher = $this->get('mautic.lead.import.dispatcher');
 
         parent::initialize($event);
     }
@@ -477,7 +473,14 @@ class ImportController extends FormController
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
-            $activeLink = $object === 'lead' ? '#mautic_contact_index' : '#mautic_company_index';
+            $importBuilderEvent = $this->importDispatcher->dispatchBuilder($import);
+            $activeLink         = $importBuilderEvent->getActiveLink();
+            $viewParameters     = array_merge(
+                $viewParameters,
+                [
+                    'importBuilderEvent' => $importBuilderEvent,
+                ]
+            );
 
             return $this->delegateView(
                 [
@@ -489,7 +492,7 @@ class ImportController extends FormController
                         'route'         => $this->generateUrl(
                             'mautic_import_action',
                             [
-                                'object'       => $this->importBuilderEvent->getObject(),
+                                'object'       => $importBuilderEvent->getObject(),
                                 'objectAction' => 'new',
                             ]
                         ),
@@ -686,9 +689,12 @@ class ImportController extends FormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
+    /**
+     * @return string
+     */
     protected function getObjectFromRequest()
     {
-        return $this->importBuilderEvent->getObjectInRequest();
+        return $this->importDispatcher->dispatchBuilder()->getObjectFromRequest();
     }
 
     /**

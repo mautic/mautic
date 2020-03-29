@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Import;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,7 +24,7 @@ class ImportBuilderEvent extends CommonEvent
     /**
      * @var string
      */
-    private $objectInRequest;
+    private $objectFromRequest;
 
     /**
      * @var string
@@ -33,7 +34,7 @@ class ImportBuilderEvent extends CommonEvent
     /**
      * @var array
      */
-    private $fields;
+    private $fields = [];
 
     /**
      * @var FormModel
@@ -41,13 +42,40 @@ class ImportBuilderEvent extends CommonEvent
     private $model;
 
     /**
+     * @var string
+     */
+    private $activeLink;
+
+    /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     * @var string
+     */
+    private $label;
+
+    /**
+     * @var string
+     */
+    private $route;
+
+    /**
      * ImportBuilderEvent constructor.
      *
-     * @param Request $request
+     * @param Request     $request
+     * @param Import|null $import
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request = null, Import $import = null)
     {
-        $this->object = $request->get('object', 'contacts');
+        $this->object = $request ? $request->get('object', 'contacts') : null;
+        if (!$this->object && $import) {
+            $this->object = $import->getObject();
+        }
+        $this->setLabel('mautic.lead.list.view_'.$this->object);
+        $this->setRoute('mautic_'.$this->object.'_index');
+        $this->request = $request;
     }
 
     /**
@@ -61,17 +89,17 @@ class ImportBuilderEvent extends CommonEvent
     /**
      * @return string
      */
-    public function getObjectInRequest()
+    public function getObjectFromRequest()
     {
-        return $this->objectInRequest;
+        return $this->objectFromRequest;
     }
 
     /**
-     * @param string $objectInRequest
+     * @param string $objectFromRequest
      */
-    public function setObjectInRequest($objectInRequest)
+    public function setObjectFromRequest($objectFromRequest)
     {
-        $this->objectInRequest = $objectInRequest;
+        $this->objectFromRequest = $objectFromRequest;
     }
 
     /**
@@ -104,5 +132,61 @@ class ImportBuilderEvent extends CommonEvent
     public function setModel($model)
     {
         $this->model = $model;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActiveLink()
+    {
+        return $this->activeLink;
+    }
+
+    /**
+     * @param string $activeLink
+     */
+    public function setActiveLink($activeLink)
+    {
+        $this->activeLink = $activeLink;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param string $label
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * @param string $route
+     */
+    public function setRoute($route)
+    {
+        $this->route = $route;
     }
 }

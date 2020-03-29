@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2016 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
@@ -54,11 +54,12 @@ class ImportCompaniesSubscriber extends CommonSubscriber
     public function importBuilder(ImportBuilderEvent $event)
     {
         if ($event->getObject() === 'companies') {
-            $event->setObjectInRequest('company');
+            $event->setObjectFromRequest('company');
             $fields = [
                 'mautic.lead.company'=> $this->fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),
             ];
 
+            $event->setActiveLink('#mautic_company_index');
             $event->setFields($fields);
             $event->setModel($this->companyModel);
         }
