@@ -69,7 +69,6 @@ class ImportFormsSubscriber extends CommonSubscriber
             $event->setModel($this->importResultsModel);
             $event->setLabel('mautic.form.import.view_forms');
             $event->setRoute('mautic_form_index');
-            $event->setImportInBackground(false);
         }
     }
 

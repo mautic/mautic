@@ -79,7 +79,6 @@ class ImportBuilderEvent extends CommonEvent
             $this->object = $import->getObject();
         }
         $this->setLabel('mautic.lead.list.view_'.$this->object);
-        $this->setRoute('mautic_'.$this->object.'_index');
         $this->request = $request;
     }
 

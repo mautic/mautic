@@ -66,6 +66,7 @@ class ImportContactsSubscriber extends CommonSubscriber
                 'mautic.lead.special_fields' => $this->getSpecialFields(),
             ];
 
+            $event->setRoute('mautic_contact_index');
             $event->setActiveLink('#mautic_contact_index');
             $event->setFields($fields);
             $event->setModel($this->leadModel);

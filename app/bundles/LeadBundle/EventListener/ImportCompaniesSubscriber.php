@@ -59,6 +59,7 @@ class ImportCompaniesSubscriber extends CommonSubscriber
                 'mautic.lead.company'=> $this->fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),
             ];
 
+            $event->setRoute('mautic_company_index');
             $event->setActiveLink('#mautic_company_index');
             $event->setFields($fields);
             $event->setModel($this->companyModel);

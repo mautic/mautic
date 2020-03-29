@@ -67,22 +67,24 @@ class LeadImportFieldType extends AbstractType
             'MauticUserBundle:User'
         );
 
-        $builder->add(
-            $builder->create(
-                'owner',
-                'user_list',
-                [
-                    'label'      => 'mautic.lead.lead.field.owner',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class' => 'form-control',
-                    ],
-                    'required' => false,
-                    'multiple' => false,
-                ]
-            )
-                ->addModelTransformer($transformer)
-        );
+        if ($options['object'] === 'lead' || $options['object'] === 'company') {
+            $builder->add(
+                $builder->create(
+                    'owner',
+                    'user_list',
+                    [
+                        'label'      => 'mautic.lead.lead.field.owner',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
+                        ],
+                        'required'   => false,
+                        'multiple'   => false,
+                    ]
+                )
+                    ->addModelTransformer($transformer)
+            );
+        }
 
         if ($options['object'] === 'lead') {
             $builder->add(

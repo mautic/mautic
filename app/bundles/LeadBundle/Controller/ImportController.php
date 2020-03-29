@@ -367,8 +367,11 @@ class ImportController extends FormController
                             return $this->newAction(0, true);
                         }
 
-                        $owner = $matchedFields['owner'];
-                        unset($matchedFields['owner']);
+                        $owner = null;
+                        if (array_key_exists('owner', $matchedFields)) {
+                            $owner = $matchedFields['owner'];
+                            unset($matchedFields['owner']);
+                        }
 
                         $list = null;
                         if (array_key_exists('list', $matchedFields)) {
@@ -553,10 +556,9 @@ class ImportController extends FormController
     protected function importInCli(Form $form)
     {
         $browserImportLimit = $this->getLineCountLimit();
-
         if ($browserImportLimit && $this->getLineCount() >= $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->get('apply')->isClicked()) {
+        } elseif (!$browserImportLimit && $form->get('buttons')->offsetExists('apply') && $form->get('buttons')->get('apply')->isClicked()) {
             return true;
         }
 

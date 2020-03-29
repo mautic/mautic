@@ -20,13 +20,12 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\LeadBundle\Entity\Company;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
-use Mautic\LeadBundle\Event\ImportBuilderEvent;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -436,8 +435,10 @@ class ImportModel extends FormModel
             $this->em->detach($eventLog);
             $eventLog = null;
             $data     = null;
-            $this->em->clear(Lead::class);
-            $this->em->clear(Company::class);
+            if (in_array($importBuilderEvent->getObject(), ['lead', 'company'])) {
+                $this->em->clear(Lead::class);
+                $this->em->clear(Company::class);
+            }
 
             // Save Import entity once per batch so the user could see the progress
             if ($batchSize === 0 && $import->isBackgroundProcess()) {
