@@ -657,8 +657,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Form\Type\LeadImportFieldType::class,
                 'arguments' => [
                     'mautic.factory',
-                    'request_stack',
-                    'event_dispatcher',
+                    'mautic.lead.import.dispatcher',
                     ],
                 'alias'     => 'lead_field_import',
             ],

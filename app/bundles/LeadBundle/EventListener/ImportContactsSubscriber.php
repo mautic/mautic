@@ -63,11 +63,32 @@ class ImportContactsSubscriber extends CommonSubscriber
                     false,
                     ['isPublished' => true, 'object' => 'company']
                 ),
+                'mautic.lead.special_fields' => $this->getSpecialFields(),
             ];
 
             $event->setActiveLink('#mautic_contact_index');
             $event->setFields($fields);
             $event->setModel($this->leadModel);
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function getSpecialFields()
+    {
+        return [
+            'dateAdded'      => 'mautic.lead.import.label.dateAdded',
+            'createdByUser'  => 'mautic.lead.import.label.createdByUser',
+            'dateModified'   => 'mautic.lead.import.label.dateModified',
+            'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
+            'lastActive'     => 'mautic.lead.import.label.lastActive',
+            'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
+            'ip'             => 'mautic.lead.import.label.ip',
+            'points'         => 'mautic.lead.import.label.points',
+            'stage'          => 'mautic.lead.import.label.stage',
+            'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
+            'ownerusername'  => 'mautic.lead.import.label.ownerusername',
+        ];
     }
 }

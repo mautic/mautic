@@ -32,11 +32,6 @@ class ImportFormsSubscriber extends CommonSubscriber
     private $formModel;
 
     /**
-     * @var SubmissionModel
-     */
-    private $submissionModel;
-
-    /**
      * @var ImportResultsModel
      */
     private $importResultsModel;
@@ -74,6 +69,7 @@ class ImportFormsSubscriber extends CommonSubscriber
             $event->setModel($this->importResultsModel);
             $event->setLabel('mautic.form.import.view_forms');
             $event->setRoute('mautic_form_index');
+            $event->setImportInBackground(false);
         }
     }
 
@@ -87,7 +83,11 @@ class ImportFormsSubscriber extends CommonSubscriber
         list($type, $formId) = explode('-', $event->getObject());
         $form                = $this->formModel->getEntity($formId);
         $formFields          = [];
+        $viewOnlyFields      = $this->formModel->getCustomComponents()['viewOnlyFields'];
         foreach ($form->getFields() as $field) {
+            if (in_array($field->getType(), $viewOnlyFields) || $field->getSaveResult() === false) {
+                continue;
+            }
             $formFields[$field->getAlias()] = $field->getLabel();
         }
 

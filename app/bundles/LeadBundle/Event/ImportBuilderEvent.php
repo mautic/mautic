@@ -62,6 +62,11 @@ class ImportBuilderEvent extends CommonEvent
     private $route;
 
     /**
+     * @var bool
+     */
+    private $importInBackground = true;
+
+    /**
      * ImportBuilderEvent constructor.
      *
      * @param Request     $request
@@ -188,5 +193,21 @@ class ImportBuilderEvent extends CommonEvent
     public function setRoute($route)
     {
         $this->route = $route;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isImportInBackground()
+    {
+        return $this->importInBackground;
+    }
+
+    /**
+     * @param bool $importInBackground
+     */
+    public function setImportInBackground($importInBackground)
+    {
+        $this->importInBackground = $importInBackground;
     }
 }

@@ -12,12 +12,9 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Event\ImportBuilderEvent;
-use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\LeadBundle\Import\ImportDispatcher;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -28,23 +25,17 @@ class LeadImportFieldType extends AbstractType
     private $factory;
 
     /**
-     * @var EventDispatcher
+     * @var ImportDispatcher
      */
-    private $dispatcher;
-
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
-     */
-    private $request;
+    private $importDispatcher;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory, RequestStack $requestStack, EventDispatcherInterface $dispatcher)
+    public function __construct(MauticFactory $factory, ImportDispatcher $importDispatcher)
     {
-        $this->request    = $requestStack->getCurrentRequest();
-        $this->factory    = $factory;
-        $this->dispatcher = $dispatcher;
+        $this->factory          = $factory;
+        $this->importDispatcher = $importDispatcher;
     }
 
     /**
@@ -53,24 +44,8 @@ class LeadImportFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $importBuilderEvent      = new ImportBuilderEvent($this->request);
-        $this->dispatcher->dispatch(LeadEvents::IMPORT_BUILDER, $importBuilderEvent);
-
-        $specialFields = [
-            'dateAdded'      => 'mautic.lead.import.label.dateAdded',
-            'createdByUser'  => 'mautic.lead.import.label.createdByUser',
-            'dateModified'   => 'mautic.lead.import.label.dateModified',
-            'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
-            'lastActive'     => 'mautic.lead.import.label.lastActive',
-            'dateIdentified' => 'mautic.lead.import.label.dateIdentified',
-            'ip'             => 'mautic.lead.import.label.ip',
-            'points'         => 'mautic.lead.import.label.points',
-            'stage'          => 'mautic.lead.import.label.stage',
-            'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
-            'ownerusername'  => 'mautic.lead.import.label.ownerusername',
-        ];
-
-        $importChoiceFields = array_merge($importBuilderEvent->getFields(), ['mautic.lead.special_fields' => $specialFields]);
+        $dispatchBuilder    = $this->importDispatcher->dispatchBuilder();
+        $importChoiceFields = $dispatchBuilder->getFields();
 
         foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
@@ -150,7 +125,7 @@ class LeadImportFieldType extends AbstractType
             $buttons = array_merge(
                 $buttons,
                 [
-                    'apply_text'  => 'mautic.lead.import.in.background',
+                    'apply_text'  => $dispatchBuilder->isImportInBackground() ? 'mautic.lead.import.in.background' : false,
                     'apply_class' => 'btn btn-success',
                     'apply_icon'  => 'fa fa-history',
                     'save_text'   => 'mautic.lead.import.start',
