@@ -55,7 +55,7 @@ class ImportContactsSubscriber extends CommonSubscriber
     {
         $event->setObjectFromRequest('lead');
 
-        if ($event->getObject() === 'contacts') {
+        if (in_array($event->getObject(), ['contacts', 'lead'])) {
             $fields = [
                 'mautic.lead.contact' => $this->fieldModel->getFieldList(false, false),
                 'mautic.lead.company' => $this->fieldModel->getFieldList(

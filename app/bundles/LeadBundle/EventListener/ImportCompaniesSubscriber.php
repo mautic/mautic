@@ -53,7 +53,7 @@ class ImportCompaniesSubscriber extends CommonSubscriber
      */
     public function importBuilder(ImportBuilderEvent $event)
     {
-        if ($event->getObject() === 'companies') {
+        if (in_array($event->getObject(), ['companies', 'company'])) {
             $event->setObjectFromRequest('company');
             $fields = [
                 'mautic.lead.company'=> $this->fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']),

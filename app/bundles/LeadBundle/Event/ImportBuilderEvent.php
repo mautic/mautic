@@ -69,10 +69,9 @@ class ImportBuilderEvent extends CommonEvent
      */
     public function __construct(Request $request = null, Import $import = null)
     {
-        if ($import) {
+        $this->object = $request ? $request->get('object', 'contacts') : null;
+        if (!$this->object && $import) {
             $this->object = $import->getObject();
-        } elseif ($request) {
-            $this->object = $request->get('object', 'contacts');
         }
 
         $this->setLabel('mautic.lead.list.view_'.$this->object);
