@@ -442,10 +442,6 @@ class MailHelper
                     $this->transportStartTime = time();
                 }
 
-                if ($this->factory->getParameter('mailer_convert_embed_images')) {
-                    $this->convertEmbedImages();
-                }
-
                 $this->mailer->send($this->message, $failures);
 
                 if (!empty($failures)) {
@@ -961,6 +957,10 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
+        if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_convert_embed_images')) {
+            $content = $this->convertEmbedImages($content);
+        }
+
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
@@ -981,19 +981,25 @@ class MailHelper
         ];
     }
 
-    private function convertEmbedImages()
+    /**
+     * @param string $content
+     *
+     * @return string
+     */
+    private function convertEmbedImages($content)
     {
         $matches = [];
-        $content = strtr($this->message->getBody(), $this->embedImagesReplaces);
+        $content = strtr($content, $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
             foreach ($matches[1] as $match) {
                 if (strpos($match, 'cid:') === false) {
                     $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
-            $content = strtr($this->message->getBody(), $this->embedImagesReplaces);
+            $content = strtr($content, $this->embedImagesReplaces);
         }
-        $this->message->setBody($content);
+
+        return $content;
     }
 
     /**
@@ -1899,7 +1905,8 @@ class MailHelper
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
             $copyCreated = false;
             if (null === $copy) {
-                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $this->body['content'])) {
+                $contentToPersist = strtr($this->body['content'], array_flip($this->embedImagesReplaces));
+                if (!$emailModel->getCopyRepository()->saveCopy($hash, $this->subject, $contentToPersist)) {
                     // Try one more time to find the ID in case there was overlap when creating
                     $copy = $emailModel->getCopyRepository()->findByHash($hash);
                 } else {
