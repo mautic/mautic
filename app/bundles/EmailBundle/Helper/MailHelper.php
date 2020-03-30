@@ -254,9 +254,9 @@ class MailHelper
     private $copies = [];
 
     /**
-     * @var bool|MauticMessage
+     * @var array
      */
-    private $messageBackup;
+    private $embedImagesReplaces = [];
 
     /**
      * @param MauticFactory $factory
@@ -345,8 +345,6 @@ class MailHelper
      */
     public function send($dispatchSendEvent = false, $isQueueFlush = false, $useOwnerAsMailer = true)
     {
-        $this->messageBackup = clone $this->message;
-
         if ($this->tokenizationEnabled && !empty($this->queuedRecipients) && !$isQueueFlush) {
             // This transport uses tokenization and queue()/flushQueue() was not used therefore use them in order
             // properly populate metadata for this transport
@@ -445,8 +443,7 @@ class MailHelper
                 }
 
                 if ($this->factory->getParameter('mailer_convert_embed_images')) {
-                    $convertedContent = $this->convertEmbedImages($this->message->getBody());
-                    $this->message->setBody($convertedContent);
+                    $this->convertEmbedImages();
                 }
 
                 $this->mailer->send($this->message, $failures);
@@ -483,8 +480,6 @@ class MailHelper
         if (!$isQueueFlush) {
             $this->createAssetDownloadEntries();
         } // else handled in flushQueue
-
-        $this->message = clone $this->messageBackup;
 
         return $error;
     }
@@ -986,25 +981,19 @@ class MailHelper
         ];
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string
-     */
-    private function convertEmbedImages($content)
+    private function convertEmbedImages()
     {
         $matches = [];
+        $content = strtr($this->message->getBody(), $this->embedImagesReplaces);
         if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
-            $replaces = [];
             foreach ($matches[1] as $match) {
                 if (strpos($match, 'cid:') === false) {
-                    $replaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
                 }
             }
-            $content = strtr($content, $replaces);
+            $content = strtr($this->message->getBody(), $this->embedImagesReplaces);
         }
-
-        return $content;
+        $this->message->setBody($content);
     }
 
     /**
