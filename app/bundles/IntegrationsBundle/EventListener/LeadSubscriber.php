@@ -156,6 +156,19 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, Company::class);
     }
 
+    public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event): void
+    {
+        $lead = $event->getLead();
+
+        // This mechanism is not able to record multiple company changes.
+        $changes['company'] = [
+            0 => '',
+            1 => $lead->getCompany(),
+        ];
+
+        $this->recordFieldChanges($changes, $lead->getId(), Lead::class);
+    }
+
     /**
      * @param int $objectId
      *
