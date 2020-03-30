@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup\DoNotSellList;
 
+use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
@@ -20,16 +21,22 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
 
     public function loadList(): bool
     {
-        if (false == $this->listPath) {
-            throw new FileNotFoundException('Please configure the path for the Do Not Sell List.');
+        $listPath = $this->getListPath();
+
+        if (false == $listPath) {
+            throw new BadConfigurationException('Please configure the path to the MaxMind Do Not Sell List.');
         }
 
-        if (false !== ($json = file_get_contents($this->listPath))) {
-            if ($data = json_decode($json, true)) {
-                $this->list = $data;
+        if (!file_exists($listPath)) {
+            throw new FileNotFoundException('Please make sure the MaxMind Do Not Sell List file has been downloaded.');
+        }
 
-                return true;
-            }
+        $json = file_get_contents($listPath);
+
+        if ($data = json_decode($json, true)) {
+            $this->list = $data['exclusions'];
+
+            return true;
         }
 
         return false;

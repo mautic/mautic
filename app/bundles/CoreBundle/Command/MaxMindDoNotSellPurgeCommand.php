@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use function Clue\StreamFilter\fun;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
@@ -79,7 +80,11 @@ EOT
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();
-            $doNotSellContacts = $this->findContactsFromIPs($this->doNotSellList->getList());
+            $doNotSellListIPs = array_map(function ($item) {
+                // strip subnet mask characters
+                return substr_replace($item['value'], '', strpos($item['value'], '/'), 3);
+            }, $this->doNotSellList->getList());
+            $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 
             if (0 == count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
@@ -87,7 +92,7 @@ EOT
                 return 0;
             }
 
-            $output->writeln('Found '.count($doNotSellContacts)." contacts with IPs from Do Not Sell list.\n");
+            $output->writeln('Found '.count($doNotSellContacts)." contacts with an IP from the Do Not Sell list.\n");
 
             if ($dryRun) {
                 $output->writeln('<info>Dry run; skipping purge.</info>');

@@ -65,7 +65,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute([]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Found 1 contacts with IPs from Do Not Sell list', $output);
+        $this->assertContains('Found 1 contacts with an IP from the Do Not Sell list', $output);
         $this->assertContains('Step 2: Purging data...', $output);
         $this->assertNotContains('No matches found', $output);
         $this->assertEquals(0, $result);
