@@ -556,9 +556,10 @@ class ImportController extends FormController
     protected function importInCli(Form $form)
     {
         $browserImportLimit = $this->getLineCountLimit();
+
         if ($browserImportLimit && $this->getLineCount() >= $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->offsetExists('apply') && $form->get('buttons')->get('apply')->isClicked()) {
+        } elseif (!$browserImportLimit && $form->get('buttons')->get('apply')->isClicked()) {
             return true;
         }
 

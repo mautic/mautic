@@ -127,7 +127,7 @@ class LeadImportFieldType extends AbstractType
             $buttons = array_merge(
                 $buttons,
                 [
-                    'apply_text'  => $dispatchBuilder->isImportInBackground() ? 'mautic.lead.import.in.background' : false,
+                    'apply_text'  => 'mautic.lead.import.in.background',
                     'apply_class' => 'btn btn-success',
                     'apply_icon'  => 'fa fa-history',
                     'save_text'   => 'mautic.lead.import.start',

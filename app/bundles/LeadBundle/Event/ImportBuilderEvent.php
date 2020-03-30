@@ -62,11 +62,6 @@ class ImportBuilderEvent extends CommonEvent
     private $route;
 
     /**
-     * @var bool
-     */
-    private $importInBackground = true;
-
-    /**
      * ImportBuilderEvent constructor.
      *
      * @param Request     $request
@@ -74,10 +69,12 @@ class ImportBuilderEvent extends CommonEvent
      */
     public function __construct(Request $request = null, Import $import = null)
     {
-        $this->object = $request ? $request->get('object', 'contacts') : null;
-        if (!$this->object && $import) {
+        if ($import) {
             $this->object = $import->getObject();
+        } elseif ($request) {
+            $this->object = $request->get('object', 'contacts');
         }
+
         $this->setLabel('mautic.lead.list.view_'.$this->object);
         $this->request = $request;
     }
@@ -192,21 +189,5 @@ class ImportBuilderEvent extends CommonEvent
     public function setRoute($route)
     {
         $this->route = $route;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isImportInBackground()
-    {
-        return $this->importInBackground;
-    }
-
-    /**
-     * @param bool $importInBackground
-     */
-    public function setImportInBackground($importInBackground)
-    {
-        $this->importInBackground = $importInBackground;
     }
 }
