@@ -323,19 +323,19 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->execute();
 
         // Test a single company is added and is set as primary
-        $this->testCompanyAssociation([1], 1);
+        $this->assertCompanyAssociation([1], 1);
 
         // Test that a company a contact is already part of does not change anything
-        $this->testCompanyAssociation([1], 1);
+        $this->assertCompanyAssociation([1], 1);
 
         // Test that multiple companies are added and one primary is set
-        $this->testCompanyAssociation([1, 2, 3], 1);
+        $this->assertCompanyAssociation([1, 2, 3], 1);
 
         // Test that removing a company will leave the two remaining with one set as primary
-        $this->testCompanyAssociation([1, 3], 1);
+        $this->assertCompanyAssociation([1, 3], 1);
 
         // Test that adding a company in addition to others will set it as primary
-        $this->testCompanyAssociation([1, 2, 3], 1);
+        $this->assertCompanyAssociation([1, 2, 3], 1);
 
         // Test that removing all companies will empty the lead's primary company
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
@@ -489,7 +489,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->fetchColumn();
     }
 
-    private function testCompanyAssociation(array $expectedCompanies, int $leadId)
+    private function assertCompanyAssociation(array $expectedCompanies, int $leadId)
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
