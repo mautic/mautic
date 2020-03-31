@@ -69,12 +69,10 @@ class GrapesJsController extends CommonController
         $template     = InputHelper::clean($this->request->query->get('template'));
         $templateName = ':'.$template.':'.$objectType;
         $content      = $entity->getContent();
+        $themeHelper  = $this->get('mautic.helper.theme');
 
         // Check for MJML template
-        $themeHelper = $this->get('mautic.helper.theme');
-
-        if ($themeHelper->exists($templateName.'.mjml.twig')) {
-            $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.mjml.twig');
+        if ($logicalName = $this->checkForMjmlTemplate($templateName.'.mjml.twig')) {
             $type        = 'mjml';
         } else {
             $logicalName = $themeHelper->checkForTwigTemplate($templateName.'.html.twig');
@@ -269,5 +267,23 @@ class GrapesJsController extends CommonController
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php
         $slotsHelper->stop();
+    }
+
+    private function checkForMjmlTemplate($template)
+    {
+        $templatingHelper = $this->get('mautic.helper.templating');
+
+        $parser     = $templatingHelper->getTemplateNameParser();
+        $templating = $templatingHelper->getTemplating();
+        $template   = $parser->parse($template);
+
+        $twigTemplate = clone $template;
+        $twigTemplate->set('engine', 'twig');
+
+        if ($templating->exists($twigTemplate)) {
+            return $twigTemplate->getLogicalName();
+        }
+
+        return null;
     }
 }
