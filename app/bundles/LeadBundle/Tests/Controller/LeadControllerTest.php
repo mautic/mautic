@@ -323,116 +323,19 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->execute();
 
         // Test a single company is added and is set as primary
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
-        $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([1]);
-        $this->client->submit($form);
-        $companies  = $this->getCompanyLeads(1);
-        $collection = (new Collection($companies))->keyBy('company_id');
-        // Should have only one company associated
-        $this->assertCount(1, $collection);
-        $this->assertEquals([1], $collection->keys()->toArray());
-        // Only one should be primary
-        $primary = $collection->reject(
-            function (array $company) {
-                return empty($company['is_primary']);
-            }
-        );
-        $this->assertCount(1, $primary);
-        // Primary company name should match
-        $primaryCompanyName = $this->getLeadPrimaryCompany(1);
-        $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
+        $this->testCompanyAssociation([1], 1);
 
         // Test that a company a contact is already part of does not change anything
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
-        $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([1]);
-        $this->client->submit($form);
-        $companies  = $this->getCompanyLeads(1);
-        $collection = (new Collection($companies))->keyBy('company_id');
-        // Should have only one company associated
-        $this->assertCount(1, $collection);
-        $this->assertEquals([1], $collection->keys()->toArray());
-        // Only one should be primary
-        $primary = $collection->reject(
-            function (array $company) {
-                return empty($company['is_primary']);
-            }
-        );
-        $this->assertCount(1, $primary);
-        // Primary company name should match
-        $primaryCompanyName = $this->getLeadPrimaryCompany(1);
-        $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
+        $this->testCompanyAssociation([1], 1);
 
         // Test that multiple companies are added and one primary is set
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
-        $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([1, 2, 3]);
-        $this->client->submit($form);
-        $companies  = $this->getCompanyLeads(1);
-        $collection = (new Collection($companies))->keyBy('company_id');
-        // Should have three companies associated
-        $this->assertCount(3, $collection);
-        $this->assertEquals([1, 2, 3], $collection->keys()->toArray());
-        // Only one should be primary
-        $primary = $collection->reject(
-            function (array $company) {
-                return empty($company['is_primary']);
-            }
-        );
-        $this->assertCount(1, $primary);
-        // Primary company name should match
-        $primaryCompanyName = $this->getLeadPrimaryCompany(1);
-        $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
+        $this->testCompanyAssociation([1, 2, 3], 1);
 
         // Test that removing a company will leave the two remaining with one set as primary
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
-        $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([1, 3]);
-        $this->client->submit($form);
-        $companies  = $this->getCompanyLeads(1);
-        $collection = (new Collection($companies))->keyBy('company_id');
-        // Should have two companies associated
-        $this->assertCount(2, $collection);
-        $this->assertEquals([1, 3], $collection->keys()->toArray());
-        // Only one should be primary
-        $primary = $collection->reject(
-            function (array $company) {
-                return empty($company['is_primary']);
-            }
-        );
-        $this->assertCount(1, $primary);
-        // Primary company name should match
-        $primaryCompanyName = $this->getLeadPrimaryCompany(1);
-        $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
+        $this->testCompanyAssociation([1, 3], 1);
 
         // Test that adding a company in addition to others will set it as primary
-        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
-        $saveButton = $crawler->selectButton('lead[buttons][save]');
-        $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([1, 2, 3]);
-        $this->client->submit($form);
-        $companies  = $this->getCompanyLeads(1);
-        $collection = (new Collection($companies))->keyBy('company_id');
-        // Should have three companies associated
-        $this->assertCount(3, $collection);
-        $this->assertEquals([1, 2, 3], $collection->keys()->toArray());
-        // Only one should be primary and it should be the newest added
-        $primary = $collection->reject(
-            function (array $company) {
-                return empty($company['is_primary']);
-            }
-        );
-        $primaryCompany = $primary->first();
-        $this->assertCount(1, $primary);
-        $this->assertEquals(2, $primaryCompany['company_id']);
-        // Primary company name should match
-        $primaryCompanyName = $this->getLeadPrimaryCompany(1);
-        $this->assertEquals($primaryCompany['companyname'], $primaryCompanyName);
+        $this->testCompanyAssociation([1, 2, 3], 1);
 
         // Test that removing all companies will empty the lead's primary company
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
@@ -584,5 +487,32 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->where("l.id = {$leadId}")
             ->execute()
             ->fetchColumn();
+    }
+
+    private function testCompanyAssociation(array $expectedCompanies, int $leadId)
+    {
+        $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
+        $saveButton = $crawler->selectButton('lead[buttons][save]');
+        $form       = $saveButton->form();
+        $form['lead[companies]']->setValue($expectedCompanies);
+        $crawler    = $this->client->submit($form);
+        $companies  = $this->getCompanyLeads($leadId);
+        $collection = (new Collection($companies))->keyBy('company_id');
+        // Should have only one company associated
+        $this->assertCount(count($expectedCompanies), $collection);
+        $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
+        // Only one should be primary
+        $primary = $collection->reject(
+            function (array $company) {
+                return empty($company['is_primary']);
+            }
+        );
+        $this->assertCount(1, $primary);
+        // Primary company name should match
+        $primaryCompanyName = $this->getLeadPrimaryCompany($leadId);
+        $this->assertEquals($primary->first()['companyname'], $primaryCompanyName);
+        // Primary company should be in the UI of the details dropdown tray
+        $details = $crawler->filter('#lead-details')->html();
+        $this->assertContains($primaryCompanyName, $details);
     }
 }
