@@ -20,5 +20,11 @@ Setup is very easy.
 
 ## Dependencies
 
-This plugin depend of following GrapesJS plugin: https://github.com/Webmecanik/grapesjs-preset-mautic  
+This plugin depend of following GrapesJS plugin:
+- Custom for Mautic : https://github.com/Webmecanik/grapesjs-preset-mautic
+- Builder email MJML : https://github.com/artf/grapesjs-mjml
+- Builder email HTML : https://github.com/artf/grapesjs-preset-newsletter
+- Builder page HTML : https://github.com/artf/grapesjs-preset-webpage
+- Parser CSS : https://github.com/artf/grapesjs-parser-postcss
+
 If you need to update it, code is in the `Assets/js` folder.
