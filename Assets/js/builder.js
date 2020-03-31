@@ -3,23 +3,25 @@
  *
  * @param themeField
  */
-Mautic.coreInitSelectTheme = Mautic.initSelectTheme;
+Mautic.initSelectTheme = (function (initSelectTheme) {
+    return function (themeField) {
+        let builderUrl = mQuery('#builder_url');
 
-Mautic.initSelectTheme = function(themeField) {
-    let builderUrl = mQuery('#builder_url');
+        // Replace Mautic URL by plugin URL
+        if (builderUrl.length) {
+            if (builderUrl.val().indexOf('pages') !== -1) {
+                url = builderUrl.val().replace('s/pages/builder','s/grapesjsbuilder/page');
+            } else {
+                url = builderUrl.val().replace('s/emails/builder','s/grapesjsbuilder/email');
+            }
 
-    if (builderUrl.length) {
-        if (builderUrl.val().indexOf('pages') !== -1) {
-            url = builderUrl.val().replace('s/pages/builder','s/grapesjsbuilder/page');
-        } else {
-            url = builderUrl.val().replace('s/emails/builder','s/grapesjsbuilder/email');
+            builderUrl.val(url);
         }
 
-        builderUrl.val(url);
+        // Launch original Mautic.initSelectTheme function
+        initSelectTheme(themeField);
     }
-
-    Mautic.coreInitSelectTheme(themeField);
-};
+})(Mautic.initSelectTheme);
 
 /**
  * Launch builder
@@ -36,7 +38,7 @@ Mautic.launchBuilder = function (formName, actionName) {
     mQuery('.builder-panel').css('padding', 0);
     mQuery('.builder').addClass('builder-active').removeClass('hide');
 
-    // Init GrapesJS
+    // Initialize GrapesJS
     Mautic.initGrapesJS(formName);
 };
 
@@ -69,7 +71,7 @@ Mautic.initGrapesJS = function (object) {
         autoAdd: true,
     };
 
-    if (object === 'page') {
+    if (object === 'page') { // PageBuilder
         // Parse HTML template
         let parser = new DOMParser();
         let fullHtml = parser.parseFromString(textareaHtml.val(), "text/html");
@@ -96,7 +98,7 @@ Mautic.initGrapesJS = function (object) {
             },
         });
 
-        // Customize GrapesJS
+        // Customize GrapesJS -> add close button with save for Mautic
         panelManager = editor.Panels;
         panelManager.addButton('views', [
             {
@@ -121,7 +123,7 @@ Mautic.initGrapesJS = function (object) {
     } else if (object === 'emailform') {
         let textareaMjml = mQuery('textarea.builder-mjml');
 
-        if (textareaMjml.val().length) {
+        if (textareaMjml.val().length) { // EmailBuilder -> MJML
             editor = grapesjs.init({
                 clearOnRender: true,
                 container: '.builder-panel',
@@ -137,6 +139,7 @@ Mautic.initGrapesJS = function (object) {
                 }
             });
 
+            // Customize GrapesJS -> add close button with save for Mautic
             panelManager = editor.Panels;
             panelManager.addButton('views', [
                 {
@@ -170,7 +173,7 @@ Mautic.initGrapesJS = function (object) {
                     }
                 }
             ]);
-        } else {
+        } else { // EmailBuilder -> HTML
             // Parse HTML template
             let parser = new DOMParser();
             let fullHtml = parser.parseFromString(textareaHtml.val(), "text/html");
@@ -194,7 +197,7 @@ Mautic.initGrapesJS = function (object) {
                 }
             });
 
-            // Customize GrapesJS
+            // Customize GrapesJS -> add close button with save for Mautic
             panelManager = editor.Panels;
             panelManager.addButton('views', [
                 {
@@ -244,6 +247,7 @@ Mautic.initGrapesJS = function (object) {
 Mautic.setThemeHtml = function(theme) {
     setupButtonLoadingIndicator(true);
 
+    // Load template and fill field
     mQuery.ajax({
         url: mQuery('#builder_url').val(),
         data: 'template=' + theme,
@@ -336,6 +340,11 @@ let setupButtonLoadingIndicator = function (activate) {
     }
 };
 
+/**
+ * Generate assets list from GrapesJs
+ *
+ * @param editor
+ */
 let getAssetsList = function(editor) {
     let assetManager = editor.AssetManager;
     let assets = assetManager.getAll();

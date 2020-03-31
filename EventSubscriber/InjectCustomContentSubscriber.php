@@ -81,6 +81,7 @@ class InjectCustomContentSubscriber extends CommonSubscriber
         $parameters = $customContentEvent->getVars();
 
         if ($customContentEvent->getContext() === 'email.settings.advanced') {
+            // Inject MJML form within mail page
             if (empty($parameters['email']) || !$parameters['email'] instanceof Email) {
                 return;
             }
@@ -107,6 +108,7 @@ class InjectCustomContentSubscriber extends CommonSubscriber
             $customContentEvent->addContent($content);
 
         } elseif ($customContentEvent->getContext() === 'page.header.left') {
+            // Inject fileManager URL and list of images within all pages
             $passParams['assets']     = json_encode($this->fileManager->getImages());
             $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], true) ;
             $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], true) ;
