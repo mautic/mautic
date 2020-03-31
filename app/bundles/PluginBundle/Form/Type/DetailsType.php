@@ -35,37 +35,38 @@ class DetailsType extends AbstractType
     {
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $keys          = $options['integration_object']->getRequiredKeyFields();
-        $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
-        $formSettings  = $options['integration_object']->getFormDisplaySettings();
+        $formSettings = $options['integration_object']->getFormDisplaySettings();
 
-        if (!empty($formSettings['hide_keys'])) {
-            foreach ($formSettings['hide_keys'] as $key) {
-                unset($keys[$key]);
+        if (!empty($formSettings['requires_authorization'])) {
+            $keys          = $options['integration_object']->getRequiredKeyFields();
+            $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+
+            if (!empty($formSettings['hide_keys'])) {
+                foreach ($formSettings['hide_keys'] as $key) {
+                    unset($keys[$key]);
+                }
             }
-        }
 
-        $builder->add('apiKeys', KeysType::class, [
-            'label'              => false,
-            'integration_keys'   => $keys,
-            'data'               => $decryptedKeys,
-            'integration_object' => $options['integration_object'],
-        ]);
-
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
-            $data = $event->getData();
-            $form = $event->getForm();
-
-            $form->add('apiKeys', KeysType::class, [
+            $builder->add('apiKeys', KeysType::class, [
                 'label'              => false,
                 'integration_keys'   => $keys,
                 'data'               => $decryptedKeys,
                 'integration_object' => $options['integration_object'],
-                'is_published'       => (int) $data['isPublished'],
             ]);
-        });
 
-        if (!empty($formSettings['requires_authorization'])) {
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
+                $data = $event->getData();
+                $form = $event->getForm();
+
+                $form->add('apiKeys', KeysType::class, [
+                    'label'              => false,
+                    'integration_keys'   => $keys,
+                    'data'               => $decryptedKeys,
+                    'integration_object' => $options['integration_object'],
+                    'is_published'       => (int) $data['isPublished'],
+                ]);
+            });
+
             $disabled = false;
             $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
