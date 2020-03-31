@@ -411,6 +411,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($companyName)) {
+            // Set the contact's primary company to the first company added in the batch
+            // This must happen before LeadEvents::LEAD_COMPANY_CHANGE to ensure the Lead::getCompany has the correct value
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
                 $lead->addUpdatedField('company', $companyName)
@@ -529,6 +531,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if ($primaryRemoved) {
+            // Set the contact's primary company to a remaining company or empty it out if none are left
+            // This must happen before LeadEvents::LEAD_COMPANY_CHANGE to ensure the Lead::getCompany has the correct value
             $this->updateContactAfterPrimaryCompanyWasRemoved($lead);
         }
 
