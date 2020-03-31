@@ -1,5 +1,5 @@
 export default (editor, opts = {}) => {
-    const $ = mQuery;
+    const $ = editor.$;
     const pm = editor.Panels;
 
     // Add function within builder to edit source code
@@ -22,14 +22,17 @@ export default (editor, opts = {}) => {
         let htmlImportBtn = pm.getButton('options', 'gjs-open-import-template');
         let pageImportBtn = pm.getButton('options', 'gjs-open-import-webpage');
 
+        // MJML import
         if (mjmlImportBtn !== null) {
             pm.removeButton('options', 'mjml-import');
         }
 
+        // Newsletter import
         if (htmlImportBtn !== null) {
             pm.removeButton('options', 'gjs-open-import-template');
         }
 
+        // Webpage import
         if (pageImportBtn !== null) {
             pm.removeButton('options', 'gjs-open-import-webpage');
         }

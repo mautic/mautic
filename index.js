@@ -6,27 +6,21 @@ import loadBlocks from './blocks';
 export default (editor, opts = {}) => {
     const $ = mQuery;
     const am = editor.AssetManager;
-    const cfg = editor.getConfig();
 
     let config = {
         sourceEdit: 1,
         sourceEditBtnLabel: 'Edit',
+        sourceCancelBtnLabel: 'Cancel',
         sourceEditModalTitle: 'Edit code',
         deleteAssetConfirmText: 'Are you sure?',
         showLayersManager: 0,
         showImportButton: 0,
-        mjmlTemplate: false,
         replaceRteWithFroala: true,
         categorySectionLabel: 'Sections',
         categoryBlockLabel: 'Blocks',
         dynamicContentBlockLabel: 'Dynamic Content',
         ...opts,
     };
-
-    // Check if MJML plugin is on
-    if (cfg.plugins.includes('grapesjs-mjml')) {
-        config.mjmlTemplate = true;
-    }
 
     // Extend the original `image` and add a confirm dialog before removing it
     am.addType('image', {
@@ -80,7 +74,7 @@ export default (editor, opts = {}) => {
                         let top = currentLink.getBoundingClientRect().top;
                         let height = $(currentLink).outerHeight();
 
-                        // Set position of popup
+                        // Set position of link popup
                         popupLink.css('top', parseInt(top) + parseInt(height) + 35);
                     }
                 });
@@ -95,6 +89,7 @@ export default (editor, opts = {}) => {
         });
     }
 
+    // Load other parts
     loadComponents(editor, config);
     loadCommands(editor, config);
     loadButtons(editor, config);

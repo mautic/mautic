@@ -5,8 +5,9 @@ export default (editor, opts = {}) => {
 
     let codeEditor = null;
 
+    // Launch Code Editor popup
     cmd.add('preset-mautic:code-edit', {
-        run: (editor, sender) => {
+        run: (editor, sender, options = {}) => {
             if (!codeEditor) codeEditor = new CodeEditor(editor, opts);
 
             sender && sender.set('active', 0);
