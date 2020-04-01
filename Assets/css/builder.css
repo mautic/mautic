@@ -26,6 +26,10 @@ body, html {
 }
 
 /* GrapesJS FileManager custom CSS */
+.gjs-btn-code-cancel {
+    margin-left: 10px;
+}
+
 .gjs-am-file-uploader {
     width: 100%;
     float: none;
