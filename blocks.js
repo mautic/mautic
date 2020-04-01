@@ -1,7 +1,36 @@
 export default (editor, opts = {}) => {
     const bm = editor.BlockManager;
+    const cfg = editor.getConfig();
 
     let blocks = bm.getAll();
+
+    // Add Dynamic Content block only for newsletter
+    if (cfg.plugins.includes('grapesjs-mjml') || cfg.plugins.includes('gjs-preset-newsletter')) {
+        bm.add('dynamic-content', {
+            label: opts.dynamicContentBlockLabel,
+            activate: true,
+            select: true,
+            attributes: { class: 'fa fa-tag' },
+            content: {
+                type: 'dynamic-content',
+                content: 'Dynamic Content',
+                style: { padding: '10px' },
+                activeOnRender: 1
+            }
+        });
+    }
+
+    // Add icon to mj-hero
+    if (typeof bm.get('mj-hero') !== 'undefined') {
+        bm.get('mj-hero').set({
+            attributes: { class: 'gjs-fonts gjs-f-hero' },
+        });
+    }
+
+    // Delete mj-wrapper
+    if (typeof bm.get('mj-wrapper') !== 'undefined') {
+        bm.remove('mj-wrapper');
+    }
 
     // All block inside Blocks category
     blocks.forEach(block => {
@@ -81,17 +110,5 @@ export default (editor, opts = {}) => {
         bm.get('column3-7').set({
             category: opts.categorySectionLabel
         });
-    }
-
-    // Add icon to mj-hero
-    if (typeof bm.get('mj-hero') !== 'undefined') {
-        bm.get('mj-hero').set({
-            attributes: { class: 'gjs-fonts gjs-f-hero' },
-        });
-    }
-
-    // Delete mj-wrapper
-    if (typeof bm.get('mj-wrapper') !== 'undefined') {
-        bm.remove('mj-wrapper');
     }
 };

@@ -19,6 +19,8 @@ export default (editor, opts = {}) => {
         categorySectionLabel: 'Sections',
         categoryBlockLabel: 'Blocks',
         dynamicContentBlockLabel: 'Dynamic Content',
+        dynamicContentBtnLabel: 'Save',
+        dynamicContentModalTitle: 'Edit Dynamic Content',
         ...opts,
     };
 
