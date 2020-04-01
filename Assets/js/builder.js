@@ -229,7 +229,12 @@ Mautic.initGrapesJS = function (object) {
     }
 
     editor.on('load', (response) => {
+        const um = editor.UndoManager;
+
         convertDynamicContentTokenToSlot(editor);
+
+        // Clear stack of undo/redo
+        um.clear();
     });
 
     editor.on('component:add', (component) => {
