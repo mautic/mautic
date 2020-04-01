@@ -71,6 +71,52 @@ Mautic.initGrapesJS = function (object) {
         autoAdd: true,
     };
 
+    // Redefine Keyboard shortcuts due to unbind won't works with multiple keys.
+    let keymapsConf = {
+        defaults: {
+            'core:undoios': {
+                keys: '⌘+z',
+                handler: 'core:undo'
+            },
+            'core:redoios': {
+                keys: '⌘+shift+z',
+                handler: 'core:redo'
+            },
+            'core:copyios': {
+                keys: '⌘+c',
+                handler: 'core:copy'
+            },
+            'core:pasteios': {
+                keys: '⌘+v',
+                handler: 'core:paste'
+            },
+            'core:undo': {
+                keys: 'ctrl+z',
+                handler: 'core:undo'
+            },
+            'core:redo': {
+                keys: 'ctrl+shift+z',
+                handler: 'core:redo'
+            },
+            'core:copy': {
+                keys: 'ctrl+c',
+                handler: 'core:copy'
+            },
+            'core:paste': {
+                keys: 'ctrl+v',
+                handler: 'core:paste'
+            },
+            'core:c-deletebackspace': {
+                keys: 'backspace',
+                handler: 'core:component-delete'
+            },
+            'core:c-deletesuppr': {
+                keys: 'delete',
+                handler: 'core:component-delete'
+            },
+        }
+    };
+
     if (object === 'page') { // PageBuilder
         // Parse HTML template
         let parser = new DOMParser();
@@ -96,6 +142,7 @@ Mautic.initGrapesJS = function (object) {
                 'gjs-preset-webpage': {},
                 'grapesjs-preset-mautic': {}
             },
+            keymaps: keymapsConf
         });
 
         // Customize GrapesJS -> add close button with save for Mautic
@@ -138,7 +185,8 @@ Mautic.initGrapesJS = function (object) {
                 pluginsOpts: {
                     'grapesjs-mjml': {},
                     'grapesjs-preset-mautic': {}
-                }
+                },
+                keymaps: keymapsConf
             });
 
             // Customize GrapesJS -> add close button with save for Mautic
@@ -198,7 +246,8 @@ Mautic.initGrapesJS = function (object) {
                 pluginsOpts: {
                     'gjs-preset-newsletter': {},
                     'grapesjs-preset-mautic': {}
-                }
+                },
+                keymaps: keymapsConf
             });
 
             // Customize GrapesJS -> add close button with save for Mautic
@@ -259,7 +308,25 @@ Mautic.initGrapesJS = function (object) {
         }
     });
 
+    const keymaps = editor.Keymaps;
+    let allKeymaps;
+
+    editor.on('modal:open', () => {
+        // Save all keyboard shortcuts
+        allKeymaps = Object.assign({}, keymaps.getAll());
+
+        // Remove keyboard shortcuts to prevent launch behind popup
+        keymaps.removeAll();
+    });
+
     editor.on('modal:close', () => {
+        // ReMap keyboard shortcuts on modal close
+        Object.keys(allKeymaps).map(function(objectKey) {
+            let shortcut = allKeymaps[objectKey];
+
+            keymaps.add(shortcut.id, shortcut.keys, shortcut.handler);
+        });
+
         let modalContent = editor.Modal.getContent().querySelector('#dynamic-content-popup');
 
         // On modal close -> update view of DC block and move editor within Mautic
