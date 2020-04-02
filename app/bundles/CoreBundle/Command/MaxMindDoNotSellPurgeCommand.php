@@ -18,17 +18,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MaxMindDoNotSellPurgeCommand extends Command
 {
-    /**
-     * @var LeadRepository
-     */
-    private \Doctrine\ORM\EntityRepository $leadRepository;
 
     public function __construct(
         private EntityManager $em,
+        private LeadRepository $leadRepository,
         private MaxMindDoNotSellList $doNotSellList
     ) {
         parent::__construct();
-        $this->leadRepository = $this->em->getRepository(Lead::class);
     }
 
     protected function configure()
@@ -64,7 +60,8 @@ EOT
             $this->doNotSellList->loadList();
             $doNotSellListIPs = array_map(fn ($item): string|array =>
                 // strip subnet mask characters
-                substr_replace($item['value'], '', strpos($item['value'], '/'), 3), $this->doNotSellList->getList());
+                $this->doNotSellList->stripCIDR($item['value'])
+            , $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 
             if (0 == count($doNotSellContacts)) {
@@ -124,19 +121,28 @@ EOT
 
         // We only purge data from the contact if it matches the data in the IP details
         if ($ipDetails = $matchedIps[0]->getIpDetails()) {
-            if (($ipDetails['city'] ?? '') == $lead->getCity()) {
-                $lead->setCity(null);
-            }
-            if (($ipDetails['region'] ?? '') == $lead->getState()) {
-                $lead->setState(null);
-            }
-            if (($ipDetails['country'] ?? '') == $lead->getCountry()) {
-                $lead->setCountry(null);
-            }
-            if (($ipDetails['zipcode'] ?? '') == $lead->getZipcode()) {
-                $lead->setZipcode(null);
-            }
+            return false;
+        }
 
+        $changed = false;
+        if (($ipDetails['city'] ?? '') == $lead->getCity()) {
+            $lead->setCity(null);
+            $changed = true;
+        }
+        if (($ipDetails['region'] ?? '') == $lead->getState()) {
+            $lead->setState(null);
+            $changed = true;
+        }
+        if (($ipDetails['country'] ?? '') == $lead->getCountry()) {
+            $lead->setCountry(null);
+            $changed = true;
+        }
+        if (($ipDetails['zipcode'] ?? '') == $lead->getZipcode()) {
+            $lead->setZipcode(null);
+            $changed = true;
+        }
+
+        if ($changed) {
             $this->leadRepository->saveEntity($lead);
 
             return true;

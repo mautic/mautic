@@ -2,8 +2,24 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use Joomla\Http\Http;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
+use Psr\Log\LoggerInterface;
+
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 {
+    /**
+     * @var MaxMindDoNotSellList
+     */
+    private $doNotSellList;
+
+    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null, CoreParametersHelper $coreParametersHelper = null)
+    {
+        parent::__construct($auth, $ipLookupConfig, $cacheDir, $logger, $httpConnector, $coreParametersHelper);
+        $this->doNotSellList = new MaxMindDoNotSellList($coreParametersHelper);
+    }
+
     /**
      * @return string
      */
@@ -85,5 +101,20 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                 $this->logger->warning('IP LOOKUP: '.$data->error);
             }
         }
+    }
+
+    protected function shouldPerformLookup(): bool
+    {
+        if (!isset($this->ip)) {
+            return false;
+        }
+
+        $ip = $this->ip;
+        $this->doNotSellList->loadList();
+        $ipMatch = array_filter($this->doNotSellList->getList(), function ($item) use ($ip) {
+            return $this->doNotSellList->stripCIDR($item['value']) == $ip;
+        });
+
+        return !boolval(count($ipMatch));
     }
 }

@@ -15,12 +15,36 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 {
+    protected $mockLeadRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        define('MAUTIC_TABLE_PREFIX', 'test');
+
+        $ip = new IpAddress('123.123.123.123');
+        $ip->setIpDetails(['city' => 'Boston', 'region' => 'MA', 'country' => 'United States', 'zipcode' => '02113']);
+
+        $lead = new Lead();
+        $lead->addIpAddress($ip);
+        $lead->setCity('Boston');
+        $lead->setState('MA');
+        $lead->setCountry('United States');
+        $lead->setZipcode('02113');
+
+        $mockLeadRepository = $this->createMock(LeadRepository::class);
+        $mockLeadRepository->method('findOneBy')->with(['id' => 1])->willReturn($lead);
+
+        $this->mockLeadRepository = $mockLeadRepository;
+    }
+
     public function testCommandDryRun(): void
     {
         $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
 
-        $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $mockDoNotSellList);
+        $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
 
         $result = $commandTester->execute(['--dry-run' => true]);
@@ -37,7 +61,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $mockEntityManager = $this->buildMockEntityManager([]);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
 
-        $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $mockDoNotSellList);
+        $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
 
         $result = $commandTester->execute([]);
@@ -53,7 +77,7 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $mockEntityManager = $this->buildMockEntityManager([['id' => 1, 'ip_address' => '123.123.123.123']]);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
 
-        $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $mockDoNotSellList);
+        $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
 
         $result = $commandTester->execute([]);
@@ -75,22 +99,8 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $mockConnection = $this->createMock(Connection::class);
         $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);
 
-        $ip = new IpAddress('123.123.123.123');
-        $ip->setIpDetails(['city' => 'Boston', 'region' => 'MA', 'country' => 'United States', 'zipcode' => '02113']);
-
-        $lead = new Lead();
-        $lead->addIpAddress($ip);
-        $lead->setCity('Boston');
-        $lead->setState('MA');
-        $lead->setCountry('United States');
-        $lead->setZipcode('02113');
-
-        $mockLeadRepository = $this->createMock(LeadRepository::class);
-        $mockLeadRepository->method('findOneBy')->with(['id' => 1])->willReturn($lead);
-
         $mockEntityManager = $this->createMock(EntityManager::class);
         $mockEntityManager->method('getConnection')->willReturn($mockConnection);
-        $mockEntityManager->method('getRepository')->withAnyParameters()->willReturn($mockLeadRepository);
 
         return $mockEntityManager;
     }

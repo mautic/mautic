@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\MaxmindCountryLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
@@ -22,8 +23,13 @@ class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
      */
     protected $mockHttp;
 
+    protected $mockCoreParamsHelper;
+
     protected function setUp(): void
     {
+        $this->mockCoreParamsHelper = $this->createMock(CoreParametersHelper::class);
+        $this->mockCoreParamsHelper->method('get')->willReturn('list_path');
+
         // Mock http connector
         $this->mockHttp = $this->createMock(Client::class);
 
@@ -156,7 +162,11 @@ RESPONSE);
 
     public function testCountryIpLookupSuccessful(): void
     {
-        $ipService = new MaxmindCountryLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = $this->getMockBuilder(MaxmindCountryLookup::class)
+            ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
+            ->setMethods(['shouldPerformLookup'])
+            ->getMock();
+        $ipService->method('shouldPerformLookup')->willReturn(true);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -165,7 +175,11 @@ RESPONSE);
 
     public function testOmniIpLookupSuccessful(): void
     {
-        $ipService = new MaxmindOmniLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = $this->getMockBuilder(MaxmindOmniLookup::class)
+            ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
+            ->setMethods(['shouldPerformLookup'])
+            ->getMock();
+        $ipService->method('shouldPerformLookup')->willReturn(true);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
@@ -174,7 +188,11 @@ RESPONSE);
 
     public function testPrecisionIpLookupSuccessful(): void
     {
-        $ipService = new MaxmindPrecisionLookup('some-api-key', null, $this->cacheDir, null, $this->mockHttp);
+        $ipService = $this->getMockBuilder(MaxmindPrecisionLookup::class)
+            ->setConstructorArgs([null, null, $this->cacheDir, null, $this->mockHttp, $this->mockCoreParamsHelper])
+            ->setMethods(['shouldPerformLookup'])
+            ->getMock();
+        $ipService->method('shouldPerformLookup')->willReturn(true);
 
         $details = $ipService->setIpAddress('1.2.3.4')->getDetails();
 
