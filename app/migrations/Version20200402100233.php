@@ -49,7 +49,8 @@ final class Version20200402100233 extends AbstractMauticMigration
 
             $entityHasToBeSaved = false;
             foreach ($ipDetails as $key => $record) {
-                // Objects cannot be saved because they contain null byte symbols.
+                // Objects cannot be saved because they contain null byte symbols
+                // if we try to serialize them
                 if (is_object($record)) {
                     unset($ipDetails[$key]);
                     $entityHasToBeSaved = true;
