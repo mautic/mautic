@@ -21,6 +21,8 @@ export default (editor, opts = {}) => {
         dynamicContentBlockLabel: 'Dynamic Content',
         dynamicContentBtnLabel: 'Save',
         dynamicContentModalTitle: 'Edit Dynamic Content',
+        dynamicContentFroalaButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontSize', 'color',
+            'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'html'],
         ...opts,
     };
 

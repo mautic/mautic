@@ -42,9 +42,27 @@ class DynamicContent {
 
     // Load Dynamic Content editor from Mautic and append to popup
     updatePopupContents(component) {
+        let self = this;
         let popupContent = this.codePopup.querySelector('#dynamic-content-popup');
         let attributes = component.getAttributes();
         let focusForm = mQuery('#emailform_dynamicContent_' + attributes['data-param-dec-id']);
+
+        // Remove Mautic Froala and reload one with custom setting
+        focusForm.find('textarea.editor').each(function () {
+            var buttons = self.opts.dynamicContentFroalaButtons;
+            var froalaOptions = {
+                toolbarButtons: buttons,
+                toolbarButtonsMD: buttons,
+                toolbarButtonsSM: buttons,
+                toolbarButtonsXS: buttons,
+                toolbarSticky: false,
+                linkList: [],
+                imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageAlt', 'imageSize', '|', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove']
+            };
+
+            mQuery(this).froalaEditor('destroy');
+            mQuery(this).froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, froalaOptions));
+        });
 
         // Show if hidden
         focusForm.removeClass('fade');
