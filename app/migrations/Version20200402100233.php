@@ -11,14 +11,18 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Entity\IpAddress;
 
 final class Version20200402100233 extends AbstractMauticMigration
 {
+    const BATCH_SIZE = 50;
+
     public function getDescription(): string
     {
         return 'This migration fixes "Serialized array includes null-byte" error when merging some contacts.';
@@ -26,28 +30,74 @@ final class Version20200402100233 extends AbstractMauticMigration
 
     public function preUp(Schema $schema): void
     {
-        $this->getIpDetailsWithNullByteSymbols();
-        throw new \Exception();
+        if (false === $this->getIpAddressesWithNullByteSymbolsIterator()->next()) {
+            throw new SkipMigration(sprintf('%sip_addresses table doesn\'t contain any null byte symbols.', $this->prefix));
+        }
     }
 
     public function up(Schema $schema): void
     {
-        // Please modify to your needs
+        $ipAddressesIterator = $this->getIpAddressesWithNullByteSymbolsIterator();
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->container->get('doctrine')->getManager();
+        $i             = 0;
+
+        $hasToFlushInTheEnd = false;
+        /** @var IpAddress $ipAddress */
+        while (false !== ($ipAddress = $ipAddressesIterator->next())) {
+            $ipAddress = current($ipAddress);
+            $ipDetails = $ipAddress->getIpDetails();
+            if (!is_array($ipDetails)) {
+                continue;
+            }
+
+            if (1 > count($ipDetails)) {
+                continue;
+            }
+
+            $entityHasToBeSaved = false;
+            foreach ($ipDetails as $key => $record) {
+                // Objects cannot be saved because they contain null byte symbols.
+                if (is_object($record)) {
+                    unset($ipDetails[$key]);
+                    $entityHasToBeSaved = true;
+                }
+            }
+
+            if (!$entityHasToBeSaved) {
+                continue;
+            }
+
+            $ipAddress->setIpDetails($ipDetails);
+            $entityManager->persist($ipAddress);
+            $hasToFlushInTheEnd = true;
+            ++$i;
+
+            if (0 === ($i % static::BATCH_SIZE)) {
+                $hasToFlushInTheEnd = false;
+                $entityManager->flush();
+                $entityManager->clear();
+            }
+        }
+
+        if ($hasToFlushInTheEnd) {
+            $entityManager->flush();
+        }
     }
 
-    /**
-     * Get hourly average based on last 30 days of sending.
-     *
-     * @return float|int
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function getIpDetailsWithNullByteSymbols()
+    public function getIpAddressesWithNullByteSymbolsIterator(): IterableResult
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->container->get('doctrine')->getManager()->createQueryBuilder();
         $queryBuilder
+            ->select('ia')
             ->from('MauticCoreBundle:IpAddress', 'ia')
-            ->where($queryBuilder->expr()->like('ip_details'));
+            ->andWhere($queryBuilder->expr()->like('ia.ipDetails', ':search1'))
+            ->setParameter('search1', '%{O:%')
+            ->orWhere($queryBuilder->expr()->like('ia.ipDetails', ':search2'))
+            ->setParameter('search2', '%;O:%');
+
+        return $queryBuilder->getQuery()->iterate();
     }
 }
