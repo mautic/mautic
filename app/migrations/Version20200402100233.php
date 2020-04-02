@@ -24,7 +24,7 @@ final class Version20200402100233 extends AbstractMauticMigration
 
     public function getDescription(): string
     {
-        return 'This migration fixes "Serialized array includes null-byte" error when merging some contacts.';
+        return 'This migration fixes "Serialized array includes null-byte" exception when merging some contacts.';
     }
 
     public function up(Schema $schema): void
