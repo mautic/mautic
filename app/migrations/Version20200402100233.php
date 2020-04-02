@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\QueryBuilder;
@@ -28,13 +27,6 @@ final class Version20200402100233 extends AbstractMauticMigration
         return 'This migration fixes "Serialized array includes null-byte" error when merging some contacts.';
     }
 
-    public function preUp(Schema $schema): void
-    {
-        if (false === $this->getIpAddressesWithNullByteSymbolsIterator()->next()) {
-            throw new SkipMigration(sprintf('%sip_addresses table doesn\'t contain any null byte symbols.', $this->prefix));
-        }
-    }
-
     public function up(Schema $schema): void
     {
         $ipAddressesIterator = $this->getIpAddressesWithNullByteSymbolsIterator();
@@ -43,7 +35,6 @@ final class Version20200402100233 extends AbstractMauticMigration
         $entityManager = $this->container->get('doctrine')->getManager();
         $i             = 0;
 
-        $hasToFlushInTheEnd = false;
         /** @var IpAddress $ipAddress */
         while (false !== ($ipAddress = $ipAddressesIterator->next())) {
             $ipAddress = current($ipAddress);
@@ -71,19 +62,15 @@ final class Version20200402100233 extends AbstractMauticMigration
 
             $ipAddress->setIpDetails($ipDetails);
             $entityManager->persist($ipAddress);
-            $hasToFlushInTheEnd = true;
             ++$i;
 
             if (0 === ($i % static::BATCH_SIZE)) {
-                $hasToFlushInTheEnd = false;
                 $entityManager->flush();
                 $entityManager->clear();
             }
         }
 
-        if ($hasToFlushInTheEnd) {
-            $entityManager->flush();
-        }
+        $entityManager->flush();
     }
 
     public function getIpAddressesWithNullByteSymbolsIterator(): IterableResult
@@ -97,6 +84,8 @@ final class Version20200402100233 extends AbstractMauticMigration
             ->setParameter('search1', '%{O:%')
             ->orWhere($queryBuilder->expr()->like('ia.ipDetails', ':search2'))
             ->setParameter('search2', '%;O:%');
+
+        $query = $queryBuilder->getQuery();
 
         return $queryBuilder->getQuery()->iterate();
     }
