@@ -38,6 +38,7 @@ class ProcessEmailQueueCommand extends ModeratedCommand
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
             ->addOption('--recover-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before attempting to resend failed messages.  Defaults to value set in config.')
             ->addOption('--clear-timeout', null, InputOption::VALUE_OPTIONAL, 'Sets the amount of time in seconds before deleting failed messages.  Defaults to value set in config.')
+            ->addOption('--lock-name', null, InputOption::VALUE_OPTIONAL, 'Set name of lock to run multiple mautic:emails:send command at time')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to process the application's e-mail queue
 
@@ -53,14 +54,15 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $options    = $input->getOptions();
-        $env        = (!empty($options['env'])) ? $options['env'] : 'dev';
-        $container  = $this->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
-        $skipClear  = $input->getOption('do-not-clear');
-        $quiet      = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
-        $timeout    = $input->getOption('clear-timeout');
-        $queueMode  = $container->get('mautic.helper.core_parameters')->get('mailer_spool_type');
+        $options     = $input->getOptions();
+        $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
+        $container   = $this->getContainer();
+        $dispatcher  = $container->get('event_dispatcher');
+        $skipClear   = $input->getOption('do-not-clear');
+        $quiet       = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $timeout     = $input->getOption('clear-timeout');
+        $queueMode   = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
+        $lockName    = $input->getOption('lock-name') ?? '';
 
         if ('file' != $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
@@ -68,7 +70,7 @@ EOT
             return 0;
         }
 
-        if (!$this->checkRunStatus($input, $output)) {
+        if (!$this->checkRunStatus($input, $output, $lockName)) {
             return 0;
         }
 
