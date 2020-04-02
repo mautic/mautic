@@ -86,8 +86,6 @@ final class Version20200402100233 extends AbstractMauticMigration
             ->orWhere($queryBuilder->expr()->like('ia.ipDetails', ':search2'))
             ->setParameter('search2', '%;O:%');
 
-        $query = $queryBuilder->getQuery();
-
         return $queryBuilder->getQuery()->iterate();
     }
 }
