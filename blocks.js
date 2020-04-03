@@ -5,7 +5,9 @@ export default (editor, opts = {}) => {
     let blocks = bm.getAll();
 
     // Add Dynamic Content block only for newsletter
-    if (cfg.plugins.includes('grapesjs-mjml') || cfg.plugins.includes('gjs-preset-newsletter')) {
+    if (cfg.plugins.includes('grapesjs-mjml')) {
+        // Dynamic Content MJML block
+    } else if (cfg.plugins.includes('gjs-preset-newsletter')) {
         bm.add('dynamic-content', {
             label: opts.dynamicContentBlockLabel,
             activate: true,
