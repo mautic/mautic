@@ -184,7 +184,7 @@ class FieldBuilder
         return new ReportFieldDAO(
             $field,
             $normalizedValue,
-            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_UNCHANGED
+            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_CHANGED
         );
     }
 }
