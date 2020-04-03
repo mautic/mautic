@@ -13,7 +13,7 @@ export default (editor, opts = {}) => {
             attributes: { class: 'fa fa-tag' },
             content: {
                 type: 'dynamic-content',
-                content: 'Dynamic Content',
+                content: '{dynamiccontent="Dynamic Content"}',
                 style: { padding: '10px' },
                 activeOnRender: 1
             }

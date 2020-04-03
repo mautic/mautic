@@ -11,9 +11,15 @@ export default (editor, opts = {}) => {
     cmd.add('preset-mautic:code-edit', {
         run: (editor, sender, options = {}) => {
             if (!codeEditor) codeEditor = new CodeEditor(editor, opts);
-
             sender && sender.set('active', 0);
+
+            // Transform DC to token
+            Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
             codeEditor.showCodePopup()
+        },
+        stop: (editor) => {
+            // Transform token to DC
+            Mautic.grapesConvertDynamicContentTokenToSlot(editor);
         }
     });
 
@@ -25,7 +31,13 @@ export default (editor, opts = {}) => {
 
             if (!dynamicContent) dynamicContent = new DynamicContent(editor, opts);
 
-            dynamicContent.showCodePopup(component)
+            dynamicContent.showCodePopup(component);
+            // Transform DC to token
+            Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
+        },
+        stop: (editor) => {
+            // Transform token to DC
+            Mautic.grapesConvertDynamicContentTokenToSlot(editor);
         }
     });
 };

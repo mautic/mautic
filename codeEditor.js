@@ -49,7 +49,6 @@ class CodeEditor {
         codePopup.appendChild(btnCancel);
 
         this.codeEditor.init(textarea);
-        this.updateEditorContents();
 
         return codePopup;
     }
