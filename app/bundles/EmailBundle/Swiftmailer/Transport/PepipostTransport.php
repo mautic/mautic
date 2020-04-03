@@ -70,7 +70,7 @@ class PepipostTransport extends \Swift_SmtpTransport implements CallbackTranspor
     {
         $this->logger->debug('Receiving webhook from Pepipost');
 
-        $email    = rawurldecode($request->get(0)['FROMADDRESS']);
+        $email    = rawurldecode($request->get(0)['EMAIL']);
         $event    = rawurldecode($request->get(0)['EVENT']);
 
         if ($event == 'unsubscribed') {
@@ -86,6 +86,8 @@ class PepipostTransport extends \Swift_SmtpTransport implements CallbackTranspor
             }
         } elseif ($event == 'spam') {
             $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.spam'));
+        } elseif ($event == 'dropped') {
+            $this->transportCallback->addFailureByAddress($email, $this->translator->trans('mautic.email.bounce.reason.dropped'));
         }
     }
 }
