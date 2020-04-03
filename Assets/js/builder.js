@@ -157,7 +157,7 @@ Mautic.initGrapesJS = function (object) {
                 className: 'fa fa-times-circle',
                 attributes: {title: 'Close'},
                 command: function () {
-                    convertDynamicContentSlotsToTokens(editor);
+                    Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
 
                     // Update textarea for save
                     fullHtml.body.innerHTML = editor.getHtml() + '<style>' + editor.getCss({avoidProtected: true}) + '</style>';
@@ -201,7 +201,7 @@ Mautic.initGrapesJS = function (object) {
                     className: 'fa fa-times-circle',
                     attributes: {title: 'Close'},
                     command: function () {
-                        convertDynamicContentSlotsToTokens(editor);
+                        Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
 
                         let code = '';
 
@@ -262,7 +262,7 @@ Mautic.initGrapesJS = function (object) {
                     className: 'fa fa-times-circle',
                     attributes: {title: 'Close'},
                     command: function () {
-                        convertDynamicContentSlotsToTokens(editor);
+                        Mautic.grapesConvertDynamicContentSlotsToTokens(editor);
 
                         // Update textarea for save
                         fullHtml.body.innerHTML = editor.runCommand('gjs-get-inlined-html');
@@ -284,7 +284,7 @@ Mautic.initGrapesJS = function (object) {
     editor.on('load', (response) => {
         const um = editor.UndoManager;
 
-        convertDynamicContentTokenToSlot(editor);
+        Mautic.grapesConvertDynamicContentTokenToSlot(editor);
 
         // Clear stack of undo/redo
         um.clear();
@@ -295,11 +295,7 @@ Mautic.initGrapesJS = function (object) {
 
         // Create dynamic-content on Mautic side
         if (type === 'dynamic-content') {
-            let dynConTarget = Mautic.createNewDynamicContentItem(mQuery);
-            let dynConTab = mQuery('#dynamicContentTabs').find('a[href="'+dynConTarget+'"]');
-
-            component.set('content', dynConTab.text());
-            component.addAttributes({'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, '')) });
+            manageDynamicContentTokenToSlot(component);
         }
     });
 
@@ -324,6 +320,20 @@ Mautic.initGrapesJS = function (object) {
     });
 
     editor.on('modal:close', () => {
+        const commands = editor.Commands;
+        const cmdCodeEdit = 'preset-mautic:code-edit';
+        const cmdDynamicContent = 'preset-mautic:dynamic-content';
+
+        // Launch preset-mautic:code-edit command stop
+        if (commands.isActive(cmdCodeEdit)) {
+            commands.stop(cmdCodeEdit, {editor});
+        }
+
+        // Launch preset-mautic:dynamic-content command stop
+        if (commands.isActive(cmdDynamicContent)) {
+            commands.stop(cmdDynamicContent, {editor});
+        }
+
         // ReMap keyboard shortcuts on modal close
         Object.keys(allKeymaps).map(function(objectKey) {
             let shortcut = allKeymaps[objectKey];
@@ -333,33 +343,10 @@ Mautic.initGrapesJS = function (object) {
 
         let modalContent = editor.Modal.getContent().querySelector('#dynamic-content-popup');
 
-        // On modal close -> update view of DC block and move editor within Mautic
+        // On modal close -> move editor within Mautic
         if (modalContent !== null) {
             let dynamicContentContainer = mQuery('#dynamicContentContainer');
             let content = mQuery(modalContent).contents().first();
-
-            let dynConTarget = '#'+content.attr('id');
-            let dynConTab = mQuery('#dynamicContentTabs').find('a[href=' + dynConTarget + ']');
-            let dynConContent = '';
-
-            // Get editor content to populate view
-            if (content.html()) {
-                let dynConContainer = content.find(dynConTarget+'_content');
-
-                if (dynConContainer.hasClass('editor')) {
-                    dynConContent = dynConContainer.froalaEditor('html.get');
-                } else {
-                    dynConContent = dynConContainer.html();
-                }
-            }
-
-            // If editor empty populate view with tab text
-            if (dynConContent.trim() === '') {
-                dynConContent = dynConTab.text();
-            }
-
-            let dynamicContent = editor.DomComponents.getWrapper().find('[data-param-dec-id="' + parseInt(dynConTarget.replace(/[^0-9]/g, '')) + '"]');
-            dynamicContent[0].set('content', dynConContent);
 
             dynamicContentContainer.append(content.detach());
         }
@@ -509,37 +496,14 @@ let getAssetsList = function(editor) {
  *
  * @param editor
  */
-let convertDynamicContentTokenToSlot = function(editor) {
+Mautic.grapesConvertDynamicContentTokenToSlot = function(editor) {
     const dc = editor.DomComponents;
 
     let dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
 
     if (dynamicContents.length) {
         dynamicContents.forEach(dynamicContent => {
-            const regex = RegExp(/\{dynamiccontent="(.*)"\}/,'g');
-
-            let content = dynamicContent.get('content');
-            let dynConName = regex.exec(content)[1];
-            let dynConTab = mQuery('#dynamicContentTabs').find('a:contains("'+dynConName+'")');
-            let dynConTarget = dynConTab.attr('href');
-            let dynConContent = '';
-
-            if (mQuery(dynConTarget).html()) {
-                let dynConContainer = mQuery(dynConTarget).find(dynConTarget+'_content');
-
-                if (dynConContainer.hasClass('editor')) {
-                    dynConContent = dynConContainer.froalaEditor('html.get');
-                } else {
-                    dynConContent = dynConContainer.html();
-                }
-            }
-
-            if (dynConContent === '') {
-                dynConContent = dynConTab.text();
-            }
-
-            dynamicContent.addAttributes({'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, '')) });
-            dynamicContent.set('content', dynConContent);
+            manageDynamicContentTokenToSlot(dynamicContent);
         });
     }
 };
@@ -549,7 +513,7 @@ let convertDynamicContentTokenToSlot = function(editor) {
  *
  * @param editor
  */
-let convertDynamicContentSlotsToTokens = function (editor) {
+Mautic.grapesConvertDynamicContentSlotsToTokens = function (editor) {
     const dc = editor.DomComponents;
 
     let dynamicContents = dc.getWrapper().find('[data-slot="dynamicContent"]');
@@ -557,15 +521,20 @@ let convertDynamicContentSlotsToTokens = function (editor) {
     if (dynamicContents.length) {
         dynamicContents.forEach(dynamicContent => {
             let attributes = dynamicContent.getAttributes();
-            let dynConId   = '#emailform_dynamicContent_' + attributes['data-param-dec-id'];
+            let decId = attributes['data-param-dec-id'];
 
-            let dynConTarget = mQuery(dynConId);
-            let dynConName   = dynConTarget.find(dynConId + '_tokenName').val();
-            let dynConToken  = '{dynamiccontent="'+dynConName+'"}';
+            // If it's not a token -> convert to token
+            if (decId !== '') {
+                let dynConId   = '#emailform_dynamicContent_' + attributes['data-param-dec-id'];
 
-            // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
-            dynamicContent.addAttributes({'data-param-dec-id': ''});
-            dynamicContent.set('content', dynConToken);
+                let dynConTarget = mQuery(dynConId);
+                let dynConName   = dynConTarget.find(dynConId + '_tokenName').val();
+                let dynConToken  = '{dynamiccontent="'+dynConName+'"}';
+
+                // Clear id because it's reloaded by Mautic and this prevent slot to be destroyed by GrapesJs destroy event on close.
+                dynamicContent.addAttributes({'data-param-dec-id': ''});
+                dynamicContent.set('content', dynConToken);
+            }
         });
     }
 };
@@ -587,6 +556,48 @@ let deleteDynamicContentItem = function (component) {
             dynConTarget.find('a.remove-item:first').click();
             // remove vertical tab in outside form
             mQuery('.dynamicContentFilterContainer').find('a[href=' + dynConId + ']').parent().remove();
+        }
+    }
+};
+
+let manageDynamicContentTokenToSlot = function (component) {
+    const regex = RegExp(/\{dynamiccontent="(.*)"\}/,'g');
+
+    let content = component.get('content');
+    let regexEx = regex.exec(content);
+
+    if (regexEx !== null) {
+        let dynConName = regexEx[1];
+        let dynConTab = mQuery('#dynamicContentTabs a').filter(function() {
+            return mQuery(this).text().trim() === dynConName;
+        });
+
+        if (typeof dynConTab !== 'undefined' && dynConTab.length) {  // If exist -> fill
+            let dynConTarget = dynConTab.attr('href');
+            let dynConContent = '';
+
+            if (mQuery(dynConTarget).html()) {
+                let dynConContainer = mQuery(dynConTarget).find(dynConTarget + '_content');
+
+                if (dynConContainer.hasClass('editor')) {
+                    dynConContent = dynConContainer.froalaEditor('html.get');
+                } else {
+                    dynConContent = dynConContainer.html();
+                }
+            }
+
+            if (dynConContent === '') {
+                dynConContent = dynConTab.text();
+            }
+
+            component.addAttributes({'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, ''))});
+            component.set('content', dynConContent);
+        } else {  // If doesn't exist -> create
+            let dynConTarget = Mautic.createNewDynamicContentItem(mQuery);
+            let dynConTab = mQuery('#dynamicContentTabs').find('a[href="'+dynConTarget+'"]');
+
+            component.addAttributes({'data-param-dec-id': parseInt(dynConTarget.replace(/[^0-9]/g, '')) });
+            component.set('content', dynConTab.text());
         }
     }
 };
